@@ -4,6 +4,7 @@ import com.destroystokyo.paper.util.maplist.EntityList;
 import com.fastasyncworldedit.bukkit.adapter.CachedBukkitAdapter;
 import com.fastasyncworldedit.bukkit.adapter.DelegateSemaphore;
 import com.fastasyncworldedit.bukkit.adapter.NMSAdapter;
+import com.fastasyncworldedit.bukkit.util.FoliaTaskManager;
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.math.BitArrayUnstretched;
@@ -15,6 +16,7 @@ import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.bukkit.adapter.Refraction;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
+import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -83,6 +85,7 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import static java.lang.invoke.MethodType.methodType;
 import static net.minecraft.core.registries.Registries.BIOME;
@@ -122,10 +125,20 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
     private static Method PAPER_CHUNK_GEN_ALL_ENTITIES;
     private static Field LEVEL_CHUNK_ENTITIES;
     private static Field SERVER_LEVEL_ENTITY_MANAGER;
+    private static boolean FOLIA_SUPPORT;
 
     static {
         final MethodHandles.Lookup lookup = MethodHandles.lookup();
         try {
+            boolean isFolia = false;
+            try {
+                // Assume API is present
+                Class.forName("io.papermc.paper.threadedregions.scheduler.EntityScheduler");
+                isFolia = true;
+            } catch (Exception unused) {
+
+            }
+            FOLIA_SUPPORT = isFolia;
             fieldData = PalettedContainer.class.getDeclaredField(Refraction.pickName("data", "d"));
             fieldData.setAccessible(true);
 
@@ -290,25 +303,28 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             if (Fawe.isMainThread()) {
                 return serverLevel.getChunk(chunkX, chunkZ);
             }
+            if (FOLIA_SUPPORT) {
+                Supplier<LevelChunk> foliaSupplier = () -> {
+                    CompletableFuture<org.bukkit.Chunk> future = serverLevel.getWorld().getChunkAtAsync(chunkX, chunkZ, true, true);
+                    try {
+                        CraftChunk chunk = (CraftChunk) future.get();
+
+                        addTicket(serverLevel, chunkX, chunkZ);
+                        return (LevelChunk) CRAFT_CHUNK_GET_HANDLE.invoke(chunk);
+
+                    } catch (Throwable e) {
+                        e.printStackTrace();
+                    }
+                    throw new RuntimeException();
+                };
+                FoliaTaskManager taskManager = (FoliaTaskManager) TaskManager.taskManager();
+                return taskManager.syncAt(foliaSupplier, serverLevel.getWorld(), chunkX, chunkZ);
+            }
             CompletableFuture<org.bukkit.Chunk> future = serverLevel.getWorld().getChunkAtAsync(chunkX, chunkZ, true, true);
             try {
-                CraftChunk chunk;
-                try {
-                    chunk = (CraftChunk) future.get(10, TimeUnit.SECONDS);
-                } catch (TimeoutException e) {
-                    String world = serverLevel.getWorld().getName();
-                    // We've already taken 10 seconds we can afford to wait a little here.
-                    boolean loaded = TaskManager.taskManager().sync(() -> Bukkit.getWorld(world) != null);
-                    if (loaded) {
-                        LOGGER.warn("Chunk {},{} failed to load in 10 seconds in world {}. Retrying...", chunkX, chunkZ, world);
-                        // Retry chunk load
-                        chunk = (CraftChunk) serverLevel.getWorld().getChunkAtAsync(chunkX, chunkZ, true, true).get();
-                    } else {
-                        throw new UnsupportedOperationException("Cannot load chunk from unloaded world " + world + "!");
-                    }
-                }
+                CraftChunk chunk = (CraftChunk) future.get();
                 addTicket(serverLevel, chunkX, chunkZ);
-                return (LevelChunk) CRAFT_CHUNK_GET_HANDLE.invoke(chunk);
+                return chunk.getCraftWorld().getHandle().getChunk(chunkX, chunkZ);
             } catch (Throwable e) {
                 e.printStackTrace();
             }
@@ -317,10 +333,15 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
     }
 
     private static void addTicket(ServerLevel serverLevel, int chunkX, int chunkZ) {
-        // Ensure chunk is definitely loaded before applying a ticket
-        io.papermc.paper.util.MCUtil.MAIN_EXECUTOR.execute(() -> serverLevel
+        Runnable runnable = () -> serverLevel
                 .getChunkSource()
-                .addRegionTicket(TicketType.UNLOAD_COOLDOWN, new ChunkPos(chunkX, chunkZ), 0, Unit.INSTANCE));
+                .addRegionTicket(TicketType.UNLOAD_COOLDOWN, new ChunkPos(chunkX, chunkZ), 0, Unit.INSTANCE);
+        if (FOLIA_SUPPORT) {
+            TaskManager.taskManager().taskNowMain(runnable);
+        } else {
+            // Ensure chunk is definitely loaded before applying a ticket
+            io.papermc.paper.util.MCUtil.MAIN_EXECUTOR.execute(runnable);
+        }
     }
 
     public static ChunkHolder getPlayerChunk(ServerLevel nmsWorld, final int chunkX, final int chunkZ) {
@@ -458,7 +479,8 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             }
 
             // Create palette with data
-            @SuppressWarnings("deprecation") // constructor is deprecated on paper, but needed to keep compatibility with spigot
+            @SuppressWarnings("deprecation")
+            // constructor is deprecated on paper, but needed to keep compatibility with spigot
             final PalettedContainer<net.minecraft.world.level.block.state.BlockState> blockStatePalettedContainer =
                     new PalettedContainer<>(
                             Block.BLOCK_STATE_REGISTRY,
