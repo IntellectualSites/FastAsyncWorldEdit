@@ -35,4 +35,35 @@ public final class FoliaSupport {
     public static boolean isTickThread() {
         return TICK_THREAD_CLASS.isInstance(Thread.currentThread());
     }
+
+
+    @FunctionalInterface
+    public interface ThrowingSupplier<T> {
+
+        T get() throws Throwable;
+
+    }
+    @FunctionalInterface
+    public interface ThrowingRunnable {
+
+        void run() throws Throwable;
+
+    }
+
+    public static void runRethrowing(ThrowingRunnable runnable) {
+        getRethrowing(() -> {
+            runnable.run();
+            return null;
+        });
+    }
+
+    public static <T> T getRethrowing(ThrowingSupplier<T> supplier) {
+        try {
+            return supplier.get();
+        } catch (RuntimeException | Error e) {
+            throw e;
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

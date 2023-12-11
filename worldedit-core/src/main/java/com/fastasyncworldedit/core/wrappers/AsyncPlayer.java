@@ -40,7 +40,7 @@ public class AsyncPlayer extends PlayerProxy {
 
     @Override
     public void findFreePosition(Location searchPos) {
-        TaskManager.taskManager().syncAt(new RunnableVal<Boolean>() {
+        TaskManager.taskManager().task(new RunnableVal<Boolean>() {
             @Override
             public void run(Boolean value) {
                 getBasePlayer().findFreePosition(searchPos);
@@ -50,7 +50,7 @@ public class AsyncPlayer extends PlayerProxy {
 
     @Override
     public void setOnGround(Location searchPos) {
-        TaskManager.taskManager().syncAt(new RunnableVal<Boolean>() {
+        TaskManager.taskManager().task(new RunnableVal<Boolean>() {
             @Override
             public void run(Boolean value) {
                 getBasePlayer().setOnGround(searchPos);

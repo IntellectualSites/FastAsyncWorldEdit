@@ -73,6 +73,8 @@ public abstract class TaskManager {
 
     public abstract void task(@Nonnull final Runnable runnable, @Nonnull World world, int chunkX, int chunkZ);
 
+    public abstract void taskGlobal(Runnable runnable);
+
     /**
      * Get the public ForkJoinPool.
      * - ONLY SUBMIT SHORT LIVED TASKS<br>

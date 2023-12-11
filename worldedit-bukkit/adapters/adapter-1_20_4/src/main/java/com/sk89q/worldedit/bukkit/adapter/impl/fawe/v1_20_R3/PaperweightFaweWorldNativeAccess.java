@@ -2,7 +2,7 @@ package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_20_R3;
 
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.math.IntPair;
-import com.fastasyncworldedit.core.util.TaskManager;
+import com.fastasyncworldedit.core.util.FoliaSupport;
 import com.fastasyncworldedit.core.util.task.RunnableVal;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.internal.block.BlockStateIdAccess;
@@ -15,12 +15,13 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.FullChunkStatus;
+import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.chunk.LevelChunk;
+import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_20_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_20_R3.block.data.CraftBlockData;
 import org.bukkit.event.block.BlockPhysicsEvent;
@@ -58,7 +59,10 @@ public class PaperweightFaweWorldNativeAccess implements WorldNativeAccess<Level
         this.level = level;
         // Use the actual tick as minecraft-defined so we don't try to force blocks into the world when the server's already lagging.
         //  - With the caveat that we don't want to have too many cached changed (1024) so we'd flush those at 1024 anyway.
-        this.lastTick = new AtomicInteger(MinecraftServer.currentTick);
+        this.lastTick = new AtomicInteger();
+        if (!FoliaSupport.isFolia()) {
+            this.lastTick.set(Bukkit.getCurrentTick());
+        }
     }
 
     private Level getLevel() {
@@ -250,7 +254,8 @@ public class PaperweightFaweWorldNativeAccess implements WorldNativeAccess<Level
                 }
             }
         };
-        TaskManager.taskManager().async(() -> TaskManager.taskManager().sync(runnableVal));
+        // TODO
+        // TaskManager.taskManager().async(() -> TaskManager.taskManager().sync(runnableVal));
     }
 
     @Override
@@ -269,7 +274,8 @@ public class PaperweightFaweWorldNativeAccess implements WorldNativeAccess<Level
         if (Fawe.isMainThread()) {
             runnableVal.run();
         } else {
-            TaskManager.taskManager().sync(runnableVal);
+            // TODO
+            // TaskManager.taskManager().sync(runnableVal);
         }
         cachedChanges.clear();
         cachedChunksToSend.clear();

@@ -33,17 +33,22 @@ public class BukkitTaskManager extends TaskManager {
 
     @Override
     public void task(@NotNull final Runnable runnable, @NotNull final Location location) {
-
+        this.plugin.getServer().getScheduler().runTask(this.plugin, runnable);
     }
 
     @Override
     public void task(@NotNull final Runnable runnable, @NotNull final World world, final int chunkX, final int chunkZ) {
+        this.plugin.getServer().getScheduler().runTask(this.plugin, runnable);
+    }
 
+    @Override
+    public void taskGlobal(final Runnable runnable) {
+        this.plugin.getServer().getGlobalRegionScheduler().run(this.plugin, task -> runnable.run());
     }
 
     @Override
     public void later(@NotNull final Runnable runnable, final Location location, final int delay) {
-
+        this.plugin.getServer().getScheduler().runTaskLater(this.plugin, runnable, delay);
     }
 
     @Override

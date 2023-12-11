@@ -1,5 +1,6 @@
 package com.fastasyncworldedit.bukkit.util;
 
+import com.fastasyncworldedit.core.util.FoliaSupport;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
@@ -9,6 +10,7 @@ import com.sk89q.worldedit.world.World;
 import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
 
+import java.lang.invoke.MethodHandle;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
@@ -16,7 +18,20 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import static java.lang.invoke.MethodHandles.lookup;
+import static java.lang.invoke.MethodType.methodType;
+
 public class FoliaTaskManager extends TaskManager {
+
+    private final static MethodHandle IS_GLOBAL_TICK_THREAD;
+
+    static {
+        try {
+            IS_GLOBAL_TICK_THREAD = lookup().findStatic(Bukkit.class, "isGlobalTickThread", methodType(boolean.class));
+        } catch (NoSuchMethodException | IllegalAccessException e) {
+          throw new AssertionError("Incompatile Folia version", e);
+        }
+    }
 
     private final AtomicInteger idCounter = new AtomicInteger();
 
@@ -50,6 +65,11 @@ public class FoliaTaskManager extends TaskManager {
     }
 
     @Override
+    public void taskGlobal(final Runnable runnable) {
+        Bukkit.getGlobalRegionScheduler().run(WorldEditPlugin.getInstance(), asConsumer(runnable));
+    }
+
+    @Override
     public void later(@NotNull final Runnable runnable, final Location location, final int delay) {
         Bukkit.getRegionScheduler().runDelayed(
                 WorldEditPlugin.getInstance(),
@@ -80,6 +100,7 @@ public class FoliaTaskManager extends TaskManager {
         if (Bukkit.isOwnedByCurrentRegion(adapt, chunkX, chunkZ)) {
             return supplier.get();
         }
+        ensureOffTickThread();
         FutureTask<T> task = new FutureTask<>(supplier::get);
         Bukkit.getRegionScheduler().run(
                 WorldEditPlugin.getInstance(),
@@ -105,6 +126,7 @@ public class FoliaTaskManager extends TaskManager {
         if (Bukkit.isOwnedByCurrentRegion(adapt)) {
             return supplier.get();
         }
+        ensureOffTickThread();
         FutureTask<T> task = new FutureTask<>(supplier::get);
         adapt.getScheduler().execute(WorldEditPlugin.getInstance(), task, null, 0);
         try {
@@ -117,6 +139,9 @@ public class FoliaTaskManager extends TaskManager {
     @Override
     public <T> T syncGlobal(final Supplier<T> supplier) {
         // TODO avoid deadlocks (Bukkit.isGlobalTickThread not available at time of writing)
+        if (isGlobalTickThread()) {
+            return supplier.get();
+        }
         FutureTask<T> task = new FutureTask<>(supplier::get);
         Bukkit.getGlobalRegionScheduler().run(WorldEditPlugin.getInstance(), asConsumer(task));
         try {
@@ -126,11 +151,20 @@ public class FoliaTaskManager extends TaskManager {
         }
     }
 
+    private boolean isGlobalTickThread() {
+        return FoliaSupport.getRethrowing(() -> (boolean) IS_GLOBAL_TICK_THREAD.invokeExact());
+    }
+
+    private void ensureOffTickThread() {
+        if (FoliaSupport.isTickThread()) {
+            throw new IllegalStateException("Expected to be off tick thread");
+        }
+    }
+
     private int ticksToMs(int ticks) {
         // 1 tick = 50ms
         return ticks * 50;
     }
-
 
     private <T> T fail(String message) {
         throw new UnsupportedOperationException(message);

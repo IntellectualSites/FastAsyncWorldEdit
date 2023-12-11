@@ -21,6 +21,7 @@ package com.sk89q.worldedit.bukkit;
 
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.configuration.Settings;
+import com.fastasyncworldedit.core.util.FoliaSupport;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.sk89q.util.StringUtil;
 import com.sk89q.wepif.VaultResolver;
@@ -52,6 +53,7 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.gamemode.GameMode;
 import com.sk89q.worldedit.world.gamemode.GameModes;
+import io.papermc.lib.PaperLib;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -69,7 +71,9 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Supplier;
 
 public class BukkitPlayer extends AbstractPlayerActor {
 
@@ -239,16 +243,21 @@ public class BukkitPlayer extends AbstractPlayerActor {
             }
         }
         org.bukkit.World finalWorld = world;
+        final Location target = new Location(finalWorld, pos.getX(), pos.getY(), pos.getZ(), yaw, pitch);
+        Supplier<CompletableFuture<Boolean>> teleport = () -> PaperLib.teleportAsync(player, target);
+        if (FoliaSupport.isTickThread()) {
+            teleport.get().whenComplete((b, thr) -> {
+                if (thr != null) {
+                    thr.printStackTrace();
+                }
+                if (!b) {
+                    player.sendMessage("Teleportation failed");
+                }
+            });
+            return true; // TODO this might not be correct
+        }
+        return TaskManager.taskManager().syncWith(() -> teleport.get().join(), this);
         //FAWE end
-        // TODO async teleport?
-        return TaskManager.taskManager().syncWith(() -> player.teleport(new Location(
-                finalWorld,
-                pos.getX(),
-                pos.getY(),
-                pos.getZ(),
-                yaw,
-                pitch
-        )), this);
     }
 
     @Override
