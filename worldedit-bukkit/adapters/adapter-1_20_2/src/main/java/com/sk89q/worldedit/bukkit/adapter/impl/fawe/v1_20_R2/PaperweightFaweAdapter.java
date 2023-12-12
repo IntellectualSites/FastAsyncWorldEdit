@@ -722,7 +722,6 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
         }
     }
 
-
     @Override
     public BaseItemStack adapt(org.bukkit.inventory.ItemStack itemStack) {
         final ItemStack nmsStack = CraftItemStack.asNMSCopy(itemStack);

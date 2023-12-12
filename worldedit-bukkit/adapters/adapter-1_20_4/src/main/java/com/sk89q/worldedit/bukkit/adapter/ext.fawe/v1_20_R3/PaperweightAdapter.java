@@ -908,6 +908,7 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
                 ConfiguredFeatureType.REGISTRY.register(name.toString(), new ConfiguredFeatureType(name.toString()));
             }
         }
+
         // Structures
         for (ResourceLocation name : server.registryAccess().registryOrThrow(Registries.STRUCTURE).keySet()) {
             if (StructureType.REGISTRY.get(name.toString()) == null) {
@@ -964,7 +965,7 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
         ServerChunkCache chunkManager = originalWorld.getChunkSource();
         WorldGenLevel proxyLevel = PaperweightServerLevelDelegateProxy.newInstance(session, originalWorld, this);
         ChunkPos chunkPos = new ChunkPos(new BlockPos(pt.getBlockX(), pt.getBlockY(), pt.getBlockZ()));
-        StructureStart structureStart = k.generate(originalWorld.registryAccess(), chunkManager.getGenerator(), chunkManager.getGenerator().getBiomeSource(), chunkManager.randomState(), chunkManager.chunkMap.structureTemplateManager, originalWorld.getSeed(), chunkPos, 0, proxyLevel, biome -> true);
+        StructureStart structureStart = k.generate(originalWorld.registryAccess(), chunkManager.getGenerator(), chunkManager.getGenerator().getBiomeSource(), chunkManager.randomState(), originalWorld.getStructureManager(), originalWorld.getSeed(), chunkPos, 0, proxyLevel, biome -> true);
 
         if (!structureStart.isValid()) {
             return false;

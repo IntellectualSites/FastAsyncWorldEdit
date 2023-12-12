@@ -643,7 +643,7 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
                         serverLevel.getSeed(),
                         chunkPos,
                         0,
-                        serverLevel,
+                        populator,
                         biome -> true
                 );
                 if (!structureStart.isValid()) {
@@ -659,7 +659,7 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
                             SectionPos.blockToSectionCoord(boundingBox.maxZ())
                     );
                     ChunkPos.rangeClosed(min, max).forEach((chunkPosx) -> structureStart.placeInChunk(
-                            serverLevel,
+                            populator,
                             serverLevel.structureManager(),
                             chunkManager.getGenerator(),
                             serverLevel.getRandom(),
@@ -673,10 +673,12 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
                             ),
                             chunkPosx
                     ));
-                    return populator.getList().stream().collect(Collectors.toMap(
+                    Map<BlockPos, CraftBlockState> placedBlocks = populator.getList().stream().collect(Collectors.toMap(
                             CraftBlockState::getPosition,
                             craftBlockState -> craftBlockState
                     ));
+                    placedBlocks.putAll(serverLevel.capturedBlockStates);
+                    return placedBlocks;
                 }
             } finally {
                 serverLevel.captureBlockStates = false;
