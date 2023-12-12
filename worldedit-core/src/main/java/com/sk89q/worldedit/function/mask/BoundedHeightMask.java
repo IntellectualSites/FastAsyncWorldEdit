@@ -41,7 +41,7 @@ public class BoundedHeightMask extends AbstractMask {
      * @param maxY the maximum Y (must be equal to or greater than minY)
      */
     public BoundedHeightMask(int minY, int maxY) {
-        checkArgument(minY <= maxY, "minY <= maxY required");
+        checkArgument(minY <= maxY, "minY <= maxY required. minY:" + minY + " and maxY:" + maxY + " were given.");
         this.minY = minY;
         this.maxY = maxY;
     }

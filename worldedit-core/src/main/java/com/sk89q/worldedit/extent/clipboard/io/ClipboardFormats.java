@@ -26,7 +26,6 @@ import com.fastasyncworldedit.core.extent.clipboard.MultiClipboardHolder;
 import com.fastasyncworldedit.core.extent.clipboard.URIClipboardHolder;
 import com.fastasyncworldedit.core.internal.io.FastByteArrayOutputStream;
 import com.fastasyncworldedit.core.util.MainUtil;
-import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import com.google.common.io.ByteSource;
@@ -51,6 +50,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -64,7 +64,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class ClipboardFormats {
 
     private static final Map<String, ClipboardFormat> aliasMap = new HashMap<>();
-    private static final Multimap<String, ClipboardFormat> fileExtensionMap = HashMultimap.create();
+    // FAWE start - keep order of ClipboardFormat entries -> prefer FAST over SPONGE_SCHEMATIC
+    private static final Multimap<String, ClipboardFormat> fileExtensionMap = Multimaps.newMultimap(new HashMap<>(), LinkedHashSet::new);
+    // FAWE end
     private static final List<ClipboardFormat> registeredFormats = new ArrayList<>();
 
     public static void registerClipboardFormat(ClipboardFormat format) {

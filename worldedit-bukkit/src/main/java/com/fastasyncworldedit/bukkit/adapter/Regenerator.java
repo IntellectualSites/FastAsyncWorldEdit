@@ -41,6 +41,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.ThreadFactory;
 import java.util.function.Function;
 
 /**
@@ -158,16 +159,14 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
     }
 
     private boolean generate() throws Exception {
+        ThreadFactory factory = new ThreadFactoryBuilder()
+                .setNameFormat("FAWE Regenerator - %d")
+                .build();
         if (generateConcurrent) {
             //Using concurrent chunk generation
-            executor = Executors.newFixedThreadPool(Settings.settings().QUEUE.PARALLEL_THREADS, new ThreadFactoryBuilder()
-                    .setNameFormat("fawe-regen-%d")
-                    .build()
-            );
+            executor = Executors.newFixedThreadPool(Settings.settings().QUEUE.PARALLEL_THREADS, factory);
         } else { // else using sequential chunk generation, concurrent not supported
-            executor = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder()
-                    .setNameFormat("fawe-regen-%d")
-                    .build());
+            executor = Executors.newSingleThreadExecutor(factory);
         }
 
         //TODO: can we get that required radius down without affecting chunk generation (e.g. strucures, features, ...)?

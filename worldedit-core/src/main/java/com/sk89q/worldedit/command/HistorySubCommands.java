@@ -13,20 +13,22 @@ import com.fastasyncworldedit.core.util.MainUtil;
 import com.fastasyncworldedit.core.util.StringMan;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
+import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.EditSessionBuilder;
 import com.sk89q.worldedit.LocalSession;
+import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.command.argument.Arguments;
 import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
-import com.sk89q.worldedit.command.util.annotation.AllowedRegion;
 import com.sk89q.worldedit.command.util.annotation.Confirm;
 import com.sk89q.worldedit.command.util.annotation.Time;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.function.operation.ChangeSetExecutor;
 import com.sk89q.worldedit.history.changeset.ChangeSet;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Countable;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.Identifiable;
@@ -80,7 +82,6 @@ public class HistorySubCommands {
     @Confirm
     public synchronized void rerun(
             Player player, World world, RollbackDatabase database,
-            @AllowedRegion Region[] allowedRegions,
             @ArgFlag(name = 'u', desc = "String user", def = "me")
                     UUID other,
             @ArgFlag(name = 'r', def = "0", desc = "radius")
@@ -90,7 +91,7 @@ public class HistorySubCommands {
             @Time
                     long timeDiff
     ) throws WorldEditException {
-        rollback(player, world, database, allowedRegions, other, radius, timeDiff, true);
+        rollback(player, world, database, other, radius, timeDiff, true);
     }
 
     @Command(
@@ -102,7 +103,6 @@ public class HistorySubCommands {
     @Confirm
     public synchronized void rollback(
             Player player, World world, RollbackDatabase database,
-            @AllowedRegion Region[] allowedRegions,
             @ArgFlag(name = 'u', desc = "String user", def = "")
                     UUID other,
             @ArgFlag(name = 'r', def = "0", desc = "radius")
@@ -149,9 +149,9 @@ public class HistorySubCommands {
             count++;
             RollbackOptimizedHistory edit = supplier.get();
             if (restore) {
-                edit.redo(player, allowedRegions);
+                edit.redo(player);
             } else {
-                edit.undo(player, allowedRegions);
+                edit.undo(player);
             }
             String path = edit.getWorld().getName() + "/" + finalOther + "-" + edit.getIndex();
             player.print(Caption.of("fawe.worldedit.rollback.rollback.element", path));
@@ -201,8 +201,7 @@ public class HistorySubCommands {
                                                         .at(summary.maxX, world.getMaxY(), summary.maxZ)
                                         );
                                         rollback.setTime(historyFile.lastModified());
-                                        RollbackDatabase db = DBHandler.IMP
-                                                .getDatabase(world);
+                                        RollbackDatabase db = DBHandler.dbHandler().getDatabase(world);
                                         db.logEdit(rollback);
                                         actor.print(TextComponent.of("Logging: " + historyFile));
                                     }

@@ -72,9 +72,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -91,6 +93,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
             .getInstance()
             .getBukkitImplAdapter());
     private final ReadWriteLock sectionLock = new ReentrantReadWriteLock();
+    private final ReentrantLock callLock = new ReentrantLock();
     private final ServerLevel serverLevel;
     private final int chunkX;
     private final int chunkZ;
@@ -98,14 +101,16 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
     private final int maxHeight;
     private final int minSectionPosition;
     private final int maxSectionPosition;
+    private final ConcurrentHashMap<Integer, PaperweightGetBlocks_Copy> copies = new ConcurrentHashMap<>();
+    private final Object sendLock = new Object();
     private LevelChunkSection[] sections;
     private LevelChunk levelChunk;
     private DataLayer[] blockLight;
     private DataLayer[] skyLight;
     private boolean createCopy = false;
-    private PaperweightGetBlocks_Copy copy = null;
     private boolean forceLoadSections = true;
     private boolean lightUpdate = false;
+    private int copyKey = 0;
 
     public PaperweightGetBlocks(World world, int chunkX, int chunkZ) {
         this(((CraftWorld) world).getHandle(), chunkX, chunkZ);
@@ -138,13 +143,27 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
     }
 
     @Override
-    public void setCreateCopy(boolean createCopy) {
+    public int setCreateCopy(boolean createCopy) {
+        if (!callLock.isHeldByCurrentThread()) {
+            throw new IllegalStateException("Attempting to set if chunk GET should create copy, but it is not call-locked.");
+        }
         this.createCopy = createCopy;
+        return ++this.copyKey;
     }
 
     @Override
-    public IChunkGet getCopy() {
-        return copy;
+    public IChunkGet getCopy(final int key) {
+        return copies.remove(key);
+    }
+
+    @Override
+    public void lockCall() {
+        this.callLock.lock();
+    }
+
+    @Override
+    public void unlockCall() {
+        this.callLock.unlock();
     }
 
     @Override
@@ -393,8 +412,17 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
     @Override
     @SuppressWarnings("rawtypes")
     public synchronized <T extends Future<T>> T call(IChunkSet set, Runnable finalizer) {
+        if (!callLock.isHeldByCurrentThread()) {
+            throw new IllegalStateException("Attempted to call chunk GET but chunk was not call-locked.");
+        }
         forceLoadSections = false;
-        copy = createCopy ? new PaperweightGetBlocks_Copy(getChunk()) : null;
+        PaperweightGetBlocks_Copy copy = createCopy ? new PaperweightGetBlocks_Copy(levelChunk) : null;
+        if (createCopy) {
+            if (copies.containsKey(copyKey)) {
+                throw new IllegalStateException("Copy key already used.");
+            }
+            copies.put(copyKey, copy);
+        }
         try {
             ServerLevel nmsWorld = serverLevel;
             LevelChunk nmsChunk = ensureLoaded(nmsWorld, chunkX, chunkZ);
@@ -831,9 +859,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
         if (super.sections[layer] != null) {
             synchronized (super.sectionLocks[layer]) {
                 if (super.sections[layer].isFull() && super.blocks[layer] != null) {
-                    char[] blocks = new char[4096];
-                    System.arraycopy(super.blocks[layer], 0, blocks, 0, 4096);
-                    return blocks;
+                    return super.blocks[layer];
                 }
             }
         }
@@ -841,8 +867,10 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
     }
 
     @Override
-    public synchronized void send(int mask, boolean lighting) {
-        PaperweightPlatformAdapter.sendChunk(serverLevel, chunkX, chunkZ, lighting);
+    public void send(int mask, boolean lighting) {
+        synchronized (sendLock) {
+            PaperweightPlatformAdapter.sendChunk(serverLevel, chunkX, chunkZ, lighting);
+        }
     }
 
     /**
@@ -946,9 +974,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
 
     public LevelChunkSection[] getSections(boolean force) {
         force &= forceLoadSections;
-        sectionLock.readLock().lock();
         LevelChunkSection[] tmp = sections;
-        sectionLock.readLock().unlock();
         if (tmp == null || force) {
             try {
                 sectionLock.writeLock().lock();

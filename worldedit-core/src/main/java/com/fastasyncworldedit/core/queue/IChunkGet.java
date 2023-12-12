@@ -50,12 +50,30 @@ public interface IChunkGet extends IBlocks, Trimable, InputExtent, ITileInput {
 
     boolean isCreateCopy();
 
-    void setCreateCopy(boolean createCopy);
+    /**
+     * Not for external API use. Internal use only.
+     */
+    int setCreateCopy(boolean createCopy);
 
     @Nullable
-    default IChunkGet getCopy() {
+    default IChunkGet getCopy(int key) {
         return null;
     }
+
+    /**
+     * Lock the {@link IChunkGet#call(IChunkSet, Runnable)} method to the current thread using a reentrant lock. Also locks
+     * related methods e.g. {@link IChunkGet#setCreateCopy(boolean)}
+     *
+     * @since 2.8.2
+     */
+    default void lockCall() {}
+
+    /**
+     * Unlock {@link IChunkGet#call(IChunkSet, Runnable)} (and other related methods) to executions from other threads
+     *
+     * @since 2.8.2
+     */
+    default void unlockCall() {}
 
     /**
      * Flush the block lighting array (section*blocks) to the chunk GET between the given section indices. Negative allowed.

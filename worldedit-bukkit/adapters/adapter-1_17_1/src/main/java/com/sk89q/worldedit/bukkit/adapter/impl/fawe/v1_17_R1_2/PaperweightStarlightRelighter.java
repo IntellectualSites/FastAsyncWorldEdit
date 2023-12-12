@@ -1,17 +1,8 @@
 package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_17_R1_2;
 
+import com.fastasyncworldedit.bukkit.adapter.StarlightRelighter;
 import com.fastasyncworldedit.core.configuration.Settings;
-import com.fastasyncworldedit.core.extent.processor.lighting.NMSRelighter;
-import com.fastasyncworldedit.core.extent.processor.lighting.Relighter;
-import com.fastasyncworldedit.core.queue.IQueueChunk;
 import com.fastasyncworldedit.core.queue.IQueueExtent;
-import com.fastasyncworldedit.core.util.MathMan;
-import com.fastasyncworldedit.core.util.TaskManager;
-import com.sk89q.worldedit.internal.util.LogManagerCompat;
-import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
-import it.unimi.dsi.fastutil.longs.LongArraySet;
-import it.unimi.dsi.fastutil.longs.LongIterator;
-import it.unimi.dsi.fastutil.longs.LongSet;
 import net.minecraft.server.MCUtil;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ThreadedLevelLightEngine;
@@ -19,27 +10,18 @@ import net.minecraft.server.level.TicketType;
 import net.minecraft.util.Unit;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.chunk.ChunkStatus;
-import org.apache.logging.log4j.Logger;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 import java.util.function.IntConsumer;
 
-public class PaperweightStarlightRelighter implements Relighter {
+public class PaperweightStarlightRelighter extends StarlightRelighter<ServerLevel, ChunkPos> {
 
-    public static final MethodHandle RELIGHT;
-    private static final Logger LOGGER = LogManagerCompat.getLogger();
-    private static final int CHUNKS_PER_BATCH = 1024; // 32 * 32
-    private static final int CHUNKS_PER_BATCH_SQRT_LOG2 = 5; // for shifting
-
+    private static final MethodHandle RELIGHT;
     private static final TicketType<Unit> FAWE_TICKET = TicketType.create("fawe_ticket", (a, b) -> 0);
     private static final int LIGHT_LEVEL = MCUtil.getTicketLevelFor(ChunkStatus.LIGHT);
 
@@ -58,22 +40,36 @@ public class PaperweightStarlightRelighter implements Relighter {
                             IntConsumer.class
                     )
             );
+            tmp = MethodHandles.dropReturn(tmp);
         } catch (NoSuchMethodException | IllegalAccessException e) {
             LOGGER.error("Failed to locate 'relight' method in ThreadedLevelLightEngine. Is everything up to date?", e);
         }
         RELIGHT = tmp;
     }
 
-    private final ServerLevel serverLevel;
-    private final ReentrantLock lock = new ReentrantLock();
-    private final Long2ObjectLinkedOpenHashMap<LongSet> regions = new Long2ObjectLinkedOpenHashMap<>();
-    private final ReentrantLock areaLock = new ReentrantLock();
-    private final NMSRelighter delegate;
+    public PaperweightStarlightRelighter(ServerLevel serverLevel, IQueueExtent<?> queue) {
+        super(serverLevel, queue);
+    }
 
-    @SuppressWarnings("rawtypes")
-    public PaperweightStarlightRelighter(ServerLevel serverLevel, IQueueExtent<IQueueChunk> queue) {
-        this.serverLevel = serverLevel;
-        this.delegate = new NMSRelighter(queue);
+    @Override
+    protected ChunkPos createChunkPos(final long chunkKey) {
+        return new ChunkPos(chunkKey);
+    }
+
+    @Override
+    protected long asLong(final int chunkX, final int chunkZ) {
+        return ChunkPos.asLong(chunkX, chunkZ);
+    }
+
+    @Override
+    protected CompletableFuture<?> chunkLoadFuture(final ChunkPos chunkPos) {
+        return serverLevel.getWorld().getChunkAtAsync(chunkPos.x, chunkPos.z)
+                .thenAccept(c -> serverLevel.getChunkSource().addTicketAtLevel(
+                        FAWE_TICKET,
+                        chunkPos,
+                        LIGHT_LEVEL,
+                        Unit.INSTANCE
+                ));
     }
 
     public static boolean isUsable() {
@@ -81,95 +77,13 @@ public class PaperweightStarlightRelighter implements Relighter {
     }
 
     @Override
-    public boolean addChunk(int cx, int cz, byte[] skipReason, int bitmask) {
-        areaLock.lock();
-        try {
-            long key = MathMan.pairInt(cx >> CHUNKS_PER_BATCH_SQRT_LOG2, cz >> CHUNKS_PER_BATCH_SQRT_LOG2);
-            // TODO probably submit here already if chunks.size == CHUNKS_PER_BATCH?
-            LongSet chunks = this.regions.computeIfAbsent(key, k -> new LongArraySet(CHUNKS_PER_BATCH >> 2));
-            chunks.add(ChunkPos.asLong(cx, cz));
-        } finally {
-            areaLock.unlock();
-        }
-        return true;
-    }
-
-    @Override
-    public void addLightUpdate(int x, int y, int z) {
-        delegate.addLightUpdate(x, y, z);
-    }
-
-    /*
-     * This method is called "recursively", iterating and removing elements
-     * from the regions linked map. This way, chunks are loaded in batches to avoid
-     * OOMEs.
-     */
-    @Override
-    public void fixLightingSafe(boolean sky) {
-        this.areaLock.lock();
-        try {
-            if (regions.isEmpty()) {
-                return;
-            }
-            LongSet first = regions.removeFirst();
-            fixLighting(first, () -> fixLightingSafe(true));
-        } finally {
-            this.areaLock.unlock();
-        }
-    }
-
-    /*
-     * Processes a set of chunks and runs an action afterwards.
-     * The action is run async, the chunks are partly processed on the main thread
-     * (as required by the server).
-     */
-    private void fixLighting(LongSet chunks, Runnable andThen) {
-        // convert from long keys to ChunkPos
-        Set<ChunkPos> coords = new HashSet<>();
-        LongIterator iterator = chunks.iterator();
-        while (iterator.hasNext()) {
-            coords.add(new ChunkPos(iterator.nextLong()));
-        }
-        TaskManager.taskManager().task(() -> {
-            // trigger chunk load and apply ticket on main thread
-            List<CompletableFuture<?>> futures = new ArrayList<>();
-            for (ChunkPos pos : coords) {
-                futures.add(serverLevel.getWorld().getChunkAtAsync(pos.x, pos.z)
-                        .thenAccept(c -> serverLevel.getChunkSource().addTicketAtLevel(
-                                FAWE_TICKET,
-                                pos,
-                                LIGHT_LEVEL,
-                                Unit.INSTANCE
-                        ))
-                );
-            }
-            // collect futures and trigger relight once all chunks are loaded
-            CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).thenAccept(v ->
-                    invokeRelight(
-                            coords,
-                            c -> {
-                            }, // no callback for single chunks required
-                            i -> {
-                                if (i != coords.size()) {
-                                    LOGGER.warn("Processed {} chunks instead of {}", i, coords.size());
-                                }
-                                // post process chunks on main thread
-                                TaskManager.taskManager().task(() -> postProcessChunks(coords));
-                                // call callback on our own threads
-                                TaskManager.taskManager().async(andThen);
-                            }
-                    )
-            );
-        });
-    }
-
-    private void invokeRelight(
+    protected void invokeRelight(
             Set<ChunkPos> coords,
             Consumer<ChunkPos> chunkCallback,
             IntConsumer processCallback
     ) {
         try {
-            int unused = (int) RELIGHT.invokeExact(
+            RELIGHT.invokeExact(
                     serverLevel.getChunkSource().getLightEngine(),
                     coords,
                     chunkCallback, // callback per chunk
@@ -184,7 +98,7 @@ public class PaperweightStarlightRelighter implements Relighter {
      * Allow the server to unload the chunks again.
      * Also, if chunk packets are sent delayed, we need to do that here
      */
-    private void postProcessChunks(Set<ChunkPos> coords) {
+    protected void postProcessChunks(Set<ChunkPos> coords) {
         boolean delay = Settings.settings().LIGHTING.DELAY_PACKET_SENDING;
         for (ChunkPos pos : coords) {
             int x = pos.x;
@@ -194,46 +108,6 @@ public class PaperweightStarlightRelighter implements Relighter {
             }
             serverLevel.getChunkSource().removeTicketAtLevel(FAWE_TICKET, pos, LIGHT_LEVEL, Unit.INSTANCE);
         }
-    }
-
-    @Override
-    public void clear() {
-
-    }
-
-    @Override
-    public void removeLighting() {
-        this.delegate.removeLighting();
-    }
-
-    @Override
-    public void fixBlockLighting() {
-        fixLightingSafe(true);
-    }
-
-    @Override
-    public void fixSkyLighting() {
-        fixLightingSafe(true);
-    }
-
-    @Override
-    public boolean isEmpty() {
-        return true;
-    }
-
-    @Override
-    public ReentrantLock getLock() {
-        return this.lock;
-    }
-
-    @Override
-    public boolean isFinished() {
-        return false;
-    }
-
-    @Override
-    public void close() throws Exception {
-        fixLightingSafe(true);
     }
 
 }

@@ -11,7 +11,6 @@ import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_18_R2.nbt.PaperweightLazyCompoundTag;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
-import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
@@ -24,6 +23,7 @@ import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.PalettedContainer;
 
 import javax.annotation.Nullable;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -101,7 +101,8 @@ public class PaperweightGetBlocks_Copy implements IChunkGet {
     }
 
     @Override
-    public void setCreateCopy(boolean createCopy) {
+    public int setCreateCopy(boolean createCopy) {
+        return -1;
     }
 
     @Override
@@ -187,6 +188,10 @@ public class PaperweightGetBlocks_Copy implements IChunkGet {
     @Override
     public char[] load(int layer) {
         layer -= getMinSectionPosition();
+        if (blocks[layer] == null) {
+            blocks[layer] = new char[4096];
+            Arrays.fill(blocks[layer], (char) BlockTypesCache.ReservedIDs.AIR);
+        }
         return blocks[layer];
     }
 

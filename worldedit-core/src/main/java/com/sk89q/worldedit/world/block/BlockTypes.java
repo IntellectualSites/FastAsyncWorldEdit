@@ -415,6 +415,8 @@ public final class BlockTypes {
     @Nullable
     public static final BlockType CHISELED_BOOKSHELF = init();
     @Nullable
+    public static final BlockType CHISELED_COPPER = init();
+    @Nullable
     public static final BlockType CHISELED_DEEPSLATE = init();
     @Nullable
     public static final BlockType CHISELED_NETHER_BRICKS = init();
@@ -428,6 +430,10 @@ public final class BlockTypes {
     public static final BlockType CHISELED_SANDSTONE = init();
     @Nullable
     public static final BlockType CHISELED_STONE_BRICKS = init();
+    @Nullable
+    public static final BlockType CHISELED_TUFF = init();
+    @Nullable
+    public static final BlockType CHISELED_TUFF_BRICKS = init();
     @Nullable
     public static final BlockType CHORUS_FLOWER = init();
     @Nullable
@@ -470,6 +476,12 @@ public final class BlockTypes {
     public static final BlockType CONDUIT = init();
     @Nullable
     public static final BlockType COPPER_BLOCK = init();
+    @Nullable
+    public static final BlockType COPPER_BULB = init();
+    @Nullable
+    public static final BlockType COPPER_DOOR = init();
+    @Nullable
+    public static final BlockType COPPER_GRATE = init();
     @Nullable
     public static final BlockType CORNFLOWER = init();
     @Nullable
@@ -673,6 +685,8 @@ public final class BlockTypes {
     @Nullable
     public static final BlockType DEEPSLATE_COPPER_ORE = init();
     @Nullable
+    public static final BlockType COPPER_TRAPDOOR = init();
+    @Nullable
     public static final BlockType DEEPSLATE_DIAMOND_ORE = init();
     @Nullable
     public static final BlockType DEEPSLATE_EMERALD_ORE = init();
@@ -733,6 +747,8 @@ public final class BlockTypes {
     @Nullable
     public static final BlockType ENDER_CHEST = init();
     @Nullable
+    public static final BlockType EXPOSED_CHISELED_COPPER = init();
+    @Nullable
     public static final BlockType END_GATEWAY = init();
     @Nullable
     public static final BlockType END_PORTAL = init();
@@ -752,6 +768,14 @@ public final class BlockTypes {
     public static final BlockType END_STONE_BRICK_WALL = init();
     @Nullable
     public static final BlockType EXPOSED_COPPER = init();
+    @Nullable
+    public static final BlockType EXPOSED_COPPER_BULB = init();
+    @Nullable
+    public static final BlockType EXPOSED_COPPER_DOOR = init();
+    @Nullable
+    public static final BlockType EXPOSED_COPPER_GRATE = init();
+    @Nullable
+    public static final BlockType EXPOSED_COPPER_TRAPDOOR = init();
     @Nullable
     public static final BlockType EXPOSED_CUT_COPPER = init();
     @Nullable
@@ -808,7 +832,7 @@ public final class BlockTypes {
     public static final BlockType GRANITE_STAIRS = init();
     @Nullable
     public static final BlockType GRANITE_WALL = init();
-    @Nullable
+    @Nullable @Deprecated
     public static final BlockType GRASS = init();
     @Nullable
     public static final BlockType GRASS_BLOCK = init();
@@ -900,6 +924,8 @@ public final class BlockTypes {
     public static final BlockType INFESTED_COBBLESTONE = init();
     @Nullable
     public static final BlockType INFESTED_CRACKED_STONE_BRICKS = init();
+    @Nullable
+    public static final BlockType CRAFTER = init();
     @Nullable
     public static final BlockType INFESTED_DEEPSLATE = init();
     @Nullable
@@ -1293,7 +1319,17 @@ public final class BlockTypes {
     @Nullable
     public static final BlockType OXEYE_DAISY = init();
     @Nullable
+    public static final BlockType OXIDIZED_CHISELED_COPPER = init();
+    @Nullable
     public static final BlockType OXIDIZED_COPPER = init();
+    @Nullable
+    public static final BlockType OXIDIZED_COPPER_BULB = init();
+    @Nullable
+    public static final BlockType OXIDIZED_COPPER_DOOR = init();
+    @Nullable
+    public static final BlockType OXIDIZED_COPPER_GRATE = init();
+    @Nullable
+    public static final BlockType OXIDIZED_COPPER_TRAPDOOR = init();
     @Nullable
     public static final BlockType OXIDIZED_CUT_COPPER = init();
     @Nullable
@@ -1410,6 +1446,14 @@ public final class BlockTypes {
     public static final BlockType POLISHED_GRANITE_SLAB = init();
     @Nullable
     public static final BlockType POLISHED_GRANITE_STAIRS = init();
+    @Nullable
+    public static final BlockType POLISHED_TUFF = init();
+    @Nullable
+    public static final BlockType POLISHED_TUFF_SLAB = init();
+    @Nullable
+    public static final BlockType POLISHED_TUFF_STAIRS = init();
+    @Nullable
+    public static final BlockType POLISHED_TUFF_WALL = init();
     @Nullable
     public static final BlockType POPPY = init();
     @Nullable
@@ -1667,6 +1711,8 @@ public final class BlockTypes {
     @Nullable
     public static final BlockType SEAGRASS = init();
     @Nullable
+    public static final BlockType SHORT_GRASS = init();
+    @Nullable
     public static final BlockType SEA_LANTERN = init();
     @Nullable
     public static final BlockType SEA_PICKLE = init();
@@ -1874,6 +1920,8 @@ public final class BlockTypes {
     @Nullable
     public static final BlockType TRAPPED_CHEST = init();
     @Nullable
+    public static final BlockType TRIAL_SPAWNER = init();
+    @Nullable
     public static final BlockType TRIPWIRE = init();
     @Nullable
     public static final BlockType TRIPWIRE_HOOK = init();
@@ -1887,6 +1935,20 @@ public final class BlockTypes {
     public static final BlockType TUBE_CORAL_WALL_FAN = init();
     @Nullable
     public static final BlockType TUFF = init();
+    @Nullable
+    public static final BlockType TUFF_BRICK_SLAB = init();
+    @Nullable
+    public static final BlockType TUFF_BRICK_STAIRS = init();
+    @Nullable
+    public static final BlockType TUFF_BRICK_WALL = init();
+    @Nullable
+    public static final BlockType TUFF_BRICKS = init();
+    @Nullable
+    public static final BlockType TUFF_SLAB = init();
+    @Nullable
+    public static final BlockType TUFF_STAIRS = init();
+    @Nullable
+    public static final BlockType TUFF_WALL = init();
     @Nullable
     public static final BlockType TURTLE_EGG = init();
     @Nullable
@@ -1947,15 +2009,35 @@ public final class BlockTypes {
     @Nullable
     public static final BlockType WATER_CAULDRON = init();
     @Nullable
+    public static final BlockType WAXED_CHISELED_COPPER = init();
+    @Nullable
     public static final BlockType WAXED_COPPER_BLOCK = init();
+    @Nullable
+    public static final BlockType WAXED_COPPER_BULB = init();
+    @Nullable
+    public static final BlockType WAXED_COPPER_DOOR = init();
+    @Nullable
+    public static final BlockType WAXED_COPPER_GRATE = init();
+    @Nullable
+    public static final BlockType WAXED_COPPER_TRAPDOOR = init();
     @Nullable
     public static final BlockType WAXED_CUT_COPPER = init();
     @Nullable
     public static final BlockType WAXED_CUT_COPPER_SLAB = init();
     @Nullable
     public static final BlockType WAXED_CUT_COPPER_STAIRS = init();
+    @ Nullable
+    public static final BlockType WAXED_EXPOSED_CHISELED_COPPER = init();
     @Nullable
     public static final BlockType WAXED_EXPOSED_COPPER = init();
+    @Nullable
+    public static final BlockType WAXED_EXPOSED_COPPER_BULB = init();
+    @Nullable
+    public static final BlockType WAXED_EXPOSED_COPPER_DOOR = init();
+    @Nullable
+    public static final BlockType WAXED_EXPOSED_COPPER_GRATE = init();
+    @Nullable
+    public static final BlockType WAXED_EXPOSED_COPPER_TRAPDOOR = init();
     @Nullable
     public static final BlockType WAXED_EXPOSED_CUT_COPPER = init();
     @Nullable
@@ -1965,13 +2047,33 @@ public final class BlockTypes {
     @Nullable
     public static final BlockType WAXED_OXIDIZED_COPPER = init();
     @Nullable
+    public static final BlockType WAXED_OXIDIZED_COPPER_BULB = init();
+    @Nullable
+    public static final BlockType WAXED_OXIDIZED_COPPER_DOOR = init();
+    @Nullable
+    public static final BlockType WAXED_OXIDIZED_COPPER_GRATE = init();
+    @Nullable
+    public static final BlockType WAXED_OXIDIZED_COPPER_TRAPDOOR = init();
+    @Nullable
+    public static final BlockType WAXED_OXIDIZED_CHISELED_COPPER = init();
+    @Nullable
     public static final BlockType WAXED_OXIDIZED_CUT_COPPER = init();
     @Nullable
     public static final BlockType WAXED_OXIDIZED_CUT_COPPER_SLAB = init();
     @Nullable
     public static final BlockType WAXED_OXIDIZED_CUT_COPPER_STAIRS = init();
     @Nullable
+    public static final BlockType WAXED_WEATHERED_CHISELED_COPPER = init();
+    @Nullable
     public static final BlockType WAXED_WEATHERED_COPPER = init();
+    @Nullable
+    public static final BlockType WAXED_WEATHERED_COPPER_BULB = init();
+    @Nullable
+    public static final BlockType WAXED_WEATHERED_COPPER_DOOR = init();
+    @Nullable
+    public static final BlockType WAXED_WEATHERED_COPPER_GRATE = init();
+    @Nullable
+    public static final BlockType WAXED_WEATHERED_COPPER_TRAPDOOR = init();
     @Nullable
     public static final BlockType WAXED_WEATHERED_CUT_COPPER = init();
     @Nullable
@@ -1979,7 +2081,17 @@ public final class BlockTypes {
     @Nullable
     public static final BlockType WAXED_WEATHERED_CUT_COPPER_STAIRS = init();
     @Nullable
+    public static final BlockType WEATHERED_CHISELED_COPPER = init();
+    @Nullable
     public static final BlockType WEATHERED_COPPER = init();
+    @Nullable
+    public static final BlockType WEATHERED_COPPER_BULB = init();
+    @Nullable
+    public static final BlockType WEATHERED_COPPER_DOOR = init();
+    @Nullable
+    public static final BlockType WEATHERED_COPPER_GRATE = init();
+    @Nullable
+    public static final BlockType WEATHERED_COPPER_TRAPDOOR = init();
     @Nullable
     public static final BlockType WEATHERED_CUT_COPPER = init();
     @Nullable

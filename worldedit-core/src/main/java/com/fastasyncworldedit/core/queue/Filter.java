@@ -2,7 +2,6 @@ package com.fastasyncworldedit.core.queue;
 
 import com.fastasyncworldedit.core.extent.filter.block.FilterBlock;
 import com.sk89q.worldedit.regions.Region;
-import org.jetbrains.annotations.Range;
 
 import javax.annotation.Nullable;
 
@@ -18,8 +17,8 @@ public interface Filter {
      * @param chunkZ the z coordinate in the chunk
      */
     default boolean appliesChunk(
-            @Range(from = 0, to = 15) int chunkX,
-            @Range(from = 0, to = 15) int chunkZ
+            int chunkX,
+            int chunkZ
     ) {
         return true;
     }

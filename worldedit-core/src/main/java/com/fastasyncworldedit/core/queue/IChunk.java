@@ -1,8 +1,8 @@
 package com.fastasyncworldedit.core.queue;
 
 import com.fastasyncworldedit.core.extent.filter.block.ChunkFilterBlock;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
-import org.jetbrains.annotations.Range;
 
 import javax.annotation.Nullable;
 
@@ -25,7 +25,6 @@ public interface IChunk extends Trimable, IChunkGet, IChunkSet {
      *
      * @return the x coordinate of the chunk
      */
-    @Range(from = 0, to = 15)
     int getX();
 
     /**
@@ -33,8 +32,17 @@ public interface IChunk extends Trimable, IChunkGet, IChunkSet {
      *
      * @return the z coordinate of the chunk
      */
-    @Range(from = 0, to = 15)
     int getZ();
+
+    /**
+     * Return the minimum block coordinate of the chunk
+     *
+     * @return BlockVector3 of minimum block coordinate
+     * @since TODO
+     */
+    default BlockVector3 getChunkBlockCoord() {
+        return BlockVector3.at(getX() << 4, getMinY(), getZ() << 4);
+    }
 
     /**
      * If the chunk is a delegate, returns its parent's root

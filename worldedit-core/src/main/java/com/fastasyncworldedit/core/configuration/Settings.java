@@ -19,14 +19,14 @@ import java.util.stream.Stream;
 
 public class Settings extends Config {
 
+    @Ignore
+    static Settings INSTANCE = new Settings();
     /**
      * @deprecated Use {@link #settings()} instead to get an instance.
      */
     @Ignore
     @Deprecated(forRemoval = true, since = "2.0.0")
-    public static final Settings IMP = new Settings();
-    @Ignore
-    static Settings INSTANCE = new Settings();
+    public static final Settings IMP = INSTANCE;
     @Ignore
     public boolean PROTOCOL_SUPPORT_FIX = false;
     @Comment("These first 6 aren't configurable") // This is a comment
@@ -102,7 +102,7 @@ public class Settings extends Config {
 
     public FaweLimit getLimit(Actor actor) {
         FaweLimit limit;
-        if (actor.hasPermission("fawe.bypass") || actor.hasPermission("fawe.limit.unlimited")) {
+        if (actor.hasPermission("fawe.limit.unlimited")) {
             return FaweLimit.MAX.copy();
         }
         limit = new FaweLimit();

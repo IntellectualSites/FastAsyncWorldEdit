@@ -18,6 +18,7 @@ import com.fastasyncworldedit.core.util.collection.CleanableThreadLocal;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.sk89q.jnbt.ByteArrayTag;
 import com.sk89q.jnbt.ByteTag;
 import com.sk89q.jnbt.CompoundTag;
@@ -48,7 +49,6 @@ import java.util.Map.Entry;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -61,14 +61,15 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 public enum FaweCache implements Trimable {
     /**
-     * @deprecated Use {@link #INSTANCE} to get an instance.
-     */
-    @Deprecated(forRemoval = true, since = "2.0.0")
-    IMP,
-    /**
      * @since 2.0.0
      */
     INSTANCE;
+
+    /**
+     * @deprecated Use {@link #INSTANCE} to get an instance.
+     */
+    @Deprecated(forRemoval = true, since = "2.0.0")
+    public static final FaweCache IMP = INSTANCE;
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
 
@@ -616,7 +617,7 @@ public enum FaweCache implements Trimable {
         ArrayBlockingQueue<Runnable> queue = new ArrayBlockingQueue<>(nThreads, true);
         return new ThreadPoolExecutor(nThreads, nThreads,
                 0L, TimeUnit.MILLISECONDS, queue,
-                Executors.defaultThreadFactory(),
+                new ThreadFactoryBuilder().setNameFormat("FAWE Blocking Executor - %d").build(),
                 new ThreadPoolExecutor.CallerRunsPolicy()
         ) {
 

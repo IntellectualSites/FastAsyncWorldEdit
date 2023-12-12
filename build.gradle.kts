@@ -7,7 +7,7 @@ import xyz.jpenilla.runpaper.task.RunServer
 
 plugins {
     id("io.github.gradle-nexus.publish-plugin") version "1.3.0"
-    id("xyz.jpenilla.run-paper") version "2.2.0"
+    id("xyz.jpenilla.run-paper") version "2.2.2"
 }
 
 if (!File("$rootDir/.git").exists()) {
@@ -34,7 +34,7 @@ logger.lifecycle("""
 *******************************************
 """)
 
-var rootVersion by extra("2.8.2")
+var rootVersion by extra("2.8.4")
 var snapshot by extra("SNAPSHOT")
 var revision: String by extra("")
 var buildNumber by extra("")
@@ -83,7 +83,7 @@ allprojects {
 }
 
 applyCommonConfiguration()
-val supportedVersions = listOf("1.17.1", "1.18.2", "1.19.4", "1.20", "1.20.2")
+val supportedVersions = listOf("1.17.1", "1.18.2", "1.19.4", "1.20", "1.20.4")
 
 tasks {
     supportedVersions.forEach {
@@ -97,7 +97,7 @@ tasks {
         }
     }
     runServer {
-        minecraftVersion("1.20.2")
+        minecraftVersion("1.20.4")
         pluginJars(*project(":worldedit-bukkit").getTasksByName("shadowJar", false).map { (it as Jar).archiveFile }
                 .toTypedArray())
 

@@ -33,6 +33,7 @@ import com.fastasyncworldedit.core.limit.FaweLimit;
 import com.fastasyncworldedit.core.util.BrushCache;
 import com.fastasyncworldedit.core.util.MainUtil;
 import com.fastasyncworldedit.core.util.StringMan;
+import com.fastasyncworldedit.core.util.TaskManager;
 import com.fastasyncworldedit.core.util.TextureHolder;
 import com.fastasyncworldedit.core.util.TextureUtil;
 import com.fastasyncworldedit.core.wrappers.WorldWrapper;
@@ -99,7 +100,6 @@ import java.util.TimeZone;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
@@ -143,7 +143,7 @@ public class LocalSession implements TextureHolder {
         }
     });
     private transient volatile Integer historyNegativeIndex;
-    private transient final Lock historyWriteLock = new ReentrantLock(true);
+    private transient final ReentrantLock historyWriteLock = new ReentrantLock(true);
     private final transient Int2ObjectOpenHashMap<Tool> tools = new Int2ObjectOpenHashMap<>(0);
     private transient Mask sourceMask;
     private transient TextureUtil texture;
@@ -405,6 +405,23 @@ public class LocalSession implements TextureHolder {
      */
     public void clearHistory() {
         //FAWE start
+        boolean mainThread = Fawe.isMainThread();
+        if (mainThread && !historyWriteLock.tryLock()) {
+            // Do not make main thread wait if we cannot immediately clear history (on player logout usually)
+            TaskManager.taskManager().async(this::clearHistoryTask);
+            return;
+        }
+        try {
+            clearHistoryTask();
+        } finally {
+            // only if we are on the main thread, we ever called tryLock -> need to unlock again
+            if (mainThread) {
+                historyWriteLock.unlock();
+            }
+        }
+    }
+
+    private void clearHistoryTask() {
         historyWriteLock.lock();
         try {
             // Ensure that changesets are properly removed
@@ -420,8 +437,8 @@ public class LocalSession implements TextureHolder {
         save();
         historySize = 0;
         currentWorld = null;
-        //FAWE end
     }
+    //FAWE end
 
     /**
      * Remember an edit session for the undo history. If the history maximum

@@ -1,7 +1,6 @@
 package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_19_R3;
 
-import com.fastasyncworldedit.bukkit.adapter.CachedBukkitAdapter;
-import com.fastasyncworldedit.bukkit.adapter.IDelegateBukkitImplAdapter;
+import com.fastasyncworldedit.bukkit.adapter.FaweAdapter;
 import com.fastasyncworldedit.bukkit.adapter.NMSRelighterFactory;
 import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.entity.LazyBaseEntity;
@@ -10,15 +9,12 @@ import com.fastasyncworldedit.core.queue.IBatchProcessor;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.implementation.packet.ChunkPacket;
 import com.fastasyncworldedit.core.util.NbtUtils;
-import com.fastasyncworldedit.core.util.TaskManager;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.sk89q.jnbt.Tag;
-import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.bukkit.adapter.ext.fawe.v1_19_R3.PaperweightAdapter;
 import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_19_R3.nbt.PaperweightLazyCompoundTag;
@@ -38,7 +34,6 @@ import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.SideEffect;
 import com.sk89q.worldedit.util.SideEffectSet;
-import com.sk89q.worldedit.util.TreeGenerator;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.nbt.BinaryTag;
 import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
@@ -77,13 +72,11 @@ import net.minecraft.world.level.chunk.LevelChunk;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.TreeType;
+import org.bukkit.World;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_19_R3.CraftWorld;
-import org.bukkit.craftbukkit.v1_19_R3.block.CraftBlockState;
 import org.bukkit.craftbukkit.v1_19_R3.block.data.CraftBlockData;
 import org.bukkit.craftbukkit.v1_19_R3.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_19_R3.entity.CraftPlayer;
@@ -111,8 +104,7 @@ import java.util.stream.Stream;
 
 import static net.minecraft.core.registries.Registries.BIOME;
 
-public final class PaperweightFaweAdapter extends CachedBukkitAdapter implements
-        IDelegateBukkitImplAdapter<net.minecraft.nbt.Tag> {
+public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.Tag, ServerLevel> {
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
     private static Method CHUNK_HOLDER_WAS_ACCESSIBLE_SINCE_LAST_SAVE;
@@ -244,11 +236,10 @@ public final class PaperweightFaweAdapter extends CachedBukkitAdapter implements
     public BlockState getBlock(Location location) {
         Preconditions.checkNotNull(location);
 
-        CraftWorld craftWorld = ((CraftWorld) location.getWorld());
         int x = location.getBlockX();
         int y = location.getBlockY();
         int z = location.getBlockZ();
-        final ServerLevel handle = craftWorld.getHandle();
+        final ServerLevel handle = getServerLevel(location.getWorld());
         LevelChunk chunk = handle.getChunk(x >> 4, z >> 4);
         final BlockPos blockPos = new BlockPos(x, y, z);
         final net.minecraft.world.level.block.state.BlockState blockData = chunk.getBlockState(blockPos);
@@ -264,12 +255,11 @@ public final class PaperweightFaweAdapter extends CachedBukkitAdapter implements
     public BaseBlock getFullBlock(final Location location) {
         Preconditions.checkNotNull(location);
 
-        CraftWorld craftWorld = ((CraftWorld) location.getWorld());
         int x = location.getBlockX();
         int y = location.getBlockY();
         int z = location.getBlockZ();
 
-        final ServerLevel handle = craftWorld.getHandle();
+        final ServerLevel handle = getServerLevel(location.getWorld());
         LevelChunk chunk = handle.getChunk(x >> 4, z >> 4);
         final BlockPos blockPos = new BlockPos(x, y, z);
         final net.minecraft.world.level.block.state.BlockState blockData = chunk.getBlockState(blockPos);
@@ -298,10 +288,7 @@ public final class PaperweightFaweAdapter extends CachedBukkitAdapter implements
 
     @Override
     public WorldNativeAccess<?, ?, ?> createWorldNativeAccess(org.bukkit.World world) {
-        return new PaperweightFaweWorldNativeAccess(
-                this,
-                new WeakReference<>(((CraftWorld) world).getHandle())
-        );
+        return new PaperweightFaweWorldNativeAccess(this, new WeakReference<>(getServerLevel(world)));
     }
 
     @Override
@@ -446,7 +433,7 @@ public final class PaperweightFaweAdapter extends CachedBukkitAdapter implements
 
     @Override
     public void sendFakeChunk(org.bukkit.World world, Player player, ChunkPacket chunkPacket) {
-        ServerLevel nmsWorld = ((CraftWorld) world).getHandle();
+        ServerLevel nmsWorld = getServerLevel(world);
         ChunkHolder map = PaperweightPlatformAdapter.getPlayerChunk(nmsWorld, chunkPacket.getChunkX(), chunkPacket.getChunkZ());
         if (map != null && wasAccessibleSinceLastSave(map)) {
             boolean flag = false;
@@ -484,7 +471,7 @@ public final class PaperweightFaweAdapter extends CachedBukkitAdapter implements
         int internalId = BlockStateIdAccess.getBlockStateId(blockState);
         net.minecraft.world.level.block.state.BlockState blockState1 = Block.stateById(internalId);
         return blockState1.hasPostProcess(
-                ((CraftWorld) world).getHandle(),
+                getServerLevel(world),
                 new BlockPos(blockVector3.getX(), blockVector3.getY(), blockVector3.getZ())
         );
     }
@@ -501,47 +488,26 @@ public final class PaperweightFaweAdapter extends CachedBukkitAdapter implements
     }
 
     @Override
-    public boolean generateTree(
-            TreeGenerator.TreeType treeType, EditSession editSession, BlockVector3 blockVector3,
-            org.bukkit.World bukkitWorld
-    ) {
-        TreeType bukkitType = BukkitWorld.toBukkitTreeType(treeType);
-        if (bukkitType == TreeType.CHORUS_PLANT) {
-            blockVector3 = blockVector3.add(
-                    0,
-                    1,
-                    0
-            ); // bukkit skips the feature gen which does this offset normally, so we have to add it back
-        }
-        ServerLevel serverLevel = ((CraftWorld) bukkitWorld).getHandle();
-        final BlockVector3 finalBlockVector = blockVector3;
-        // Sync to main thread to ensure no clashes occur
-        Map<BlockPos, CraftBlockState> placed = TaskManager.taskManager().sync(() -> {
-            serverLevel.captureTreeGeneration = true;
-            serverLevel.captureBlockStates = true;
-            try {
-                if (!bukkitWorld.generateTree(BukkitAdapter.adapt(bukkitWorld, finalBlockVector), bukkitType)) {
-                    return null;
-                }
-                return ImmutableMap.copyOf(serverLevel.capturedBlockStates);
-            } finally {
-                serverLevel.captureBlockStates = false;
-                serverLevel.captureTreeGeneration = false;
-                serverLevel.capturedBlockStates.clear();
-            }
-        });
-        if (placed == null || placed.isEmpty()) {
-            return false;
-        }
-        for (CraftBlockState craftBlockState : placed.values()) {
-            if (craftBlockState == null || craftBlockState.getType() == Material.AIR) {
-                continue;
-            }
-            editSession.setBlock(craftBlockState.getX(), craftBlockState.getY(), craftBlockState.getZ(),
-                    BukkitAdapter.adapt(((org.bukkit.block.BlockState) craftBlockState).getBlockData())
-            );
-        }
-        return true;
+    protected void preCaptureStates(final ServerLevel serverLevel) {
+        serverLevel.captureTreeGeneration = true;
+        serverLevel.captureBlockStates = true;
+    }
+
+    @Override
+    protected List<org.bukkit.block.BlockState> getCapturedBlockStatesCopy(final ServerLevel serverLevel) {
+        return new ArrayList<>(serverLevel.capturedBlockStates.values());
+    }
+
+    @Override
+    protected void postCaptureBlockStates(final ServerLevel serverLevel) {
+        serverLevel.captureBlockStates = false;
+        serverLevel.captureTreeGeneration = false;
+        serverLevel.capturedBlockStates.clear();
+    }
+
+    @Override
+    protected ServerLevel getServerLevel(final World world) {
+        return ((CraftWorld) world).getHandle();
     }
 
     @Override
