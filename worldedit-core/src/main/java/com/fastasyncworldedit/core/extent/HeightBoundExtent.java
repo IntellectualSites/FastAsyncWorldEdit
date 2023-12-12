@@ -6,12 +6,11 @@ import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.IChunkSet;
 import com.fastasyncworldedit.core.regions.RegionWrapper;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Future;
 
 public class HeightBoundExtent extends FaweRegionExtent {
 
@@ -50,7 +49,8 @@ public class HeightBoundExtent extends FaweRegionExtent {
 
     @Override
     public IChunkSet processSet(IChunk chunk, IChunkGet get, IChunkSet set) {
-        if (trimY(set, min, max, true) | trimNBT(set, this::contains)) {
+        BlockVector3 chunkPos = chunk.getChunkBlockCoord().withY(0);
+        if (trimY(set, min, max, true) | trimNBT(set, this::contains, pos -> this.contains(pos.add(chunkPos)))) {
             return set;
         }
         return null;
