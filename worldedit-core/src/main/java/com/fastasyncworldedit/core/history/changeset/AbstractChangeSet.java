@@ -179,14 +179,14 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
                 for (int z = 0; z < 16; z++) {
                     int zz = z + bz;
                     for (int x = 0; x < 16; x++, index++) {
-                        int xx = bx + x;
-                        int from = blocksGet[index];
-                        if (from == BlockTypesCache.ReservedIDs.__RESERVED__) {
-                            from = BlockTypesCache.ReservedIDs.AIR;
-                        }
-                        final int combinedFrom = from;
                         final int combinedTo = blocksSet[index];
                         if (combinedTo != BlockTypesCache.ReservedIDs.__RESERVED__) {
+                            int xx = bx + x;
+                            int from = blocksGet[index];
+                            if (from == BlockTypesCache.ReservedIDs.__RESERVED__) {
+                                from = BlockTypesCache.ReservedIDs.AIR;
+                            }
+                            final int combinedFrom = from;
                             add(xx, yy, zz, combinedFrom, combinedTo);
                         }
                     }
@@ -257,12 +257,14 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
     }
 
     public EditSession toEditSession(Actor actor, Region[] regions) {
-        EditSessionBuilder builder = WorldEdit.getInstance().newEditSessionBuilder().world(getWorld()).actor(actor).
-                fastMode(false).checkMemory(false).changeSet(this).limitUnlimited();
-        if (regions != null) {
-            builder.allowedRegions(regions);
-        } else {
-            builder.allowedRegionsEverywhere();
+        EditSessionBuilder builder = WorldEdit.getInstance().newEditSessionBuilder().world(world)
+                .checkMemory(false)
+                .changeSetNull()
+                .fastMode(false)
+                .limitUnprocessed(actor)
+                .actor(actor);
+        if (!actor.getLimit().RESTRICT_HISTORY_TO_REGIONS) {
+            builder = builder.allowedRegionsEverywhere();
         }
         EditSession editSession = builder.build();
         editSession.setSize(1);

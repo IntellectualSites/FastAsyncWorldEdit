@@ -13,7 +13,6 @@ import java.util.regex.Pattern;
 public class MinecraftVersion implements Comparable<MinecraftVersion> {
 
     public static final MinecraftVersion NETHER = new MinecraftVersion(1, 16);
-    public static final MinecraftVersion ONE_DOT_SIXTEEN_EOL = new MinecraftVersion(1, 16, 5);
     public static final MinecraftVersion CAVES_17 = new MinecraftVersion(1, 17);
     public static final MinecraftVersion CAVES_18 = new MinecraftVersion(1, 18);
     private static MinecraftVersion current = null;

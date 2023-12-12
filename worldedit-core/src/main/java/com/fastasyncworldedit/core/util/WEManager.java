@@ -32,7 +32,7 @@ public class WEManager {
      * @deprecated Use {@link #weManager()} instead.
      */
     @Deprecated(forRemoval = true, since = "2.0.0")
-    public static WEManager IMP = new WEManager();
+    public static WEManager IMP = weManager();
     private final ArrayDeque<FaweMaskManager> managers = new ArrayDeque<>();
 
     /**

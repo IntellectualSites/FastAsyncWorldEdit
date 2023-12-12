@@ -17,7 +17,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldedit.bukkit.adapter.impl.v1_20_R2;
+package com.sk89q.worldedit.bukkit.adapter.ext.fawe.v1_20_R2;
 
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.internal.block.BlockStateIdAccess;
@@ -43,11 +43,11 @@ public class PaperweightWorldNativeAccess implements WorldNativeAccess<LevelChun
     private static final int UPDATE = 1;
     private static final int NOTIFY = 2;
 
-    private final com.sk89q.worldedit.bukkit.adapter.impl.v1_20_R2.PaperweightAdapter adapter;
+    private final PaperweightAdapter adapter;
     private final WeakReference<ServerLevel> world;
     private SideEffectSet sideEffectSet;
 
-    public PaperweightWorldNativeAccess(com.sk89q.worldedit.bukkit.adapter.impl.v1_20_R2.PaperweightAdapter adapter, WeakReference<ServerLevel> world) {
+    public PaperweightWorldNativeAccess(PaperweightAdapter adapter, WeakReference<ServerLevel> world) {
         this.adapter = adapter;
         this.world = world;
     }

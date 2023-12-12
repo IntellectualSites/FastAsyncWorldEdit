@@ -51,6 +51,8 @@ public final class EntityTypes {
     @Nullable
     public static final EntityType BOAT = get("minecraft:boat");
     @Nullable
+    public static final EntityType BREEZE = get("minecraft:breeze");
+    @Nullable
     public static final EntityType CAMEL = get("minecraft:camel");
     @Nullable
     public static final EntityType CAT = get("minecraft:cat");
@@ -258,6 +260,8 @@ public final class EntityTypes {
     public static final EntityType WANDERING_TRADER = get("minecraft:wandering_trader");
     @Nullable
     public static final EntityType WARDEN = get("minecraft:warden");
+    @Nullable
+    public static final EntityType WIND_CHARGE = get("minecraft:wind_charge");
     @Nullable
     public static final EntityType WITCH = get("minecraft:witch");
     @Nullable

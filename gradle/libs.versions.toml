@@ -14,8 +14,8 @@ mapmanager = "1.8.0-SNAPSHOT"
 griefprevention = "16.18.1"
 griefdefender = "2.1.0-SNAPSHOT"
 residence = "4.5._13.1"
-towny = "0.99.6.0"
-plotsquared = "7.0.0"
+towny = "0.100.0.8"
+plotsquared = "7.2.0"
 
 # Third party
 bstats = "3.0.2"
@@ -23,7 +23,7 @@ sparsebitset = "1.3"
 parallelgzip = "1.0.5"
 adventure = "4.14.0"
 adventure-bukkit = "4.3.1"
-checkerqual = "3.39.0"
+checkerqual = "3.41.0"
 truezip = "6.8.4"
 auto-value = "1.10.4"
 findbugs = "3.0.2"
@@ -35,7 +35,7 @@ jlibnoise = "1.0.0"
 jchronic = "0.2.4a"
 lz4-java = "1.8.0"
 lz4-stream = "1.0.0"
-commons-cli = "1.5.0"
+commons-cli = "1.6.0"
 paperlib = "1.0.8"
 paster = "1.1.5"
 vault = "1.7.1"
@@ -46,11 +46,11 @@ text = "3.0.4"
 piston = "0.5.7"
 
 # Tests
-mockito = "5.6.0"
+mockito = "5.8.0"
 
 # Gradle plugins
 pluginyml = "0.6.0"
-minotaur = "2.8.4"
+minotaur = "2.8.7"
 
 [libraries]
 # Minecraft expectations

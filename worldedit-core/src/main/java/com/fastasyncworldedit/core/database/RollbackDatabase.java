@@ -159,15 +159,20 @@ public class RollbackDatabase extends AsyncNotifyQueue {
         Future<Integer> future = call(() -> {
             try {
                 int count = 0;
-                String stmtStr = ascending ? uuid == null ? "SELECT * FROM`" + this.prefix + "edits` WHERE `time`>? AND `x2`>=? AND" +
-                        " `x1`<=? AND `z2`>=? AND `z1`<=? AND `y2`>=? AND `y1`<=? ORDER BY `time` , `id`" :
-                        "SELECT * FROM`" + this.prefix + "edits` WHERE `time`>? AND" +
-                                " `x2`>=? AND `x1`<=? AND `z2`>=? AND `z1`<=? AND `y2`>=? AND `y1`<=? AND `player`=? ORDER BY `time` ASC, `id` ASC" :
-                        uuid == null ? "SELECT * FROM`" + this.prefix + "edits` WHERE `time`>? AND `x2`>=? AND `x1`<=? AND `z2`>=? " +
-                                "AND `z1`<=? AND `y2`>=? AND `y1`<=? ORDER BY `time` DESC, `id` DESC" :
-                                "SELECT * FROM`" + this.prefix + "edits` WHERE `time`>? AND `x2`>=? AND `x1`<=? AND" +
-                                        " `z2`>=? AND `z1`<=? AND `y2`>=? AND `y1`<=? AND `player`=? ORDER BY `time` DESC, `id` DESC";
-                try (PreparedStatement stmt = connection.prepareStatement(stmtStr)) {
+                String stmtStr;
+                if (ascending) {
+                    if (uuid == null) {
+                        stmtStr = "SELECT * FROM`%sedits` WHERE `time`>? AND `x2`>=? AND `x1`<=? AND `z2`>=? AND `z1`<=? AND " +
+                                "`y2`>=? AND `y1`<=? ORDER BY `time` , `id`";
+                    } else {
+                        stmtStr = "SELECT * FROM`%sedits` WHERE `time`>? AND `x2`>=? AND `x1`<=? AND `z2`>=? AND `z1`<=? AND " +
+                                "`y2`>=? AND `y1`<=? AND `player`=? ORDER BY `time` ASC, `id` ASC";
+                    }
+                } else {
+                    stmtStr = "SELECT * FROM`%sedits` WHERE `time`>? AND `x2`>=? AND `x1`<=? AND `z2`>=? AND `z1`<=? AND " +
+                            "`y2`>=? AND `y1`<=? AND `player`=? ORDER BY `time` DESC, `id` DESC";
+                }
+                try (PreparedStatement stmt = connection.prepareStatement(stmtStr.formatted(this.prefix))) {
                     stmt.setInt(1, (int) (minTime / 1000));
                     stmt.setInt(2, pos1.getBlockX());
                     stmt.setInt(3, pos2.getBlockX());
@@ -193,20 +198,20 @@ public class RollbackDatabase extends AsyncNotifyQueue {
                 if (delete && uuid != null) {
                     try (PreparedStatement stmt = connection.prepareStatement("DELETE FROM`" + this.prefix +
                             "edits` WHERE `player`=? AND `time`>? AND `x2`>=? AND `x1`<=? AND `y2`>=? AND `y1`<=? AND `z2`>=? AND `z1`<=?")) {
-                        stmt.setInt(1, (int) (minTime / 1000));
-                        stmt.setInt(2, pos1.getBlockX());
-                        stmt.setInt(3, pos2.getBlockX());
-                        stmt.setInt(4, pos1.getBlockZ());
-                        stmt.setInt(5, pos2.getBlockZ());
-                        // Keep 128 offset for backwards-compatibility
-                        stmt.setInt(6, pos1.getBlockY() - 128);
-                        stmt.setInt(7, pos2.getBlockY() - 128);
                         byte[] uuidBytes = ByteBuffer
                                 .allocate(16)
                                 .putLong(uuid.getMostSignificantBits())
                                 .putLong(uuid.getLeastSignificantBits())
                                 .array();
-                        stmt.setBytes(8, uuidBytes);
+                        stmt.setBytes(1, uuidBytes);
+                        stmt.setInt(2, (int) (minTime / 1000));
+                        stmt.setInt(3, pos1.getBlockX());
+                        stmt.setInt(4, pos2.getBlockX());
+                        stmt.setInt(5, pos1.getBlockZ());
+                        stmt.setInt(6, pos2.getBlockZ());
+                        // Keep 128 offset for backwards-compatibility
+                        stmt.setInt(7, pos1.getBlockY() - 128);
+                        stmt.setInt(8, pos2.getBlockY() - 128);
                     }
                 }
                 return count;

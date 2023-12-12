@@ -1,6 +1,5 @@
 package com.fastasyncworldedit.core.extent.processor.lighting;
 
-import com.fastasyncworldedit.core.queue.IQueueChunk;
 import com.fastasyncworldedit.core.queue.IQueueExtent;
 import com.sk89q.worldedit.world.World;
 
@@ -25,6 +24,6 @@ public interface RelighterFactory {
      * @return a new Relighter instance with the specified settings.
      */
     @Nonnull
-    Relighter createRelighter(RelightMode relightMode, World world, IQueueExtent<IQueueChunk> queue);
+    Relighter createRelighter(RelightMode relightMode, World world, IQueueExtent<?> queue);
 
 }

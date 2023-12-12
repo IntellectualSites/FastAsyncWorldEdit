@@ -11,7 +11,7 @@ jobs:
       - name: Validate Gradle Wrapper
         uses: gradle/wrapper-validation-action@v1
       - name: Setup Java
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           distribution: temurin
           cache: gradle
@@ -19,7 +19,7 @@ jobs:
       - name: Clean Build
         run: ./gradlew clean build --no-daemon
       - name: Upload Release Assets
-        uses: AButler/upload-release-assets@v2.0
+        uses: AButler/upload-release-assets@v3.0
         with:
           files: 'worldedit-bukkit/build/libs/FastAsyncWorldEdit-Bukkit-*.jar'
           repo-token: ${{ secrets.GITHUB_TOKEN }}

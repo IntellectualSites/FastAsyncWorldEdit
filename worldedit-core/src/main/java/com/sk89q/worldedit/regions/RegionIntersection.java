@@ -164,14 +164,23 @@ public class RegionIntersection extends AbstractRegion {
         int bz = chunk.getZ() << 4;
         int tx = bx + 15;
         int tz = bz + 15;
+        List<Region> intersecting = new ArrayList<>(2);
         for (Region region : regions) {
             BlockVector3 regMin = region.getMinimumPoint();
             BlockVector3 regMax = region.getMaximumPoint();
             if (tx >= regMin.getX() && bx <= regMax.getX() && tz >= regMin.getZ() && bz <= regMax.getZ()) {
-                return region.processSet(chunk, get, set);
+                intersecting.add(region);
             }
         }
-        return null;
+        if (intersecting.isEmpty()) {
+            return null;
+        }
+        if (intersecting.size() == 1) {
+            return intersecting.get(0).processSet(chunk, get, set);
+        }
+        // if multiple regions intersect with this chunk, we must be more careful, otherwise one region might trim content of
+        // another region
+        return super.processSet(chunk, get, set);
     }
 
     @Override

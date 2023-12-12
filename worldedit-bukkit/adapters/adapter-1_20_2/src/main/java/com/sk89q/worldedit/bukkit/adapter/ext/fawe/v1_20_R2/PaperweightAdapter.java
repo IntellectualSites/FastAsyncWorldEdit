@@ -17,7 +17,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldedit.bukkit.adapter.impl.v1_20_R2;
+package com.sk89q.worldedit.bukkit.adapter.ext.fawe.v1_20_R2;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -28,8 +28,6 @@ import com.google.common.util.concurrent.Futures;
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Lifecycle;
 import com.sk89q.jnbt.NBTConstants;
-import com.sk89q.worldedit.bukkit.adapter.ext.fawe.v1_20_R2.PaperweightDataConverters;
-import com.sk89q.worldedit.bukkit.adapter.impl.v1_20_R2.PaperweightFakePlayer;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.blocks.BaseItemStack;
@@ -358,8 +356,7 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
 
     @Override
     public WorldNativeAccess<?, ?, ?> createWorldNativeAccess(org.bukkit.World world) {
-        return new com.sk89q.worldedit.bukkit.adapter.impl.v1_20_R2.PaperweightWorldNativeAccess(this,
-                new WeakReference<>(((CraftWorld) world).getHandle()));
+        return new PaperweightWorldNativeAccess(this, new WeakReference<>(((CraftWorld) world).getHandle()));
     }
 
     private static net.minecraft.core.Direction adapt(Direction face) {

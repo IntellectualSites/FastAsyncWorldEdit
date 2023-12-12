@@ -425,7 +425,8 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
                 }
             }
             if (processExtra) {
-                trimNBT(set, this::contains);
+                BlockVector3 chunkPos = chunk.getChunkBlockCoord().withY(0);
+                trimNBT(set, this::contains, pos -> this.contains(pos.add(chunkPos)));
             }
             return set;
         } else {
@@ -477,7 +478,8 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
                 }
             }
             if (processExtra) {
-                trimNBT(set, bv3 -> !this.contains(bv3));
+                BlockVector3 chunkPos = chunk.getChunkBlockCoord().withY(0);
+                trimNBT(set, bv3 -> !this.contains(bv3), bv3 -> !this.contains(bv3.add(chunkPos)));
             }
             return set;
         } else {

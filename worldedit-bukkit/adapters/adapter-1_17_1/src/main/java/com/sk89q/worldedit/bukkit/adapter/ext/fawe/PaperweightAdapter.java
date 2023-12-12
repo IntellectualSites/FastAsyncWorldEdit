@@ -198,7 +198,7 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
         getChunkFutureMainThreadMethod.setAccessible(true);
 
         mainThreadProcessorField = ServerChunkCache.class.getDeclaredField(
-                Refraction.pickName("mainThreadProcessor", "h")
+                Refraction.pickName("mainThreadProcessor", "g")
         );
         mainThreadProcessorField.setAccessible(true);
 
