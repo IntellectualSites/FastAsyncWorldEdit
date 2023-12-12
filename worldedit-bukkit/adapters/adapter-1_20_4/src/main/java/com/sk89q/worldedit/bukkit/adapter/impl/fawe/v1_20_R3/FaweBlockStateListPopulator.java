@@ -5,6 +5,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeManager;
@@ -101,6 +102,31 @@ public class FaweBlockStateListPopulator extends BlockStateListPopulator {
     @Override
     public WorldBorder getWorldBorder() {
         return world.getWorldBorder();
+    }
+
+    @Override
+    public boolean setBlock(final BlockPos pos, final BlockState state, final int flags, final int maxUpdateDepth) {
+        return world.setBlock(pos, state, flags, maxUpdateDepth);
+    }
+
+    @Override
+    public boolean removeBlock(final BlockPos pos, final boolean move) {
+        return world.removeBlock(pos, move);
+    }
+
+    @Override
+    public boolean destroyBlock(final BlockPos pos, final boolean drop, final Entity breakingEntity, final int maxUpdateDepth) {
+        return world.destroyBlock(pos, drop, breakingEntity, maxUpdateDepth);
+    }
+
+    @Override
+    public BlockState getBlockState(final BlockPos pos) {
+        return world.getBlockState(pos);
+    }
+
+    @Override
+    public boolean setBlock(final BlockPos pos, final BlockState state, final int flags) {
+        return world.setBlock(pos, state, flags);
     }
 
 }
