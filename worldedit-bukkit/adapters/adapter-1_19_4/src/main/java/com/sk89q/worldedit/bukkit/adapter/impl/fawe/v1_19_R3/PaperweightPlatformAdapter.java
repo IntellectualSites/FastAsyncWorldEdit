@@ -58,8 +58,8 @@ import net.minecraft.world.level.chunk.PalettedContainer;
 import net.minecraft.world.level.chunk.SingleValuePalette;
 import net.minecraft.world.level.entity.PersistentEntitySectionManager;
 import org.apache.logging.log4j.Logger;
+import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_19_R3.CraftChunk;
-import sun.misc.Unsafe;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -283,7 +283,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                 } catch (TimeoutException e) {
                     String world = serverLevel.getWorld().getName();
                     // We've already taken 10 seconds we can afford to wait a little here.
-                    boolean loaded = false; // TODO TaskManager.taskManager().sync(() -> Bukkit.getWorld(world) != null);
+                    boolean loaded = TaskManager.taskManager().syncGlobal(() -> Bukkit.getWorld(world) != null);
                     if (loaded) {
                         LOGGER.warn("Chunk {},{} failed to load in 10 seconds in world {}. Retrying...", chunkX, chunkZ, world);
                         // Retry chunk load

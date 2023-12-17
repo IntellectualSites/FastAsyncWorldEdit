@@ -130,13 +130,12 @@ public class Fawe {
         this.timer = new FaweTimer();
 
         // Delayed worldedit setup
-        // TODO support again
-        /*TaskManager.taskManager().later(() -> {
+        TaskManager.taskManager().laterGlobal(() -> {
             try {
                 WEManager.weManager().addManagers(Fawe.this.implementation.getMaskManagers());
             } catch (Throwable ignored) {
             }
-        }, 0);*/
+        }, 0);
 
         if (!FoliaSupport.isFolia()) {
             // TODO TaskManager.taskManager().repeat(timer, 1);

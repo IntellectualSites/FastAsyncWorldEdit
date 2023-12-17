@@ -170,13 +170,21 @@ public abstract class TaskManager {
     }
 
     /**
-     * Run a task later on the main thread.
+     * Run a task later on the ticking thread at the given location.
      *
      * @param runnable the task to run
      * @param location the location context to run at
      * @param delay    in ticks
      */
     public abstract void later(@Nonnull final Runnable runnable, Location location, final int delay);
+
+    /**
+     * Run a task later on the global tick thread.
+     *
+     * @param runnable the task to run
+     * @param delay    in ticks
+     */
+    public abstract void laterGlobal(@Nonnull final Runnable runnable, final int delay);
 
     /**
      * Run a task later asynchronously.

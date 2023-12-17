@@ -80,6 +80,15 @@ public class FoliaTaskManager extends TaskManager {
     }
 
     @Override
+    public void laterGlobal(@NotNull final Runnable runnable, final int delay) {
+        Bukkit.getGlobalRegionScheduler().runDelayed(
+                WorldEditPlugin.getInstance(),
+                asConsumer(runnable),
+                delay
+        );
+    }
+
+    @Override
     public void laterAsync(@NotNull final Runnable runnable, final int delay) {
         Bukkit.getAsyncScheduler().runDelayed(
                 WorldEditPlugin.getInstance(),

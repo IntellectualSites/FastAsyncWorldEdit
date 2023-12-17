@@ -48,6 +48,11 @@ public class BukkitTaskManager extends TaskManager {
 
     @Override
     public void later(@NotNull final Runnable runnable, final Location location, final int delay) {
+        laterGlobal(runnable, delay);
+    }
+
+    @Override
+    public void laterGlobal(@NotNull final Runnable runnable, final int delay) {
         this.plugin.getServer().getScheduler().runTaskLater(this.plugin, runnable, delay);
     }
 
