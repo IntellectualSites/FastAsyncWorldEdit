@@ -721,6 +721,13 @@ public class Settings extends Config {
                 " - Requires clipboard.use-disk to be enabled"
         })
         public boolean SAVE_CLIPBOARD_NBT_TO_DISK = true;
+        @Comment({
+                "Apply a file lock on the clipboard file (only relevant if clipboad.on-disk is enabled)",
+                " - Prevents other processes using the file whilst in use by FAWE",
+                " - This extends to other servers, useful if you have multiple servers using a unified clipboard folder",
+                " - May run into issues where a file lock is not correctly lifted"
+        })
+        public boolean LOCK_CLIPBOARD_FILE = false;
 
     }
 
