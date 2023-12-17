@@ -92,6 +92,7 @@
   "fawe.error.parser.invalid-data": "Invalid data: {0}",
   "fawe.error.unsupported": "Unsupported!",
   "fawe.error.invalid-block-type": "Does not match a valid block type: {0}",
+  "fawe.error.invalid-block-state-property": "Cannot parse value `{0}` for property `{1}`, block state: `{2}`",
   "fawe.error.nbt.forbidden": "You are not allowed to use nbt. Lacking permission: {0}",
   "fawe.error.invalid-arguments": "Invalid amount of arguments. Expected: {0}",
   "fawe.error.unrecognised-tag": "Unrecognised tag: {0} {1}",
