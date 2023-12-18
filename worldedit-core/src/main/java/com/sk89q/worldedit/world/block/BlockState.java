@@ -178,9 +178,18 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
             String name = property.getName();
 
             charSequence.setSubstring(propStrStart + name.length() + 2, state.length() - 1);
-            int index = charSequence.length() <= 0 ? -1 : property.getIndexFor(charSequence);
-            if (index != -1) {
-                return type.withPropertyId(index);
+            try {
+                int index = charSequence.length() <= 0 ? -1 : property.getIndexFor(charSequence);
+                if (index != -1) {
+                    return type.withPropertyId(index);
+                }
+            } catch (Exception e) {
+                throw new InputParseException(Caption.of(
+                        "fawe.error.invalid-block-state-property",
+                        TextComponent.of(charSequence.toString()),
+                        TextComponent.of(name),
+                        TextComponent.of(state)
+                ), e);
             }
         }
         int stateId;
@@ -200,7 +209,17 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
                 case ',': {
                     charSequence.setSubstring(last, i);
                     if (property != null) {
-                        int index = property.getIndexFor(charSequence);
+                        int index;
+                        try {
+                            index = property.getIndexFor(charSequence);
+                        } catch (Exception e) {
+                            throw new InputParseException(Caption.of(
+                                    "fawe.error.invalid-block-state-property",
+                                    TextComponent.of(charSequence.toString()),
+                                    TextComponent.of(property.getName()),
+                                    TextComponent.of(state)
+                            ), e);
+                        }
                         if (index == -1) {
                             throw SuggestInputParseException.of(charSequence.toString(), (List<Object>) property.getValues());
                         }
