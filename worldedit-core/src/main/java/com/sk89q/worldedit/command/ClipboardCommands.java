@@ -456,7 +456,7 @@ public class ClipboardCommands {
                     boolean pasteEntities,
             @Switch(name = 'b', desc = "Paste biomes if available")
                     boolean pasteBiomes,
-            @Switch(name = 'x', desc = "Remove existing entities in the affect region")
+            @Switch(name = 'x', desc = "Remove existing entities in the affected region")
                     boolean removeEntities
     ) throws WorldEditException {
         ClipboardHolder holder = session.getClipboard();
@@ -524,7 +524,7 @@ public class ClipboardCommands {
             @ClipboardMask
                     Mask sourceMask,
             //FAWE start - entity removal
-            @Switch(name = 'x', desc = "Remove existing entities in the affect region")
+            @Switch(name = 'x', desc = "Remove existing entities in the affected region")
                     boolean removeEntities
             //FAWE end
 
