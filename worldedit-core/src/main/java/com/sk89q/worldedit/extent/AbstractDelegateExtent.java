@@ -25,27 +25,34 @@ import com.fastasyncworldedit.core.extent.HistoryExtent;
 import com.fastasyncworldedit.core.extent.NullExtent;
 import com.fastasyncworldedit.core.history.changeset.AbstractChangeSet;
 import com.fastasyncworldedit.core.internal.exception.FaweException;
+import com.fastasyncworldedit.core.queue.Filter;
 import com.fastasyncworldedit.core.queue.IBatchProcessor;
 import com.fastasyncworldedit.core.util.ExtentTraverser;
 import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.buffer.ForgetfulExtentBuffer;
+import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.OperationQueue;
+import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.util.Countable;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BlockType;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -168,6 +175,7 @@ public class AbstractDelegateExtent implements Extent {
         }
     }
 
+    //FAWE start
     @Override
     public boolean cancel() {
         ExtentTraverser<Extent> traverser = new ExtentTraverser<>(this);
@@ -188,7 +196,6 @@ public class AbstractDelegateExtent implements Extent {
         return true;
     }
 
-    //FAWE start
     @Override
     public void removeEntity(int x, int y, int z, UUID uuid) {
         extent.removeEntity(x, y, z, uuid);
@@ -226,8 +233,69 @@ public class AbstractDelegateExtent implements Extent {
     }
 
     @Override
+    public boolean isWorld() {
+        return extent.isWorld();
+    }
+
+    @Override
+    public List<Countable<BlockType>> getBlockDistribution(final Region region) {
+        return extent.getBlockDistribution(region);
+    }
+
+    @Override
+    public List<Countable<BlockState>> getBlockDistributionWithData(final Region region) {
+        return extent.getBlockDistributionWithData(region);
+    }
+
+    @Override
     public int getMaxY() {
         return extent.getMaxY();
+    }
+
+    @Override
+    public int countBlocks(final Region region, final Set<BaseBlock> searchBlocks) {
+        return extent.countBlocks(region, searchBlocks);
+    }
+
+    @Override
+    public int countBlocks(final Region region, final Mask searchMask) {
+        return extent.countBlocks(region, searchMask);
+    }
+
+    @Override
+    public <B extends BlockStateHolder<B>> int setBlocks(final Region region, final B block) throws MaxChangedBlocksException {
+        return extent.setBlocks(region, block);
+    }
+
+    @Override
+    public int setBlocks(final Region region, final Pattern pattern) throws MaxChangedBlocksException {
+        return extent.setBlocks(region, pattern);
+    }
+
+    @Override
+    public <B extends BlockStateHolder<B>> int replaceBlocks(
+            final Region region,
+            final Set<BaseBlock> filter,
+            final B replacement
+    )
+            throws MaxChangedBlocksException {
+        return extent.replaceBlocks(region, filter, replacement);
+    }
+
+    @Override
+    public int replaceBlocks(final Region region, final Set<BaseBlock> filter, final Pattern pattern) throws
+            MaxChangedBlocksException {
+        return extent.replaceBlocks(region, filter, pattern);
+    }
+
+    @Override
+    public int replaceBlocks(final Region region, final Mask mask, final Pattern pattern) throws MaxChangedBlocksException {
+        return extent.replaceBlocks(region, mask, pattern);
+    }
+
+    @Override
+    public int setBlocks(final Set<BlockVector3> vset, final Pattern pattern) {
+        return extent.setBlocks(vset, pattern);
     }
 
     @Override
@@ -295,22 +363,28 @@ public class AbstractDelegateExtent implements Extent {
         return this;
     }
 
+    @Override
+    public <T extends Filter> T apply(final Region region, final T filter, final boolean full) {
+        return extent.apply(region, filter, full);
+    }
+    //FAWE end
+
     protected Operation commitBefore() {
         return null;
     }
 
     @Override
+    public BiomeType getBiome(BlockVector3 position) {
+        //FAWE start - switch top x,y,z
+        return extent.getBiomeType(position.getX(), position.getY(), position.getZ());
+        //FAWE end
+    }
+
+    //FAWE start
+    @Override
     public BiomeType getBiomeType(int x, int y, int z) {
         return extent.getBiomeType(x, y, z);
     }
-
-    @Override
-    public BiomeType getBiome(BlockVector3 position) {
-        return extent.getBiome(position);
-    }
-    /*
-     History
-     */
 
     @Override
     public int getEmittedLight(int x, int y, int z) {
@@ -341,13 +415,17 @@ public class AbstractDelegateExtent implements Extent {
             new ExtentTraverser<>(this).setNext(new HistoryExtent(extent, changeSet));
         }
     }
+    //FAWE end
 
     @Override
     public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 position, T block)
             throws WorldEditException {
+        //FAWE start - switch to x,y,z
         return extent.setBlock(position.getX(), position.getY(), position.getZ(), block);
+        //FAWE end
     }
 
+    //FAWE start
     @Override
     public <T extends BlockStateHolder<T>> boolean setBlock(
             int x, int y,
@@ -360,6 +438,7 @@ public class AbstractDelegateExtent implements Extent {
     public boolean setTile(int x, int y, int z, CompoundTag tile) throws WorldEditException {
         return setBlock(x, y, z, getBlock(x, y, z).toBaseBlock(tile));
     }
+    //FAWE end
 
     @Override
     public boolean fullySupports3DBiomes() {
@@ -367,13 +446,16 @@ public class AbstractDelegateExtent implements Extent {
     }
 
     @Override
-    public boolean setBiome(int x, int y, int z, BiomeType biome) {
-        return extent.setBiome(x, y, z, biome);
+    public boolean setBiome(BlockVector3 position, BiomeType biome) {
+        //FAWE start - switch to x,y,z
+        return extent.setBiome(position.getX(), position.getY(), position.getZ(), biome);
+        //FAWE end
     }
 
+    //FAWE start
     @Override
-    public boolean setBiome(BlockVector3 position, BiomeType biome) {
-        return extent.setBiome(position.getX(), position.getY(), position.getZ(), biome);
+    public boolean setBiome(int x, int y, int z, BiomeType biome) {
+        return extent.setBiome(x, y, z, biome);
     }
 
     @Override
