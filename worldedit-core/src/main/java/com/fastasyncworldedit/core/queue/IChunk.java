@@ -38,7 +38,7 @@ public interface IChunk extends Trimable, IChunkGet, IChunkSet {
      * Return the minimum block coordinate of the chunk
      *
      * @return BlockVector3 of minimum block coordinate
-     * @since TODO
+     * @since 2.8.4
      */
     default BlockVector3 getChunkBlockCoord() {
         return BlockVector3.at(getX() << 4, getMinY(), getZ() << 4);
