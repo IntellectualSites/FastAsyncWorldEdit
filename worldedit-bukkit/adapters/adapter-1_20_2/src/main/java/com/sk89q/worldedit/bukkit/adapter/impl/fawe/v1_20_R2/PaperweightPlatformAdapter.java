@@ -7,6 +7,7 @@ import com.fastasyncworldedit.bukkit.adapter.NMSAdapter;
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.math.BitArrayUnstretched;
+import com.fastasyncworldedit.core.util.FoliaSupport;
 import com.fastasyncworldedit.core.util.MathMan;
 import com.fastasyncworldedit.core.util.ReflectionUtils;
 import com.fastasyncworldedit.core.util.TaskManager;
@@ -21,6 +22,7 @@ import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import io.papermc.lib.PaperLib;
+import io.papermc.paper.util.TickThread;
 import io.papermc.paper.world.ChunkEntitySlices;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
@@ -292,9 +294,8 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             }
             CompletableFuture<org.bukkit.Chunk> future = serverLevel.getWorld().getChunkAtAsync(chunkX, chunkZ, true, true);
             try {
-                CraftChunk chunk;
                 try {
-                    chunk = (CraftChunk) future.get(10, TimeUnit.SECONDS);
+                    future.get(10, TimeUnit.SECONDS);
                 } catch (TimeoutException e) {
                     String world = serverLevel.getWorld().getName();
                     // We've already taken 10 seconds we can afford to wait a little here.
@@ -302,26 +303,28 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                     if (loaded) {
                         LOGGER.warn("Chunk {},{} failed to load in 10 seconds in world {}. Retrying...", chunkX, chunkZ, world);
                         // Retry chunk load
-                        chunk = (CraftChunk) serverLevel.getWorld().getChunkAtAsync(chunkX, chunkZ, true, true).get();
+                        serverLevel.getWorld().getChunkAtAsync(chunkX, chunkZ, true, true).get();
                     } else {
                         throw new UnsupportedOperationException("Cannot load chunk from unloaded world " + world + "!");
                     }
                 }
                 addTicket(serverLevel, chunkX, chunkZ);
-                return (LevelChunk) CRAFT_CHUNK_GET_HANDLE.invoke(chunk);
+                // chunk is loaded now, can access it directly
+                return serverLevel.getChunkSource().getChunkAtIfCachedImmediately(chunkX, chunkZ);
             } catch (Throwable e) {
                 e.printStackTrace();
             }
         }
         return TaskManager.taskManager().syncAt(() -> serverLevel.getChunk(chunkX, chunkZ),
-                BukkitAdapter.adapt(serverLevel.getWorld()), chunkX, chunkZ);
+                BukkitAdapter.adapt(serverLevel.getWorld()), chunkX, chunkZ
+        );
     }
 
     private static void addTicket(ServerLevel serverLevel, int chunkX, int chunkZ) {
         // Ensure chunk is definitely loaded before applying a ticket
         PaperweightPlatformAdapter.task(() -> serverLevel
-                .getChunkSource()
-                .addRegionTicket(TicketType.UNLOAD_COOLDOWN, new ChunkPos(chunkX, chunkZ), 0, Unit.INSTANCE),
+                        .getChunkSource()
+                        .addRegionTicket(TicketType.UNLOAD_COOLDOWN, new ChunkPos(chunkX, chunkZ), 0, Unit.INSTANCE),
                 serverLevel, chunkX, chunkZ
         );
     }
@@ -679,6 +682,13 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
 
     public static void task(Runnable task, ServerLevel level, int chunkX, int chunkZ) {
         TaskManager.taskManager().task(task, BukkitAdapter.adapt(level.getWorld()), chunkX, chunkZ);
+    }
+
+    public static boolean isTickThreadFor(LevelChunk levelChunk) {
+        if (FoliaSupport.isFolia()) {
+            return TickThread.isTickThreadFor(levelChunk.level, levelChunk.locX, levelChunk.locZ);
+        }
+        return Fawe.isTickThread();
     }
 
     record FakeIdMapBlock(int size) implements IdMap<net.minecraft.world.level.block.state.BlockState> {

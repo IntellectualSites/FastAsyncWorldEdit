@@ -135,7 +135,7 @@ public class Fawe {
                 WEManager.weManager().addManagers(Fawe.this.implementation.getMaskManagers());
             } catch (Throwable ignored) {
             }
-        }, 0);
+        }, 1);
 
         if (!FoliaSupport.isFolia()) {
             // TODO TaskManager.taskManager().repeat(timer, 1);

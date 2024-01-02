@@ -10,8 +10,8 @@ public final class FoliaSupport {
     static {
         boolean isFolia = false;
         try {
-            // Assume API is present
-            Class.forName("io.papermc.paper.threadedregions.scheduler.EntityScheduler");
+            // Assume implementation details are present
+            Class.forName("io.papermc.paper.threadedregions.RegionizedServer");
             isFolia = true;
         } catch (Exception unused) {
 
