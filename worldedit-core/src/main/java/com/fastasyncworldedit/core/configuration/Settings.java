@@ -544,12 +544,6 @@ public class Settings extends Config {
         })
         public boolean POOL = true;
 
-        @Comment({
-                "When using fastmode do not bother to tick existing/placed blocks/fluids",
-                "Only works in versions up to 1.17.1"
-        })
-        public boolean NO_TICK_FASTMODE = true;
-
         public static class PROGRESS {
 
             @Comment({"Display constant titles about the progress of a user's edit",
