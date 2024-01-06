@@ -3,7 +3,6 @@ package com.fastasyncworldedit.core.util.progress;
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.util.StringMan;
-import com.fastasyncworldedit.core.util.TaskManager;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;

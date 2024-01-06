@@ -690,7 +690,7 @@ public final class PlatformCommandManager {
             if (actor instanceof Player player) {
                 TaskManager.taskManager().task(() -> handleCommandOnCurrentThread(event), player.getLocation());
             } else {
-                // TODO
+                // TODO folia
             }
             return;
         } else {

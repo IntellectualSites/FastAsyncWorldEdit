@@ -3,7 +3,6 @@ package com.fastasyncworldedit.bukkit;
 import com.fastasyncworldedit.bukkit.adapter.BukkitQueueHandler;
 import com.fastasyncworldedit.bukkit.adapter.NMSAdapter;
 import com.fastasyncworldedit.bukkit.listener.BrushListener;
-import com.fastasyncworldedit.bukkit.listener.ChunkListener9;
 import com.fastasyncworldedit.bukkit.listener.RenderListener;
 import com.fastasyncworldedit.bukkit.regions.GriefDefenderFeature;
 import com.fastasyncworldedit.bukkit.regions.GriefPreventionFeature;
@@ -12,7 +11,6 @@ import com.fastasyncworldedit.bukkit.regions.TownyFeature;
 import com.fastasyncworldedit.bukkit.regions.WorldGuardFeature;
 import com.fastasyncworldedit.bukkit.util.BukkitTaskManager;
 import com.fastasyncworldedit.bukkit.util.FoliaTaskManager;
-import com.fastasyncworldedit.core.util.FoliaSupport;
 import com.fastasyncworldedit.bukkit.util.ItemUtil;
 import com.fastasyncworldedit.bukkit.util.MinecraftVersion;
 import com.fastasyncworldedit.bukkit.util.image.BukkitImageViewer;
@@ -24,6 +22,7 @@ import com.fastasyncworldedit.core.queue.implementation.QueueHandler;
 import com.fastasyncworldedit.core.queue.implementation.preloader.AsyncPreloader;
 import com.fastasyncworldedit.core.queue.implementation.preloader.Preloader;
 import com.fastasyncworldedit.core.regions.FaweMaskManager;
+import com.fastasyncworldedit.core.util.FoliaSupport;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.fastasyncworldedit.core.util.WEManager;
 import com.fastasyncworldedit.core.util.image.ImageViewer;
@@ -92,8 +91,7 @@ public class FaweBukkit implements IFawe, Listener {
         platformAdapter = new NMSAdapter();
 
         //PlotSquared support is limited to Spigot/Paper as of 02/20/2020
-        // TODO plotsquared support
-        // TaskManager.taskManager().later(this::setupPlotSquared, 0);
+        TaskManager.taskManager().taskGlobal(this::setupPlotSquared);
 
         // TODO moved out of task below??
         Bukkit.getPluginManager().registerEvents(FaweBukkit.this, FaweBukkit.this.plugin);

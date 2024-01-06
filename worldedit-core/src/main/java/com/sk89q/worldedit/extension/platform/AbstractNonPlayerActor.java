@@ -20,7 +20,6 @@
 package com.sk89q.worldedit.extension.platform;
 
 import com.fastasyncworldedit.core.internal.exception.FaweException;
-import com.fastasyncworldedit.core.util.TaskManager;
 import com.fastasyncworldedit.core.util.task.AsyncNotifyKeyedQueue;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.internal.cui.CUIEvent;
@@ -109,7 +108,7 @@ public abstract class AbstractNonPlayerActor implements Actor {
         if (async) {
             asyncNotifyQueue.run(wrapped);
         } else {
-            // TODO
+            // TODO folia
             // TaskManager.taskManager().taskNow(wrapped, false);
         }
         return true;

@@ -1,7 +1,6 @@
 package com.fastasyncworldedit.core.entity;
 
 import com.fastasyncworldedit.core.Fawe;
-import com.fastasyncworldedit.core.util.TaskManager;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
 import com.sk89q.worldedit.world.entity.EntityType;
@@ -27,7 +26,7 @@ public class LazyBaseEntity extends BaseEntity {
             if (Fawe.isMainThread()) {
                 setNbt(tmp.get());
             } else {
-                // TODO
+                // TODO folia
                 // setNbt(TaskManager.taskManager().sync(tmp));
             }
         }
