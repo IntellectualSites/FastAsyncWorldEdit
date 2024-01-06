@@ -2,7 +2,7 @@ name: FastAsyncWorldEdit
 main: com.sk89q.worldedit.bukkit.WorldEditPlugin
 version: "${internalVersion}"
 load: STARTUP
-api-version: 1.15
+api-version: 1.19
 softdepend: [ Vault ]
 provides: [ WorldEdit ]
 website: https://www.spigotmc.org/resources/13932/
