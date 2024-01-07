@@ -6,6 +6,7 @@ import com.fastasyncworldedit.core.history.change.MutableBlockChange;
 import com.fastasyncworldedit.core.history.change.MutableEntityChange;
 import com.fastasyncworldedit.core.history.change.MutableFullBlockChange;
 import com.fastasyncworldedit.core.history.change.MutableTileChange;
+import com.fastasyncworldedit.core.history.change.BlockPositionChange;
 import com.fastasyncworldedit.core.internal.exception.FaweSmallEditUnsupportedException;
 import com.fastasyncworldedit.core.internal.io.FaweInputStream;
 import com.fastasyncworldedit.core.internal.io.FaweOutputStream;
@@ -20,6 +21,7 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.io.EOFException;
 import java.io.IOException;
@@ -32,6 +34,7 @@ import java.util.NoSuchElementException;
 /**
  * FAWE stream ChangeSet offering support for extended-height worlds
  */
+@ApiStatus.Internal
 public abstract class FaweStreamChangeSet extends AbstractChangeSet {
 
     public static final int HEADER_SIZE = 9;
@@ -68,19 +71,15 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
         }
     }
 
-    public interface FaweStreamPositionDelegate {
+    interface FaweStreamPositionDelegate {
 
         void write(OutputStream out, int x, int y, int z) throws IOException;
 
-        int readX(FaweInputStream in) throws IOException;
-
-        int readY(FaweInputStream in) throws IOException;
-
-        int readZ(FaweInputStream in) throws IOException;
+        void read(FaweInputStream in, BlockPositionChange change) throws IOException;
 
     }
 
-    public interface FaweStreamIdDelegate {
+    interface FaweStreamIdDelegate {
 
         void writeChange(FaweOutputStream out, int from, int to) throws IOException;
 
@@ -138,6 +137,7 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
         }
         if (mode == 1 || mode == 4) { // small
             posDel = new FaweStreamPositionDelegate() {
+                final byte[] buffer = new byte[4];
                 int lx;
                 int ly;
                 int lz;
@@ -162,23 +162,14 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
                     out.write(b4);
                 }
 
-                final byte[] buffer = new byte[4];
-
                 @Override
-                public int readX(FaweInputStream in) throws IOException {
+                public void read(final FaweInputStream in, final BlockPositionChange change) throws IOException {
                     in.readFully(buffer);
-                    return lx = lx + ((((buffer[1] & 0xFF) | ((MathMan.unpair16x(buffer[3])) << 8)) << 20) >> 20);
+                    change.x = lx = lx + ((((buffer[1] & 0xFF) | ((MathMan.unpair16x(buffer[3])) << 8)) << 20) >> 20);
+                    change.y = (ly = ly + buffer[0]) & 0xFF;
+                    change.z = lz = lz + ((((buffer[2] & 0xFF) | ((MathMan.unpair16y(buffer[3])) << 8)) << 20) >> 20);
                 }
 
-                @Override
-                public int readY(FaweInputStream in) {
-                    return (ly = ly + buffer[0]) & 0xFF;
-                }
-
-                @Override
-                public int readZ(FaweInputStream in) throws IOException {
-                    return lz = lz + ((((buffer[2] & 0xFF) | ((MathMan.unpair16y(buffer[3])) << 8)) << 20) >> 20);
-                }
             };
         } else {
             posDel = new FaweStreamPositionDelegate() {
@@ -201,19 +192,11 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
                 }
 
                 @Override
-                public int readX(FaweInputStream is) throws IOException {
-                    is.readFully(buffer);
-                    return lx = lx + ((buffer[0] & 0xFF) | (buffer[1] << 8));
-                }
-
-                @Override
-                public int readY(FaweInputStream is) throws IOException {
-                    return ly = ly + ((buffer[4] & 0xFF) | (buffer[5]) << 8);
-                }
-
-                @Override
-                public int readZ(FaweInputStream is) throws IOException {
-                    return lz = lz + ((buffer[2] & 0xFF) | (buffer[3]) << 8);
+                public void read(final FaweInputStream in, final BlockPositionChange change) throws IOException {
+                    in.readFully(buffer);
+                    change.x = lx = lx + ((buffer[0] & 0xFF) | (buffer[1] << 8));
+                    change.z = lz = lz + ((buffer[2] & 0xFF) | (buffer[3]) << 8);
+                    change.y = ly = ly + ((buffer[4] & 0xFF) | (buffer[5]) << 8);
                 }
             };
         }
@@ -428,9 +411,9 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
 
             public MutableBlockChange read() {
                 try {
-                    change.x = posDel.readX(is) + originX;
-                    change.y = posDel.readY(is);
-                    change.z = posDel.readZ(is) + originZ;
+                    posDel.read(is, change);
+                    change.x += originX;
+                    change.z += originZ;
                     idDel.readCombined(is, change, dir);
                     return change;
                 } catch (EOFException ignored) {
@@ -545,9 +528,9 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
 
             public MutableFullBlockChange read() {
                 try {
-                    change.x = posDel.readX(is) + originX;
-                    change.y = posDel.readY(is);
-                    change.z = posDel.readZ(is) + originZ;
+                    posDel.read(is, change);
+                    change.x += originX;
+                    change.z += originZ;
                     idDel.readCombined(is, change);
                     return change;
                 } catch (EOFException ignored) {
@@ -765,11 +748,9 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
                 int amount = (Settings.settings().HISTORY.BUFFER_SIZE - HEADER_SIZE) / 9;
                 MutableFullBlockChange change = new MutableFullBlockChange(null, 0, false);
                 for (int i = 0; i < amount; i++) {
-                    int x = posDel.readX(fis) + ox;
-                    int y = posDel.readY(fis);
-                    int z = posDel.readZ(fis) + ox;
+                    posDel.read(fis, change);
                     idDel.readCombined(fis, change);
-                    summary.add(x, z, change.to);
+                    summary.add(change.x + ox, change.z + oz, change.to);
                 }
             }
         } catch (EOFException ignored) {
