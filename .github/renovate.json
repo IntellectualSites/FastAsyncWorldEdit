@@ -1,18 +1,18 @@
 {
-  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "config:base",
+  "$schema" : "https://docs.renovatebot.com/renovate-schema.json",
+  "extends" : [
+    "config:recommended",
     ":semanticCommitsDisabled"
   ],
-  "automerge": true,
-  "ignoreDeps": [
-    "guava",  
+  "automerge" : true,
+  "ignoreDeps" : [
+    "guava",
     "com.google.guava:guava",
     "rhino-runtime",
     "org.antlr",
     "antlr4-runtime",
     "fastutil",
-    "it.unimi.dsi:fastutil",  
+    "it.unimi.dsi:fastutil",
     "auto-value-annotations",
     "auto-value",
     "com.google.code.gson:gson",
@@ -29,7 +29,37 @@
     "org.spongepowered:spongeapi",
     "org.yaml:snakeyaml"
   ],
-  "labels": ["Renovate"],
-  "rebaseWhen": "conflicted",
-  "schedule": ["on the first day of the month"]
+  "labels" : [
+    "Renovate"
+  ],
+  "rebaseWhen" : "conflicted",
+  "schedule" : [
+    "on the first day of the month"
+  ],
+  "customManagers" : [
+    {
+      "customType" : "regex",
+      "datasourceTemplate" : "custom.paperweight-userdev",
+      "fileMatch" : "^worldedit-bukkit\\/adapters\\/adapter-\\d+_\\d+(_\\d+)?\\/build\\.gradle\\.kts$",
+      "matchStrings" : [
+        "url=(?<registryUrl>.*)\\s",
+        "paperDevBundle\\(\"(?<currentValue>.*?)\"\\)\\s"
+      ],
+      "matchStringsStrategy": "combination",
+      "depNameTemplate" : "paperweight-userdev",
+      "extractVersionTemplate" : "(?<version>\\d+\\.\\d+\\.?\\d*-R0\\.1-\\d+\\.\\d+-\\d+)"
+    }
+  ],
+  "customDatasources" : {
+    "paperweight-userdev": {
+      "defaultRegistryUrlTemplate": "",
+      "format": "html"
+    }
+  },
+  "packageRules" : [
+    {
+      "matchDatasources" : ["custom.paperweight-userdev"],
+      "versioning": "regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)?-R0\\.1-\\d+\\d+\\.\\d+-(?<build>\\d+)$"
+    }
+  ]
 }
