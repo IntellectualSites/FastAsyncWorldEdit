@@ -24,9 +24,9 @@ import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -758,7 +758,7 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
         }
 
         @Override
-        public @Nullable C populate(final @NotNull C change) {
+        public @Nullable C populate(final @Nonnull C change) {
             try {
                 write(change, (CompoundTag) inputStream.readTag());
                 return change;
@@ -786,7 +786,7 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
             }
 
             @Override
-            public @NotNull MutableTileChange create() {
+            public @Nonnull MutableTileChange create() {
                 return new MutableTileChange(null, create);
             }
 
@@ -814,7 +814,7 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
             }
 
             @Override
-            public @NotNull MutableEntityChange create() {
+            public @Nonnull MutableEntityChange create() {
                 return new MutableEntityChange(null, create);
             }
 
@@ -841,12 +841,12 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
         class Populator implements ChangePopulator<MutableFullBlockChange> {
 
             @Override
-            public @NotNull MutableFullBlockChange create() {
+            public @Nonnull MutableFullBlockChange create() {
                 return new MutableFullBlockChange(blockBag, mode, dir);
             }
 
             @Override
-            public @Nullable MutableFullBlockChange populate(@NotNull final MutableFullBlockChange change) {
+            public @Nullable MutableFullBlockChange populate(@Nonnull final MutableFullBlockChange change) {
                 try {
                     posDel.read(is, change);
                     idDel.readCombined(is, change);
@@ -883,12 +883,12 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
         class Populator implements ChangePopulator<MutableBlockChange> {
 
             @Override
-            public @NotNull MutableBlockChange create() {
+            public @Nonnull MutableBlockChange create() {
                 return new MutableBlockChange(0, 0, 0, BlockTypes.AIR.getInternalId());
             }
 
             @Override
-            public @Nullable MutableBlockChange populate(@NotNull final MutableBlockChange change) {
+            public @Nullable MutableBlockChange populate(@Nonnull final MutableBlockChange change) {
                 try {
                     posDel.read(is, change);
                     idDel.readCombined(is, change, dir);
@@ -924,12 +924,12 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
         class Populator implements ChangePopulator<MutableBiomeChange> {
 
             @Override
-            public @NotNull MutableBiomeChange create() {
+            public @Nonnull MutableBiomeChange create() {
                 return new MutableBiomeChange();
             }
 
             @Override
-            public @Nullable MutableBiomeChange populate(@NotNull final MutableBiomeChange change) {
+            public @Nullable MutableBiomeChange populate(@Nonnull final MutableBiomeChange change) {
                 try {
                     int int1 = is.read();
                     if (int1 != -1) {
