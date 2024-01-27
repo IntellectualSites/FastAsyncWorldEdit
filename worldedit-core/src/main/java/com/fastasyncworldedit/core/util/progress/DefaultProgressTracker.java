@@ -92,7 +92,7 @@ public class DefaultProgressTracker implements BiConsumer<DefaultProgressTracker
     }
 
     private void done() {
-        // TODO
+        // TODO (folia)
         // TaskManager.taskManager().task(this::doneTask);
     }
 
@@ -100,7 +100,7 @@ public class DefaultProgressTracker implements BiConsumer<DefaultProgressTracker
 
     private void send() {
         // Run on main thread
-        // TODO
+        // TODO (folia)
         // TaskManager.taskManager().task(this::sendTask);
     }
 

@@ -65,7 +65,7 @@ public class PaperweightFaweWorldNativeAccess implements WorldNativeAccess<Level
                 cachedChange -> new IntPair(cachedChange.blockPos.getX() >> 4, cachedChange.blockPos.getZ() >> 4),
                 HashSet::new,
                 (chunk, changes) -> {
-                    // TODO only send chunks based on ticks? Need to make sure everything actually flushed in the end
+                    // TODO (folia) only send chunks based on ticks? Need to make sure everything actually flushed in the end
                     /*boolean nextTick = true;
                     if (!FoliaSupport.isFolia()) {
                         int currentTick = MinecraftServer.currentTick;

@@ -37,7 +37,7 @@ public class FoliaTaskManager extends TaskManager {
 
     @Override
     public int repeatAsync(@NotNull final Runnable runnable, final int interval) {
-        // TODO return some kind of own ScheduledTask instead of int
+        // TODO (folia) return some kind of own ScheduledTask instead of int
         Bukkit.getAsyncScheduler().runAtFixedRate(
                 WorldEditPlugin.getInstance(),
                 asConsumer(runnable),
@@ -147,7 +147,6 @@ public class FoliaTaskManager extends TaskManager {
 
     @Override
     public <T> T syncGlobal(final Supplier<T> supplier) {
-        // TODO avoid deadlocks (Bukkit.isGlobalTickThread not available at time of writing)
         if (isGlobalTickThread()) {
             return supplier.get();
         }

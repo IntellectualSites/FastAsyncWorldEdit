@@ -108,7 +108,7 @@ public abstract class AbstractNonPlayerActor implements Actor {
         if (async) {
             asyncNotifyQueue.run(wrapped);
         } else {
-            // TODO folia
+            // TODO (folia)
             // TaskManager.taskManager().taskNow(wrapped, false);
         }
         return true;

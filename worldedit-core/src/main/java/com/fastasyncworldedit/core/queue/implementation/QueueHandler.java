@@ -91,7 +91,7 @@ public abstract class QueueHandler implements Trimable, Runnable {
     private long allocate = 50;
 
     protected QueueHandler() {
-        // TODO make main thread independent
+        // TODO (folia) make main thread independent
         // TaskManager.taskManager().repeat(this, 1);
     }
 

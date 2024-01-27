@@ -254,7 +254,7 @@ public class BukkitPlayer extends AbstractPlayerActor {
                     player.sendMessage("Teleportation failed");
                 }
             });
-            return true; // TODO this might not be correct
+            return true; // TODO (folia) this might not be correct
         }
         return TaskManager.taskManager().syncWith(() -> teleport.get().join(), this);
         //FAWE end

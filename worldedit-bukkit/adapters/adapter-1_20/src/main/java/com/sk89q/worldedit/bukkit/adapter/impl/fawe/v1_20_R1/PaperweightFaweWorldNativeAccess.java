@@ -57,7 +57,6 @@ public class PaperweightFaweWorldNativeAccess implements WorldNativeAccess<Level
         this.level = level;
         // Use the actual tick as minecraft-defined so we don't try to force blocks into the world when the server's already lagging.
         //  - With the caveat that we don't want to have too many cached changed (1024) so we'd flush those at 1024 anyway.
-        // TODO
         this.lastTick = new AtomicInteger();
         if (!FoliaSupport.isFolia()) {
             this.lastTick.set(Bukkit.getCurrentTick());
@@ -66,7 +65,7 @@ public class PaperweightFaweWorldNativeAccess implements WorldNativeAccess<Level
                 cachedChange -> new IntPair(cachedChange.blockPos.getX() >> 4, cachedChange.blockPos.getZ() >> 4),
                 HashSet::new,
                 (chunk, changes) -> {
-                    // TODO only send chunks based on ticks? Need to make sure everything actually flushed in the end
+                    // TODO (folia) only send chunks based on ticks? Need to make sure everything actually flushed in the end
                     /*boolean nextTick = true;
                     if (!FoliaSupport.isFolia()) {
                         int currentTick = MinecraftServer.currentTick;

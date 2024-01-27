@@ -68,8 +68,6 @@ public class BukkitTaskManager extends TaskManager {
         }
     }
 
-    // TODO
-
     @Override
     public <T> T syncAt(final Supplier<T> supplier, final World world, final int chunkX, final int chunkZ) {
         return sync(supplier);
@@ -90,7 +88,7 @@ public class BukkitTaskManager extends TaskManager {
             return supplier.get();
         }
         try {
-            // TODO
+            // TODO (folia)
             return Fawe.instance().getQueueHandler().sync(supplier).get();
         } catch (InterruptedException | ExecutionException e) {
             throw new RuntimeException(e);

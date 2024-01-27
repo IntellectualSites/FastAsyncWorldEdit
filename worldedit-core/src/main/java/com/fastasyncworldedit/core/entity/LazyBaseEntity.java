@@ -26,7 +26,7 @@ public class LazyBaseEntity extends BaseEntity {
             if (Fawe.isMainThread()) {
                 setNbt(tmp.get());
             } else {
-                // TODO folia
+                // TODO (folia)
                 // setNbt(TaskManager.taskManager().sync(tmp));
             }
         }

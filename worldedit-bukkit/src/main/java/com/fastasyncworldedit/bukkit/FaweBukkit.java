@@ -93,7 +93,7 @@ public class FaweBukkit implements IFawe, Listener {
         //PlotSquared support is limited to Spigot/Paper as of 02/20/2020
         TaskManager.taskManager().taskGlobal(this::setupPlotSquared);
 
-        // TODO moved out of task below??
+        // TODO (folia) moved out of task below??
         Bukkit.getPluginManager().registerEvents(FaweBukkit.this, FaweBukkit.this.plugin);
         // Registered delayed Event Listeners
         /*TaskManager.taskManager().task(() -> {
