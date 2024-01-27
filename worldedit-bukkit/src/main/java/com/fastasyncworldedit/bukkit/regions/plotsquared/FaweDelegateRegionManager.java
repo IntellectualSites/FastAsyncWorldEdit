@@ -76,8 +76,7 @@ public class FaweDelegateRegionManager {
                     e.printStackTrace();
                 } finally {
                     if (whenDone != null) {
-                        // TODO (folia)
-                        // TaskManager.taskManager().task(whenDone, new com.sk89q.worldedit.util.Location(world, ));
+                        com.plotsquared.core.util.task.TaskManager.runTask(whenDone);
                     }
                 }
             }
@@ -204,8 +203,7 @@ public class FaweDelegateRegionManager {
                         RelightMode.valueOf(com.fastasyncworldedit.core.configuration.Settings.settings().LIGHTING.MODE)
                 );
                 if (whenDone != null) {
-                    // TODO (folia)
-                    // TaskManager.taskManager().task(whenDone);
+                    com.plotsquared.core.util.task.TaskManager.runTask(whenDone);
                 }
             }
         });
@@ -274,8 +272,7 @@ public class FaweDelegateRegionManager {
                         RelightMode.valueOf(com.fastasyncworldedit.core.configuration.Settings.settings().LIGHTING.MODE)
                 );
                 if (whenDone != null) {
-                    // TODO (folia)
-                    // TaskManager.taskManager().task(whenDone);
+                    com.plotsquared.core.util.task.TaskManager.runTask(whenDone);
                 }
             }
         });
@@ -304,8 +301,7 @@ public class FaweDelegateRegionManager {
                     e.printStackTrace();
                 }
                 if (whenDone != null) {
-                    // TODO (folia)
-                    // TaskManager.taskManager().task(whenDone);
+                    com.plotsquared.core.util.task.TaskManager.runTask(whenDone);
                 }
             }
         });
@@ -358,8 +354,7 @@ public class FaweDelegateRegionManager {
                 }
             }
             if (whenDone != null) {
-                // TODO (folia)
-                // TaskManager.taskManager().task(whenDone);
+                com.plotsquared.core.util.task.TaskManager.runTask(whenDone);
             }
         });
         return true;
@@ -383,8 +378,7 @@ public class FaweDelegateRegionManager {
                     editSession.flushQueue();
                 }
                 if (whenDone != null) {
-                    // TODO (folia)
-                    // TaskManager.taskManager().task(whenDone);
+                    com.plotsquared.core.util.task.TaskManager.runTask(whenDone);
                 }
             }
         });

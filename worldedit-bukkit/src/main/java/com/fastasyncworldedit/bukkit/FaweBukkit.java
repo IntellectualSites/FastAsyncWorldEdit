@@ -3,6 +3,7 @@ package com.fastasyncworldedit.bukkit;
 import com.fastasyncworldedit.bukkit.adapter.BukkitQueueHandler;
 import com.fastasyncworldedit.bukkit.adapter.NMSAdapter;
 import com.fastasyncworldedit.bukkit.listener.BrushListener;
+import com.fastasyncworldedit.bukkit.listener.ChunkListener9;
 import com.fastasyncworldedit.bukkit.listener.RenderListener;
 import com.fastasyncworldedit.bukkit.regions.GriefDefenderFeature;
 import com.fastasyncworldedit.bukkit.regions.GriefPreventionFeature;
@@ -93,10 +94,9 @@ public class FaweBukkit implements IFawe, Listener {
         //PlotSquared support is limited to Spigot/Paper as of 02/20/2020
         TaskManager.taskManager().taskGlobal(this::setupPlotSquared);
 
-        // TODO (folia) moved out of task below??
         Bukkit.getPluginManager().registerEvents(FaweBukkit.this, FaweBukkit.this.plugin);
         // Registered delayed Event Listeners
-        /*TaskManager.taskManager().task(() -> {
+        TaskManager.taskManager().taskGlobal(() -> {
             // Fix for ProtocolSupport
             Settings.settings().PROTOCOL_SUPPORT_FIX =
                     Bukkit.getPluginManager().isPluginEnabled("ProtocolSupport");
@@ -105,7 +105,7 @@ public class FaweBukkit implements IFawe, Listener {
 
             // The tick limiter
             new ChunkListener9();
-        });*/
+        });
 
         // Warn if small-edits are enabled with extended world heights
         if (version.isEqualOrHigherThan(MinecraftVersion.CAVES_18) && Settings.settings().HISTORY.SMALL_EDITS) {
