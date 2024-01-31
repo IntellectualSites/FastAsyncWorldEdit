@@ -85,9 +85,8 @@ public class ToolUtilCommands {
             player.print(Caption.of("worldedit.tool.mask.disabled"));
             tool.setMask(null);
         } else {
-            BrushSettings settings = secondary ? tool.getSecondary() : tool.getContext();
-            String lastArg = Iterables.getLast(CommandArgParser.spaceSplit(arguments.get()))
-                    .getSubstring();
+            BrushSettings settings = secondary ? tool.getSecondary() : tool.getPrimary();
+            String lastArg = Iterables.getLast(CommandArgParser.spaceSplit(arguments.get())).getSubstring();
             settings.addSetting(BrushSettings.SettingType.MASK, lastArg);
             settings.setMask(maskOpt);
             tool.update();
@@ -118,7 +117,7 @@ public class ToolUtilCommands {
         if (pattern == null) {
             tool.setFill(null);
         } else {
-            BrushSettings settings = secondary ? tool.getSecondary() : tool.getContext();
+            BrushSettings settings = secondary ? tool.getSecondary() : tool.getPrimary();
             settings.setFill(pattern);
             String lastArg = Iterables.getLast(CommandArgParser.spaceSplit(arguments.get())).getSubstring();
             settings.addSetting(BrushSettings.SettingType.FILL, lastArg);
@@ -158,7 +157,7 @@ public class ToolUtilCommands {
         we.checkMaxBrushRadius(size);
         BrushTool tool = session.getBrushTool(player, false);
 
-        BrushSettings settings = secondary ? tool.getSecondary() : tool.getContext();
+        BrushSettings settings = secondary ? tool.getSecondary() : tool.getPrimary();
         settings.setSize(size);
         String lastArg = Iterables.getLast(CommandArgParser.spaceSplit(arguments.get())).getSubstring();
         settings.addSetting(BrushSettings.SettingType.FILL, lastArg);
@@ -326,7 +325,7 @@ public class ToolUtilCommands {
             return;
         }
 
-        BrushSettings settings = secondary ? tool.getSecondary() : tool.getContext();
+        BrushSettings settings = secondary ? tool.getSecondary() : tool.getPrimary();
         Scroll action = Scroll.fromArguments(tool, player, session, mode, commandStr, true);
         settings.setScrollAction(action);
         if (mode == Scroll.Action.NONE) {
@@ -364,7 +363,7 @@ public class ToolUtilCommands {
             tool.setSourceMask(null);
             return;
         }
-        BrushSettings settings = secondary ? tool.getSecondary() : tool.getContext();
+        BrushSettings settings = secondary ? tool.getSecondary() : tool.getPrimary();
         String lastArg = Iterables.getLast(CommandArgParser.spaceSplit(arguments.get())).getSubstring();
         settings.addSetting(BrushSettings.SettingType.SOURCE_MASK, lastArg);
         settings.setSourceMask(maskArg);
@@ -395,7 +394,7 @@ public class ToolUtilCommands {
             tool.setTransform(null);
             return;
         }
-        BrushSettings settings = secondary ? tool.getSecondary() : tool.getContext();
+        BrushSettings settings = secondary ? tool.getSecondary() : tool.getPrimary();
         String lastArg = Iterables.getLast(CommandArgParser.spaceSplit(arguments.get())).getSubstring();
         settings.addSetting(BrushSettings.SettingType.TRANSFORM, lastArg);
         settings.setTransform(transform);
