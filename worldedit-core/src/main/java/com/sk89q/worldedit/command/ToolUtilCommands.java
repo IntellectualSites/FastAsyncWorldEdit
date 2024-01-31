@@ -27,7 +27,6 @@ import com.fastasyncworldedit.core.extent.ResettableExtent;
 import com.fastasyncworldedit.core.util.MathMan;
 import com.fastasyncworldedit.core.util.StringMan;
 import com.google.common.collect.Iterables;
-import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
@@ -72,8 +71,8 @@ public class ToolUtilCommands {
     @CommandPermissions({"worldedit.brush.options.mask", "worldedit.mask.brush"})
     public void mask(
             Player player, LocalSession session,
-            @Switch(name = 'h', desc = "Whether the offhand should be considered or not")
-                    boolean offHand,
+            @Switch(name = 'h', desc = "Modifies the secondary brush")
+                    boolean secondary,
             @Arg(desc = "The destination mask", def = "")
                     Mask maskOpt, Arguments arguments
     ) throws WorldEditException {
@@ -86,7 +85,7 @@ public class ToolUtilCommands {
             player.print(Caption.of("worldedit.tool.mask.disabled"));
             tool.setMask(null);
         } else {
-            BrushSettings settings = offHand ? tool.getOffHand() : tool.getContext();
+            BrushSettings settings = secondary ? tool.getSecondary() : tool.getContext();
             String lastArg = Iterables.getLast(CommandArgParser.spaceSplit(arguments.get()))
                     .getSubstring();
             settings.addSetting(BrushSettings.SettingType.MASK, lastArg);
@@ -107,9 +106,9 @@ public class ToolUtilCommands {
             Player player, LocalSession session,
             @Arg(desc = "The pattern of blocks to use")
                     Pattern pattern,
-            //FAWE start - add offhand
-            @Switch(name = 'h', desc = "Whether the offhand should be considered or not")
-                    boolean offHand, Arguments arguments
+            //FAWE start - add secondary
+            @Switch(name = 'h', desc = "Modifies the secondary brush")
+                    boolean secondary, Arguments arguments
     ) throws WorldEditException {
         BrushTool tool = session.getBrushTool(player, false);
         if (tool == null) {
@@ -119,7 +118,7 @@ public class ToolUtilCommands {
         if (pattern == null) {
             tool.setFill(null);
         } else {
-            BrushSettings settings = offHand ? tool.getOffHand() : tool.getContext();
+            BrushSettings settings = secondary ? tool.getSecondary() : tool.getContext();
             settings.setFill(pattern);
             String lastArg = Iterables.getLast(CommandArgParser.spaceSplit(arguments.get())).getSubstring();
             settings.addSetting(BrushSettings.SettingType.FILL, lastArg);
@@ -152,11 +151,18 @@ public class ToolUtilCommands {
     public void size(
             Player player, LocalSession session,
             @Arg(desc = "The size of the brush")
-                    int size
+                    int size,
+            @Switch(name = 'h', desc = "Modifies the secondary brush")
+                    boolean secondary, Arguments arguments
     ) throws WorldEditException {
         we.checkMaxBrushRadius(size);
+        BrushTool tool = session.getBrushTool(player, false);
 
-        session.getBrushTool(player).setSize(size);
+        BrushSettings settings = secondary ? tool.getSecondary() : tool.getContext();
+        settings.setSize(size);
+        String lastArg = Iterables.getLast(CommandArgParser.spaceSplit(arguments.get())).getSubstring();
+        settings.addSetting(BrushSettings.SettingType.FILL, lastArg);
+        tool.update();
         player.print(Caption.of("worldedit.tool.size.set"));
     }
 
@@ -171,12 +177,12 @@ public class ToolUtilCommands {
             @Arg(desc = "The trace mask to set", def = "")
             Mask maskOpt
     ) throws WorldEditException {
-        BrushTool brushTool = session.getBrushTool(player, false);
-        if (brushTool == null) {
+        BrushTool tool = session.getBrushTool(player, false);
+        if (tool == null) {
             player.print(Caption.of("worldedit.brush.none.equipped"));
             return;
         }
-        brushTool.setTraceMask(maskOpt);
+        tool.setTraceMask(maskOpt);
         if (maskOpt == null) {
             player.print(Caption.of("worldedit.tool.tracemask.disabled"));
         } else {
@@ -288,7 +294,7 @@ public class ToolUtilCommands {
     )
     @CommandPermissions("worldedit.brush.targetoffset")
     public void targetOffset(
-            Player player, EditSession editSession, LocalSession session,
+            Player player, LocalSession session,
             @Arg(name = "offset", desc = "offset", def = "0") int offset
     ) throws WorldEditException {
         BrushTool tool = session.getBrushTool(player, false);
@@ -306,22 +312,22 @@ public class ToolUtilCommands {
     )
     @CommandPermissions("worldedit.brush.scroll")
     public void scroll(
-            Player player, EditSession editSession, LocalSession session,
-            @Switch(name = 'h', desc = "Whether the offhand should be considered or not")
-                    boolean offHand,
+            Player player, LocalSession session,
+            @Switch(name = 'h', desc = "Modifies the secondary brush")
+                    boolean secondary,
             @Arg(desc = "Target Modes", def = "none")
                     Scroll.Action mode,
             @Arg(desc = "The scroll action", variable = true)
                     List<String> commandStr
     ) throws WorldEditException {
-        BrushTool bt = session.getBrushTool(player, false);
-        if (bt == null) {
+        BrushTool tool = session.getBrushTool(player, false);
+        if (tool == null) {
             player.print(Caption.of("fawe.worldedit.brush.brush.none"));
             return;
         }
 
-        BrushSettings settings = offHand ? bt.getOffHand() : bt.getContext();
-        Scroll action = Scroll.fromArguments(bt, player, session, mode, commandStr, true);
+        BrushSettings settings = secondary ? tool.getSecondary() : tool.getContext();
+        Scroll action = Scroll.fromArguments(tool, player, session, mode, commandStr, true);
         settings.setScrollAction(action);
         if (mode == Scroll.Action.NONE) {
             player.print(Caption.of("fawe.worldedit.brush.brush.scroll.action.unset"));
@@ -330,7 +336,7 @@ public class ToolUtilCommands {
             settings.addSetting(BrushSettings.SettingType.SCROLL_ACTION, full);
             player.print(Caption.of("fawe.worldedit.brush.brush.scroll.action.set", mode));
         }
-        bt.update();
+        tool.update();
     }
 
     @Command(
@@ -341,11 +347,11 @@ public class ToolUtilCommands {
     )
     @CommandPermissions({"worldedit.brush.options.mask", "worldedit.mask.brush"})
     public void smask(
-            Player player, LocalSession session, EditSession editSession,
+            Player player, LocalSession session,
             @Arg(desc = "The destination mask", def = "")
                     Mask maskArg,
-            @Switch(name = 'h', desc = "Whether the offhand should be considered or not")
-                    boolean offHand,
+            @Switch(name = 'h', desc = "Modifies the secondary brush")
+                    boolean secondary,
             Arguments arguments
     ) throws WorldEditException {
         BrushTool tool = session.getBrushTool(player, false);
@@ -358,7 +364,7 @@ public class ToolUtilCommands {
             tool.setSourceMask(null);
             return;
         }
-        BrushSettings settings = offHand ? tool.getOffHand() : tool.getContext();
+        BrushSettings settings = secondary ? tool.getSecondary() : tool.getContext();
         String lastArg = Iterables.getLast(CommandArgParser.spaceSplit(arguments.get())).getSubstring();
         settings.addSetting(BrushSettings.SettingType.SOURCE_MASK, lastArg);
         settings.setSourceMask(maskArg);
@@ -373,10 +379,10 @@ public class ToolUtilCommands {
     )
     @CommandPermissions({"worldedit.brush.options.transform", "worldedit.transform.brush"})
     public void transform(
-            Player player, LocalSession session, EditSession editSession,
+            Player player, LocalSession session,
             @Arg(desc = "The transform", def = "") ResettableExtent transform,
-            @Switch(name = 'h', desc = "Whether the offhand should be considered or not")
-                    boolean offHand,
+            @Switch(name = 'h', desc = "Modifies the secondary brush")
+                    boolean secondary,
             Arguments arguments
     ) throws WorldEditException {
         BrushTool tool = session.getBrushTool(player, false);
@@ -389,7 +395,7 @@ public class ToolUtilCommands {
             tool.setTransform(null);
             return;
         }
-        BrushSettings settings = offHand ? tool.getOffHand() : tool.getContext();
+        BrushSettings settings = secondary ? tool.getSecondary() : tool.getContext();
         String lastArg = Iterables.getLast(CommandArgParser.spaceSplit(arguments.get())).getSubstring();
         settings.addSetting(BrushSettings.SettingType.TRANSFORM, lastArg);
         settings.setTransform(transform);
