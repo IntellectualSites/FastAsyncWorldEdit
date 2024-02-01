@@ -91,6 +91,7 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import static java.lang.invoke.MethodType.methodType;
 import static net.minecraft.core.registries.Registries.BIOME;
@@ -723,6 +724,10 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         TaskManager.taskManager().task(task, BukkitAdapter.adapt(level.getWorld()), chunkX, chunkZ);
     }
 
+    public static <T> T sync(Supplier<T> task, ServerLevel level, int chunkX, int chunkZ) {
+        return TaskManager.taskManager().syncAt(task, BukkitAdapter.adapt(level.getWorld()), chunkX, chunkZ);
+    }
+
     public static boolean isTickThreadFor(LevelChunk levelChunk) {
         if (FoliaSupport.isFolia()) {
             return TickThread.isTickThreadFor(levelChunk.level, levelChunk.locX, levelChunk.locZ);
@@ -730,7 +735,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         return Fawe.isTickThread();
     }
 
-    record FakeIdMapBlock(int size) implements IdMap<net.minecraft.world.level.block.state.BlockState> {
+  record FakeIdMapBlock(int size) implements IdMap<net.minecraft.world.level.block.state.BlockState> {
 
         @Override
         public int getId(final net.minecraft.world.level.block.state.BlockState entry) {

@@ -85,6 +85,7 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import static java.lang.invoke.MethodType.methodType;
 import static net.minecraft.core.registries.Registries.BIOME;
@@ -682,6 +683,10 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
 
     public static void task(Runnable task, ServerLevel level, int chunkX, int chunkZ) {
         TaskManager.taskManager().task(task, BukkitAdapter.adapt(level.getWorld()), chunkX, chunkZ);
+    }
+
+    public static <T> T sync(Supplier<T> task, ServerLevel level, int chunkX, int chunkZ) {
+        return TaskManager.taskManager().syncAt(task, BukkitAdapter.adapt(level.getWorld()), chunkX, chunkZ);
     }
 
     public static boolean isTickThreadFor(LevelChunk levelChunk) {
