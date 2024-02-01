@@ -68,7 +68,8 @@ public abstract class QueueHandler implements Trimable, Runnable {
      * Main "work-horse" queue for FAWE. Handles chunk submission (and chunk submission alone). Blocking in order to forcibly
      * prevent overworking/over-submission of chunk process tasks.
      */
-    private final ThreadPoolExecutor blockingExecutor = FaweCache.INSTANCE.newBlockingExecutor();
+    private final ThreadPoolExecutor blockingExecutor = FaweCache.INSTANCE.newBlockingExecutor(
+            "FAWE QueueHandler Blocking Executor - %d");
     /**
      * Queue for tasks to be completed on the main thread. These take priority of tasks submitted to syncWhenFree queue
      */
