@@ -1031,10 +1031,10 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
             try {
                 get.lockCall();
                 boolean postProcess = !(getExtent().getPostProcessor() instanceof EmptyBatchProcessor);
+                final int copyKey = get.setCreateCopy(postProcess);
                 final IChunkSet iChunkSet = getExtent().processSet(this, get, set);
                 Runnable finalizer;
                 if (postProcess) {
-                    int copyKey = get.setCreateCopy(true);
                     finalizer = () -> {
                         getExtent().postProcess(this, get.getCopy(copyKey), iChunkSet);
                         finalize.run();
