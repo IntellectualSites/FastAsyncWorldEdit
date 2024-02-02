@@ -158,6 +158,7 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
         this.setProcessor(EmptyBatchProcessor.getInstance());
         this.setPostProcessor(EmptyBatchProcessor.getInstance());
         this.world = null;
+        this.faweExceptionReasonsUsed = new boolean[FaweException.Type.values().length];
     }
 
     /**
