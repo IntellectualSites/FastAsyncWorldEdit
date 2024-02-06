@@ -626,7 +626,7 @@ public enum FaweCache implements Trimable {
      * Create a new blocking executor with specified name and FaweCache logger
      *
      * @return new blocking executor
-     * @since TODO
+     * @since 2.9.0
      */
     public ThreadPoolExecutor newBlockingExecutor(String name) {
         return newBlockingExecutor(name, LOGGER);
@@ -636,7 +636,7 @@ public enum FaweCache implements Trimable {
      * Create a new blocking executor with specified name and logger
      *
      * @return new blocking executor
-     * @since TODO
+     * @since 2.9.0
      */
     public ThreadPoolExecutor newBlockingExecutor(String name, Logger logger) {
         int nThreads = Settings.settings().QUEUE.PARALLEL_THREADS;
