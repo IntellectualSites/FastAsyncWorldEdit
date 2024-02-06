@@ -43,7 +43,7 @@ serverlib = "2.3.4"
 ## Internal
 text-adapter = "3.0.6"
 text = "3.0.4"
-piston = "0.5.7"
+piston = "0.5.8"
 
 # Tests
 mockito = "5.10.0"
