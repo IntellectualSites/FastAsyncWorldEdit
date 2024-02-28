@@ -42,7 +42,7 @@ import java.util.Set;
 import java.util.concurrent.ForkJoinTask;
 import java.util.stream.IntStream;
 
-public class ParallelQueueExtent extends PassthroughExtent {
+public class ParallelQueueExtent extends ThreadLocalPassthroughExtent {
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
 
@@ -114,6 +114,7 @@ public class ParallelQueueExtent extends PassthroughExtent {
                     final SingleThreadQueueExtent queue = (SingleThreadQueueExtent) getNewQueue();
                     queue.setFastMode(fastmode);
                     queue.setFaweExceptionArray(faweExceptionReasonsUsed);
+                    enter(queue);
                     synchronized (queue) {
                         try {
                             ChunkFilterBlock block = null;
@@ -154,6 +155,8 @@ public class ParallelQueueExtent extends PassthroughExtent {
                         exceptionCount++;
                         LOGGER.warn(message);
                     }
+                } finally {
+                    exit();
                 }
             })).toArray(ForkJoinTask[]::new);
             // Join filters

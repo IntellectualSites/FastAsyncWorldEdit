@@ -18,9 +18,13 @@ import com.fastasyncworldedit.core.util.task.FaweForkJoinWorkerThreadFactory;
 import com.fastasyncworldedit.core.wrappers.WorldWrapper;
 import com.google.common.util.concurrent.Futures;
 import com.sk89q.worldedit.world.World;
+import jdk.jfr.Category;
+import jdk.jfr.Event;
+import jdk.jfr.Name;
 
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
+import java.util.HexFormat;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Queue;
@@ -412,10 +416,18 @@ public abstract class QueueHandler implements Trimable, Runnable {
     }
 
     private IQueueExtent<IQueueChunk> pool() {
+        @Category("FAWE")
+        @Name("Request")
+        class RequestEvent extends Event {
+            String hash;
+        }
+        final RequestEvent requestEvent = new RequestEvent();
         IQueueExtent<IQueueChunk> queue = queuePool.get();
         if (queue == null) {
             queuePool.set(queue = queuePool.init());
         }
+        requestEvent.hash = HexFormat.of().toHexDigits(System.identityHashCode(queue));
+        requestEvent.commit();
         return queue;
     }
 

@@ -30,8 +30,14 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.World;
 import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
+import jdk.jfr.Category;
+import jdk.jfr.Event;
+import jdk.jfr.Name;
+import jdk.jfr.StackTrace;
+import jdk.jfr.Threshold;
 import org.apache.logging.log4j.Logger;
 
+import java.util.HexFormat;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -47,13 +53,22 @@ import java.util.concurrent.locks.ReentrantLock;
 public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implements IQueueExtent<IQueueChunk> {
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
+    public final String hexDigits = HexFormat.of().toHexDigits(System.identityHashCode(this));
 
     // Pool discarded chunks for reuse (can safely be cleared by another thread)
     // private static final ConcurrentLinkedQueue<IChunk> CHUNK_POOL = new ConcurrentLinkedQueue<>();
     // Chunks currently being queued / worked on
     private final Long2ObjectLinkedOpenHashMap<IQueueChunk> chunks = new Long2ObjectLinkedOpenHashMap<>();
     private final ConcurrentLinkedQueue<Future> submissions = new ConcurrentLinkedQueue<>();
-    private final ReentrantLock getChunkLock = new ReentrantLock();
+    static class ObservableLock extends ReentrantLock {
+
+        @Override
+        public Thread getOwner() {
+            return super.getOwner();
+        }
+
+    }
+    private final ObservableLock getChunkLock = new ObservableLock();
     private World world = null;
     private int minY = 0;
     private int maxY = 255;
@@ -290,6 +305,19 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
 
     @Override
     public final IQueueChunk getOrCreateChunk(int x, int z) {
+        @StackTrace(value = false)
+        @Category("FAWE")
+        @Name("Call")
+        class CallEvent extends Event {
+            String hash;
+            int queueLength;
+            Thread holder;
+        }
+        final CallEvent callEvent = new CallEvent();
+        callEvent.hash = hexDigits;
+        callEvent.queueLength = getChunkLock.getQueueLength();
+        callEvent.holder = getChunkLock.getOwner();
+        callEvent.begin();
         getChunkLock.lock();
         try {
             final long pair = (long) x << 32 | z & 0xffffffffL;
@@ -333,6 +361,9 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
             return chunk;
         } finally {
             getChunkLock.unlock();
+            if (callEvent.holder != null) {
+                callEvent.commit();
+            }
         }
     }
 
