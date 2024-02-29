@@ -35,9 +35,6 @@ import com.sk89q.jnbt.StringTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
-import jdk.jfr.Category;
-import jdk.jfr.Event;
-import jdk.jfr.Name;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nonnull;
@@ -88,12 +85,6 @@ public enum FaweCache implements Trimable {
 
     @Override
     public synchronized boolean trim(boolean aggressive) {
-        @Category("FAWE")
-        @Name("ClearCache")
-        class ClearCacheEvent extends Event {
-
-        }
-        new ClearCacheEvent().commit();
         CHUNK_FLAG.clean();
         BYTE_BUFFER_8192.clean();
         BLOCK_TO_PALETTE.clean();

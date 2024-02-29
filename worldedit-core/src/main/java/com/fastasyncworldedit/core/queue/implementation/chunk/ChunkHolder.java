@@ -12,36 +12,33 @@ import com.fastasyncworldedit.core.queue.IQueueExtent;
 import com.fastasyncworldedit.core.queue.implementation.ThreadLocalPassthroughExtent;
 import com.fastasyncworldedit.core.util.MemUtil;
 import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
-import jdk.jfr.Category;
-import jdk.jfr.Event;
-import jdk.jfr.Name;
+import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Future;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * An abstract {@link IChunk} class that implements basic get/set blocks.
  */
 @SuppressWarnings("rawtypes")
 public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     public static ChunkHolder newInstance() {
         return new ChunkHolder();
     }
 
-    private static final AtomicInteger ids = new AtomicInteger();
-
-    private final int id = ids.getAndIncrement();
     private volatile IChunkGet chunkExisting; // The existing chunk (e.g. a clipboard, or the world, before changes)
     private volatile IChunkSet chunkSet; // The blocks to be set to the chunkExisting
     private IBlockDelegate delegate; // delegate handles the abstraction of the chunk layers
@@ -55,12 +52,6 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     private long initTime = -1L;
 
     private ChunkHolder() {
-        @Category("FAWE")
-        @Name("CreateChunkHolder")
-        class CreateChunkHolderEvent extends Event {
-            int id = ChunkHolder.this.id;
-        }
-        new CreateChunkHolderEvent().commit();
         this.delegate = NULL;
     }
 
@@ -68,22 +59,12 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         this.delegate = delegate;
     }
 
+    private static final AtomicBoolean recycleWarning = new AtomicBoolean(false);
     @Override
-    public synchronized void recycle() {
-        if (true) return;
-        delegate = NULL;
-        if (chunkSet != null) {
-            chunkSet.recycle();
-            chunkSet = null;
+    public void recycle() {
+        if (!recycleWarning.getAndSet(true)) {
+            LOGGER.warn("ChunkHolder should not be recycled.", new Exception());
         }
-        chunkExisting = null;
-        extent = null;
-        @Category("FAWE")
-        @Name("Offer")
-        class OfferEvent extends Event {
-            public int id = ChunkHolder.this.id;
-        }
-        new OfferEvent().commit();
     }
 
     public long initAge() {
@@ -970,17 +951,6 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
      */
     public final IChunkGet getOrCreateGet() {
         if (chunkExisting == null) {
-            @Category("FAWE")
-            @Name("CreateGet")
-            class CreateGetEvent extends Event {
-                int id = ChunkHolder.this.id;
-                int chunkX;
-                int chunkZ;
-            }
-            final CreateGetEvent event = new CreateGetEvent();
-            event.chunkX = chunkX;
-            event.chunkZ = chunkZ;
-            event.commit();
             chunkExisting = newWrappedGet();
             chunkExisting.trim(MemUtil.isMemoryLimited());
         }
@@ -1040,7 +1010,6 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
                 // Do nothing
             });
         }
-        recycle();
         return null;
     }
 

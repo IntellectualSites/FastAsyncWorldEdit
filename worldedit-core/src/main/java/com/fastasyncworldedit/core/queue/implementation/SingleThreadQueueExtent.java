@@ -9,7 +9,6 @@ import com.fastasyncworldedit.core.extent.processor.EmptyBatchProcessor;
 import com.fastasyncworldedit.core.extent.processor.ExtentBatchProcessorHolder;
 import com.fastasyncworldedit.core.extent.processor.ProcessorScope;
 import com.fastasyncworldedit.core.internal.exception.FaweException;
-import com.fastasyncworldedit.core.queue.IChunk;
 import com.fastasyncworldedit.core.queue.IChunkCache;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.IChunkSet;
@@ -30,12 +29,8 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.World;
 import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
-import jdk.jfr.Category;
-import jdk.jfr.Event;
-import jdk.jfr.Name;
 import org.apache.logging.log4j.Logger;
 
-import java.util.HexFormat;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -47,6 +42,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * <p>
  * This queue is reusable {@link #init(Extent, IChunkCache, IChunkCache)}
  */
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implements IQueueExtent<IQueueChunk> {
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
@@ -54,15 +50,7 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
     // Chunks currently being queued / worked on
     private final Long2ObjectLinkedOpenHashMap<IQueueChunk<?>> chunks = new Long2ObjectLinkedOpenHashMap<>();
     private final ConcurrentLinkedQueue<Future<?>> submissions = new ConcurrentLinkedQueue<>();
-    static class ObservableLock extends ReentrantLock {
-
-        @Override
-        public Thread getOwner() {
-            return super.getOwner();
-        }
-
-    }
-    private final ObservableLock getChunkLock = new ObservableLock();
+    private final ReentrantLock getChunkLock = new ReentrantLock();
     private World world = null;
     private int minY = 0;
     private int maxY = 255;
@@ -241,7 +229,6 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
                 }
             }
             if (chunk.isEmpty()) {
-                chunk.recycle();
                 Future result = Futures.immediateFuture(null);
                 return (V) result;
             }
@@ -330,18 +317,6 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
                     submissions.add(future);
                 }
             }
-            @Category("FAWE")
-            @Name("ChunkRequest")
-            class ChunkRequestEvent extends Event {
-                int chunkX;
-                int chunkZ;
-                String hash;
-            }
-            final ChunkRequestEvent event = new ChunkRequestEvent();
-            event.chunkX = x;
-            event.chunkZ = z;
-            event.hash = HexFormat.of().toHexDigits(System.identityHashCode(this));
-            event.commit();
             chunk = poolOrCreate(x, z);
             chunk = wrap(chunk);
 
@@ -352,9 +327,6 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
             return chunk;
         } finally {
             getChunkLock.unlock();
-/*            if (callEvent.holder != null) {
-                callEvent.commit();
-            }*/
         }
     }
 
