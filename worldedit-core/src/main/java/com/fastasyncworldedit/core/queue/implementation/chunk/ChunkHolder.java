@@ -1,7 +1,5 @@
 package com.fastasyncworldedit.core.queue.implementation.chunk;
 
-import com.fastasyncworldedit.core.FaweCache;
-import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.extent.filter.block.ChunkFilterBlock;
 import com.fastasyncworldedit.core.extent.processor.EmptyBatchProcessor;
 import com.fastasyncworldedit.core.extent.processor.heightmap.HeightMapType;
@@ -11,7 +9,7 @@ import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.IChunkSet;
 import com.fastasyncworldedit.core.queue.IQueueChunk;
 import com.fastasyncworldedit.core.queue.IQueueExtent;
-import com.fastasyncworldedit.core.queue.Pool;
+import com.fastasyncworldedit.core.queue.implementation.ThreadLocalPassthroughExtent;
 import com.fastasyncworldedit.core.util.MemUtil;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -20,12 +18,16 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
+import jdk.jfr.Category;
+import jdk.jfr.Event;
+import jdk.jfr.Name;
 
 import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * An abstract {@link IChunk} class that implements basic get/set blocks.
@@ -33,16 +35,13 @@ import java.util.concurrent.Future;
 @SuppressWarnings("rawtypes")
 public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
 
-    private static final Pool<ChunkHolder> POOL = FaweCache.INSTANCE.registerPool(
-            ChunkHolder.class,
-            ChunkHolder::new,
-            Settings.settings().QUEUE.POOL
-    );
-
     public static ChunkHolder newInstance() {
-        return POOL.poll();
+        return new ChunkHolder();
     }
 
+    private static final AtomicInteger ids = new AtomicInteger();
+
+    private final int id = ids.getAndIncrement();
     private volatile IChunkGet chunkExisting; // The existing chunk (e.g. a clipboard, or the world, before changes)
     private volatile IChunkSet chunkSet; // The blocks to be set to the chunkExisting
     private IBlockDelegate delegate; // delegate handles the abstraction of the chunk layers
@@ -56,6 +55,12 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     private long initTime = -1L;
 
     private ChunkHolder() {
+        @Category("FAWE")
+        @Name("CreateChunkHolder")
+        class CreateChunkHolderEvent extends Event {
+            int id = ChunkHolder.this.id;
+        }
+        new CreateChunkHolderEvent().commit();
         this.delegate = NULL;
     }
 
@@ -65,6 +70,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
 
     @Override
     public synchronized void recycle() {
+        if (true) return;
         delegate = NULL;
         if (chunkSet != null) {
             chunkSet.recycle();
@@ -72,7 +78,12 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         }
         chunkExisting = null;
         extent = null;
-        POOL.offer(this);
+        @Category("FAWE")
+        @Name("Offer")
+        class OfferEvent extends Event {
+            public int id = ChunkHolder.this.id;
+        }
+        new OfferEvent().commit();
     }
 
     public long initAge() {
@@ -959,6 +970,17 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
      */
     public final IChunkGet getOrCreateGet() {
         if (chunkExisting == null) {
+            @Category("FAWE")
+            @Name("CreateGet")
+            class CreateGetEvent extends Event {
+                int id = ChunkHolder.this.id;
+                int chunkX;
+                int chunkZ;
+            }
+            final CreateGetEvent event = new CreateGetEvent();
+            event.chunkX = chunkX;
+            event.chunkZ = chunkZ;
+            event.commit();
             chunkExisting = newWrappedGet();
             chunkExisting.trim(MemUtil.isMemoryLimited());
         }
@@ -1031,6 +1053,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
             IChunkGet get = getOrCreateGet();
             try {
                 get.lockCall();
+                trackExtent();
                 boolean postProcess = !(getExtent().getPostProcessor() instanceof EmptyBatchProcessor);
                 final int copyKey = get.setCreateCopy(postProcess);
                 final IChunkSet iChunkSet = getExtent().processSet(this, get, set);
@@ -1046,9 +1069,22 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
                 return get.call(set, finalizer);
             } finally {
                 get.unlockCall();
+                untrackExtent();
             }
         }
         return null;
+    }
+
+    // "call" can be called by QueueHandler#blockingExecutor. In such case, we still want the other thread
+    // to use this SingleThreadQueueExtent. Otherwise, many threads might end up locking on **one** STQE.
+    // This way, locking is spread across multiple STQEs, allowing for better performance
+
+    private void trackExtent() {
+            ThreadLocalPassthroughExtent.setCurrentExtent(extent);
+    }
+
+    private void untrackExtent() {
+        ThreadLocalPassthroughExtent.clearCurrent();
     }
 
     /**

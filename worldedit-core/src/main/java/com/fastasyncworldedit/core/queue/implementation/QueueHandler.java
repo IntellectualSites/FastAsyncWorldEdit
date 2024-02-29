@@ -412,7 +412,7 @@ public abstract class QueueHandler implements Trimable, Runnable {
      * Sets the current thread's {@link IQueueExtent} instance in the queue pool to null.
      */
     public void unCache() {
-        queuePool.set(null);
+        queuePool.remove();
     }
 
     private IQueueExtent<IQueueChunk> pool() {

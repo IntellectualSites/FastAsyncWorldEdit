@@ -1,12 +1,13 @@
 package com.fastasyncworldedit.core.queue.implementation;
 
 import com.fastasyncworldedit.core.extent.PassthroughExtent;
-import com.fastasyncworldedit.core.util.collection.CleanableThreadLocal;
 import com.sk89q.worldedit.extent.Extent;
 
-public class ThreadLocalPassthroughExtent extends PassthroughExtent {
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
-    private final CleanableThreadLocal<Extent> localExtent;
+public class ThreadLocalPassthroughExtent extends PassthroughExtent {
+    private static final ConcurrentMap<Thread, Extent> extents = new ConcurrentHashMap<>();
 
     /**
      * Create a new instance.
@@ -15,21 +16,27 @@ public class ThreadLocalPassthroughExtent extends PassthroughExtent {
      */
     public ThreadLocalPassthroughExtent(final Extent extent) {
         super(extent);
-        // fallback to one extent
-        this.localExtent = new CleanableThreadLocal<>(() -> extent);
+    }
+
+    public static void clearCurrent() {
+        extents.remove(Thread.currentThread());
+    }
+
+    public static void setCurrentExtent(Extent extent) {
+        extents.put(Thread.currentThread(), extent);
     }
 
     public void enter(Extent extent) {
-        this.localExtent.set(extent);
+        extents.put(Thread.currentThread(), extent);
     }
 
     public void exit() {
-        this.localExtent.remove();
+        extents.remove(Thread.currentThread());
     }
 
     @Override
     public Extent getExtent() {
-        return this.localExtent.get();
+        return extents.getOrDefault(Thread.currentThread(), super.getExtent());
     }
 
 }
