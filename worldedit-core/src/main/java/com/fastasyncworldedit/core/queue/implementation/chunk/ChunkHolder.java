@@ -9,7 +9,7 @@ import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.IChunkSet;
 import com.fastasyncworldedit.core.queue.IQueueChunk;
 import com.fastasyncworldedit.core.queue.IQueueExtent;
-import com.fastasyncworldedit.core.queue.implementation.ThreadLocalPassthroughExtent;
+import com.fastasyncworldedit.core.queue.implementation.ParallelQueueExtent;
 import com.fastasyncworldedit.core.util.MemUtil;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
@@ -1049,11 +1049,11 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     // This way, locking is spread across multiple STQEs, allowing for better performance
 
     private void trackExtent() {
-            ThreadLocalPassthroughExtent.setCurrentExtent(extent);
+            ParallelQueueExtent.setCurrentExtent(extent);
     }
 
     private void untrackExtent() {
-        ThreadLocalPassthroughExtent.clearCurrent();
+        ParallelQueueExtent.clearCurrentExtent();
     }
 
     /**
