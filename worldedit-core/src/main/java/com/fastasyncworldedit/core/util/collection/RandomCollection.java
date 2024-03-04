@@ -33,7 +33,7 @@ public abstract class RandomCollection<T> {
     public static <T> RandomCollection<T> of(Map<T, Double> weights, SimpleRandom random) {
         checkNotNull(random);
         return FastRandomCollection.create(weights, random)
-                .orElse(new SimpleRandomCollection<>(weights, random));
+                .orElseGet(() -> new SimpleRandomCollection<>(weights, random));
     }
 
     public void setRandom(SimpleRandom random) {

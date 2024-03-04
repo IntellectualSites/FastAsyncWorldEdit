@@ -27,7 +27,7 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BaseBlock;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
@@ -41,7 +41,7 @@ public class RandomPattern extends AbstractPattern {
 
     //FAWE start - SimpleRandom > Random, LHS<P> > List
     private final SimpleRandom random;
-    private Map<Pattern, Double> weights = new HashMap<>();
+    private Map<Pattern, Double> weights = new LinkedHashMap<>();
     private RandomCollection<Pattern> collection;
     private LinkedHashSet<Pattern> patterns = new LinkedHashSet<>();
     //FAWE end
