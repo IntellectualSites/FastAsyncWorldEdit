@@ -32,6 +32,7 @@ import com.fastasyncworldedit.core.internal.io.FaweOutputStream;
 import com.fastasyncworldedit.core.limit.FaweLimit;
 import com.fastasyncworldedit.core.util.BrushCache;
 import com.fastasyncworldedit.core.util.MainUtil;
+import com.fastasyncworldedit.core.util.MaskTraverser;
 import com.fastasyncworldedit.core.util.StringMan;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.fastasyncworldedit.core.util.TextureHolder;
@@ -53,6 +54,7 @@ import com.sk89q.worldedit.command.tool.Tool;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Locatable;
+import com.sk89q.worldedit.extent.NullExtent;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
@@ -594,6 +596,9 @@ public class LocalSession implements TextureHolder {
                 long size = MainUtil.getSize(item);
                 historySize -= size;
             }
+            // free the mask from any remaining references to e.g. extents
+            // if used again
+            new MaskTraverser(mask).reset(NullExtent.INSTANCE);
         } finally {
             historyWriteLock.unlock();
         }
