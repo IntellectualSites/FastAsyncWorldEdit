@@ -3082,8 +3082,8 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
                     ) <= 0) {
                         return null;
                     }
-                    int newType = (int) typeVariable.getValue();
-                    int newData = (int) dataVariable.getValue();
+                    int newType = (int) typeVariable.value();
+                    int newData = (int) dataVariable.value();
                     if (newType != typeVar || newData != dataVar) {
                         BlockState state = LegacyMapper.getInstance().getBlockFromLegacy(newType, newData);
                         return state == null ? defaultMaterial : state.toBaseBlock();
