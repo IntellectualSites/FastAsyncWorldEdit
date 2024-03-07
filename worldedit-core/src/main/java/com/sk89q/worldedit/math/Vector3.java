@@ -32,7 +32,9 @@ import static com.google.common.base.Preconditions.checkArgument;
 /**
  * An immutable 3-dimensional vector.
  */
+//FAWE start - not a record, make abstract
 public abstract class Vector3 {
+//FAWE end
 
     public static final Vector3 ZERO = Vector3.at(0, 0, 0);
     public static final Vector3 UNIT_X = Vector3.at(1, 0, 0);
@@ -155,13 +157,24 @@ public abstract class Vector3 {
     //FAWE end
 
     /**
+     * Get the X coordinate, aligned to the block grid.
+     *
+     * @return the block-aligned x coordinate
+     */
+    public int blockX() {
+        return MathMan.roundInt(this.x());
+    }
+
+    /**
      * Get the X coordinate.
      *
      * @return the x coordinate
+     * @deprecated use {@link #x()} instead
      */
-    //FAWE start - made abstract
-    public abstract double getX();
-    //FAWE end
+    @Deprecated(forRemoval = true)
+    public double getX() {
+        return this.x();
+    }
 
     /**
      * Set the X coordinate.
@@ -176,13 +189,24 @@ public abstract class Vector3 {
     //FAWE end
 
     /**
+     * Get the Y coordinate, aligned to the block grid.
+     *
+     * @return the block-aligned y coordinate
+     */
+    public int blockY() {
+        return MathMan.roundInt(this.y());
+    }
+
+    /**
      * Get the Y coordinate.
      *
      * @return the y coordinate
+     * @deprecated use {@link #y()} instead
      */
-    //FAWE start - made abstract
-    public abstract double getY();
-    //FAWE end
+    @Deprecated(forRemoval = true)
+    public double getY() {
+        return y;
+    }
 
     /**
      * Set the Y coordinate.
@@ -197,13 +221,24 @@ public abstract class Vector3 {
     //FAWE end
 
     /**
+     * Get the Z coordinate, aligned to the block grid.
+     *
+     * @return the block-aligned z coordinate
+     */
+    public int blockZ() {
+        return MathMan.roundInt(this.z());
+    }
+
+    /**
      * Get the Z coordinate.
      *
      * @return the z coordinate
+     * @deprecated use {@link #z()} instead
      */
-    //FAWE start - made abstract
-    public abstract double getZ();
-    //FAWE end
+    @Deprecated(forRemoval = true)
+    public double getZ() {
+        return this.z();
+    }
 
     /**
      * Set the Z coordinate.

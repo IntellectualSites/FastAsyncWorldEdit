@@ -38,7 +38,9 @@ import static com.sk89q.worldedit.math.BitMath.unpackZ;
 /**
  * An immutable 3-dimensional vector.
  */
+//FAWE start - not a record
 public abstract class BlockVector3 {
+//FAWE end
 
     public static final BlockVector3 ZERO = BlockVector3.at(0, 0, 0);
     public static final BlockVector3 UNIT_X = BlockVector3.at(1, 0, 0);
@@ -171,21 +173,23 @@ public abstract class BlockVector3 {
      * Get the X coordinate.
      *
      * @return the x coordinate
+     * @deprecated use {@link #x()} instead
      */
-    //FAWE start - Made abstract
-    public abstract int getX();
-    //FAWE end
+    @Deprecated(forRemoval = true)
+    public int getX() {
+        return this.x(); //FAWE - access abstract getter instead of local field
+    }
 
     /**
      * Get the X coordinate.
      *
      * @return the x coordinate
+     * @deprecated use {@link #x()} instead
      */
-    //FAWE start - getter
+    @Deprecated(forRemoval = true)
     public int getBlockX() {
-        return getX();
+        return this.x(); //FAWE - access abstract getter instead of local field
     }
-    //FAWE end
 
     /**
      * Set the X coordinate.
@@ -195,7 +199,7 @@ public abstract class BlockVector3 {
      */
     //FAWE start - getter
     public BlockVector3 withX(int x) {
-        return BlockVector3.at(x, getY(), getZ());
+        return BlockVector3.at(x, y(), z());
     }
     //FAWE end
 
@@ -203,21 +207,23 @@ public abstract class BlockVector3 {
      * Get the Y coordinate.
      *
      * @return the y coordinate
+     * @deprecated use {@link #y()} instead
      */
-    //FAWE start - Made abstract
-    public abstract int getY();
-    //FAWE end
+    @Deprecated(forRemoval = true)
+    public int getY() {
+        return this.y(); //FAWE - access abstract getter instead of local field
+    }
 
     /**
      * Get the Y coordinate.
      *
      * @return the y coordinate
+     * @deprecated use {@link #y()} instead
      */
-    //FAWE start - getter
+    @Deprecated(forRemoval = true)
     public int getBlockY() {
-        return getY();
+        return this.y(); //FAWE - access abstract getter instead of local field
     }
-    //FAWE end
 
     /**
      * Set the Y coordinate.
@@ -235,21 +241,23 @@ public abstract class BlockVector3 {
      * Get the Z coordinate.
      *
      * @return the z coordinate
+     * @deprecated use {@link #z()} instead
      */
-    //FAWE start - Made abstract
-    public abstract int getZ();
-    //FAWE end
+    @Deprecated(forRemoval = true)
+    public int getZ() {
+        return this.z(); //FAWE - access abstract getter instead of local field
+    }
 
     /**
      * Get the Z coordinate.
      *
      * @return the z coordinate
+     * @deprecated use {@link #z()} instead
      */
-    //FAWE start - getter
+    @Deprecated(forRemoval = true)
     public int getBlockZ() {
-        return getZ();
+        return this.z(); //FAWE - access abstract getter instead of local field
     }
-    //FAWE end
 
     /**
      * Set the Z coordinate.

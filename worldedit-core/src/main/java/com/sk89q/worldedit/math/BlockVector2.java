@@ -27,7 +27,7 @@ import java.util.Comparator;
 /**
  * An immutable 2-dimensional vector.
  */
-//FAWE start - un-finalize
+//FAWE start - not a record
 public class BlockVector2 {
 //FAWE end
 
@@ -122,7 +122,9 @@ public class BlockVector2 {
      * Get the X coordinate.
      *
      * @return the x coordinate
+     * @deprecated use {@link #x()} instead
      */
+    @Deprecated(forRemoval = true)
     public int getX() {
         return x;
     }
@@ -131,7 +133,9 @@ public class BlockVector2 {
      * Get the X coordinate.
      *
      * @return the x coordinate
+     * @deprecated use {@link #x()} instead
      */
+    @Deprecated(forRemoval = true)
     public int getBlockX() {
         return x;
     }
@@ -150,7 +154,9 @@ public class BlockVector2 {
      * Get the Z coordinate.
      *
      * @return the z coordinate
+     * @deprecated use {@link #z()} instead
      */
+    @Deprecated(forRemoval = true)
     public int getZ() {
         return z;
     }
@@ -159,7 +165,9 @@ public class BlockVector2 {
      * Get the Z coordinate.
      *
      * @return the z coordinate
+     * @deprecated use {@link #z()} instead
      */
+    @Deprecated(forRemoval = true)
     public int getBlockZ() {
         return z;
     }
@@ -600,11 +608,10 @@ public class BlockVector2 {
 
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof BlockVector2)) {
+        if (!(obj instanceof BlockVector2 other)) {
             return false;
         }
 
-        BlockVector2 other = (BlockVector2) obj;
         return other.x == this.x && other.z == this.z;
 
     }
