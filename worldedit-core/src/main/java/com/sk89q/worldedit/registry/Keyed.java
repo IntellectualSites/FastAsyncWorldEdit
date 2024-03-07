@@ -19,16 +19,33 @@
 
 package com.sk89q.worldedit.registry;
 
+import com.sk89q.worldedit.internal.util.DeprecationUtil;
+import com.sk89q.worldedit.internal.util.NonAbstractForCompatibility;
+
 /**
  * Represents an objects that can be added to a registry and referenced by an id which is unique within its registry.
  */
 public interface Keyed {
-
     /**
      * The id of this object in the registry. Must be unique, and lowercase. Certain registries (e.g Namespaced ones) may have additional restrictions.
+     * @return an id
+     * @deprecated Use {@link #id()} instead.
+     */
+    @Deprecated(forRemoval = true, since = "TODO")
+    default String getId() {
+        return id();
+    }
+
+    /**
+     * The id of this object in the registry. Must be unique and lowercase. Certain registries (e.g namespaced ones)
+     * may have additional restrictions.
      *
      * @return an id
+     * @since TODO
      */
-    String getId();
-
+    @NonAbstractForCompatibility(delegateName = "getId", delegateParams = {})
+    default String id() {
+        DeprecationUtil.checkDelegatingOverride(getClass());
+        return getId();
+    }
 }
