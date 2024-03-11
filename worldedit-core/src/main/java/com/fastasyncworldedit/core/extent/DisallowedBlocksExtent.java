@@ -29,7 +29,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class DisallowedBlocksExtent extends AbstractDelegateExtent implements IBatchProcessor {
+public final class DisallowedBlocksExtent extends AbstractDelegateExtent implements IBatchProcessor {
 
     private static final BlockState RESERVED = BlockTypes.__RESERVED__.getDefaultState();
     private final Set<PropertyRemap<?>> remaps;

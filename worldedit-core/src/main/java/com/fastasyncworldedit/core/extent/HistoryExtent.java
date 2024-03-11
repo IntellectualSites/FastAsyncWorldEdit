@@ -25,7 +25,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Stores changes to a {@link ChangeSet}.
  */
-public class HistoryExtent extends AbstractDelegateExtent {
+public final class HistoryExtent extends AbstractDelegateExtent {
 
     private final MutableBlockVector3 mutable = new MutableBlockVector3();
     private AbstractChangeSet changeSet;

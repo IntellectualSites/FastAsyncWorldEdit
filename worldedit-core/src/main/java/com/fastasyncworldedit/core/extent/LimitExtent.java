@@ -37,7 +37,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-public class LimitExtent extends AbstractDelegateExtent {
+public final class LimitExtent extends AbstractDelegateExtent {
 
     private final FaweLimit limit;
     private final boolean[] faweExceptionReasonsUsed = new boolean[FaweException.Type.values().length];

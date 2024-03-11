@@ -81,6 +81,7 @@ import static com.sk89q.worldedit.util.Direction.values;
  * Transforms blocks themselves (but not their position) according to a
  * given transform.
  */
+//TODO - Make final upon removal of TransformExtent
 public class BlockTransformExtent extends ResettableExtent {
 
     //FAWE start

@@ -12,6 +12,12 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
+/**
+ * Unused internal, will be removed
+ *
+ * @deprecated Will be removed - unused internally
+ */
+@Deprecated(forRemoval = true, since = "TODO")
 public class TransformExtent extends BlockTransformExtent {
 
     private final MutableVector3 mutable1 = new MutableVector3();

@@ -9,7 +9,7 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public class SourceMaskExtent extends TemporalExtent {
+public final class SourceMaskExtent extends TemporalExtent {
 
     private Mask mask;
     private final MutableBlockVector3 mutable = new MutableBlockVector3();
