@@ -199,7 +199,9 @@ public class Expression implements Cloneable {
 
     //FAWE start
     public Expression clone() {
-        return new Expression(initialExpression, new HashSet<>(providedSlots));
+        Expression expression = new Expression(initialExpression, new HashSet<>(providedSlots));
+        expression.setEnvironment(getEnvironment());
+        return expression;
     }
     //FAWE end
 
