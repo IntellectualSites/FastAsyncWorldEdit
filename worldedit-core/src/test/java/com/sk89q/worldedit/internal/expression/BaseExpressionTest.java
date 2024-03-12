@@ -114,6 +114,11 @@ class BaseExpressionTest {
             public int getBlockDataRel(double x, double y, double z) {
                 return (int) y * 100;
             }
+
+            @Override
+            public ExpressionEnvironment clone() {
+                return this;
+            }
         });
 
         return expression.evaluate();

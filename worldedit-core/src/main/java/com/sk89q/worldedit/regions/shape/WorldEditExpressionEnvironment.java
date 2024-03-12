@@ -94,10 +94,13 @@ public class WorldEditExpressionEnvironment implements ExpressionEnvironment {
     public Vector3 toWorldRel(double x, double y, double z) {
         return current.add(x, y, z);
     }
+
+    public WorldEditExpressionEnvironment clone() {
+        return new WorldEditExpressionEnvironment(extent, unit, zero2);
+    }
     //FAWe end
 
     public void setCurrentBlock(Vector3 current) {
         this.current = current;
     }
-
 }

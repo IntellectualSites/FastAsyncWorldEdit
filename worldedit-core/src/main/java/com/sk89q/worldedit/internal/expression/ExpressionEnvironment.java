@@ -36,4 +36,5 @@ public interface ExpressionEnvironment {
 
     int getBlockDataRel(double x, double y, double z);
 
+    ExpressionEnvironment clone();
 }
