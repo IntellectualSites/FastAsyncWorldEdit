@@ -28,6 +28,8 @@ import com.sk89q.worldedit.math.Vector3;
 
 public class WorldEditExpressionEnvironment implements ExpressionEnvironment {
 
+    private final Vector3 UN_OFFSET = Vector3.at(0.5, 0.5, 0.5);
+
     private final Vector3 unit;
     private final Vector3 zero2;
     //FAWE start - MutableVector3
@@ -42,7 +44,7 @@ public class WorldEditExpressionEnvironment implements ExpressionEnvironment {
     public WorldEditExpressionEnvironment(Extent extent, Vector3 unit, Vector3 zero) {
         this.extent = extent;
         this.unit = unit;
-        this.zero2 = zero.add(0.5, 0.5, 0.5);
+        this.zero2 = zero.add(UN_OFFSET);
     }
 
     public BlockVector3 toWorld(double x, double y, double z) {
@@ -96,7 +98,7 @@ public class WorldEditExpressionEnvironment implements ExpressionEnvironment {
     }
 
     public WorldEditExpressionEnvironment clone() {
-        return new WorldEditExpressionEnvironment(extent, unit, zero2);
+        return new WorldEditExpressionEnvironment(extent, unit, zero2.subtract(UN_OFFSET));
     }
     //FAWe end
 
