@@ -28,7 +28,7 @@ import com.sk89q.worldedit.math.Vector3;
 
 public class WorldEditExpressionEnvironment implements ExpressionEnvironment {
 
-    private final Vector3 BLOCK_CENTER_OFFSET = Vector3.at(0.5, 0.5, 0.5);
+    private static final Vector3 BLOCK_CENTER_OFFSET = Vector3.at(0.5, 0.5, 0.5);
 
     private final Vector3 unit;
     private final Vector3 zero2;
