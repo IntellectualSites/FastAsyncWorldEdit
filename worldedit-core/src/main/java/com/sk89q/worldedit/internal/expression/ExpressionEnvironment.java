@@ -36,5 +36,7 @@ public interface ExpressionEnvironment {
 
     int getBlockDataRel(double x, double y, double z);
 
+    // FAWE start
     ExpressionEnvironment clone();
+    // FAWE end
 }
