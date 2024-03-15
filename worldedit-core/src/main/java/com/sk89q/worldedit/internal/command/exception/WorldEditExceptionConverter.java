@@ -36,6 +36,7 @@ import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.command.InsufficientArgumentsException;
 import com.sk89q.worldedit.command.tool.InvalidToolBindException;
+import com.sk89q.worldedit.extent.clipboard.io.SchematicLoadException;
 import com.sk89q.worldedit.internal.expression.ExpressionException;
 import com.sk89q.worldedit.regions.RegionOperationException;
 import com.sk89q.worldedit.util.formatting.text.Component;
@@ -185,6 +186,11 @@ public class WorldEditExceptionConverter extends ExceptionConverterHelper {
     @ExceptionMatch
     public void convert(FileSelectionAbortedException e) throws CommandException {
         throw newCommandException(Caption.of("worldedit.error.file-aborted"), e);
+    }
+
+    @ExceptionMatch
+    public void convert(SchematicLoadException e) throws CommandException {
+        throw newCommandException(e.getRichMessage(), e);
     }
 
     @ExceptionMatch

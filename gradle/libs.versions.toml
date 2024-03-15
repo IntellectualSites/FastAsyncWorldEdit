@@ -1,6 +1,6 @@
 [versions]
 # Minecraft expectations
-paper = "1.20.2-R0.1-SNAPSHOT"
+paper = "1.20.4-R0.1-SNAPSHOT"
 fastutil = "8.5.9"
 guava = "31.1-jre"
 log4j = "2.19.0"
@@ -11,19 +11,19 @@ snakeyaml = "2.0"
 dummypermscompat = "1.10"
 worldguard-bukkit = "7.0.9"
 mapmanager = "1.8.0-SNAPSHOT"
-griefprevention = "16.18.1"
+griefprevention = "17.0.0"
 griefdefender = "2.1.0-SNAPSHOT"
 residence = "4.5._13.1"
-towny = "0.100.0.8"
-plotsquared = "7.2.0"
+towny = "0.100.1.20"
+plotsquared = "7.3.6"
 
 # Third party
 bstats = "3.0.2"
 sparsebitset = "1.3"
 parallelgzip = "1.0.5"
-adventure = "4.14.0"
-adventure-bukkit = "4.3.1"
-checkerqual = "3.41.0"
+adventure = "4.16.0"
+adventure-bukkit = "4.3.2"
+checkerqual = "3.42.0"
 truezip = "6.8.4"
 auto-value = "1.10.4"
 findbugs = "3.0.2"
@@ -43,10 +43,10 @@ serverlib = "2.3.4"
 ## Internal
 text-adapter = "3.0.6"
 text = "3.0.4"
-piston = "0.5.7"
+piston = "0.5.8"
 
 # Tests
-mockito = "5.8.0"
+mockito = "5.11.0"
 
 # Gradle plugins
 pluginyml = "0.6.0"

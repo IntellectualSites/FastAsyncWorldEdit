@@ -22,7 +22,6 @@ package com.sk89q.worldedit.regions;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.extent.filter.block.ChunkFilterBlock;
 import com.fastasyncworldedit.core.math.BlockVectorSet;
-import com.fastasyncworldedit.core.math.MutableBlockVector2;
 import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.fastasyncworldedit.core.queue.Filter;
 import com.fastasyncworldedit.core.queue.IChunk;
@@ -805,7 +804,8 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
                 return set;
             }
             trimY(set, minY, maxY, true);
-            trimNBT(set, this::contains);
+            BlockVector3 chunkPos = chunk.getChunkBlockCoord().withY(0);
+            trimNBT(set, this::contains, pos -> this.contains(pos.add(chunkPos)));
             return set;
         }
         if (tx >= minX && bx <= maxX && tz >= minZ && bz <= maxZ) {
@@ -868,8 +868,8 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
                 }
                 set.setBlocks(layer, arr);
             }
-
-            trimNBT(set, this::contains);
+            final BlockVector3 chunkPos = BlockVector3.at(chunk.getX() << 4, 0, chunk.getZ() << 4);
+            trimNBT(set, this::contains, pos -> this.contains(pos.add(chunkPos)));
             return set;
         }
         return null;
@@ -893,7 +893,8 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
                 return null;
             }
             trimY(set, minY, maxY, false);
-            trimNBT(set, this::contains);
+            BlockVector3 chunkPos = chunk.getChunkBlockCoord().withY(0);
+            trimNBT(set, this::contains, pos -> this.contains(pos.add(chunkPos)));
             return set;
         }
         if (tx >= minX && bx <= maxX && tz >= minZ && bz <= maxZ) {
@@ -943,7 +944,8 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
                 }
                 set.setBlocks(layer, arr);
             }
-            trimNBT(set, bv3 -> !this.contains(bv3));
+            BlockVector3 chunkPos = chunk.getChunkBlockCoord().withY(0);
+            trimNBT(set, bv3 -> !this.contains(bv3), bv3 -> !this.contains(bv3.add(chunkPos)));
             return set;
         }
         return set;

@@ -156,6 +156,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
             throw new IllegalStateException("Attempting to set if chunk GET should create copy, but it is not call-locked.");
         }
         this.createCopy = createCopy;
+        // Increment regardless of whether copy will be created or not to return null from getCopy()
         return ++this.copyKey;
     }
 

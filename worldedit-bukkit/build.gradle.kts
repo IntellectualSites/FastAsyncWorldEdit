@@ -141,20 +141,15 @@ tasks.named<Jar>("jar") {
 addJarManifest(WorldEditKind.Plugin, includeClasspath = true)
 
 tasks.named<ShadowJar>("shadowJar") {
-    dependsOn(project.project(":worldedit-bukkit:adapters").subprojects.map { it.tasks.named("assemble") })
-    from(Callable {
-        adapters.resolve()
-                .map { f ->
-                    zipTree(f).matching {
-                        exclude("META-INF/")
-                    }
-                }
-    })
+    configurations.add(adapters)
     archiveFileName.set("${rootProject.name}-Bukkit-${project.version}.${archiveExtension.getOrElse("jar")}")
     dependencies {
         // In tandem with not bundling log4j, we shouldn't relocate base package here.
         // relocate("org.apache.logging", "com.sk89q.worldedit.log4j")
         relocate("org.antlr.v4", "com.sk89q.worldedit.antlr4")
+
+        exclude(dependency("$group:$name"))
+
         include(dependency(":worldedit-core"))
         include(dependency(":worldedit-libs:bukkit"))
         // Purposefully not included, we assume (even though no API exposes it) that Log4J will be present at runtime
@@ -183,13 +178,22 @@ tasks.named<ShadowJar>("shadowJar") {
             include(dependency("org.lz4:lz4-java:1.8.0"))
         }
         relocate("net.kyori", "com.fastasyncworldedit.core.adventure") {
-            include(dependency("net.kyori:adventure-nbt:4.14.0"))
+            include(dependency("net.kyori:adventure-nbt:4.16.0"))
         }
         relocate("com.zaxxer", "com.fastasyncworldedit.core.math") {
             include(dependency("com.zaxxer:SparseBitSet:1.3"))
         }
         relocate("org.anarres", "com.fastasyncworldedit.core.internal.io") {
             include(dependency("org.anarres:parallelgzip:1.0.5"))
+        }
+    }
+
+    project.project(":worldedit-bukkit:adapters").subprojects.forEach {
+        dependencies {
+            include(dependency("${it.group}:${it.name}"))
+        }
+        minimize {
+            exclude(dependency("${it.group}:${it.name}"))
         }
     }
 }

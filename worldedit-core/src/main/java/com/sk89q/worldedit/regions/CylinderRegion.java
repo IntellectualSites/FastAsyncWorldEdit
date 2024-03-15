@@ -141,7 +141,7 @@ public class CylinderRegion extends AbstractRegion implements FlatRegion {
      */
     public void setRadius(Vector2 radius) {
         this.radius = radius.add(0.5, 0.5);
-        this.radiusInverse = Vector2.ONE.divide(radius);
+        this.radiusInverse = Vector2.ONE.divide(this.radius);
     }
 
     /**
@@ -413,11 +413,12 @@ public class CylinderRegion extends AbstractRegion implements FlatRegion {
             final IChunk chunk, final Filter filter, final ChunkFilterBlock block,
             final IChunkGet get, final IChunkSet set, boolean full
     ) {
-        int bcx = chunk.getX() >> 4;
-        int bcz = chunk.getZ() >> 4;
+        int bcx = chunk.getX() << 4;
+        int bcz = chunk.getZ() << 4;
         int tcx = bcx + 15;
         int tcz = bcz + 15;
-        if (contains(bcx, bcz) && contains(tcx, tcz)) {
+        // must contain all 4 corners for fast path
+        if (contains(bcx, bcz) && contains(tcx, tcz) && contains(bcx, tcz) && contains(tcx, bcz)) {
             filter(chunk, filter, block, get, set, minY, maxY, full);
             return;
         }

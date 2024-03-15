@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.extent.clipboard.io;
 
+import com.fastasyncworldedit.core.configuration.Caption;
 import com.google.common.collect.Maps;
 import com.sk89q.jnbt.AdventureNBTConverter;
 import com.sk89q.jnbt.ByteArrayTag;
@@ -46,6 +47,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.world.DataFixer;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
@@ -137,9 +139,8 @@ public class SpongeSchematicReader extends NBTSchematicReader {
             BlockArrayClipboard clip = readVersion1(schematicTag);
             return readVersion2(clip, schematicTag);
         }
-        throw new IOException("This schematic version is not supported; Version: " + schematicVersion + ", DataVersion: " + dataVersion + "." +
-                "It's very likely your schematic has an invalid file extension, if the schematic has been created on a version lower than" +
-                "1.13.2, the extension MUST be `.schematic`, elsewise the schematic can't be read properly.");
+        throw new SchematicLoadException(Caption.of("worldedit.schematic.load.unsupported-version",
+                TextComponent.of(schematicVersion)));
     }
 
     @Override
@@ -168,6 +169,13 @@ public class SpongeSchematicReader extends NBTSchematicReader {
 
         // Check
         Map<String, Tag> schematic = schematicTag.getValue();
+
+        // Be lenient about the specific nesting level of the Schematic tag
+        // Also allows checking the version from newer versions of the specification
+        if (schematic.size() == 1 && schematic.containsKey("Schematic")) {
+            schematicTag = requireTag(schematic, "Schematic", CompoundTag.class);
+            schematic = schematicTag.getValue();
+        }
 
         schematicVersion = requireTag(schematic, "Version", IntTag.class).getValue();
         return schematicTag;

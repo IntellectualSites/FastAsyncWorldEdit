@@ -163,13 +163,22 @@ public class WorldGuardFeature extends BukkitMaskManager implements Listener {
         final Location location = player.getLocation();
         final Set<ProtectedRegion> regions = this.getRegions(localplayer, location, isWhitelist);
         if (!regions.isEmpty()) {
+            RegionManager manager = WorldGuard
+                    .getInstance()
+                    .getPlatform()
+                    .getRegionContainer()
+                    .get(BukkitAdapter.adapt(location.getWorld()));
+            if (manager == null) {
+                return null;
+            }
             Set<Region> result = new HashSet<>();
             for (ProtectedRegion myRegion : regions) {
                 if (myRegion.getId().equals("__global__")) {
                     return new FaweMask(RegionWrapper.GLOBAL()) {
                         @Override
                         public boolean isValid(com.sk89q.worldedit.entity.Player player, MaskType type) {
-                            return isAllowed(worldguard.wrapPlayer(BukkitAdapter.adapt(player)), myRegion);
+                            return manager.hasRegion(myRegion.getId())
+                                    && isAllowed(worldguard.wrapPlayer(BukkitAdapter.adapt(player)), myRegion);
                         }
                     };
                 } else {
@@ -185,7 +194,7 @@ public class WorldGuardFeature extends BukkitMaskManager implements Listener {
                 public boolean isValid(com.sk89q.worldedit.entity.Player player, MaskType type) {
                     final LocalPlayer localplayer = worldguard.wrapPlayer(BukkitAdapter.adapt(player));
                     for (ProtectedRegion myRegion : regions) {
-                        if (!isAllowed(localplayer, myRegion)) {
+                        if (!manager.hasRegion(myRegion.getId()) || !isAllowed(localplayer, myRegion)) {
                             return false;
                         }
                     }

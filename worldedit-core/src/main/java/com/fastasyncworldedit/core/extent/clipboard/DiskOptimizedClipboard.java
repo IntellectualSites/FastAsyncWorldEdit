@@ -305,22 +305,24 @@ public class DiskOptimizedClipboard extends LinearClipboard {
     private void init() throws IOException {
         if (this.fileChannel == null) {
             this.fileChannel = braf.getChannel();
-            try {
-                FileLock lock = this.fileChannel.lock();
-                LOCK_HOLDER_CACHE.put(file.getName(), new LockHolder(lock));
-            } catch (OverlappingFileLockException e) {
-                LockHolder existing = LOCK_HOLDER_CACHE.get(file.getName());
-                if (existing != null) {
-                    long ms = System.currentTimeMillis() - existing.lockHeldSince;
-                    LOGGER.error(
-                            "Cannot lock clipboard file {} acquired by thread {}, {}ms ago",
-                            file.getName(),
-                            existing.thread,
-                            ms
-                    );
+            if (Settings.settings().CLIPBOARD.LOCK_CLIPBOARD_FILE) {
+                try {
+                    FileLock lock = this.fileChannel.lock();
+                    LOCK_HOLDER_CACHE.put(file.getName(), new LockHolder(lock));
+                } catch (OverlappingFileLockException e) {
+                    LockHolder existing = LOCK_HOLDER_CACHE.get(file.getName());
+                    if (existing != null) {
+                        long ms = System.currentTimeMillis() - existing.lockHeldSince;
+                        LOGGER.error(
+                                "Cannot lock clipboard file {} acquired by thread {}, {}ms ago",
+                                file.getName(),
+                                existing.thread,
+                                ms
+                        );
+                    }
+                    // Rethrow to prevent clipboard access
+                    throw e;
                 }
-                // Rethrow to prevent clipboard access
-                throw e;
             }
             this.byteBuffer = fileChannel.map(FileChannel.MapMode.READ_WRITE, 0, braf.length());
         }

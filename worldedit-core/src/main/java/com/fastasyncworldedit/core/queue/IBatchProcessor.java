@@ -155,7 +155,9 @@ public interface IBatchProcessor {
      * Utility method to trim entity and blocks with a provided contains function.
      *
      * @return false if chunk is empty of NBT
+     * @deprecated tiles are stored in chunk-normalised coordinate space and thus cannot use the same function as entities
      */
+    @Deprecated(forRemoval = true, since = "2.8.4")
     default boolean trimNBT(IChunkSet set, Function<BlockVector3, Boolean> contains) {
         Set<CompoundTag> ents = set.getEntities();
         if (!ents.isEmpty()) {
@@ -165,6 +167,26 @@ public interface IBatchProcessor {
         if (!tiles.isEmpty()) {
             tiles.entrySet().removeIf(blockVector3CompoundTagEntry -> !contains
                     .apply(blockVector3CompoundTagEntry.getKey()));
+        }
+        return !tiles.isEmpty() || !ents.isEmpty();
+    }
+
+    /**
+     * Utility method to trim entity and blocks with a provided contains function.
+     *
+     * @return false if chunk is empty of NBT
+     * @since 2.8.4
+     */
+    default boolean trimNBT(
+            IChunkSet set, Function<BlockVector3, Boolean> containsEntity, Function<BlockVector3, Boolean> containsTile
+    ) {
+        Set<CompoundTag> ents = set.getEntities();
+        if (!ents.isEmpty()) {
+            ents.removeIf(ent -> !containsEntity.apply(ent.getEntityPosition().toBlockPoint()));
+        }
+        Map<BlockVector3, CompoundTag> tiles = set.getTiles();
+        if (!tiles.isEmpty()) {
+            tiles.entrySet().removeIf(blockVector3CompoundTagEntry -> !containsTile.apply(blockVector3CompoundTagEntry.getKey()));
         }
         return !tiles.isEmpty() || !ents.isEmpty();
     }

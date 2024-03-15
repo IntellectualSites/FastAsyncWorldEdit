@@ -18,6 +18,7 @@ import com.fastasyncworldedit.core.queue.Filter;
 import com.fastasyncworldedit.core.queue.IQueueChunk;
 import com.fastasyncworldedit.core.queue.IQueueExtent;
 import com.sk89q.worldedit.MaxChangedBlocksException;
+import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.mask.BlockMask;
 import com.sk89q.worldedit.function.mask.ExistingBlockMask;
@@ -45,6 +46,7 @@ import java.util.stream.IntStream;
 public class ParallelQueueExtent extends PassthroughExtent {
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
+    private static final ThreadLocal<Extent> extents = new ThreadLocal<>();
 
     private final World world;
     private final QueueHandler handler;
@@ -73,10 +75,36 @@ public class ParallelQueueExtent extends PassthroughExtent {
         this.fastmode = fastmode;
     }
 
+    /**
+     * Removes the extent currently associated with the calling thread.
+     */
+    public static void clearCurrentExtent() {
+        extents.remove();
+    }
+
+    /**
+     * Sets the extent associated with the calling thread.
+     */
+    public static void setCurrentExtent(Extent extent) {
+        extents.set(extent);
+    }
+
+    private void enter(Extent extent) {
+        setCurrentExtent(extent);
+    }
+
+    private void exit() {
+        clearCurrentExtent();
+    }
+
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     public IQueueExtent<IQueueChunk> getExtent() {
-        return (IQueueExtent<IQueueChunk>) super.getExtent();
+        Extent extent = extents.get();
+        if (extent == null) {
+            extent = super.getExtent();
+        }
+        return (IQueueExtent<IQueueChunk>) extent;
     }
 
     @Override
@@ -114,6 +142,7 @@ public class ParallelQueueExtent extends PassthroughExtent {
                     final SingleThreadQueueExtent queue = (SingleThreadQueueExtent) getNewQueue();
                     queue.setFastMode(fastmode);
                     queue.setFaweExceptionArray(faweExceptionReasonsUsed);
+                    enter(queue);
                     synchronized (queue) {
                         try {
                             ChunkFilterBlock block = null;
@@ -154,6 +183,8 @@ public class ParallelQueueExtent extends PassthroughExtent {
                         exceptionCount++;
                         LOGGER.warn(message);
                     }
+                } finally {
+                    exit();
                 }
             })).toArray(ForkJoinTask[]::new);
             // Join filters

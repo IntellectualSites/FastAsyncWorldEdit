@@ -16,6 +16,7 @@ import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.function.FlatRegionFunction;
@@ -217,7 +218,6 @@ public class FaweDelegateRegionManager {
     ) {
         TaskManager.taskManager().async(() -> {
             synchronized (FaweDelegateRegionManager.class) {
-                //todo because of the following code this should probably be in the Bukkit module
                 World pos1World = BukkitAdapter.adapt(getWorld(pos1.getWorldName()));
                 World pos3World = BukkitAdapter.adapt(getWorld(swapPos.getWorldName()));
                 EditSession sessionA = WorldEdit.getInstance().newEditSessionBuilder().world(pos1World)
@@ -236,14 +236,16 @@ public class FaweDelegateRegionManager {
                 CuboidRegion regionB = new CuboidRegion(
                         pos3World,
                         swapPos.getBlockVector3(),
-                        swapPos.getBlockVector3().add(pos2.getBlockVector3()).subtract(pos1.getBlockVector3())
+                        swapPos.getBlockVector3().add(pos2.getBlockVector3().subtract(pos1.getBlockVector3())).withY(pos2.getY())
                 );
-                Clipboard clipA = Clipboard.create(regionA, UUID.randomUUID());
-                Clipboard clipB = Clipboard.create(regionB, UUID.randomUUID());
+                Clipboard clipA = new BlockArrayClipboard(regionA, UUID.randomUUID());
+                Clipboard clipB = new BlockArrayClipboard(regionB, UUID.randomUUID());
                 ForwardExtentCopy copyA = new ForwardExtentCopy(sessionA, regionA, clipA, clipA.getMinimumPoint());
                 ForwardExtentCopy copyB = new ForwardExtentCopy(sessionB, regionB, clipB, clipB.getMinimumPoint());
                 copyA.setCopyingBiomes(true);
                 copyB.setCopyingBiomes(true);
+                copyA.setCopyingEntities(true);
+                copyB.setCopyingEntities(true);
                 try {
                     Operations.completeLegacy(copyA);
                     Operations.completeLegacy(copyB);
@@ -257,17 +259,16 @@ public class FaweDelegateRegionManager {
                     sessionA.close();
                     sessionB.close();
                 }
-                FaweAPI.fixLighting(pos1World, new CuboidRegion(pos1.getBlockVector3(), pos2.getBlockVector3()), null,
+                FaweAPI.fixLighting(
+                        pos1World,
+                        regionA,
+                        null,
                         RelightMode.valueOf(com.fastasyncworldedit.core.configuration.Settings.settings().LIGHTING.MODE)
                 );
-                FaweAPI.fixLighting(pos1World, new CuboidRegion(
-                                swapPos.getBlockVector3(),
-                                BlockVector3.at(
-                                        swapPos.getX() + pos2.getX() - pos1.getX(),
-                                        0,
-                                        swapPos.getZ() + pos2.getZ() - pos1.getZ()
-                                )
-                        ), null,
+                FaweAPI.fixLighting(
+                        pos1World,
+                        regionB,
+                        null,
                         RelightMode.valueOf(com.fastasyncworldedit.core.configuration.Settings.settings().LIGHTING.MODE)
                 );
                 if (whenDone != null) {
