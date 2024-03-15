@@ -22,7 +22,7 @@ package com.sk89q.worldedit.internal.expression;
 /**
  * Represents a way to access blocks in a world. Has to accept non-rounded coordinates.
  */
-public interface ExpressionEnvironment {
+public interface ExpressionEnvironment extends Cloneable {
 
     int getBlockType(double x, double y, double z);
 
@@ -36,4 +36,7 @@ public interface ExpressionEnvironment {
 
     int getBlockDataRel(double x, double y, double z);
 
+    // FAWE start
+    ExpressionEnvironment clone();
+    // FAWE end
 }
