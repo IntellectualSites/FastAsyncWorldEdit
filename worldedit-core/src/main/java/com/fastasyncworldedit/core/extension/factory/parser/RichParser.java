@@ -122,7 +122,10 @@ public abstract class RichParser<E> extends InputParser<E> implements AliasedPar
      * @param argumentInput the already provided input for the argument at the given index.
      * @param index         the index of the argument to get suggestions for.
      * @return a stream of suggestions matching the given input for the argument at the given index.
+     *
+     * @deprecated Use the version that takes a {@link ParserContext}, {@link #getSuggestions(String, int, ParserContext)}
      */
+    @Deprecated
     protected Stream<String> getSuggestions(String argumentInput, int index) {
         return Stream.empty();
     }
