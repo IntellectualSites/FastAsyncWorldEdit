@@ -125,7 +125,9 @@ public class LocalSession implements TextureHolder {
     private transient int cuiVersion = CUI_VERSION_UNINITIALIZED;
 
     // Session related
-    private transient RegionSelector selector = new CuboidRegionSelector();
+    //FAWE start - allow saving to session store
+    private RegionSelector selector = new CuboidRegionSelector();
+    //FAWE end
     private transient boolean placeAtPos1 = false;
     //FAWE start
     private final transient List<Object> history = Collections.synchronizedList(new LinkedList<>() {
@@ -771,6 +773,7 @@ public class LocalSession implements TextureHolder {
         checkNotNull(selector);
         selector.setWorld(world);
         this.selector = selector;
+        setDirty();
         if (hasWorldOverride() && !world.equals(getWorldOverride())) {
             setWorldOverride(null);
         }
