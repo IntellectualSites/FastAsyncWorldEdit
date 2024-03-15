@@ -23,6 +23,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
+import com.sk89q.worldedit.world.item.ItemType;
+import com.sk89q.worldedit.world.item.ItemTypes;
 
 /**
  * Utility methods for Google's GSON library.
@@ -41,6 +43,7 @@ public final class GsonUtil {
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(Vector3.class, new VectorAdapter());
         gsonBuilder.registerTypeAdapter(BlockVector3.class, new BlockVectorAdapter());
+        gsonBuilder.registerTypeAdapter(ItemType.class, new ItemTypeAdapter());
         return gsonBuilder;
     }
 
