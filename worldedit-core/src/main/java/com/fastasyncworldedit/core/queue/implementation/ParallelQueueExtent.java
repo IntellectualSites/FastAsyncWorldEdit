@@ -131,9 +131,12 @@ public class ParallelQueueExtent extends PassthroughExtent {
 
         // Get a pool, to operate on the chunks in parallel
         final int size = Math.min(chunks.size(), Settings.settings().QUEUE.PARALLEL_THREADS);
-        if (size <= 1 && chunksIter.hasNext()) {
-            BlockVector2 pos = chunksIter.next();
-            getExtent().apply(null, filter, region, pos.getX(), pos.getZ(), full);
+        if (size <= 1) {
+            // if PQE is ever used with PARALLEL_THREADS = 1, or only one chunk is edited, just run sequentially
+            while (chunksIter.hasNext()) {
+                BlockVector2 pos = chunksIter.next();
+                getExtent().apply(null, filter, region, pos.getX(), pos.getZ(), full);
+            }
         } else {
             final ForkJoinTask[] tasks = IntStream.range(0, size).mapToObj(i -> handler.submit(() -> {
                 try {
