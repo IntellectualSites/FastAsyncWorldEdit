@@ -14,7 +14,7 @@ import java.lang.reflect.Field;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public class ResettableExtent extends AbstractDelegateExtent implements Serializable {
+public abstract class ResettableExtent extends AbstractDelegateExtent implements Serializable {
 
     public ResettableExtent(Extent parent) {
         super(parent);
