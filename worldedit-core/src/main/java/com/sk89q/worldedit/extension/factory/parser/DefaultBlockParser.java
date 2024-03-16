@@ -64,6 +64,7 @@ import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.entity.EntityTypes;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 
+import javax.annotation.Nonnull;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Locale;
@@ -337,9 +338,10 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
         return SuggestionHelper.getBlockPropertySuggestions(blockType, props);
     }
 
+    @Nonnull
     private BaseBlock parseLogic(String input, ParserContext context) throws InputParseException {
         //FAWE start
-        String[] blockAndExtraData = input.trim().split("\\|");
+        String[] blockAndExtraData = input.trim().split("(?<!^)\\|");
         blockAndExtraData[0] = woolMapper(blockAndExtraData[0]);
         Map<Property<?>, Object> blockStates = new HashMap<>();
         //FAWE end
