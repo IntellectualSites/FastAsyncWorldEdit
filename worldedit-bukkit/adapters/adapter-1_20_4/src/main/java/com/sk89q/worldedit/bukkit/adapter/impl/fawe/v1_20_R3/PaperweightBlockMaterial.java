@@ -148,7 +148,7 @@ public class PaperweightBlockMaterial implements BlockMaterial {
 
     @Override
     public boolean isTranslucent() {
-        return blockState.canOcclude();
+        return !blockState.canOcclude();
     }
 
     @Override
