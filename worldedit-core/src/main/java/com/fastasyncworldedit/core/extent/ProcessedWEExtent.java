@@ -18,7 +18,7 @@ import com.sk89q.worldedit.world.block.BlockTypes;
 
 import java.util.UUID;
 
-public class ProcessedWEExtent extends AbstractDelegateExtent {
+public final class ProcessedWEExtent extends AbstractDelegateExtent {
 
     private final FaweLimit limit;
     private final Extent extent;

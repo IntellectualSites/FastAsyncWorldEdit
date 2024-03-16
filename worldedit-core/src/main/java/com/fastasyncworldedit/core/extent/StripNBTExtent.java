@@ -31,7 +31,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-public class StripNBTExtent extends AbstractDelegateExtent implements IBatchProcessor {
+public final class StripNBTExtent extends AbstractDelegateExtent implements IBatchProcessor {
 
     private final Set<String> strip;
 

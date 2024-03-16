@@ -11,7 +11,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.concurrent.Future;
 
-public class SingleRegionExtent extends FaweRegionExtent {
+public final class SingleRegionExtent extends FaweRegionExtent {
 
     private final Region region;
 

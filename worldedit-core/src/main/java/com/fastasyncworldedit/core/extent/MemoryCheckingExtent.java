@@ -8,7 +8,7 @@ import com.fastasyncworldedit.core.util.WEManager;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.Extent;
 
-public class MemoryCheckingExtent extends PassthroughExtent {
+public final class MemoryCheckingExtent extends PassthroughExtent {
 
     private final Actor actor;
 

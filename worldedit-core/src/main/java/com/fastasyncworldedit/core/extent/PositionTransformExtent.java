@@ -11,7 +11,7 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
-public class PositionTransformExtent extends ResettableExtent {
+public final class PositionTransformExtent extends ResettableExtent {
 
     private transient MutableBlockVector3 mutable = new MutableBlockVector3();
     private transient BlockVector3 min;

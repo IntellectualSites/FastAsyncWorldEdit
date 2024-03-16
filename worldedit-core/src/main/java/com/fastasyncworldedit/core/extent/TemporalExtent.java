@@ -8,7 +8,7 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
-public class TemporalExtent extends PassthroughExtent {
+public abstract class TemporalExtent extends PassthroughExtent {
 
     private int x;
     private int y;

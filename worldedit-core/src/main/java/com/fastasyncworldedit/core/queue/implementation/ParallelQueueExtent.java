@@ -45,7 +45,7 @@ import java.util.Set;
 import java.util.concurrent.ForkJoinTask;
 import java.util.stream.IntStream;
 
-public class ParallelQueueExtent extends PassthroughExtent {
+public final class ParallelQueueExtent extends PassthroughExtent {
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
     private static final ThreadLocal<Extent> extents = new ThreadLocal<>();
