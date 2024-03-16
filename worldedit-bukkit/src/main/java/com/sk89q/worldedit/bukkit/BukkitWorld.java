@@ -327,12 +327,12 @@ public class BukkitWorld extends AbstractWorld {
         treeTypeMapping.put(TreeGenerator.TreeType.RANDOM_MUSHROOM, TreeType.BROWN_MUSHROOM);
         for (TreeGenerator.TreeType type : TreeGenerator.TreeType.values()) {
             if (treeTypeMapping.get(type) == null) {
-                LOGGER.error("No TreeType mapping for TreeGenerator.TreeType." + type);
                 //FAWE start
+                LOGGER.info("No TreeType mapping for TreeGenerator.TreeType." + type);
                 LOGGER.info("The above message is displayed because your FAWE version is newer than {}" +
                         " and contains features of future minecraft versions which do not exist in {} hence the tree type" +
-                        "{} is not available. This is not an error. This version will work on your version of Minecraft." +
-                        "This is an informative message only.", Bukkit.getVersion(), Bukkit.getVersion(), type);
+                        " {} is not available. This is not an error. This version of FAWE will work on your version of " +
+                        " Minecraft. This is an informative message only.", Bukkit.getVersion(), Bukkit.getVersion(), type);
                 //FAWE end
             }
         }
