@@ -27,10 +27,10 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BaseBlock;
 
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -39,11 +39,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class RandomPattern extends AbstractPattern {
 
-    //FAWE start - SimpleRandom > Random, LHS<P> > List
+    //FAWE start - SimpleRandom > Random, RandomCollection
     private final SimpleRandom random;
-    private Map<Pattern, Double> weights = new LinkedHashMap<>();
+    private final List<RandomCollection.Weighted<Pattern>> weights;
     private RandomCollection<Pattern> collection;
-    private LinkedHashSet<Pattern> patterns = new LinkedHashSet<>();
     //FAWE end
 
     //FAWE start
@@ -53,6 +52,7 @@ public class RandomPattern extends AbstractPattern {
 
     public RandomPattern(SimpleRandom random) {
         this.random = random;
+        this.weights = new ArrayList<>();
     }
 
     /**
@@ -63,16 +63,10 @@ public class RandomPattern extends AbstractPattern {
      */
     public RandomPattern(SimpleRandom random, RandomPattern parent) {
         this.random = random;
-        this.weights = parent.weights;
-        this.collection = RandomCollection.of(weights, random);
-        this.patterns = parent.patterns;
-    }
-
-    private RandomPattern(SimpleRandom random, Map<Pattern, Double> weights) {
-        this.random = random;
-        this.weights = weights;
-        this.collection = RandomCollection.of(weights, random);
-        this.patterns = new LinkedHashSet<>(weights.keySet());
+        this.weights = parent.weights.stream()
+                .map(weighted -> new RandomCollection.Weighted<>(weighted.value().fork(), weighted.weight()))
+                .collect(Collectors.toCollection(ArrayList::new));
+        this.collection = RandomCollection.of(weights);
     }
     //FAWE end
 
@@ -87,18 +81,15 @@ public class RandomPattern extends AbstractPattern {
      */
     public void add(Pattern pattern, double chance) {
         checkNotNull(pattern);
-        //FAWE start - Double, weights, patterns and collection
-        Double existingWeight = weights.get(pattern);
-        if (existingWeight != null) {
-            chance += existingWeight;
-        }
-        weights.put(pattern, chance);
-        collection = RandomCollection.of(weights, random);
-        this.patterns.add(pattern);
+        //FAWE start - Double, weights, repeating patterns, and collection
+        this.weights.add(new RandomCollection.Weighted<>(pattern, chance));
+        this.collection = RandomCollection.of(weights);
     }
 
     public Set<Pattern> getPatterns() {
-        return patterns;
+        return this.weights.stream()
+                .map(RandomCollection.Weighted::value)
+                .collect(Collectors.toSet());
     }
 
     public RandomCollection<Pattern> getCollection() {
@@ -107,19 +98,17 @@ public class RandomPattern extends AbstractPattern {
 
     @Override
     public BaseBlock applyBlock(BlockVector3 position) {
-        return collection.next(position.x(), position.y(), position.z()).applyBlock(position);
+        return collection.next(this.random, position.x(), position.y(), position.z()).applyBlock(position);
     }
 
     @Override
     public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
-        return collection.next(get.x(), get.y(), get.z()).apply(extent, get, set);
+        return collection.next(this.random, get.x(), get.y(), get.z()).apply(extent, get, set);
     }
 
     @Override
     public Pattern fork() {
-        final LinkedHashMap<Pattern, Double> newWeights = new LinkedHashMap<>();
-        this.weights.forEach((p, w) -> newWeights.put(p.fork(), w));
-        return new RandomPattern(this.random, newWeights);
+        return new RandomPattern(this.random, this);
     }
 
     //FAWE end
