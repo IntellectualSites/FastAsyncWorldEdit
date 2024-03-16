@@ -2,6 +2,8 @@ package com.fastasyncworldedit.core.queue;
 
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.DoubleTag;
+import com.sk89q.jnbt.FloatTag;
+import com.sk89q.jnbt.IntArrayTag;
 import com.sk89q.jnbt.ListTag;
 import com.sk89q.jnbt.NBTUtils;
 import com.sk89q.jnbt.StringTag;
@@ -133,6 +135,12 @@ public interface IChunkExtent<T extends IChunk> extends Extent {
         posList.add(new DoubleTag(location.getY()));
         posList.add(new DoubleTag(location.getZ()));
         map.put("Pos", new ListTag(DoubleTag.class, posList));
+        if (!map.containsKey("Rotation")) {
+            List<FloatTag> rotList = new ArrayList<>();
+            rotList.add(new FloatTag(location.getYaw()));
+            rotList.add(new FloatTag(location.getPitch()));
+            map.put("Rotation", new ListTag(FloatTag.class, rotList));
+        }
 
         NBTUtils.addUUIDToMap(map, uuid);
 

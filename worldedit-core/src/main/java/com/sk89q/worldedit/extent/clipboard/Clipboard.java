@@ -27,6 +27,10 @@ import com.fastasyncworldedit.core.extent.clipboard.ReadOnlyClipboard;
 import com.fastasyncworldedit.core.function.visitor.Order;
 import com.fastasyncworldedit.core.queue.Filter;
 import com.fastasyncworldedit.core.util.MaskTraverser;
+import com.fastasyncworldedit.core.util.NbtUtils;
+import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.jnbt.IntTag;
+import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.EditSessionBuilder;
 import com.sk89q.worldedit.WorldEdit;
@@ -47,6 +51,7 @@ import com.sk89q.worldedit.regions.Regions;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BaseBlock;
+import com.sk89q.worldedit.world.entity.EntityTypes;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -57,6 +62,7 @@ import java.io.Flushable;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.UUID;
 
@@ -412,11 +418,30 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable, Fl
                     continue;
                 }
                 Location pos = entity.getLocation();
-                Location newPos = new Location(pos.getExtent(), pos.getX() + entityOffsetX,
-                        pos.getY() + entityOffsetY, pos.getZ() + entityOffsetZ, pos.getYaw(),
-                        pos.getPitch()
-                );
-                extent.createEntity(newPos, entity.getState());
+                if (entity.getType().equals(EntityTypes.LEASH_KNOT)) {
+                    var state = entity.getState();
+                    var nbtData = new HashMap<>(state.getNbtData().getValue());
+                    var posAsMap = new HashMap<String, Tag>();
+                    posAsMap.put("X", new IntTag(pos.getBlockX()));
+                    posAsMap.put("Y", new IntTag(pos.getBlockY()));
+                    posAsMap.put("Z", new IntTag(pos.getBlockZ()));
+                    nbtData.put("OldPos", new CompoundTag(posAsMap));
+                    state.setNbtData(new CompoundTag(nbtData));
+                    Location newPos = new Location(pos.getExtent(), pos.getX() + entityOffsetX,
+                            pos.getY() + entityOffsetY, pos.getZ() + entityOffsetZ, pos.getYaw(),
+                            pos.getPitch()
+                    );
+
+                    extent.createEntity(newPos, state);
+                } else {
+                    Location newPos = new Location(pos.getExtent(), pos.getX() + entityOffsetX,
+                            pos.getY() + entityOffsetY, pos.getZ() + entityOffsetZ, pos.getYaw(),
+                            pos.getPitch()
+                    );
+
+                    extent.createEntity(newPos, entity.getState());
+                }
+
             }
         }
     }

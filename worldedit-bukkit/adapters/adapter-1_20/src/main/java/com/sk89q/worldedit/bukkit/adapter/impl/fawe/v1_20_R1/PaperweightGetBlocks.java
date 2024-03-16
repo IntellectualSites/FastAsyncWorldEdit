@@ -35,12 +35,14 @@ import net.minecraft.core.IdMap;
 import net.minecraft.core.Registry;
 import net.minecraft.core.SectionPos;
 import net.minecraft.nbt.IntTag;
+import net.minecraft.nbt.NbtUtils;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.BitStorage;
 import net.minecraft.util.ZeroBitStorage;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.decoration.LeashFenceKnotEntity;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.entity.BeaconBlockEntity;
@@ -726,6 +728,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
 
                     syncTasks[1] = () -> {
                         Iterator<CompoundTag> iterator = entities.iterator();
+                        Map<BlockPos, LeashFenceKnotEntity> leashRef = new HashMap<>();
                         while (iterator.hasNext()) {
                             final CompoundTag nativeTag = iterator.next();
                             final Map<String, Tag> entityTagMap = nativeTag.getValue();
@@ -749,12 +752,34 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                                 if (entity != null) {
                                     final net.minecraft.nbt.CompoundTag tag = (net.minecraft.nbt.CompoundTag) adapter.fromNative(
                                             nativeTag);
+                                    if (entityTagMap.containsKey("Leash")) {
+                                        var leashTag = (net.minecraft.nbt.CompoundTag) adapter.fromNative(
+                                                entityTagMap.get("Leash"));
+                                        final LeashFenceKnotEntity leashEntity = leashRef.get(NbtUtils.readBlockPos(leashTag));
+                                        if (leashEntity != null) {
+                                            tag.put("Leash", NbtUtils.writeBlockPos(leashEntity.pos));
+                                        }
+                                    }
                                     for (final String name : Constants.NO_COPY_ENTITY_NBT_FIELDS) {
                                         tag.remove(name);
                                     }
                                     entity.load(tag);
                                     entity.absMoveTo(x, y, z, yaw, pitch);
                                     entity.setUUID(nativeTag.getUUID());
+                                    if (entity instanceof LeashFenceKnotEntity leashFenceKnotEntity) {
+                                        var leashTag = (net.minecraft.nbt.CompoundTag) adapter.fromNative(
+                                                entityTagMap.get("OldPos"));
+                                        if (leashTag != null) {
+                                            leashRef.put(
+                                                    new BlockPos(
+                                                            leashTag.getInt("X"),
+                                                            leashTag.getInt("Y"),
+                                                            leashTag.getInt("Z")
+                                                    ),
+                                                    leashFenceKnotEntity
+                                            );
+                                        }
+                                    }
                                     if (!nmsWorld.addFreshEntity(entity, CreatureSpawnEvent.SpawnReason.CUSTOM)) {
                                         LOGGER.warn(
                                                 "Error creating entity of type `{}` in world `{}` at location `{},{},{}`",
