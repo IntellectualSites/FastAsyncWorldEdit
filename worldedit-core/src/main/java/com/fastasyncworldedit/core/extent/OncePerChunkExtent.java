@@ -32,7 +32,6 @@ public class OncePerChunkExtent extends AbstractDelegateExtent implements IBatch
     private final IQueueExtent<IQueueChunk> queue;
     private Consumer<IChunkGet> task;
     private volatile long lastPair = Long.MAX_VALUE;
-    private volatile boolean isProcessing;
 
     /**
      * Create a new instance.
@@ -59,16 +58,12 @@ public class OncePerChunkExtent extends AbstractDelegateExtent implements IBatch
         }
         lastPair = pair;
         synchronized (set) {
-            if (!set.contains(chunkX, chunkZ)) {
-                set.add(chunkX, chunkZ);
-                return true;
-            }
+            return set.add(chunkX, chunkZ);
         }
-        return false;
     }
 
     private void checkAndRun(int chunkX, int chunkZ) {
-        if (!isProcessing && shouldRun(chunkX, chunkZ)) {
+        if (shouldRun(chunkX, chunkZ)) {
             task.accept(queue.getCachedGet(chunkX, chunkZ));
         }
     }
@@ -88,7 +83,6 @@ public class OncePerChunkExtent extends AbstractDelegateExtent implements IBatch
 
     @Override
     public IChunkGet processGet(final IChunkGet get) {
-        isProcessing = true;
         if (shouldRun(get.getX(), get.getZ())) {
             task.accept(get);
         }

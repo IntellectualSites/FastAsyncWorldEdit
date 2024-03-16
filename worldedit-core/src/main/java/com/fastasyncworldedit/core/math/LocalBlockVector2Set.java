@@ -72,11 +72,11 @@ public class LocalBlockVector2Set implements Set<BlockVector2> {
         if (offsetX == Integer.MAX_VALUE) {
             return false;
         }
-        short sx = (short) (x - offsetX);
-        short sz = (short) (z - offsetZ);
-        if (sx > 32767 || sx < -32767 || sz > 32767 || sz < -32767) {
+        if (x > 32767 || x < -32769 || z > 32769 || z < -32767) {
             return false;
         }
+        short sx = (short) (x - offsetX);
+        short sz = (short) (z - offsetZ);
         try {
             return set.get(MathMan.pairSearchCoords(sx, sz));
         } catch (IndexOutOfBoundsException e) {
