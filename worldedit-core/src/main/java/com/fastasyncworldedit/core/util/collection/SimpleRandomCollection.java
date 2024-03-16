@@ -2,41 +2,39 @@ package com.fastasyncworldedit.core.util.collection;
 
 import com.fastasyncworldedit.core.math.random.SimpleRandom;
 
-import java.util.Map;
+import java.util.List;
 import java.util.NavigableMap;
 import java.util.TreeMap;
 
-public class SimpleRandomCollection<E> extends RandomCollection<E> {
+public final class SimpleRandomCollection<T> implements RandomCollection<T> {
 
-    private final NavigableMap<Double, E> map = new TreeMap<>();
-    private double total = 0;
+    private final NavigableMap<Double, T> map;
+    private final double total;
 
     /**
      * Create a {@link RandomCollection} from a weighted map and a RNG.
-     * It is recommended to use {@link RandomCollection#of(Map, SimpleRandom)}
+     * It is recommended to use {@link RandomCollection#of(List)}
      * instead of this constructor.
      *
      * @param weights the weighted map.
-     * @param random  the random number generator.
      */
-    public SimpleRandomCollection(Map<E, Double> weights, SimpleRandom random) {
-        super(random);
-        for (Map.Entry<E, Double> entry : weights.entrySet()) {
-            add(entry.getValue(), entry.getKey());
+    public SimpleRandomCollection(List<Weighted<T>> weights) {
+        this.map = new TreeMap<>();
+        double total = 0;
+        for (Weighted<T> entry : weights) {
+            final double weight = entry.weight();
+            if (weight <= 0) {
+                throw new IllegalArgumentException("Weights must be positive");
+            }
+            total += weight;
+            this.map.put(total, entry.value());
         }
-    }
-
-    public void add(double weight, E result) {
-        if (weight <= 0) {
-            return;
-        }
-        total += weight;
-        map.put(total, result);
+        this.total = total;
     }
 
     @Override
-    public E next(int x, int y, int z) {
-        return map.ceilingEntry(getRandom().nextDouble(x, y, z) * this.total).getValue();
+    public T next(final SimpleRandom random, int x, int y, int z) {
+        return map.ceilingEntry(random.nextDouble(x, y, z) * this.total).getValue();
     }
 
 }

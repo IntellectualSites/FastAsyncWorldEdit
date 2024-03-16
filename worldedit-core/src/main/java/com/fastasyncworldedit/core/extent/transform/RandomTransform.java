@@ -7,10 +7,10 @@ import com.fastasyncworldedit.core.util.collection.RandomCollection;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
 
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -20,10 +20,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class RandomTransform extends SelectTransform {
 
     private final SimpleRandom random;
-    private final Map<ResettableExtent, Double> weights = new HashMap<>();
+    private final List<RandomCollection.Weighted<ResettableExtent>> weights;
 
     private transient RandomCollection<ResettableExtent> collection;
-    private transient LinkedHashSet<ResettableExtent> extents = new LinkedHashSet<>();
 
     public RandomTransform() {
         this(new TrueRandom());
@@ -36,27 +35,27 @@ public class RandomTransform extends SelectTransform {
      */
     public RandomTransform(SimpleRandom random) {
         this.random = random;
+        this.weights = new ArrayList<>();
     }
 
     @Override
     public AbstractDelegateExtent getExtent(int x, int y, int z) {
-        return collection.next(x, y, z);
+        return collection.next(this.random, x, y, z);
     }
 
     @Override
     public AbstractDelegateExtent getExtent(int x, int z) {
-        return collection.next(x, 0, z);
+        return collection.next(this.random, x, 0, z);
     }
 
     @Override
     public ResettableExtent setExtent(Extent extent) {
         if (collection == null) {
-            collection = RandomCollection.of(weights, random);
-            extents = new LinkedHashSet<>(weights.keySet());
+            collection = RandomCollection.of(weights);
         }
         super.setExtent(extent);
-        for (ResettableExtent current : extents) {
-            current.setExtent(extent);
+        for (RandomCollection.Weighted<ResettableExtent> current : this.weights) {
+            current.value().setExtent(extent);
         }
         return this;
     }
@@ -72,13 +71,12 @@ public class RandomTransform extends SelectTransform {
      */
     public void add(ResettableExtent extent, double chance) {
         checkNotNull(extent);
-        weights.put(extent, chance);
-        collection = RandomCollection.of(weights, random);
-        this.extents.add(extent);
+        weights.add(new RandomCollection.Weighted<>(extent, chance));
+        collection = RandomCollection.of(weights);
     }
 
     public Set<ResettableExtent> getExtents() {
-        return extents;
+        return this.weights.stream().map(RandomCollection.Weighted::value).collect(Collectors.toSet());
     }
 
     public RandomCollection<ResettableExtent> getCollection() {
