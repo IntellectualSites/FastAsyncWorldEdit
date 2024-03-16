@@ -34,7 +34,7 @@ logger.lifecycle("""
 *******************************************
 """)
 
-var rootVersion by extra("2.9.1")
+var rootVersion by extra("2.9.2")
 var snapshot by extra("SNAPSHOT")
 var revision: String by extra("")
 var buildNumber by extra("")

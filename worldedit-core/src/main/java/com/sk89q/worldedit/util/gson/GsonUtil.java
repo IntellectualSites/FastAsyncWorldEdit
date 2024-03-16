@@ -24,6 +24,7 @@ import com.google.gson.GsonBuilder;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.RegionSelector;
+import com.sk89q.worldedit.world.item.ItemType;
 
 /**
  * Utility methods for Google's GSON library.
@@ -44,6 +45,7 @@ public final class GsonUtil {
         gsonBuilder.registerTypeAdapter(BlockVector3.class, new BlockVectorAdapter());
         //FAWE start
         gsonBuilder.registerTypeAdapter(RegionSelector.class, new RegionSelectorAdapter());
+        gsonBuilder.registerTypeAdapter(ItemType.class, new ItemTypeAdapter());
         //FAWE end
         return gsonBuilder;
     }

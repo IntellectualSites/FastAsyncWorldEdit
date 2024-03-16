@@ -96,9 +96,14 @@ public abstract class AbstractFactory<E> {
         throw new NoMatchException(Caption.of("worldedit.error.no-match", TextComponent.of(input)));
     }
 
+    @Deprecated
     public List<String> getSuggestions(String input) {
+        return getSuggestions(input, new ParserContext());
+    }
+
+    public List<String> getSuggestions(String input, ParserContext context) {
         return parsers.stream().flatMap(
-                p -> p.getSuggestions(input)
+                p -> p.getSuggestions(input, context)
         ).collect(Collectors.toList());
     }
 

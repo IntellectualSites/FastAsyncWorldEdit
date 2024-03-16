@@ -79,7 +79,7 @@ public class ItemType implements RegistryItem, Keyed {
     }
 
     //FAWE start
-    private int internalId;
+    private transient int internalId;
 
     @Override
     public void setInternalId(int internalId) {
