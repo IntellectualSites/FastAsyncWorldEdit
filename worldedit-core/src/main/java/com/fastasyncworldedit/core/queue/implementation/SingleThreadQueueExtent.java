@@ -46,7 +46,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * This queue is reusable {@link #init(Extent, IChunkCache, IChunkCache)}
  */
 @SuppressWarnings({"unchecked", "rawtypes"})
-public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implements IQueueExtent<IQueueChunk> {
+public final class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implements IQueueExtent<IQueueChunk> {
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
 

@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-public class PassthroughExtent extends AbstractDelegateExtent {
+public abstract class PassthroughExtent extends AbstractDelegateExtent {
 
     /**
      * Create a new instance.

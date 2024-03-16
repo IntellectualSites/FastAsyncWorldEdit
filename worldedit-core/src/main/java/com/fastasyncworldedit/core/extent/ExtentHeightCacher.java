@@ -4,7 +4,7 @@ import com.sk89q.worldedit.extent.Extent;
 
 import java.util.Arrays;
 
-public class ExtentHeightCacher extends PassthroughExtent {
+public final class ExtentHeightCacher extends PassthroughExtent {
 
     private transient int cacheBotX = Integer.MIN_VALUE;
     private transient int cacheBotZ = Integer.MIN_VALUE;

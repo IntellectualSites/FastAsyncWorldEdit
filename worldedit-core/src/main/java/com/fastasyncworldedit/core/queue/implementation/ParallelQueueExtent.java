@@ -49,7 +49,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ForkJoinTask;
 
-public class ParallelQueueExtent extends PassthroughExtent {
+public final class ParallelQueueExtent extends PassthroughExtent {
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
 

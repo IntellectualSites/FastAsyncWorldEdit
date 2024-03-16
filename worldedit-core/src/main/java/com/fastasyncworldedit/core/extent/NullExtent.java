@@ -40,7 +40,7 @@ import java.util.UUID;
 import java.util.concurrent.Future;
 
 //todo This should be removed in favor of com.sk89q.worldedit.extent.NullExtent
-public class NullExtent extends FaweRegionExtent implements IBatchProcessor {
+public final class NullExtent extends FaweRegionExtent implements IBatchProcessor {
 
     private final FaweException reason;
 

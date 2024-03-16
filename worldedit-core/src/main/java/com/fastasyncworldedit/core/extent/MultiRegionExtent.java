@@ -15,7 +15,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Future;
 
-public class MultiRegionExtent extends FaweRegionExtent {
+public final class MultiRegionExtent extends FaweRegionExtent {
 
     @Nullable
     private final RegionIntersection intersection;

@@ -12,7 +12,7 @@ import com.sk89q.worldedit.regions.Region;
 import java.util.Collection;
 import java.util.Collections;
 
-public class HeightBoundExtent extends FaweRegionExtent {
+public final class HeightBoundExtent extends FaweRegionExtent {
 
     private final int min;
     private final int max;

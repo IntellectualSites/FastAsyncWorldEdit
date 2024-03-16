@@ -6,7 +6,7 @@ import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
-public class SlowExtent extends AbstractDelegateExtent {
+public final class SlowExtent extends AbstractDelegateExtent {
 
     private final long THRESHOLD = 50 * 1000000; // 1 tick
     private final long nanos;

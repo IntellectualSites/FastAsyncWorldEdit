@@ -7,7 +7,7 @@ import java.util.function.Supplier;
 /**
  * An extent that delegates actions to another extent that may change at any time.
  */
-public class SupplyingExtent extends PassthroughExtent {
+public final class SupplyingExtent extends PassthroughExtent {
 
     private final Supplier<Extent> extentSupplier;
 
