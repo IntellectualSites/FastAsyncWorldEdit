@@ -15,7 +15,7 @@ public class LinearBlockPattern extends AbstractPattern implements ResettablePat
     /**
      * Create a new {@link Pattern} instance
      *
-     * @param patterns array of patterns to linearly choose from based on x/z coordinates
+     * @param patterns array of patterns to linearly choose from
      */
     public LinearBlockPattern(Pattern[] patterns) {
         this.patternsArray = patterns;
@@ -23,18 +23,14 @@ public class LinearBlockPattern extends AbstractPattern implements ResettablePat
 
     @Override
     public BaseBlock applyBlock(BlockVector3 position) {
-        if (index == patternsArray.length) {
-            index = 0;
-        }
-        return patternsArray[index++].applyBlock(position);
+        index = (index + 1) % patternsArray.length;
+        return patternsArray[index].applyBlock(position);
     }
 
     @Override
     public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
-        if (index == patternsArray.length) {
-            index = 0;
-        }
-        return patternsArray[index++].apply(extent, get, set);
+        index = (index + 1) % patternsArray.length;
+        return patternsArray[index].apply(extent, get, set);
     }
 
     @Override
