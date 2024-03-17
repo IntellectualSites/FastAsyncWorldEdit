@@ -36,7 +36,7 @@ public class SimpleRandomCollection<E> extends RandomCollection<E> {
 
     @Override
     public E next(int x, int y, int z) {
-        return map.ceilingEntry(getRandom().nextDouble(x, y, z) * this.total).getValue();
+        return map.ceilingEntry(getRandom().nextDouble(x, y, z, this.total)).getValue();
     }
 
 }

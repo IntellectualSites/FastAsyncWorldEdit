@@ -9,6 +9,11 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 
 import static java.lang.Math.floorDiv;
 
+/**
+ * @deprecated replaced by {@link com.sk89q.worldedit.function.pattern.RandomPattern}
+ * combined with {@link com.fastasyncworldedit.core.math.random.Linear2DRandom}.
+ */
+@Deprecated(forRemoval = true, since = "TODO")
 public class Linear2DBlockPattern extends AbstractPattern {
 
     private final Pattern[] patternsArray;
