@@ -129,4 +129,9 @@ public class SurfaceRandomOffsetPattern extends AbstractPattern {
         return !block.getBlockType().getMaterial().isMovementBlocker();
     }
 
+    @Override
+    public BlockVector3 size() {
+        return BlockVector3.at(moves, moves, moves);
+    }
+
 }

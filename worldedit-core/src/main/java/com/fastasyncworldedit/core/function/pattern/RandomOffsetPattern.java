@@ -72,4 +72,9 @@ public class RandomOffsetPattern extends AbstractPattern {
         return pattern.apply(extent, get, mutable);
     }
 
+    @Override
+    public BlockVector3 size() {
+        return BlockVector3.at(dx2, dy2, dz2);
+    }
+
 }

@@ -62,6 +62,22 @@ public class MutableBlockVector3 extends BlockVector3 {
     }
 
     @Override
+    public BlockVector3 getMinimum(BlockVector3 v2) {
+        this.x = Math.min(v2.getX(), x);
+        this.y = Math.min(v2.getY(), y);
+        this.z = Math.min(v2.getZ(), z);
+        return this;
+    }
+
+    @Override
+    public BlockVector3 getMaximum(BlockVector3 v2) {
+        this.x = Math.max(v2.getX(), x);
+        this.y = Math.max(v2.getY(), y);
+        this.z = Math.max(v2.getZ(), z);
+        return this;
+    }
+
+    @Override
     public MutableBlockVector3 mutX(double x) {
         this.x = (int) x;
         return this;
