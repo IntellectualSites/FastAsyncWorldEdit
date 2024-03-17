@@ -18,7 +18,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * <p>Expressions are evaluated as {@code true} if they return a value
  * greater than {@code 0}.</p>
  */
-public class ExpressionPattern extends AbstractPattern {
+public class ExpressionPattern extends AbstractPattern implements StatefulPattern {
 
     private final Expression expression;
 
@@ -55,6 +55,11 @@ public class ExpressionPattern extends AbstractPattern {
             e.printStackTrace();
             return BlockTypes.AIR.getDefaultState().toBaseBlock();
         }
+    }
+
+    @Override
+    public StatefulPattern fork() {
+        return new ExpressionPattern(this.expression.clone());
     }
 
 }

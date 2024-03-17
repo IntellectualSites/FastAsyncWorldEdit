@@ -7,6 +7,8 @@ import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BaseBlock;
 
+import java.util.Arrays;
+
 import static java.lang.Math.floorDiv;
 
 /**
@@ -14,7 +16,7 @@ import static java.lang.Math.floorDiv;
  * combined with {@link com.fastasyncworldedit.core.math.random.Linear3DRandom}.
  */
 @Deprecated(forRemoval = true, since = "TODO")
-public class Linear3DBlockPattern extends AbstractPattern {
+public class Linear3DBlockPattern extends AbstractPattern implements StatefulPattern {
 
     private final Pattern[] patternsArray;
     private final int xScale;
@@ -54,6 +56,12 @@ public class Linear3DBlockPattern extends AbstractPattern {
             index += patternsArray.length;
         }
         return patternsArray[index].apply(extent, get, set);
+    }
+
+    @Override
+    public StatefulPattern fork() {
+        final Pattern[] forked = Arrays.stream(this.patternsArray).map(Pattern::fork).toArray(Pattern[]::new);
+        return new Linear3DBlockPattern(forked, this.xScale, this.yScale, this.zScale);
     }
 
 }

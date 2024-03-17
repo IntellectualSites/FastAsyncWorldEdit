@@ -11,7 +11,7 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 
 import java.util.concurrent.ThreadLocalRandom;
 
-public class SurfaceRandomOffsetPattern extends AbstractPattern {
+public class SurfaceRandomOffsetPattern extends AbstractPattern implements StatefulPattern {
 
     private final Pattern pattern;
     private final int moves;
@@ -127,6 +127,11 @@ public class SurfaceRandomOffsetPattern extends AbstractPattern {
     private boolean canPassthrough(BlockVector3 v) {
         BaseBlock block = pattern.applyBlock(v);
         return !block.getBlockType().getMaterial().isMovementBlocker();
+    }
+
+    @Override
+    public StatefulPattern fork() {
+        return new SurfaceRandomOffsetPattern(this.pattern.fork(), this.moves, this.minY, this.maxY);
     }
 
 }

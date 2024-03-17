@@ -8,7 +8,9 @@ import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BaseBlock;
 
-public class MaskedPattern extends AbstractPattern {
+import java.util.Arrays;
+
+public class MaskedPattern extends AbstractPattern implements StatefulPattern {
 
     private final Pattern primary;
     private final Pattern secondary;
@@ -41,6 +43,11 @@ public class MaskedPattern extends AbstractPattern {
             return primary.apply(extent, get, set);
         }
         return secondary.apply(extent, get, set);
+    }
+
+    @Override
+    public StatefulPattern fork() {
+        return new MaskedPattern(this.mask.copy(), this.primary.fork(), this.secondary.fork());
     }
 
 }

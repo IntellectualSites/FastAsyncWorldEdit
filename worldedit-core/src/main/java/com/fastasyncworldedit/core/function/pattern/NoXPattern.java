@@ -8,7 +8,7 @@ import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BaseBlock;
 
-public class NoXPattern extends AbstractPattern {
+public class NoXPattern extends AbstractPattern implements StatefulPattern {
 
     private final Pattern pattern;
     private final MutableBlockVector3 mutable = new MutableBlockVector3();
@@ -37,7 +37,7 @@ public class NoXPattern extends AbstractPattern {
     }
 
     @Override
-    public Pattern fork() {
+    public StatefulPattern fork() {
         return new NoXPattern(this.pattern.fork());
     }
 

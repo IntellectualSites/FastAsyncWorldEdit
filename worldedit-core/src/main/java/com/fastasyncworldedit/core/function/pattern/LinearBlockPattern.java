@@ -7,6 +7,8 @@ import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BaseBlock;
 
+import java.util.Arrays;
+
 public class LinearBlockPattern extends AbstractPattern implements ResettablePattern {
 
     private final Pattern[] patternsArray;
@@ -40,6 +42,12 @@ public class LinearBlockPattern extends AbstractPattern implements ResettablePat
     @Override
     public void reset() {
         index = 0;
+    }
+
+    @Override
+    public Pattern fork() {
+        final Pattern[] forked = Arrays.stream(this.patternsArray).map(Pattern::fork).toArray(Pattern[]::new);
+        return new LinearBlockPattern(forked);
     }
 
 }

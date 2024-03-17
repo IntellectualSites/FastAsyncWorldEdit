@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.function.pattern;
 
+import com.fastasyncworldedit.core.function.pattern.StatefulPattern;
 import com.fastasyncworldedit.core.math.random.SimpleRandom;
 import com.fastasyncworldedit.core.math.random.TrueRandom;
 import com.fastasyncworldedit.core.util.collection.RandomCollection;
@@ -37,7 +38,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Uses a random pattern of a weighted list of patterns.
  */
-public class RandomPattern extends AbstractPattern {
+//FAWE start - StatefulPattern
+public class RandomPattern extends AbstractPattern implements StatefulPattern {
+//FAWE end
 
     //FAWE start - SimpleRandom > Random, LHS<P> > List
     private final SimpleRandom random;
@@ -66,6 +69,13 @@ public class RandomPattern extends AbstractPattern {
         this.weights = parent.weights;
         this.collection = RandomCollection.of(weights, random);
         this.patterns = parent.patterns;
+    }
+
+    private RandomPattern(SimpleRandom random, Map<Pattern, Double> weights) {
+        this.random = random;
+        this.weights = weights;
+        this.collection = RandomCollection.of(weights, random);
+        this.patterns = new LinkedHashSet<>(weights.keySet());
     }
     //FAWE end
 
@@ -107,6 +117,14 @@ public class RandomPattern extends AbstractPattern {
     public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
         return collection.next(get.getBlockX(), get.getBlockY(), get.getBlockZ()).apply(extent, get, set);
     }
+
+    @Override
+    public StatefulPattern fork() {
+        final LinkedHashMap<Pattern, Double> newWeights = new LinkedHashMap<>();
+        this.weights.forEach((p, w) -> newWeights.put(p.fork(), w));
+        return new RandomPattern(this.random, newWeights);
+    }
+
     //FAWE end
 
 }
