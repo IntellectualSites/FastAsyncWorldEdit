@@ -19,6 +19,8 @@
 
 package com.sk89q.worldedit.util.gson;
 
+import com.fastasyncworldedit.core.util.gson.ItemTypeAdapter;
+import com.fastasyncworldedit.core.util.gson.RegionSelectorAdapter;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.sk89q.worldedit.math.BlockVector3;
