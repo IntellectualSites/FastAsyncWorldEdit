@@ -755,13 +755,7 @@ public class SelectionCommands {
         }
 
         if (setDefaultSelector) {
-            RegionSelectorType found = null;
-            for (RegionSelectorType type : RegionSelectorType.values()) {
-                if (type.getSelectorClass() == newSelector.getClass()) {
-                    found = type;
-                    break;
-                }
-            }
+            RegionSelectorType found = RegionSelectorType.getForSelector(newSelector);
 
             if (found != null) {
                 session.setDefaultRegionSelector(found);

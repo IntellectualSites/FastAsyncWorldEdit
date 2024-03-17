@@ -19,7 +19,13 @@
 
 package com.sk89q.worldedit.regions.selector;
 
+import com.fastasyncworldedit.core.regions.selector.FuzzyRegionSelector;
+import com.fastasyncworldedit.core.regions.selector.PolyhedralRegionSelector;
 import com.sk89q.worldedit.regions.RegionSelector;
+
+import javax.annotation.Nullable;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * An enum of default region selector types.
@@ -32,13 +38,40 @@ public enum RegionSelectorType {
     SPHERE(SphereRegionSelector.class),
     ELLIPSOID(EllipsoidRegionSelector.class),
     POLYGON(Polygonal2DRegionSelector.class),
-    CONVEX_POLYHEDRON(ConvexPolyhedralRegionSelector.class);
+    CONVEX_POLYHEDRON(ConvexPolyhedralRegionSelector.class),
+    //FAWE start
+    POLYHEDRAL(PolyhedralRegionSelector.class),
+    FUZZY(FuzzyRegionSelector.class);
+    //FAWE end
+
+    //FAWE start
+    private static final Map<Class<? extends RegionSelector>, RegionSelectorType> VALUE_MAP = new HashMap<>();
+
+    static {
+        for (RegionSelectorType type : values()) {
+            VALUE_MAP.put(type.getSelectorClass(), type);
+        }
+    }
+    //FAWE end
 
     private final Class<? extends RegionSelector> selectorClass;
 
     RegionSelectorType(Class<? extends RegionSelector> selectorClass) {
         this.selectorClass = selectorClass;
     }
+
+    //FAWE start
+    /**
+     * Get a {@link RegionSelectorType} for the given {@link RegionSelector}
+     *
+     * @param selector Region selector to get type enum for
+     * @since TODO
+     */
+    @Nullable
+    public static RegionSelectorType getForSelector(RegionSelector selector) {
+        return VALUE_MAP.get(selector.getClass());
+    }
+    //FAWE end
 
     /**
      * Get the selector class.
