@@ -307,9 +307,6 @@ public class BukkitServerInterface extends AbstractPlatform implements MultiUser
         if (!tickFluid) {
             return null;
         }
-        if (Settings.settings().QUEUE.NO_TICK_FASTMODE && fastMode) {
-            return null;
-        }
         return this.plugin.getBukkitImplAdapter().getTickingPostProcessor();
     }
     //FAWE end
