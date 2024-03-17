@@ -38,6 +38,8 @@ import org.apache.logging.log4j.Logger;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.imageio.ImageIO;
+import javax.imageio.ImageReadParam;
+import javax.imageio.ImageReader;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.BufferedOutputStream;
@@ -70,6 +72,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -519,8 +522,22 @@ public class MainUtil {
         return destFile;
     }
 
-    public static BufferedImage readImage(InputStream in) throws IOException {
-        return MainUtil.toRGB(ImageIO.read(in));
+    public static BufferedImage readImage(InputStream stream) throws IOException {
+        Iterator<ImageReader> iter = ImageIO.getImageReaders(stream);
+        if (!iter.hasNext()) {
+            throw new IOException("Could not get image reader from stream.");
+        }
+        ImageReader reader = iter.next();
+        ImageReadParam param = reader.getDefaultReadParam();
+        reader.setInput(stream, true, true);
+        BufferedImage bi;
+        try {
+            bi = reader.read(0, param);
+        } finally {
+            reader.dispose();
+            stream.close();
+        }
+        return MainUtil.toRGB(bi);
     }
 
     public static BufferedImage readImage(URL url) throws IOException {
