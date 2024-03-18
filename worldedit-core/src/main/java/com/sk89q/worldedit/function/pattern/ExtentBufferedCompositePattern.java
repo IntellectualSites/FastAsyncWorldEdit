@@ -19,11 +19,14 @@
 
 package com.sk89q.worldedit.function.pattern;
 
+import com.fastasyncworldedit.core.function.pattern.StatefulPattern;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.buffer.ExtentBuffer;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BaseBlock;
+
+import java.util.Arrays;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
@@ -32,7 +35,9 @@ import static com.google.common.base.Preconditions.checkArgument;
  * pattern are realized by the subsequent one(s). For best results, use an {@link ExtentBuffer}
  * to avoid changing blocks in an underlying extent (e.g. the world).
  */
-public class ExtentBufferedCompositePattern extends AbstractExtentPattern {
+//FAWE - stateful pattern
+public class ExtentBufferedCompositePattern extends AbstractExtentPattern implements StatefulPattern {
+//FAWE end
 
     private final Pattern[] patterns;
 
@@ -63,5 +68,13 @@ public class ExtentBufferedCompositePattern extends AbstractExtentPattern {
         }
         return lastBlock;
     }
+
+    //FAWE - stateful pattern
+    @Override
+    public StatefulPattern fork() {
+        final Pattern[] forkedPatterns = Arrays.stream(patterns).map(Pattern::fork).toArray(Pattern[]::new);
+        return new ExtentBufferedCompositePattern(getExtent(), forkedPatterns);
+    }
+    //FAWE end
 
 }
