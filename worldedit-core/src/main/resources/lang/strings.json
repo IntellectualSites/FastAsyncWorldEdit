@@ -137,6 +137,8 @@
   "fawe.error.limit.disallowed-property": "Your limit disallows use of property '{0}'",
   "fawe.error.region-mask-invalid": "Invalid region mask: {0}",
   "fawe.error.occurred-continuing": "Ignorable error occurred during edit: {0}",
+  "fawe.error.limit.max-brush-radius": "Maximum brush radius in limit: {0}",
+  "fawe.error.limit.max-radius": "Maximum radius in limit: {0}",
   "fawe.cancel.count": "Cancelled {0} edits.",
   "fawe.cancel.reason.confirm": "Use //confirm to execute {0}",
   "fawe.cancel.reason.confirm.region": "Your selection is large ({0} -> {1}, containing {3} blocks). Use //confirm to execute {2}",

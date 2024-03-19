@@ -297,10 +297,11 @@ public class ToolCommands {
                     int range
     ) throws WorldEditException {
 
-        LocalConfiguration config = we.getConfiguration();
-
-        if (range > config.maxSuperPickaxeSize) {
-            player.print(Caption.of("worldedit.tool.superpickaxe.max-range", TextComponent.of(config.maxSuperPickaxeSize)));
+        if (range > player.getLimit().MAX_SUPER_PICKAXE_SIZE) {
+            player.print(Caption.of(
+                    "worldedit.tool.superpickaxe.max-range",
+                    TextComponent.of(player.getLimit().MAX_SUPER_PICKAXE_SIZE)
+            ));
             return;
         }
         setTool(player, session, new FloodFillTool(range, pattern), "worldedit.tool.floodfill.equip");

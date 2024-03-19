@@ -95,6 +95,13 @@ public class YAMLConfiguration extends LocalConfiguration {
         butcherDefaultRadius = Math.max(-1, config.getInt("limits.butcher-radius.default", butcherDefaultRadius));
         butcherMaxRadius = Math.max(-1, config.getInt("limits.butcher-radius.maximum", butcherMaxRadius));
 
+        //FAWE start
+        MAX_RADIUS = maxRadius;
+        MAX_BRUSH_RADIUS = maxBrushRadius;
+        MAX_SUPER_RADIUS = maxSuperPickaxeSize;
+        MAX_BUTCHER_RADIUS = butcherMaxRadius;
+        //FAWE end
+
         disallowedBlocks = config.getStringList("limits.disallowed-blocks", Lists.newArrayList(getDefaultDisallowedBlocks()))
                 .stream()
                 .map(s -> s.contains(":") ? s.toLowerCase(Locale.ROOT) : ("minecraft:" + s).toLowerCase(Locale.ROOT))

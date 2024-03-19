@@ -19,9 +19,24 @@
 
 package com.sk89q.worldedit;
 
+import com.fastasyncworldedit.core.exception.BrushRadiusLimitException;
+import com.fastasyncworldedit.core.exception.RadiusLimitException;
+
 /**
  * Thrown when a maximum radius for a brush is reached.
+ *
+ * @deprecated Use {@link RadiusLimitException}
  */
+@Deprecated
 public class MaxBrushRadiusException extends MaxRadiusException {
 
+    //FAWE start
+
+    /**
+     * @deprecated Use {@link BrushRadiusLimitException}
+     */
+    @Deprecated
+    public MaxBrushRadiusException() {
+    }
+    //FAWE end
 }
