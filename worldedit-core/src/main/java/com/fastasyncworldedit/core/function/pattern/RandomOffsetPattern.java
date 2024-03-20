@@ -11,7 +11,7 @@ import com.sk89q.worldedit.world.block.BlockTypes;
 
 import java.util.SplittableRandom;
 
-public class RandomOffsetPattern extends AbstractPattern implements StatefulPattern {
+public class RandomOffsetPattern extends AbstractPattern {
 
     private final int dx;
     private final int dy;
@@ -73,7 +73,7 @@ public class RandomOffsetPattern extends AbstractPattern implements StatefulPatt
     }
 
     @Override
-    public StatefulPattern fork() {
+    public Pattern fork() {
         return new RandomOffsetPattern(this.pattern.fork(), this.dx, this.dy, this.dz, this.minY, this.maxY);
     }
 

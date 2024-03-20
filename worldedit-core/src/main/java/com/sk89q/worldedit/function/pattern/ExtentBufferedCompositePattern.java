@@ -19,7 +19,6 @@
 
 package com.sk89q.worldedit.function.pattern;
 
-import com.fastasyncworldedit.core.function.pattern.StatefulPattern;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.buffer.ExtentBuffer;
@@ -35,9 +34,7 @@ import static com.google.common.base.Preconditions.checkArgument;
  * pattern are realized by the subsequent one(s). For best results, use an {@link ExtentBuffer}
  * to avoid changing blocks in an underlying extent (e.g. the world).
  */
-//FAWE - stateful pattern
-public class ExtentBufferedCompositePattern extends AbstractExtentPattern implements StatefulPattern {
-//FAWE end
+public class ExtentBufferedCompositePattern extends AbstractExtentPattern {
 
     private final Pattern[] patterns;
 
@@ -71,7 +68,7 @@ public class ExtentBufferedCompositePattern extends AbstractExtentPattern implem
 
     //FAWE - stateful pattern
     @Override
-    public StatefulPattern fork() {
+    public Pattern fork() {
         final Pattern[] forkedPatterns = Arrays.stream(patterns).map(Pattern::fork).toArray(Pattern[]::new);
         return new ExtentBufferedCompositePattern(getExtent(), forkedPatterns);
     }

@@ -19,7 +19,6 @@
 
 package com.sk89q.worldedit.function.pattern;
 
-import com.fastasyncworldedit.core.function.pattern.StatefulPattern;
 import com.fastasyncworldedit.core.math.random.SimpleRandom;
 import com.fastasyncworldedit.core.math.random.TrueRandom;
 import com.fastasyncworldedit.core.util.collection.RandomCollection;
@@ -38,9 +37,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Uses a random pattern of a weighted list of patterns.
  */
-//FAWE start - StatefulPattern
-public class RandomPattern extends AbstractPattern implements StatefulPattern {
-//FAWE end
+public class RandomPattern extends AbstractPattern {
 
     //FAWE start - SimpleRandom > Random, LHS<P> > List
     private final SimpleRandom random;
@@ -119,7 +116,7 @@ public class RandomPattern extends AbstractPattern implements StatefulPattern {
     }
 
     @Override
-    public StatefulPattern fork() {
+    public Pattern fork() {
         final LinkedHashMap<Pattern, Double> newWeights = new LinkedHashMap<>();
         this.weights.forEach((p, w) -> newWeights.put(p.fork(), w));
         return new RandomPattern(this.random, newWeights);

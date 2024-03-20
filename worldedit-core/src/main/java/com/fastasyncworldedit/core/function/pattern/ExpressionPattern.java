@@ -1,6 +1,7 @@
 package com.fastasyncworldedit.core.function.pattern;
 
 import com.sk89q.worldedit.function.pattern.AbstractPattern;
+import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.internal.expression.EvaluationException;
 import com.sk89q.worldedit.internal.expression.Expression;
 import com.sk89q.worldedit.internal.expression.ExpressionException;
@@ -18,7 +19,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * <p>Expressions are evaluated as {@code true} if they return a value
  * greater than {@code 0}.</p>
  */
-public class ExpressionPattern extends AbstractPattern implements StatefulPattern {
+public class ExpressionPattern extends AbstractPattern {
 
     private final Expression expression;
 
@@ -58,7 +59,7 @@ public class ExpressionPattern extends AbstractPattern implements StatefulPatter
     }
 
     @Override
-    public StatefulPattern fork() {
+    public Pattern fork() {
         return new ExpressionPattern(this.expression.clone());
     }
 

@@ -16,7 +16,7 @@ import static java.lang.Math.floorDiv;
  * combined with {@link com.fastasyncworldedit.core.math.random.Linear2DRandom}.
  */
 @Deprecated(forRemoval = true, since = "TODO")
-public class Linear2DBlockPattern extends AbstractPattern implements StatefulPattern {
+public class Linear2DBlockPattern extends AbstractPattern {
 
     private final Pattern[] patternsArray;
     private final int xScale;
@@ -55,7 +55,7 @@ public class Linear2DBlockPattern extends AbstractPattern implements StatefulPat
     }
 
     @Override
-    public StatefulPattern fork() {
+    public Pattern fork() {
         final Pattern[] forked = Arrays.stream(this.patternsArray).map(Pattern::fork).toArray(Pattern[]::new);
         return new Linear2DBlockPattern(forked, this.xScale, this.zScale);
     }

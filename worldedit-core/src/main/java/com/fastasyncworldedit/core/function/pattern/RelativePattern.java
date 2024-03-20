@@ -9,7 +9,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
-public class RelativePattern extends AbstractPattern implements ResettablePattern, StatefulPattern {
+public class RelativePattern extends AbstractPattern implements ResettablePattern {
 
     private final Pattern pattern;
     private final int minY;
@@ -64,7 +64,7 @@ public class RelativePattern extends AbstractPattern implements ResettablePatter
     }
 
     @Override
-    public StatefulPattern fork() {
+    public Pattern fork() {
         RelativePattern forked = new RelativePattern(this.pattern.fork(), this.minY, this.maxY);
         forked.origin = this.origin; // maintain origin for forks
         return forked;

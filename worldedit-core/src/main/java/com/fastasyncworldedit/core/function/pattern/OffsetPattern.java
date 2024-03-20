@@ -9,9 +9,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
-import java.util.Arrays;
-
-public class OffsetPattern extends AbstractPattern implements StatefulPattern {
+public class OffsetPattern extends AbstractPattern {
 
     private final int dx;
     private final int dy;
@@ -63,7 +61,7 @@ public class OffsetPattern extends AbstractPattern implements StatefulPattern {
     }
 
     @Override
-    public StatefulPattern fork() {
+    public Pattern fork() {
         return new OffsetPattern(this.pattern.fork(), this.dx, this.dy, this.dz, this.minY, this.maxY);
     }
 

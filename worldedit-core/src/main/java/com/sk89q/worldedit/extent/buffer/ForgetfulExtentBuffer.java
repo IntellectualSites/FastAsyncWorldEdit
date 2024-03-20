@@ -19,7 +19,6 @@
 
 package com.sk89q.worldedit.extent.buffer;
 
-import com.fastasyncworldedit.core.function.pattern.StatefulPattern;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
@@ -52,9 +51,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * <p>This buffer will not attempt to return results from the buffer when
  * accessor methods (such as {@link #getBlock(BlockVector3)}) are called.</p>
  */
-//FAWE - stateful pattern
-public class ForgetfulExtentBuffer extends AbstractDelegateExtent implements StatefulPattern, BiomePattern {
-//FAWE end
+public class ForgetfulExtentBuffer extends AbstractDelegateExtent implements Pattern, BiomePattern {
 
     private final Map<BlockVector3, BaseBlock> buffer = new LinkedHashMap<>();
     private final Map<BlockVector3, BiomeType> biomeBuffer = new LinkedHashMap<>();
@@ -240,7 +237,7 @@ public class ForgetfulExtentBuffer extends AbstractDelegateExtent implements Sta
 
     //FAWE - stateful pattern
     @Override
-    public StatefulPattern fork() {
+    public Pattern fork() {
         return new ForgetfulExtentBuffer(extent, mask.copy());
     }
     //FAWE end
