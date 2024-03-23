@@ -83,6 +83,7 @@ public class WorldEditExpressionEnvironment implements ExpressionEnvironment {
     }
 
     @SuppressWarnings("deprecation")
+    @Override
     public int getBlockDataRel(double x, double y, double z) {
         return extent.getBlock(toWorldRel(x, y, z).toBlockPoint()).getBlockType().getLegacyCombinedId() & 0xF;
     }
