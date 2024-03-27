@@ -25,6 +25,8 @@ import com.sk89q.worldedit.extent.buffer.ExtentBuffer;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BaseBlock;
 
+import java.util.Arrays;
+
 import static com.google.common.base.Preconditions.checkArgument;
 
 /**
@@ -63,5 +65,13 @@ public class ExtentBufferedCompositePattern extends AbstractExtentPattern {
         }
         return lastBlock;
     }
+
+    //FAWE - stateful pattern
+    @Override
+    public Pattern fork() {
+        final Pattern[] forkedPatterns = Arrays.stream(patterns).map(Pattern::fork).toArray(Pattern[]::new);
+        return new ExtentBufferedCompositePattern(getExtent(), forkedPatterns);
+    }
+    //FAWE end
 
 }

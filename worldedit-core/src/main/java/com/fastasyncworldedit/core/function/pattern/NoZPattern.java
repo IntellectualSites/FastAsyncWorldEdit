@@ -1,6 +1,7 @@
 package com.fastasyncworldedit.core.function.pattern;
 
 import com.fastasyncworldedit.core.math.MutableBlockVector3;
+import com.fastasyncworldedit.core.queue.Filter;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.pattern.AbstractPattern;
@@ -34,6 +35,11 @@ public class NoZPattern extends AbstractPattern {
         mutable.mutX(get.getX());
         mutable.mutY(get.getY());
         return pattern.apply(extent, mutable, set);
+    }
+
+    @Override
+    public Pattern fork() {
+        return new NoZPattern(this.pattern.fork());
     }
 
 }

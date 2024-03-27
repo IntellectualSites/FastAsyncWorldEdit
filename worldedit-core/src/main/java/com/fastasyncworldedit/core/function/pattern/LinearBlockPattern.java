@@ -47,4 +47,10 @@ public class LinearBlockPattern extends AbstractPattern implements ResettablePat
         index = 0;
     }
 
+    @Override
+    public Pattern fork() {
+        final Pattern[] forked = Arrays.stream(this.patternsArray).map(Pattern::fork).toArray(Pattern[]::new);
+        return new LinearBlockPattern(forked);
+    }
+
 }
