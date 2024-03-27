@@ -2,6 +2,7 @@ package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_18_R2;
 
 import com.fastasyncworldedit.bukkit.adapter.BukkitGetBlocks;
 import com.fastasyncworldedit.bukkit.adapter.DelegateSemaphore;
+import com.fastasyncworldedit.bukkit.adapter.NativeEntityFunctionSet;
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.configuration.Settings;
@@ -19,6 +20,7 @@ import com.sk89q.jnbt.ListTag;
 import com.sk89q.jnbt.StringTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.bukkit.BukkitEntity;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_18_R2.nbt.PaperweightLazyCompoundTag;
 import com.sk89q.worldedit.internal.Constants;
@@ -59,6 +61,7 @@ import org.apache.logging.log4j.Logger;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_18_R2.CraftWorld;
 import org.bukkit.craftbukkit.v1_18_R2.block.CraftBlock;
+import org.bukkit.craftbukkit.v1_18_R2.entity.CraftEntity;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 
 import javax.annotation.Nonnull;
@@ -134,11 +137,13 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
         this.biomeHolderIdMap = biomeRegistry.asHolderIdMap();
     }
 
-    public int getChunkX() {
+    @Override
+    public int getX() {
         return chunkX;
     }
 
-    public int getChunkZ() {
+    @Override
+    public int getZ() {
         return chunkZ;
     }
 
@@ -349,48 +354,24 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
 
     @Override
     public Set<CompoundTag> getEntities() {
-        List<Entity> entities = PaperweightPlatformAdapter.getEntities(getChunk());
+        List<Entity> entities = PaperweightPlatformAdapter.getEntities(ensureLoaded(serverLevel, chunkX, chunkZ));
         if (entities.isEmpty()) {
             return Collections.emptySet();
         }
-        int size = entities.size();
-        return new AbstractSet<>() {
-            @Override
-            public int size() {
-                return size;
-            }
+        return new NativeEntityFunctionSet<>(entities, Entity::getUUID, e -> {
+            net.minecraft.nbt.CompoundTag tag = new net.minecraft.nbt.CompoundTag();
+            e.save(tag);
+            return (CompoundTag) adapter.toNative(tag);
+        });
+    }
 
-            @Override
-            public boolean isEmpty() {
-                return false;
-            }
-
-            @Override
-            public boolean contains(Object get) {
-                if (!(get instanceof CompoundTag getTag)) {
-                    return false;
-                }
-                UUID getUUID = getTag.getUUID();
-                for (Entity entity : entities) {
-                    UUID uuid = entity.getUUID();
-                    if (uuid.equals(getUUID)) {
-                        return true;
-                    }
-                }
-                return false;
-            }
-
-            @Nonnull
-            @Override
-            public Iterator<CompoundTag> iterator() {
-                Iterable<CompoundTag> result = entities.stream().map(input -> {
-                    net.minecraft.nbt.CompoundTag tag = new net.minecraft.nbt.CompoundTag();
-                    PaperweightPlatformAdapter.readEntityIntoTag(input, tag);
-                    return (CompoundTag) adapter.toNative(tag);
-                }).collect(Collectors.toList());
-                return result.iterator();
-            }
-        };
+    @Override
+    public Set<com.sk89q.worldedit.entity.Entity> getFullEntities() {
+        List<Entity> entities = PaperweightPlatformAdapter.getEntities(ensureLoaded(serverLevel, chunkX, chunkZ));
+        if (entities.isEmpty()) {
+            return Collections.emptySet();
+        }
+        return new NativeEntityFunctionSet<>(entities, Entity::getUUID, e -> new BukkitEntity(e.getBukkitEntity()));
     }
 
     private void removeEntity(Entity entity) {
@@ -407,17 +388,20 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
         if (!callLock.isHeldByCurrentThread()) {
             throw new IllegalStateException("Attempted to call chunk GET but chunk was not call-locked.");
         }
-        forceLoadSections = false;
-        PaperweightGetBlocks_Copy copy = createCopy ? new PaperweightGetBlocks_Copy(levelChunk) : null;
-        if (createCopy) {
-            if (copies.containsKey(copyKey)) {
-                throw new IllegalStateException("Copy key already used.");
-            }
-            copies.put(copyKey, copy);
+        if (createCopy && copies.containsKey(copyKey)) { // Do not sometimes load chunk if we're going to error
+            throw new IllegalStateException("Copy key already used.");
         }
         try {
+            forceLoadSections = false;
             ServerLevel nmsWorld = serverLevel;
             LevelChunk nmsChunk = ensureLoaded(nmsWorld, chunkX, chunkZ);
+            PaperweightGetBlocks_Copy copy;
+            if (createCopy) {
+                copy = new PaperweightGetBlocks_Copy(nmsChunk);
+                copies.put(copyKey, copy);
+            } else {
+                copy = null;
+            }
 
             // Remove existing tiles. Create a copy so that we can remove blocks
             Map<BlockPos, BlockEntity> chunkTiles = new HashMap<>(nmsChunk.getBlockEntities());
