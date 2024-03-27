@@ -700,10 +700,10 @@ public class SchematicCommands {
 
         String headerBytesElem = String.format("%.1fkb", totalBytes / 1000.0);
 
-        if (Settings.settings().PATHS.PER_PLAYER_SCHEMATICS && Settings.settings().EXPERIMENTAL.PER_PLAYER_FILE_SIZE_LIMIT > -1) {
+        if (Settings.settings().PATHS.PER_PLAYER_SCHEMATICS && actor.getLimit().SCHEM_FILE_SIZE_LIMIT > -1) {
             headerBytesElem += String.format(
                     " / %dkb",
-                    Settings.settings().EXPERIMENTAL.PER_PLAYER_FILE_SIZE_LIMIT
+                    actor.getLimit().SCHEM_FILE_SIZE_LIMIT
             );
         }
 
@@ -837,7 +837,7 @@ public class SchematicCommands {
 
             //FAWE start
             boolean checkFilesize = Settings.settings().PATHS.PER_PLAYER_SCHEMATICS
-                    && Settings.settings().EXPERIMENTAL.PER_PLAYER_FILE_SIZE_LIMIT > -1;
+                    && actor.getLimit().SCHEM_FILE_SIZE_LIMIT > -1;
 
             double directorysizeKb = 0;
             String curFilepath = file.getAbsolutePath();
@@ -867,7 +867,7 @@ public class SchematicCommands {
             }
 
 
-            if (Settings.settings().PATHS.PER_PLAYER_SCHEMATICS && Settings.settings().EXPERIMENTAL.PER_PLAYER_FILE_NUM_LIMIT > -1) {
+            if (Settings.settings().PATHS.PER_PLAYER_SCHEMATICS && actor.getLimit().SCHEM_FILE_NUM_LIMIT > -1) {
 
                 if (numFiles == -1) {
                     numFiles = 0;
@@ -880,7 +880,7 @@ public class SchematicCommands {
                         }
                     }
                 }
-                int limit = Settings.settings().EXPERIMENTAL.PER_PLAYER_FILE_NUM_LIMIT;
+                int limit = actor.getLimit().SCHEM_FILE_NUM_LIMIT;
 
                 if (numFiles >= limit) {
                     TextComponent noSlotsErr = TextComponent.of( //TODO - to be moved into captions/translatablecomponents
@@ -931,7 +931,7 @@ public class SchematicCommands {
                     if (checkFilesize) {
 
                         double curKb = filesizeKb + directorysizeKb;
-                        int allocatedKb = Settings.settings().EXPERIMENTAL.PER_PLAYER_FILE_SIZE_LIMIT;
+                        int allocatedKb = actor.getLimit().SCHEM_FILE_SIZE_LIMIT;
 
                         if (overwrite) {
                             curKb -= oldKbOverwritten;
@@ -966,11 +966,11 @@ public class SchematicCommands {
                         actor.print(kbRemainingNotif);
                     }
 
-                    if (Settings.settings().PATHS.PER_PLAYER_SCHEMATICS && Settings.settings().EXPERIMENTAL.PER_PLAYER_FILE_NUM_LIMIT > -1) {
+                    if (Settings.settings().PATHS.PER_PLAYER_SCHEMATICS && actor.getLimit().SCHEM_FILE_NUM_LIMIT > -1) {
 
                         TextComponent slotsRemainingNotif = TextComponent.of(
                                 //TODO - to be moved into captions/translatablecomponents
-                                "You have " + (Settings.settings().EXPERIMENTAL.PER_PLAYER_FILE_NUM_LIMIT - numFiles)
+                                "You have " + (actor.getLimit().SCHEM_FILE_NUM_LIMIT - numFiles)
                                         + " schematic file slots left.",
                                 TextColor.GRAY
                         );

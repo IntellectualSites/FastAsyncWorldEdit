@@ -2,6 +2,7 @@ package com.fastasyncworldedit.core.configuration;
 
 import com.fastasyncworldedit.core.configuration.file.YamlConfiguration;
 import com.fastasyncworldedit.core.util.StringMan;
+import com.sk89q.util.StringUtil;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import org.apache.logging.log4j.Logger;
 
@@ -14,8 +15,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -26,6 +29,9 @@ import java.util.Map;
 public class Config {
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
+
+    private final Map<String, Object> removedKeyVals = new HashMap<>();
+    private List<String> existingMigrateNodes = null;
 
     public Config() {
         save(new PrintWriter(new ByteArrayOutputStream(0)), getClass(), this, 0);
@@ -43,7 +49,8 @@ public class Config {
                 try {
                     return (T) field.get(instance);
                 } catch (IllegalAccessException e) {
-                    e.printStackTrace();
+                    LOGGER.error("Failed to get config option: {}", key, e);
+                    return null;
                 }
             }
         }
@@ -67,6 +74,10 @@ public class Config {
                     if (field.getAnnotation(Final.class) != null) {
                         return;
                     }
+                    Migrate migrate = field.getAnnotation(Migrate.class);
+                    if (existingMigrateNodes != null && migrate != null) {
+                        existingMigrateNodes.add(migrate.value());
+                    }
                     if (field.getType() == String.class && !(value instanceof String)) {
                         value = value + "";
                     }
@@ -74,17 +85,22 @@ public class Config {
                     field.set(instance, value);
                     return;
                 } catch (Throwable e) {
-                    e.printStackTrace();
+                    LOGGER.error("Failed to set config option: {}", key);
                 }
             }
         }
-        LOGGER.error("Failed to set config option: {}: {} | {} | {}.yml", key, value, instance, root.getSimpleName());
+        removedKeyVals.put(key, value);
+        LOGGER.error(
+                "Failed to set config option: {}: {} | {} | {}.yml. This is likely because it was removed.",
+                key,
+                value,
+                instance,
+                root.getSimpleName()
+        );
     }
 
     public boolean load(File file) {
-        if (!file.exists()) {
-            return false;
-        }
+        existingMigrateNodes = new ArrayList<>();
         YamlConfiguration yml = YamlConfiguration.loadConfiguration(file);
         for (String key : yml.getKeys(true)) {
             Object value = yml.get(key);
@@ -93,6 +109,10 @@ public class Config {
             }
             set(key, value, getClass());
         }
+        for (String node : existingMigrateNodes) {
+            removedKeyVals.remove(node);
+        }
+        existingMigrateNodes = null;
         return true;
     }
 
@@ -113,7 +133,7 @@ public class Config {
             save(writer, getClass(), instance, 0);
             writer.close();
         } catch (Throwable e) {
-            e.printStackTrace();
+            LOGGER.error("Failed to save config file: {}", file, e);
         }
     }
 
@@ -163,6 +183,19 @@ public class Config {
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.FIELD, ElementType.TYPE})
     public @interface Ignore {
+
+    }
+
+    /**
+     * Indicates that a field should be instantiated / created.
+     *
+     * @since TODO
+     */
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({ElementType.FIELD})
+    public @interface Migrate {
+
+        String value();
 
     }
 
@@ -222,7 +255,6 @@ public class Config {
         try {
             String CTRF = System.lineSeparator();
             String spacing = StringMan.repeat(" ", indent);
-            HashMap<Class<?>, Object> instances = new HashMap<>();
             for (Field field : clazz.getFields()) {
                 if (field.getAnnotation(Ignore.class) != null) {
                     continue;
@@ -239,31 +271,14 @@ public class Config {
                 }
                 if (current == ConfigBlock.class) {
                     current = (Class<?>) ((ParameterizedType) (field.getGenericType())).getActualTypeArguments()[0];
-                    comment = current.getAnnotation(Comment.class);
-                    if (comment != null) {
-                        for (String commentLine : comment.value()) {
-                            writer.write(spacing + "# " + commentLine + CTRF);
-                        }
-                    }
-                    BlockName blockNames = current.getAnnotation(BlockName.class);
-                    if (blockNames != null) {
-                        writer.write(spacing + toNodeName(current.getSimpleName()) + ":" + CTRF);
-                        ConfigBlock configBlock = (ConfigBlock) field.get(instance);
-                        if (configBlock == null || configBlock.getInstances().isEmpty()) {
-                            configBlock = new ConfigBlock();
-                            field.set(instance, configBlock);
-                            for (String blockName : blockNames.value()) {
-                                configBlock.put(blockName, current.getDeclaredConstructor().newInstance());
-                            }
-                        }
-                        // Save each instance
-                        for (Map.Entry<String, Object> entry : ((Map<String, Object>) configBlock.getRaw()).entrySet()) {
-                            String key = entry.getKey();
-                            writer.write(spacing + "  " + toNodeName(key) + ":" + CTRF);
-                            save(writer, current, entry.getValue(), indent + 4);
-                        }
-                    }
+                    handleConfigBlockSave(writer, instance, indent, field, spacing, CTRF, current);
                     continue;
+                } else if (!removedKeyVals.isEmpty()) {
+                    Migrate migrate = field.getAnnotation(Migrate.class);
+                    Object value;
+                    if (migrate != null && (value = removedKeyVals.remove(migrate.value())) != null) {
+                        field.set(instance, value);
+                    }
                 }
                 Create create = field.getAnnotation(Create.class);
                 if (create != null) {
@@ -281,7 +296,6 @@ public class Config {
                     writer.write(spacing + toNodeName(current.getSimpleName()) + ":" + CTRF);
                     if (value == null) {
                         field.set(instance, value = current.getDeclaredConstructor().newInstance());
-                        instances.put(current, value);
                     }
                     save(writer, current, value, indent + 2);
                 } else {
@@ -292,7 +306,42 @@ public class Config {
                 }
             }
         } catch (Throwable e) {
-            e.printStackTrace();
+            LOGGER.error("Failed to save config file", e);
+        }
+    }
+
+    private <T> void handleConfigBlockSave(
+            PrintWriter writer,
+            Object instance,
+            int indent,
+            Field field,
+            String spacing,
+            String CTRF,
+            Class<T> current
+    ) throws IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException {
+        Comment comment = current.getAnnotation(Comment.class);
+        if (comment != null) {
+            for (String commentLine : comment.value()) {
+                writer.write(spacing + "# " + commentLine + CTRF);
+            }
+        }
+        BlockName blockNames = current.getAnnotation(BlockName.class);
+        if (blockNames != null) {
+            writer.write(spacing + toNodeName(current.getSimpleName()) + ":" + CTRF);
+            ConfigBlock<T> configBlock = (ConfigBlock<T>) field.get(instance);
+            if (configBlock == null || configBlock.getInstances().isEmpty()) {
+                configBlock = new ConfigBlock<>();
+                field.set(instance, configBlock);
+                for (String blockName : blockNames.value()) {
+                    configBlock.put(blockName, current.getDeclaredConstructor().newInstance());
+                }
+            }
+            // Save each instance
+            for (Map.Entry<String, T> entry : configBlock.getRaw().entrySet()) {
+                String key = entry.getKey();
+                writer.write(spacing + "  " + toNodeName(key) + ":" + CTRF);
+                save(writer, current, entry.getValue(), indent + 4);
+            }
         }
     }
 
@@ -311,7 +360,7 @@ public class Config {
             return field;
         } catch (Throwable ignored) {
             LOGGER.warn(
-                    "Invalid config field: {} for {}",
+                    "Invalid config field: {} for {}. It is possible this is because it has been removed.",
                     StringMan.join(split, "."),
                     toNodeName(instance.getClass().getSimpleName())
             );
@@ -379,7 +428,7 @@ public class Config {
                 return null;
             }
         } catch (Throwable e) {
-            e.printStackTrace();
+            LOGGER.error("Failed retrieving instance for config node: {}", StringUtil.joinString(split, "."), e);
         }
         return null;
     }

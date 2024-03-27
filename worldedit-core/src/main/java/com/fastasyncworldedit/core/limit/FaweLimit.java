@@ -15,6 +15,8 @@ public class FaweLimit {
     public int MAX_BLOCKSTATES = 0;
     public int MAX_ENTITIES = 0;
     public int MAX_HISTORY = 0;
+    public int SCHEM_FILE_SIZE_LIMIT = 0;
+    public int SCHEM_FILE_NUM_LIMIT = 0;
     public int MAX_EXPRESSION_MS = 0;
     public int INVENTORY_MODE = Integer.MAX_VALUE;
     public int SPEED_REDUCTION = Integer.MAX_VALUE;
@@ -111,6 +113,8 @@ public class FaweLimit {
         MAX.MAX_BLOCKSTATES = Integer.MAX_VALUE;
         MAX.MAX_ENTITIES = Integer.MAX_VALUE;
         MAX.MAX_HISTORY = Integer.MAX_VALUE;
+        MAX.SCHEM_FILE_NUM_LIMIT = Integer.MAX_VALUE;
+        MAX.SCHEM_FILE_SIZE_LIMIT = Integer.MAX_VALUE;
         MAX.MAX_EXPRESSION_MS = 50;
         MAX.FAST_PLACEMENT = true;
         MAX.CONFIRM_LARGE = true;
@@ -237,6 +241,8 @@ public class FaweLimit {
                 && MAX_BLOCKSTATES == Integer.MAX_VALUE
                 && MAX_ENTITIES == Integer.MAX_VALUE
                 && MAX_HISTORY == Integer.MAX_VALUE
+                && SCHEM_FILE_SIZE_LIMIT == Integer.MAX_VALUE
+                && SCHEM_FILE_NUM_LIMIT == Integer.MAX_VALUE
                 && INVENTORY_MODE == 0
                 && SPEED_REDUCTION == 0
                 && FAST_PLACEMENT
@@ -256,6 +262,8 @@ public class FaweLimit {
         MAX_FAILS = limit.MAX_FAILS;
         MAX_ITERATIONS = limit.MAX_ITERATIONS;
         MAX_HISTORY = limit.MAX_HISTORY;
+        SCHEM_FILE_NUM_LIMIT = limit.SCHEM_FILE_NUM_LIMIT;
+        SCHEM_FILE_SIZE_LIMIT = limit.SCHEM_FILE_SIZE_LIMIT;
         INVENTORY_MODE = limit.INVENTORY_MODE;
         SPEED_REDUCTION = limit.SPEED_REDUCTION;
         FAST_PLACEMENT = limit.FAST_PLACEMENT;
@@ -279,6 +287,8 @@ public class FaweLimit {
         limit.MAX_FAILS = MAX_FAILS;
         limit.MAX_ITERATIONS = MAX_ITERATIONS;
         limit.MAX_HISTORY = MAX_HISTORY;
+        limit.SCHEM_FILE_SIZE_LIMIT = SCHEM_FILE_SIZE_LIMIT;
+        limit.SCHEM_FILE_NUM_LIMIT = SCHEM_FILE_NUM_LIMIT;
         limit.FAST_PLACEMENT = FAST_PLACEMENT;
         limit.CONFIRM_LARGE = CONFIRM_LARGE;
         limit.RESTRICT_HISTORY_TO_REGIONS = RESTRICT_HISTORY_TO_REGIONS;
