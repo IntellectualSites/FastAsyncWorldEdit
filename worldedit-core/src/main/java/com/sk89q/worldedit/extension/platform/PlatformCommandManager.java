@@ -41,6 +41,8 @@ import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.MissingWorldException;
 import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.command.AnvilCommands;
+import com.sk89q.worldedit.command.AnvilCommandsRegistration;
 import com.sk89q.worldedit.command.ApplyBrushCommands;
 import com.sk89q.worldedit.command.BiomeCommands;
 import com.sk89q.worldedit.command.BiomeCommandsRegistration;
@@ -95,6 +97,7 @@ import com.sk89q.worldedit.command.argument.ExpressionConverter;
 import com.sk89q.worldedit.command.argument.FactoryConverter;
 import com.sk89q.worldedit.command.argument.HeightConverter;
 import com.sk89q.worldedit.command.argument.LocationConverter;
+import com.sk89q.worldedit.command.argument.MCAWorldConverter;
 import com.sk89q.worldedit.command.argument.OffsetConverter;
 import com.sk89q.worldedit.command.argument.RegionFactoryConverter;
 import com.sk89q.worldedit.command.argument.RegistryConverter;
@@ -273,6 +276,7 @@ public final class PlatformCommandManager {
         HeightConverter.register(commandManager);
         OffsetConverter.register(worldEdit, commandManager);
         //FAWE start
+        MCAWorldConverter.register(commandManager);
         commandManager.registerConverter(
                 Key.of(com.sk89q.worldedit.function.pattern.Pattern.class, Annotations.patternList()),
                 CommaSeparatedValuesConverter.wrap(commandManager.getConverter(Key.of(
@@ -547,6 +551,13 @@ public final class PlatformCommandManager {
                     "Manage your history",
                     HistorySubCommandsRegistration.builder(),
                     new HistorySubCommands(history)
+            );
+            registerSubCommands(
+                    "/anvil",
+                    ImmutableList.of(),
+                    "Anvil commands",
+                    AnvilCommandsRegistration.builder(),
+                    new AnvilCommands(worldEdit)
             );
             //FAWE end
             this.registration.register(

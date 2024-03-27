@@ -110,9 +110,7 @@ public final class NBTOutputStream extends OutputStream implements Closeable, Da
         checkNotNull(value);
         int type = NBTConstants.TYPE_STRING;
         writeNamedTagName(name, type);
-        byte[] bytes = value.getBytes(NBTConstants.CHARSET);
-        os.writeShort(bytes.length);
-        os.write(bytes);
+        os.writeUTF(value);
     }
 
     public void writeNamedTag(String name, int value) throws IOException {
@@ -161,6 +159,16 @@ public final class NBTOutputStream extends OutputStream implements Closeable, Da
         }
     }
 
+    public void writeNamedTag(String name, long[] data) throws IOException {
+        checkNotNull(name);
+        int type = NBTConstants.TYPE_LONG_ARRAY;
+        writeNamedTagName(name, type);
+        os.writeInt(data.length);
+        for (long aData : data) {
+            os.writeLong(aData);
+        }
+    }
+
     public void writeNamedEmptyList(String name) throws IOException {
         writeNamedEmptyList(name, NBTConstants.TYPE_COMPOUND);
     }
@@ -181,10 +189,13 @@ public final class NBTOutputStream extends OutputStream implements Closeable, Da
     }
 
     public void writeLazyCompoundTag(String name, LazyWrite next) throws IOException {
-        byte[] nameBytes = name.getBytes(NBTConstants.CHARSET);
         os.writeByte(NBTConstants.TYPE_COMPOUND);
-        os.writeShort(nameBytes.length);
-        os.write(nameBytes);
+        os.writeUTF(name);
+        next.write(this);
+        os.writeByte(NBTConstants.TYPE_END);
+    }
+
+    public void writeLazyListedCompoundTag(LazyWrite next) throws IOException {
         next.write(this);
         os.writeByte(NBTConstants.TYPE_END);
     }
@@ -325,9 +336,7 @@ public final class NBTOutputStream extends OutputStream implements Closeable, Da
      * @throws IOException if an I/O error occurs.
      */
     private void writeStringTagPayload(StringTag tag) throws IOException {
-        byte[] bytes = tag.getValue().getBytes(NBTConstants.CHARSET);
-        os.writeShort(bytes.length);
-        os.write(bytes);
+        os.writeUTF(tag.getValue());
     }
 
     /**

@@ -20,8 +20,6 @@
 package com.sk89q.worldedit.regions;
 
 import com.fastasyncworldedit.core.math.BlockVectorSet;
-import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;

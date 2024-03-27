@@ -31,6 +31,8 @@ import com.sk89q.worldedit.world.World;
 import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
 import org.apache.logging.log4j.Logger;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -68,6 +70,7 @@ public final class SingleThreadQueueExtent extends ExtentBatchProcessorHolder im
     private boolean[] faweExceptionReasonsUsed = new boolean[FaweException.Type.values().length];
     private int lastException = Integer.MIN_VALUE;
     private int exceptionCount = 0;
+    private List<Runnable> flushTasks = null;
 
     public SingleThreadQueueExtent() {
     }
@@ -196,6 +199,14 @@ public final class SingleThreadQueueExtent extends ExtentBatchProcessorHolder im
     @Override
     public boolean isEmpty() {
         return chunks.isEmpty() && submissions.isEmpty();
+    }
+
+    @Override
+    public void addFlushTask(final Runnable task) {
+        if (flushTasks == null) {
+            flushTasks = new ArrayList<>();
+        }
+        flushTasks.add(task);
     }
 
     @Override
@@ -470,6 +481,11 @@ public final class SingleThreadQueueExtent extends ExtentBatchProcessorHolder im
             getChunkLock.unlock();
         }
         pollSubmissions(0, true);
+        if (flushTasks != null) {
+            for (Runnable r : flushTasks) {
+                r.run();
+            }
+        }
     }
 
     @Override
