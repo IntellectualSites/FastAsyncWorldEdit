@@ -94,4 +94,9 @@ public class SolidRandomOffsetPattern extends AbstractPattern {
         return pattern.apply(extent, get, set);
     }
 
+    @Override
+    public Pattern fork() {
+        return new SolidRandomOffsetPattern(this.pattern.fork(), this.dx, this.dy, this.dz, this.minY, this.maxY);
+    }
+
 }
