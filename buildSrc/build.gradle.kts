@@ -24,7 +24,7 @@ dependencies {
     implementation(gradleApi())
     implementation("org.ajoberstar.grgit:grgit-gradle:5.2.2")
     implementation("com.github.johnrengelman:shadow:8.1.1")
-    implementation("io.papermc.paperweight.userdev:io.papermc.paperweight.userdev.gradle.plugin:1.5.11")
+    implementation("io.papermc.paperweight.userdev:io.papermc.paperweight.userdev.gradle.plugin:1.5.12")
 }
 
 kotlin {
