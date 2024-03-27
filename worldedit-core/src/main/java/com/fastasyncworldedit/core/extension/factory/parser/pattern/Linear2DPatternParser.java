@@ -2,7 +2,7 @@ package com.fastasyncworldedit.core.extension.factory.parser.pattern;
 
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.extension.factory.parser.RichParser;
-import com.fastasyncworldedit.core.function.pattern.Linear2DBlockPattern;
+import com.fastasyncworldedit.core.math.random.Linear2DRandom;
 import com.google.common.base.Preconditions;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.command.util.SuggestionHelper;
@@ -14,7 +14,6 @@ import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 import javax.annotation.Nonnull;
-import java.util.Set;
 import java.util.stream.Stream;
 
 public class Linear2DPatternParser extends RichParser<Pattern> {
@@ -59,9 +58,8 @@ public class Linear2DPatternParser extends RichParser<Pattern> {
             zScale = Integer.parseInt(arguments[2]);
             Preconditions.checkArgument(zScale != 0);
         }
-        if (inner instanceof RandomPattern) {
-            Set<Pattern> patterns = ((RandomPattern) inner).getPatterns();
-            return new Linear2DBlockPattern(patterns.toArray(new Pattern[0]), xScale, zScale);
+        if (inner instanceof RandomPattern rp) {
+            return new RandomPattern(new Linear2DRandom(xScale, zScale), rp);
         }
         throw new InputParseException(TextComponent.of("Pattern " + inner.getClass().getSimpleName()
                 + " cannot be used with " + getPrefix()));

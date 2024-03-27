@@ -511,7 +511,7 @@ public class Settings extends Config {
                 " - A larger value will use slightly less CPU time",
                 " - A smaller value will reduce memory usage",
                 " - A value too small may break some operations (deform?)",
-                " - Values smaller than the configurated parallel-threads are not accepted",
+                " - Values smaller than the configured parallel-threads are not accepted",
                 " - It is recommended this option be at least 4x greater than parallel-threads"
 
         })
@@ -543,12 +543,6 @@ public class Settings extends Config {
                 " - Enable to improve performance at the expense of memory",
         })
         public boolean POOL = true;
-
-        @Comment({
-                "When using fastmode do not bother to tick existing/placed blocks/fluids",
-                "Only works in versions up to 1.17.1"
-        })
-        public boolean NO_TICK_FASTMODE = true;
 
         public static class PROGRESS {
 

@@ -34,7 +34,7 @@ logger.lifecycle("""
 *******************************************
 """)
 
-var rootVersion by extra("2.9.1")
+var rootVersion by extra("2.9.2")
 var snapshot by extra("SNAPSHOT")
 var revision: String by extra("")
 var buildNumber by extra("")
@@ -83,7 +83,7 @@ allprojects {
 }
 
 applyCommonConfiguration()
-val supportedVersions = listOf("1.17.1", "1.18.2", "1.19.4", "1.20", "1.20.4")
+val supportedVersions = listOf("1.18.2", "1.19.4", "1.20", "1.20.4")
 
 tasks {
     supportedVersions.forEach {

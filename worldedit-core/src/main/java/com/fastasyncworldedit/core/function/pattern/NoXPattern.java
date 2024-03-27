@@ -36,4 +36,9 @@ public class NoXPattern extends AbstractPattern {
         return pattern.apply(extent, mutable, set);
     }
 
+    @Override
+    public Pattern fork() {
+        return new NoXPattern(this.pattern.fork());
+    }
+
 }

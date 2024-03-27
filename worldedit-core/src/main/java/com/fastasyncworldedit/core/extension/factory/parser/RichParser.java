@@ -53,7 +53,7 @@ public abstract class RichParser<E> extends InputParser<E> implements AliasedPar
     }
 
     @Nonnull
-    private Function<String, Stream<? extends String>> extractArguments(String input) {
+    private Function<String, Stream<? extends String>> extractArguments(String input, ParserContext context) {
         return prefix -> {
             if (input.length() > prefix.length() && input.startsWith(prefix + "[")) {
                 // input already contains argument(s) -> extract them
@@ -65,7 +65,7 @@ public abstract class RichParser<E> extends InputParser<E> implements AliasedPar
                 }
                 String previous = prefix + builder;
                 // read the suggestions for the last argument
-                return getSuggestions(strings[strings.length - 1], strings.length - 1)
+                return getSuggestions(strings[strings.length - 1], strings.length - 1, context)
                         .map(suggestion -> previous + "[" + suggestion);
             } else {
                 return Stream.of(prefix);
@@ -95,7 +95,7 @@ public abstract class RichParser<E> extends InputParser<E> implements AliasedPar
     public Stream<String> getSuggestions(String input) {
         return Arrays.stream(this.prefixes)
                 .filter(validPrefix(input))
-                .flatMap(extractArguments(input));
+                .flatMap(extractArguments(input, new ParserContext()));
     }
 
     @Override
@@ -122,8 +122,25 @@ public abstract class RichParser<E> extends InputParser<E> implements AliasedPar
      * @param argumentInput the already provided input for the argument at the given index.
      * @param index         the index of the argument to get suggestions for.
      * @return a stream of suggestions matching the given input for the argument at the given index.
+     *
+     * @deprecated Use the version that takes a {@link ParserContext}, {@link #getSuggestions(String, int, ParserContext)}
      */
-    protected abstract Stream<String> getSuggestions(String argumentInput, int index);
+    @Deprecated
+    protected Stream<String> getSuggestions(String argumentInput, int index) {
+        return Stream.empty();
+    }
+
+    /**
+     * Returns a stream of suggestions for the argument at the given index.
+     *
+     * @param argumentInput the already provided input for the argument at the given index.
+     * @param index         the index of the argument to get suggestions for.
+     * @param context       the context which may optionally be provided by a parser.
+     * @return a stream of suggestions matching the given input for the argument at the given index.
+     */
+    protected Stream<String> getSuggestions(String argumentInput, int index, ParserContext context) {
+        return getSuggestions(argumentInput, index);
+    }
 
     /**
      * Parses the already split arguments.

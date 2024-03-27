@@ -63,4 +63,11 @@ public class RelativePattern extends AbstractPattern implements ResettablePatter
         origin = null;
     }
 
+    @Override
+    public Pattern fork() {
+        RelativePattern forked = new RelativePattern(this.pattern.fork(), this.minY, this.maxY);
+        forked.origin = this.origin; // maintain origin for forks
+        return forked;
+    }
+
 }

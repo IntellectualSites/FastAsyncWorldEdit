@@ -235,4 +235,11 @@ public class ForgetfulExtentBuffer extends AbstractDelegateExtent implements Pat
         };
     }
 
+    //FAWE - stateful pattern
+    @Override
+    public Pattern fork() {
+        return new ForgetfulExtentBuffer(extent, mask.copy());
+    }
+    //FAWE end
+
 }

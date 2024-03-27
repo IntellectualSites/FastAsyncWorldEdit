@@ -97,11 +97,11 @@ public class RichMaskParser extends FaweParser<Mask> {
                                 )),
                                 () -> {
                                     if (full.length() == 1) {
-                                        return new ArrayList<>(worldEdit.getMaskFactory().getSuggestions(""));
+                                        return new ArrayList<>(worldEdit.getMaskFactory().getSuggestions("", context));
                                     }
                                     return new ArrayList<>(worldEdit
                                             .getMaskFactory()
-                                            .getSuggestions(command.toLowerCase(Locale.ROOT)));
+                                            .getSuggestions(command.toLowerCase(Locale.ROOT), context));
                                 }
                         );
                     }
@@ -164,11 +164,11 @@ public class RichMaskParser extends FaweParser<Mask> {
                                         )),
                                         () -> {
                                             if (full.length() == 1) {
-                                                return new ArrayList<>(worldEdit.getMaskFactory().getSuggestions(""));
+                                                return new ArrayList<>(worldEdit.getMaskFactory().getSuggestions("", context));
                                             }
                                             return new ArrayList<>(worldEdit
                                                     .getMaskFactory()
-                                                    .getSuggestions(command.toLowerCase(Locale.ROOT)));
+                                                    .getSuggestions(command.toLowerCase(Locale.ROOT), context));
                                         }
                                 );
                             }

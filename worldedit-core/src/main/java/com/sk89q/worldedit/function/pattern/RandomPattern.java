@@ -66,6 +66,12 @@ public class RandomPattern extends AbstractPattern {
         this.weights = new ArrayList<>(parent.weights);
         this.collection = RandomCollection.of(weights);
     }
+
+    private RandomPattern(SimpleRandom random, List<RandomCollection.Weighted<Pattern>> weights) {
+        this.random = random;
+        this.weights = weights;
+        this.collection = RandomCollection.of(weights);
+    }
     //FAWE end
 
     /**
@@ -103,6 +109,14 @@ public class RandomPattern extends AbstractPattern {
     public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
         return collection.next(this.random, get.getBlockX(), get.getBlockY(), get.getBlockZ()).apply(extent, get, set);
     }
+
+    @Override
+    public Pattern fork() {
+        List<RandomCollection.Weighted<Pattern>> newWeights = new ArrayList<>();
+        this.weights.forEach((w) -> newWeights.add(new RandomCollection.Weighted<>(w.value().fork(), w.weight())));
+        return new RandomPattern(this.random, newWeights);
+    }
+
     //FAWE end
 
 }

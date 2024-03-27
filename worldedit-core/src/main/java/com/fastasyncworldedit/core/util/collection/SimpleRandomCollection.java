@@ -34,7 +34,7 @@ public final class SimpleRandomCollection<T> implements RandomCollection<T> {
 
     @Override
     public T next(final SimpleRandom random, int x, int y, int z) {
-        return map.ceilingEntry(random.nextDouble(x, y, z) * this.total).getValue();
+        return map.ceilingEntry(random.nextDouble(x, y, z, this.total)).getValue();
     }
 
 }

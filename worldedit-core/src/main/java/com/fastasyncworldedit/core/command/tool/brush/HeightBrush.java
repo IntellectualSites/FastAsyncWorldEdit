@@ -53,7 +53,7 @@ public class HeightBrush implements Brush {
             try {
                 heightMap = ScalableHeightMap.fromPNG(stream);
             } catch (IOException e) {
-                throw new FaweException(Caption.of("fawe.worldedit.brush.brush.height.invalid"));
+                throw new FaweException(Caption.of("fawe.worldedit.brush.brush.height.invalid", e.getMessage()));
             }
         } else if (clipboard != null) {
             heightMap = ScalableHeightMap.fromClipboard(clipboard, minY, maxY);
