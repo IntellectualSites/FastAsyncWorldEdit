@@ -38,6 +38,9 @@ import org.apache.logging.log4j.Logger;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.imageio.ImageIO;
+import javax.imageio.ImageReadParam;
+import javax.imageio.ImageReader;
+import javax.imageio.stream.ImageInputStream;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.BufferedOutputStream;
@@ -56,6 +59,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
@@ -70,6 +76,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -91,6 +98,10 @@ import static java.lang.System.arraycopy;
 public class MainUtil {
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
+    private static final String CURL_USER_AGENT = "curl/8.1.1";
+    private static final HttpClient HTTP_CLIENT = HttpClient.newBuilder()
+            .followRedirects(HttpClient.Redirect.NORMAL)
+            .build();
 
     public static List<String> filter(String prefix, List<String> suggestions) {
         if (prefix.isEmpty()) {
@@ -519,12 +530,53 @@ public class MainUtil {
         return destFile;
     }
 
-    public static BufferedImage readImage(InputStream in) throws IOException {
-        return MainUtil.toRGB(ImageIO.read(in));
+    public static BufferedImage readImage(InputStream stream) throws IOException {
+        final ImageInputStream imageStream = ImageIO.createImageInputStream(stream);
+        if (imageStream == null) {
+            throw new IOException("Can't find suitable ImageInputStream");
+        }
+        Iterator<ImageReader> iter = ImageIO.getImageReaders(imageStream);
+        if (!iter.hasNext()) {
+            throw new IOException("Could not get image reader from stream.");
+        }
+        ImageReader reader = iter.next();
+        ImageReadParam param = reader.getDefaultReadParam();
+        reader.setInput(imageStream, true, true);
+        BufferedImage bi;
+        try {
+            bi = reader.read(0, param);
+        } finally {
+            reader.dispose();
+            stream.close();
+            imageStream.close();
+        }
+        return MainUtil.toRGB(bi);
     }
 
     public static BufferedImage readImage(URL url) throws IOException {
-        return readImage(url.openStream());
+        try {
+            final URI uri = url.toURI();
+            HttpRequest.Builder requestBuilder = HttpRequest.newBuilder(uri).GET();
+
+            if (uri.getHost().equalsIgnoreCase("i.imgur.com")) {
+                requestBuilder = requestBuilder.setHeader("User-Agent", CURL_USER_AGENT);
+            }
+
+            final HttpResponse<InputStream> response = HTTP_CLIENT.send(
+                    requestBuilder.build(),
+                    HttpResponse.BodyHandlers.ofInputStream()
+            );
+            try (final InputStream body = response.body()) {
+                if (response.statusCode() > 299) {
+                    throw new IOException("Expected 2xx as response code, but received " + response.statusCode());
+                }
+                return readImage(body);
+            }
+        } catch (InterruptedException e) {
+            throw new IOException("request was interrupted", e);
+        } catch (URISyntaxException e) {
+            throw new IOException("failed to parse url to uri reference", e);
+        }
     }
 
     public static BufferedImage readImage(File file) throws IOException {

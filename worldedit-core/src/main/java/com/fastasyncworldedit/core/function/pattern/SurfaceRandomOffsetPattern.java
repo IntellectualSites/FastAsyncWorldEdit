@@ -134,4 +134,9 @@ public class SurfaceRandomOffsetPattern extends AbstractPattern {
         return BlockVector3.at(moves, moves, moves);
     }
 
+    @Override
+    public Pattern fork() {
+        return new SurfaceRandomOffsetPattern(this.pattern.fork(), this.moves, this.minY, this.maxY);
+    }
+
 }

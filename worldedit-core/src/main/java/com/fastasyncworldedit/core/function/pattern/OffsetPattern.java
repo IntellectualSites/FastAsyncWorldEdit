@@ -67,4 +67,9 @@ public class OffsetPattern extends AbstractPattern {
         return BlockVector3.at(dx, dy, dz);
     }
 
+    @Override
+    public Pattern fork() {
+        return new OffsetPattern(this.pattern.fork(), this.dx, this.dy, this.dz, this.minY, this.maxY);
+    }
+
 }

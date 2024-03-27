@@ -77,4 +77,9 @@ public class RandomOffsetPattern extends AbstractPattern {
         return BlockVector3.at(dx2, dy2, dz2);
     }
 
+    @Override
+    public Pattern fork() {
+        return new RandomOffsetPattern(this.pattern.fork(), this.dx, this.dy, this.dz, this.minY, this.maxY);
+    }
+
 }

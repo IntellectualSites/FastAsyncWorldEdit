@@ -43,4 +43,9 @@ public class MaskedPattern extends AbstractPattern {
         return secondary.apply(extent, get, set);
     }
 
+    @Override
+    public Pattern fork() {
+        return new MaskedPattern(this.mask.copy(), this.primary.fork(), this.secondary.fork());
+    }
+
 }

@@ -7,8 +7,15 @@ import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BaseBlock;
 
+import java.util.Arrays;
+
 import static java.lang.Math.floorDiv;
 
+/**
+ * @deprecated replaced by {@link com.sk89q.worldedit.function.pattern.RandomPattern}
+ * combined with {@link com.fastasyncworldedit.core.math.random.Linear2DRandom}.
+ */
+@Deprecated(forRemoval = true, since = "TODO")
 public class Linear2DBlockPattern extends AbstractPattern {
 
     private final Pattern[] patternsArray;
@@ -45,6 +52,12 @@ public class Linear2DBlockPattern extends AbstractPattern {
             index += patternsArray.length;
         }
         return patternsArray[index].apply(extent, get, set);
+    }
+
+    @Override
+    public Pattern fork() {
+        final Pattern[] forked = Arrays.stream(this.patternsArray).map(Pattern::fork).toArray(Pattern[]::new);
+        return new Linear2DBlockPattern(forked, this.xScale, this.zScale);
     }
 
 }

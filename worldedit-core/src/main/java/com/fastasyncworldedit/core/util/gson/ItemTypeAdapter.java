@@ -1,4 +1,4 @@
-package com.sk89q.worldedit.util.gson;
+package com.fastasyncworldedit.core.util.gson;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
