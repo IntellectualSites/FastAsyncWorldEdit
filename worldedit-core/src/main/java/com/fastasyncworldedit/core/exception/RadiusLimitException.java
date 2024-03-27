@@ -17,25 +17,24 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldedit;
+package com.fastasyncworldedit.core.exception;
 
-import com.fastasyncworldedit.core.exception.RadiusLimitException;
+import com.sk89q.worldedit.WorldEditException;
 
 /**
  * Thrown when a maximum radius is reached, such as, for example,
  * in the case of a sphere command.
- *
- * @deprecated Use {@link RadiusLimitException}
  */
-@Deprecated
-public class MaxRadiusException extends WorldEditException {
+public class RadiusLimitException extends WorldEditException {
 
-    //FAWE start
-    /**
-     * @deprecated Use {@link RadiusLimitException}
-     */
-    @Deprecated
-    public MaxRadiusException() {
+    private final int maxRadius;
+
+    public RadiusLimitException(int maxRadius) {
+        this.maxRadius = maxRadius;
+    }
+
+    public int getMaxRadius() {
+        return maxRadius;
     }
     //FAWE end
 

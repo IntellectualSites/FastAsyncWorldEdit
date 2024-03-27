@@ -75,7 +75,7 @@ public @interface Confirm {
                 if (checkExisting(context)) {
                     return true;
                 }
-                int max = WorldEdit.getInstance().getConfiguration().maxRadius;
+                int max = actor.getLimit().MAX_RADIUS;
                 if (max != -1 && value > max) {
                     actor.print(Caption.of("fawe.cancel.reason.confirm.radius",
                             value, max, getArgs(context)

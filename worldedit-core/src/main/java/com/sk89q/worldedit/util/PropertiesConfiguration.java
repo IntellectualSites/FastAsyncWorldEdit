@@ -136,6 +136,14 @@ public class PropertiesConfiguration extends LocalConfiguration {
         scriptsDir = getString("craftscript-dir", scriptsDir);
         butcherDefaultRadius = getInt("butcher-default-radius", butcherDefaultRadius);
         butcherMaxRadius = getInt("butcher-max-radius", butcherMaxRadius);
+
+        //FAWE start
+        MAX_RADIUS = maxRadius;
+        MAX_BRUSH_RADIUS = maxBrushRadius;
+        MAX_SUPER_RADIUS = maxSuperPickaxeSize;
+        MAX_BUTCHER_RADIUS = butcherMaxRadius;
+        //FAWE end
+
         allowSymlinks = getBool("allow-symbolic-links", allowSymlinks);
         serverSideCUI = getBool("server-side-cui", serverSideCUI);
         extendedYLimit = getBool("extended-y-limit", extendedYLimit);

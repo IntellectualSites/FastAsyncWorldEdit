@@ -66,10 +66,11 @@ public class SuperPickaxeCommands {
                     int range
     ) throws WorldEditException {
 
-        LocalConfiguration config = we.getConfiguration();
-
-        if (range > config.maxSuperPickaxeSize) {
-            player.print(Caption.of("worldedit.tool.superpickaxe.max-range", TextComponent.of(config.maxSuperPickaxeSize)));
+        if (range > player.getLimit().MAX_SUPER_PICKAXE_SIZE) {
+            player.print(Caption.of(
+                    "worldedit.tool.superpickaxe.max-range",
+                    TextComponent.of(player.getLimit().MAX_SUPER_PICKAXE_SIZE)
+            ));
             return;
         }
         session.setSuperPickaxe(new AreaPickaxe(range));
@@ -89,10 +90,11 @@ public class SuperPickaxeCommands {
                     double range
     ) throws WorldEditException {
 
-        LocalConfiguration config = we.getConfiguration();
-
-        if (range > config.maxSuperPickaxeSize) {
-            player.print(Caption.of("worldedit.tool.superpickaxe.max-range", TextComponent.of(config.maxSuperPickaxeSize)));
+        if (range > player.getLimit().MAX_SUPER_PICKAXE_SIZE) {
+            player.print(Caption.of(
+                    "worldedit.tool.superpickaxe.max-range",
+                    TextComponent.of(player.getLimit().MAX_SUPER_PICKAXE_SIZE)
+            ));
             return;
         }
 

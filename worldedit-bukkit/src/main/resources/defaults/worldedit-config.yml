@@ -24,11 +24,13 @@ limits:
   max-polygonal-points:
     default: -1
     maximum: 20
+  # radius, superpickaxe, brush radius are ignored, use FAWE config limits
   max-radius: -1
   max-super-pickaxe-size: 5
   max-brush-radius: 100
   butcher-radius:
     default: -1
+    # Ignored, use FAWE config limits
     maximum: -1
   disallowed-blocks:
     - "minecraft:wheat"

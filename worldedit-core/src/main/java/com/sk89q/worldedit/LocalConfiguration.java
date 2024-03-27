@@ -52,12 +52,26 @@ import java.util.Set;
 public abstract class LocalConfiguration {
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
+    //FAWE start - inelegant but required to transfer to FAWE limits as defaults
+    public static int MAX_RADIUS;
+    public static int MAX_SUPER_RADIUS;
+    public static int MAX_BRUSH_RADIUS;
+    public static int MAX_BUTCHER_RADIUS;
+    //FAWE end
 
     public boolean profile = false;
     public boolean traceUnflushedSessions = true;
     public Set<String> disallowedBlocks = new HashSet<>();
     protected BlockMask disallowedBlocksMask;
+    /**
+     * @deprecated Use actor's limit {@link com.fastasyncworldedit.core.limit.FaweLimit#MAX_CHANGES}
+     */
+    @Deprecated
     public int defaultChangeLimit = -1;
+    /**
+     * @deprecated Use actor's limit {@link com.fastasyncworldedit.core.limit.FaweLimit#MAX_CHANGES}
+     */
+    @Deprecated
     public int maxChangeLimit = -1;
     public int defaultVerticalHeight = 256;
     public int defaultMaxPolygonalPoints = -1;
@@ -68,8 +82,20 @@ public abstract class LocalConfiguration {
     public boolean snapshotsConfigured = false;
     public SnapshotRepository snapshotRepo = null;
     public SnapshotDatabase snapshotDatabase = null;
+    /**
+     * @deprecated Use actor's limit {@link com.fastasyncworldedit.core.limit.FaweLimit#MAX_RADIUS}
+     */
+    @Deprecated
     public int maxRadius = -1;
+    /**
+     * @deprecated Use actor's limit {@link com.fastasyncworldedit.core.limit.FaweLimit#MAX_SUPER_PICKAXE_SIZE}
+     */
+    @Deprecated
     public int maxSuperPickaxeSize = 5;
+    /**
+     * @deprecated Use actor's limit {@link com.fastasyncworldedit.core.limit.FaweLimit#MAX_BRUSH_RADIUS}
+     */
+    @Deprecated
     public int maxBrushRadius = 6;
     public boolean logCommands = false;
     public String logFile = "";
@@ -92,6 +118,10 @@ public abstract class LocalConfiguration {
     public String scriptsDir = "craftscripts";
     public boolean showHelpInfo = true; // unused
     public int butcherDefaultRadius = -1;
+    /**
+     * @deprecated Use actor's limit {@link com.fastasyncworldedit.core.limit.FaweLimit#MAX_BUTCHER_RADIUS}
+     */
+    @Deprecated
     public int butcherMaxRadius = -1;
     public boolean allowSymlinks = false;
     public boolean serverSideCUI = true;
