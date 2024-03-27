@@ -29,13 +29,16 @@ import com.sk89q.worldedit.world.block.BlockType;
 
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static com.sk89q.worldedit.blocks.Blocks.resolveProperties;
 
 public class StateApplyingPattern extends AbstractExtentPattern {
 
     private final Map<String, String> states;
-    private final Map<BlockType, Map<Property<Object>, Object>> cache = Maps.newHashMap();
+    //FAWE - avoid race conditions
+    private final Map<BlockType, Map<Property<Object>, Object>> cache = new ConcurrentHashMap<>();
+    //FAWE end
 
     public StateApplyingPattern(Extent extent, Map<String, String> statesToSet) {
         super(extent);

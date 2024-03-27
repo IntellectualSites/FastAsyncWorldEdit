@@ -59,6 +59,11 @@ public interface Pattern extends Filter {
         apply(block, block, block);
     }
 
+    @Override
+    default Pattern fork() { // covariant return type
+        return this;
+    }
+
     //FAWE end
 
     /**

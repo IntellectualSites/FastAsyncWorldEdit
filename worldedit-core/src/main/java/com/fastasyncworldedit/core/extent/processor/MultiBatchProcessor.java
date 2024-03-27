@@ -19,12 +19,9 @@ import org.apache.logging.log4j.Logger;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 import java.util.function.Supplier;
@@ -80,28 +77,18 @@ public class MultiBatchProcessor implements IBatchProcessor {
 
     @Override
     public IChunkSet processSet(IChunk chunk, IChunkGet get, IChunkSet set) {
-        Map<Integer, Set<IBatchProcessor>> ordered = new HashMap<>();
+        Map<Integer, List<IBatchProcessor>> ordered = new HashMap<>();
         IChunkSet chunkSet = set;
         for (IBatchProcessor processor : processors) {
             if (processor.getScope() != ProcessorScope.ADDING_BLOCKS) {
-                ordered.merge(
-                        processor.getScope().intValue(),
-                        new HashSet<>(Collections.singleton(processor)),
-                        (existing, theNew) -> {
-                            existing.add(processor);
-                            return existing;
-                        }
-                );
+                ordered.computeIfAbsent(processor.getScope().intValue(), k -> new ArrayList<>())
+                        .add(processor);
                 continue;
             }
             chunkSet = processSet(processor, chunk, get, chunkSet);
         }
-        if (ordered.size() > 0) {
-            for (int i = 1; i <= 4; i++) {
-                Set<IBatchProcessor> processors = ordered.get(i);
-                if (processors == null) {
-                    continue;
-                }
+        if (!ordered.isEmpty()) {
+            for (List<IBatchProcessor> processors : ordered.values()) {
                 for (IBatchProcessor processor : processors) {
                     chunkSet = processSet(processor, chunk, get, chunkSet);
                     if (chunkSet == null) {

@@ -60,4 +60,9 @@ public class OffsetPattern extends AbstractPattern {
         return pattern.apply(extent, get, mutable);
     }
 
+    @Override
+    public Pattern fork() {
+        return new OffsetPattern(this.pattern.fork(), this.dx, this.dy, this.dz, this.minY, this.maxY);
+    }
+
 }

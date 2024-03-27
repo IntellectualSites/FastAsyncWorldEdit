@@ -72,4 +72,9 @@ public class RandomOffsetPattern extends AbstractPattern {
         return pattern.apply(extent, get, mutable);
     }
 
+    @Override
+    public Pattern fork() {
+        return new RandomOffsetPattern(this.pattern.fork(), this.dx, this.dy, this.dz, this.minY, this.maxY);
+    }
+
 }

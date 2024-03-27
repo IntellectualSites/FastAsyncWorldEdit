@@ -1,6 +1,7 @@
 package com.fastasyncworldedit.core.function.pattern;
 
 import com.sk89q.worldedit.function.pattern.AbstractPattern;
+import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.internal.expression.EvaluationException;
 import com.sk89q.worldedit.internal.expression.Expression;
 import com.sk89q.worldedit.internal.expression.ExpressionException;
@@ -55,6 +56,11 @@ public class ExpressionPattern extends AbstractPattern {
             e.printStackTrace();
             return BlockTypes.AIR.getDefaultState().toBaseBlock();
         }
+    }
+
+    @Override
+    public Pattern fork() {
+        return new ExpressionPattern(this.expression.clone());
     }
 
 }
