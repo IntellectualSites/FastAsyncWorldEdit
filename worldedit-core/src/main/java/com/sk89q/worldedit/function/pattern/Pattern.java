@@ -25,6 +25,7 @@ import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.internal.util.NonAbstractForCompatibility;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.world.block.BaseBlock;
 
 /**
@@ -73,5 +74,15 @@ public interface Pattern extends Filter {
      * @return a block
      */
     BaseBlock applyBlock(BlockVector3 position);
+
+    /**
+     * Get the likely maximum size of the volume this pattern will affect
+     *
+     * @return Pattern size
+     * @since TODO
+     */
+    default BlockVector3 size() {
+        return BlockVector3.ONE;
+    }
 
 }

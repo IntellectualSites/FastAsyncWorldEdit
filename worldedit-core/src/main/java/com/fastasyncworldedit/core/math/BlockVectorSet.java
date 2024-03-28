@@ -79,6 +79,49 @@ public class BlockVectorSet extends AbstractCollection<BlockVector3> implements 
     }
 
     @Override
+    public void setOffset(final int x, final int z) {
+        // Do nothing
+    }
+
+    @Override
+    public void setOffset(final int x, final int y, final int z) {
+        // Do nothing
+    }
+
+    @Override
+    public boolean containsRadius(final int x, final int y, final int z, final int radius) {
+        if (radius <= 0) {
+            return contains(x, y, z);
+        }
+        // Quick corners check
+        if (!contains(x - radius, y, z - radius)) {
+            return false;
+        }
+        if (!contains(x + radius, y, z + radius)) {
+            return false;
+        }
+        if (!contains(x - radius, y, z + radius)) {
+            return false;
+        }
+        if (!contains(x + radius, y, z - radius)) {
+            return false;
+        }
+        // Slow but if someone wants to think of an elegant way then feel free to add it
+        for (int xx = -radius; xx <= radius; xx++) {
+            int rx = x + xx;
+            for (int yy = -radius; yy <= radius; yy++) {
+                int ry = y + yy;
+                for (int zz = -radius; zz <= radius; zz++) {
+                    if (contains(rx, ry, z + zz)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    @Override
     public boolean contains(Object o) {
         if (o instanceof BlockVector3 v) {
             return contains(v.getBlockX(), v.getBlockY(), v.getBlockZ());
