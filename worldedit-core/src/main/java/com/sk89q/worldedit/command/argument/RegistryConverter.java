@@ -32,6 +32,8 @@ import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.fluid.FluidCategory;
 import com.sk89q.worldedit.world.fluid.FluidType;
 import com.sk89q.worldedit.world.gamemode.GameMode;
+import com.sk89q.worldedit.world.generation.ConfiguredFeatureType;
+import com.sk89q.worldedit.world.generation.StructureType;
 import com.sk89q.worldedit.world.item.ItemCategory;
 import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.weather.WeatherType;
@@ -62,7 +64,9 @@ public final class RegistryConverter<V extends Keyed> implements ArgumentConvert
                         FluidType.class,
                         FluidCategory.class,
                         GameMode.class,
-                        WeatherType.class
+                        WeatherType.class,
+                        ConfiguredFeatureType.class,
+                        StructureType.class
                 )
                 .stream()
                 .map(c -> (Class<Keyed>) c)

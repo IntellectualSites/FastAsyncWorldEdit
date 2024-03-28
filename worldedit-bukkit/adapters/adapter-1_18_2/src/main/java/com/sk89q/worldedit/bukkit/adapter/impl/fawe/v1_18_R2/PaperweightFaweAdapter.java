@@ -9,10 +9,13 @@ import com.fastasyncworldedit.core.queue.IBatchProcessor;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.implementation.packet.ChunkPacket;
 import com.fastasyncworldedit.core.util.NbtUtils;
+import com.fastasyncworldedit.core.util.TaskManager;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.Tag;
+import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.blocks.TileEntityBlock;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
@@ -48,30 +51,41 @@ import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import com.sk89q.worldedit.world.entity.EntityType;
+import com.sk89q.worldedit.world.generation.ConfiguredFeatureType;
+import com.sk89q.worldedit.world.generation.StructureType;
 import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 import io.papermc.lib.PaperLib;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
+import net.minecraft.core.SectionPos;
 import net.minecraft.core.WritableRegistry;
 import net.minecraft.nbt.IntTag;
 import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.server.level.ChunkHolder;
+import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.LevelChunkSection;
+import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
+import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
+import net.minecraft.world.level.levelgen.structure.StructureStart;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -81,6 +95,7 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.craftbukkit.v1_18_R2.CraftChunk;
 import org.bukkit.craftbukkit.v1_18_R2.CraftServer;
 import org.bukkit.craftbukkit.v1_18_R2.CraftWorld;
+import org.bukkit.craftbukkit.v1_18_R2.block.CraftBlockState;
 import org.bukkit.craftbukkit.v1_18_R2.block.data.CraftBlockData;
 import org.bukkit.craftbukkit.v1_18_R2.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_18_R2.entity.CraftPlayer;
@@ -545,6 +560,163 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
     @Override
     protected ServerLevel getServerLevel(final World world) {
         return ((CraftWorld) world).getHandle();
+    }
+
+    @Override
+    public boolean generateFeature(ConfiguredFeatureType feature, World world, EditSession editSession, BlockVector3 pt) {
+        ServerLevel serverLevel = ((CraftWorld) world).getHandle();
+        ChunkGenerator generator = serverLevel.getMinecraftWorld().getChunkSource().getGenerator();
+
+        Registry<ConfiguredFeature<?, ?>> registry = serverLevel
+                .registryAccess()
+                .registryOrThrow(Registry.CONFIGURED_FEATURE_REGISTRY);
+        ConfiguredFeature<?, ?> configuredFeature = registry.get(ResourceLocation.tryParse(feature.getId()));
+        FaweBlockStateListPopulator populator = new FaweBlockStateListPopulator(serverLevel);
+
+        Map<BlockPos, CraftBlockState> placed = TaskManager.taskManager().sync(() -> {
+            serverLevel.captureTreeGeneration = true;
+            serverLevel.captureBlockStates = true;
+            try {
+                if (!configuredFeature.place(
+                        populator,
+                        generator,
+                        serverLevel.random,
+                        new BlockPos(pt.getX(), pt.getY(), pt.getZ())
+                )) {
+                    return null;
+                }
+                return populator.getList().stream().collect(Collectors.toMap(
+                        CraftBlockState::getPosition,
+                        craftBlockState -> craftBlockState
+                ));
+            } finally {
+                serverLevel.captureBlockStates = false;
+                serverLevel.captureTreeGeneration = false;
+                serverLevel.capturedBlockStates.clear();
+            }
+        });
+
+        return placeFeatureIntoSession(editSession, populator, placed);
+        //FAWE end
+    }
+
+    @Override
+    public boolean generateStructure(StructureType type, World world, EditSession editSession, BlockVector3 pt) {
+        ServerLevel serverLevel = ((CraftWorld) world).getHandle();
+        ConfiguredStructureFeature k = serverLevel
+                .registryAccess()
+                .registryOrThrow(Registry.CONFIGURED_STRUCTURE_FEATURE_REGISTRY)
+                .get(ResourceLocation.tryParse(type.getId()));
+        if (k == null) {
+            return false;
+        }
+
+        ServerChunkCache chunkManager = serverLevel.getChunkSource();
+
+        ChunkPos chunkPos = new ChunkPos(new BlockPos(pt.getBlockX(), pt.getBlockY(), pt.getBlockZ()));
+
+        //FAWE start
+        FaweBlockStateListPopulator populator = new FaweBlockStateListPopulator(serverLevel);
+        Map<BlockPos, CraftBlockState> placed = TaskManager.taskManager().sync(() -> {
+            serverLevel.captureTreeGeneration = true;
+            serverLevel.captureBlockStates = true;
+            try {
+                StructureStart structureStart = k.generate(
+                        serverLevel.registryAccess(),
+                        chunkManager.getGenerator(),
+                        chunkManager.getGenerator().getBiomeSource(),
+                        serverLevel.getStructureManager(),
+                        serverLevel.getSeed(),
+                        chunkPos,
+                        0,
+                        serverLevel,
+                        biome -> true
+                );
+                if (!structureStart.isValid()) {
+                    return null;
+                } else {
+                    BoundingBox boundingBox = structureStart.getBoundingBox();
+                    ChunkPos min = new ChunkPos(
+                            SectionPos.blockToSectionCoord(boundingBox.minX()),
+                            SectionPos.blockToSectionCoord(boundingBox.minZ())
+                    );
+                    ChunkPos max = new ChunkPos(
+                            SectionPos.blockToSectionCoord(boundingBox.maxX()),
+                            SectionPos.blockToSectionCoord(boundingBox.maxZ())
+                    );
+                    ChunkPos.rangeClosed(min, max).forEach((chunkPosx) -> structureStart.placeInChunk(
+                            serverLevel,
+                            serverLevel.structureFeatureManager(),
+                            chunkManager.getGenerator(),
+                            serverLevel.getRandom(),
+                            new BoundingBox(
+                                    chunkPosx.getMinBlockX(),
+                                    serverLevel.getMinBuildHeight(),
+                                    chunkPosx.getMinBlockZ(),
+                                    chunkPosx.getMaxBlockX(),
+                                    serverLevel.getMaxBuildHeight(),
+                                    chunkPosx.getMaxBlockZ()
+                            ),
+                            chunkPosx
+                    ));
+                    return populator.getList().stream().collect(Collectors.toMap(
+                            CraftBlockState::getPosition,
+                            craftBlockState -> craftBlockState
+                    ));
+                }
+            } finally {
+                serverLevel.captureBlockStates = false;
+                serverLevel.captureTreeGeneration = false;
+                serverLevel.capturedBlockStates.clear();
+            }
+        });
+
+        return placeFeatureIntoSession(editSession, populator, placed);
+        //FAWE end
+    }
+
+    private boolean placeFeatureIntoSession(
+            final EditSession editSession,
+            final FaweBlockStateListPopulator populator,
+            final Map<BlockPos, CraftBlockState> placed
+    ) {
+        if (placed == null || placed.isEmpty()) {
+            return false;
+        }
+
+        for (Map.Entry<BlockPos, CraftBlockState> entry : placed.entrySet()) {
+            CraftBlockState craftBlockState = entry.getValue();
+            if (entry.getValue() == null) {
+                continue;
+            }
+            BlockPos pos = entry.getKey();
+            editSession.setBlock(pos.getX(), pos.getY(), pos.getZ(), BukkitAdapter.adapt(craftBlockState.getBlockData()));
+            BlockEntity blockEntity = populator.getBlockEntity(pos);
+            if (blockEntity != null) {
+                net.minecraft.nbt.CompoundTag tag = blockEntity.saveWithId();
+                editSession.setTile(pos.getX(), pos.getY(), pos.getZ(), (CompoundTag) toNative(tag));
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public void setupFeatures() {
+        DedicatedServer server = ((CraftServer) Bukkit.getServer()).getServer();
+
+        // Features
+        for (ResourceLocation name : server.registryAccess().registryOrThrow(Registry.CONFIGURED_FEATURE_REGISTRY).keySet()) {
+            if (ConfiguredFeatureType.REGISTRY.get(name.toString()) == null) {
+                ConfiguredFeatureType.REGISTRY.register(name.toString(), new ConfiguredFeatureType(name.toString()));
+            }
+        }
+
+        // Structures
+        for (ResourceLocation name : server.registryAccess().registryOrThrow(Registry.STRUCTURE_FEATURE_REGISTRY).keySet()) {
+            if (StructureType.REGISTRY.get(name.toString()) == null) {
+                StructureType.REGISTRY.register(name.toString(), new StructureType(name.toString()));
+            }
+        }
     }
 
     @Override
