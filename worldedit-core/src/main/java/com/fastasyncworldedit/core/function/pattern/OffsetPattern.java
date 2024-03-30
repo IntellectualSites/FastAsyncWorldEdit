@@ -61,6 +61,13 @@ public class OffsetPattern extends AbstractPattern {
     }
 
     @Override
+    public BlockVector3 size() {
+        // Not exactly the "size" but offset should be taken into consideration in most
+        //  places where the "size" matters
+        return BlockVector3.at(dx, dy, dz);
+    }
+
+    @Override
     public Pattern fork() {
         return new OffsetPattern(this.pattern.fork(), this.dx, this.dy, this.dz, this.minY, this.maxY);
     }
