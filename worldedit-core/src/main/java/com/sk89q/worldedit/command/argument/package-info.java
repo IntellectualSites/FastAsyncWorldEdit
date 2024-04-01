@@ -20,8 +20,8 @@
 /**
  * The following classes are FAWE additions:
  *
- * @see com.sk89q.worldedit.command.argument.ExpressionConverter
- * @see com.sk89q.worldedit.command.argument.LocationConverter
+ * {@link com.sk89q.worldedit.command.argument.ExpressionConverter},
+ * {@link com.sk89q.worldedit.command.argument.LocationConverter}
  */
 @org.enginehub.piston.util.NonnullByDefault
 package com.sk89q.worldedit.command.argument;
