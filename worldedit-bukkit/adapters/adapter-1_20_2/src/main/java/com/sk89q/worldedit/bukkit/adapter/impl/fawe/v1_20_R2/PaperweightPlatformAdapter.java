@@ -323,11 +323,15 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
 
     private static void addTicket(ServerLevel serverLevel, int chunkX, int chunkZ) {
         // Ensure chunk is definitely loaded before applying a ticket
-        PaperweightPlatformAdapter.task(() -> serverLevel
-                        .getChunkSource()
-                        .addRegionTicket(TicketType.UNLOAD_COOLDOWN, new ChunkPos(chunkX, chunkZ), 0, Unit.INSTANCE),
-                serverLevel, chunkX, chunkZ
-        );
+        final Runnable addChunkTicket = () -> serverLevel
+                .getChunkSource()
+                .addRegionTicket(TicketType.UNLOAD_COOLDOWN, new ChunkPos(chunkX, chunkZ), 0, Unit.INSTANCE);
+        if (FoliaSupport.isFolia()) {
+            // run from any thread on Folia
+            addChunkTicket.run();
+            return;
+        }
+        io.papermc.paper.util.MCUtil.MAIN_EXECUTOR.execute(addChunkTicket);
     }
 
     public static ChunkHolder getPlayerChunk(ServerLevel nmsWorld, final int chunkX, final int chunkZ) {

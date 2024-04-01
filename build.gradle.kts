@@ -85,7 +85,7 @@ allprojects {
 
 applyCommonConfiguration()
 val supportedVersions = listOf("1.18.2", "1.19.4", "1.20", "1.20.4")
-val foliaSupportedVersions = listOf("1.20.2")
+val foliaSupportedVersions = listOf("1.20.4")
 
 tasks {
     fun registerVersion(version: String, software: String, task: RunServer.() -> Unit = {}) {
