@@ -59,7 +59,7 @@ public interface BlockVector3Set extends Set<BlockVector3> {
      *
      * @param x x offset
      * @param z z offset
-     * @since TODO
+     * @since 2.9.2
      */
     void setOffset(int x, int z);
 
@@ -70,7 +70,7 @@ public interface BlockVector3Set extends Set<BlockVector3> {
      * @param x x offset
      * @param y y offset
      * @param z z offset
-     * @since TODO
+     * @since 2.9.2
      */
     void setOffset(int x, int y, int z);
 
@@ -81,7 +81,7 @@ public interface BlockVector3Set extends Set<BlockVector3> {
      * @param y      y radius center
      * @param z      z radius center
      * @return if radius is contained by the set
-     * @since TODO
+     * @since 2.9.2
      */
     boolean containsRadius(int x, int y, int z, int radius);
 

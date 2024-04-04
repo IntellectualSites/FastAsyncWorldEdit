@@ -79,7 +79,7 @@ public interface Pattern extends Filter {
      * Get the likely maximum size of the volume this pattern will affect
      *
      * @return Pattern size
-     * @since TODO
+     * @since 2.9.2
      */
     default BlockVector3 size() {
         return BlockVector3.ONE;

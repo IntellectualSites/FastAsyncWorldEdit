@@ -65,7 +65,7 @@ public enum RegionSelectorType {
      * Get a {@link RegionSelectorType} for the given {@link RegionSelector}
      *
      * @param selector Region selector to get type enum for
-     * @since TODO
+     * @since 2.9.2
      */
     @Nullable
     public static RegionSelectorType getForSelector(RegionSelector selector) {

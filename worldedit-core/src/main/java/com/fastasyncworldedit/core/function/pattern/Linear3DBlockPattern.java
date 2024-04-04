@@ -15,7 +15,7 @@ import static java.lang.Math.floorDiv;
  * @deprecated replaced by {@link com.sk89q.worldedit.function.pattern.RandomPattern}
  * combined with {@link com.fastasyncworldedit.core.math.random.Linear3DRandom}.
  */
-@Deprecated(forRemoval = true, since = "TODO")
+@Deprecated(forRemoval = true, since = "2.9.2")
 public class Linear3DBlockPattern extends AbstractPattern {
 
     private final Pattern[] patternsArray;

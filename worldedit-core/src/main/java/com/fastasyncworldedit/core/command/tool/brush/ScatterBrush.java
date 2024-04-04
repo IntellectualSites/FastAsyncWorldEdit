@@ -93,7 +93,7 @@ public class ScatterBrush implements Brush {
     /**
      * @deprecated Use {@link ScatterBrush#finish(EditSession, BlockVector3Set, BlockVector3, Pattern, double)}
      */
-    @Deprecated(forRemoval = true, since = "TODO")
+    @Deprecated(forRemoval = true, since = "2.9.2")
     public void finish(EditSession editSession, LocalBlockVectorSet placed, BlockVector3 pos, Pattern pattern, double size) {
         finish(editSession, (BlockVector3Set) placed, pos, pattern, size);
     }
@@ -101,7 +101,7 @@ public class ScatterBrush implements Brush {
     /**
      * Complete the scatter brush process.
      *
-     * @since TODO
+     * @since 2.9.2
      */
     public void finish(EditSession editSession, BlockVector3Set placed, BlockVector3 pos, Pattern pattern, double size) {
     }
@@ -118,7 +118,7 @@ public class ScatterBrush implements Brush {
     /**
      * @deprecated Use {@link ScatterBrush#apply(EditSession, BlockVector3Set, BlockVector3, Pattern, double)}
      */
-    @Deprecated(forRemoval = true, since = "TODO")
+    @Deprecated(forRemoval = true, since = "2.9.2")
     public void apply(EditSession editSession, LocalBlockVectorSet placed, BlockVector3 pt, Pattern p, double size) throws
             MaxChangedBlocksException {
         apply(editSession, (BlockVector3Set) placed, pt, p, size);
@@ -127,7 +127,7 @@ public class ScatterBrush implements Brush {
     /**
      * Apply the scatter brush to a given position
      *
-     * @since TODO
+     * @since 2.9.2
      */
     public void apply(EditSession editSession, BlockVector3Set placed, BlockVector3 pt, Pattern p, double size) throws
             MaxChangedBlocksException {
