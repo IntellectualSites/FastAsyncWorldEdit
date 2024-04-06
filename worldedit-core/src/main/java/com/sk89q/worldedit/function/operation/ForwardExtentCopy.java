@@ -561,40 +561,4 @@ public class ForwardExtentCopy implements Operation {
         );
     }
 
-    private static final class EntityHolder implements Entity {
-
-        @Nullable
-        @Override
-        public BaseEntity getState() {
-            return null;
-        }
-
-        @Override
-        public boolean remove() {
-            return false;
-        }
-
-        @Override
-        public Location getLocation() {
-            return null;
-        }
-
-        @Override
-        public boolean setLocation(final Location location) {
-            return false;
-        }
-
-        @Override
-        public Extent getExtent() {
-            return null;
-        }
-
-        @Nullable
-        @Override
-        public <T> T getFacet(final Class<? extends T> cls) {
-            return null;
-        }
-
-    }
-
 }
