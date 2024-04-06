@@ -24,18 +24,21 @@ import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.extent.BlockTranslateExtent;
 import com.fastasyncworldedit.core.extent.OncePerChunkExtent;
 import com.fastasyncworldedit.core.extent.PositionTransformExtent;
+import com.fastasyncworldedit.core.extent.clipboard.WorldCopyClipboard;
 import com.fastasyncworldedit.core.extent.processor.ExtentBatchProcessorHolder;
 import com.fastasyncworldedit.core.function.RegionMaskTestFunction;
 import com.fastasyncworldedit.core.function.block.BiomeCopy;
 import com.fastasyncworldedit.core.function.block.CombinedBlockCopy;
 import com.fastasyncworldedit.core.function.block.SimpleBlockCopy;
 import com.fastasyncworldedit.core.function.visitor.IntersectRegionFunction;
+import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.IQueueChunk;
 import com.fastasyncworldedit.core.queue.IQueueExtent;
 import com.fastasyncworldedit.core.queue.implementation.ParallelQueueExtent;
 import com.fastasyncworldedit.core.queue.implementation.SingleThreadQueueExtent;
 import com.fastasyncworldedit.core.util.ExtentTraverser;
 import com.fastasyncworldedit.core.util.MaskTraverser;
+import com.fastasyncworldedit.core.util.ProcessorTraverser;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.sk89q.worldedit.WorldEditException;
@@ -57,6 +60,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.math.transform.Identity;
 import com.sk89q.worldedit.math.transform.Transform;
+import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.FlatRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
@@ -69,7 +73,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.function.Consumer;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -422,54 +428,7 @@ public class ForwardExtentCopy implements Operation {
             blockCopy = new RegionVisitor(region, copy, preloader);
         }
 
-        Collection<Entity> entities;
-        if (copyingEntities) {
-            IQueueExtent<IQueueChunk> queue;
-            Extent ext = source instanceof AbstractDelegateExtent ex ? ex.getExtent() : source;
-            ParallelQueueExtent parallel = new ExtentTraverser<>(source).findAndGet(ParallelQueueExtent.class);
-            if (parallel != null) {
-                queue = parallel.getExtent();
-            } else {
-                queue = new ExtentTraverser<>(source).findAndGet(SingleThreadQueueExtent.class);
-            }
-            if (Settings.settings().EXPERIMENTAL.IMPROVED_ENTITY_EDITS && queue != null) {
-                entities = new LinkedBlockingQueue<>();
-                OncePerChunkExtent oncePer = new OncePerChunkExtent(
-                        ext,
-                        queue,
-                        (get) -> {
-                            if (region.containsChunk(get.getX(), get.getZ())) {
-                                entities.addAll(get.getFullEntities());
-                            } else {
-                                get.getFullEntities().forEach(e -> {
-                                    if (region.contains(e.getLocation().toBlockPoint())) {
-                                        entities.add(e);
-                                    }
-                                });
-                            }
-                        }
-                );
-                ExtentBatchProcessorHolder batchExtent =
-                        new ExtentTraverser<>(source).findAndGet(ExtentBatchProcessorHolder.class);
-                if (batchExtent != null) {
-                    batchExtent.getProcessor().join(oncePer);
-                } else {
-                    new ExtentTraverser(source).setNext(oncePer);
-                }
-            } else {
-                if (Settings.settings().EXPERIMENTAL.IMPROVED_ENTITY_EDITS) {
-                    LOGGER.warn("Could not find IQueueExtent instance for entity retrieval, falling back to default method.");
-                }
-                // filter players since they can't be copied
-                entities = new HashSet<>(source.getEntities(region));
-                entities.removeIf(entity -> {
-                    EntityProperties properties = entity.getFacet(EntityProperties.class);
-                    return properties != null && !properties.isPasteable();
-                });
-            }
-        } else {
-            entities = Collections.emptySet();
-        }
+        Collection<Entity> entities = copyingEntities ? getEntities(source, region) : Collections.emptySet();
 
         for (int i = 0; i < repetitions; i++) {
             Operations.completeBlindly(blockCopy);
@@ -506,6 +465,78 @@ public class ForwardExtentCopy implements Operation {
         }
         //FAWE end
         return null;
+    }
+
+    /**
+     * If setting enabled, Creates a new OncePerChunkExtent instance to retain a list of entities for the given source extent,
+     * then add it to the source extent. If setting is not set simply returns the entities from {@link Extent#getEntities()} Accepts an
+     * optional region for entities to be within.
+     *
+     * @param source Source extent
+     * @param region Optional regions for entities to be within
+     * @return Collection of entities (may not be filled until an operation completes on the chunks)
+     * @since TODO
+     */
+    public static Collection<Entity> getEntities(Extent source, Region region) {
+        Extent extent = source;
+        if (source instanceof WorldCopyClipboard clip) {
+            extent = clip.getExtent();
+        }
+        IQueueExtent<IQueueChunk> queue = null;
+        if (Settings.settings().EXPERIMENTAL.IMPROVED_ENTITY_EDITS) {
+            ParallelQueueExtent parallel = new ExtentTraverser<>(extent).findAndGet(ParallelQueueExtent.class);
+            if (parallel != null) {
+                queue = parallel.getExtent();
+            } else {
+                queue = new ExtentTraverser<>(extent).findAndGet(SingleThreadQueueExtent.class);
+            }
+            if (queue == null) {
+                LOGGER.warn("Could not find IQueueExtent instance for entity retrieval, OncePerChunkExtent will not work.");
+            }
+        }
+        if (queue == null) {
+            Set<Entity> entities = new HashSet<>(region != null ? source.getEntities(region) : source.getEntities());
+            entities.removeIf(entity -> {
+                EntityProperties properties = entity.getFacet(EntityProperties.class);
+                return properties != null && !properties.isPasteable();
+            });
+            return entities;
+        }
+        LinkedBlockingQueue<Entity> entities = new LinkedBlockingQueue<>();
+        Consumer<IChunkGet> task = (get) -> {
+            if (region == null || region instanceof CuboidRegion cuboid && cuboid.chunkContainedBy(
+                    get.getX(),
+                    get.getZ(),
+                    get.getMinY(),
+                    get.getMaxY()
+            )) {
+                entities.addAll(get.getFullEntities());
+            } else {
+                get.getFullEntities().forEach(e -> {
+                    if (region.contains(e.getLocation().toBlockPoint())) {
+                        entities.add(e);
+                    }
+                });
+            }
+        };
+        Extent ext = extent instanceof AbstractDelegateExtent ex ? ex.getExtent() : extent;
+        ExtentBatchProcessorHolder batchExtent = new ExtentTraverser<>(extent).findAndGet(ExtentBatchProcessorHolder.class);
+        OncePerChunkExtent oncePer = new ExtentTraverser<>(extent).findAndGet(OncePerChunkExtent.class);
+        if (batchExtent != null && oncePer == null) {
+            oncePer = new ProcessorTraverser<>(batchExtent).find(OncePerChunkExtent.class);
+        }
+        if (oncePer != null) {
+            oncePer.reset();
+            oncePer.setTask(task);
+        } else {
+            oncePer = new OncePerChunkExtent(ext, queue, task);
+            if (false && batchExtent != null) {
+                batchExtent.getProcessor().join(oncePer);
+            } else {
+                new ExtentTraverser(extent).setNext(oncePer);
+            }
+        }
+        return entities;
     }
 
     @Override

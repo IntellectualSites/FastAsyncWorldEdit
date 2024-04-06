@@ -29,6 +29,7 @@ import com.fastasyncworldedit.core.extent.clipboard.DiskOptimizedClipboard;
 import com.fastasyncworldedit.core.extent.clipboard.MultiClipboardHolder;
 import com.fastasyncworldedit.core.extent.clipboard.ReadOnlyClipboard;
 import com.fastasyncworldedit.core.extent.clipboard.URIClipboardHolder;
+import com.fastasyncworldedit.core.extent.clipboard.WorldCopyClipboard;
 import com.fastasyncworldedit.core.internal.io.FastByteArrayOutputStream;
 import com.fastasyncworldedit.core.limit.FaweLimit;
 import com.fastasyncworldedit.core.util.ImgurUtility;
@@ -192,7 +193,7 @@ public class ClipboardCommands {
             throw FaweCache.MAX_CHECKS;
         }
         session.setClipboard(null);
-        ReadOnlyClipboard lazyClipboard = ReadOnlyClipboard.of(region, !skipEntities, copyBiomes);
+        ReadOnlyClipboard lazyClipboard = WorldCopyClipboard.of(editSession, region, !skipEntities, copyBiomes);
 
         lazyClipboard.setOrigin(session.getPlacementPosition(actor));
         session.setClipboard(new ClipboardHolder(lazyClipboard));

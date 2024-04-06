@@ -52,12 +52,12 @@ public class OncePerChunkExtent extends AbstractDelegateExtent implements IBatch
     }
 
     private boolean shouldRun(int chunkX, int chunkZ) {
-        final long pair = (long) chunkX << 32 | chunkZ & 0xffffffffL;
-        if (pair == lastPair) {
-            return false;
-        }
-        lastPair = pair;
         synchronized (set) {
+            final long pair = (long) chunkX << 32 | chunkZ & 0xffffffffL;
+            if (pair == lastPair) {
+                return false;
+            }
+            lastPair = pair;
             return set.add(chunkX, chunkZ);
         }
     }
@@ -68,10 +68,16 @@ public class OncePerChunkExtent extends AbstractDelegateExtent implements IBatch
         }
     }
 
+    /**
+     * Get the task run once per chunk.
+     */
     public Consumer<IChunkGet> getTask() {
         return task;
     }
 
+    /**
+     * Set the task to be run once per chunk
+     */
     public void setTask(Consumer<IChunkGet> task) {
         this.task = task;
     }
@@ -179,6 +185,14 @@ public class OncePerChunkExtent extends AbstractDelegateExtent implements IBatch
     public void setSkyLight(final int x, final int y, final int z, final int value) {
         checkAndRun(x >> 4, z >> 4);
         super.setSkyLight(x, y, z, value);
+    }
+
+    /**
+     * Reset the chunks visited
+     */
+    public void reset() {
+        lastPair = Long.MAX_VALUE;
+        set.clear();
     }
 
 }
