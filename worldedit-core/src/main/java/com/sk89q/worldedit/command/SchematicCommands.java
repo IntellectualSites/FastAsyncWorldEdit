@@ -554,6 +554,9 @@ public class SchematicCommands {
                       String schematicName,
                       @Arg(desc = "Format name.", def = "sponge")
                       String formatName) throws WorldEditException {
+        if (true) {
+            throw new UnsupportedOperationException("This feature is currently not implemented");
+        }
         if (worldEdit.getPlatformManager().queryCapability(Capability.GAME_HOOKS).getDataVersion() == -1) {
             actor.printError(TranslatableComponent.of("worldedit.schematic.unsupported-minecraft-version"));
             return;
