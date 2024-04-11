@@ -1,5 +1,6 @@
 package com.fastasyncworldedit.bukkit.adapter;
 
+import com.destroystokyo.paper.util.SneakyThrow;
 import com.fastasyncworldedit.bukkit.util.BukkitReflectionUtils;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.adapter.Refraction;
@@ -24,11 +25,22 @@ import static java.lang.invoke.MethodType.methodType;
 
 public class BukkitFoliaAdapter {
 
-    // @formatter:off
+    private static final MethodHandle GET_ENTITIES = createEntitiesGetter();
+
+    @SuppressWarnings("unchecked")
     public static List<Entity> getEntities(World world, Region region) {
         try {
+            return (List<Entity>) GET_ENTITIES.invoke(world, region);
+        } catch (Throwable t) {
+            throw new RuntimeException(t);
+        }
+    }
+
+    // @formatter:off
+    private static MethodHandle createEntitiesGetter() {
+        try {
             MethodHandles.Lookup lookup = MethodHandles.lookup();
-            Class<?> craftWorldClass = world.getClass(); // assume it's CraftWorld
+            Class<?> craftWorldClass = BukkitReflectionUtils.getCbClass("CraftWorld");
             Class<?> serverLevel = Class.forName(Refraction.pickName("net.minecraft.server.level.ServerLevel", "net.minecraft.server.level.WorldServer"));
             Class<?> craftEntity = BukkitReflectionUtils.getCbClass("entity.CraftEntity");
             Class<?> nmsEntityClass = Class.forName("net.minecraft.world.entity.Entity");
@@ -55,12 +67,14 @@ public class BukkitFoliaAdapter {
             MethodHandle addConvertedReturn = collectArguments(dropArguments(arrayListIdentity, 1, nmsEntityClass), 0, dropReturn(addConverted));
             MethodHandle addConvertedReturnCollapsed = permuteArguments(addConvertedReturn, methodType(ArrayList.class, ArrayList.class, nmsEntityClass), 0, 1, 0, 1);
             MethodHandle newArrayListHandle = lookup.findConstructor(ArrayList.class, methodType(void.class));
-            MethodHandle ifInRegion = guardWithTest(isInRegion, dropArguments(addConvertedReturnCollapsed, 2, Region.class), dropArguments(arrayListIdentity, 1, nmsEntityClass, Region.class));
+            MethodHandle ifTrue = dropArguments(addConvertedReturnCollapsed, 2, Region.class);
+            MethodHandle ifFalse = dropArguments(arrayListIdentity, 1, nmsEntityClass, Region.class);
+            MethodHandle ifInRegion = guardWithTest(isInRegion, ifTrue, ifFalse);
             MethodHandle iterate = iteratedLoop(null, newArrayListHandle, dropArguments(ifInRegion, 2, Iterable.class));
-            MethodHandle preIter = filterArguments(iterate, 0, getEntities);
-            return (List<Entity>) preIter.invoke(world, region);
+            return filterArguments(iterate, 0, getEntities);
         } catch (Throwable t) {
-            throw new RuntimeException(t);
+            SneakyThrow.sneaky(t);
+            return null;
         }
     }
     // @formatter:on
