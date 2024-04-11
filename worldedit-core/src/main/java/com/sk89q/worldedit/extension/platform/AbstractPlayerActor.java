@@ -23,7 +23,6 @@ import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.internal.exception.FaweException;
 import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.fastasyncworldedit.core.regions.FaweMaskManager;
-import com.fastasyncworldedit.core.util.TaskManager;
 import com.fastasyncworldedit.core.util.WEManager;
 import com.fastasyncworldedit.core.util.task.AsyncNotifyKeyedQueue;
 import com.sk89q.worldedit.EditSession;
@@ -677,7 +676,8 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
         if (async) {
             asyncNotifyQueue.run(wrapped);
         } else {
-            TaskManager.taskManager().taskNow(wrapped, false);
+            // TODO (folia)
+            // TaskManager.taskManager().taskNow(wrapped, false);
         }
         return true;
     }

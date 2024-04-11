@@ -1,9 +1,10 @@
 import org.ajoberstar.grgit.Grgit
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
 import org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED
+import org.gradle.configurationcache.extensions.capitalized
+import xyz.jpenilla.runpaper.task.RunServer
 import java.net.URI
 import java.time.format.DateTimeFormatter
-import xyz.jpenilla.runpaper.task.RunServer
 
 plugins {
     id("io.github.gradle-nexus.publish-plugin") version "1.3.0"
@@ -84,24 +85,33 @@ allprojects {
 
 applyCommonConfiguration()
 val supportedVersions = listOf("1.18.2", "1.19.4", "1.20", "1.20.4")
+val foliaSupportedVersions = listOf("1.20.4")
 
 tasks {
-    supportedVersions.forEach {
-        register<RunServer>("runServer-$it") {
-            minecraftVersion(it)
-            pluginJars(*project(":worldedit-bukkit").getTasksByName("shadowJar", false).map { (it as Jar).archiveFile }
+    fun registerVersion(version: String, software: String, task: RunServer.() -> Unit = {}) {
+        register<RunServer>("run${software.capitalized()}-$version") {
+            minecraftVersion(version)
+            pluginJars(*project(":worldedit-bukkit").getTasksByName("shadowJar", false)
+                    .map { (it as Jar).archiveFile }
                     .toTypedArray())
             jvmArgs("-DPaper.IgnoreJavaVersion=true", "-Dcom.mojang.eula.agree=true")
-            group = "run paper"
-            runDirectory.set(file("run-$it"))
+            group = "run $software"
+            runDirectory.set(file("run-$software-$version"))
+            task(this)
         }
     }
     runServer {
-        minecraftVersion("1.20.4")
-        pluginJars(*project(":worldedit-bukkit").getTasksByName("shadowJar", false).map { (it as Jar).archiveFile }
-                .toTypedArray())
-
+        registerVersion("1.20.4", "paper")
     }
+    supportedVersions.forEach {
+        registerVersion(it, "paper")
+    }
+    foliaSupportedVersions.forEach {
+        registerVersion(it, "folia") {
+            downloadsApiService.set(xyz.jpenilla.runtask.service.DownloadsAPIService.folia(project))
+        }
+    }
+
 }
 
 nexusPublishing {

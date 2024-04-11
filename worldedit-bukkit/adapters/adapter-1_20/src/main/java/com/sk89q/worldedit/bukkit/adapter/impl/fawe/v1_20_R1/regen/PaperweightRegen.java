@@ -9,6 +9,7 @@ import com.fastasyncworldedit.core.util.TaskManager;
 import com.google.common.collect.ImmutableList;
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Lifecycle;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.adapter.Refraction;
 import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_20_R1.PaperweightGetBlocks;
@@ -443,7 +444,7 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
             final CraftWorld world = freshWorld.getWorld();
             final Chunk chunk = world.getChunkAt(levelChunk.locX, levelChunk.locZ);
             blockPopulator.populate(world, random, chunk);
-        });
+        }, BukkitAdapter.adapt(originalBukkitWorld), levelChunk.getPos().x, levelChunk.getPos().z);
     }
 
     @Override

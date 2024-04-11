@@ -50,19 +50,12 @@ import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.function.EntityFunction;
-import com.sk89q.worldedit.function.block.BlockReplace;
 import com.sk89q.worldedit.function.mask.BlockTypeMask;
-import com.sk89q.worldedit.function.mask.BoundedHeightMask;
 import com.sk89q.worldedit.function.mask.ExistingBlockMask;
 import com.sk89q.worldedit.function.mask.Mask;
-import com.sk89q.worldedit.function.mask.MaskIntersection;
-import com.sk89q.worldedit.function.mask.Masks;
-import com.sk89q.worldedit.function.mask.RegionMask;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.pattern.Pattern;
-import com.sk89q.worldedit.function.visitor.DownwardVisitor;
 import com.sk89q.worldedit.function.visitor.EntityVisitor;
-import com.sk89q.worldedit.function.visitor.RecursiveVisitor;
 import com.sk89q.worldedit.internal.annotation.Direction;
 import com.sk89q.worldedit.internal.annotation.VertHeight;
 import com.sk89q.worldedit.internal.expression.EvaluationException;
@@ -70,10 +63,8 @@ import com.sk89q.worldedit.internal.expression.Expression;
 import com.sk89q.worldedit.internal.expression.ExpressionException;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector2;
-import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.CylinderRegion;
-import com.sk89q.worldedit.regions.EllipsoidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.formatting.component.SubtleFormat;
 import com.sk89q.worldedit.util.formatting.text.Component;
@@ -89,7 +80,7 @@ import org.enginehub.piston.annotation.param.ArgFlag;
 import org.enginehub.piston.annotation.param.Switch;
 
 import javax.imageio.ImageIO;
-import java.awt.RenderingHints;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -709,7 +700,16 @@ public class UtilityCommands {
 
         //FAWE start - run this sync
         int finalRadius = radius;
-        int killed = TaskManager.taskManager().sync(() -> killMatchingEntities(finalRadius, actor, flags::createFunction));
+        int killed;
+        // TODO (folia) location context might be somewhere else actually
+        if (actor instanceof Player player) {
+            killed = TaskManager.taskManager().syncWith(
+                    () -> killMatchingEntities(finalRadius, actor, flags::createFunction),
+                    player
+            );
+        } else {
+            killed = 0;
+        }
         //FAWE end
 
         actor.print(Caption.of(
@@ -741,10 +741,23 @@ public class UtilityCommands {
         }
 
         //FAWE start - run this sync
-        int removed = TaskManager.taskManager().sync(() -> killMatchingEntities(radius, actor, remover::createFunction));
+        int removed = 0;
+        // TODO (folia) location context might be somewhere else actually
+        // removed = TaskManager.taskManager().sync(() -> killMatchingEntities(radius, actor, remover::createFunction));
         //FAWE end
         actor.print(Caption.of("worldedit.remove.removed", TextComponent.of(removed)));
         return removed;
+    }
+
+    private int killMatchingEntitiesSync(Integer radius, Actor actor, Supplier<EntityFunction> func) {
+        LocalSession session = we.getSessionManager().get(actor);
+        BlockVector3 center = session.getPlacementPosition(actor);
+        EditSession editSession = session.createEditSession(actor);
+        World world = editSession.getWorld();
+        return TaskManager.taskManager().syncAt(
+                () -> killMatchingEntities(radius, actor, func),
+                world, center.getBlockX() >> 4, center.getBlockZ() >> 4
+        );
     }
 
     private int killMatchingEntities(Integer radius, Actor actor, Supplier<EntityFunction> func) throws IncompleteRegionException,

@@ -4,14 +4,13 @@ import com.fastasyncworldedit.bukkit.adapter.Regenerator;
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.queue.IChunkCache;
 import com.fastasyncworldedit.core.queue.IChunkGet;
-import com.fastasyncworldedit.core.util.ReflectionUtils;
-import com.fastasyncworldedit.core.util.TaskManager;
 import com.google.common.collect.ImmutableList;
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Lifecycle;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.adapter.Refraction;
 import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_20_R2.PaperweightGetBlocks;
+import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_20_R2.PaperweightPlatformAdapter;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.regions.Region;
@@ -439,11 +438,11 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
     @Override
     protected void populate(LevelChunk levelChunk, Random random, BlockPopulator blockPopulator) {
         // BlockPopulator#populate has to be called synchronously for TileEntity access
-        TaskManager.taskManager().task(() -> {
+        PaperweightPlatformAdapter.task(() -> {
             final CraftWorld world = freshWorld.getWorld();
             final Chunk chunk = world.getChunkAt(levelChunk.locX, levelChunk.locZ);
             blockPopulator.populate(world, random, chunk);
-        });
+        }, freshWorld, levelChunk.getPos().x, levelChunk.getPos().z);
     }
 
     @Override

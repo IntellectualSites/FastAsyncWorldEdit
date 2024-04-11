@@ -4,6 +4,7 @@ import com.fastasyncworldedit.core.util.TaskManager;
 import com.fastasyncworldedit.core.util.image.Drawable;
 import com.fastasyncworldedit.core.util.image.ImageUtil;
 import com.fastasyncworldedit.core.util.image.ImageViewer;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -164,7 +165,7 @@ public class BukkitImageViewer implements ImageViewer {
             controller.showInFrames(player, frames, true);
         } else {
             int slot = getMapSlot(player);
-            TaskManager.taskManager().sync(() -> {
+            TaskManager.taskManager().syncWith(() -> {
                 if (slot == -1) {
                     if (initializing) {
                         player.getInventory().setItemInMainHand(new ItemStack(Material.MAP));
@@ -175,7 +176,7 @@ public class BukkitImageViewer implements ImageViewer {
                     player.getInventory().setHeldItemSlot(slot);
                 }
                 return null;
-            });
+            }, BukkitAdapter.adapt(player));
             if (image == null && drawable != null) {
                 image = drawable.draw();
             }

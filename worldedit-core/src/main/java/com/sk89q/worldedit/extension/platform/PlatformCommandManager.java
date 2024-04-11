@@ -687,7 +687,11 @@ public final class PlatformCommandManager {
         Command cmd = optional.get();
         PermissionCondition queued = cmd.getCondition().as(PermissionCondition.class).orElse(null);
         if (queued != null && !queued.isQueued()) {
-            TaskManager.taskManager().taskNow(() -> handleCommandOnCurrentThread(event), Fawe.isMainThread());
+            if (actor instanceof Player player) {
+                TaskManager.taskManager().task(() -> handleCommandOnCurrentThread(event), player.getLocation());
+            } else {
+                // TODO (folia)
+            }
             return;
         } else {
             actor.decline();

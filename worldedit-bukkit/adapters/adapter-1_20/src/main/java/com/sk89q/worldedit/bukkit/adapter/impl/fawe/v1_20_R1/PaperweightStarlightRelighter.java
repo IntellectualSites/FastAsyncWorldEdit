@@ -45,10 +45,11 @@ public class PaperweightStarlightRelighter extends StarlightRelighter<ServerLeve
                 ));
     }
 
+    @Override
     protected void invokeRelight(
-            Set<ChunkPos> coords,
-            Consumer<ChunkPos> chunkCallback,
-            IntConsumer processCallback
+            final Set<ChunkPos> coords,
+            final Consumer<ChunkPos> chunkCallback,
+            final IntConsumer processCallback
     ) {
         try {
             serverLevel.getChunkSource().getLightEngine().relight(coords, chunkCallback, processCallback);
@@ -64,12 +65,20 @@ public class PaperweightStarlightRelighter extends StarlightRelighter<ServerLeve
     protected void postProcessChunks(Set<ChunkPos> coords) {
         boolean delay = Settings.settings().LIGHTING.DELAY_PACKET_SENDING;
         for (ChunkPos pos : coords) {
-            int x = pos.x;
-            int z = pos.z;
-            if (delay) { // we still need to send the block changes of that chunk
-                PaperweightPlatformAdapter.sendChunk(serverLevel, x, z, false);
-            }
-            serverLevel.getChunkSource().removeTicketAtLevel(FAWE_TICKET, pos, LIGHT_LEVEL, Unit.INSTANCE);
+            PaperweightPlatformAdapter.task(
+                    () -> {
+                        int x = pos.x;
+                        int z = pos.z;
+                        if (delay) { // we still need to send the block changes of that chunk
+                            PaperweightPlatformAdapter.sendChunk(serverLevel, x, z, false);
+                        }
+                        serverLevel.getChunkSource().removeTicketAtLevel(FAWE_TICKET, pos, LIGHT_LEVEL, Unit.INSTANCE);
+                    },
+                    serverLevel,
+                    pos.x,
+                    pos.z
+            );
+
         }
     }
 

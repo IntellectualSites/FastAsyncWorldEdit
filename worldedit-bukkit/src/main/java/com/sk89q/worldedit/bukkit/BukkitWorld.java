@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.bukkit;
 
+import com.fastasyncworldedit.bukkit.adapter.BukkitFoliaAdapter;
 import com.fastasyncworldedit.bukkit.util.WorldUnloadedException;
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.FaweCache;
@@ -26,6 +27,7 @@ import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.internal.exception.FaweException;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.implementation.packet.ChunkPacket;
+import com.fastasyncworldedit.core.util.FoliaSupport;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
@@ -43,8 +45,11 @@ import com.sk89q.worldedit.internal.wna.WorldNativeAccess;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
+import com.sk89q.worldedit.regions.AbstractRegion;
 import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.regions.RegionOperationException;
 import com.sk89q.worldedit.util.Direction;
+import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.SideEffect;
 import com.sk89q.worldedit.util.SideEffectSet;
 import com.sk89q.worldedit.util.TreeGenerator;
@@ -146,7 +151,10 @@ public class BukkitWorld extends AbstractWorld {
     public List<com.sk89q.worldedit.entity.Entity> getEntities(Region region) {
         World world = getWorld();
 
-        List<Entity> ents = TaskManager.taskManager().sync(world::getEntities);
+        if (FoliaSupport.isFolia()) {
+            return BukkitFoliaAdapter.getEntities(world, region);
+        }
+        List<Entity> ents = TaskManager.taskManager().syncGlobal(world::getEntities);
         List<com.sk89q.worldedit.entity.Entity> entities = new ArrayList<>();
         for (Entity ent : ents) {
             if (region.contains(BukkitAdapter.asBlockVector(ent.getLocation()))) {
@@ -158,9 +166,43 @@ public class BukkitWorld extends AbstractWorld {
 
     @Override
     public List<com.sk89q.worldedit.entity.Entity> getEntities() {
+        if (FoliaSupport.isFolia()) {
+            return BukkitFoliaAdapter.getEntities(getWorld(), new AbstractRegion(null) {
+
+                @Override
+                public BlockVector3 getMinimumPoint() {
+                    return null;
+                }
+
+                @Override
+                public BlockVector3 getMaximumPoint() {
+                    return null;
+                }
+
+                @Override
+                public void expand(final BlockVector3... changes) throws RegionOperationException {
+
+                }
+
+                @Override
+                public void contract(final BlockVector3... changes) throws RegionOperationException {
+
+                }
+
+                @Override
+                public boolean contains(final BlockVector3 position) {
+                    return false;
+                }
+
+                @Override
+                public boolean contains(final int x, final int y, final int z) {
+                    return true;
+                }
+            });
+        }
         List<com.sk89q.worldedit.entity.Entity> list = new ArrayList<>();
 
-        List<Entity> ents = TaskManager.taskManager().sync(getWorld()::getEntities);
+        List<Entity> ents = TaskManager.taskManager().syncGlobal(getWorld()::getEntities);
         for (Entity entity : ents) {
             list.add(BukkitAdapter.adapt(entity));
         }
@@ -290,7 +332,7 @@ public class BukkitWorld extends AbstractWorld {
             return false;
         }
 
-        TaskManager.taskManager().sync(() -> {
+        TaskManager.taskManager().syncAt(() -> {
             InventoryHolder chest = (InventoryHolder) state;
             Inventory inven = chest.getInventory();
             if (chest instanceof Chest) {
@@ -298,7 +340,7 @@ public class BukkitWorld extends AbstractWorld {
             }
             inven.clear();
             return null;
-        });
+        }, new Location(this, pt.toVector3()));
         return true;
     }
 

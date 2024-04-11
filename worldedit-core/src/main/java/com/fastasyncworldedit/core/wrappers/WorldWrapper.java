@@ -253,18 +253,20 @@ public class WorldWrapper extends AbstractWorld {
 
     @Override
     public void simulateBlockMine(BlockVector3 pt) {
-        TaskManager.taskManager().sync(new RunnableVal<Object>() {
+        TaskManager.taskManager().syncAt(new RunnableVal<Object>() {
             @Override
             public void run(Object value) {
                 parent.simulateBlockMine(pt);
             }
-        });
+        }, new Location(this, pt.toVector3()));
     }
 
     //FAWE start
     @Override
     public Collection<BaseItemStack> getBlockDrops(final BlockVector3 position) {
-        return TaskManager.taskManager().sync(() -> parent.getBlockDrops(position));
+        return TaskManager.taskManager().syncAt(
+                () -> parent.getBlockDrops(position),
+                new Location(this, position.toVector3()));
     }
     //FAWE end
 

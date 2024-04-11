@@ -7,10 +7,12 @@ import com.fastasyncworldedit.bukkit.adapter.NMSAdapter;
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.math.BitArrayUnstretched;
+import com.fastasyncworldedit.core.util.FoliaSupport;
 import com.fastasyncworldedit.core.util.MathMan;
 import com.fastasyncworldedit.core.util.ReflectionUtils;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.mojang.datafixers.util.Either;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.bukkit.adapter.Refraction;
@@ -20,6 +22,7 @@ import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import io.papermc.lib.PaperLib;
+import io.papermc.paper.util.TickThread;
 import io.papermc.paper.world.ChunkEntitySlices;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
@@ -58,7 +61,6 @@ import net.minecraft.world.level.entity.PersistentEntitySectionManager;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_20_R2.CraftChunk;
-import sun.misc.Unsafe;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -83,6 +85,7 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import static java.lang.invoke.MethodType.methodType;
 import static net.minecraft.core.registries.Registries.BIOME;
@@ -292,35 +295,43 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             }
             CompletableFuture<org.bukkit.Chunk> future = serverLevel.getWorld().getChunkAtAsync(chunkX, chunkZ, true, true);
             try {
-                CraftChunk chunk;
                 try {
-                    chunk = (CraftChunk) future.get(10, TimeUnit.SECONDS);
+                    future.get(10, TimeUnit.SECONDS);
                 } catch (TimeoutException e) {
                     String world = serverLevel.getWorld().getName();
                     // We've already taken 10 seconds we can afford to wait a little here.
-                    boolean loaded = TaskManager.taskManager().sync(() -> Bukkit.getWorld(world) != null);
+                    boolean loaded = TaskManager.taskManager().syncGlobal(() -> Bukkit.getWorld(world) != null);
                     if (loaded) {
                         LOGGER.warn("Chunk {},{} failed to load in 10 seconds in world {}. Retrying...", chunkX, chunkZ, world);
                         // Retry chunk load
-                        chunk = (CraftChunk) serverLevel.getWorld().getChunkAtAsync(chunkX, chunkZ, true, true).get();
+                        serverLevel.getWorld().getChunkAtAsync(chunkX, chunkZ, true, true).get();
                     } else {
                         throw new UnsupportedOperationException("Cannot load chunk from unloaded world " + world + "!");
                     }
                 }
                 addTicket(serverLevel, chunkX, chunkZ);
-                return (LevelChunk) CRAFT_CHUNK_GET_HANDLE.invoke(chunk);
+                // chunk is loaded now, can access it directly
+                return serverLevel.getChunkSource().getChunkAtIfCachedImmediately(chunkX, chunkZ);
             } catch (Throwable e) {
                 e.printStackTrace();
             }
         }
-        return TaskManager.taskManager().sync(() -> serverLevel.getChunk(chunkX, chunkZ));
+        return TaskManager.taskManager().syncAt(() -> serverLevel.getChunk(chunkX, chunkZ),
+                BukkitAdapter.adapt(serverLevel.getWorld()), chunkX, chunkZ
+        );
     }
 
     private static void addTicket(ServerLevel serverLevel, int chunkX, int chunkZ) {
         // Ensure chunk is definitely loaded before applying a ticket
-        io.papermc.paper.util.MCUtil.MAIN_EXECUTOR.execute(() -> serverLevel
+        final Runnable addChunkTicket = () -> serverLevel
                 .getChunkSource()
-                .addRegionTicket(TicketType.UNLOAD_COOLDOWN, new ChunkPos(chunkX, chunkZ), 0, Unit.INSTANCE));
+                .addRegionTicket(TicketType.UNLOAD_COOLDOWN, new ChunkPos(chunkX, chunkZ), 0, Unit.INSTANCE);
+        if (FoliaSupport.isFolia()) {
+            // run from any thread on Folia
+            addChunkTicket.run();
+            return;
+        }
+        io.papermc.paper.util.MCUtil.MAIN_EXECUTOR.execute(addChunkTicket);
     }
 
     public static ChunkHolder getPlayerChunk(ServerLevel nmsWorld, final int chunkX, final int chunkZ) {
@@ -374,7 +385,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                 );
             }
             nearbyPlayers(nmsWorld, coordIntPair).forEach(p -> p.connection.send(packet));
-        });
+        }, BukkitAdapter.adapt(nmsWorld.getWorld()), chunkX, chunkZ);
     }
 
     private static List<ServerPlayer> nearbyPlayers(ServerLevel serverLevel, ChunkPos coordIntPair) {
@@ -672,6 +683,21 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         }
         collector.throwIfPresent();
         return List.of();
+    }
+
+    public static void task(Runnable task, ServerLevel level, int chunkX, int chunkZ) {
+        TaskManager.taskManager().task(task, BukkitAdapter.adapt(level.getWorld()), chunkX, chunkZ);
+    }
+
+    public static <T> T sync(Supplier<T> task, ServerLevel level, int chunkX, int chunkZ) {
+        return TaskManager.taskManager().syncAt(task, BukkitAdapter.adapt(level.getWorld()), chunkX, chunkZ);
+    }
+
+    public static boolean isTickThreadFor(LevelChunk levelChunk) {
+        if (FoliaSupport.isFolia()) {
+            return TickThread.isTickThreadFor(levelChunk.level, levelChunk.locX, levelChunk.locZ);
+        }
+        return Fawe.isTickThread();
     }
 
     record FakeIdMapBlock(int size) implements IdMap<net.minecraft.world.level.block.state.BlockState> {

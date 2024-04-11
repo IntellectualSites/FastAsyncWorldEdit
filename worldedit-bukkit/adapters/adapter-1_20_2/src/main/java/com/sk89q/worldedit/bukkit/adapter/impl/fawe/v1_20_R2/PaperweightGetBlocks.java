@@ -12,6 +12,7 @@ import com.fastasyncworldedit.core.queue.IChunkSet;
 import com.fastasyncworldedit.core.queue.implementation.QueueHandler;
 import com.fastasyncworldedit.core.queue.implementation.blocks.CharGetBlocks;
 import com.fastasyncworldedit.core.util.MathMan;
+import com.fastasyncworldedit.core.util.TaskManager;
 import com.fastasyncworldedit.core.util.collection.AdaptedMap;
 import com.google.common.base.Suppliers;
 import com.sk89q.jnbt.CompoundTag;
@@ -20,6 +21,7 @@ import com.sk89q.jnbt.StringTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
+import com.sk89q.worldedit.bukkit.adapter.ext.fawe.v1_20_R2.PaperweightAdapter;
 import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_20_R2.nbt.PaperweightLazyCompoundTag;
 import com.sk89q.worldedit.internal.Constants;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
@@ -236,9 +238,9 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
 
     @Override
     public CompoundTag getTile(int x, int y, int z) {
-        BlockEntity blockEntity = getChunk().getBlockEntity(new BlockPos((x & 15) + (
-                chunkX << 4), y, (z & 15) + (
-                chunkZ << 4)));
+        BlockEntity blockEntity = PaperweightPlatformAdapter.sync(() -> getChunk().getBlockEntity(
+                new BlockPos((x & 15) + (chunkX << 4), y, (z & 15) + (chunkZ << 4))),
+                serverLevel, chunkX, chunkZ);
         if (blockEntity == null) {
             return null;
         }
@@ -247,7 +249,10 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
 
     @Override
     public Map<BlockVector3, CompoundTag> getTiles() {
-        Map<BlockPos, BlockEntity> nmsTiles = getChunk().getBlockEntities();
+        Map<BlockPos, BlockEntity> nmsTiles = PaperweightPlatformAdapter.sync(
+                () -> getChunk().getBlockEntities(),
+                serverLevel, chunkX, chunkZ
+        );
         if (nmsTiles.isEmpty()) {
             return Collections.emptyMap();
         }

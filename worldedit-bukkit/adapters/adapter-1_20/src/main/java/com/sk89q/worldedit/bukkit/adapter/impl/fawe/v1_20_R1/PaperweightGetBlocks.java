@@ -257,9 +257,9 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
 
     @Override
     public CompoundTag getTile(int x, int y, int z) {
-        BlockEntity blockEntity = getChunk().getBlockEntity(new BlockPos((x & 15) + (
-                chunkX << 4), y, (z & 15) + (
-                chunkZ << 4)));
+        BlockEntity blockEntity = PaperweightPlatformAdapter.sync(() -> getChunk().getBlockEntity(
+                        new BlockPos((x & 15) + (chunkX << 4), y, (z & 15) + (chunkZ << 4))),
+                serverLevel, chunkX, chunkZ);
         if (blockEntity == null) {
             return null;
         }
@@ -268,7 +268,10 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
 
     @Override
     public Map<BlockVector3, CompoundTag> getTiles() {
-        Map<BlockPos, BlockEntity> nmsTiles = getChunk().getBlockEntities();
+        Map<BlockPos, BlockEntity> nmsTiles = PaperweightPlatformAdapter.sync(
+                () -> getChunk().getBlockEntities(),
+                serverLevel, chunkX, chunkZ
+        );
         if (nmsTiles.isEmpty()) {
             return Collections.emptyMap();
         }

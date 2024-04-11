@@ -3819,7 +3819,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
             }
             if (containsAny) {
                 changes++;
-                TaskManager.taskManager().sync(new RunnableVal<Object>() {
+                TaskManager.taskManager().syncGlobal(new RunnableVal<Object>() {
                     @Override
                     public void run(Object value) {
                         regenerateChunk(cx, cz, biome, seed);
