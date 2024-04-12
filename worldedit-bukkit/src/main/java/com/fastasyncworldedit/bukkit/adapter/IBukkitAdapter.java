@@ -31,6 +31,8 @@ import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.item.ItemTypes;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.Registry;
 import org.bukkit.TreeType;
 import org.bukkit.block.Biome;
 import org.bukkit.block.data.BlockData;
@@ -186,10 +188,12 @@ public interface IBukkitAdapter {
     }
 
     default org.bukkit.entity.EntityType adapt(EntityType entityType) {
-        if (!entityType.getId().startsWith("minecraft:")) {
-            throw new IllegalArgumentException("Bukkit only supports vanilla entities");
+        NamespacedKey entityKey = NamespacedKey.fromString(entityType.toString());
+        if (entityKey == null) {
+            throw new IllegalArgumentException("Entity key '" + entityType + "' does not map to Bukkit");
         }
-        return org.bukkit.entity.EntityType.fromName(entityType.getId().substring(10).toLowerCase(Locale.ROOT));
+
+        return Registry.ENTITY_TYPE.get(entityKey);
     }
 
     /**
@@ -343,7 +347,7 @@ public interface IBukkitAdapter {
      * @return WorldEdit EntityType
      */
     default EntityType adapt(org.bukkit.entity.EntityType entityType) {
-        return EntityTypes.get(entityType.getName().toLowerCase(Locale.ROOT));
+        return EntityTypes.get(entityType.getKey().toString());
     }
 
     /**
