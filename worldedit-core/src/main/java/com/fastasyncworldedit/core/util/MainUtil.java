@@ -554,8 +554,15 @@ public class MainUtil {
     }
 
     public static BufferedImage readImage(URL url) throws IOException {
+        try (final InputStream stream = readImageStream(url.toURI())) {
+            return readImage(stream);
+        } catch (URISyntaxException e) {
+            throw new IOException("failed to parse url to uri reference", e);
+        }
+    }
+
+    public static InputStream readImageStream(final URI uri) throws IOException {
         try {
-            final URI uri = url.toURI();
             HttpRequest.Builder requestBuilder = HttpRequest.newBuilder(uri).GET();
 
             if (uri.getHost().equalsIgnoreCase("i.imgur.com")) {
@@ -566,16 +573,13 @@ public class MainUtil {
                     requestBuilder.build(),
                     HttpResponse.BodyHandlers.ofInputStream()
             );
-            try (final InputStream body = response.body()) {
-                if (response.statusCode() > 299) {
-                    throw new IOException("Expected 2xx as response code, but received " + response.statusCode());
-                }
-                return readImage(body);
+            final InputStream body = response.body();
+            if (response.statusCode() > 299) {
+                throw new IOException("Expected 2xx as response code, but received " + response.statusCode());
             }
+            return body;
         } catch (InterruptedException e) {
             throw new IOException("request was interrupted", e);
-        } catch (URISyntaxException e) {
-            throw new IOException("failed to parse url to uri reference", e);
         }
     }
 
