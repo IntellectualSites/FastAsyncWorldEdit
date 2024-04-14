@@ -39,7 +39,7 @@ commons-cli = "1.6.0"
 paperlib = "1.0.8"
 paster = "1.1.5"
 vault = "1.7.1"
-serverlib = "2.3.5"
+serverlib = "2.3.6"
 ## Internal
 text-adapter = "3.0.6"
 text = "3.0.4"
