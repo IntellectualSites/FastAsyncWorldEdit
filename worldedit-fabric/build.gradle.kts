@@ -100,7 +100,7 @@ dependencies {
     }
 
     // No need for this at runtime
-    "modCompileOnly"("me.lucko:fabric-permissions-api:0.3")
+    "modCompileOnly"("me.lucko:fabric-permissions-api:0.3.1")
 
     // Hook these up manually, because Fabric doesn't seem to quite do it properly.
     "compileOnly"("net.fabricmc:sponge-mixin:${project.versions.mixin}")
