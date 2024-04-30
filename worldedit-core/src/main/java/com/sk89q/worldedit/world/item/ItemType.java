@@ -42,7 +42,7 @@ public class ItemType implements RegistryItem, Keyed {
     public static final NamespacedRegistry<ItemType> REGISTRY = new NamespacedRegistry<>("item type", true);
 
     private final String id;
-    @SuppressWarnings("deprecation")
+    @SuppressWarnings({"deprecation", "this-escape"})
     private transient final LazyReference<String> name = LazyReference.from(() -> {
         String name = GuavaUtil.firstNonNull(
                 WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS)
@@ -51,10 +51,12 @@ public class ItemType implements RegistryItem, Keyed {
         );
         return name.isEmpty() ? getId() : name;
     });
+    @SuppressWarnings("this-escape")
     private transient final LazyReference<Component> richName = LazyReference.from(() ->
             WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS)
                     .getRegistries().getItemRegistry().getRichName(this)
     );
+    @SuppressWarnings("this-escape")
     private transient final LazyReference<ItemMaterial> itemMaterial = LazyReference.from(() ->
             WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS)
                     .getRegistries().getItemRegistry().getMaterial(this)

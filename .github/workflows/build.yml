@@ -17,7 +17,7 @@ jobs:
         with:
           distribution: temurin
           cache: gradle
-          java-version: 17
+          java-version: 21
       - name: Clean Build
         run: ./gradlew clean build --no-daemon
       - name: Determine release status

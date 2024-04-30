@@ -901,6 +901,8 @@ public final class BlockTypes {
     @Nullable
     public static final BlockType HAY_BLOCK = init();
     @Nullable
+    public static final BlockType HEAVY_CORE = init();
+    @Nullable
     public static final BlockType HEAVY_WEIGHTED_PRESSURE_PLATE = init();
     @Nullable
     public static final BlockType HONEYCOMB_BLOCK = init();
@@ -1957,6 +1959,8 @@ public final class BlockTypes {
     public static final BlockType VERDANT_FROGLIGHT = init();
     @Nullable
     public static final BlockType TWISTING_VINES_PLANT = init();
+    @Nullable
+    public static final BlockType VAULT = init();
     @Nullable
     public static final BlockType VINE = init();
     @Nullable

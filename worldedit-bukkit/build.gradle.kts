@@ -36,6 +36,7 @@ repositories {
         name = "Glaremasters"
         url = uri("https://repo.glaremasters.me/repository/towny/")
     }
+    maven("https://s01.oss.sonatype.org/content/repositories/snapshots/") // TODO Remove when 4.17.0 is released
     flatDir { dir(File("src/main/resources")) }
 }
 

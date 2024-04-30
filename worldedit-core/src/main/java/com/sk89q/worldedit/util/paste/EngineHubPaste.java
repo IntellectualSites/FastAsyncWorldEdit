@@ -24,6 +24,7 @@ import com.google.gson.reflect.TypeToken;
 import com.sk89q.worldedit.util.net.HttpRequest;
 
 import java.io.IOException;
+import java.net.URI;
 import java.net.URL;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -68,7 +69,7 @@ public class EngineHubPaste implements Paster {
                     .execute()
                     .expectResponseCode(200, 204);
 
-            return new URL(response.viewUrl);
+            return URI.create(response.viewUrl).toURL();
         }
 
     }
