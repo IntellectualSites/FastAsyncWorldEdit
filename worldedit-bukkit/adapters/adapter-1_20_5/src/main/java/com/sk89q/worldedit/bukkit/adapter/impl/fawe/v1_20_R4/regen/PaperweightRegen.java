@@ -60,9 +60,9 @@ import net.minecraft.world.level.storage.PrimaryLevelData;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
-import org.bukkit.craftbukkit.v1_20_R4.CraftServer;
-import org.bukkit.craftbukkit.v1_20_R4.CraftWorld;
-import org.bukkit.craftbukkit.v1_20_R4.generator.CustomChunkGenerator;
+import org.bukkit.craftbukkit.CraftServer;
+import org.bukkit.craftbukkit.CraftWorld;
+import org.bukkit.craftbukkit.generator.CustomChunkGenerator;
 import org.bukkit.generator.BiomeProvider;
 import org.bukkit.generator.BlockPopulator;
 
@@ -486,7 +486,11 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
         }
 
         @Override
-        public void onStatusChange(ChunkPos pos, @Nullable ChunkStatus status) {
+        public void onStatusChange(
+                final ChunkPos pos,
+                @org.jetbrains.annotations.Nullable final net.minecraft.world.level.chunk.status.ChunkStatus status
+        ) {
+
         }
 
         @Override

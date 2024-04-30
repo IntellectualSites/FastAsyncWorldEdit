@@ -7,7 +7,7 @@ import com.fastasyncworldedit.core.extent.processor.lighting.RelighterFactory;
 import com.fastasyncworldedit.core.queue.IQueueExtent;
 import com.sk89q.worldedit.world.World;
 import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.v1_20_R4.CraftWorld;
+import org.bukkit.craftbukkit.CraftWorld;
 
 import javax.annotation.Nonnull;
 

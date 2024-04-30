@@ -39,9 +39,11 @@ import com.sk89q.worldedit.bukkit.adapter.ext.fawe.v1_20_R4.PaperweightAdapter;
 import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.NbtOps;
+import net.minecraft.nbt.StringTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.util.StringUtil;
 import net.minecraft.util.datafix.DataFixers;
@@ -1908,7 +1910,7 @@ public class PaperweightDataConverters extends DataFixerBuilder implements com.s
 
                                 if (object == null) {
                                     try {
-                                        object = Component.Serializer.fromJson(s);
+                                        object = Component.Serializer.fromJson(s, MinecraftServer.getServer().registryAccess());
                                     } catch (JsonParseException jsonparseexception1) {
                                         ;
                                     }
@@ -1916,7 +1918,7 @@ public class PaperweightDataConverters extends DataFixerBuilder implements com.s
 
                                 if (object == null) {
                                     try {
-                                        object = Component.Serializer.fromJsonLenient(s);
+                                        object = Component.Serializer.fromJsonLenient(s, MinecraftServer.getServer().registryAccess());
                                     } catch (JsonParseException jsonparseexception2) {
                                         ;
                                     }
@@ -1930,7 +1932,7 @@ public class PaperweightDataConverters extends DataFixerBuilder implements com.s
                             object = Component.literal("");
                         }
 
-                        nbttaglist.set(i, net.minecraft.nbt.StringTag.valueOf(Component.Serializer.toJson(object)));
+                        nbttaglist.set(i, StringTag.valueOf(Component.Serializer.toJson(object, MinecraftServer.getServer().registryAccess())));
                     }
 
                     nbttagcompound1.put("pages", nbttaglist);
@@ -2572,7 +2574,7 @@ public class PaperweightDataConverters extends DataFixerBuilder implements com.s
 
                     if (object == null) {
                         try {
-                            object = Component.Serializer.fromJson(s1);
+                            object = Component.Serializer.fromJson(s1, MinecraftServer.getServer().registryAccess());
                         } catch (JsonParseException jsonparseexception1) {
                             ;
                         }
@@ -2580,7 +2582,7 @@ public class PaperweightDataConverters extends DataFixerBuilder implements com.s
 
                     if (object == null) {
                         try {
-                            object = Component.Serializer.fromJsonLenient(s1);
+                            object = Component.Serializer.fromJsonLenient(s1, MinecraftServer.getServer().registryAccess());
                         } catch (JsonParseException jsonparseexception2) {
                             ;
                         }
@@ -2594,7 +2596,7 @@ public class PaperweightDataConverters extends DataFixerBuilder implements com.s
                 object = Component.literal("");
             }
 
-            nbttagcompound.putString(s, Component.Serializer.toJson(object));
+            nbttagcompound.putString(s, Component.Serializer.toJson(object, MinecraftServer.getServer().registryAccess()));
         }
     }
 
