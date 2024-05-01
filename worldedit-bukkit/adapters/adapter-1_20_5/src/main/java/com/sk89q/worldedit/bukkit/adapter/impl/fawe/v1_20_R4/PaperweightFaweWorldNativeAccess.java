@@ -181,7 +181,7 @@ public class PaperweightFaweWorldNativeAccess implements WorldNativeAccess<Level
             // Un-nest neighbour updating
             for (Direction direction : NEIGHBOUR_ORDER) {
                 BlockPos shifted = blockPos.relative(direction);
-                level.getBlockState(shifted).neighborChanged(level, shifted, oldState.getBlock(), blockPos, false);
+                level.getBlockState(shifted).handleNeighborChanged(level, shifted, oldState.getBlock(), blockPos, false);
             }
         }
         if (newState.hasAnalogOutputSignal()) {

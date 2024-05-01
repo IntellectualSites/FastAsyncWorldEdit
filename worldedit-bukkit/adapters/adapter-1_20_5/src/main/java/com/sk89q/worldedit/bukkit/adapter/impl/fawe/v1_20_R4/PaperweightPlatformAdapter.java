@@ -57,7 +57,7 @@ import net.minecraft.world.level.chunk.SingleValuePalette;
 import net.minecraft.world.level.entity.PersistentEntitySectionManager;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.v1_20_R4.CraftChunk;
+import org.bukkit.craftbukkit.CraftChunk;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

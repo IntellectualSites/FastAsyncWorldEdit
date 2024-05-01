@@ -88,7 +88,6 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.dedicated.DedicatedServer;
-import net.minecraft.server.level.ChunkHolder;
 import net.minecraft.server.level.ChunkResult;
 import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.ServerLevel;
@@ -547,12 +546,14 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
 
     @Override
     public void sendFakeNBT(Player player, BlockVector3 pos, CompoundBinaryTag nbtData) {
+        var structureBlock = new StructureBlockEntity(
+                new BlockPos(pos.getX(), pos.getY(), pos.getZ()),
+                Blocks.STRUCTURE_BLOCK.defaultBlockState()
+        );
+        structureBlock.setLevel(((CraftPlayer) player).getHandle().level());
         ((CraftPlayer) player).getHandle().connection.send(ClientboundBlockEntityDataPacket.create(
-                new StructureBlockEntity(
-                        new BlockPos(pos.getBlockX(), pos.getBlockY(), pos.getBlockZ()),
-                        Blocks.STRUCTURE_BLOCK.defaultBlockState()
-                ),
-                __ -> (net.minecraft.nbt.CompoundTag) fromNativeBinary(nbtData)
+                structureBlock,
+                (blockEntity, registryAccess) -> (net.minecraft.nbt.CompoundTag) fromNativeBinary(nbtData)
         ));
     }
 
