@@ -1,8 +1,8 @@
-package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_20_R4;
+package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_20_R3;
 
 import com.google.common.base.Suppliers;
 import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_20_R4.nbt.PaperweightLazyCompoundTag;
+import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_20_R3.nbt.PaperweightLazyCompoundTag;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.EmptyBlockGetter;

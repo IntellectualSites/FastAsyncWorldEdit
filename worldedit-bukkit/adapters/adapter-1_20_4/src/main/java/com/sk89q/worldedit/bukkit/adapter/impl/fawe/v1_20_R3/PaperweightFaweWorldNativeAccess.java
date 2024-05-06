@@ -1,4 +1,4 @@
-package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_20_R4;
+package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_20_R3;
 
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.math.IntPair;

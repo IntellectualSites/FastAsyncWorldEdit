@@ -15,6 +15,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.FullChunkStatus;
 import net.minecraft.world.level.Level;
@@ -140,7 +141,7 @@ public class PaperweightFaweWorldNativeAccess implements WorldNativeAccess<Level
             return false;
         }
         net.minecraft.nbt.Tag nativeTag = paperweightFaweAdapter.fromNativeBinary(tag);
-        blockEntity.load((CompoundTag) nativeTag);
+        blockEntity.loadWithComponents((CompoundTag) nativeTag, DedicatedServer.getServer().registryAccess());
         return true;
     }
 

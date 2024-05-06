@@ -31,6 +31,7 @@ import io.papermc.lib.PaperLib;
 import io.papermc.paper.event.block.BeaconDeactivatedEvent;
 import net.minecraft.core.*;
 import net.minecraft.nbt.IntTag;
+import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.BitStorage;
@@ -70,8 +71,9 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
     private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     private static final Function<BlockPos, BlockVector3> posNms2We = v -> BlockVector3.at(v.getX(), v.getY(), v.getZ());
-    private static final Function<BlockEntity, CompoundTag> nmsTile2We =
-            tileEntity -> new PaperweightLazyCompoundTag(Suppliers.memoize(tileEntity::saveWithId));
+    private static final Function<BlockEntity, CompoundTag> nmsTile2We = tileEntity -> new PaperweightLazyCompoundTag(
+            Suppliers.memoize(() -> tileEntity.saveWithId(DedicatedServer.getServer().registryAccess()))
+    );
     private final PaperweightFaweAdapter adapter = ((PaperweightFaweAdapter) WorldEditPlugin
             .getInstance()
             .getBukkitImplAdapter());
@@ -242,7 +244,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
         if (blockEntity == null) {
             return null;
         }
-        return new PaperweightLazyCompoundTag(Suppliers.memoize(blockEntity::saveWithId));
+        return new PaperweightLazyCompoundTag(Suppliers.memoize(() -> blockEntity.saveWithId(DedicatedServer.getServer().registryAccess())));
     }
 
     @Override
@@ -788,7 +790,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                                     tag.put("x", IntTag.valueOf(x));
                                     tag.put("y", IntTag.valueOf(y));
                                     tag.put("z", IntTag.valueOf(z));
-                                    tileEntity.load(tag);
+                                    tileEntity.loadWithComponents(tag, DedicatedServer.getServer().registryAccess());
                                 }
                             }
                         }

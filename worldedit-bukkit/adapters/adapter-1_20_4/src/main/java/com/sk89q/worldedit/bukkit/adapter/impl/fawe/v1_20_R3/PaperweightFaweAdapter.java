@@ -1,4 +1,4 @@
-package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_20_R4;
+package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_20_R3;
 
 import com.fastasyncworldedit.bukkit.adapter.FaweAdapter;
 import com.fastasyncworldedit.bukkit.adapter.NMSRelighterFactory;
@@ -16,8 +16,8 @@ import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
-import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_20_R4.nbt.PaperweightLazyCompoundTag;
-import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_20_R4.regen.PaperweightRegen;
+import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_20_R3.nbt.PaperweightLazyCompoundTag;
+import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_20_R3.regen.PaperweightRegen;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.internal.block.BlockStateIdAccess;

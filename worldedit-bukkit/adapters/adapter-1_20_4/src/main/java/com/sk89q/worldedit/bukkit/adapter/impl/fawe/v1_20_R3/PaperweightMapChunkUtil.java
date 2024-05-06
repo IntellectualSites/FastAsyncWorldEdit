@@ -1,4 +1,4 @@
-package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_20_R4;
+package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_20_R3;
 
 import com.fastasyncworldedit.bukkit.adapter.MapChunkUtil;
 import com.sk89q.worldedit.bukkit.adapter.Refraction;

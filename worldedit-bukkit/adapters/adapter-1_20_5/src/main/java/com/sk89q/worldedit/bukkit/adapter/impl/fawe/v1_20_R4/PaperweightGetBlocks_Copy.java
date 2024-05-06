@@ -16,6 +16,7 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import net.minecraft.core.Holder;
+import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.biome.Biome;
@@ -62,7 +63,7 @@ public class PaperweightGetBlocks_Copy implements IChunkGet {
                         blockEntity.getBlockPos().getY(),
                         blockEntity.getBlockPos().getZ()
                 ),
-                new PaperweightLazyCompoundTag(Suppliers.memoize(blockEntity::saveWithId))
+                new PaperweightLazyCompoundTag(Suppliers.memoize(() -> blockEntity.saveWithId(DedicatedServer.getServer().registryAccess())))
         );
     }
 

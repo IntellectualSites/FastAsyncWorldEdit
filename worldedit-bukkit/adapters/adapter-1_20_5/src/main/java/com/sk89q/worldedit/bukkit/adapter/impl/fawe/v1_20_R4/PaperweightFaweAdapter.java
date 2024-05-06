@@ -12,6 +12,7 @@ import com.fastasyncworldedit.core.util.NbtUtils;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.mojang.serialization.Codec;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
@@ -33,6 +34,7 @@ import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.SideEffect;
 import com.sk89q.worldedit.util.SideEffectSet;
+import com.sk89q.worldedit.util.concurrency.LazyReference;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.nbt.BinaryTag;
 import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
@@ -50,8 +52,12 @@ import com.sk89q.worldedit.world.registry.BlockMaterial;
 import io.papermc.lib.PaperLib;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.WritableRegistry;
+import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
@@ -107,6 +113,9 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
     private static Method CHUNK_HOLDER_WAS_ACCESSIBLE_SINCE_LAST_SAVE;
+    private static final Codec<DataComponentPatch> COMPONENTS_CODEC = DataComponentPatch.CODEC.optionalFieldOf(
+            "components", DataComponentPatch.EMPTY
+    ).codec();
 
     static {
         try {
@@ -276,7 +285,7 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
             // Read the NBT data
             BlockEntity blockEntity = chunk.getBlockEntity(blockPos, LevelChunk.EntityCreationType.CHECK);
             if (blockEntity != null) {
-                net.minecraft.nbt.CompoundTag tag = blockEntity.saveWithId();
+                net.minecraft.nbt.CompoundTag tag = blockEntity.saveWithId(DedicatedServer.getServer().registryAccess());
                 return state.toBaseBlock((CompoundBinaryTag) toNativeBinary(tag));
             }
         }
@@ -481,12 +490,16 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
 
     @Override
     public org.bukkit.inventory.ItemStack adapt(BaseItemStack baseItemStack) {
+        final RegistryAccess.Frozen registryAccess = DedicatedServer.getServer().registryAccess();
         ItemStack stack = new ItemStack(
-                DedicatedServer.getServer().registryAccess().registryOrThrow(Registries.ITEM)
-                        .get(ResourceLocation.tryParse(baseItemStack.getType().getId())),
+                registryAccess.registryOrThrow(Registries.ITEM).get(ResourceLocation.tryParse(baseItemStack.getType().getId())),
                 baseItemStack.getAmount()
         );
-        stack.setTag(((net.minecraft.nbt.CompoundTag) fromNative(baseItemStack.getNbtData())));
+        final CompoundTag nbt = (net.minecraft.nbt.CompoundTag) fromNative(baseItemStack.getNbtData());
+        final DataComponentPatch patch = COMPONENTS_CODEC
+                .parse(registryAccess.createSerializationContext(NbtOps.INSTANCE), nbt)
+                .getOrThrow();
+        stack.applyComponents(patch);
         return CraftItemStack.asCraftMirror(stack);
     }
 
@@ -515,10 +528,17 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
 
     @Override
     public BaseItemStack adapt(org.bukkit.inventory.ItemStack itemStack) {
+        final RegistryAccess.Frozen registryAccess = DedicatedServer.getServer().registryAccess();
         final ItemStack nmsStack = CraftItemStack.asNMSCopy(itemStack);
-        final BaseItemStack weStack = new BaseItemStack(BukkitAdapter.asItemType(itemStack.getType()), itemStack.getAmount());
-        weStack.setNbt(((CompoundBinaryTag) toNativeBinary(nmsStack.getTag())));
-        return weStack;
+        final net.minecraft.nbt.Tag tag = COMPONENTS_CODEC.encodeStart(
+                registryAccess.createSerializationContext(NbtOps.INSTANCE),
+                nmsStack.getComponentsPatch()
+        ).getOrThrow();
+        return new BaseItemStack(
+                BukkitAdapter.asItemType(itemStack.getType()),
+                LazyReference.from(() -> (CompoundBinaryTag) toNativeBinary(tag)),
+                itemStack.getAmount()
+        );
     }
 
     @Override

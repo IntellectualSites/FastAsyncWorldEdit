@@ -1,4 +1,4 @@
-package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_20_R4;
+package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_20_R3;
 
 import com.fastasyncworldedit.bukkit.adapter.StarlightRelighter;
 import com.fastasyncworldedit.core.configuration.Settings;

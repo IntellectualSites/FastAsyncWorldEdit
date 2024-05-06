@@ -175,7 +175,7 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
         //generate chunk coords lists with a certain radius
         Int2ObjectOpenHashMap<long[]> chunkCoordsForRadius = new Int2ObjectOpenHashMap<>();
         chunkStatuses.keySet().stream().mapToInt(ChunkStatusWrapper::requiredNeighborChunkRadius0).distinct().forEach(radius -> {
-            if (radius == -1) { //ignore ChunkStatus.EMPTY
+            if (radius == -1 || chunkCoordsForRadius.containsKey(radius)) { //ignore ChunkStatus.EMPTY and already populated radii
                 return;
             }
             int border = 10 - radius; //9 = 8 + 1, 8: max border radius used in chunk stages, 1: need 1 extra chunk for chunk

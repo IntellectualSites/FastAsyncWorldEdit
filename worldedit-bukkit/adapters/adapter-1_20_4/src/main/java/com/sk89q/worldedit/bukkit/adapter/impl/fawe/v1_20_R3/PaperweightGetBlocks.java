@@ -1,4 +1,4 @@
-package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_20_R4;
+package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_20_R3;
 
 import com.fastasyncworldedit.bukkit.adapter.BukkitGetBlocks;
 import com.fastasyncworldedit.bukkit.adapter.DelegateSemaphore;
@@ -20,7 +20,7 @@ import com.sk89q.jnbt.StringTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
-import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_20_R4.nbt.PaperweightLazyCompoundTag;
+import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_20_R3.nbt.PaperweightLazyCompoundTag;
 import com.sk89q.worldedit.internal.Constants;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;

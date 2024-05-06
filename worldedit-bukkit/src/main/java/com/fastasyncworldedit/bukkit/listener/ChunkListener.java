@@ -135,7 +135,7 @@ public abstract class ChunkListener implements Listener {
     @Deprecated(since = "2.0.0")
     public void cleanup(Chunk chunk) {
         for (Entity entity : chunk.getEntities()) {
-            if (entity.getType() == EntityType.DROPPED_ITEM) {
+            if (entity.getType() == EntityType.ITEM) {
                 entity.remove();
             }
         }

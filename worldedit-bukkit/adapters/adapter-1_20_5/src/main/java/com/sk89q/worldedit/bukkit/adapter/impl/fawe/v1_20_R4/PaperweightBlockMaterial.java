@@ -5,6 +5,7 @@ import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_20_R4.nbt.PaperweightLazyCompoundTag;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.world.level.EmptyBlockGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
@@ -37,9 +38,9 @@ public class PaperweightBlockMaterial implements BlockMaterial {
                 BlockPos.ZERO,
                 blockState
         );
-        tile = tileEntity == null
-                ? null
-                : new PaperweightLazyCompoundTag(Suppliers.memoize(tileEntity::saveWithId));
+        tile = tileEntity == null ? null : new PaperweightLazyCompoundTag(
+                Suppliers.memoize(() -> tileEntity.saveWithId(DedicatedServer.getServer().registryAccess()))
+        );
     }
 
     public Block getBlock() {
@@ -122,7 +123,7 @@ public class PaperweightBlockMaterial implements BlockMaterial {
 
     @Override
     public boolean isTicksRandomly() {
-        return block.isRandomlyTicking(blockState);
+        return blockState.isRandomlyTicking();
     }
 
     @Override

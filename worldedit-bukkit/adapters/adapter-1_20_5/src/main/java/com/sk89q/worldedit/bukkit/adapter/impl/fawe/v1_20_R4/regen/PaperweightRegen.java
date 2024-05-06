@@ -6,7 +6,6 @@ import com.fastasyncworldedit.core.queue.IChunkCache;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.google.common.collect.ImmutableList;
-import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Lifecycle;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.adapter.Refraction;
@@ -42,10 +41,11 @@ import net.minecraft.world.level.biome.FixedBiomeSource;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.chunk.ChunkGeneratorStructureState;
-import net.minecraft.world.level.chunk.ChunkStatus;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.ProtoChunk;
 import net.minecraft.world.level.chunk.UpgradeData;
+import net.minecraft.world.level.chunk.status.ChunkStatus;
+import net.minecraft.world.level.chunk.status.WorldGenContext;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.FlatLevelSource;
 import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
@@ -65,6 +65,7 @@ import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.generator.CustomChunkGenerator;
 import org.bukkit.generator.BiomeProvider;
 import org.bukkit.generator.BlockPopulator;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.Field;
@@ -104,9 +105,9 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
         chunkStati.put(ChunkStatus.STRUCTURE_STARTS, Concurrency.NONE);   // structure starts: uses unsynchronized maps
         chunkStati.put(
                 ChunkStatus.STRUCTURE_REFERENCES,
-                Concurrency.FULL
+                Concurrency.NONE
         );   // structure refs: radius 8, but only writes to current chunk
-        chunkStati.put(ChunkStatus.BIOMES, Concurrency.FULL);   // biomes: radius 0
+        chunkStati.put(ChunkStatus.BIOMES, Concurrency.NONE);   // biomes: radius 0
         chunkStati.put(ChunkStatus.NOISE, Concurrency.RADIUS); // noise: radius 8
         chunkStati.put(ChunkStatus.SURFACE, Concurrency.NONE);   // surface: radius 0, requires NONE
         chunkStati.put(ChunkStatus.CARVERS, Concurrency.NONE);   // carvers: radius 0, but RADIUS and FULL change results
@@ -116,10 +117,14 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
         );   // liquid carvers: radius 0, but RADIUS and FULL change results*/
         chunkStati.put(ChunkStatus.FEATURES, Concurrency.NONE);   // features: uses unsynchronized maps
         chunkStati.put(
+                ChunkStatus.INITIALIZE_LIGHT,
+                Concurrency.FULL
+        ); // initialize_light: radius 0
+        chunkStati.put(
                 ChunkStatus.LIGHT,
                 Concurrency.FULL
         );   // light: radius 1, but no writes to other chunks, only current chunk
-        chunkStati.put(ChunkStatus.SPAWN, Concurrency.FULL);   // spawn: radius 0
+        chunkStati.put(ChunkStatus.SPAWN, Concurrency.NONE);   // spawn: radius 0
         // chunkStati.put(ChunkStatus.HEIGHTMAPS, Concurrency.FULL);   // heightmaps: radius 0
 
         try {
@@ -178,6 +183,7 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
     private StructureTemplateManager structureTemplateManager;
     private ThreadedLevelLightEngine threadedLevelLightEngine;
     private ChunkGenerator chunkGenerator;
+    private WorldGenContext worldGenContext;
 
     private Path tempDir;
 
@@ -284,6 +290,7 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
                         biomeX, biomeY, biomeZ, getChunkSource().randomState().sampler()
                 );
             }
+
         }).get();
         freshWorld.noSave = true;
         removeWorldFromWorldsMap();
@@ -297,11 +304,10 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
             FlatLevelGeneratorSettings generatorSettingFlat = flatLevelSource.settings();
             chunkGenerator = new FlatLevelSource(generatorSettingFlat);
         } else if (originalGenerator instanceof NoiseBasedChunkGenerator noiseBasedChunkGenerator) {
-            Holder<NoiseGeneratorSettings> generatorSettingBaseSupplier = (Holder<NoiseGeneratorSettings>) generatorSettingBaseSupplierField.get(
-                    originalGenerator);
+            Holder<NoiseGeneratorSettings> generatorSettingBaseSupplier = (Holder<NoiseGeneratorSettings>)
+                    generatorSettingBaseSupplierField.get(noiseBasedChunkGenerator);
             BiomeSource biomeSource;
             if (options.hasBiomeType()) {
-
                 biomeSource = new FixedBiomeSource(
                         DedicatedServer.getServer().registryAccess()
                                 .registryOrThrow(BIOME).asHolderIdMap().byIdOrThrow(
@@ -355,14 +361,16 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
 
         if (seed == originalOpts.seed() && !options.hasBiomeType()) {
             // Optimisation for needless ring position calculation when the seed and biome is the same.
-            ChunkGeneratorStructureState state = (ChunkGeneratorStructureState) generatorStructureStateField.get(originalChunkProvider.chunkMap);
+            ChunkGeneratorStructureState state = (ChunkGeneratorStructureState) generatorStructureStateField.get(
+                    originalChunkProvider.chunkMap);
             boolean hasGeneratedPositions = hasGeneratedPositionsField.getBoolean(state);
             if (hasGeneratedPositions) {
                 Map<ConcentricRingsStructurePlacement, CompletableFuture<List<ChunkPos>>> origPositions =
                         (Map<ConcentricRingsStructurePlacement, CompletableFuture<List<ChunkPos>>>) ringPositionsField.get(state);
                 Map<ConcentricRingsStructurePlacement, CompletableFuture<List<ChunkPos>>> copy = new Object2ObjectArrayMap<>(
                         origPositions);
-                ChunkGeneratorStructureState newState = (ChunkGeneratorStructureState) generatorStructureStateField.get(freshChunkProvider.chunkMap);
+                ChunkGeneratorStructureState newState = (ChunkGeneratorStructureState) generatorStructureStateField.get(
+                        freshChunkProvider.chunkMap);
                 ringPositionsField.set(newState, copy);
                 hasGeneratedPositionsField.setBoolean(newState, true);
             }
@@ -374,6 +382,9 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
         structureTemplateManager = server.getStructureManager();
         threadedLevelLightEngine = new NoOpLightEngine(freshChunkProvider);
 
+        this.worldGenContext = new WorldGenContext(freshWorld, chunkGenerator, structureTemplateManager,
+                threadedLevelLightEngine
+        );
         return true;
     }
 
@@ -530,7 +541,7 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
 
         // no one will ever see the entities!
         @Override
-        public List<CompoundTag> getEntities() {
+        public @NotNull List<CompoundTag> getEntities() {
             return Collections.emptyList();
         }
 
@@ -557,12 +568,9 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
         @Override
         public CompletableFuture<?> processChunk(List<ChunkAccess> accessibleChunks) {
             return chunkStatus.generate(
-                    Runnable::run, // TODO revisit, we might profit from this somehow?
-                    freshWorld,
-                    chunkGenerator,
-                    structureTemplateManager,
-                    threadedLevelLightEngine,
-                    c -> CompletableFuture.completedFuture(Either.left(c)),
+                    worldGenContext,
+                    Runnable::run,
+                    CompletableFuture::completedFuture,
                     accessibleChunks
             );
         }
