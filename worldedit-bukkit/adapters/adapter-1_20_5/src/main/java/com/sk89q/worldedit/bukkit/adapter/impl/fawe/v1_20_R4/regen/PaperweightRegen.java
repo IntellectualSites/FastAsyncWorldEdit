@@ -273,11 +273,11 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
                     ) : null;
 
             @Override
-            public void tick(BooleanSupplier shouldKeepTicking) { //no ticking
+            public void tick(@NotNull BooleanSupplier shouldKeepTicking) { //no ticking
             }
 
             @Override
-            public Holder<Biome> getUncachedNoiseBiome(int biomeX, int biomeY, int biomeZ) {
+            public @NotNull Holder<Biome> getUncachedNoiseBiome(int biomeX, int biomeY, int biomeZ) {
                 if (options.hasBiomeType()) {
                     return singleBiome;
                 }
@@ -345,7 +345,7 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
         ) {
             // redirect to LevelChunks created in #createChunks
             @Override
-            public ChunkAccess getChunk(int x, int z, ChunkStatus chunkstatus, boolean create) {
+            public ChunkAccess getChunk(int x, int z, @NotNull ChunkStatus chunkstatus, boolean create) {
                 ChunkAccess chunkAccess = getChunkAt(x, z);
                 if (chunkAccess == null && create) {
                     chunkAccess = createChunk(getProtoChunkAt(x, z));
@@ -464,14 +464,12 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
     //util
     @SuppressWarnings("unchecked")
     private void removeWorldFromWorldsMap() {
-        Fawe.instance().getQueueHandler().sync(() -> {
-            try {
-                Map<String, org.bukkit.World> map = (Map<String, org.bukkit.World>) serverWorldsField.get(Bukkit.getServer());
-                map.remove("faweregentempworld");
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
-            }
-        });
+        try {
+            Map<String, org.bukkit.World> map = (Map<String, org.bukkit.World>) serverWorldsField.get(Bukkit.getServer());
+            map.remove("faweregentempworld");
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private ResourceKey<LevelStem> getWorldDimKey(org.bukkit.World.Environment env) {
@@ -488,12 +486,12 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
         }
 
         @Override
-        public void updateSpawnPos(ChunkPos spawnPos) {
+        public void updateSpawnPos(@NotNull ChunkPos spawnPos) {
         }
 
         @Override
         public void onStatusChange(
-                final ChunkPos pos,
+                final @NotNull ChunkPos pos,
                 @org.jetbrains.annotations.Nullable final net.minecraft.world.level.chunk.status.ChunkStatus status
         ) {
 
@@ -528,8 +526,7 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
 
         // avoid warning on paper
 
-        // compatibility with spigot
-
+        @SuppressWarnings("unused") // compatibility with spigot
         public boolean generateFlatBedrock() {
             return generateFlatBedrock;
         }
@@ -588,7 +585,7 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
         }
 
         @Override
-        public CompletableFuture<ChunkAccess> lightChunk(final ChunkAccess chunk, final boolean excludeBlocks) {
+        public @NotNull CompletableFuture<ChunkAccess> lightChunk(final @NotNull ChunkAccess chunk, final boolean excludeBlocks) {
             return CompletableFuture.completedFuture(chunk);
         }
 
