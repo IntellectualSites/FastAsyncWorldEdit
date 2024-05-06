@@ -111,10 +111,6 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
         chunkStati.put(ChunkStatus.NOISE, Concurrency.RADIUS); // noise: radius 8
         chunkStati.put(ChunkStatus.SURFACE, Concurrency.NONE);   // surface: radius 0, requires NONE
         chunkStati.put(ChunkStatus.CARVERS, Concurrency.NONE);   // carvers: radius 0, but RADIUS and FULL change results
-        /*chunkStati.put(
-                ChunkStatus.LIQUID_CARVERS,
-                Concurrency.NONE
-        );   // liquid carvers: radius 0, but RADIUS and FULL change results*/
         chunkStati.put(ChunkStatus.FEATURES, Concurrency.NONE);   // features: uses unsynchronized maps
         chunkStati.put(
                 ChunkStatus.INITIALIZE_LIGHT,
@@ -125,7 +121,6 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
                 Concurrency.FULL
         );   // light: radius 1, but no writes to other chunks, only current chunk
         chunkStati.put(ChunkStatus.SPAWN, Concurrency.NONE);   // spawn: radius 0
-        // chunkStati.put(ChunkStatus.HEIGHTMAPS, Concurrency.FULL);   // heightmaps: radius 0
 
         try {
             serverWorldsField = CraftServer.class.getDeclaredField("worlds");

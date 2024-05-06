@@ -172,31 +172,35 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
         //TODO: can we get that required radius down without affecting chunk generation (e.g. strucures, features, ...)?
         //for now it is working well and fast, if we are bored in the future we could do the research (a lot of it) to reduce the border radius
 
+        final int[] margins = chunkStatuses
+                .keySet()
+                .stream()
+                .mapToInt(ChunkStatusWrapper::requiredNeighborChunkRadius0)
+                .distinct()
+                .sorted()
+                .toArray();
+        int maxMargin = margins[margins.length - 1];
+
         //generate chunk coords lists with a certain radius
-        Int2ObjectOpenHashMap<long[]> chunkCoordsForRadius = new Int2ObjectOpenHashMap<>();
-        chunkStatuses.keySet().stream().mapToInt(ChunkStatusWrapper::requiredNeighborChunkRadius0).distinct().forEach(radius -> {
-            if (radius == -1 || chunkCoordsForRadius.containsKey(radius)) { //ignore ChunkStatus.EMPTY and already populated radii
-                return;
-            }
-            int border = 10 - radius; //9 = 8 + 1, 8: max border radius used in chunk stages, 1: need 1 extra chunk for chunk
-            // features to generate at the border of the region
-            chunkCoordsForRadius.put(radius, getChunkCoordsRegen(region, border));
-        });
+        long[][] chunkCoordsForRadius = new long[maxMargin + 1][];
+        for (final int radius : margins) {
+            int border = 10 - radius;
+            chunkCoordsForRadius[radius] = getChunkCoordsRegen(region, border);
+        }
 
         //create chunks
-        for (long xz : chunkCoordsForRadius.get(0)) {
+        for (long xz : chunkCoordsForRadius[0]) {
             ProtoChunk chunk = createProtoChunk(MathMan.unpairIntX(xz), MathMan.unpairIntY(xz));
             protoChunks.put(xz, chunk);
         }
 
         //generate lists for RegionLimitedWorldAccess, need to be square with odd length (e.g. 17x17), 17 = 1 middle chunk + 8 border chunks * 2
         Int2ObjectOpenHashMap<Long2ObjectOpenHashMap<List<IChunkAccess>>> worldLimits = new Int2ObjectOpenHashMap<>();
-        chunkStatuses.keySet().stream().mapToInt(ChunkStatusWrapper::requiredNeighborChunkRadius0).distinct().forEach(radius -> {
-            if (radius == -1) { //ignore ChunkStatus.EMPTY
-                return;
-            }
+
+        for (int radius : margins) {
+            long[] coords = chunkCoordsForRadius[radius];
             Long2ObjectOpenHashMap<List<IChunkAccess>> map = new Long2ObjectOpenHashMap<>();
-            for (long xz : chunkCoordsForRadius.get(radius)) {
+            for (long xz : coords) {
                 int x = MathMan.unpairIntX(xz);
                 int z = MathMan.unpairIntY(xz);
                 List<IChunkAccess> l = new ArrayList<>((radius + 1 + radius) * (radius + 1 + radius));
@@ -208,14 +212,14 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
                 map.put(xz, l);
             }
             worldLimits.put(radius, map);
-        });
+        }
 
         //run generation tasks excluding FULL chunk status
         for (Map.Entry<ChunkStatus, Concurrency> entry : chunkStatuses.entrySet()) {
             ChunkStatus chunkStatus = entry.getKey();
             int radius = chunkStatus.requiredNeighborChunkRadius0();
 
-            long[] coords = chunkCoordsForRadius.get(radius);
+            long[] coords = chunkCoordsForRadius[radius];
             Long2ObjectOpenHashMap<List<IChunkAccess>> limitsForRadius = worldLimits.get(radius);
             if (this.generateConcurrent && entry.getValue() == Concurrency.RADIUS) {
                 SequentialTasks<ConcurrentTasks<LongList>> tasks = getChunkStatusTaskRows(coords, radius);
@@ -249,21 +253,21 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
         }
 
         //convert to proper chunks
-        for (long xz : chunkCoordsForRadius.get(0)) {
+        for (long xz : chunkCoordsForRadius[0]) {
             ProtoChunk proto = protoChunks.get(xz);
             chunks.put(xz, createChunk(proto));
         }
 
         //final chunkstatus
         ChunkStatus FULL = getFullChunkStatus();
-        for (long xz : chunkCoordsForRadius.get(0)) { //FULL.requiredNeighbourChunkRadius() == 0!
+        for (long xz : chunkCoordsForRadius[0]) { //FULL.requiredNeighbourChunkRadius() == 0!
             Chunk chunk = chunks.get(xz);
             FULL.processChunkSave(xz, List.of(chunk));
         }
 
         //populate
         List<BlockPopulator> populators = getBlockPopulators();
-        for (long xz : chunkCoordsForRadius.get(0)) {
+        for (long xz : chunkCoordsForRadius[0]) {
             int x = MathMan.unpairIntX(xz);
             int z = MathMan.unpairIntY(xz);
 
@@ -277,8 +281,10 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
             });
         }
 
-        source = new SingleThreadQueueExtent(BukkitWorld.HAS_MIN_Y ? originalBukkitWorld.getMinHeight() : 0,
-                BukkitWorld.HAS_MIN_Y ? originalBukkitWorld.getMaxHeight() : 256);
+        source = new SingleThreadQueueExtent(
+                BukkitWorld.HAS_MIN_Y ? originalBukkitWorld.getMinHeight() : 0,
+                BukkitWorld.HAS_MIN_Y ? originalBukkitWorld.getMaxHeight() : 256
+        );
         source.init(target, initSourceQueueCache(), null);
         return true;
     }
