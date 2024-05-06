@@ -184,6 +184,8 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
         //generate chunk coords lists with a certain radius
         long[][] chunkCoordsForRadius = new long[maxMargin + 1][];
         for (final int radius : margins) {
+            // 9 = 8 + 1, 8: max border radius used in chunk stages,
+            // 1: need 1 extra chunk for chunk features to generate at the border of the region
             int border = 10 - radius;
             chunkCoordsForRadius[radius] = getChunkCoordsRegen(region, border);
         }
