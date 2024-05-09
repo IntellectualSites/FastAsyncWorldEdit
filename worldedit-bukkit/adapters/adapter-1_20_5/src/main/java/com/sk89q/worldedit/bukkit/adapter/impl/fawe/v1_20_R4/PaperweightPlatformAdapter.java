@@ -173,13 +173,13 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             Method removeBlockEntityTicker = LevelChunk.class.getDeclaredMethod(
                     Refraction.pickName(
                             "removeBlockEntityTicker",
-                            "l"
+                            "k"
                     ), BlockPos.class
             );
             removeBlockEntityTicker.setAccessible(true);
             methodremoveTickingBlockEntity = lookup.unreflect(removeBlockEntityTicker);
 
-            fieldRemove = BlockEntity.class.getDeclaredField(Refraction.pickName("remove", "q"));
+            fieldRemove = BlockEntity.class.getDeclaredField(Refraction.pickName("remove", "p"));
             fieldRemove.setAccessible(true);
 
             boolean chunkRewrite;
@@ -199,7 +199,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             }
             try {
                 // Non-Paper
-                SERVER_LEVEL_ENTITY_MANAGER = ServerLevel.class.getDeclaredField(Refraction.pickName("entityManager", "M"));
+                SERVER_LEVEL_ENTITY_MANAGER = ServerLevel.class.getDeclaredField(Refraction.pickName("entityManager", "N"));
                 SERVER_LEVEL_ENTITY_MANAGER.setAccessible(true);
             } catch (NoSuchFieldException ignored) {
             }
