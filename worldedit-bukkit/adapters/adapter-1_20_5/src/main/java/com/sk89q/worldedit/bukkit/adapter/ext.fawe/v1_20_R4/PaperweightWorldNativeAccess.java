@@ -145,7 +145,6 @@ public class PaperweightWorldNativeAccess implements WorldNativeAccess<LevelChun
     }
 
     // Not sure why neighborChanged is deprecated
-    @SuppressWarnings("deprecation")
     private void fireNeighborChanged(BlockPos pos, ServerLevel world, Block block, BlockPos neighborPos) {
         world.getBlockState(neighborPos).handleNeighborChanged(world, neighborPos, block, pos, false);
     }
