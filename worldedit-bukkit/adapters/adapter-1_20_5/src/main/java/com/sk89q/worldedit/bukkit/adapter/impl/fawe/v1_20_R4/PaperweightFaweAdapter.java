@@ -496,10 +496,12 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
                 baseItemStack.getAmount()
         );
         final CompoundTag nbt = (net.minecraft.nbt.CompoundTag) fromNative(baseItemStack.getNbtData());
-        final DataComponentPatch patch = COMPONENTS_CODEC
-                .parse(registryAccess.createSerializationContext(NbtOps.INSTANCE), nbt)
-                .getOrThrow();
-        stack.applyComponents(patch);
+        if (nbt != null) {
+            final DataComponentPatch patch = COMPONENTS_CODEC
+                    .parse(registryAccess.createSerializationContext(NbtOps.INSTANCE), nbt)
+                    .getOrThrow();
+            stack.applyComponents(patch);
+        }
         return CraftItemStack.asCraftMirror(stack);
     }
 
