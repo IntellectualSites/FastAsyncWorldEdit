@@ -483,6 +483,10 @@ public final class BlockTypes {
     @Nullable
     public static final BlockType COPPER_GRATE = init();
     @Nullable
+    public static final BlockType COPPER_ORE = init();
+    @Nullable
+    public static final BlockType COPPER_TRAPDOOR = init();
+    @Nullable
     public static final BlockType CORNFLOWER = init();
     @Nullable
     public static final BlockType CRACKED_DEEPSLATE_BRICKS = init();
@@ -494,6 +498,8 @@ public final class BlockTypes {
     public static final BlockType CRACKED_POLISHED_BLACKSTONE_BRICKS = init();
     @Nullable
     public static final BlockType CRACKED_STONE_BRICKS = init();
+    @Nullable
+    public static final BlockType CRAFTER = init();
     @Nullable
     public static final BlockType CRAFTING_TABLE = init();
     @Nullable
@@ -685,8 +691,6 @@ public final class BlockTypes {
     @Nullable
     public static final BlockType DEEPSLATE_COPPER_ORE = init();
     @Nullable
-    public static final BlockType COPPER_TRAPDOOR = init();
-    @Nullable
     public static final BlockType DEEPSLATE_DIAMOND_ORE = init();
     @Nullable
     public static final BlockType DEEPSLATE_EMERALD_ORE = init();
@@ -747,8 +751,6 @@ public final class BlockTypes {
     @Nullable
     public static final BlockType ENDER_CHEST = init();
     @Nullable
-    public static final BlockType EXPOSED_CHISELED_COPPER = init();
-    @Nullable
     public static final BlockType END_GATEWAY = init();
     @Nullable
     public static final BlockType END_PORTAL = init();
@@ -766,6 +768,8 @@ public final class BlockTypes {
     public static final BlockType END_STONE_BRICK_STAIRS = init();
     @Nullable
     public static final BlockType END_STONE_BRICK_WALL = init();
+    @Nullable
+    public static final BlockType EXPOSED_CHISELED_COPPER = init();
     @Nullable
     public static final BlockType EXPOSED_COPPER = init();
     @Nullable
@@ -836,6 +840,9 @@ public final class BlockTypes {
     public static final BlockType GRASS = init();
     @Nullable
     public static final BlockType GRASS_BLOCK = init();
+    @Deprecated
+    @Nullable
+    public static final BlockType GRASS_PATH = init();
     @Nullable
     public static final BlockType GRAVEL = init();
     @Nullable
@@ -924,8 +931,6 @@ public final class BlockTypes {
     public static final BlockType INFESTED_COBBLESTONE = init();
     @Nullable
     public static final BlockType INFESTED_CRACKED_STONE_BRICKS = init();
-    @Nullable
-    public static final BlockType CRAFTER = init();
     @Nullable
     public static final BlockType INFESTED_DEEPSLATE = init();
     @Nullable
@@ -1954,9 +1959,11 @@ public final class BlockTypes {
     @Nullable
     public static final BlockType TWISTING_VINES = init();
     @Nullable
-    public static final BlockType VERDANT_FROGLIGHT = init();
-    @Nullable
     public static final BlockType TWISTING_VINES_PLANT = init();
+    @Nullable
+    public static final BlockType VAULT = init();
+    @Nullable
+    public static final BlockType VERDANT_FROGLIGHT = init();
     @Nullable
     public static final BlockType VINE = init();
     @Nullable
@@ -2026,7 +2033,7 @@ public final class BlockTypes {
     public static final BlockType WAXED_CUT_COPPER_SLAB = init();
     @Nullable
     public static final BlockType WAXED_CUT_COPPER_STAIRS = init();
-    @ Nullable
+    @Nullable
     public static final BlockType WAXED_EXPOSED_CHISELED_COPPER = init();
     @Nullable
     public static final BlockType WAXED_EXPOSED_COPPER = init();
