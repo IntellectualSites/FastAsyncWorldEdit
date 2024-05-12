@@ -22,6 +22,7 @@ package com.sk89q.worldedit.command;
 import com.fastasyncworldedit.core.FaweAPI;
 import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.extent.processor.lighting.RelightMode;
 import com.fastasyncworldedit.core.limit.FaweLimit;
 import com.fastasyncworldedit.core.util.MaskTraverser;
@@ -715,6 +716,9 @@ public class RegionCommands {
             session.setSourceMask(mask);
             //FAWE end
         }
+        if (actor instanceof Player && Settings.settings().GENERAL.UNSTUCK_ON_GENERATE) {
+            ((Player) actor).findFreePosition();
+        }
         if (success) {
             actor.print(Caption.of("worldedit.regen.regenerated"));
         } else {
@@ -788,7 +792,7 @@ public class RegionCommands {
                     String.join(" ", expression),
                     session.getTimeout()
             );
-            if (actor instanceof Player) {
+            if (actor instanceof Player && Settings.settings().GENERAL.UNSTUCK_ON_GENERATE) {
                 ((Player) actor).findFreePosition();
             }
             actor.print(Caption.of("worldedit.deform.deformed", TextComponent.of(affected)));
