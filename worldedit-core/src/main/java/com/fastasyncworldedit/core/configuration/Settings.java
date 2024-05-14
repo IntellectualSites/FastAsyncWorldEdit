@@ -79,6 +79,8 @@ public class Settings extends Config {
     @Create
     public REGION_RESTRICTIONS_OPTIONS REGION_RESTRICTIONS_OPTIONS;
     @Create
+    public GENERAL GENERAL;
+    @Create
     public ConfigBlock<LIMITS> LIMITS;
 
     private Settings() {
@@ -749,6 +751,15 @@ public class Settings extends Config {
         public int MODE = 1;
         @Comment({"If existing lighting should be removed before relighting"})
         public boolean REMOVE_FIRST = true;
+
+    }
+
+    public static class GENERAL {
+
+        @Comment({
+                "If the player should be relocated/unstuck when a generation command would bury them",
+        })
+        public boolean UNSTUCK_ON_GENERATE = true;
 
     }
 

@@ -184,6 +184,9 @@ public class GenerationCommands {
 
         BlockVector3 pos = session.getPlacementPosition(actor);
         int affected = editSession.makeCylinder(pos, pattern, radiusX, radiusZ, height, !hollow);
+        if (actor instanceof Player && Settings.settings().GENERAL.UNSTUCK_ON_GENERATE) {
+            ((Player) actor).findFreePosition();
+        }
         actor.print(Caption.of("worldedit.cyl.created", TextComponent.of(affected)));
         return affected;
     }
@@ -227,6 +230,9 @@ public class GenerationCommands {
 
         BlockVector3 pos = session.getPlacementPosition(actor);
         int affected = editSession.makeCone(pos, pattern, radiusX, radiusZ, height, !hollow, thickness);
+        if (actor instanceof Player && Settings.settings().GENERAL.UNSTUCK_ON_GENERATE) {
+            ((Player) actor).findFreePosition();
+        }
         actor.printInfo(Caption.of("worldedit.cone.created", TextComponent.of(affected)));
         return affected;
     }
@@ -293,7 +299,7 @@ public class GenerationCommands {
         }
 
         int affected = editSession.makeSphere(pos, pattern, radiusX, radiusY, radiusZ, !hollow);
-        if (actor instanceof Player) {
+        if (actor instanceof Player && Settings.settings().GENERAL.UNSTUCK_ON_GENERATE) {
             ((Player) actor).findFreePosition();
         }
         actor.print(Caption.of("worldedit.sphere.created", TextComponent.of(affected)));
@@ -379,7 +385,7 @@ public class GenerationCommands {
         worldEdit.checkMaxRadius(size);
         BlockVector3 pos = session.getPlacementPosition(actor);
         int affected = editSession.makePyramid(pos, pattern, size, !hollow);
-        if (actor instanceof Player) {
+        if (actor instanceof Player && Settings.settings().GENERAL.UNSTUCK_ON_GENERATE) {
             ((Player) actor).findFreePosition();
         }
         actor.print(Caption.of("worldedit.pyramid.created", TextComponent.of(affected)));
@@ -457,7 +463,7 @@ public class GenerationCommands {
                     hollow,
                     session.getTimeout()
             );
-            if (actor instanceof Player) {
+            if (actor instanceof Player && Settings.settings().GENERAL.UNSTUCK_ON_GENERATE) {
                 ((Player) actor).findFreePosition();
             }
             actor.print(Caption.of("worldedit.generate.created", TextComponent.of(affected)));
@@ -741,7 +747,7 @@ public class GenerationCommands {
                 radius.divide(max),
                 sphericity / 100
         );
-        if (actor instanceof Player) {
+        if (actor instanceof Player && Settings.settings().GENERAL.UNSTUCK_ON_GENERATE) {
             ((Player) actor).findFreePosition();
         }
         actor.print(Caption.of("worldedit.sphere.created", TextComponent.of(affected)));
