@@ -908,6 +908,8 @@ public final class BlockTypes {
     @Nullable
     public static final BlockType HAY_BLOCK = init();
     @Nullable
+    public static final BlockType HEAVY_CORE = init();
+    @Nullable
     public static final BlockType HEAVY_WEIGHTED_PRESSURE_PLATE = init();
     @Nullable
     public static final BlockType HONEYCOMB_BLOCK = init();

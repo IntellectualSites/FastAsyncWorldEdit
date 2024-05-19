@@ -35,6 +35,8 @@ public final class EntityTypes {
     @Nullable
     public static final EntityType AREA_EFFECT_CLOUD = get("minecraft:area_effect_cloud");
     @Nullable
+    public static final EntityType ARMADILLO = get("minecraft:armadillo");
+    @Nullable
     public static final EntityType ARMOR_STAND = get("minecraft:armor_stand");
     @Nullable
     public static final EntityType ARROW = get("minecraft:arrow");
@@ -51,7 +53,11 @@ public final class EntityTypes {
     @Nullable
     public static final EntityType BOAT = get("minecraft:boat");
     @Nullable
+    public static final EntityType BOGGED = get("minecraft:bogged");
+    @Nullable
     public static final EntityType BREEZE = get("minecraft:breeze");
+    @Nullable
+    public static final EntityType BREEZE_WIND_CHARGE = get("minecraft:breeze_wind_charge");
     @Nullable
     public static final EntityType CAMEL = get("minecraft:camel");
     @Nullable
@@ -170,6 +176,8 @@ public final class EntityTypes {
     public static final EntityType MULE = get("minecraft:mule");
     @Nullable
     public static final EntityType OCELOT = get("minecraft:ocelot");
+    @Nullable
+    public static final EntityType OMINOUS_ITEM_SPAWNER = get("minecraft:ominous_item_spawner");
     @Nullable
     public static final EntityType PAINTING = get("minecraft:painting");
     @Nullable

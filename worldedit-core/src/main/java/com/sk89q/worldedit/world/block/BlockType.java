@@ -60,6 +60,7 @@ public class BlockType implements Keyed, Pattern {
     private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     private final String id;
+    @SuppressWarnings("this-escape")
     private final LazyReference<FuzzyBlockState> emptyFuzzy
             = LazyReference.from(() -> new FuzzyBlockState(this));
     //FAWE start

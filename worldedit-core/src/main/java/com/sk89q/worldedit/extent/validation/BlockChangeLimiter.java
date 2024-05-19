@@ -62,6 +62,7 @@ public class BlockChangeLimiter extends AbstractDelegateExtent {
      *
      * @param limit the limit (&gt;= 0) or -1 for no limit
      */
+    @SuppressWarnings("this-escape") // Unlikely anyone is extending this in practice
     public void setLimit(int limit) {
         checkArgument(limit >= -1, "limit >= -1 required");
         this.limit = limit;

@@ -23,7 +23,7 @@ import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.JarURLConnection;
-import java.net.URL;
+import java.net.URI;
 import java.util.function.Supplier;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
@@ -73,8 +73,7 @@ public class WorldEditManifest {
         }
 
         try {
-            URL url = new URL(classPath);
-            JarURLConnection jarConnection = (JarURLConnection) url.openConnection();
+            JarURLConnection jarConnection = (JarURLConnection) URI.create(classPath).toURL().openConnection();
             Manifest manifest = jarConnection.getManifest();
             return manifest.getMainAttributes();
         } catch (IOException e) {

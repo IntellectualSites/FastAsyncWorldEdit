@@ -27,10 +27,9 @@ body:
       description: Which server version version you using? If your server version is not listed, it is not supported. Update to a supported version first.
       multiple: false
       options:
-        - '1.20.4'
+        - '1.20.5/6'
         - '1.20'
         - '1.19.4'
-        - '1.18.2'
     validations:
       required: true
 
