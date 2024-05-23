@@ -23,7 +23,7 @@ public class MutableVector3 extends Vector3 {
     }
 
     public MutableVector3(Vector3 other) {
-        this(other.getX(), other.getY(), other.getZ());
+        this(other.x(), other.y(), other.z());
     }
 
     public static MutableVector3 get(int x, int y, int z) {
@@ -36,9 +36,9 @@ public class MutableVector3 extends Vector3 {
 
     @Override
     public MutableVector3 setComponents(Vector3 other) {
-        this.x = other.getX();
-        this.y = other.getY();
-        this.z = other.getZ();
+        this.x = other.x();
+        this.y = other.y();
+        this.z = other.z();
         return this;
     }
 
@@ -95,17 +95,17 @@ public class MutableVector3 extends Vector3 {
     }
 
     @Override
-    public double getX() {
+    public double x() {
         return x;
     }
 
     @Override
-    public double getY() {
+    public double y() {
         return y;
     }
 
     @Override
-    public double getZ() {
+    public double z() {
         return z;
     }
 

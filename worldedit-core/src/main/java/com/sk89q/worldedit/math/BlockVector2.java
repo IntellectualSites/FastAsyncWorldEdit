@@ -122,6 +122,16 @@ public class BlockVector2 {
      * Get the X coordinate.
      *
      * @return the x coordinate
+     * @since TODO
+     */
+    public int x() {
+        return x;
+    }
+
+    /**
+     * Get the X coordinate.
+     *
+     * @return the x coordinate
      * @deprecated use {@link #x()} instead
      */
     @Deprecated(forRemoval = true)
@@ -148,6 +158,16 @@ public class BlockVector2 {
      */
     public BlockVector2 withX(int x) {
         return BlockVector2.at(x, z);
+    }
+
+    /**
+     * Get the Z coordinate.
+     *
+     * @return the z coordinate
+     * @since TODO
+     */
+    public int z() {
+        return z;
     }
 
     /**

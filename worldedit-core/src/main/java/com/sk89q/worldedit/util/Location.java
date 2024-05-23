@@ -302,11 +302,11 @@ public class Location extends Vector3Impl {
     @Override
     public Location clampY(int min, int max) {
         checkArgument(min <= max, "minimum cannot be greater than maximum");
-        if (getY() < min) {
-            return new Location(extent, getX(), min, getZ());
+        if (y() < min) {
+            return new Location(extent, x(), min, z());
         }
-        if (getY() > max) {
-            return new Location(extent, getX(), max, getZ());
+        if (y() > max) {
+            return new Location(extent, x(), max, z());
         }
         return this;
 
@@ -331,13 +331,13 @@ public class Location extends Vector3Impl {
             return false;
         }
         //FAWE start
-        if (this.getX() != location.getX()) {
+        if (this.x() != location.x()) {
             return false;
         }
-        if (this.getZ() != location.getZ()) {
+        if (this.z() != location.z()) {
             return false;
         }
-        if (this.getY() != location.getY()) {
+        if (this.y() != location.y()) {
             return false;
         }
         return extent.equals(location.extent);

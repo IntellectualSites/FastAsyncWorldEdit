@@ -56,33 +56,33 @@ public final class BlockVector3Imp extends BlockVector3 {
     }
 
     @Override
-    public final int getX() {
+    public int x() {
         return x;
     }
 
     @Override
-    public final int getY() {
+    public int y() {
         return y;
     }
 
     @Override
-    public final int getZ() {
+    public int z() {
         return z;
     }
 
     @Override
     public int hashCode() {
-        return (getX() ^ (getZ() << 12)) ^ (getY() << 24);
+        return (x() ^ (z() << 12)) ^ (y() << 24);
     }
 
     @Override
-    public final BlockVector3 toImmutable() {
+    public BlockVector3 toImmutable() {
         return this;
     }
 
     @Override
     public String toString() {
-        return "(" + getX() + ", " + getY() + ", " + getZ() + ")";
+        return "(" + x() + ", " + y() + ", " + z() + ")";
     }
 
 }
