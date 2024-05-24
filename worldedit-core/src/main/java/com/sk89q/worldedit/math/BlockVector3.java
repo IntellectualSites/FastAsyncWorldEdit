@@ -881,6 +881,7 @@ public abstract class BlockVector3 {
         return Vector3.at(x(), y(), z());
     }
 
+    //FAWE start - not a record, need own implementations
     @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof final BlockVector3 other)) {
@@ -902,6 +903,7 @@ public abstract class BlockVector3 {
     public int hashCode() {
         return (x() ^ (z() << 12)) ^ (y() << 24);
     }
+    //FAWE end
 
     @Override
     public String toString() {

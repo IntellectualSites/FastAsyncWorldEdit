@@ -626,6 +626,7 @@ public class BlockVector2 {
         return BlockVector3.at(x, y, z);
     }
 
+    //FAWE start - not a record, need own implementations
     @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof BlockVector2 other)) {
@@ -640,6 +641,7 @@ public class BlockVector2 {
     public int hashCode() {
         return (x << 16) ^ z;
     }
+    //FAWE end
 
     @Override
     public String toString() {

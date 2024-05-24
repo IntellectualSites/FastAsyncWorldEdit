@@ -774,18 +774,15 @@ public abstract class Vector3 {
     }
     //FAWE end
 
+    //FAWE start - not a record, need own implementations
     @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof final Vector3 other)) {
             return false;
         }
 
-        //FAWE start - getter
         return other.x() == this.x() && other.y() == this.y() && other.z() == this.z();
-        //FAWE end
     }
-
-    //FAWE start
 
     /**
      * Tests if vectors are equal, accounting for floating point errors
@@ -807,13 +804,12 @@ public abstract class Vector3 {
         }
         return !(Math.abs(z() - other.z()) > 0.000001d);
     }
-    //FAWE end
 
     @Override
-    //FAWE start - XOR over get calculating all values independently
     public int hashCode() {
         return (int) x() ^ (int) z() << 12 ^ (int) y() << 24;
     }
+    //FAWE end
 
     @Override
     public String toString() {
