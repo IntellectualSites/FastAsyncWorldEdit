@@ -20,6 +20,8 @@
 package com.sk89q.worldedit;
 
 import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.exception.BrushRadiusLimitException;
+import com.fastasyncworldedit.core.exception.RadiusLimitException;
 import com.fastasyncworldedit.core.extension.factory.TransformFactory;
 import com.fastasyncworldedit.core.extent.ResettableExtent;
 import com.google.common.base.Throwables;
@@ -437,7 +439,9 @@ public final class WorldEdit {
      *
      * @param radius the radius
      * @throws MaxRadiusException if the radius is bigger than the configured radius
+     * @deprecated Use {@link WorldEdit#checkMaxRadius(double, Actor)}
      */
+    @Deprecated
     public void checkMaxRadius(double radius) throws MaxRadiusException {
         if (getConfiguration().maxRadius > 0 && radius > getConfiguration().maxRadius) {
             throw new MaxRadiusException();
@@ -449,7 +453,9 @@ public final class WorldEdit {
      *
      * @param radius the radius
      * @throws MaxBrushRadiusException if the radius is bigger than the configured radius
+     * @deprecated Use {@link WorldEdit#checkMaxBrushRadius(double, Actor)}
      */
+    @Deprecated
     public void checkMaxBrushRadius(double radius) throws MaxBrushRadiusException {
         if (getConfiguration().maxBrushRadius > 0 && radius > getConfiguration().maxBrushRadius) {
             throw new MaxBrushRadiusException();
@@ -457,6 +463,10 @@ public final class WorldEdit {
     }
 
     //FAWE start
+    /**
+     * @deprecated Use {@link WorldEdit#checkMaxBrushRadius(Expression, Actor)}
+     */
+    @Deprecated(forRemoval = true, since = "TODO")
     public void checkMaxBrushRadius(Expression radius) throws MaxBrushRadiusException {
         double val = radius.evaluate();
         checkArgument(val >= 0, "Radius must be a positive number.");
@@ -464,6 +474,53 @@ public final class WorldEdit {
             if (val > getConfiguration().maxBrushRadius) {
                 throw new MaxBrushRadiusException();
             }
+        }
+    }
+
+    /**
+     * Check the given radius against the give actor's limit.
+     *
+     * @param radius Radius to check
+     * @param actor  Actor to check for
+     * @throws MaxRadiusException If given radius larger than allowed
+     * @since TODO
+     */
+    public void checkMaxRadius(double radius, Actor actor) {
+        int max = actor.getLimit().MAX_RADIUS;
+        if (max > 0 && radius > max) {
+            throw new RadiusLimitException(max);
+        }
+    }
+
+    /**
+     * Check the given radius against the give actor's limit.
+     *
+     * @param radius Radius to check
+     * @param actor  Actor to check for
+     * @throws MaxRadiusException If given radius larger than allowed
+     * @since TODO
+     */
+    public void checkMaxBrushRadius(double radius, Actor actor) {
+        int max = actor.getLimit().MAX_BRUSH_RADIUS;
+        if (max > 0 && radius > max) {
+            throw new RadiusLimitException(max);
+        }
+    }
+
+    /**
+     * Check the given radius against the give actor's limit.
+     *
+     * @param expression Radius to check
+     * @param actor      Actor to check for
+     * @throws BrushRadiusLimitException If given radius larger than allowed
+     * @since TODO
+     */
+    public void checkMaxBrushRadius(Expression expression, Actor actor) {
+        double radius = expression.evaluate();
+        checkArgument(radius >= 0, "Radius must be a positive number.");
+        int max = actor.getLimit().MAX_BRUSH_RADIUS;
+        if (max > 0 && radius > max) {
+            throw new BrushRadiusLimitException(max);
         }
     }
     //FAWE end

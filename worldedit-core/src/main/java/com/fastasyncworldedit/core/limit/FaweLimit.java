@@ -18,6 +18,10 @@ public class FaweLimit {
     public int SCHEM_FILE_SIZE_LIMIT = 0;
     public int SCHEM_FILE_NUM_LIMIT = 0;
     public int MAX_EXPRESSION_MS = 0;
+    public int MAX_RADIUS = 0;
+    public int MAX_SUPER_PICKAXE_SIZE = 0;
+    public int MAX_BRUSH_RADIUS = 0;
+    public int MAX_BUTCHER_RADIUS = 0;
     public int INVENTORY_MODE = Integer.MAX_VALUE;
     public int SPEED_REDUCTION = Integer.MAX_VALUE;
     public boolean FAST_PLACEMENT = false;
@@ -123,6 +127,10 @@ public class FaweLimit {
         MAX.UNIVERSAL_DISALLOWED_BLOCKS = false;
         MAX.DISALLOWED_BLOCKS = Collections.emptySet();
         MAX.REMAP_PROPERTIES = Collections.emptySet();
+        MAX.MAX_RADIUS = Integer.MAX_VALUE;
+        MAX.MAX_SUPER_PICKAXE_SIZE = Integer.MAX_VALUE;
+        MAX.MAX_BRUSH_RADIUS = Integer.MAX_VALUE;
+        MAX.MAX_BUTCHER_RADIUS = Integer.MAX_VALUE;
     }
 
     public boolean MAX_CHANGES() {
@@ -250,7 +258,12 @@ public class FaweLimit {
                 && (STRIP_NBT == null || STRIP_NBT.isEmpty())
                 // && !UNIVERSAL_DISALLOWED_BLOCKS --> do not include this, it effectively has no relevance
                 && (DISALLOWED_BLOCKS == null || DISALLOWED_BLOCKS.isEmpty())
-                && (REMAP_PROPERTIES == null || REMAP_PROPERTIES.isEmpty());
+                && (REMAP_PROPERTIES == null || REMAP_PROPERTIES.isEmpty())
+                && MAX_RADIUS == Integer.MAX_VALUE
+                && MAX_SUPER_PICKAXE_SIZE == Integer.MAX_VALUE
+                && MAX_BRUSH_RADIUS == Integer.MAX_VALUE
+                && MAX_BUTCHER_RADIUS == Integer.MAX_VALUE;
+
     }
 
     public void set(FaweLimit limit) {
@@ -273,6 +286,10 @@ public class FaweLimit {
         UNIVERSAL_DISALLOWED_BLOCKS = limit.UNIVERSAL_DISALLOWED_BLOCKS;
         DISALLOWED_BLOCKS = limit.DISALLOWED_BLOCKS;
         REMAP_PROPERTIES = limit.REMAP_PROPERTIES;
+        MAX_RADIUS = limit.MAX_RADIUS;
+        MAX_SUPER_PICKAXE_SIZE = limit.MAX_SUPER_PICKAXE_SIZE;
+        MAX_BRUSH_RADIUS = limit.MAX_BRUSH_RADIUS;
+        MAX_BUTCHER_RADIUS = limit.MAX_BUTCHER_RADIUS;
     }
 
     public FaweLimit copy() {
@@ -296,6 +313,10 @@ public class FaweLimit {
         limit.UNIVERSAL_DISALLOWED_BLOCKS = UNIVERSAL_DISALLOWED_BLOCKS;
         limit.DISALLOWED_BLOCKS = DISALLOWED_BLOCKS;
         limit.REMAP_PROPERTIES = REMAP_PROPERTIES;
+        limit.MAX_RADIUS = MAX_RADIUS;
+        limit.MAX_SUPER_PICKAXE_SIZE = MAX_SUPER_PICKAXE_SIZE;
+        limit.MAX_BRUSH_RADIUS = MAX_BRUSH_RADIUS;
+        limit.MAX_BUTCHER_RADIUS = MAX_BUTCHER_RADIUS;
         return limit;
     }
 

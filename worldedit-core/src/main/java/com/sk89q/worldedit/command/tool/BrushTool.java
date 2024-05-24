@@ -477,7 +477,7 @@ public class BrushTool
             try {
                 new PatternTraverser(current).reset(editSession);
                 double size = current.getSize();
-                WorldEdit.getInstance().checkMaxBrushRadius(size);
+                WorldEdit.getInstance().checkMaxBrushRadius(size, player);
                 brush.build(editSession, target.toBlockPoint(), current.getMaterial(), size);
             } catch (MaxChangedBlocksException e) {
                 player.print(Caption.of("worldedit.tool.max-block-changes"));

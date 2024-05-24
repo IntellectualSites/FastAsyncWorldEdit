@@ -130,9 +130,9 @@ public class GenerationCommands {
                 return 0;
             }
         }
-        worldEdit.checkMaxRadius(radiusX);
-        worldEdit.checkMaxRadius(radiusZ);
-        worldEdit.checkMaxRadius(height);
+        worldEdit.checkMaxRadius(radiusX, actor);
+        worldEdit.checkMaxRadius(radiusZ, actor);
+        worldEdit.checkMaxRadius(height, actor);
 
         if (thickness > radiusX || thickness > radiusZ) {
             actor.print(Caption.of("worldedit.hcyl.thickness-too-large"));
@@ -178,9 +178,9 @@ public class GenerationCommands {
             }
         }
 
-        worldEdit.checkMaxRadius(radiusX);
-        worldEdit.checkMaxRadius(radiusZ);
-        worldEdit.checkMaxRadius(height);
+        worldEdit.checkMaxRadius(radiusX, actor);
+        worldEdit.checkMaxRadius(radiusZ, actor);
+        worldEdit.checkMaxRadius(height, actor);
 
         BlockVector3 pos = session.getPlacementPosition(actor);
         int affected = editSession.makeCylinder(pos, pattern, radiusX, radiusZ, height, !hollow);
@@ -224,9 +224,9 @@ public class GenerationCommands {
             }
         }
 
-        worldEdit.checkMaxRadius(radiusX);
-        worldEdit.checkMaxRadius(radiusZ);
-        worldEdit.checkMaxRadius(height);
+        worldEdit.checkMaxRadius(radiusX, actor);
+        worldEdit.checkMaxRadius(radiusZ, actor);
+        worldEdit.checkMaxRadius(height, actor);
 
         BlockVector3 pos = session.getPlacementPosition(actor);
         int affected = editSession.makeCone(pos, pattern, radiusX, radiusZ, height, !hollow, thickness);
@@ -290,9 +290,9 @@ public class GenerationCommands {
             }
         }
 
-        worldEdit.checkMaxRadius(radiusX);
-        worldEdit.checkMaxRadius(radiusY);
-        worldEdit.checkMaxRadius(radiusZ);
+        worldEdit.checkMaxRadius(radiusX, actor);
+        worldEdit.checkMaxRadius(radiusY, actor);
+        worldEdit.checkMaxRadius(radiusZ, actor);
         BlockVector3 pos = session.getPlacementPosition(actor);
         if (raised) {
             pos = pos.add(0, (int) radiusY, 0);
@@ -323,7 +323,7 @@ public class GenerationCommands {
                     double density
     ) throws WorldEditException {
         checkCommandArgument(0 <= density && density <= 100, "Density must be between 0 and 100");
-        worldEdit.checkMaxRadius(size);
+        worldEdit.checkMaxRadius(size, actor);
         density /= 100;
         int affected = editSession.makeForest(session.getPlacementPosition(actor), size, density, type);
         actor.print(Caption.of("worldedit.forestgen.created", TextComponent.of(affected)));
@@ -345,7 +345,7 @@ public class GenerationCommands {
                     double density
     ) throws WorldEditException {
         checkCommandArgument(0 <= density && density <= 100, "Density must be between 0 and 100");
-        worldEdit.checkMaxRadius(size);
+        worldEdit.checkMaxRadius(size, actor);
         int affected = editSession.makePumpkinPatches(session.getPlacementPosition(actor), size, density);
         actor.print(Caption.of("worldedit.pumpkins.created", TextComponent.of(affected)));
         return affected;
@@ -382,7 +382,7 @@ public class GenerationCommands {
             @Switch(name = 'h', desc = "Make a hollow pyramid")
                     boolean hollow
     ) throws WorldEditException {
-        worldEdit.checkMaxRadius(size);
+        worldEdit.checkMaxRadius(size, actor);
         BlockVector3 pos = session.getPlacementPosition(actor);
         int affected = editSession.makePyramid(pos, pattern, size, !hollow);
         if (actor instanceof Player && Settings.settings().GENERAL.UNSTUCK_ON_GENERATE) {
@@ -736,7 +736,7 @@ public class GenerationCommands {
                     double amplitude
     ) throws WorldEditException {
         double max = MathMan.max(radius.getX(), radius.getY(), radius.getZ());
-        worldEdit.checkMaxRadius(max);
+        worldEdit.checkMaxRadius(max, actor);
         BlockVector3 pos = session.getPlacementPosition(actor);
         int affected = editSession.makeBlob(
                 pos,

@@ -12,7 +12,7 @@ public class ScrollSize extends Scroll {
 
     @Override
     public boolean increment(Player player, int amount) {
-        int max = WorldEdit.getInstance().getConfiguration().maxRadius;
+        int max = player.getLimit().MAX_RADIUS;
         double newSize = Math.max(0, Math.min(max == -1 ? 4095 : max, getTool().getSize() + amount));
         getTool().setSize(newSize);
         return true;

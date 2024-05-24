@@ -120,7 +120,6 @@ public class WorldEditPlugin extends JavaPlugin {
     public void onLoad() {
 
         //FAWE start
-        this.bukkitConsoleCommandSender = new BukkitCommandSender(this, Bukkit.getConsoleSender());
         // This is already covered by Spigot, however, a more pesky warning with a proper explanation over "Ambiguous plugin name..." can't hurt.
         Plugin[] plugins = Bukkit.getServer().getPluginManager().getPlugins();
         for (Plugin p : plugins) {
@@ -138,6 +137,14 @@ public class WorldEditPlugin extends JavaPlugin {
         //noinspection ResultOfMethodCallIgnored
         getDataFolder().mkdirs();
 
+        //FAWE start - Modify WorldEdit config name
+        config = new BukkitConfiguration(new YAMLProcessor(new File(getDataFolder(), "worldedit-config.yml"), true), this);
+        // Load config before we say we've loaded platforms as it is used in listeners of the event
+        // Load config in onLoad to ensure it is loaded before FAWE settings to allow (inelegant) copying of values across
+        // where needed
+        config.load();
+        //FAWE end
+
         WorldEdit worldEdit = WorldEdit.getInstance();
 
         // Setup platform
@@ -148,12 +155,12 @@ public class WorldEditPlugin extends JavaPlugin {
         migrateLegacyConfig();
         //FAWE end
 
-        //FAWE start - Modify WorldEdit config name
-        config = new BukkitConfiguration(new YAMLProcessor(new File(getDataFolder(), "worldedit-config.yml"), true), this);
-        //FAWE end
-
         //FAWE start - Setup permission attachments
         permissionAttachmentManager = new BukkitPermissionAttachmentManager(this);
+        //FAWE end
+
+        //FAWE start - initialise bukkitConsoleCommandSender later
+        this.bukkitConsoleCommandSender = new BukkitCommandSender(this, Bukkit.getConsoleSender());
         //FAWE end
 
         Path delChunks = Paths.get(getDataFolder().getPath(), DELCHUNKS_FILE_NAME);
@@ -188,8 +195,6 @@ public class WorldEditPlugin extends JavaPlugin {
         //FAWE start
         new FaweBukkit(this);
         //FAWE end
-
-        config.load(); // Load config before we say we've loaded platforms as it is used in listeners of the event
 
         WorldEdit.getInstance().getEventBus().post(new PlatformsRegisteredEvent());
 

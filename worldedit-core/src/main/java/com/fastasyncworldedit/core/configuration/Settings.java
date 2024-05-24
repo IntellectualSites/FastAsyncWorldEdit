@@ -2,6 +2,7 @@ package com.fastasyncworldedit.core.configuration;
 
 import com.fastasyncworldedit.core.limit.FaweLimit;
 import com.fastasyncworldedit.core.limit.PropertyRemap;
+import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
@@ -140,8 +141,22 @@ public class Settings extends Config {
                 );
                 limit.MAX_FAILS = Math.max(limit.MAX_FAILS, newLimit.MAX_FAILS != -1 ? newLimit.MAX_FAILS : Integer.MAX_VALUE);
                 limit.MAX_ITERATIONS = Math.max(
-                        limit.MAX_ITERATIONS,
-                        newLimit.MAX_ITERATIONS != -1 ? newLimit.MAX_ITERATIONS : Integer.MAX_VALUE
+                        limit.MAX_ITERATIONS, newLimit.MAX_ITERATIONS != -1 ? newLimit.MAX_ITERATIONS : Integer.MAX_VALUE);
+                limit.MAX_RADIUS = Math.max(
+                        limit.MAX_RADIUS,
+                        newLimit.MAX_RADIUS != -1 ? newLimit.MAX_RADIUS : Integer.MAX_VALUE
+                );
+                limit.MAX_SUPER_PICKAXE_SIZE = Math.max(
+                        limit.MAX_SUPER_PICKAXE_SIZE,
+                        newLimit.MAX_SUPER_PICKAXE_SIZE != -1 ? newLimit.MAX_SUPER_PICKAXE_SIZE : Integer.MAX_VALUE
+                );
+                limit.MAX_BRUSH_RADIUS = Math.max(
+                        limit.MAX_BRUSH_RADIUS,
+                        newLimit.MAX_BRUSH_RADIUS != -1 ? newLimit.MAX_BRUSH_RADIUS : Integer.MAX_VALUE
+                );
+                limit.MAX_BUTCHER_RADIUS = Math.max(
+                        limit.MAX_BUTCHER_RADIUS,
+                        newLimit.MAX_BUTCHER_RADIUS != -1 ? newLimit.MAX_BUTCHER_RADIUS : Integer.MAX_VALUE
                 );
                 limit.MAX_HISTORY = Math.max(
                         limit.MAX_HISTORY,
@@ -352,6 +367,14 @@ public class Settings extends Config {
         public int MAX_ITERATIONS = 1000;
         @Comment("Max allowed entities (e.g. cows)")
         public int MAX_ENTITIES = 1337;
+        @Comment("Max allowed radius (e.g. for //sphere)")
+        public int MAX_RADIUS = LocalConfiguration.MAX_RADIUS;
+        @Comment("Max allowed superpickaxe size")
+        public int MAX_SUPER_PICKAXE_SIZE = LocalConfiguration.MAX_SUPER_RADIUS;
+        @Comment("Max allowed brush radius")
+        public int MAX_BRUSH_RADIUS = LocalConfiguration.MAX_BRUSH_RADIUS;
+        @Comment("Max allowed butcher radius")
+        public int MAX_BUTCHER_RADIUS = LocalConfiguration.MAX_BUTCHER_RADIUS;
         @Comment({
                 "Blockstates include Banner, Beacon, BrewingStand, Chest, CommandBlock, ",
                 "CreatureSpawner, Dispenser, Dropper, EndGateway, Furnace, Hopper, Jukebox, ",
