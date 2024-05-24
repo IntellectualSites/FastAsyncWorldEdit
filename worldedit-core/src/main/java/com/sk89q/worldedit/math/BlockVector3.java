@@ -185,7 +185,7 @@ public abstract class BlockVector3 {
      * @return the x coordinate
      * @deprecated use {@link #x()} instead
      */
-    @Deprecated(forRemoval = true)
+    @Deprecated(forRemoval = true, since = "TODO")
     public int getX() {
         return this.x(); //FAWE - access abstract getter instead of local field
     }
@@ -196,7 +196,7 @@ public abstract class BlockVector3 {
      * @return the x coordinate
      * @deprecated use {@link #x()} instead
      */
-    @Deprecated(forRemoval = true)
+    @Deprecated(forRemoval = true, since = "TODO")
     public int getBlockX() {
         return this.x(); //FAWE - access abstract getter instead of local field
     }
@@ -230,7 +230,7 @@ public abstract class BlockVector3 {
      * @return the y coordinate
      * @deprecated use {@link #y()} instead
      */
-    @Deprecated(forRemoval = true)
+    @Deprecated(forRemoval = true, since = "TODO")
     public int getY() {
         return this.y(); //FAWE - access abstract getter instead of local field
     }
@@ -241,7 +241,7 @@ public abstract class BlockVector3 {
      * @return the y coordinate
      * @deprecated use {@link #y()} instead
      */
-    @Deprecated(forRemoval = true)
+    @Deprecated(forRemoval = true, since = "TODO")
     public int getBlockY() {
         return this.y(); //FAWE - access abstract getter instead of local field
     }
@@ -274,7 +274,7 @@ public abstract class BlockVector3 {
      * @return the z coordinate
      * @deprecated use {@link #z()} instead
      */
-    @Deprecated(forRemoval = true)
+    @Deprecated(forRemoval = true, since = "TODO")
     public int getZ() {
         return this.z(); //FAWE - access abstract getter instead of local field
     }
@@ -285,7 +285,7 @@ public abstract class BlockVector3 {
      * @return the z coordinate
      * @deprecated use {@link #z()} instead
      */
-    @Deprecated(forRemoval = true)
+    @Deprecated(forRemoval = true, since = "TODO")
     public int getBlockZ() {
         return this.z(); //FAWE - access abstract getter instead of local field
     }

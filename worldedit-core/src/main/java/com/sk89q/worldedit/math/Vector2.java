@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.math;
 
+import com.fastasyncworldedit.core.util.MathMan;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 
 /**
@@ -56,7 +57,7 @@ public record Vector2(double x, double z) {
      * @return the x coordinate
      * @deprecated use {@link #x()} instead
      */
-    @Deprecated(forRemoval = true)
+    @Deprecated(forRemoval = true, since = "TODO")
     public double getX() {
         return x;
     }
@@ -65,9 +66,10 @@ public record Vector2(double x, double z) {
      * Get the X coordinate, aligned to the block grid.
      *
      * @return the block-aligned x coordinate
+     * @since TODO
      */
     public int blockX() {
-        return (int) Math.floor(x);
+        return MathMan.roundInt(x);
     }
 
     /**
@@ -84,9 +86,10 @@ public record Vector2(double x, double z) {
      * Get the Z coordinate, aligned to the block grid.
      *
      * @return the block-aligned z coordinate
+     * @since TODO
      */
     public int blockZ() {
-        return (int) Math.floor(z);
+        return MathMan.roundInt(z);
     }
 
     /**
@@ -95,7 +98,7 @@ public record Vector2(double x, double z) {
      * @return the z coordinate
      * @deprecated use {@link #z()} instead
      */
-    @Deprecated(forRemoval = true)
+    @Deprecated(forRemoval = true, since = "TODO")
     public double getZ() {
         return z;
     }

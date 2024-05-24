@@ -179,7 +179,7 @@ public abstract class Vector3 {
      * @return the x coordinate
      * @deprecated use {@link #x()} instead
      */
-    @Deprecated(forRemoval = true)
+    @Deprecated(forRemoval = true, since = "TODO")
     public double getX() {
         return this.x();
     }
@@ -220,7 +220,7 @@ public abstract class Vector3 {
      * @return the y coordinate
      * @deprecated use {@link #y()} instead
      */
-    @Deprecated(forRemoval = true)
+    @Deprecated(forRemoval = true, since = "TODO")
     public double getY() {
         return this.y();
     }
@@ -260,7 +260,7 @@ public abstract class Vector3 {
      * @return the z coordinate
      * @deprecated use {@link #z()} instead
      */
-    @Deprecated(forRemoval = true)
+    @Deprecated(forRemoval = true, since = "TODO")
     public double getZ() {
         return this.z();
     }
