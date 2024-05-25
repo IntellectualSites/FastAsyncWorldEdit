@@ -542,7 +542,7 @@ public class SchematicCommands {
                           String schematicName,
                       @Arg(desc = "Share location", def = "arkitektonika") //FAWE: def: ehpaste -> arkitektonika
                           ClipboardShareDestination destination,
-                      @Arg(desc = "Format name", def = "sponge")
+                      @Arg(desc = "Format name", def = "fast") //FAWE: def: sponge -> fast
                           ClipboardFormat format) throws WorldEditException {
         if (worldEdit.getPlatformManager().queryCapability(Capability.GAME_HOOKS).getDataVersion() == -1) {
             actor.printError(TranslatableComponent.of("worldedit.schematic.unsupported-minecraft-version"));
