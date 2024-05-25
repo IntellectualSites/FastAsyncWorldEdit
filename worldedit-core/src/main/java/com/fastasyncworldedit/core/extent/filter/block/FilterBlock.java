@@ -73,60 +73,60 @@ public abstract class FilterBlock extends BlockVector3 implements Extent, TileEn
     }
 
     public BlockState getBlockBelow() {
-        return getBlock(getX(), getY() - 1, getZ());
+        return getBlock(x(), y() - 1, z());
     }
 
     public BlockState getBlockAbove() {
-        return getBlock(getX(), getY() + 1, getZ());
+        return getBlock(x(), y() + 1, z());
     }
 
     public BlockState getBlockNorth() {
-        return getBlock(getX(), getY(), getZ() - 1);
+        return getBlock(x(), y(), z() - 1);
     }
 
     public BlockState getBlockEast() {
-        return getBlock(getX() + 1, getY(), getZ());
+        return getBlock(x() + 1, y(), z());
     }
 
     public BlockState getBlockSouth() {
-        return getBlock(getX(), getY(), getZ() + 1);
+        return getBlock(x(), y(), z() + 1);
     }
 
     public BlockState getBlockWest() {
-        return getBlock(getX() - 1, getY(), getZ());
+        return getBlock(x() - 1, y(), z());
     }
 
     public BlockState getBlockRelativeY(int y) {
-        return getBlock(getX(), getY() + y, getZ());
+        return getBlock(x(), y() + y, z());
     }
 
     @Override
-    public abstract int getX();
+    public abstract int x();
 
     @Override
-    public abstract int getY();
+    public abstract int y();
 
     @Override
-    public abstract int getZ();
+    public abstract int z();
 
     public int getLocalX() {
-        return getX() & 15;
+        return x() & 15;
     }
 
     public int getLocalY() {
-        return getY() & 15;
+        return y() & 15;
     }
 
     public int getLocalZ() {
-        return getZ() & 15;
+        return z() & 15;
     }
 
     public int getChunkX() {
-        return getX() >> 4;
+        return x() >> 4;
     }
 
     public int getChunkZ() {
-        return getZ() >> 4;
+        return z() >> 4;
     }
 
     /*
@@ -204,7 +204,7 @@ public abstract class FilterBlock extends BlockVector3 implements Extent, TileEn
 
     @Override
     public boolean setBiome(BlockVector3 position, BiomeType biome) {
-        return setBiome(position.getX(), position.getY(), position.getZ(), biome);
+        return setBiome(position.x(), position.y(), position.z(), biome);
     }
 
 }

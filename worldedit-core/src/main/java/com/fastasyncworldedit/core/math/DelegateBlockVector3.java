@@ -95,13 +95,8 @@ public class DelegateBlockVector3 extends BlockVector3 {
     }
 
     @Override
-    public int getX() {
-        return parent.getX();
-    }
-
-    @Override
-    public int getBlockX() {
-        return parent.getBlockX();
+    public int x() {
+        return parent.x();
     }
 
     @Override
@@ -110,13 +105,8 @@ public class DelegateBlockVector3 extends BlockVector3 {
     }
 
     @Override
-    public int getY() {
-        return parent.getY();
-    }
-
-    @Override
-    public int getBlockY() {
-        return parent.getBlockY();
+    public int y() {
+        return parent.y();
     }
 
     @Override
@@ -125,13 +115,8 @@ public class DelegateBlockVector3 extends BlockVector3 {
     }
 
     @Override
-    public int getZ() {
-        return parent.getZ();
-    }
-
-    @Override
-    public int getBlockZ() {
-        return parent.getBlockZ();
+    public int z() {
+        return parent.z();
     }
 
     @Override

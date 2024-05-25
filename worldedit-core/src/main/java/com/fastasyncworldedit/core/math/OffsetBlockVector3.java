@@ -11,18 +11,18 @@ public class OffsetBlockVector3 extends DelegateBlockVector3 {
     }
 
     @Override
-    public int getX() {
-        return super.getX() + offset.getX();
+    public int x() {
+        return super.x() + offset.x();
     }
 
     @Override
-    public int getY() {
-        return super.getY() + offset.getY();
+    public int y() {
+        return super.y() + offset.y();
     }
 
     @Override
-    public int getZ() {
-        return super.getZ() + offset.getZ();
+    public int z() {
+        return super.z() + offset.z();
     }
 
 }

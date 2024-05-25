@@ -19,12 +19,13 @@
 
 package com.sk89q.worldedit.math;
 
+import com.fastasyncworldedit.core.util.MathMan;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 
 /**
  * An immutable 2-dimensional vector.
  */
-public final class Vector2 {
+public record Vector2(double x, double z) {
 
     public static final Vector2 ZERO = new Vector2(0, 0);
     public static final Vector2 UNIT_X = new Vector2(1, 0);
@@ -50,27 +51,25 @@ public final class Vector2 {
         return new Vector2(x, z);
     }
 
-    private final double x;
-    private final double z;
-
-    /**
-     * Construct an instance.
-     *
-     * @param x the X coordinate
-     * @param z the Z coordinate
-     */
-    private Vector2(double x, double z) {
-        this.x = x;
-        this.z = z;
-    }
-
     /**
      * Get the X coordinate.
      *
      * @return the x coordinate
+     * @deprecated use {@link #x()} instead
      */
+    @Deprecated(forRemoval = true, since = "TODO")
     public double getX() {
         return x;
+    }
+
+    /**
+     * Get the X coordinate, aligned to the block grid.
+     *
+     * @return the block-aligned x coordinate
+     * @since TODO
+     */
+    public int blockX() {
+        return MathMan.roundInt(x);
     }
 
     /**
@@ -84,10 +83,22 @@ public final class Vector2 {
     }
 
     /**
+     * Get the Z coordinate, aligned to the block grid.
+     *
+     * @return the block-aligned z coordinate
+     * @since TODO
+     */
+    public int blockZ() {
+        return MathMan.roundInt(z);
+    }
+
+    /**
      * Get the Z coordinate.
      *
      * @return the z coordinate
+     * @deprecated use {@link #z()} instead
      */
+    @Deprecated(forRemoval = true, since = "TODO")
     public double getZ() {
         return z;
     }
@@ -456,24 +467,6 @@ public final class Vector2 {
      */
     public Vector3 toVector3(double y) {
         return Vector3.at(x, y, z);
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (!(obj instanceof Vector2)) {
-            return false;
-        }
-
-        Vector2 other = (Vector2) obj;
-        return other.x == this.x && other.z == this.z;
-
-    }
-
-    @Override
-    public int hashCode() {
-        //FAWE start - XOR over x z calc
-        return (int) x << 16 ^ (int) z;
-        //FAWE end
     }
 
     @Override

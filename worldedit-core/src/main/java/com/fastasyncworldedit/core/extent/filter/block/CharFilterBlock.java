@@ -190,17 +190,17 @@ public class CharFilterBlock extends ChunkFilterBlock {
     }
 
     @Override
-    public final int getX() {
+    public final int x() {
         return xx + x;
     }
 
     @Override
-    public final int getY() {
+    public final int y() {
         return yy + y;
     }
 
     @Override
-    public final int getZ() {
+    public final int z() {
         return zz + z;
     }
 
@@ -304,7 +304,7 @@ public class CharFilterBlock extends ChunkFilterBlock {
         if (z > 0) {
             return states[getArr[index - 16]];
         }
-        return getExtent().getBlock(getX(), getY(), getZ() - 1);
+        return getExtent().getBlock(x(), y(), z() - 1);
     }
 
     @Override
@@ -312,7 +312,7 @@ public class CharFilterBlock extends ChunkFilterBlock {
         if (x < 15) {
             return states[getArr[index + 1]];
         }
-        return getExtent().getBlock(getX() + 1, getY(), getZ());
+        return getExtent().getBlock(x() + 1, y(), z());
     }
 
     @Override
@@ -320,7 +320,7 @@ public class CharFilterBlock extends ChunkFilterBlock {
         if (z < 15) {
             return states[getArr[index + 16]];
         }
-        return getExtent().getBlock(getX(), getY(), getZ() + 1);
+        return getExtent().getBlock(x(), y(), z() + 1);
     }
 
     @Override
@@ -328,7 +328,7 @@ public class CharFilterBlock extends ChunkFilterBlock {
         if (x > 0) {
             return states[getArr[index - 1]];
         }
-        return getExtent().getBlock(getX() - 1, getY(), getZ());
+        return getExtent().getBlock(x() - 1, y(), z());
     }
 
     @Override
@@ -401,7 +401,7 @@ public class CharFilterBlock extends ChunkFilterBlock {
 
     @Override
     public boolean setBiome(BlockVector3 position, BiomeType biome) {
-        return setBiome(position.getX(), position.getY(), position.getBlockZ(), biome);
+        return setBiome(position.x(), position.y(), position.z(), biome);
     }
 
     @Override

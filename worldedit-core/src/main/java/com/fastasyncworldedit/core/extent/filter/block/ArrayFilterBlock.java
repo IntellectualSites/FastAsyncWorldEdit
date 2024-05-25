@@ -80,17 +80,17 @@ public class ArrayFilterBlock extends AbstractExtentFilterBlock {
     }
 
     @Override
-    public int getX() {
+    public int x() {
         return x;
     }
 
     @Override
-    public int getY() {
+    public int y() {
         return (heights[index] & 0xFF) + yOffset;
     }
 
     @Override
-    public int getZ() {
+    public int z() {
         return z;
     }
 
@@ -112,12 +112,12 @@ public class ArrayFilterBlock extends AbstractExtentFilterBlock {
 
     @Override
     public void setBiome(final BiomeType biome) {
-        getExtent().setBiome(getX(), getY(), getZ(), biome);
+        getExtent().setBiome(x(), y(), z(), biome);
     }
 
     @Override
     public BiomeType getBiome() {
-        return getExtent().getBiomeType(getX(), getY(), getZ());
+        return getExtent().getBiomeType(x(), y(), z());
     }
 
 }
