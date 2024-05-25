@@ -581,7 +581,7 @@ public class SchematicCommands {
                 .registerWithSupervisor(worldEdit.getSupervisor(), "Sharing schematic")
                 .setDelayMessage(TranslatableComponent.of("worldedit.schematic.save.saving"))
                 .setWorkingMessage(TranslatableComponent.of("worldedit.schematic.save.still-saving"))
-                .onSuccess("Shared", (url -> actor.printInfo(TextComponent.of(url.toExternalForm() + ".schem").clickEvent(ClickEvent.openUrl(url.toExternalForm() + ".schem")))))
+                .onSuccess("Shared", (consumer -> consumer.accept(actor)))
                 .onFailure("Failed to share schematic", worldEdit.getPlatformManager().getPlatformCommandManager().getExceptionConverter())
                 .buildAndExec(worldEdit.getExecutorService());
     }
@@ -1068,7 +1068,7 @@ public class SchematicCommands {
                            ClipboardShareDestination destination,
                            ClipboardFormat format,
                            String name) {
-            super(format, holder);
+            super(actor, format, holder);
             this.actor = actor;
             this.name = name;
             this.destination = destination;
