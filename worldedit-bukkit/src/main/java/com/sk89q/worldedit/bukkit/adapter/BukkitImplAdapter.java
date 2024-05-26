@@ -23,6 +23,7 @@ import com.fastasyncworldedit.bukkit.FaweBukkit;
 import com.fastasyncworldedit.bukkit.adapter.IBukkitAdapter;
 import com.fastasyncworldedit.bukkit.adapter.NMSRelighterFactory;
 import com.fastasyncworldedit.core.Fawe;
+import com.fastasyncworldedit.core.extent.processor.PlacementStateProcessor;
 import com.fastasyncworldedit.core.extent.processor.lighting.RelighterFactory;
 import com.fastasyncworldedit.core.queue.IBatchProcessor;
 import com.fastasyncworldedit.core.queue.IChunkGet;
@@ -34,6 +35,7 @@ import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.function.mask.BlockTypeMask;
 import com.sk89q.worldedit.internal.wna.WorldNativeAccess;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -400,6 +402,14 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
      * @since 2.1.0
      */
     default IBatchProcessor getTickingPostProcessor() {
+        return null;
+    }
+
+    /**
+     * Returns an {@link PlacementStateProcessor} instance for processing placed blocks to "fix" them.
+     * @since TODO
+     */
+    default PlacementStateProcessor getPlatformPlacementProcessor(Extent extent, BlockTypeMask mask, boolean includeUnedited) {
         return null;
     }
     //FAWE end

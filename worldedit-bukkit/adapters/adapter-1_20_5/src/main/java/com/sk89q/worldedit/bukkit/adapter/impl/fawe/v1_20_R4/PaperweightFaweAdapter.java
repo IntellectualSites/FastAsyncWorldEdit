@@ -4,6 +4,7 @@ import com.fastasyncworldedit.bukkit.adapter.FaweAdapter;
 import com.fastasyncworldedit.bukkit.adapter.NMSRelighterFactory;
 import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.entity.LazyBaseEntity;
+import com.fastasyncworldedit.core.extent.processor.PlacementStateProcessor;
 import com.fastasyncworldedit.core.extent.processor.lighting.RelighterFactory;
 import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.fastasyncworldedit.core.queue.IBatchProcessor;
@@ -22,6 +23,7 @@ import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_20_R4.nbt.PaperweightLazy
 import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_20_R4.regen.PaperweightRegen;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.function.mask.BlockTypeMask;
 import com.sk89q.worldedit.internal.block.BlockStateIdAccess;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.internal.wna.WorldNativeAccess;
@@ -443,6 +445,10 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
         return material.getCraftBlockData();
     }
 
+    public net.minecraft.world.level.block.state.BlockState adapt(BlockState blockState) {
+        return Block.stateById(ordinalToIbdID[blockState.getOrdinal()]);
+    }
+
     @Override
     public void sendFakeChunk(org.bukkit.World world, Player player, ChunkPacket chunkPacket) {
         ServerLevel nmsWorld = getServerLevel(world);
@@ -622,6 +628,11 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
     @Override
     public IBatchProcessor getTickingPostProcessor() {
         return new PaperweightPostProcessor();
+    }
+
+    @Override
+    public PlacementStateProcessor getPlatformPlacementProcessor(Extent extent, BlockTypeMask mask, boolean includeUnedited) {
+        return new PaperweightPlacementStateProcessor(extent, mask, includeUnedited);
     }
 
     private boolean wasAccessibleSinceLastSave(ChunkHolder holder) {
