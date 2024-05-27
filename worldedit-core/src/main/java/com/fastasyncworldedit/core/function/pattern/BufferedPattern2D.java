@@ -33,7 +33,7 @@ public class BufferedPattern2D extends BufferedPattern {
 
     @Override
     public boolean set(BlockVector3 pos) {
-        return set.add(pos.x(), 0, pos.y());
+        return set.add(pos.x(), 0, pos.z());
     }
 
 }
