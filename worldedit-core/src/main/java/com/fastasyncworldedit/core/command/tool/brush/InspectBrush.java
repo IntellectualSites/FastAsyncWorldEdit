@@ -14,7 +14,6 @@ import com.sk89q.worldedit.command.tool.BrushTool;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Platform;
-import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.util.Location;
@@ -25,7 +24,6 @@ import com.sk89q.worldedit.util.formatting.text.event.HoverEvent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockState;
-import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.util.Iterator;
@@ -80,9 +78,9 @@ public class InspectBrush extends BrushTool {
                 return true;
             }
             BlockVector3 target = targetVector.toBlockPoint();
-            final int x = target.getBlockX();
-            final int y = target.getBlockY();
-            final int z = target.getBlockZ();
+            final int x = target.x();
+            final int y = target.y();
+            final int z = target.z();
             World world = player.getWorld();
             RollbackDatabase db = DBHandler.dbHandler().getDatabase(world);
             int count = 0;

@@ -773,9 +773,9 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                         for (final Map.Entry<BlockVector3, CompoundTag> entry : tiles.entrySet()) {
                             final CompoundTag nativeTag = entry.getValue();
                             final BlockVector3 blockHash = entry.getKey();
-                            final int x = blockHash.getX() + bx;
-                            final int y = blockHash.getY();
-                            final int z = blockHash.getZ() + bz;
+                            final int x = blockHash.x() + bx;
+                            final int y = blockHash.y();
+                            final int z = blockHash.z() + bz;
                             final BlockPos pos = new BlockPos(x, y, z);
 
                             synchronized (nmsWorld) {

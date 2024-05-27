@@ -38,16 +38,16 @@ public class SurfaceSpline implements Brush {
         int minY = editSession.getMinY();
         if (path.isEmpty() || !pos.equals(path.get(path.size() - 1))) {
             int max = editSession.getNearestSurfaceTerrainBlock(
-                    pos.getBlockX(),
-                    pos.getBlockZ(),
-                    pos.getBlockY(),
+                    pos.x(),
+                    pos.z(),
+                    pos.y(),
                     minY,
                     maxY
             );
             if (max == -1) {
                 return;
             }
-            path.add(BlockVector3.at(pos.getBlockX(), max, pos.getBlockZ()));
+            path.add(BlockVector3.at(pos.x(), max, pos.z()));
             if (editSession.getActor() != null) {
                 editSession.getActor().print(Caption.of("fawe.worldedit.brush.spline.primary.2"));
             }
@@ -69,9 +69,9 @@ public class SurfaceSpline implements Brush {
         LocalBlockVectorSet vset = new LocalBlockVectorSet();
         for (double loop = 0; loop <= 1; loop += 1D / splinelength / quality) {
             final Vector3 tipv = interpol.getPosition(loop);
-            final int tipx = MathMan.roundInt(tipv.getX());
-            final int tipz = (int) tipv.getZ();
-            int tipy = MathMan.roundInt(tipv.getY());
+            final int tipx = MathMan.roundInt(tipv.x());
+            final int tipz = (int) tipv.z();
+            int tipy = MathMan.roundInt(tipv.y());
             tipy = editSession.getNearestSurfaceTerrainBlock(tipx, tipz, tipy, minY, maxY, Integer.MIN_VALUE, Integer.MAX_VALUE);
             if (tipy == Integer.MIN_VALUE || tipy == Integer.MAX_VALUE) {
                 continue;
@@ -88,15 +88,15 @@ public class SurfaceSpline implements Brush {
             LocalBlockVectorSet newSet = new LocalBlockVectorSet();
             final int ceilrad = (int) Math.ceil(radius);
             for (BlockVector3 v : vset) {
-                final int tipx = v.getBlockX();
-                final int tipz = v.getBlockZ();
+                final int tipx = v.x();
+                final int tipz = v.z();
                 for (int loopx = tipx - ceilrad; loopx <= tipx + ceilrad; loopx++) {
                     for (int loopz = tipz - ceilrad; loopz <= tipz + ceilrad; loopz++) {
                         if (MathMan.hypot2(loopx - tipx, 0, loopz - tipz) <= radius2) {
                             int y = editSession.getNearestSurfaceTerrainBlock(
                                     loopx,
                                     loopz,
-                                    v.getBlockY(),
+                                    v.y(),
                                     minY,
                                     maxY,
                                     Integer.MIN_VALUE,

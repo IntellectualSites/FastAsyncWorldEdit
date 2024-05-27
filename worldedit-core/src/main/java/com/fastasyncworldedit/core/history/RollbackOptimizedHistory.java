@@ -84,12 +84,12 @@ public class RollbackOptimizedHistory extends DiskStorageHistory {
     }
 
     public void setDimensions(BlockVector3 pos1, BlockVector3 pos2) {
-        this.minX = pos1.getBlockX();
-        this.minY = pos1.getBlockY();
-        this.minZ = pos1.getBlockZ();
-        this.maxX = pos2.getBlockX();
-        this.maxY = pos2.getBlockY();
-        this.maxZ = pos2.getBlockZ();
+        this.minX = pos1.x();
+        this.minY = pos1.y();
+        this.minZ = pos1.z();
+        this.maxX = pos2.x();
+        this.maxY = pos2.y();
+        this.maxZ = pos2.z();
     }
 
     public void setTime(long time) {

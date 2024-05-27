@@ -127,18 +127,18 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
         if (!tilesFrom.isEmpty()) {
             for (Map.Entry<BlockVector3, CompoundTag> entry : tilesFrom.entrySet()) {
                 BlockVector3 pos = entry.getKey();
-                BlockState fromBlock = get.getBlock(pos.getX() & 15, pos.getY(), pos.getZ() & 15);
-                BlockState toBlock = set.getBlock(pos.getX() & 15, pos.getY(), pos.getZ() & 15);
+                BlockState fromBlock = get.getBlock(pos.x() & 15, pos.y(), pos.z() & 15);
+                BlockState toBlock = set.getBlock(pos.x() & 15, pos.y(), pos.z() & 15);
                 if (fromBlock != toBlock || tilesTo.containsKey(pos)) {
-                    addTileRemove(MainUtil.setPosition(entry.getValue(), entry.getKey().getX(), entry.getKey().getY(),
-                            entry.getKey().getZ()));
+                    addTileRemove(MainUtil.setPosition(entry.getValue(), entry.getKey().x(), entry.getKey().y(),
+                            entry.getKey().z()));
                 }
             }
         }
         if (!tilesTo.isEmpty()) {
             for (Map.Entry<BlockVector3, CompoundTag> entry : tilesTo.entrySet()) {
                 BlockVector3 pos = entry.getKey();
-                addTileCreate(MainUtil.setPosition(entry.getValue(), pos.getX() + bx, pos.getY(), pos.getZ() + bz));
+                addTileCreate(MainUtil.setPosition(entry.getValue(), pos.x() + bx, pos.y(), pos.z() + bz));
             }
         }
         Set<UUID> entRemoves = set.getEntityRemoves();
@@ -310,9 +310,9 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
     }
 
     public void add(BlockVector3 loc, BaseBlock from, BaseBlock to) {
-        int x = loc.getBlockX();
-        int y = loc.getBlockY();
-        int z = loc.getBlockZ();
+        int x = loc.x();
+        int y = loc.y();
+        int z = loc.z();
         add(x, y, z, from, to);
     }
 

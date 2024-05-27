@@ -22,9 +22,9 @@ public class AdjacentMask extends AbstractMask {
     @Override
     public boolean test(BlockVector3 bv) {
         vector.setComponents(bv);
-        double x = bv.getX();
-        double y = bv.getY();
-        double z = bv.getZ();
+        double x = bv.x();
+        double y = bv.y();
+        double z = bv.z();
         vector.mutX(x + 1);
         int count = 0;
         if (mask.test(vector) && ++count == min && max >= 8) {

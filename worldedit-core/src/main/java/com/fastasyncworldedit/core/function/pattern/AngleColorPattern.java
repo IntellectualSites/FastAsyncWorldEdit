@@ -42,9 +42,9 @@ public class AngleColorPattern extends AnglePattern {
     public <T extends BlockStateHolder<T>> int getSlope(T block, BlockVector3 vector, Extent extent) {
         int slope = super.getSlope(block, vector, extent);
         if (slope != -1) {
-            int x = vector.getBlockX();
-            int y = vector.getBlockY();
-            int z = vector.getBlockZ();
+            int x = vector.x();
+            int y = vector.y();
+            int z = vector.z();
             int height = extent.getNearestSurfaceTerrainBlock(x, z, y, minY, maxY);
             if (height > minY) {
                 BlockState below = extent.getBlock(x, height - 1, z);

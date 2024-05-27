@@ -354,7 +354,7 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
 
         @Override
         public boolean apply(final Extent extent, final BlockVector3 get, final BlockVector3 set) throws WorldEditException {
-            return extent.setBlock(set.getX(), set.getY(), set.getZ(), source.getFullBlock(get.getX(), get.getY(), get.getZ()));
+            return extent.setBlock(set.x(), set.y(), set.z(), source.getFullBlock(get.x(), get.y(), get.z()));
         }
 
     }
@@ -374,8 +374,8 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
 
         @Override
         public boolean apply(final Extent extent, final BlockVector3 get, final BlockVector3 set) throws WorldEditException {
-            return extent.setBlock(set.getX(), set.getY(), set.getZ(), source.getFullBlock(get.getX(), get.getY(), get.getZ()))
-                    && extent.setBiome(set.getX(), set.getY(), set.getZ(), biomeGetter.apply(get));
+            return extent.setBlock(set.x(), set.y(), set.z(), source.getFullBlock(get.x(), get.y(), get.z()))
+                    && extent.setBiome(set.x(), set.y(), set.z(), biomeGetter.apply(get));
         }
 
     }
@@ -468,22 +468,22 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
     private long[] getChunkCoordsRegen(Region region, int border) { //needs to be square num of chunks
         BlockVector3 oldMin = region.getMinimumPoint();
         BlockVector3 newMin = BlockVector3.at(
-                (oldMin.getX() >> 4 << 4) - border * 16,
-                oldMin.getY(),
-                (oldMin.getZ() >> 4 << 4) - border * 16
+                (oldMin.x() >> 4 << 4) - border * 16,
+                oldMin.y(),
+                (oldMin.z() >> 4 << 4) - border * 16
         );
         BlockVector3 oldMax = region.getMaximumPoint();
         BlockVector3 newMax = BlockVector3.at(
-                (oldMax.getX() >> 4 << 4) + (border + 1) * 16 - 1,
-                oldMax.getY(),
-                (oldMax.getZ() >> 4 << 4) + (border + 1) * 16 - 1
+                (oldMax.x() >> 4 << 4) + (border + 1) * 16 - 1,
+                oldMax.y(),
+                (oldMax.z() >> 4 << 4) + (border + 1) * 16 - 1
         );
         Region adjustedRegion = new CuboidRegion(newMin, newMax);
         return adjustedRegion.getChunks().stream()
                 .sorted(Comparator
-                        .comparingInt(BlockVector2::getZ)
-                        .thenComparingInt(BlockVector2::getX)) //needed for RegionLimitedWorldAccess
-                .mapToLong(c -> MathMan.pairInt(c.getX(), c.getZ()))
+                        .comparingInt(BlockVector2::z)
+                        .thenComparingInt(BlockVector2::x)) //needed for RegionLimitedWorldAccess
+                .mapToLong(c -> MathMan.pairInt(c.x(), c.z()))
                 .toArray();
     }
 

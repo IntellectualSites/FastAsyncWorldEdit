@@ -504,8 +504,8 @@ public interface Extent extends InputExtent, OutputExtent {
                 if (random.nextInt(100) > rarity) {
                     continue;
                 }
-                int x = (chunkPos.getBlockX() << 4) + random.nextInt(16);
-                int z = (chunkPos.getBlockZ() << 4) + random.nextInt(16);
+                int x = (chunkPos.x() << 4) + random.nextInt(16);
+                int z = (chunkPos.z() << 4) + random.nextInt(16);
                 gen.spawn(random, x, z);
             }
         }
@@ -534,9 +534,9 @@ public interface Extent extends InputExtent, OutputExtent {
     default boolean contains(int x, int y, int z) {
         BlockVector3 min = getMinimumPoint();
         BlockVector3 max = getMaximumPoint();
-        return min.getX() <= x && max.getX() >= x
-                && min.getY() <= y && max.getY() >= y
-                && min.getZ() <= z && max.getZ() >= z;
+        return min.x() <= x && max.x() >= x
+                && min.y() <= y && max.y() >= y
+                && min.z() <= z && max.z() >= z;
     }
 
     default void addOre(
@@ -665,11 +665,11 @@ public interface Extent extends InputExtent, OutputExtent {
     }
 
     default int getMinY() {
-        return getMinimumPoint().getY();
+        return getMinimumPoint().y();
     }
 
     default int getMaxY() {
-        return getMaximumPoint().getY();
+        return getMaximumPoint().y();
     }
 
     /**
@@ -832,9 +832,9 @@ public interface Extent extends InputExtent, OutputExtent {
         Vector3 center = region.getCenter();
         Region centerRegion = new CuboidRegion(
                 this instanceof World ? (World) this : null, // Causes clamping of Y range
-                BlockVector3.at(((int) center.getX()), ((int) center.getY()), ((int) center.getZ())),
-                BlockVector3.at(MathUtils.roundHalfUp(center.getX()),
-                        center.getY(), MathUtils.roundHalfUp(center.getZ())
+                BlockVector3.at(((int) center.x()), ((int) center.y()), ((int) center.z())),
+                BlockVector3.at(MathUtils.roundHalfUp(center.x()),
+                        center.y(), MathUtils.roundHalfUp(center.z())
                 )
         );
         return setBlocks(centerRegion, pattern);

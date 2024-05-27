@@ -83,7 +83,7 @@ public class ClipboardSpline extends Spline {
         Region region = clipboard.getRegion();
         BlockVector3 origin = clipboard.getOrigin();
         //        center = region.getCenter().setY(origin.getY() - 1);
-        center = region.getCenter().withY(origin.getY() - 1).toBlockPoint();
+        center = region.getCenter().withY(origin.y() - 1).toBlockPoint();
         this.centerOffset = center.subtract(center.round());
         this.center = center.subtract(centerOffset);
         this.transform = transform;
@@ -108,15 +108,15 @@ public class ClipboardSpline extends Spline {
         clipboardHolder.setTransform(transform);
 
         BlockVector3 functionOffset = target.subtract(clipboard.getOrigin());
-        final int offX = functionOffset.getBlockX();
-        final int offY = functionOffset.getBlockY();
-        final int offZ = functionOffset.getBlockZ();
+        final int offX = functionOffset.x();
+        final int offY = functionOffset.y();
+        final int offZ = functionOffset.z();
 
         Operation operation = clipboardHolder
                 .createPaste(editSession)
                 .to(target)
                 .ignoreAirBlocks(true)
-                .filter(v -> buffer.add(v.getBlockX() + offX, v.getBlockY() + offY, v.getBlockZ() + offZ))
+                .filter(v -> buffer.add(v.x() + offX, v.y() + offY, v.z() + offZ))
                 .build();
         Operations.completeLegacy(operation);
 

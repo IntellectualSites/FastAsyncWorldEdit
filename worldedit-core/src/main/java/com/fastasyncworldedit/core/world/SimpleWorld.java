@@ -58,12 +58,12 @@ public interface SimpleWorld extends World {
 
     @Override
     default int getMaxY() {
-        return getMaximumPoint().getBlockY();
+        return getMaximumPoint().y();
     }
 
     @Override
     default int getMinY() {
-        return getMinimumPoint().getBlockY();
+        return getMinimumPoint().y();
     }
 
     @Override

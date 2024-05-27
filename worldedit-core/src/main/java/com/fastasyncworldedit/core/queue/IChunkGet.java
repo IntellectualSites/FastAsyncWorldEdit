@@ -25,7 +25,7 @@ public interface IChunkGet extends IBlocks, Trimable, InputExtent, ITileInput {
 
     @Override
     default BiomeType getBiome(BlockVector3 position) {
-        return getBiomeType(position.getX(), position.getY(), position.getZ());
+        return getBiomeType(position.x(), position.y(), position.z());
     }
 
     @Override

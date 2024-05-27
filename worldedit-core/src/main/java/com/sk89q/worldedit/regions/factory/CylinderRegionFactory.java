@@ -37,8 +37,8 @@ public class CylinderRegionFactory implements RegionFactory {
         return new CylinderRegion(
                 position,
                 Vector2.at(size, size),
-                position.getBlockY() - (int) (height / 2),
-                position.getBlockY() + (int) (height / 2)
+                position.y() - (int) (height / 2),
+                position.y() + (int) (height / 2)
         );
     }
 

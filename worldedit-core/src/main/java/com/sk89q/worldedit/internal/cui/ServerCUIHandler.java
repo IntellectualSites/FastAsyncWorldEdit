@@ -79,9 +79,9 @@ public class ServerCUIHandler {
                 try {
                     CuboidRegion region = ((CuboidRegionSelector) regionSelector).getRegion();
 
-                    posX = region.getMinimumPoint().getBlockX();
-                    posY = region.getMinimumPoint().getBlockY();
-                    posZ = region.getMinimumPoint().getBlockZ();
+                    posX = region.getMinimumPoint().x();
+                    posY = region.getMinimumPoint().y();
+                    posZ = region.getMinimumPoint().z();
 
                     width = region.getWidth();
                     height = region.getHeight();
@@ -104,9 +104,9 @@ public class ServerCUIHandler {
                 }
 
                 // Just select the point.
-                posX = point.getBlockX();
-                posY = point.getBlockY();
-                posZ = point.getBlockZ();
+                posX = point.x();
+                posY = point.y();
+                posZ = point.z();
                 width = 1;
                 height = 1;
                 length = 1;
@@ -128,8 +128,8 @@ public class ServerCUIHandler {
         double rotX = location.getYaw();
         double rotY = location.getPitch();
         double xz = Math.cos(Math.toRadians(rotY));
-        int x = (int) (location.getX() - (-xz * Math.sin(Math.toRadians(rotX))) * 12);
-        int z = (int) (location.getZ() - (xz * Math.cos(Math.toRadians(rotX))) * 12);
+        int x = (int) (location.x() - (-xz * Math.sin(Math.toRadians(rotX))) * 12);
+        int z = (int) (location.z() - (xz * Math.cos(Math.toRadians(rotX))) * 12);
         int y = Math.max(
                 player.getWorld().getMinY(),
                 Math.min(Math.min(player.getWorld().getMaxY(), posY + MAX_DISTANCE), posY + 3)

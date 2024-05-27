@@ -440,13 +440,13 @@ public class GenerationCommands {
             zero = max.add(min).multiply(0.5);
             unit = max.subtract(zero);
 
-            if (unit.getX() == 0) {
+            if (unit.x() == 0) {
                 unit = unit.withX(1.0);
             }
-            if (unit.getY() == 0) {
+            if (unit.y() == 0) {
                 unit = unit.withY(1.0);
             }
-            if (unit.getZ() == 0) {
+            if (unit.z() == 0) {
                 unit = unit.withZ(1.0);
             }
         }
@@ -526,13 +526,13 @@ public class GenerationCommands {
             zero = max.add(min).multiply(0.5);
             unit = max.subtract(zero);
 
-            if (unit.getX() == 0) {
+            if (unit.x() == 0) {
                 unit = unit.withX(1.0);
             }
-            if (unit.getY() == 0) {
+            if (unit.y() == 0) {
                 unit = unit.withY(1.0);
             }
-            if (unit.getZ() == 0) {
+            if (unit.z() == 0) {
                 unit = unit.withZ(1.0);
             }
         }
@@ -636,7 +636,7 @@ public class GenerationCommands {
         MainUtil.checkImageHost(url.toURI());
         if (dimensions != null) {
             checkCommandArgument(
-                    (long) dimensions.getX() * dimensions.getZ() <= Settings.settings().WEB.MAX_IMAGE_SIZE,
+                    (long) dimensions.x() * dimensions.z() <= Settings.settings().WEB.MAX_IMAGE_SIZE,
                     Caption.of("fawe.error.image-dimensions", Settings.settings().WEB.MAX_IMAGE_SIZE)
             );
         }
@@ -644,7 +644,7 @@ public class GenerationCommands {
         Future<BufferedImage> future = executor.submit(() -> {
             BufferedImage image = MainUtil.readImage(url);
             if (dimensions != null) {
-                image = ImageUtil.getScaledInstance(image, dimensions.getBlockX(), dimensions.getBlockZ(),
+                image = ImageUtil.getScaledInstance(image, dimensions.x(), dimensions.z(),
                         RenderingHints.VALUE_INTERPOLATION_BILINEAR, false
                 );
             }
@@ -668,8 +668,8 @@ public class GenerationCommands {
         CuboidRegion region = new CuboidRegion(pos1, pos2);
         final BufferedImage finalImage = image;
         RegionVisitor visitor = new RegionVisitor(region, pos -> {
-            int x = pos.getBlockX() - pos1.getBlockX();
-            int z = pos.getBlockZ() - pos1.getBlockZ();
+            int x = pos.x() - pos1.x();
+            int z = pos.z() - pos1.z();
             int color = finalImage.getRGB(x, z);
             BlockType block = tu.getNearestBlock(color);
             if (block != null) {
@@ -735,7 +735,7 @@ public class GenerationCommands {
             @Arg(desc = "double", def = "50")
                     double amplitude
     ) throws WorldEditException {
-        double max = MathMan.max(radius.getX(), radius.getY(), radius.getZ());
+        double max = MathMan.max(radius.x(), radius.y(), radius.z());
         worldEdit.checkMaxRadius(max, actor);
         BlockVector3 pos = session.getPlacementPosition(actor);
         int affected = editSession.makeBlob(

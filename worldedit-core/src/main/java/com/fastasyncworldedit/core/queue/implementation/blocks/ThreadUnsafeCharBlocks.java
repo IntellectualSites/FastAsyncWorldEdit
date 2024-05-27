@@ -218,7 +218,7 @@ public class ThreadUnsafeCharBlocks implements IChunkSet, IBlocks {
 
     @Override
     public boolean setBiome(BlockVector3 position, BiomeType biome) {
-        return setBiome(position.getX(), position.getY(), position.getZ(), biome);
+        return setBiome(position.x(), position.y(), position.z(), biome);
     }
 
     public void set(int x, int y, int z, char value) {

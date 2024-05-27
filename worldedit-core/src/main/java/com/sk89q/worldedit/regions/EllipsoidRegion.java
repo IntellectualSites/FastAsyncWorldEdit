@@ -102,32 +102,32 @@ public class EllipsoidRegion extends AbstractRegion {
     @Override
     public long getVolume() {
         return ELLIPSOID_BASE_MULTIPLIER
-                .multiply(BigDecimal.valueOf(radius.getX()))
-                .multiply(BigDecimal.valueOf(radius.getY()))
-                .multiply(BigDecimal.valueOf(radius.getZ()))
+                .multiply(BigDecimal.valueOf(radius.x()))
+                .multiply(BigDecimal.valueOf(radius.y()))
+                .multiply(BigDecimal.valueOf(radius.z()))
                 .setScale(0, RoundingMode.FLOOR)
                 .longValue();
     }
 
     @Override
     public int getWidth() {
-        return (int) (2 * radius.getX());
+        return (int) (2 * radius.x());
     }
 
     @Override
     public int getHeight() {
-        return (int) (2 * radius.getY());
+        return (int) (2 * radius.y());
     }
 
     @Override
     public int getLength() {
-        return (int) (2 * radius.getZ());
+        return (int) (2 * radius.z());
     }
 
     private BlockVector3 calculateDiff(BlockVector3... changes) throws RegionOperationException {
         BlockVector3 diff = BlockVector3.ZERO.add(changes);
 
-        if ((diff.getBlockX() & 1) + (diff.getBlockY() & 1) + (diff.getBlockZ() & 1) != 0) {
+        if ((diff.x() & 1) + (diff.y() & 1) + (diff.z() & 1) != 0) {
             throw new RegionOperationException(Caption.of("worldedit.selection.ellipsoid.error.even-horizontal"));
         }
 
@@ -198,8 +198,8 @@ public class EllipsoidRegion extends AbstractRegion {
         this.radius = radius.add(0.5, 0.5, 0.5);
         //FAWE start
         radiusSqr = radius.multiply(radius);
-        radiusLengthSqr = (int) radiusSqr.getX();
-        this.sphere = radius.getY() == radius.getX() && radius.getX() == radius.getZ();
+        radiusLengthSqr = (int) radiusSqr.x();
+        this.sphere = radius.y() == radius.x() && radius.x() == radius.z();
         inverseRadiusSqr = Vector3.ONE.divide(radiusSqr);
         //FAWE end
     }
@@ -210,10 +210,10 @@ public class EllipsoidRegion extends AbstractRegion {
 
         final BlockVector3 min = getMinimumPoint();
         final BlockVector3 max = getMaximumPoint();
-        final int centerY = center.getBlockY();
+        final int centerY = center.y();
 
-        for (int x = min.getBlockX(); x <= max.getBlockX(); ++x) {
-            for (int z = min.getBlockZ(); z <= max.getBlockZ(); ++z) {
+        for (int x = min.x(); x <= max.x(); ++x) {
+            for (int z = min.z(); z <= max.z(); ++z) {
                 if (!contains(x, centerY, z)) {
                     continue;
                 }
@@ -231,17 +231,17 @@ public class EllipsoidRegion extends AbstractRegion {
     //FAWE start
     @Override
     public boolean contains(int x, int y, int z) {
-        int cx = x - center.getBlockX();
+        int cx = x - center.x();
         int cx2 = cx * cx;
         if (cx2 > radiusSqr.getBlockX()) {
             return false;
         }
-        int cz = z - center.getBlockZ();
+        int cz = z - center.z();
         int cz2 = cz * cz;
         if (cz2 > radiusSqr.getBlockZ()) {
             return false;
         }
-        int cy = y - center.getBlockY();
+        int cy = y - center.y();
         int cy2 = cy * cy;
         if (radiusSqr.getBlockY() < getWorldMaxY() && cy2 > radiusSqr.getBlockY()) {
             return false;
@@ -249,9 +249,9 @@ public class EllipsoidRegion extends AbstractRegion {
         if (sphere) {
             return cx2 + cy2 + cz2 <= radiusLengthSqr;
         }
-        double cxd = cx2 * inverseRadiusSqr.getX();
-        double cyd = cy2 * inverseRadiusSqr.getY();
-        double czd = cz2 * inverseRadiusSqr.getZ();
+        double cxd = cx2 * inverseRadiusSqr.x();
+        double cyd = cy2 * inverseRadiusSqr.y();
+        double czd = cz2 * inverseRadiusSqr.z();
         return cxd + cyd + czd <= 1;
     }
 
@@ -265,23 +265,23 @@ public class EllipsoidRegion extends AbstractRegion {
 
     @Override
     public boolean contains(BlockVector3 position) {
-        return contains(position.getX(), position.getY(), position.getZ());
+        return contains(position.x(), position.y(), position.z());
     }
 
     @Override
     public boolean contains(int x, int z) {
-        int cx = x - center.getBlockX();
+        int cx = x - center.x();
         int cx2 = cx * cx;
         if (cx2 > radiusSqr.getBlockX()) {
             return false;
         }
-        int cz = z - center.getBlockZ();
+        int cz = z - center.z();
         int cz2 = cz * cz;
         if (cz2 > radiusSqr.getBlockZ()) {
             return false;
         }
-        double cxd = cx2 * inverseRadiusSqr.getX();
-        double czd = cz2 * inverseRadiusSqr.getZ();
+        double cxd = cx2 * inverseRadiusSqr.x();
+        double czd = cz2 * inverseRadiusSqr.z();
         return cxd + czd <= 1;
     }
     //FAWE end
@@ -339,9 +339,9 @@ public class EllipsoidRegion extends AbstractRegion {
             int layer, int y1, int y2, int bx, int bz, Filter filter,
             ChunkFilterBlock block, IChunkGet get, IChunkSet set
     ) {
-        int cx = center.getBlockX();
-        int cy = center.getBlockY();
-        int cz = center.getBlockZ();
+        int cx = center.x();
+        int cy = center.y();
+        int cz = center.z();
 
         block.initLayer(get, set, layer);
 
@@ -376,8 +376,8 @@ public class EllipsoidRegion extends AbstractRegion {
     ) {
         // Check bounds
         // This needs to be able to perform 50M blocks/sec otherwise it becomes a bottleneck
-        int cx = center.getBlockX();
-        int cz = center.getBlockZ();
+        int cx = center.x();
+        int cz = center.z();
         int bx = chunk.getX() << 4;
         int bz = chunk.getZ() << 4;
         int tx = bx + 15;
@@ -415,7 +415,7 @@ public class EllipsoidRegion extends AbstractRegion {
             block = block.initChunk(chunk.getX(), chunk.getZ());
 
             // Get the solid layers
-            int cy = center.getBlockY();
+            int cy = center.y();
             int diffYFull = MathMan.usqrt(diffY2);
 
             int yBotFull = Math.max(getWorldMinY(), cy - diffYFull);

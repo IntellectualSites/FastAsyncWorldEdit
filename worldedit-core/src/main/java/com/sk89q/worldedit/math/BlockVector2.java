@@ -53,7 +53,7 @@ public class BlockVector2 {
      * </pre>
      */
     public static final Comparator<BlockVector2> COMPARING_GRID_ARRANGEMENT =
-            Comparator.comparingInt(BlockVector2::getZ).thenComparingInt(BlockVector2::getX);
+            Comparator.comparingInt(BlockVector2::z).thenComparingInt(BlockVector2::x);
 
     public static BlockVector2 at(double x, double z) {
         return at((int) Math.floor(x), (int) Math.floor(z));

@@ -40,10 +40,10 @@ public class OffsetPattern extends AbstractPattern {
 
     @Override
     public BaseBlock applyBlock(BlockVector3 position) {
-        mutable.mutX(position.getX() + dx);
-        mutable.mutY(position.getY() + dy);
-        mutable.mutZ(position.getZ() + dz);
-        if (mutable.getY() < minY || mutable.getY() > maxY) {
+        mutable.mutX(position.x() + dx);
+        mutable.mutY(position.y() + dy);
+        mutable.mutZ(position.z() + dz);
+        if (mutable.y() < minY || mutable.y() > maxY) {
             return BlockTypes.AIR.getDefaultState().toBaseBlock();
         }
         return pattern.applyBlock(mutable);
@@ -51,10 +51,10 @@ public class OffsetPattern extends AbstractPattern {
 
     @Override
     public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
-        mutable.mutX(get.getX() + dx);
-        mutable.mutY(get.getY() + dy);
-        mutable.mutZ(get.getZ() + dz);
-        if (mutable.getY() < extent.getMinY() || mutable.getY() > extent.getMaxY()) {
+        mutable.mutX(get.x() + dx);
+        mutable.mutY(get.y() + dy);
+        mutable.mutZ(get.z() + dz);
+        if (mutable.y() < extent.getMinY() || mutable.y() > extent.getMaxY()) {
             return false;
         }
         return pattern.apply(extent, get, mutable);

@@ -359,7 +359,7 @@ public class DiskOptimizedClipboard extends LinearClipboard {
 
     @Override
     public boolean setBiome(BlockVector3 position, BiomeType biome) {
-        return setBiome(position.getX(), position.getY(), position.getZ(), biome);
+        return setBiome(position.x(), position.y(), position.z(), biome);
     }
 
     @Override
@@ -417,7 +417,7 @@ public class DiskOptimizedClipboard extends LinearClipboard {
 
     @Override
     public BiomeType getBiome(BlockVector3 position) {
-        return getBiome(getBiomeIndex(position.getX(), position.getY(), position.getZ()));
+        return getBiome(getBiomeIndex(position.x(), position.y(), position.z()));
     }
 
     public BlockArrayClipboard toClipboard() {
@@ -438,9 +438,9 @@ public class DiskOptimizedClipboard extends LinearClipboard {
         super.setOrigin(origin);
         origin = origin.subtract(offset);
         try {
-            byteBuffer.putShort(10, (short) origin.getBlockX());
-            byteBuffer.putShort(12, (short) origin.getBlockY());
-            byteBuffer.putShort(14, (short) origin.getBlockZ());
+            byteBuffer.putShort(10, (short) origin.x());
+            byteBuffer.putShort(12, (short) origin.y());
+            byteBuffer.putShort(14, (short) origin.z());
         } catch (Throwable e) {
             e.printStackTrace();
         }
@@ -450,9 +450,9 @@ public class DiskOptimizedClipboard extends LinearClipboard {
     protected void setOffset(BlockVector3 offset) {
         super.setOffset(offset);
         try {
-            byteBuffer.putShort(16, (short) offset.getBlockX());
-            byteBuffer.putShort(18, (short) offset.getBlockY());
-            byteBuffer.putShort(20, (short) offset.getBlockZ());
+            byteBuffer.putShort(16, (short) offset.x());
+            byteBuffer.putShort(18, (short) offset.y());
+            byteBuffer.putShort(20, (short) offset.z());
         } catch (Throwable e) {
             e.printStackTrace();
         }
@@ -588,9 +588,9 @@ public class DiskOptimizedClipboard extends LinearClipboard {
                                 CompoundTag data = entity.getState().getNbtData();
                                 HashMap<String, Tag> value = new HashMap<>(data.getValue());
                                 List<DoubleTag> pos = new ArrayList<>(3);
-                                pos.add(new DoubleTag(entity.getLocation().getX()));
-                                pos.add(new DoubleTag(entity.getLocation().getX()));
-                                pos.add(new DoubleTag(entity.getLocation().getX()));
+                                pos.add(new DoubleTag(entity.getLocation().x()));
+                                pos.add(new DoubleTag(entity.getLocation().x()));
+                                pos.add(new DoubleTag(entity.getLocation().x()));
                                 value.put("Pos", new ListTag(DoubleTag.class, pos));
                                 nbtOS.writeTag(new CompoundTag(value));
                             }

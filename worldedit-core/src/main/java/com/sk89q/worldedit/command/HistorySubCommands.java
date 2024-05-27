@@ -13,10 +13,7 @@ import com.fastasyncworldedit.core.util.MainUtil;
 import com.fastasyncworldedit.core.util.StringMan;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
-import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.EditSessionBuilder;
 import com.sk89q.worldedit.LocalSession;
-import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.command.argument.Arguments;
 import com.sk89q.worldedit.command.util.CommandPermissions;
@@ -25,7 +22,6 @@ import com.sk89q.worldedit.command.util.annotation.Confirm;
 import com.sk89q.worldedit.command.util.annotation.Time;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
-import com.sk89q.worldedit.function.operation.ChangeSetExecutor;
 import com.sk89q.worldedit.history.changeset.ChangeSet;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -245,11 +241,11 @@ public class HistorySubCommands {
         BlockVector3 pos1 = edit.getMinimumPoint();
         BlockVector3 pos2 = edit.getMaximumPoint();
 
-        double distanceX = Math.min(Math.abs(pos1.getX() - origin.getX()), Math.abs(pos2.getX() - origin.getX()));
-        double distanceZ = Math.min(Math.abs(pos1.getZ() - origin.getZ()), Math.abs(pos2.getZ() - origin.getZ()));
+        double distanceX = Math.min(Math.abs(pos1.x() - origin.x()), Math.abs(pos2.x() - origin.x()));
+        double distanceZ = Math.min(Math.abs(pos1.z() - origin.z()), Math.abs(pos2.z() - origin.z()));
         int distance = (int) Math.sqrt(distanceX * distanceX + distanceZ * distanceZ);
 
-        BlockVector2 dirVec = BlockVector2.at(edit.getOriginX() - origin.getX(), edit.getOriginZ() - origin.getZ());
+        BlockVector2 dirVec = BlockVector2.at(edit.getOriginX() - origin.x(), edit.getOriginZ() - origin.z());
         Direction direction = Direction.findClosest(dirVec.toVector3(), Direction.Flag.ALL);
 
         long seconds = (System.currentTimeMillis() - edit.getBDFile().lastModified()) / 1000;
@@ -326,13 +322,13 @@ public class HistorySubCommands {
                             BlockVector3 pos1 = rollback.getMinimumPoint();
                             BlockVector3 pos2 = rollback.getMaximumPoint();
 
-                            double distanceX = Math.min(Math.abs(pos1.getX() - origin.getX()), Math.abs(pos2.getX() - origin.getX()));
-                            double distanceZ = Math.min(Math.abs(pos1.getZ() - origin.getZ()), Math.abs(pos2.getZ() - origin.getZ()));
+                            double distanceX = Math.min(Math.abs(pos1.x() - origin.x()), Math.abs(pos2.x() - origin.x()));
+                            double distanceZ = Math.min(Math.abs(pos1.z() - origin.z()), Math.abs(pos2.z() - origin.z()));
                             int distance = (int) Math.sqrt(distanceX * distanceX + distanceZ * distanceZ);
 
                             BlockVector2 dirVec = BlockVector2.at(
-                                    rollback.getOriginX() - origin.getX(),
-                                    rollback.getOriginZ() - origin.getZ()
+                                    rollback.getOriginX() - origin.x(),
+                                    rollback.getOriginZ() - origin.z()
                             );
                             Direction direction = Direction.findClosest(dirVec.toVector3(), Direction.Flag.ALL);
 

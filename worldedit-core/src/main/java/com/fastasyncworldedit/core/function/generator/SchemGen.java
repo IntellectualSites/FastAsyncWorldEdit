@@ -36,7 +36,7 @@ public class SchemGen implements Resource {
         int y = extent.getNearestSurfaceTerrainBlock(
                 x,
                 z,
-                mutable.getBlockY(),
+                mutable.y(),
                 this.extent.getMinY(),
                 this.extent.getMaxY(),
                 Integer.MIN_VALUE,

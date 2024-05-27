@@ -475,7 +475,7 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
         net.minecraft.world.level.block.state.BlockState blockState1 = Block.stateById(internalId);
         return blockState1.hasPostProcess(
                 getServerLevel(world),
-                new BlockPos(blockVector3.getX(), blockVector3.getY(), blockVector3.getZ())
+                new BlockPos(blockVector3.x(), blockVector3.y(), blockVector3.z())
         );
     }
 

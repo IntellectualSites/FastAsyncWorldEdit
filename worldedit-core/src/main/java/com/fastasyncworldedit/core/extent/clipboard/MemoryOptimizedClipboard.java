@@ -64,7 +64,7 @@ public class MemoryOptimizedClipboard extends LinearClipboard {
 
     @Override
     public boolean setBiome(BlockVector3 position, BiomeType biome) {
-        return setBiome(position.getX(), position.getY(), position.getZ(), biome);
+        return setBiome(position.x(), position.y(), position.z(), biome);
     }
 
     @Override
@@ -115,7 +115,7 @@ public class MemoryOptimizedClipboard extends LinearClipboard {
 
     @Override
     public BiomeType getBiome(BlockVector3 position) {
-        return getBiome(getBiomeIndex(position.getX(), position.getY(), position.getZ()));
+        return getBiome(getBiomeIndex(position.x(), position.y(), position.z()));
     }
 
     private int getOrdinal(int index) {

@@ -114,9 +114,9 @@ public class SnapshotRestore {
 
         // First, we need to group points by chunk so that we only need
         // to keep one chunk in memory at any given moment
-        for (int x = min.getBlockX(); x <= max.getBlockX(); ++x) {
-            for (int y = min.getBlockY(); y <= max.getBlockY(); ++y) {
-                for (int z = min.getBlockZ(); z <= max.getBlockZ(); ++z) {
+        for (int x = min.x(); x <= max.x(); ++x) {
+            for (int y = min.y(); y <= max.y(); ++y) {
+                for (int z = min.z(); z <= max.z(); ++z) {
                     BlockVector3 pos = BlockVector3.at(x, y, z);
                     checkAndAddBlock(pos);
                 }
@@ -185,7 +185,7 @@ public class SnapshotRestore {
                     try {
                         editSession.setBlock(pos, chunk.getBlock(pos));
                         //FAWE start - biome and entity restore
-                        if (restoreBiomes && (pos.getX() & 3) == 0 && (pos.getY() & 3) == 0 && (pos.getZ() & 3) == 0) {
+                        if (restoreBiomes && (pos.x() & 3) == 0 && (pos.y() & 3) == 0 && (pos.z() & 3) == 0) {
                             editSession.setBiome(pos, chunk.getBiome(pos));
                         }
                         //FAWE end

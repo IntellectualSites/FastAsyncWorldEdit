@@ -25,7 +25,7 @@ public interface IChunkSet extends IBlocks, OutputExtent {
 
     @Override
     default boolean setBiome(BlockVector3 position, BiomeType biome) {
-        return setBiome(position.getX(), position.getY(), position.getZ(), biome);
+        return setBiome(position.x(), position.y(), position.z(), biome);
     }
 
     @Override

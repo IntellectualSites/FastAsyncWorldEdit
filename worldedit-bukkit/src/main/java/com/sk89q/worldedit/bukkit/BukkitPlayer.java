@@ -242,9 +242,9 @@ public class BukkitPlayer extends AbstractPlayerActor {
         //FAWE end
         return TaskManager.taskManager().sync(() -> player.teleport(new Location(
                 finalWorld,
-                pos.getX(),
-                pos.getY(),
-                pos.getZ(),
+                pos.x(),
+                pos.y(),
+                pos.z(),
                 yaw,
                 pitch
         )));
@@ -422,7 +422,7 @@ public class BukkitPlayer extends AbstractPlayerActor {
 
     @Override
     public <B extends BlockStateHolder<B>> void sendFakeBlock(BlockVector3 pos, B block) {
-        Location loc = new Location(player.getWorld(), pos.getX(), pos.getY(), pos.getZ());
+        Location loc = new Location(player.getWorld(), pos.x(), pos.y(), pos.z());
         if (block == null) {
             player.sendBlockChange(loc, player.getWorld().getBlockAt(loc).getBlockData());
         } else {

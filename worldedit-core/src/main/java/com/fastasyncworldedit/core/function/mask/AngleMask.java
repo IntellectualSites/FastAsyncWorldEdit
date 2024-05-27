@@ -127,9 +127,9 @@ public class AngleMask extends AbstractExtentMask implements ResettableMask {
     }
 
     private boolean adjacentAir(Extent extent, MutableBlockVector3 mutable) {
-        int x = mutable.getBlockX();
-        int y = mutable.getBlockY();
-        int z = mutable.getBlockZ();
+        int x = mutable.x();
+        int y = mutable.y();
+        int z = mutable.z();
         if (!mask.test(extent, mutable.setComponents(x + 1, y, z))) {
             return true;
         }
@@ -154,23 +154,23 @@ public class AngleMask extends AbstractExtentMask implements ResettableMask {
         if (!mask.test(vector)) {
             return false;
         }
-        int y = vector.getBlockY();
+        int y = vector.y();
         if (overlay) {
             MutableBlockVector3 mutable = new MutableBlockVector3(vector);
             if (y < maxY && !adjacentAir(null, mutable)) {
                 return false;
             }
         }
-        int x = vector.getBlockX();
-        int z = vector.getBlockZ();
+        int x = vector.x();
+        int z = vector.z();
         return testSlope(getExtent(), x, y, z);
     }
 
     @Override
     public boolean test(final Extent extent, final BlockVector3 vector) {
-        int x = vector.getBlockX();
-        int y = vector.getBlockY();
-        int z = vector.getBlockZ();
+        int x = vector.x();
+        int y = vector.y();
+        int z = vector.z();
 
         if ((lastX == (lastX = x) & lastZ == (lastZ = z))) {
             int height = getHeight(extent, x, y, z);

@@ -184,7 +184,7 @@ public class NullWorld extends AbstractWorld {
 
     @Override
     public BlockState getBlock(BlockVector3 position) {
-        return this.getBlock(position.getBlockX(), position.getBlockY(), position.getBlockZ());
+        return this.getBlock(position.x(), position.y(), position.z());
     }
 
     @Override
