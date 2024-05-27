@@ -306,9 +306,9 @@ public class ForwardExtentCopy implements Operation {
         if (!translation.equals(BlockVector3.ZERO)) {
             finalDest = new BlockTranslateExtent(
                     finalDest,
-                    translation.getBlockX(),
-                    translation.getBlockY(),
-                    translation.getBlockZ()
+                    translation.x(),
+                    translation.y(),
+                    translation.z()
             );
         }
         //FAWE end
@@ -349,21 +349,21 @@ public class ForwardExtentCopy implements Operation {
             if (sourceFunction != null) {
                 BlockVector3 disAbs = translation.abs();
                 BlockVector3 size = region.getMaximumPoint().subtract(region.getMinimumPoint()).add(1, 1, 1);
-                boolean overlap = (disAbs.getBlockX() < size.getBlockX() && disAbs.getBlockY() < size.getBlockY() && disAbs.getBlockZ() < size
-                        .getBlockZ());
+                boolean overlap = (disAbs.x() < size.x() && disAbs.y() < size.y() && disAbs.z() < size
+                        .z());
 
                 RegionFunction copySrcFunc = sourceFunction;
                 if (overlap && translation.length() != 0) {
 
-                    int x = translation.getBlockX();
-                    int y = translation.getBlockY();
-                    int z = translation.getBlockZ();
+                    int x = translation.x();
+                    int y = translation.y();
+                    int z = translation.z();
 
                     maskFunc = position -> {
                         BlockVector3 bv = BlockVector3.at(
-                                position.getBlockX() + x,
-                                position.getBlockY() + y,
-                                position.getBlockZ() + z
+                                position.x() + x,
+                                position.y() + y,
+                                position.z() + z
                         );
                         if (region.contains(bv)) {
                             return sourceFunction.apply(bv);
@@ -373,9 +373,9 @@ public class ForwardExtentCopy implements Operation {
 
                     copySrcFunc = position -> {
                         BlockVector3 bv = BlockVector3.at(
-                                position.getBlockX() - x,
-                                position.getBlockY() - y,
-                                position.getBlockZ() - z
+                                position.x() - x,
+                                position.y() - y,
+                                position.z() - z
                         );
                         if (!region.contains(bv)) {
                             return sourceFunction.apply(position);

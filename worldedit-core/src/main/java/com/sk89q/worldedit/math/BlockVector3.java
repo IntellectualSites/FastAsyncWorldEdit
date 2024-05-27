@@ -254,7 +254,7 @@ public abstract class BlockVector3 {
      */
     //FAWE start - getter
     public BlockVector3 withY(int y) {
-        return BlockVector3.at(getX(), y, getZ());
+        return BlockVector3.at(x(), y, z());
     }
     //FAWE end
 

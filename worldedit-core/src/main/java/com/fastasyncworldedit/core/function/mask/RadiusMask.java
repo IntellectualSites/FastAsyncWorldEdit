@@ -30,17 +30,17 @@ public class RadiusMask extends AbstractMask implements ResettableMask {
         if (pos == null) {
             pos = to.toImmutable();
         }
-        int dx = pos.getBlockX() - to.getBlockX();
+        int dx = pos.x() - to.x();
         int d = dx * dx;
         if (d > maxSqr) {
             return false;
         }
-        int dz = pos.getBlockZ() - to.getBlockZ();
+        int dz = pos.z() - to.z();
         d += dz * dz;
         if (d > maxSqr) {
             return false;
         }
-        int dy = pos.getBlockY() - to.getBlockY();
+        int dy = pos.y() - to.y();
         d += dy * dy;
         return d >= minSqr && d <= maxSqr;
     }

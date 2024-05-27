@@ -56,7 +56,7 @@ public class WorldGuardFeature extends BukkitMaskManager implements Listener {
         if (region instanceof ProtectedPolygonalRegion casted) {
             BlockVector3 max = region.getMaximumPoint();
             BlockVector3 min = region.getMinimumPoint();
-            return new Polygonal2DRegion(null, casted.getPoints(), min.getBlockY(), max.getBlockY());
+            return new Polygonal2DRegion(null, casted.getPoints(), min.y(), max.y());
         }
         return new AdaptedRegion(region);
     }

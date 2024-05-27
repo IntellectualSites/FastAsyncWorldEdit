@@ -52,22 +52,22 @@ public class DirectionalVisitor extends RecursiveVisitor {
 
     @Override
     public boolean isVisitable(final BlockVector3 from, final BlockVector3 to) {
-        int dx = to.getBlockX() - from.getBlockX();
-        int dz = to.getBlockZ() - from.getBlockZ();
-        int dy = to.getBlockY() - from.getBlockY();
+        int dx = to.x() - from.x();
+        int dz = to.z() - from.z();
+        int dy = to.y() - from.y();
 
         if (dx != 0) {
-            if (dirVec.getBlockX() != 0 && dirVec.getBlockX() != dx) {
+            if (dirVec.x() != 0 && dirVec.x() != dx) {
                 return false;
             }
         }
         if (dy != 0) {
-            if (dirVec.getBlockY() != 0 && dirVec.getBlockY() != dy) {
+            if (dirVec.y() != 0 && dirVec.y() != dy) {
                 return false;
             }
         }
         if (dz != 0) {
-            if (dirVec.getBlockZ() != 0 && dirVec.getBlockZ() != dz) {
+            if (dirVec.z() != 0 && dirVec.z() != dz) {
                 return false;
             }
         }

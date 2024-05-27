@@ -94,15 +94,15 @@ public class FaweDelegateSchematicHandler {
                 return;
             }
             BlockVector3 dimension = schematic.getClipboard().getDimensions();
-            final int WIDTH = dimension.getX();
-            final int LENGTH = dimension.getZ();
-            final int HEIGHT = dimension.getY();
+            final int WIDTH = dimension.x();
+            final int LENGTH = dimension.z();
+            final int HEIGHT = dimension.y();
             final int worldHeight = plot.getArea().getMaxGenHeight() - plot.getArea().getMinGenHeight() + 1;
             // Validate dimensions
             CuboidRegion region = plot.getLargestRegion();
             boolean sizeMismatch =
-                    ((region.getMaximumPoint().getX() - region.getMinimumPoint().getX() + xOffset + 1) < WIDTH) || (
-                            (region.getMaximumPoint().getZ() - region.getMinimumPoint().getZ() + zOffset + 1) < LENGTH) || (HEIGHT
+                    ((region.getMaximumPoint().x() - region.getMinimumPoint().x() + xOffset + 1) < WIDTH) || (
+                            (region.getMaximumPoint().z() - region.getMinimumPoint().z() + zOffset + 1) < LENGTH) || (HEIGHT
                             > worldHeight);
             if (!Settings.Schematics.PASTE_MISMATCHES && sizeMismatch) {
                 if (actor != null) {
@@ -111,8 +111,8 @@ public class FaweDelegateSchematicHandler {
                 TaskManager.runTask(whenDone);
                 return;
             }
-            if (((region.getMaximumPoint().getX() - region.getMinimumPoint().getX() + xOffset + 1) < WIDTH) || (
-                    (region.getMaximumPoint().getZ() - region.getMinimumPoint().getZ() + zOffset + 1) < LENGTH) || (HEIGHT
+            if (((region.getMaximumPoint().x() - region.getMinimumPoint().x() + xOffset + 1) < WIDTH) || (
+                    (region.getMaximumPoint().z() - region.getMinimumPoint().z() + zOffset + 1) < LENGTH) || (HEIGHT
                     > worldHeight)) {
                 if (whenDone != null) {
                     TaskManager.runTask(whenDone);
@@ -141,7 +141,7 @@ public class FaweDelegateSchematicHandler {
                         } else {
                             y_offset_actual = yOffset + pw.getMinBuildHeight() + editSession.getHighestTerrainBlock(region
                                     .getMinimumPoint()
-                                    .getX() + 1, region.getMinimumPoint().getZ() + 1, pw.getMinGenHeight(), pw.getMaxGenHeight()
+                                    .x() + 1, region.getMinimumPoint().z() + 1, pw.getMinGenHeight(), pw.getMaxGenHeight()
                             );
                         }
                     }
@@ -150,7 +150,7 @@ public class FaweDelegateSchematicHandler {
                 }
 
                 final BlockVector3 to = BlockVector3
-                        .at(region.getMinimumPoint().getX() + xOffset, y_offset_actual, region.getMinimumPoint().getZ() + zOffset);
+                        .at(region.getMinimumPoint().x() + xOffset, y_offset_actual, region.getMinimumPoint().z() + zOffset);
                 final Clipboard clipboard = schematic.getClipboard();
                 clipboard.setOrigin(clipboard.getRegion().getMinimumPoint());
                 clipboard.paste(editSession, to, true, false, true);

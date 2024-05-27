@@ -163,15 +163,15 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable, Fl
     void removeEntity(Entity entity);
 
     default int getWidth() {
-        return getDimensions().getBlockX();
+        return getDimensions().x();
     }
 
     default int getHeight() {
-        return getDimensions().getBlockY();
+        return getDimensions().y();
     }
 
     default int getLength() {
-        return getDimensions().getBlockZ();
+        return getDimensions().z();
     }
 
     default int getArea() {
@@ -380,17 +380,17 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable, Fl
         final BlockVector3 origin = this.getOrigin();
 
         // To must be relative to the clipboard origin ( player location - clipboard origin ) (as the locations supplied are relative to the world origin)
-        final int relx = to.getBlockX() - origin.getBlockX();
-        final int rely = to.getBlockY() - origin.getBlockY();
-        final int relz = to.getBlockZ() - origin.getBlockZ();
+        final int relx = to.x() - origin.x();
+        final int rely = to.y() - origin.y();
+        final int relz = to.z() - origin.z();
 
         pasteBiomes &= Clipboard.this.hasBiomes();
 
         for (BlockVector3 pos : this) {
             BaseBlock block = pos.getFullBlock(this);
-            int xx = pos.getX() + relx;
-            int yy = pos.getY() + rely;
-            int zz = pos.getZ() + relz;
+            int xx = pos.x() + relx;
+            int yy = pos.y() + rely;
+            int zz = pos.z() + relz;
             if (pasteBiomes) {
                 extent.setBiome(xx, yy, zz, pos.getBiome(this));
             }
@@ -400,9 +400,9 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable, Fl
             extent.setBlock(xx, yy, zz, block);
         }
         // Entity offset is the paste location subtract the clipboard origin (entity's location is already relative to the world origin)
-        final int entityOffsetX = to.getBlockX() - origin.getBlockX();
-        final int entityOffsetY = to.getBlockY() - origin.getBlockY();
-        final int entityOffsetZ = to.getBlockZ() - origin.getBlockZ();
+        final int entityOffsetX = to.x() - origin.x();
+        final int entityOffsetY = to.y() - origin.y();
+        final int entityOffsetZ = to.z() - origin.z();
         // entities
         if (pasteEntities) {
             for (Entity entity : this.getEntities()) {
@@ -412,8 +412,8 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable, Fl
                     continue;
                 }
                 Location pos = entity.getLocation();
-                Location newPos = new Location(pos.getExtent(), pos.getX() + entityOffsetX,
-                        pos.getY() + entityOffsetY, pos.getZ() + entityOffsetZ, pos.getYaw(),
+                Location newPos = new Location(pos.getExtent(), pos.x() + entityOffsetX,
+                        pos.y() + entityOffsetY, pos.z() + entityOffsetZ, pos.getYaw(),
                         pos.getPitch()
                 );
                 extent.createEntity(newPos, entity.getState());

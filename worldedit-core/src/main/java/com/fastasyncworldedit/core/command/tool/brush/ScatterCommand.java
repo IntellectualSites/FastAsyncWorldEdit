@@ -45,9 +45,9 @@ public class ScatterCommand extends ScatterBrush {
                 position.subtract(radius, radius, radius),
                 position.add(radius, radius, radius)
         );
-        String replaced = command.replace("{x}", Integer.toString(position.getBlockX()))
-                .replace("{y}", Integer.toString(position.getBlockY()))
-                .replace("{z}", Integer.toString(position.getBlockZ()))
+        String replaced = command.replace("{x}", Integer.toString(position.x()))
+                .replace("{y}", Integer.toString(position.y()))
+                .replace("{z}", Integer.toString(position.z()))
                 .replace("{world}", editSession.getWorld().getName())
                 .replace("{size}", Integer.toString(radius));
 

@@ -97,7 +97,7 @@ public class AsyncPlayer extends PlayerProxy {
             return false;
         }
 
-        while (y <= world.getMaximumPoint().getY()) {
+        while (y <= world.getMaximumPoint().y()) {
             // Found a ceiling!
             if (world.getBlock(mutable.mutY(y)).getBlockType().getMaterial()
                     .isMovementBlocker()) {

@@ -165,9 +165,9 @@ public class BlockArrayClipboard implements Clipboard {
     @Override
     public BlockState getBlock(BlockVector3 position) {
         if (region.contains(position)) {
-            int x = position.getBlockX() - offset.getX();
-            int y = position.getBlockY() - offset.getY();
-            int z = position.getBlockZ() - offset.getZ();
+            int x = position.x() - offset.x();
+            int y = position.y() - offset.y();
+            int z = position.z() - offset.z();
             return getParent().getBlock(x, y, z);
         }
 
@@ -177,9 +177,9 @@ public class BlockArrayClipboard implements Clipboard {
     @Override
     public BaseBlock getFullBlock(BlockVector3 position) {
         if (region.contains(position)) {
-            int x = position.getBlockX() - offset.getX();
-            int y = position.getBlockY() - offset.getY();
-            int z = position.getBlockZ() - offset.getZ();
+            int x = position.x() - offset.x();
+            int y = position.y() - offset.y();
+            int z = position.z() - offset.z();
             return getParent().getFullBlock(x, y, z);
         }
         return BlockTypes.AIR.getDefaultState().toBaseBlock();
@@ -189,9 +189,9 @@ public class BlockArrayClipboard implements Clipboard {
     public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block) throws WorldEditException {
         if (region.contains(position)) {
             //FAWE - get points
-            final int x = position.getBlockX();
-            final int y = position.getBlockY();
-            final int z = position.getBlockZ();
+            final int x = position.x();
+            final int y = position.y();
+            final int z = position.z();
             return setBlock(x, y, z, block);
             //FAWE end
         }
@@ -201,22 +201,22 @@ public class BlockArrayClipboard implements Clipboard {
     //FAWE start
     @Override
     public boolean setTile(int x, int y, int z, CompoundTag tag) {
-        x -= offset.getX();
-        y -= offset.getY();
-        z -= offset.getZ();
+        x -= offset.x();
+        y -= offset.y();
+        z -= offset.z();
         return getParent().setTile(x, y, z, tag);
     }
 
 
     public boolean setTile(BlockVector3 position, CompoundTag tag) {
-        return setTile(position.getX(), position.getY(), position.getZ(), tag);
+        return setTile(position.x(), position.y(), position.z(), tag);
     }
 
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) throws WorldEditException {
-        x -= offset.getX();
-        y -= offset.getY();
-        z -= offset.getZ();
+        x -= offset.x();
+        y -= offset.y();
+        z -= offset.z();
         return parent.setBlock(x, y, z, block);
     }
 
@@ -230,25 +230,25 @@ public class BlockArrayClipboard implements Clipboard {
         if (!region.contains(position)) {
             return null;
         }
-        int x = position.getBlockX() - offset.getX();
-        int y = position.getBlockY() - offset.getY();
-        int z = position.getBlockZ() - offset.getZ();
+        int x = position.x() - offset.x();
+        int y = position.y() - offset.y();
+        int z = position.z() - offset.z();
         return getParent().getBiomeType(x, y, z);
     }
 
     @Override
     public boolean setBiome(BlockVector3 position, BiomeType biome) {
-        int x = position.getBlockX() - offset.getX();
-        int y = position.getBlockY() - offset.getY();
-        int z = position.getBlockZ() - offset.getZ();
+        int x = position.x() - offset.x();
+        int y = position.y() - offset.y();
+        int z = position.z() - offset.z();
         return getParent().setBiome(x, y, z, biome);
     }
 
     @Override
     public boolean setBiome(int x, int y, int z, BiomeType biome) {
-        x -= offset.getX();
-        y -= offset.getY();
-        z -= offset.getZ();
+        x -= offset.x();
+        y -= offset.y();
+        z -= offset.z();
         return getParent().setBiome(x, y, z, biome);
     }
 
@@ -262,9 +262,9 @@ public class BlockArrayClipboard implements Clipboard {
                 ClipboardEntity ce = (ClipboardEntity) e;
                 Location oldloc = ce.getLocation();
                 Location loc = new Location(oldloc.getExtent(),
-                        oldloc.getX() + offset.getBlockX(),
-                        oldloc.getY() + offset.getBlockY(),
-                        oldloc.getZ() + offset.getBlockZ(),
+                        oldloc.x() + offset.x(),
+                        oldloc.y() + offset.y(),
+                        oldloc.z() + offset.z(),
                         oldloc.getYaw(), oldloc.getPitch()
                 );
                 return new ClipboardEntity(loc, ce.entity);
@@ -281,9 +281,9 @@ public class BlockArrayClipboard implements Clipboard {
                 ClipboardEntity ce = (ClipboardEntity) e;
                 Location oldloc = ce.getLocation();
                 Location loc = new Location(oldloc.getExtent(),
-                        oldloc.getX() + offset.getBlockX(),
-                        oldloc.getY() + offset.getBlockY(),
-                        oldloc.getZ() + offset.getBlockZ(),
+                        oldloc.x() + offset.x(),
+                        oldloc.y() + offset.y(),
+                        oldloc.z() + offset.z(),
                         oldloc.getYaw(), oldloc.getPitch()
                 );
                 return new ClipboardEntity(loc, ce.entity);
@@ -296,9 +296,9 @@ public class BlockArrayClipboard implements Clipboard {
     @Nullable
     public Entity createEntity(Location location, BaseEntity entity) {
         Location l = new Location(location.getExtent(),
-                location.getX() - offset.getBlockX(),
-                location.getY() - offset.getBlockY(),
-                location.getZ() - offset.getBlockZ(),
+                location.x() - offset.x(),
+                location.y() - offset.y(),
+                location.z() - offset.z(),
                 location.getYaw(), location.getPitch()
         );
         return getParent().createEntity(l, entity);
@@ -308,9 +308,9 @@ public class BlockArrayClipboard implements Clipboard {
     @Nullable
     public Entity createEntity(Location location, BaseEntity entity, UUID uuid) {
         Location l = new Location(location.getExtent(),
-                location.getX() - offset.getBlockX(),
-                location.getY() - offset.getBlockY(),
-                location.getZ() - offset.getBlockZ(),
+                location.x() - offset.x(),
+                location.y() - offset.y(),
+                location.z() - offset.z(),
                 location.getYaw(), location.getPitch()
         );
         return getParent().createEntity(l, entity, uuid);
@@ -318,33 +318,33 @@ public class BlockArrayClipboard implements Clipboard {
 
     @Override
     public void removeEntity(int x, int y, int z, UUID uuid) {
-        x -= offset.getX();
-        y -= offset.getY();
-        z -= offset.getZ();
+        x -= offset.x();
+        y -= offset.y();
+        z -= offset.z();
         getParent().removeEntity(x, y, z, uuid);
     }
 
     @Override
     public BlockState getBlock(int x, int y, int z) {
-        x -= offset.getX();
-        y -= offset.getY();
-        z -= offset.getZ();
+        x -= offset.x();
+        y -= offset.y();
+        z -= offset.z();
         return getParent().getBlock(x, y, z);
     }
 
     @Override
     public BaseBlock getFullBlock(int x, int y, int z) {
-        x -= offset.getX();
-        y -= offset.getY();
-        z -= offset.getZ();
+        x -= offset.x();
+        y -= offset.y();
+        z -= offset.z();
         return getParent().getFullBlock(x, y, z);
     }
 
     @Override
     public BiomeType getBiomeType(int x, int y, int z) {
-        x -= offset.getX();
-        y -= offset.getY();
-        z -= offset.getZ();
+        x -= offset.x();
+        y -= offset.y();
+        z -= offset.z();
         return getParent().getBiomeType(x, y, z);
     }
 
@@ -359,7 +359,7 @@ public class BlockArrayClipboard implements Clipboard {
     public Iterator<BlockVector2> iterator2d() {
         MutableBlockVector2 mutable = new MutableBlockVector2();
         return Iterators.transform(getParent().iterator2d(), input ->
-                mutable.setComponents(input.getX() + offset.getX(), input.getZ() + offset.getZ()));
+                mutable.setComponents(input.x() + offset.x(), input.z() + offset.z()));
     }
 
     @Override
@@ -409,7 +409,7 @@ public class BlockArrayClipboard implements Clipboard {
         private final float pitch;
 
         public ClipboardEntity(Location loc, BaseEntity entity) {
-            this((Clipboard) loc.getExtent(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch(), entity);
+            this((Clipboard) loc.getExtent(), loc.x(), loc.y(), loc.z(), loc.getYaw(), loc.getPitch(), entity);
         }
 
         public ClipboardEntity(Clipboard clipboard, double x, double y, double z, float yaw, float pitch, BaseEntity entity) {

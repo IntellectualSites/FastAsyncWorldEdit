@@ -232,9 +232,9 @@ public class AnvilChunk18 implements Chunk {
 
     @Override
     public BaseBlock getBlock(BlockVector3 position) throws DataException {
-        int x = position.getX() & 15;
-        int y = position.getY();
-        int z = position.getZ() & 15;
+        int x = position.x() & 15;
+        int y = position.y();
+        int z = position.z() & 15;
 
         int section = y >> 4;
         int yIndex = y & 0x0F;
@@ -259,10 +259,10 @@ public class AnvilChunk18 implements Chunk {
         if (biomes == null) {
             populateBiomes();
         }
-        int x = (position.getX() & 15) >> 2;
-        int y = (position.getY() & 15) >> 2;
-        int z = (position.getZ() & 15) >> 2;
-        int section = position.getY() >> 4;
+        int x = (position.x() & 15) >> 2;
+        int y = (position.y() & 15) >> 2;
+        int z = (position.z() & 15) >> 2;
+        int section = position.y() >> 4;
         BiomeType[] sectionBiomes = biomes.get(section);
         if (sectionBiomes.length == 1) {
             return sectionBiomes[0];

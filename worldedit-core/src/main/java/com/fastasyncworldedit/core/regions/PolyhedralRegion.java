@@ -261,27 +261,27 @@ public class PolyhedralRegion extends AbstractRegion {
         if (!isDefined()) {
             return false;
         }
-        final int x = position.getBlockX();
-        final int y = position.getBlockY();
-        final int z = position.getBlockZ();
+        final int x = position.x();
+        final int y = position.y();
+        final int z = position.z();
         final BlockVector3 min = getMinimumPoint();
         final BlockVector3 max = getMaximumPoint();
-        if (x < min.getBlockX()) {
+        if (x < min.x()) {
             return false;
         }
-        if (x > max.getBlockX()) {
+        if (x > max.x()) {
             return false;
         }
-        if (z < min.getBlockZ()) {
+        if (z < min.z()) {
             return false;
         }
-        if (z > max.getBlockZ()) {
+        if (z > max.z()) {
             return false;
         }
-        if (y < min.getBlockY()) {
+        if (y < min.y()) {
             return false;
         }
-        if (y > max.getBlockY()) {
+        if (y > max.y()) {
             return false;
         }
         return containsRaw(position);

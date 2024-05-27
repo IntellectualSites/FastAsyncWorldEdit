@@ -55,9 +55,9 @@ public class ScaleTransform extends ResettableExtent {
         if (min == null) {
             min = pos;
         }
-        mutable.mutX(min.getX() + (pos.getX() - min.getX()) * dx);
-        mutable.mutY(min.getY() + (pos.getY() - min.getY()) * dy);
-        mutable.mutZ(min.getZ() + (pos.getZ() - min.getZ()) * dz);
+        mutable.mutX(min.x() + (pos.x() - min.x()) * dx);
+        mutable.mutY(min.y() + (pos.y() - min.y()) * dy);
+        mutable.mutZ(min.z() + (pos.z() - min.z()) * dz);
         return new MutableVector3(mutable);
     }
 
@@ -65,9 +65,9 @@ public class ScaleTransform extends ResettableExtent {
         if (min == null) {
             min = BlockVector3.at(x, y, z);
         }
-        mutable.mutX(min.getX() + (x - min.getX()) * dx);
-        mutable.mutY(min.getY() + (y - min.getY()) * dy);
-        mutable.mutZ(min.getZ() + (z - min.getZ()) * dz);
+        mutable.mutX(min.x() + (x - min.x()) * dx);
+        mutable.mutY(min.y() + (y - min.y()) * dy);
+        mutable.mutZ(min.z() + (z - min.z()) * dz);
         return new MutableVector3(mutable);
     }
 
@@ -77,15 +77,15 @@ public class ScaleTransform extends ResettableExtent {
         boolean result = false;
         MutableVector3 vector3 = getPos(location);
         MutableBlockVector3 pos = new MutableBlockVector3();
-        double sx = vector3.getX();
-        double sy = vector3.getY();
-        double sz = vector3.getZ();
+        double sx = vector3.x();
+        double sy = vector3.y();
+        double sz = vector3.z();
         double ex = sx + dx;
         double ey = Math.max(minY, Math.min(maxy, sy + dy));
         double ez = sz + dz;
-        for (pos.mutY(sy); pos.getY() < ey; pos.mutY(pos.getY() + 1)) {
-            for (pos.mutZ(sz); pos.getZ() < ez; pos.mutZ(pos.getZ() + 1)) {
-                for (pos.mutX(sx); pos.getX() < ex; pos.mutX(pos.getX() + 1)) {
+        for (pos.mutY(sy); pos.y() < ey; pos.mutY(pos.y() + 1)) {
+            for (pos.mutZ(sz); pos.z() < ez; pos.mutZ(pos.z() + 1)) {
+                for (pos.mutX(sx); pos.x() < ex; pos.mutX(pos.x() + 1)) {
                     if (!getExtent().contains(pos)) {
                         continue;
                     }
@@ -101,15 +101,15 @@ public class ScaleTransform extends ResettableExtent {
         boolean result = false;
         MutableVector3 vector3 = getPos(position);
         MutableBlockVector3 pos = new MutableBlockVector3();
-        double sx = vector3.getX();
-        double sy = vector3.getY();
-        double sz = vector3.getZ();
+        double sx = vector3.x();
+        double sy = vector3.y();
+        double sz = vector3.z();
         double ex = sx + dx;
         double ey = Math.max(minY, Math.min(maxy, sy + dy));
         double ez = sz + dz;
-        for (pos.mutY(sy); pos.getY() < ey; pos.mutY(pos.getY() + 1)) {
-            for (pos.mutZ(sz); pos.getZ() < ez; pos.mutZ(pos.getZ() + 1)) {
-                for (pos.mutX(sx); pos.getX() < ex; pos.mutX(pos.getX() + 1)) {
+        for (pos.mutY(sy); pos.y() < ey; pos.mutY(pos.y() + 1)) {
+            for (pos.mutZ(sz); pos.z() < ez; pos.mutZ(pos.z() + 1)) {
+                for (pos.mutX(sx); pos.x() < ex; pos.mutX(pos.x() + 1)) {
                     if (!getExtent().contains(pos)) {
                         continue;
                     }
@@ -126,15 +126,15 @@ public class ScaleTransform extends ResettableExtent {
         boolean result = false;
         MutableVector3 vector3 = getPos(x1, y1, z1);
         MutableBlockVector3 pos = new MutableBlockVector3();
-        double sx = vector3.getX();
-        double sy = vector3.getY();
-        double sz = vector3.getZ();
-        double ex = vector3.getX() + dx;
+        double sx = vector3.x();
+        double sy = vector3.y();
+        double sz = vector3.z();
+        double ex = vector3.x() + dx;
         double ey = Math.min(maxy, sy + dy);
-        double ez = vector3.getZ() + dz;
-        for (pos.mutY(sy); pos.getY() < ey; pos.mutY(pos.getY() + 1)) {
-            for (pos.mutZ(sz); pos.getZ() < ez; pos.mutZ(pos.getZ() + 1)) {
-                for (pos.mutX(sx); pos.getX() < ex; pos.mutX(pos.getX() + 1)) {
+        double ez = vector3.z() + dz;
+        for (pos.mutY(sy); pos.y() < ey; pos.mutY(pos.y() + 1)) {
+            for (pos.mutZ(sz); pos.z() < ez; pos.mutZ(pos.z() + 1)) {
+                for (pos.mutX(sx); pos.x() < ex; pos.mutX(pos.x() + 1)) {
                     if (!getExtent().contains(pos)) {
                         continue;
                     }
@@ -150,15 +150,15 @@ public class ScaleTransform extends ResettableExtent {
         boolean result = false;
         MutableVector3 vector3 = getPos(x1, y1, z1);
         MutableBlockVector3 pos = new MutableBlockVector3();
-        double sx = vector3.getX();
-        double sy = vector3.getY();
-        double sz = vector3.getZ();
+        double sx = vector3.x();
+        double sy = vector3.y();
+        double sz = vector3.z();
         double ex = sx + dx;
         double ey = Math.max(minY, Math.min(maxy, sy + dy));
         double ez = sz + dz;
-        for (pos.mutY(sy); pos.getY() < ey; pos.mutY(pos.getY() + 1)) {
-            for (pos.mutZ(sz); pos.getZ() < ez; pos.mutZ(pos.getZ() + 1)) {
-                for (pos.mutX(sx); pos.getX() < ex; pos.mutX(pos.getX() + 1)) {
+        for (pos.mutY(sy); pos.y() < ey; pos.mutY(pos.y() + 1)) {
+            for (pos.mutZ(sz); pos.z() < ez; pos.mutZ(pos.z() + 1)) {
+                for (pos.mutX(sx); pos.x() < ex; pos.mutX(pos.x() + 1)) {
                     if (!getExtent().contains(pos)) {
                         continue;
                     }

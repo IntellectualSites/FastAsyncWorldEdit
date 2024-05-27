@@ -72,8 +72,8 @@ public class CavesGen extends GenBase {
             int maxAngle,
             double paramDouble4
     ) throws WorldEditException {
-        int bx = chunkPos.getBlockX() << 4;
-        int bz = chunkPos.getBlockZ() << 4;
+        int bx = chunkPos.x() << 4;
+        int bz = chunkPos.z() << 4;
         double real_x = bx + 7;
         double real_z = bz + 7;
 

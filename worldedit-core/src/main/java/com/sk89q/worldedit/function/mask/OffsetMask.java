@@ -116,7 +116,7 @@ public class OffsetMask extends AbstractMask {
     public boolean test(BlockVector3 vector) {
         //FAWE start - ignore resultant position outside world height range
         BlockVector3 testPos = vector.add(offset);
-        if (testPos.getBlockY() < minY || testPos.getBlockY() > maxY) {
+        if (testPos.y() < minY || testPos.y() > maxY) {
             return false;
         }
         return getMask().test(testPos);

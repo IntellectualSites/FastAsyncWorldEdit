@@ -31,7 +31,7 @@ public class BlockVector3ChunkMap<T> implements IAdaptedMap<BlockVector3, T, Int
 
     @Override
     public Integer adaptKey(BlockVector3 key) {
-        return MathMan.tripleBlockCoord(key.getX(), key.getY(), key.getZ());
+        return MathMan.tripleBlockCoord(key.x(), key.y(), key.z());
     }
 
     @Override

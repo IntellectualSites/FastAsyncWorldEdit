@@ -44,7 +44,7 @@ public class TemporalExtent extends PassthroughExtent {
 
     @Override
     public BlockState getBlock(BlockVector3 position) {
-        if (position.getX() == x && position.getY() == y && position.getZ() == z) {
+        if (position.x() == x && position.y() == y && position.z() == z) {
             return block.toImmutableState();
         }
         return super.getBlock(position);
@@ -60,7 +60,7 @@ public class TemporalExtent extends PassthroughExtent {
 
     @Override
     public BaseBlock getFullBlock(BlockVector3 position) {
-        if (position.getX() == x && position.getY() == y && position.getZ() == z) {
+        if (position.x() == x && position.y() == y && position.z() == z) {
             if (block instanceof BaseBlock) {
                 return (BaseBlock) block;
             } else {
@@ -72,7 +72,7 @@ public class TemporalExtent extends PassthroughExtent {
 
     @Override
     public BiomeType getBiome(BlockVector3 position) {
-        if (position.getX() == bx && position.getZ() == bz) {
+        if (position.x() == bx && position.z() == bz) {
             return biome;
         }
         return super.getBiome(position);

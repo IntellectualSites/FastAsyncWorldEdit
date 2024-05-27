@@ -339,11 +339,11 @@ public class FaweAPI {
         final BlockVector3 bot = selection.getMinimumPoint();
         final BlockVector3 top = selection.getMaximumPoint();
 
-        final int minX = bot.getBlockX() >> 4;
-        final int minZ = bot.getBlockZ() >> 4;
+        final int minX = bot.x() >> 4;
+        final int minZ = bot.z() >> 4;
 
-        final int maxX = top.getBlockX() >> 4;
-        final int maxZ = top.getBlockZ() >> 4;
+        final int maxX = top.x() >> 4;
+        final int maxZ = top.z() >> 4;
 
         int count = 0;
 

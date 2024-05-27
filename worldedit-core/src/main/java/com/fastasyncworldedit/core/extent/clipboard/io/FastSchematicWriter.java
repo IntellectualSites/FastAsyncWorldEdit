@@ -114,15 +114,15 @@ public class FastSchematicWriter implements ClipboardWriter {
 
             // The Sponge format Offset refers to the 'min' points location in the world. That's our 'Origin'
             out.writeNamedTag("Offset", new int[]{
-                    min.getBlockX(),
-                    min.getBlockY(),
-                    min.getBlockZ(),
+                    min.x(),
+                    min.y(),
+                    min.z(),
             });
 
             out.writeLazyCompoundTag("Metadata", out1 -> {
-                out1.writeNamedTag("WEOffsetX", offset.getBlockX());
-                out1.writeNamedTag("WEOffsetY", offset.getBlockY());
-                out1.writeNamedTag("WEOffsetZ", offset.getBlockZ());
+                out1.writeNamedTag("WEOffsetX", offset.x());
+                out1.writeNamedTag("WEOffsetY", offset.y());
+                out1.writeNamedTag("WEOffsetZ", offset.z());
                 out1.writeNamedTag("FAWEVersion", Fawe.instance().getVersion().build);
             });
 
@@ -162,9 +162,9 @@ public class FastSchematicWriter implements ClipboardWriter {
                     // Dum.
                     values.remove("id");
                     values.put("Pos", new IntArrayTag(new int[]{
-                            pos.getX(),
-                            pos.getY(),
-                            pos.getZ()
+                            pos.x(),
+                            pos.y(),
+                            pos.z()
                     }));
                     numTiles++;
 
@@ -282,10 +282,10 @@ public class FastSchematicWriter implements ClipboardWriter {
         int length = clipboard.getRegion().getLength();
         MutableBlockVector3 mutable = new MutableBlockVector3();
         for (int z = 0, i = 0; z < length; z++) {
-            int z0 = min.getBlockZ() + z;
+            int z0 = min.z() + z;
             for (int x = 0; x < width; x++, i++) {
-                int x0 = min.getBlockX() + x;
-                BiomeType biome = clipboard.getBiome(mutable.setComponents(x0, min.getY(), z0));
+                int x0 = min.x() + x;
+                BiomeType biome = clipboard.getBiome(mutable.setComponents(x0, min.y(), z0));
                 task.applyInt(i, biome.getInternalId());
             }
         }

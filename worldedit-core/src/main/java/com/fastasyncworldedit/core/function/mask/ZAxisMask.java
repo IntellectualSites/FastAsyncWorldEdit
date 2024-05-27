@@ -14,9 +14,9 @@ public class ZAxisMask extends AbstractMask implements ResettableMask {
     @Override
     public boolean test(BlockVector3 vector) {
         if (layer == -1) {
-            layer = vector.getBlockZ();
+            layer = vector.z();
         }
-        return vector.getBlockZ() == layer;
+        return vector.z() == layer;
     }
 
     @Override

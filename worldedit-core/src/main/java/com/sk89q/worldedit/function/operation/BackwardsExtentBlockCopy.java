@@ -52,9 +52,9 @@ public class BackwardsExtentBlockCopy extends RegionVisitor implements Operation
         BlockVector3 max = BlockVector3.at(Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE);
         BlockVector3 pos1 = region.getMinimumPoint();
         BlockVector3 pos2 = region.getMaximumPoint();
-        for (int x : new int[]{pos1.getBlockX(), pos2.getBlockX()}) {
-            for (int y : new int[]{pos1.getBlockY(), pos2.getBlockY()}) {
-                for (int z : new int[]{pos1.getBlockZ(), pos2.getBlockZ()}) {
+        for (int x : new int[]{pos1.x(), pos2.x()}) {
+            for (int y : new int[]{pos1.y(), pos2.y()}) {
+                for (int z : new int[]{pos1.z(), pos2.z()}) {
                     BlockVector3 pt = transform(transform, BlockVector3.at(x, y, z));
                     min = min.getMinimum(pt);
                     max = max.getMaximum(pt);
@@ -65,13 +65,13 @@ public class BackwardsExtentBlockCopy extends RegionVisitor implements Operation
     }
 
     private BlockVector3 transform(Transform transform, BlockVector3 pt) {
-        mutV3.mutX(((pt.getBlockX() - origin.getBlockX())));
-        mutV3.mutY(((pt.getBlockY() - origin.getBlockY())));
-        mutV3.mutZ(((pt.getBlockZ() - origin.getBlockZ())));
+        mutV3.mutX(((pt.x() - origin.x())));
+        mutV3.mutY(((pt.y() - origin.y())));
+        mutV3.mutZ(((pt.z() - origin.z())));
         Vector3 tmp = transform.apply(mutV3);
-        mutBV3.mutX((tmp.getBlockX() + origin.getBlockX()));
-        mutBV3.mutY((tmp.getBlockY() + origin.getBlockY()));
-        mutBV3.mutZ((tmp.getBlockZ() + origin.getBlockZ()));
+        mutBV3.mutX((tmp.getBlockX() + origin.x()));
+        mutBV3.mutY((tmp.getBlockY() + origin.y()));
+        mutBV3.mutZ((tmp.getBlockZ() + origin.z()));
         return mutBV3;
     }
 

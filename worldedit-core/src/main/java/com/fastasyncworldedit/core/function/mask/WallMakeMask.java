@@ -14,8 +14,8 @@ public class WallMakeMask implements Mask {
 
     @Override
     public boolean test(BlockVector3 position) {
-        int x = position.getBlockX();
-        int z = position.getBlockZ();
+        int x = position.x();
+        int z = position.z();
         return !region.contains(x, z + 1) || !region.contains(x, z - 1) || !region.contains(x + 1, z) || !region.contains(
                 x - 1,
                 z

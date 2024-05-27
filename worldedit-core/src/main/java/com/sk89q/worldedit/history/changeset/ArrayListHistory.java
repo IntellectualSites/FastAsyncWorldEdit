@@ -83,7 +83,7 @@ public class ArrayListHistory implements ChangeSet {
             if (change instanceof BlockChange) {
                 BlockChange blockChange = (BlockChange) change;
                 BlockVector3 pos = blockChange.getPosition();
-                summary.add(pos.getX(), pos.getZ(), blockChange.getCurrent().getOrdinal());
+                summary.add(pos.x(), pos.z(), blockChange.getCurrent().getOrdinal());
             }
         }
         return summary;

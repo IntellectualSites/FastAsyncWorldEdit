@@ -30,9 +30,9 @@ public class EntityInBlockRemovingProcessor implements IBatchProcessor {
                     continue;
                 }
                 BlockVector3 pos = tag.getEntityPosition().toBlockPoint();
-                int x = pos.getX() & 15;
-                int y = pos.getY();
-                int z = pos.getZ() & 15;
+                int x = pos.x() & 15;
+                int y = pos.y();
+                int z = pos.z() & 15;
                 if (!set.hasSection(y >> 4)) {
                     continue;
                 }

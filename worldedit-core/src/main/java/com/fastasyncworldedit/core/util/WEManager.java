@@ -183,8 +183,8 @@ public class WEManager {
         BlockVector3 rg2P1 = region2.getMinimumPoint();
         BlockVector3 rg2P2 = region2.getMaximumPoint();
 
-        return rg1P1.getBlockX() <= rg2P2.getBlockX() && rg1P2.getBlockX() >= rg2P1.getBlockX()
-                && rg1P1.getBlockZ() <= rg2P2.getBlockZ() && rg1P2.getBlockZ() >= rg2P1.getBlockZ();
+        return rg1P1.x() <= rg2P2.x() && rg1P2.x() >= rg2P1.x()
+                && rg1P1.z() <= rg2P2.z() && rg1P2.z() >= rg2P1.z();
     }
 
     public boolean regionContains(Region selection, HashSet<Region> mask) {

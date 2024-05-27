@@ -19,15 +19,15 @@ public record RockBrush(double amplitude, double frequency, Vector3 radius) impl
         double seedY = ThreadLocalRandom.current().nextDouble();
         double seedZ = ThreadLocalRandom.current().nextDouble();
 
-        int px = position.getBlockX();
-        int py = position.getBlockY();
-        int pz = position.getBlockZ();
+        int px = position.x();
+        int py = position.y();
+        int pz = position.z();
 
         double distort = this.frequency / size;
 
-        double modX = 1D / radius.getX();
-        double modY = 1D / radius.getY();
-        double modZ = 1D / radius.getZ();
+        double modX = 1D / radius.x();
+        double modY = 1D / radius.y();
+        double modZ = 1D / radius.z();
 
         int radiusSqr = (int) (size * size);
         int sizeInt = (int) size * 2;

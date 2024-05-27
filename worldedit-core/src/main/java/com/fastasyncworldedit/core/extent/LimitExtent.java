@@ -373,12 +373,12 @@ public class LimitExtent extends AbstractDelegateExtent {
             size = ((Collection<BlockVector3>) positions).size();
         } else if (positions instanceof Region) {
             BlockVector3 dim = ((Region) positions).getDimensions();
-            size = dim.getX() * dim.getY() * dim.getZ();
+            size = dim.x() * dim.y() * dim.z();
         } else if (positions instanceof Extent) {
             BlockVector3 min = ((Extent) positions).getMinimumPoint();
             BlockVector3 max = ((Extent) positions).getMinimumPoint();
             BlockVector3 dim = max.subtract(min).add(BlockVector3.ONE);
-            size = dim.getX() * dim.getY() * dim.getZ();
+            size = dim.x() * dim.y() * dim.z();
         } else {
             ExtentFilterBlock block = new ExtentFilterBlock(this);
             for (BlockVector3 pos : positions) {

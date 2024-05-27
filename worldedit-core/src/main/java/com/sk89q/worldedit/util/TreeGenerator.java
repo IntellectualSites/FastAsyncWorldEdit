@@ -135,9 +135,9 @@ public final class TreeGenerator {
             public boolean generate(EditSession editSession, BlockVector3 pos) throws MaxChangedBlocksException {
                 //FAWE start - perform sanity check on generation location
                 if (editSession
-                        .getBlockType(pos.getX(), pos.getY(), pos.getZ())
+                        .getBlockType(pos.x(), pos.y(), pos.z())
                         .getMaterial()
-                        .isAir() && canGenerateOn(editSession.getBlockType(pos.getX(), pos.getY() - 1, pos.getZ()))) {
+                        .isAir() && canGenerateOn(editSession.getBlockType(pos.x(), pos.y() - 1, pos.z()))) {
                     makePineTree(editSession, pos);
                     return true;
                 }
@@ -151,7 +151,7 @@ public final class TreeGenerator {
                 //FAWE start - ensure canGenerateOn is called.
                 // chorus plants have to generate starting in the end stone itself, not the air above the ground
                 BlockVector3 down = pos.subtract(0, 1, 0);
-                if (!canGenerateOn(editSession.getBlockType(down.getX(), down.getY(), down.getZ()))) {
+                if (!canGenerateOn(editSession.getBlockType(down.x(), down.y(), down.z()))) {
                     return false;
                 }
                 return editSession.getWorld().generateTree(this, editSession, down);
@@ -212,9 +212,9 @@ public final class TreeGenerator {
         public boolean generate(EditSession editSession, BlockVector3 pos) throws MaxChangedBlocksException {
             //FAWE start - check for ability for tree to generate on block
             if (editSession
-                    .getBlockType(pos.getX(), pos.getY(), pos.getZ())
+                    .getBlockType(pos.x(), pos.y(), pos.z())
                     .getMaterial()
-                    .isAir() && canGenerateOn(editSession.getBlockType(pos.getX(), pos.getY() - 1, pos.getZ()))) {
+                    .isAir() && canGenerateOn(editSession.getBlockType(pos.x(), pos.y() - 1, pos.z()))) {
                 return editSession.getWorld().generateTree(this, editSession, pos);
             }
             return false;

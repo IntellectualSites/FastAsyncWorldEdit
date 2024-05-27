@@ -24,7 +24,7 @@ public class BlockTranslateExtent extends AbstractDelegateExtent {
 
     @Override
     public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 location, T block) throws WorldEditException {
-        return getExtent().setBlock(location.getX() + dx, location.getY() + dy, location.getZ() + dz, block);
+        return getExtent().setBlock(location.x() + dx, location.y() + dy, location.z() + dz, block);
     }
 
     @Override
@@ -49,7 +49,7 @@ public class BlockTranslateExtent extends AbstractDelegateExtent {
 
     @Override
     public BlockState getBlock(BlockVector3 location) {
-        return getBlock(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+        return getBlock(location.x(), location.y(), location.z());
     }
 
     @Override

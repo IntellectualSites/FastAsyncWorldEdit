@@ -273,9 +273,9 @@ public class NMSRelighter implements Relighter {
             int lightLevel = (int) val[1];
 
             this.computeRemoveBlockLight(
-                    node.getX() - 1,
-                    node.getY(),
-                    node.getZ(),
+                    node.x() - 1,
+                    node.y(),
+                    node.z(),
                     lightLevel,
                     lightRemovalQueue,
                     lightPropagationQueue,
@@ -283,20 +283,20 @@ public class NMSRelighter implements Relighter {
                     visited
             );
             this.computeRemoveBlockLight(
-                    node.getX() + 1,
-                    node.getY(),
-                    node.getZ(),
+                    node.x() + 1,
+                    node.y(),
+                    node.z(),
                     lightLevel,
                     lightRemovalQueue,
                     lightPropagationQueue,
                     removalVisited,
                     visited
             );
-            if (node.getY() > minY) {
+            if (node.y() > minY) {
                 this.computeRemoveBlockLight(
-                        node.getX(),
-                        node.getY() - 1,
-                        node.getZ(),
+                        node.x(),
+                        node.y() - 1,
+                        node.z(),
                         lightLevel,
                         lightRemovalQueue,
                         lightPropagationQueue,
@@ -304,11 +304,11 @@ public class NMSRelighter implements Relighter {
                         visited
                 );
             }
-            if (node.getY() < maxY) {
+            if (node.y() < maxY) {
                 this.computeRemoveBlockLight(
-                        node.getX(),
-                        node.getY() + 1,
-                        node.getZ(),
+                        node.x(),
+                        node.y() + 1,
+                        node.z(),
                         lightLevel,
                         lightRemovalQueue,
                         lightPropagationQueue,
@@ -317,9 +317,9 @@ public class NMSRelighter implements Relighter {
                 );
             }
             this.computeRemoveBlockLight(
-                    node.getX(),
-                    node.getY(),
-                    node.getZ() - 1,
+                    node.x(),
+                    node.y(),
+                    node.z() - 1,
                     lightLevel,
                     lightRemovalQueue,
                     lightPropagationQueue,
@@ -327,9 +327,9 @@ public class NMSRelighter implements Relighter {
                     visited
             );
             this.computeRemoveBlockLight(
-                    node.getX(),
-                    node.getY(),
-                    node.getZ() + 1,
+                    node.x(),
+                    node.y(),
+                    node.z() + 1,
                     lightLevel,
                     lightRemovalQueue,
                     lightPropagationQueue,
@@ -340,27 +340,27 @@ public class NMSRelighter implements Relighter {
 
         while (!lightPropagationQueue.isEmpty()) {
             MutableBlockVector3 node = lightPropagationQueue.poll();
-            ChunkHolder<?> iChunk = (ChunkHolder<?>) queue.getOrCreateChunk(node.getX() >> 4, node.getZ() >> 4);
+            ChunkHolder<?> iChunk = (ChunkHolder<?>) queue.getOrCreateChunk(node.x() >> 4, node.z() >> 4);
             if (!iChunk.isInit()) {
-                iChunk.init(queue, node.getX() >> 4, node.getZ() >> 4);
+                iChunk.init(queue, node.x() >> 4, node.z() >> 4);
             }
-            int lightLevel = iChunk.getEmittedLight(node.getX() & 15, node.getY(), node.getZ() & 15);
-            BlockState state = this.queue.getBlock(node.getX(), node.getY(), node.getZ());
+            int lightLevel = iChunk.getEmittedLight(node.x() & 15, node.y(), node.z() & 15);
+            BlockState state = this.queue.getBlock(node.x(), node.y(), node.z());
             String id = state.getBlockType().getId().toLowerCase(Locale.ROOT);
             if (lightLevel <= 1) {
                 continue;
             }
             if (id.contains("slab")) {
                 boolean top = state.getState(slabHalf).equalsIgnoreCase("top");
-                computeSlab(node.getX(), node.getY(), node.getZ(), lightLevel, lightPropagationQueue, visited, top);
+                computeSlab(node.x(), node.y(), node.z(), lightLevel, lightPropagationQueue, visited, top);
             } else if (id.contains("stair")) {
                 boolean top = state.getState(stairHalf).equalsIgnoreCase("top");
                 Direction direction = getStairDir(state);
                 String shape = getStairShape(state);
                 computeStair(
-                        node.getX(),
-                        node.getY(),
-                        node.getZ(),
+                        node.x(),
+                        node.y(),
+                        node.z(),
                         lightLevel,
                         lightPropagationQueue,
                         visited,
@@ -369,7 +369,7 @@ public class NMSRelighter implements Relighter {
                         shape
                 );
             } else {
-                computeNormal(node.getX(), node.getY(), node.getZ(), lightLevel, lightPropagationQueue, visited);
+                computeNormal(node.x(), node.y(), node.z(), lightLevel, lightPropagationQueue, visited);
             }
         }
     }

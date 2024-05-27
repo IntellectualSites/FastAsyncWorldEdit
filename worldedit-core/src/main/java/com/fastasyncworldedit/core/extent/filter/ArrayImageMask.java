@@ -20,7 +20,7 @@ public class ArrayImageMask implements FilterBlockMask {
 
     @Override
     public boolean applyBlock(FilterBlock block) {
-        int height = image.getRGB(block.getX(), block.getZ()) & 0xFF;
+        int height = image.getRGB(block.x(), block.z()) & 0xFF;
         return height == 255 || height > 0 && !white && random.nextInt(256) <= height;
     }
 

@@ -90,7 +90,7 @@ public class LocalBlockVectorSet implements BlockVector3Set {
     @Override
     public boolean contains(Object o) {
         if (o instanceof BlockVector3 v) {
-            return contains(v.getBlockX(), v.getBlockY(), v.getBlockZ());
+            return contains(v.x(), v.y(), v.z());
         }
         return false;
     }
@@ -302,14 +302,14 @@ public class LocalBlockVectorSet implements BlockVector3Set {
      */
     @Override
     public boolean add(BlockVector3 vector) {
-        return add(vector.getBlockX(), vector.getBlockY(), vector.getBlockZ());
+        return add(vector.x(), vector.y(), vector.z());
     }
 
     private int getIndex(BlockVector3 vector) {
         return MathMan.tripleSearchCoords(
-                vector.getBlockX() - offsetX,
-                vector.getBlockY() - offsetY,
-                vector.getBlockZ() - offsetZ
+                vector.x() - offsetX,
+                vector.y() - offsetY,
+                vector.z() - offsetZ
         );
     }
 
@@ -342,7 +342,7 @@ public class LocalBlockVectorSet implements BlockVector3Set {
     public boolean remove(Object o) {
         if (o instanceof BlockVector3) {
             BlockVector3 v = (BlockVector3) o;
-            return remove(v.getBlockX(), v.getBlockY(), v.getBlockZ());
+            return remove(v.x(), v.y(), v.z());
         }
         return false;
     }

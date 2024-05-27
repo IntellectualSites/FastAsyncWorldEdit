@@ -16,9 +16,9 @@ public class ScatterOverlayBrush extends ScatterBrush {
     @Override
     public void apply(EditSession editSession, LocalBlockVectorSet placed, BlockVector3 pt, Pattern p, double size) throws
             MaxChangedBlocksException {
-        final int x = pt.getBlockX();
-        final int y = pt.getBlockY();
-        final int z = pt.getBlockZ();
+        final int x = pt.x();
+        final int y = pt.y();
+        final int z = pt.z();
         BlockVector3 dir = getDirection(pt);
         if (dir == null) {
             getDir:
@@ -37,7 +37,7 @@ public class ScatterOverlayBrush extends ScatterBrush {
                 return;
             }
         }
-        editSession.setBlock(x + dir.getBlockX(), y + dir.getBlockY(), z + dir.getBlockZ(), p);
+        editSession.setBlock(x + dir.x(), y + dir.y(), z + dir.z(), p);
     }
 
 }

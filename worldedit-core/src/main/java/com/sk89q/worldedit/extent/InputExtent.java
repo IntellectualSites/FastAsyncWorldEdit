@@ -50,7 +50,7 @@ public interface InputExtent {
      * @return the block
      */
     default BlockState getBlock(BlockVector3 position) {
-        return getBlock(position.getX(), position.getY(), position.getZ());
+        return getBlock(position.x(), position.y(), position.z());
     }
 
     //FAWE start
@@ -65,7 +65,7 @@ public interface InputExtent {
      * @return the block
      */
     default BaseBlock getFullBlock(BlockVector3 position) {
-        return getFullBlock(position.getX(), position.getY(), position.getZ());
+        return getFullBlock(position.x(), position.y(), position.z());
     }
 
     default BaseBlock getFullBlock(int x, int y, int z) {
@@ -85,7 +85,7 @@ public interface InputExtent {
      */
     @Deprecated
     default BiomeType getBiome(BlockVector2 position) {
-        return getBiomeType(position.getX(), 0, position.getZ());
+        return getBiomeType(position.x(), 0, position.z());
     }
 
     default BiomeType getBiomeType(int x, int y, int z) {
@@ -126,7 +126,7 @@ public interface InputExtent {
      * @return the light level at the location
      */
     default int getEmittedLight(BlockVector3 position) {
-        return getEmittedLight(position.getX(), position.getY(), position.getZ());
+        return getEmittedLight(position.x(), position.y(), position.z());
     }
 
     default int getEmittedLight(int x, int y, int z) {
@@ -140,7 +140,7 @@ public interface InputExtent {
      * @return the sky light level at the location
      */
     default int getSkyLight(MutableBlockVector3 position) {
-        return getSkyLight(position.getX(), position.getY(), position.getZ());
+        return getSkyLight(position.x(), position.y(), position.z());
     }
 
     default int getSkyLight(int x, int y, int z) {
@@ -148,7 +148,7 @@ public interface InputExtent {
     }
 
     default int getBrightness(MutableBlockVector3 position) {
-        return getBrightness(position.getX(), position.getY(), position.getZ());
+        return getBrightness(position.x(), position.y(), position.z());
     }
 
     default int getBrightness(int x, int y, int z) {
@@ -156,7 +156,7 @@ public interface InputExtent {
     }
 
     default int getOpacity(MutableBlockVector3 position) {
-        return getOpacity(position.getX(), position.getY(), position.getZ());
+        return getOpacity(position.x(), position.y(), position.z());
     }
 
     default int getOpacity(int x, int y, int z) {

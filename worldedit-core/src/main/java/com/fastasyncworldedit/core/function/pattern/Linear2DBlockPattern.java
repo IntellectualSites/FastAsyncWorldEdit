@@ -37,7 +37,7 @@ public class Linear2DBlockPattern extends AbstractPattern {
 
     @Override
     public BaseBlock applyBlock(BlockVector3 position) {
-        int index = (position.getBlockX() / this.xScale + position.getBlockZ() / this.zScale) % patternsArray.length;
+        int index = (position.x() / this.xScale + position.z() / this.zScale) % patternsArray.length;
         if (index < 0) {
             index += patternsArray.length;
         }
@@ -46,8 +46,8 @@ public class Linear2DBlockPattern extends AbstractPattern {
 
     @Override
     public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
-        int index = (floorDiv(get.getBlockX(), this.xScale)
-                + floorDiv(get.getBlockZ(), this.zScale)) % patternsArray.length;
+        int index = (floorDiv(get.x(), this.xScale)
+                + floorDiv(get.z(), this.zScale)) % patternsArray.length;
         if (index < 0) {
             index += patternsArray.length;
         }

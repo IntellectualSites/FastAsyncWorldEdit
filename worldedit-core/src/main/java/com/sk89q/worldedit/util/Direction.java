@@ -84,7 +84,7 @@ public enum Direction {
     }
 
     Direction(Vector3 vector, int flags, int left, int right) {
-        this.blockPoint = BlockVector3.at(Math.signum(vector.getX()), Math.signum(vector.getY()), Math.signum(vector.getZ()));
+        this.blockPoint = BlockVector3.at(Math.signum(vector.x()), Math.signum(vector.y()), Math.signum(vector.z()));
         this.direction = vector.normalize();
         this.flags = flags;
         this.left = left;
@@ -104,27 +104,27 @@ public enum Direction {
     }
 
     public double getX() {
-        return direction.getX();
+        return direction.x();
     }
 
     public double getY() {
-        return direction.getY();
+        return direction.y();
     }
 
     public double getZ() {
-        return direction.getZ();
+        return direction.z();
     }
 
     public int getBlockX() {
-        return blockPoint.getX();
+        return blockPoint.x();
     }
 
     public int getBlockY() {
-        return blockPoint.getY();
+        return blockPoint.y();
     }
 
     public int getBlockZ() {
-        return blockPoint.getZ();
+        return blockPoint.z();
     }
     //FAWE end
 
