@@ -345,10 +345,8 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                     .getChunkSource()
                     .getChunkAtIfLoadedImmediately(chunkX, chunkZ);
         } else {
-            levelChunk = ((Optional<LevelChunk>) ((Either) chunkHolder
-                    .getTickingChunkFuture() // method is not present with new paper chunk system
-                    .getNow(ChunkHolder.UNLOADED_LEVEL_CHUNK)).left())
-                    .orElse(null);
+            levelChunk = chunkHolder.getTickingChunkFuture()
+                    .getNow(ChunkHolder.UNLOADED_LEVEL_CHUNK).orElse(null);
         }
         if (levelChunk == null) {
             return;
