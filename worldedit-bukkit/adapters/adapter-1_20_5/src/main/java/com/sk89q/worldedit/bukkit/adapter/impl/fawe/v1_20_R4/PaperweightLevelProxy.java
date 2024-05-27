@@ -2,12 +2,12 @@ package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_20_R4;
 
 import com.fastasyncworldedit.core.util.ReflectionUtils;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
-import com.sk89q.worldedit.extent.Extent;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
@@ -19,18 +19,17 @@ import javax.annotation.Nullable;
 
 public class PaperweightLevelProxy extends ServerLevel {
 
+    protected ServerLevel serverLevel;
+    private PaperweightPlacementStateProcessor processor;
     private PaperweightFaweAdapter adapter;
-    private Extent extent;
-    private ServerLevel serverLevel;
-    private boolean enabled = false;
 
     @SuppressWarnings("DataFlowIssue")
-    public PaperweightLevelProxy() {
+    private PaperweightLevelProxy() {
         super(null, null, null, null, null, null, null, true, 0L, null, true, null, null, null, null);
         throw new IllegalStateException("Cannot be instantiated");
     }
 
-    public static PaperweightLevelProxy getInstance(ServerLevel level, Extent extent) {
+    public static PaperweightLevelProxy getInstance(ServerLevel serverLevel, PaperweightPlacementStateProcessor processor) {
         Unsafe unsafe = ReflectionUtils.getUnsafe();
 
         PaperweightLevelProxy newLevel;
@@ -39,48 +38,38 @@ public class PaperweightLevelProxy extends ServerLevel {
         } catch (InstantiationException e) {
             throw new RuntimeException(e);
         }
-        newLevel.adapter = ((PaperweightFaweAdapter) WorldEditPlugin
-                .getInstance()
-                .getBukkitImplAdapter());
-        newLevel.extent = extent;
-        newLevel.serverLevel = level;
+        newLevel.processor = processor;
+        newLevel.adapter = ((PaperweightFaweAdapter) WorldEditPlugin.getInstance().getBukkitImplAdapter());
+        newLevel.serverLevel = serverLevel;
         return newLevel;
-    }
-
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
     }
 
     @Nullable
     @Override
     public BlockEntity getBlockEntity(@Nonnull BlockPos blockPos) {
-        if (!enabled) {
+        if (blockPos.getX() == Integer.MAX_VALUE) {
             return null;
         }
-        BlockEntity tileEntity = this.serverLevel.getChunkAt(blockPos).getBlockEntity(blockPos);
-        if (tileEntity == null) {
+        com.sk89q.jnbt.CompoundTag tag = processor.getTileAt(blockPos.getX(), blockPos.getY(), blockPos.getZ());
+        if (tag == null) {
             return null;
         }
-        BlockEntity newEntity = tileEntity.getType().create(blockPos, getBlockState(blockPos));
-        newEntity.loadWithComponents(
-                (CompoundTag) adapter.fromNativeLin(this.extent.getFullBlock(
-                        blockPos.getX(),
-                        blockPos.getY(),
-                        blockPos.getZ()
-                ).getNbtReference().getValue()),
-                this.serverLevel.registryAccess()
-        );
-
-        return newEntity;
+        BlockState state = adapter.adapt(processor.getBlockStateAt(blockPos.getX(), blockPos.getY(), blockPos.getZ()));
+        if (!(state.getBlock() instanceof EntityBlock entityBlock)) {
+            return null;
+        }
+        BlockEntity tileEntity = entityBlock.newBlockEntity(blockPos, state);
+        tileEntity.loadWithComponents((CompoundTag) adapter.fromNative(tag), serverLevel.registryAccess());
+        return tileEntity;
     }
 
     @Override
     @Nonnull
     public BlockState getBlockState(@Nonnull BlockPos blockPos) {
-        if (!enabled) {
+        if (blockPos.getX() == Integer.MAX_VALUE) {
             return Blocks.AIR.defaultBlockState();
         }
-        com.sk89q.worldedit.world.block.BlockState state = this.extent.getBlock(
+        com.sk89q.worldedit.world.block.BlockState state = processor.getBlockStateAt(
                 blockPos.getX(),
                 blockPos.getY(),
                 blockPos.getZ()
@@ -92,7 +81,7 @@ public class PaperweightLevelProxy extends ServerLevel {
     @Override
     @Nonnull
     public FluidState getFluidState(@Nonnull BlockPos pos) {
-        if (!enabled) {
+        if (pos.getX() == Integer.MAX_VALUE) {
             return Fluids.EMPTY.defaultFluidState();
         }
         return getBlockState(pos).getFluidState();
@@ -101,7 +90,7 @@ public class PaperweightLevelProxy extends ServerLevel {
     @SuppressWarnings("unused")
     @Override
     public boolean isWaterAt(@Nonnull BlockPos pos) {
-        if (!enabled) {
+        if (pos.getX() == Integer.MAX_VALUE) {
             return false;
         }
         return getBlockState(pos).getFluidState().is(FluidTags.WATER);

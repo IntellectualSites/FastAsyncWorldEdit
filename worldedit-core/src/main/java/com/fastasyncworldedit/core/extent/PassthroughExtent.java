@@ -10,7 +10,6 @@ import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.mask.Mask;
-import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
@@ -213,12 +212,6 @@ public class PassthroughExtent extends AbstractDelegateExtent {
     @Override
     public boolean setBiome(BlockVector3 position, BiomeType biome) {
         return getExtent().setBiome(position, biome);
-    }
-
-    @Override
-    @Nullable
-    public Operation commit() {
-        return getExtent().commit();
     }
 
     @Override

@@ -936,7 +936,7 @@ public class RegionCommands {
                         .getInstance()
                         .getPlatformManager()
                         .queryCapability(Capability.WORLD_EDITING)
-                        .getPlatformPlacementProcessor(editSession, null, true)
+                        .getPlatformPlacementProcessor(editSession, null, region)
         );
         if (affected != 0) {
             actor.print(Caption.of("worldedit.set.done", TextComponent.of(affected)));

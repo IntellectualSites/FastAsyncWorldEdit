@@ -62,4 +62,13 @@ public interface Filter {
 
     }
 
+    /**
+     * Signals to the filter the edit has concluded
+     *
+     * @since TODO
+     */
+    default void finish() {
+
+    }
+
 }

@@ -19,16 +19,16 @@
 
 package com.sk89q.worldedit.extension.platform;
 
-import com.fastasyncworldedit.core.extent.processor.PlacementStateProcessor;
+import com.fastasyncworldedit.core.extent.PlacementStateProcessor;
 import com.fastasyncworldedit.core.extent.processor.lighting.Relighter;
 import com.fastasyncworldedit.core.extent.processor.lighting.RelighterFactory;
 import com.fastasyncworldedit.core.queue.IBatchProcessor;
 import com.sk89q.worldedit.LocalConfiguration;
-import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.BlockTypeMask;
 import com.sk89q.worldedit.internal.util.NonAbstractForCompatibility;
+import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.registry.Keyed;
 import com.sk89q.worldedit.util.SideEffect;
 import com.sk89q.worldedit.util.io.ResourceLoader;
@@ -281,10 +281,12 @@ public interface Platform extends Keyed {
     }
 
     /**
-     * Returns an {@link PlacementStateProcessor} instance for processing placed blocks to "fix" them.
+     * Returns an {@link PlacementStateProcessor} instance for processing placed blocks to "fix" them. Optional region to
+     * prevent any changes outside of, as sometimes block neighbours will also be updated otherwise.
+     *
      * @since TODO
      */
-    default PlacementStateProcessor getPlatformPlacementProcessor(Extent extent, BlockTypeMask mask, boolean includeUnedited) {
+    default PlacementStateProcessor getPlatformPlacementProcessor(Extent extent, BlockTypeMask mask, @Nullable Region region) {
         return null;
     }
     //FAWE end

@@ -8,6 +8,7 @@ import com.fastasyncworldedit.core.queue.IChunkSet;
 import com.fastasyncworldedit.core.queue.IQueueChunk;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.util.SideEffectSet;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -84,6 +85,16 @@ public final class NullChunk implements IQueueChunk {
     @Override
     public boolean hasBiomes(final int layer) {
         return false;
+    }
+
+    @Override
+    public void setSideEffectSet(SideEffectSet sideEffectSet) {
+
+    }
+
+    @Override
+    public SideEffectSet getSideEffectSet() {
+        return SideEffectSet.none();
     }
 
     @Nonnull

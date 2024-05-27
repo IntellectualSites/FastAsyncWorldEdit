@@ -1749,6 +1749,7 @@ public class LocalSession implements TextureHolder {
         }
         builder.command(command);
         builder.fastMode(!this.sideEffectSet.doesApplyAny());
+        builder.setSideEffectSet(this.sideEffectSet);
 
         editSession = builder.build();
 

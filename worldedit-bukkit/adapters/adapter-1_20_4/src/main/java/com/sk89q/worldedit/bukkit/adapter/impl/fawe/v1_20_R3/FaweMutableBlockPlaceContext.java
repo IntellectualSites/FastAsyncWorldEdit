@@ -16,7 +16,11 @@ import javax.annotation.Nullable;
 
 public class FaweMutableBlockPlaceContext extends BlockPlaceContext {
 
-    private static final BlockHitResult DEFAULT_BLOCK_HIT = new BlockHitResult(Vec3.ZERO, Direction.NORTH, BlockPos.ZERO, false);
+    private static final BlockHitResult DEFAULT_BLOCK_HIT = new BlockHitResult(new Vec3(
+            Integer.MAX_VALUE,
+            Integer.MAX_VALUE,
+            Integer.MAX_VALUE
+    ), Direction.NORTH, BlockPos.ZERO, false);
     private final ServerLevel level;
     private BlockHitResult hitResult = null;
     private Direction direction = null;

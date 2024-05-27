@@ -32,6 +32,8 @@ import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.util.SideEffect;
+import com.sk89q.worldedit.util.SideEffectSet;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.world.World;
 import org.apache.logging.log4j.Logger;
@@ -355,8 +357,12 @@ public class FaweAPI {
             if (unwrapped instanceof IQueueExtent) {
                 queue = (IQueueExtent) unwrapped;
             } else if (Settings.settings().QUEUE.PARALLEL_THREADS > 1) {
-                ParallelQueueExtent parallel =
-                        new ParallelQueueExtent(Fawe.instance().getQueueHandler(), world, true);
+                ParallelQueueExtent parallel = new ParallelQueueExtent(
+                        Fawe.instance().getQueueHandler(),
+                        world,
+                        true,
+                        SideEffectSet.none().with(SideEffect.LIGHTING, SideEffect.State.ON)
+                );
                 queue = parallel.getExtent();
             } else {
                 queue = Fawe.instance().getQueueHandler().getQueue(world);
