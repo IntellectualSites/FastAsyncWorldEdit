@@ -19,7 +19,7 @@
 
 package com.sk89q.worldedit.extension.platform;
 
-import com.fastasyncworldedit.core.extent.PlacementStateProcessor;
+import com.fastasyncworldedit.core.extent.processor.PlacementStateProcessor;
 import com.fastasyncworldedit.core.extent.processor.lighting.Relighter;
 import com.fastasyncworldedit.core.extent.processor.lighting.RelighterFactory;
 import com.fastasyncworldedit.core.queue.IBatchProcessor;

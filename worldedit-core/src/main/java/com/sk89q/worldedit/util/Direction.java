@@ -359,6 +359,12 @@ public enum Direction {
     }
 
     //FAWE start - utility methods for block states
+
+    /**
+     * Get the directions associated with the given block state, e.g. the connections a fence makes or the direction stairs face
+     *
+     * @since TODO
+     */
     public static EnumSet<Direction> getDirections(BlockState state) {
         Set<Direction> directions = new HashSet<>();
         for (Property<?> property : state.getBlockType().getProperties()) {

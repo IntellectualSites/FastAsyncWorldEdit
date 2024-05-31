@@ -1,6 +1,6 @@
 package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_20_R3;
 
-import com.fastasyncworldedit.core.extent.PlacementStateProcessor;
+import com.fastasyncworldedit.core.extent.processor.PlacementStateProcessor;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.BlockTypeMask;

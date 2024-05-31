@@ -21,7 +21,7 @@ package com.sk89q.worldedit.bukkit;
 
 import com.fastasyncworldedit.bukkit.util.MinecraftVersion;
 import com.fastasyncworldedit.core.configuration.Settings;
-import com.fastasyncworldedit.core.extent.PlacementStateProcessor;
+import com.fastasyncworldedit.core.extent.processor.PlacementStateProcessor;
 import com.fastasyncworldedit.core.extent.processor.lighting.RelighterFactory;
 import com.fastasyncworldedit.core.queue.IBatchProcessor;
 import com.google.common.collect.Sets;

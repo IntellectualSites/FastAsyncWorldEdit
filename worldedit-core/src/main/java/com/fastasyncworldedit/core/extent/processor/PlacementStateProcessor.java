@@ -1,7 +1,6 @@
-package com.fastasyncworldedit.core.extent;
+package com.fastasyncworldedit.core.extent.processor;
 
 import com.fastasyncworldedit.core.extent.filter.block.FilterBlock;
-import com.fastasyncworldedit.core.extent.processor.ProcessorScope;
 import com.fastasyncworldedit.core.function.mask.AdjacentAny2DMask;
 import com.fastasyncworldedit.core.math.BlockVector3ChunkMap;
 import com.fastasyncworldedit.core.math.MutableBlockVector3;
@@ -37,6 +36,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
+/**
+ * Processor/pattern that uses Minecraft internal methods to determine the shape of blocks, e.g. stairs and fences
+ *
+ * @since TODO
+ */
 public abstract class PlacementStateProcessor extends AbstractDelegateExtent implements IBatchProcessor, Pattern {
 
     private static final Direction[] NESW = new Direction[]{Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST};
@@ -62,7 +66,7 @@ public abstract class PlacementStateProcessor extends AbstractDelegateExtent imp
     private int processChunkZ;
 
     /**
-     * Process/extent/pattern for performing block updates, e.g. stair shape and glass pane connections
+     * Processor/pattern for performing block updates, e.g. stair shape and glass pane connections
      *
      * @param extent Extent to use
      * @param mask   Mask of blocks to perform updates on
@@ -208,7 +212,13 @@ public abstract class PlacementStateProcessor extends AbstractDelegateExtent imp
         return processChunkSet;
     }
 
-    private void checkAndPerformUpdate(Map<BlockVector3, CompoundTag> setTiles, char[] set, int index, int blockY, boolean firstPass) {
+    private void checkAndPerformUpdate(
+            Map<BlockVector3, CompoundTag> setTiles,
+            char[] set,
+            int index,
+            int blockY,
+            boolean firstPass
+    ) {
         for (int z = 0; z < 16; z++) {
             int blockZ = processChunkZ + z;
             for (int x = 0; x < 16; x++, index++) {

@@ -5,6 +5,11 @@ import com.sk89q.worldedit.function.mask.AbstractMask;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.math.BlockVector3;
 
+/**
+ * Mask that tests adjacency only in 2D/the same y-level
+ *
+ * @since TODO
+ */
 public class Adjacent2DMask extends AbstractMask {
 
     private final int min;
@@ -12,6 +17,14 @@ public class Adjacent2DMask extends AbstractMask {
     private final Mask mask;
     private final MutableBlockVector3 vector;
 
+    /**
+     * Mask that tests adjacency only in 2D/the same y-level
+     *
+     * @param mask Mask required to be adjacent
+     * @param requiredMin Minimum number of positive adjacency matches required
+     * @param requiredMax Maximum number of positive adjacency matches  required
+     * @since TODO
+     */
     public Adjacent2DMask(Mask mask, int requiredMin, int requiredMax) {
         this.mask = mask;
         this.min = requiredMin;

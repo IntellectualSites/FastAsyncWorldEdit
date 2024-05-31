@@ -142,6 +142,11 @@ public class BlockTypeMask extends AbstractExtentMask {
         return types[block.getInternalId()];
     }
 
+    /**
+     * Test a block state against this block type mask
+     *
+     * @since TODO
+     */
     public <B extends BlockStateHolder<B>> boolean test(B blockStateHolder) {
         return types[blockStateHolder.getBlockType().getInternalId()];
     }
