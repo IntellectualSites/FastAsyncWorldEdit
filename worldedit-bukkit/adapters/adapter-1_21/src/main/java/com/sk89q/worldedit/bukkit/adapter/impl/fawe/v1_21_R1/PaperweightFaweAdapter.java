@@ -594,7 +594,7 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
                         populator,
                         generator,
                         serverLevel.random,
-                        new BlockPos(pt.getX(), pt.getY(), pt.getZ())
+                        new BlockPos(pt.x(), pt.y(), pt.z())
                 )) {
                     return null;
                 }
@@ -627,7 +627,7 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
 
         ServerChunkCache chunkManager = serverLevel.getChunkSource();
 
-        ChunkPos chunkPos = new ChunkPos(new BlockPos(pt.getBlockX(), pt.getBlockY(), pt.getBlockZ()));
+        ChunkPos chunkPos = new ChunkPos(new BlockPos(pt.x(), pt.y(), pt.z()));
 
         //FAWE start
         FaweBlockStateListPopulator populator = new FaweBlockStateListPopulator(serverLevel);
