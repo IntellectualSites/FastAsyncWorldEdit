@@ -111,7 +111,7 @@ public class OncePerChunkExtent extends AbstractDelegateExtent implements IBatch
 
     @Override
     public BlockState getBlock(final BlockVector3 position) {
-        checkAndRun(position.getBlockX() >> 4, position.getBlockZ() >> 4);
+        checkAndRun(position.x() >> 4, position.z() >> 4);
         return super.getBlock(position);
     }
 
@@ -123,7 +123,7 @@ public class OncePerChunkExtent extends AbstractDelegateExtent implements IBatch
 
     @Override
     public BaseBlock getFullBlock(final BlockVector3 position) {
-        checkAndRun(position.getBlockX() >> 4, position.getBlockZ() >> 4);
+        checkAndRun(position.x() >> 4, position.z() >> 4);
         return super.getFullBlock(position);
     }
 
@@ -141,7 +141,7 @@ public class OncePerChunkExtent extends AbstractDelegateExtent implements IBatch
 
     @Override
     public BiomeType getBiome(final BlockVector3 position) {
-        checkAndRun(position.getBlockX() >> 4, position.getBlockZ() >> 4);
+        checkAndRun(position.x() >> 4, position.z() >> 4);
         return super.getBiome(position);
     }
 
@@ -171,7 +171,7 @@ public class OncePerChunkExtent extends AbstractDelegateExtent implements IBatch
 
     @Override
     public boolean setBiome(final BlockVector3 position, final BiomeType biome) {
-        checkAndRun(position.getBlockX() >> 4, position.getBlockZ() >> 4);
+        checkAndRun(position.x() >> 4, position.z() >> 4);
         return super.setBiome(position, biome);
     }
 

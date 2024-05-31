@@ -761,7 +761,7 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
         int tz = bz + 15;
         BlockVector3 min = getMinimumPoint();
         BlockVector3 max = getMaximumPoint();
-        return min.getY() <= chunkMinY && max.getY() >= chunkMaxY && min.getX() <= bx && max.getX() >= tx && min.getZ() <= bz && max.getZ() >= tz;
+        return min.y() <= chunkMinY && max.y() >= chunkMaxY && min.x() <= bx && max.x() >= tx && min.z() <= bz && max.z() >= tz;
     }
 
     @Override

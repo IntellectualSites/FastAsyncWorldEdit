@@ -88,7 +88,7 @@ public class LocalBlockVector2Set implements Set<BlockVector2> {
     @Override
     public boolean contains(Object o) {
         if (o instanceof BlockVector2 v) {
-            return contains(v.getBlockX(), v.getBlockZ());
+            return contains(v.x(), v.z());
         }
         return false;
     }
@@ -271,11 +271,11 @@ public class LocalBlockVector2Set implements Set<BlockVector2> {
      */
     @Override
     public boolean add(BlockVector2 vector) {
-        return add(vector.getBlockX(), vector.getBlockZ());
+        return add(vector.x(), vector.z());
     }
 
     private int getIndex(BlockVector2 vector) {
-        return getIndex(vector.getX(), vector.getZ());
+        return getIndex(vector.x(), vector.z());
     }
 
     private int getIndex(int x, int z) {
@@ -304,7 +304,7 @@ public class LocalBlockVector2Set implements Set<BlockVector2> {
     @Override
     public boolean remove(Object o) {
         if (o instanceof BlockVector2 v) {
-            return remove(v.getBlockX(), v.getBlockZ());
+            return remove(v.x(), v.z());
         }
         return false;
     }
