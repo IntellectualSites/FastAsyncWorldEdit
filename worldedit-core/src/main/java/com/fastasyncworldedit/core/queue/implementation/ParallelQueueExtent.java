@@ -221,9 +221,9 @@ public class ParallelQueueExtent extends PassthroughExtent {
         return new Operation() {
             @Override
             public Operation resume(final RunContext run) throws WorldEditException {
-                getExtent().commit();
+                extent.commit();
                 processor.flush();
-                getExtent().flush();
+                ((IQueueExtent<IQueueChunk<?>>) extent).flush();
                 return null;
             }
 
