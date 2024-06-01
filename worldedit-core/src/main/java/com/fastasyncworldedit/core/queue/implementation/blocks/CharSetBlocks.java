@@ -128,7 +128,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
     @Override
     public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 position, T block)
             throws WorldEditException {
-        return setBlock(position.getX(), position.getY(), position.getZ(), block);
+        return setBlock(position.x(), position.y(), position.z(), block);
     }
 
     @Override
@@ -255,7 +255,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
 
     @Override
     public boolean setBiome(BlockVector3 position, BiomeType biome) {
-        return setBiome(position.getX(), position.getY(), position.getZ(), biome);
+        return setBiome(position.x(), position.y(), position.z(), biome);
     }
 
     @Override

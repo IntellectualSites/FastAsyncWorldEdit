@@ -351,8 +351,8 @@ public class RegionCommands {
         int affected = 0;
         while (iter.hasNext()) {
             BlockVector2 pos = iter.next();
-            int x = pos.getBlockX();
-            int z = pos.getBlockZ();
+            int x = pos.x();
+            int z = pos.z();
             //FAWE start - world min/maxY
             y = editSession.getNearestSurfaceTerrainBlock(x, z, y, minY, maxY);
             //FAWE end
@@ -449,8 +449,8 @@ public class RegionCommands {
         //FAWE end
         BlockVector3 min = region.getMinimumPoint();
         BlockVector3 max = region.getMaximumPoint();
-        long volume = (((long) max.getX() - (long) min.getX() + 1) * ((long) max.getY() - (long) min.getY() + 1) * ((long) max.getZ() - (long) min
-                .getZ() + 1));
+        long volume = (((long) max.x() - (long) min.x() + 1) * ((long) max.y() - (long) min.y() + 1) * ((long) max.z() - (long) min
+                .z() + 1));
         FaweLimit limit = actor.getLimit();
         if (volume >= limit.MAX_CHECKS) {
             throw FaweCache.MAX_CHECKS;
@@ -772,13 +772,13 @@ public class RegionCommands {
             zero = max.add(min).divide(2);
             unit = max.subtract(zero);
 
-            if (unit.getX() == 0) {
+            if (unit.x() == 0) {
                 unit = unit.withX(1.0);
             }
-            if (unit.getY() == 0) {
+            if (unit.y() == 0) {
                 unit = unit.withY(1.0);
             }
-            if (unit.getZ() == 0) {
+            if (unit.z() == 0) {
                 unit = unit.withZ(1.0);
             }
         }

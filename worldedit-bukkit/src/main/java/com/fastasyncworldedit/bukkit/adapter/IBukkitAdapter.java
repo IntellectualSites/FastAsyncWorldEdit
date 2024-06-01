@@ -99,7 +99,7 @@ public interface IBukkitAdapter {
         checkNotNull(position);
         return new org.bukkit.Location(
                 world,
-                position.getX(), position.getY(), position.getZ()
+                position.x(), position.y(), position.z()
         );
     }
 
@@ -119,7 +119,7 @@ public interface IBukkitAdapter {
         checkNotNull(location);
         return new org.bukkit.Location(
                 world,
-                location.getX(), location.getY(), location.getZ(),
+                location.x(), location.y(), location.z(),
                 location.getYaw(),
                 location.getPitch()
         );

@@ -152,7 +152,7 @@ public interface IQueueExtent<T extends IChunk> extends Flushable, Trimable, ICh
         final Set<BlockVector2> chunks = region.getChunks();
         ChunkFilterBlock block = null;
         for (BlockVector2 chunk : chunks) {
-            block = apply(block, filter, region, chunk.getX(), chunk.getZ(), full);
+            block = apply(block, filter, region, chunk.x(), chunk.z(), full);
         }
         flush();
         return filter;

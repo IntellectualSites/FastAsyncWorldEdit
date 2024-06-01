@@ -24,7 +24,7 @@ public class RotatableHeightMap extends AbstractDelegateHeightMap {
         mutable.mutX(x);
         mutable.mutZ(z);
         BlockVector3 pos = transform.apply(mutable.setComponents(x, 0, z)).toBlockPoint();
-        return super.getHeight(pos.getBlockX(), pos.getBlockZ());
+        return super.getHeight(pos.x(), pos.z());
     }
 
 }

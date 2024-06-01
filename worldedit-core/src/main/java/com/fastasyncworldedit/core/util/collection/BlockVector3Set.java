@@ -23,11 +23,11 @@ public interface BlockVector3Set extends Set<BlockVector3> {
         // Set default offset as many operations utilising a region are likely to start in a corner, this initialising the
         // LocalBlockVectorSet poorly
         // This needs to be ceiling as LocalBlockVector extends 1 block further "negative"
-        int offsetX = (int) Math.ceil((min.getX() + max.getX()) / 2d);
-        int offsetZ = (int) Math.ceil((min.getZ() + max.getZ()) / 2d);
+        int offsetX = (int) Math.ceil((min.x() + max.x()) / 2d);
+        int offsetZ = (int) Math.ceil((min.z() + max.z()) / 2d);
         int offsetY;
         if (region.getMinimumY() < -128 || region.getMaximumY() > 320) {
-            offsetY = (min.getY() + max.getY()) / 2;
+            offsetY = (min.y() + max.y()) / 2;
         } else {
             offsetY = 128;
         }
@@ -43,7 +43,7 @@ public interface BlockVector3Set extends Set<BlockVector3> {
      * @return Appropriate {@link BlockVector3Set} implementation
      */
     static BlockVector3Set getAppropriateVectorSet(BlockVector3 size) {
-        if (size.getBlockX() > 2048 || size.getBlockZ() > 2048 || size.getBlockY() > 512) {
+        if (size.x() > 2048 || size.z() > 2048 || size.y() > 512) {
             return new BlockVectorSet();
         } else {
             return new LocalBlockVectorSet();

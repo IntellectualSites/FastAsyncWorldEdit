@@ -577,7 +577,7 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
     @Override
     public void sendFakeNBT(Player player, BlockVector3 pos, CompoundBinaryTag nbtData) {
         var structureBlock = new StructureBlockEntity(
-                new BlockPos(pos.getX(), pos.getY(), pos.getZ()),
+                new BlockPos(pos.x(), pos.y(), pos.z()),
                 Blocks.STRUCTURE_BLOCK.defaultBlockState()
         );
         structureBlock.setLevel(((CraftPlayer) player).getHandle().level());
@@ -644,11 +644,11 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
             return false;
         }
         fakePlayer.setItemInHand(InteractionHand.MAIN_HAND, stack);
-        fakePlayer.absMoveTo(position.getX(), position.getY(), position.getZ(),
+        fakePlayer.absMoveTo(position.x(), position.y(), position.z(),
                 (float) face.toVector().toYaw(), (float) face.toVector().toPitch()
         );
 
-        final BlockPos blockPos = new BlockPos(position.getX(), position.getY(), position.getZ());
+        final BlockPos blockPos = new BlockPos(position.x(), position.y(), position.z());
         final Vec3 blockVec = Vec3.atLowerCornerOf(blockPos);
         final net.minecraft.core.Direction enumFacing = adapt(face);
         BlockHitResult rayTrace = new BlockHitResult(blockVec, enumFacing, blockPos, false);
@@ -674,7 +674,7 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
         net.minecraft.world.level.block.state.BlockState blockData = Block.stateById(internalId);
         return blockData.canSurvive(
                 ((CraftWorld) world).getHandle(),
-                new BlockPos(position.getX(), position.getY(), position.getZ())
+                new BlockPos(position.x(), position.y(), position.z())
         );
     }
 
@@ -802,7 +802,7 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
         }
 
         for (BlockVector3 vec : region) {
-            BlockPos pos = new BlockPos(vec.getBlockX(), vec.getBlockY(), vec.getBlockZ());
+            BlockPos pos = new BlockPos(vec.x(), vec.y(), vec.z());
             ChunkAccess chunk = chunks.get(new ChunkPos(pos));
             final net.minecraft.world.level.block.state.BlockState blockData = chunk.getBlockState(pos);
             int internalId = Block.getId(blockData);
@@ -815,7 +815,7 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
             }
             extent.setBlock(vec, state.toBaseBlock());
             if (options.shouldRegenBiomes()) {
-                Biome origBiome = chunk.getNoiseBiome(vec.getX(), vec.getY(), vec.getZ()).value();
+                Biome origBiome = chunk.getNoiseBiome(vec.x(), vec.y(), vec.z()).value();
                 BiomeType adaptedBiome = adapt(serverWorld, origBiome);
                 if (adaptedBiome != null) {
                     extent.setBiome(vec, adaptedBiome);
@@ -834,7 +834,7 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
                 //noinspection unchecked
                 chunkLoadings.add(
                         ((CompletableFuture<ChunkResult<ChunkAccess>>)
-                                getChunkFutureMethod.invoke(chunkManager, chunk.getX(), chunk.getZ(), ChunkStatus.FEATURES, true))
+                                getChunkFutureMethod.invoke(chunkManager, chunk.x(), chunk.z(), ChunkStatus.FEATURES, true))
                                 .thenApply(either -> either.orElse(null))
                 );
             } catch (IllegalAccessException | InvocationTargetException e) {
@@ -874,7 +874,7 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
     public boolean clearContainerBlockContents(org.bukkit.World world, BlockVector3 pt) {
         ServerLevel originalWorld = ((CraftWorld) world).getHandle();
 
-        BlockEntity entity = originalWorld.getBlockEntity(new BlockPos(pt.getBlockX(), pt.getBlockY(), pt.getBlockZ()));
+        BlockEntity entity = originalWorld.getBlockEntity(new BlockPos(pt.x(), pt.y(), pt.z()));
         if (entity instanceof Clearable) {
             ((Clearable) entity).clearContent();
             return true;

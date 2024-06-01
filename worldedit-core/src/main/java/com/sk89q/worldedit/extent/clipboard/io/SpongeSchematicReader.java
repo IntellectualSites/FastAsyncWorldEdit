@@ -263,9 +263,9 @@ public class SpongeSchematicReader extends NBTSchematicReader {
                 int[] pos = requireTag(tileEntity, "Pos", IntArrayTag.class).getValue();
                 final BlockVector3 pt = BlockVector3.at(pos[0], pos[1], pos[2]);
                 Map<String, Tag> values = Maps.newHashMap(tileEntity);
-                values.put("x", new IntTag(pt.getBlockX()));
-                values.put("y", new IntTag(pt.getBlockY()));
-                values.put("z", new IntTag(pt.getBlockZ()));
+                values.put("x", new IntTag(pt.x()));
+                values.put("y", new IntTag(pt.y()));
+                values.put("z", new IntTag(pt.z()));
                 //FAWE start - support old, corrupt schematics
                 Tag id = values.get("Id");
                 if (id == null) {
@@ -378,7 +378,7 @@ public class SpongeSchematicReader extends NBTSchematicReader {
             palette.put(((IntTag) idTag).getValue(), biome);
         }
 
-        int width = clipboard.getDimensions().getX();
+        int width = clipboard.getDimensions().x();
 
         byte[] biomes = dataTag.getValue();
         int biomeIndex = 0;

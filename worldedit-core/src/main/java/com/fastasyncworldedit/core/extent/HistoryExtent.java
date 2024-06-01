@@ -66,7 +66,7 @@ public class HistoryExtent extends AbstractDelegateExtent {
 
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 location, B block) throws WorldEditException {
-        return setBlock(location.getBlockX(), location.getBlockY(), location.getBlockZ(), block);
+        return setBlock(location.x(), location.y(), location.z(), block);
     }
 
     @Nullable
@@ -111,7 +111,7 @@ public class HistoryExtent extends AbstractDelegateExtent {
     public boolean setBiome(BlockVector3 position, BiomeType newBiome) {
         BiomeType oldBiome = this.getBiome(position);
         if (!oldBiome.getId().equals(newBiome.getId())) {
-            this.changeSet.addBiomeChange(position.getBlockX(), position.getBlockY(), position.getBlockZ(), oldBiome, newBiome);
+            this.changeSet.addBiomeChange(position.x(), position.y(), position.z(), oldBiome, newBiome);
             return getExtent().setBiome(position, newBiome);
         } else {
             return false;

@@ -8,12 +8,12 @@ public class SimplexNoiseGenerator implements NoiseGenerator {
 
     @Override
     public float noise(Vector2 position) {
-        return convert(SimplexNoise.noise(position.getX(), position.getZ()));
+        return convert(SimplexNoise.noise(position.x(), position.z()));
     }
 
     @Override
     public float noise(Vector3 position) {
-        return convert(SimplexNoise.noise(position.getX(), position.getY(), position.getZ()));
+        return convert(SimplexNoise.noise(position.x(), position.y(), position.z()));
     }
 
     private float convert(double d) {

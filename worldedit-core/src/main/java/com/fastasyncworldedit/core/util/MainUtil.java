@@ -450,9 +450,9 @@ public class MainUtil {
             Location loc = entity.getLocation();
             // Create a copy, because the list is immutable...
             List<Tag> posList = new ArrayList<>(pos.getValue());
-            posList.set(0, new DoubleTag(loc.getX()));
-            posList.set(1, new DoubleTag(loc.getY()));
-            posList.set(2, new DoubleTag(loc.getZ()));
+            posList.set(0, new DoubleTag(loc.x()));
+            posList.set(1, new DoubleTag(loc.y()));
+            posList.set(2, new DoubleTag(loc.z()));
             map.put("Pos", new ListTag(pos.getType(), posList));
         }
         return new CompoundTag(map);

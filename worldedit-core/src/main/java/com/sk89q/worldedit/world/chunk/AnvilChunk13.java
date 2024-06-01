@@ -231,9 +231,9 @@ public class AnvilChunk13 implements Chunk {
     @Override
     public BaseBlock getBlock(BlockVector3 position) throws DataException {
         //FAWE start - simplified
-        int x = position.getX() & 15;
-        int y = position.getY();
-        int z = position.getZ() & 15;
+        int x = position.x() & 15;
+        int y = position.y();
+        int z = position.z() & 15;
         //FAWE end
 
         int section = y >> 4;
@@ -261,8 +261,8 @@ public class AnvilChunk13 implements Chunk {
         if (biomes == null) {
             populateBiomes();
         }
-        int rx = position.getX() & 15;
-        int rz = position.getZ() & 15;
+        int rx = position.x() & 15;
+        int rz = position.z() & 15;
         return biomes[rz << 4 | rx];
     }
 

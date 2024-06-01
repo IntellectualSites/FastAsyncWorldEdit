@@ -111,8 +111,8 @@ public class RegionVisitor implements Operation {
             while (trailIter.hasNext()) {
                 BlockVector3 pt = trailIter.next();
                 apply(pt);
-                int cx = pt.getBlockX() >> 4;
-                int cz = pt.getBlockZ() >> 4;
+                int cx = pt.x() >> 4;
+                int cz = pt.z() >> 4;
                 if (cx != lastTrailChunkX || cz != lastTrailChunkZ) {
                     lastTrailChunkX = cx;
                     lastTrailChunkZ = cz;
@@ -128,8 +128,8 @@ public class RegionVisitor implements Operation {
                         lead:
                         for (int count = 0; count < amount; ) {
                             BlockVector3 v = leadIter.next();
-                            int vcx = v.getBlockX() >> 4;
-                            int vcz = v.getBlockZ() >> 4;
+                            int vcx = v.x() >> 4;
+                            int vcz = v.z() >> 4;
                             if (vcx != lastLeadChunkX || vcz != lastLeadChunkZ) {
                                 lastLeadChunkX = vcx;
                                 lastLeadChunkZ = vcz;

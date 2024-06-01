@@ -396,8 +396,8 @@ public class FastSchematicReader extends NBTSchematicReader {
                         int locY = loc.getBlockY();
                         int locZ = loc.getBlockZ();
                         BlockVector3 max = min.add(dimensions).subtract(BlockVector3.ONE);
-                        if (locX < min.getX() || locY < min.getY() || locZ < min.getZ()
-                                || locX > max.getX() || locY > max.getY() || locZ > max.getZ()) {
+                        if (locX < min.x() || locY < min.y() || locZ < min.z()
+                                || locX > max.x() || locY > max.y() || locZ > max.z()) {
                             for (Entity e : clipboard.getEntities()) {
                                 clipboard.removeEntity(e);
                             }

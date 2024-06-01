@@ -462,7 +462,7 @@ public class BrushCommands {
             @Arg(desc = "double", def = "50")
                     double amplitude
     ) throws WorldEditException {
-        double max = MathMan.max(radius.getX(), radius.getY(), radius.getZ());
+        double max = MathMan.max(radius.x(), radius.y(), radius.z());
         worldEdit.checkMaxBrushRadius(
                 max,
                 context.injectedValue(Key.of(Player.class)).orElseThrow(() -> new IllegalStateException("No player"))
@@ -1368,15 +1368,15 @@ public class BrushCommands {
         BlockVector3 size = clipboard.getDimensions();
 
         worldEdit.checkMaxBrushRadius(
-                size.getBlockX() / 2D - 1,
+                size.x() / 2D - 1,
                 context.injectedValue(Key.of(Player.class)).orElseThrow(() -> new IllegalStateException("No player"))
         );
         worldEdit.checkMaxBrushRadius(
-                size.getBlockY() / 2D - 1,
+                size.y() / 2D - 1,
                 context.injectedValue(Key.of(Player.class)).orElseThrow(() -> new IllegalStateException("No player"))
         );
         worldEdit.checkMaxBrushRadius(
-                size.getBlockZ() / 2D - 1,
+                size.z() / 2D - 1,
                 context.injectedValue(Key.of(Player.class)).orElseThrow(() -> new IllegalStateException("No player"))
         );
 

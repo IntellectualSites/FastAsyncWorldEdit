@@ -213,8 +213,8 @@ public class MinecraftStructure implements ClipboardReader, ClipboardWriter {
             if (block.getBlockType() != BlockTypes.STRUCTURE_VOID) {
                 int combined = block.getInternalId();
                 int index = indexes.get(combined);
-                List<Integer> pos = Arrays.asList(point.getX() - min.getX(),
-                        point.getY() - min.getY(), point.getZ() - min.getZ()
+                List<Integer> pos = Arrays.asList(point.x() - min.x(),
+                        point.y() - min.y(), point.z() - min.z()
                 );
                 if (!block.hasNbtData()) {
                     blocks.add(FaweCache.INSTANCE.asMap("state", index, "pos", pos));
@@ -231,7 +231,7 @@ public class MinecraftStructure implements ClipboardReader, ClipboardWriter {
         ArrayList<Map<String, Object>> entities = new ArrayList<>();
         for (Entity entity : clipboard.getEntities()) {
             Location loc = entity.getLocation();
-            List<Double> pos = Arrays.asList(loc.getX(), loc.getY(), loc.getZ());
+            List<Double> pos = Arrays.asList(loc.x(), loc.y(), loc.z());
             List<Integer> blockPos = Arrays.asList(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
             BaseEntity state = entity.getState();
             if (state != null) {

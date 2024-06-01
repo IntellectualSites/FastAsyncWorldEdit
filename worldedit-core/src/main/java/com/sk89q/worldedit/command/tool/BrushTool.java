@@ -380,7 +380,7 @@ public class BrushTool
                 pitch = 23 - (pitch / 4);
                 d += (int) (Math.sin(Math.toRadians(pitch)) * 50);
                 final Vector3 vector = loc.getDirection().withY(0).normalize().multiply(d)
-                        .add(loc.getX(), loc.getY(), loc.getZ());
+                        .add(loc.x(), loc.y(), loc.z());
                 return offset(vector, loc).toBlockPoint();
             }
             case TARGET_POINT_HEIGHT: {

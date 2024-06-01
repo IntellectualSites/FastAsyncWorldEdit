@@ -53,8 +53,8 @@ public class ApplyLayer implements Contextual<Operation> {
 
         return new LayerVisitor(
                 localRegion,
-                localRegion.getMinimumPoint().getY(),
-                localRegion.getMaximumPoint().getY(),
+                localRegion.getMinimumPoint().y(),
+                localRegion.getMaximumPoint().y(),
                 function.createFromContext(context),
                 //FAWE start - provide extent for preloading
                 context.getDestination()

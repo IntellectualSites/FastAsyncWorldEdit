@@ -68,9 +68,9 @@ public class BlockBagChangeSet extends AbstractDelegateChangeSet {
 
     @Override
     public void add(BlockVector3 loc, BaseBlock from, BaseBlock to) {
-        int x = loc.getBlockX();
-        int y = loc.getBlockY();
-        int z = loc.getBlockZ();
+        int x = loc.x();
+        int y = loc.y();
+        int z = loc.z();
         add(x, y, z, from, to);
     }
 

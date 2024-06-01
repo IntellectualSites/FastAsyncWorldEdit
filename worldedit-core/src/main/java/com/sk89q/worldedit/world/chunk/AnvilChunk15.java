@@ -60,9 +60,9 @@ public class AnvilChunk15 extends AnvilChunk13 {
         if (biomes == null) {
             populateBiomes();
         }
-        int x = (position.getX() & 15) >> 2;
-        int y = position.getY() >> 2;
-        int z = (position.getZ() & 15) >> 2;
+        int x = (position.x() & 15) >> 2;
+        int y = position.y() >> 2;
+        int z = (position.z() & 15) >> 2;
         return biomes[y << 4 | z << 2 | x];
     }
 

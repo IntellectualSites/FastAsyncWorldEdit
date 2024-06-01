@@ -67,15 +67,15 @@ public class ScatterBrush implements Brush {
         }
         BlockVector3 patternSize = pattern.size();
         BlockVector3Set placed = BlockVector3Set.getAppropriateVectorSet(patternSize.add(distance, distance, distance));
-        placed.setOffset(position.getX(), position.getY(), position.getZ());
+        placed.setOffset(position.x(), position.y(), position.z());
         int maxFails = 1000;
         for (int i = 0; i < count; i++) {
             int index = ThreadLocalRandom.current().nextInt(length);
             BlockVector3 pos = visited.get(index);
             if (pos != null && canApply(pos)) {
-                int x = pos.getBlockX();
-                int y = pos.getBlockY();
-                int z = pos.getBlockZ();
+                int x = pos.x();
+                int y = pos.y();
+                int z = pos.z();
                 if (placed.containsRadius(x, y, z, distance)) {
                     if (maxFails-- <= 0) {
                         break;

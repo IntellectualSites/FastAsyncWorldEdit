@@ -262,12 +262,12 @@ public class SelectionCommands {
 
             actor.print(Caption.of(
                     "worldedit.chunk.selected-multiple",
-                    TextComponent.of(minChunk.getBlockX()),
-                    TextComponent.of(minChunk.getBlockY()),
-                    TextComponent.of(minChunk.getBlockZ()),
-                    TextComponent.of(maxChunk.getBlockX()),
-                    TextComponent.of(maxChunk.getBlockY()),
-                    TextComponent.of(maxChunk.getBlockZ())
+                    TextComponent.of(minChunk.x()),
+                    TextComponent.of(minChunk.y()),
+                    TextComponent.of(minChunk.z()),
+                    TextComponent.of(maxChunk.x()),
+                    TextComponent.of(maxChunk.y()),
+                    TextComponent.of(maxChunk.z())
             ));
         } else {
             BlockVector3 minChunk;
@@ -290,9 +290,9 @@ public class SelectionCommands {
 
             actor.print(Caption.of(
                     "worldedit.chunk.selected",
-                    TextComponent.of(minChunk.getBlockX()),
-                    TextComponent.of(minChunk.getBlockY()),
-                    TextComponent.of(minChunk.getBlockZ())
+                    TextComponent.of(minChunk.x()),
+                    TextComponent.of(minChunk.y()),
+                    TextComponent.of(minChunk.z())
             ));
         }
 
@@ -538,10 +538,10 @@ public class SelectionCommands {
                         .subtract(region.getMinimumPoint()).add(1, 1, 1);
                 BlockVector3 origin = clipboard.getOrigin();
 
-                String sizeStr = size.getBlockX() + "*" + size.getBlockY() + "*" + size.getBlockZ();
-                String originStr = origin.getBlockX() + "," + origin.getBlockY() + "," + origin.getBlockZ();
+                String sizeStr = size.x() + "*" + size.y() + "*" + size.z();
+                String originStr = origin.x() + "," + origin.y() + "," + origin.z();
 
-                long numBlocks = ((long) size.getBlockX() * size.getBlockY() * size.getBlockZ());
+                long numBlocks = ((long) size.x() * size.y() * size.z());
                 actor.print(Caption.of(
                         "worldedit.size.offset",
                         TextComponent.of(name),

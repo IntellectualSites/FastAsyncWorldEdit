@@ -56,7 +56,7 @@ public class WorldCopyClipboard extends ReadOnlyClipboard {
 
     @Override
     public BiomeType getBiome(BlockVector3 position) {
-        return getExtent().getBiomeType(position.getX(), position.getY(), position.getZ());
+        return getExtent().getBiomeType(position.x(), position.y(), position.z());
     }
 
     @Override

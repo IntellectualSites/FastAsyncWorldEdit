@@ -159,8 +159,8 @@ public class PlotSquaredFeature extends FaweMaskManager {
             regions = WEManager.getMask(pp);
             if (regions.size() == 1) {
                 CuboidRegion region = regions.iterator().next();
-                if (region.getMinimumPoint().getX() == Integer.MIN_VALUE
-                        && region.getMaximumPoint().getX() == Integer.MAX_VALUE) {
+                if (region.getMinimumPoint().x() == Integer.MIN_VALUE
+                        && region.getMaximumPoint().x() == Integer.MAX_VALUE) {
                     regions.clear();
                 }
             }
