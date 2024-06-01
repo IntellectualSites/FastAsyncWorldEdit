@@ -137,6 +137,10 @@ public class WorldEditPlugin extends JavaPlugin {
         //noinspection ResultOfMethodCallIgnored
         getDataFolder().mkdirs();
 
+        //FAWE start - Migrate from config-legacy to worldedit-config
+        migrateLegacyConfig();
+        //FAWE end
+
         //FAWE start - Modify WorldEdit config name
         config = new BukkitConfiguration(new YAMLProcessor(new File(getDataFolder(), "worldedit-config.yml"), true), this);
         // Load config before we say we've loaded platforms as it is used in listeners of the event
@@ -150,10 +154,6 @@ public class WorldEditPlugin extends JavaPlugin {
         // Setup platform
         platform = new BukkitServerInterface(this, getServer());
         worldEdit.getPlatformManager().register(platform);
-
-        //FAWE start - Migrate from config-legacy to worldedit-config
-        migrateLegacyConfig();
-        //FAWE end
 
         //FAWE start - Setup permission attachments
         permissionAttachmentManager = new BukkitPermissionAttachmentManager(this);
