@@ -346,7 +346,7 @@ public abstract class PlacementStateProcessor extends AbstractDelegateExtent imp
         return BlockTypesCache.states[ordinal].getNbtData();
     }
 
-    private char getBlockOrdinal(final int blockX, final int blockY, final int blockZ, final BlockState state) {
+    private char getBlockOrdinal(int blockX, int blockY, int blockZ, BlockState state) {
         EnumSet<Direction> dirs = Direction.getDirections(state);
         Direction clickedFaceDirection = null; // This should be always be set by the below.
         Set<String> states = state.getStates().keySet().stream().map(Property::getName).collect(Collectors.toSet());
@@ -358,7 +358,12 @@ public abstract class PlacementStateProcessor extends AbstractDelegateExtent imp
             boolean hadNesw = false;
             for (Direction dir : NESW) {
                 if (dirs.contains(dir)) {
-                    clickedFaceDirection = dir.getLeft().getLeft(); // opposite
+                    clickedFaceDirection = dir.getLeft().getLeft();
+                    if (state.getBlockType() == BlockTypes.CHEST || state.getBlockType() == BlockTypes.TRAPPED_CHEST) {
+                        Direction tmp = clickedFaceDirection;
+                        clickedFaceDirection = dir;
+                        dir = tmp;
+                    }
                     clickPos.setComponents(
                             (double) blockX + 0.5 * (1 + dir.getBlockX()),
                             (double) blockY + 0.2,

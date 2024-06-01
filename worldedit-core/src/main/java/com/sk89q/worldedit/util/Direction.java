@@ -29,12 +29,10 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.OptionalInt;
-import java.util.Set;
 
 /**
  * A collection of cardinal, ordinal, and secondary-ordinal directions.
@@ -366,7 +364,7 @@ public enum Direction {
      * @since TODO
      */
     public static EnumSet<Direction> getDirections(BlockState state) {
-        Set<Direction> directions = new HashSet<>();
+        EnumSet<Direction> directions = EnumSet.noneOf(Direction.class);
         for (Property<?> property : state.getBlockType().getProperties()) {
             if (property instanceof DirectionalProperty dirProp) {
                 directions.add(state.getState(dirProp));
@@ -376,8 +374,7 @@ public enum Direction {
             if (!(value instanceof String str)) {
                 if (value instanceof Integer i) {
                     fromRotationIndex(i).ifPresent(directions::add);
-                }
-                if (value instanceof Boolean) {
+                } else if (value instanceof Boolean b && b) {
                     try {
                         directions.add(Direction.valueOf(property.getName().toUpperCase(Locale.ROOT)));
                     } catch (IllegalArgumentException ignored) {
@@ -397,9 +394,8 @@ public enum Direction {
                 case "shape" -> {} // Do nothing for now
             }
         }
-        return EnumSet.copyOf(directions);
+        return directions;
     }
     //FAWE end
 
 }
-
