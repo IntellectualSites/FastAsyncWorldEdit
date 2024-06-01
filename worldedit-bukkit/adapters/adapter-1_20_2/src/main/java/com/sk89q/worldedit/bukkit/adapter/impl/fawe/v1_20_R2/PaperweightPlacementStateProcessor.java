@@ -24,13 +24,13 @@ public class PaperweightPlacementStateProcessor extends PlacementStateProcessor 
     private final PaperweightFaweAdapter adapter = ((PaperweightFaweAdapter) WorldEditPlugin
             .getInstance()
             .getBukkitImplAdapter());
-    private final FaweMutableBlockPlaceContext mutableBlockPlaceContext;
+    private final PaperweightFaweMutableBlockPlaceContext mutableBlockPlaceContext;
     private final PaperweightLevelProxy proxyLevel;
 
     public PaperweightPlacementStateProcessor(Extent extent, BlockTypeMask mask, Region region) {
         super(extent, mask, region);
         this.proxyLevel = PaperweightLevelProxy.getInstance(this);
-        this.mutableBlockPlaceContext = new FaweMutableBlockPlaceContext(proxyLevel);
+        this.mutableBlockPlaceContext = new PaperweightFaweMutableBlockPlaceContext(proxyLevel);
     }
 
     private PaperweightPlacementStateProcessor(
@@ -43,7 +43,7 @@ public class PaperweightPlacementStateProcessor extends PlacementStateProcessor 
     ) {
         super(extent, mask, crossChunkSecondPasses, threadProcessors, region, finished);
         this.proxyLevel = PaperweightLevelProxy.getInstance(this);
-        this.mutableBlockPlaceContext = new FaweMutableBlockPlaceContext(proxyLevel);
+        this.mutableBlockPlaceContext = new PaperweightFaweMutableBlockPlaceContext(proxyLevel);
     }
 
     @Override

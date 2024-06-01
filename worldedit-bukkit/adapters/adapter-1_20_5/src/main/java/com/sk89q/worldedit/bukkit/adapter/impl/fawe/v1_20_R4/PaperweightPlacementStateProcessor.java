@@ -31,7 +31,7 @@ public class PaperweightPlacementStateProcessor extends PlacementStateProcessor 
             .getInstance()
             .getBukkitImplAdapter());
     private final PaperweightLevelProxy proxyLevel;
-    private final FaweMutableBlockPlaceContext mutableBlockPlaceContext;
+    private final PaperweightFaweMutableBlockPlaceContext mutableBlockPlaceContext;
 
     public PaperweightPlacementStateProcessor(Extent extent, BlockTypeMask mask, Region region) {
         super(extent, mask, region);
@@ -47,7 +47,7 @@ public class PaperweightPlacementStateProcessor extends PlacementStateProcessor 
             bukkitWorld = (BukkitWorld) world;
         }
         this.proxyLevel = PaperweightLevelProxy.getInstance(((CraftWorld) bukkitWorld.getWorld()).getHandle(), this);
-        this.mutableBlockPlaceContext = new FaweMutableBlockPlaceContext(proxyLevel);
+        this.mutableBlockPlaceContext = new PaperweightFaweMutableBlockPlaceContext(proxyLevel);
     }
 
     private PaperweightPlacementStateProcessor(
@@ -61,7 +61,7 @@ public class PaperweightPlacementStateProcessor extends PlacementStateProcessor 
     ) {
         super(extent, mask, crossChunkSecondPasses, threadProcessors, region, finished);
         this.proxyLevel = PaperweightLevelProxy.getInstance(serverLevel, this);
-        this.mutableBlockPlaceContext = new FaweMutableBlockPlaceContext(proxyLevel);
+        this.mutableBlockPlaceContext = new PaperweightFaweMutableBlockPlaceContext(proxyLevel);
     }
 
     @Override

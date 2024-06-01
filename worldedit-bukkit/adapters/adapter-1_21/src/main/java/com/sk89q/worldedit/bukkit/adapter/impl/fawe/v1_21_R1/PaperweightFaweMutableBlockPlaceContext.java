@@ -14,20 +14,21 @@ import net.minecraft.world.phys.Vec3;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class FaweMutableBlockPlaceContext extends BlockPlaceContext {
+public class PaperweightFaweMutableBlockPlaceContext extends BlockPlaceContext {
 
-    private static final BlockHitResult DEFAULT_BLOCK_HIT = new BlockHitResult(new Vec3(
-            Integer.MAX_VALUE,
-            Integer.MAX_VALUE,
-            Integer.MAX_VALUE
-    ), Direction.NORTH, BlockPos.ZERO, false);
+    private static final BlockHitResult DEFAULT_BLOCK_HIT = new BlockHitResult(
+            new Vec3(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE),
+            Direction.NORTH,
+            new BlockPos(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE),
+            false
+    );
     private final ServerLevel level;
     private BlockHitResult hitResult = null;
     private Direction direction = null;
     private BlockPos relativePos;
 
     @SuppressWarnings("DataFlowIssue")
-    public FaweMutableBlockPlaceContext(ServerLevel level) {
+    public PaperweightFaweMutableBlockPlaceContext(ServerLevel level) {
         super(
                 level,
                 null,
@@ -40,7 +41,7 @@ public class FaweMutableBlockPlaceContext extends BlockPlaceContext {
         this.replaceClicked = false;
     }
 
-    public FaweMutableBlockPlaceContext withSetting(BlockHitResult hitResult, Direction direction) {
+    public PaperweightFaweMutableBlockPlaceContext withSetting(BlockHitResult hitResult, Direction direction) {
         this.hitResult = hitResult;
         this.direction = direction;
         this.relativePos = hitResult.getBlockPos().relative(hitResult.getDirection());

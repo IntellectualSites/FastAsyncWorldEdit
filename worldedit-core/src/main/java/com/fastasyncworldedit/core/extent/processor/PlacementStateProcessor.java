@@ -1,5 +1,7 @@
 package com.fastasyncworldedit.core.extent.processor;
 
+import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.extent.NullExtent;
 import com.fastasyncworldedit.core.extent.filter.block.FilterBlock;
 import com.fastasyncworldedit.core.function.mask.AdjacentAny2DMask;
 import com.fastasyncworldedit.core.math.BlockVector3ChunkMap;
@@ -9,11 +11,12 @@ import com.fastasyncworldedit.core.queue.IBatchProcessor;
 import com.fastasyncworldedit.core.queue.IChunk;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.IChunkSet;
+import com.fastasyncworldedit.core.registry.state.PropertyKey;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.extent.NullExtent;
+import com.sk89q.worldedit.function.mask.BlockCategoryMask;
 import com.sk89q.worldedit.function.mask.BlockTypeMask;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -48,6 +51,7 @@ public abstract class PlacementStateProcessor extends AbstractDelegateExtent imp
 
     private static volatile boolean SETUP = false;
     private static BlockTypeMask DEFAULT_MASK = null;
+    private static BlockTypeMask IN_FIRST_PASS = null;
     private static BlockTypeMask REQUIRES_SECOND_PASS = null;
     private static AdjacentAny2DMask ADJACENT_STAIR_MASK = null;
 
@@ -59,6 +63,7 @@ public abstract class PlacementStateProcessor extends AbstractDelegateExtent imp
     protected final AtomicBoolean finished;
     private final MutableVector3 clickPos = new MutableVector3();
     private final MutableBlockVector3 clickedBlock = new MutableBlockVector3();
+    private final MutableBlockVector3 placedBlock = new MutableBlockVector3(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE);
 
     private IChunkGet processChunkGet = null;
     private IChunkSet processChunkSet = null;
@@ -109,7 +114,19 @@ public abstract class PlacementStateProcessor extends AbstractDelegateExtent imp
     }
 
     private static void setup() {
-        REQUIRES_SECOND_PASS = new BlockTypeMask(new NullExtent());
+        NullExtent nullExtent = new NullExtent(
+                com.sk89q.worldedit.extent.NullExtent.INSTANCE,
+                Caption.of("PlacementStateProcessor fell through to null extent")
+        );
+
+        IN_FIRST_PASS = new BlockTypeMask(nullExtent);
+        IN_FIRST_PASS.add(
+                BlockTypes.CHEST,
+                BlockTypes.TRAPPED_CHEST
+        );
+        IN_FIRST_PASS.add(BlockCategories.STAIRS.getAll());
+
+        REQUIRES_SECOND_PASS = new BlockTypeMask(nullExtent);
         REQUIRES_SECOND_PASS.add(
                 BlockTypes.IRON_BARS,
                 BlockTypes.GLASS_PANE,
@@ -164,8 +181,8 @@ public abstract class PlacementStateProcessor extends AbstractDelegateExtent imp
                 DEFAULT_MASK.add(category.getAll());
             }
         }
-        BlockTypeMask stairs = new BlockTypeMask(new NullExtent(), BlockCategories.STAIRS.getAll());
-        ADJACENT_STAIR_MASK = new AdjacentAny2DMask(stairs, false);
+
+        ADJACENT_STAIR_MASK = new AdjacentAny2DMask(new BlockCategoryMask(nullExtent, BlockCategories.STAIRS), false);
         SETUP = true;
     }
 
@@ -225,13 +242,14 @@ public abstract class PlacementStateProcessor extends AbstractDelegateExtent imp
                 int blockX = processChunkX + x;
                 char ordinal = set[index];
                 BlockState state = BlockTypesCache.states[ordinal];
-                if (firstPass && !BlockCategories.STAIRS.contains(state)) {
+                if (firstPass && !IN_FIRST_PASS.test(state)) {
                     continue;
                 }
                 if (!mask.test(state)) {
                     continue;
                 }
-                if (!firstPass && REQUIRES_SECOND_PASS.test(state)) {
+                boolean atEdge = x == 0 || x == 15 || z == 0 || z == 15;
+                if (!firstPass && atEdge && REQUIRES_SECOND_PASS.test(state)) {
                     postCompleteSecondPasses.put(new SecondPass(
                             blockX,
                             blockY,
@@ -240,6 +258,11 @@ public abstract class PlacementStateProcessor extends AbstractDelegateExtent imp
                     ), ordinal);
                     set[index] = BlockTypesCache.ReservedIDs.__RESERVED__;
                     continue;
+                }
+                if (state.getBlockType().equals(BlockTypes.CHEST) || state.getBlockType().equals(BlockTypes.TRAPPED_CHEST)) {
+                    placedBlock.setComponents(blockX, blockY, blockZ);
+                } else {
+                    placedBlock.setComponents(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE);
                 }
                 char newOrdinal = getBlockOrdinal(blockX, blockY, blockZ, state);
                 if (newOrdinal == ordinal) {
@@ -312,6 +335,28 @@ public abstract class PlacementStateProcessor extends AbstractDelegateExtent imp
         char ordinal = set[(y & 15) << 8 | (z & 15) << 4 | (x & 15)];
         if (ordinal == BlockTypesCache.ReservedIDs.__RESERVED__) {
             return processChunkGet.getBlock(x & 15, y, z & 15);
+        }
+        BlockState state = BlockTypesCache.states[ordinal];
+        // "Hack" for stairs as internal server methods will only accept "single" chests for joining
+        if (state.getBlockType().equals(BlockTypes.CHEST) || state.getBlockType().equals(BlockTypes.TRAPPED_CHEST)) {
+            String shape =  state.getState(PropertyKey.TYPE).toString();
+            if (shape.equals("right")) {
+                Direction facing = state.getState(PropertyKey.FACING);
+                Direction left = facing.getLeft();
+                int testX = x + left.getBlockX();
+                int testZ = z + left.getBlockZ();
+                if (placedBlock.isAt(testX, y, testZ)) {
+                    return state.with(PropertyKey.TYPE, "single");
+                }
+            } else if(shape.equals("left")) {
+                Direction facing = state.getState(PropertyKey.FACING);
+                Direction right = facing.getRight();
+                int testX = x + right.getBlockX();
+                int testZ = z + right.getBlockZ();
+                if (placedBlock.isAt(testX, y, testZ)) {
+                    return state.with(PropertyKey.TYPE, "single");
+                }
+            }
         }
         return BlockTypesCache.states[ordinal];
     }
