@@ -59,6 +59,27 @@ public class SideEffectSet {
         //FAWE end
     }
 
+    //FAWE start - simple overload method for setting side effects
+
+    /**
+     * Create a new {@link SideEffectSet} with the given side effect set to "on"
+     *
+     * @since TODO
+     */
+    public SideEffectSet with(SideEffect sideEffect) {
+        return with(sideEffect, SideEffect.State.ON);
+    }
+
+    /**
+     * Create a new {@link SideEffectSet} with the given side effect set to "off"
+     *
+     * @since TODO
+     */
+    public SideEffectSet without(SideEffect sideEffect) {
+        return with(sideEffect, SideEffect.State.OFF);
+    }
+    //FAWE end
+
     public SideEffectSet with(SideEffect sideEffect, SideEffect.State state) {
         Map<SideEffect, SideEffect.State> entries = this.sideEffects.isEmpty()
                 ? Maps.newEnumMap(SideEffect.class)
@@ -100,5 +121,24 @@ public class SideEffectSet {
     public static SideEffectSet none() {
         return NONE;
     }
+
+    //FAWE start
+
+    /**
+     * API-friendly side effect set.
+     * Sets:
+     *  - Heightmaps
+     *  - Lighting (if set to mode 1 or 2 in config)
+     * Does not set:
+     *  - History
+     *  - Neighbours
+     *  - Lighting (if set to mode 0 in config
+     *
+     * @since TODO
+     */
+    public static SideEffectSet api() {
+        return defaults().without(SideEffect.HISTORY);
+    }
+    //FAWE end
 
 }

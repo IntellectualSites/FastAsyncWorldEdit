@@ -361,7 +361,7 @@ public class FaweAPI {
                         Fawe.instance().getQueueHandler(),
                         world,
                         true,
-                        SideEffectSet.none().with(SideEffect.LIGHTING, SideEffect.State.ON)
+                        SideEffectSet.none().with(SideEffect.LIGHTING)
                 );
                 queue = parallel.getExtent();
             } else {

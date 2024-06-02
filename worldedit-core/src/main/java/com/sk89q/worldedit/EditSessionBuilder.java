@@ -107,7 +107,7 @@ public final class EditSessionBuilder {
     private Extent extent;
     private boolean compiled;
     private boolean wrapped;
-    private SideEffectSet sideEffectSet = SideEffectSet.defaults();
+    private SideEffectSet sideEffectSet = null;
 
     private @Nullable
     World world;
@@ -459,8 +459,9 @@ public final class EditSessionBuilder {
                 fastMode = actor.getSession().hasFastMode();
             }
         }
-        if (fastMode) {
-            sideEffectSet = SideEffectSet.none();
+        if (sideEffectSet == null) {
+            // Keep heightmaps to maintain behaviour
+            sideEffectSet = fastMode ? SideEffectSet.none().with(SideEffect.HEIGHTMAPS) : SideEffectSet.defaults();
         }
         if (checkMemory == null) {
             checkMemory = actor != null && !this.fastMode;
@@ -498,6 +499,7 @@ public final class EditSessionBuilder {
                 } else {
                     extent = queue = Fawe.instance().getQueueHandler().getQueue(world);
                 }
+                queue.setSideEffectSet(sideEffectSet);
             } else {
                 wnaMode = true;
                 extent = world;
@@ -580,8 +582,7 @@ public final class EditSessionBuilder {
                 if (this.sideEffectSet.shouldApply(SideEffect.HEIGHTMAPS)) {
                     queue.addProcessor(new HeightmapProcessor(world.getMinY(), world.getMaxY()));
                 }
-                if (this.sideEffectSet.shouldApply(SideEffect.UPDATE) || this.sideEffectSet.shouldApply(SideEffect.NEIGHBORS) || this.sideEffectSet.shouldApply(
-                        SideEffect.VALIDATION)) {
+                if (this.sideEffectSet.shouldApply(SideEffect.NEIGHBORS)) {
                     Region region = allowedRegions == null || allowedRegions.length == 0
                             ? null
                             : allowedRegions.length == 1 ? allowedRegions[0] : new RegionIntersection(allowedRegions);
