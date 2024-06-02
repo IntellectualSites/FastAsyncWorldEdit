@@ -149,7 +149,7 @@ public class ToolCommands {
             throws InvalidToolBindException {
         //FAWE start
         isBrush = session.getTool(player) instanceof BrushTool;
-        session.setTool(player.getItemInHand(HandSide.MAIN_HAND).getType(), null);
+        session.setTool(player.getItemInHand(HandSide.MAIN_HAND), null);
         //FAWE end
         player.print(Caption.of(isBrush ? "worldedit.brush.none.equip" : "worldedit.tool.none.equip"));
     }
@@ -163,7 +163,7 @@ public class ToolCommands {
             String translationKey
     ) throws InvalidToolBindException {
         BaseItemStack itemStack = player.getItemInHand(HandSide.MAIN_HAND);
-        session.setTool(itemStack.getType(), tool);
+        session.setTool(itemStack, tool);
         player.print(Caption.of(translationKey, itemStack.getRichName()));
         sendUnbindInstruction(player, UNBIND_COMMAND_COMPONENT);
     }
