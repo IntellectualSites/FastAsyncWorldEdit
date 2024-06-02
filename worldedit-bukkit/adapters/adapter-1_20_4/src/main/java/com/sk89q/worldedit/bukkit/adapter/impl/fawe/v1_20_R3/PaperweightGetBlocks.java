@@ -29,7 +29,11 @@ import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import io.papermc.lib.PaperLib;
 import io.papermc.paper.event.block.BeaconDeactivatedEvent;
-import net.minecraft.core.*;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
+import net.minecraft.core.IdMap;
+import net.minecraft.core.Registry;
+import net.minecraft.core.SectionPos;
 import net.minecraft.nbt.IntTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -42,7 +46,14 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.entity.BeaconBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.chunk.*;
+import net.minecraft.world.level.chunk.DataLayer;
+import net.minecraft.world.level.chunk.HashMapPalette;
+import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.level.chunk.LevelChunkSection;
+import net.minecraft.world.level.chunk.LinearPalette;
+import net.minecraft.world.level.chunk.Palette;
+import net.minecraft.world.level.chunk.PalettedContainer;
+import net.minecraft.world.level.chunk.PalettedContainerRO;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.lighting.LevelLightEngine;
 import org.apache.logging.log4j.Logger;
@@ -52,7 +63,17 @@ import org.bukkit.craftbukkit.v1_20_R3.block.CraftBlock;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 
 import javax.annotation.Nonnull;
-import java.util.*;
+import java.util.AbstractSet;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
@@ -497,7 +518,14 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                                         }
                                     }
                                 } else {
-                                    setBiomesToPalettedContainer(biomes, setSectionIndex, existingSection.getBiomes());
+                                    PalettedContainer<Holder<Biome>> paletteBiomes = setBiomesToPalettedContainer(
+                                            biomes,
+                                            setSectionIndex,
+                                            existingSection.getBiomes()
+                                    );
+                                    if (paletteBiomes != null) {
+                                        PaperweightPlatformAdapter.setBiomesToChunkSection(existingSection, paletteBiomes);
+                                    }
                                 }
                             }
                         }
@@ -539,11 +567,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                         if (existingSection == null) {
                             PalettedContainer<Holder<Biome>> biomeData = biomes == null ? new PalettedContainer<>(
                                     biomeHolderIdMap,
-                                    biomeHolderIdMap.byIdOrThrow(WorldEditPlugin
-                                            .getInstance()
-                                            .getBukkitImplAdapter()
-                                            .getInternalBiomeId(
-                                                    BiomeTypes.PLAINS)),
+                                    biomeHolderIdMap.byIdOrThrow(adapter.getInternalBiomeId(BiomeTypes.PLAINS)),
                                     PalettedContainer.Strategy.SECTION_BIOMES
                             ) : PaperweightPlatformAdapter.getBiomePalettedContainer(biomes[setSectionIndex], biomeHolderIdMap);
                             newSection = PaperweightPlatformAdapter.newChunkSection(
@@ -610,15 +634,14 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                                     existingSection.getBiomes()
                             );
 
-                            newSection =
-                                    PaperweightPlatformAdapter.newChunkSection(
-                                            layerNo,
-                                            this::loadPrivately,
-                                            setArr,
-                                            adapter,
-                                            biomeRegistry,
-                                            biomeData
-                                    );
+                            newSection = PaperweightPlatformAdapter.newChunkSection(
+                                    layerNo,
+                                    this::loadPrivately,
+                                    setArr,
+                                    adapter,
+                                    biomeRegistry,
+                                    biomeData != null ? biomeData : (PalettedContainer<Holder<Biome>>) existingSection.getBiomes()
+                            );
                             if (!PaperweightPlatformAdapter.setSectionAtomic(
                                     levelChunkSections,
                                     existingSection,
@@ -830,7 +853,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                             }
                             if (callback == null) {
                                 if (finalizer != null) {
-                                    finalizer.run();
+                                    queueHandler.async(finalizer, null);
                                 }
                                 return null;
                             } else {
@@ -1087,9 +1110,13 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
             final int sectionIndex,
             final PalettedContainerRO<Holder<Biome>> data
     ) {
+        BiomeType[] sectionBiomes;
+        if (biomes == null || (sectionBiomes = biomes[sectionIndex]) == null) {
+            return null;
+        }
         PalettedContainer<Holder<Biome>> biomeData;
         if (data instanceof PalettedContainer<Holder<Biome>> palettedContainer) {
-            biomeData = palettedContainer;
+            biomeData = palettedContainer.copy();
         } else {
             LOGGER.warn(
                     "Cannot correctly set biomes to world, existing biomes may be lost. Expected class " +
@@ -1098,10 +1125,6 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                     data.getClass().getSimpleName()
             );
             biomeData = data.recreate();
-        }
-        BiomeType[] sectionBiomes;
-        if (biomes == null || (sectionBiomes = biomes[sectionIndex]) == null) {
-            return biomeData;
         }
         for (int y = 0, index = 0; y < 4; y++) {
             for (int z = 0; z < 4; z++) {
@@ -1114,10 +1137,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                             x,
                             y,
                             z,
-                            biomeHolderIdMap.byIdOrThrow(WorldEditPlugin
-                                    .getInstance()
-                                    .getBukkitImplAdapter()
-                                    .getInternalBiomeId(biomeType))
+                            biomeHolderIdMap.byIdOrThrow(adapter.getInternalBiomeId(biomeType))
                     );
                 }
             }
