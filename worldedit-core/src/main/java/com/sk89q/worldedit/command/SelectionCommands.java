@@ -342,7 +342,6 @@ public class SelectionCommands {
                 return;
             }
         }
-        System.out.println("a "+ wand);
         player.giveItem(new BaseItemStack(wand.getType(), wand.getNbtReference(), 1));
         //FAWE end
         //FAWE start - instance-iate session
