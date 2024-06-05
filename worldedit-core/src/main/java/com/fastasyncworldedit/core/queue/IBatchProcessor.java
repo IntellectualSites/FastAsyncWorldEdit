@@ -58,7 +58,7 @@ public interface IBatchProcessor {
     /**
      * Utility method to trim a chunk based on min and max Y (inclusive).
      *
-     * @param keepInsideRange if all blocks inside the range (inclusive) should be kept (default)
+     * @param keepInsideRange if all blocks inside the range (inclusive) should be kept (default), or removed
      * @return false if chunk is empty of blocks
      */
     default boolean trimY(IChunkSet set, int minY, int maxY, final boolean keepInsideRange) {
@@ -74,16 +74,14 @@ public interface IBatchProcessor {
                             for (int i = 0; i < index; i++) {
                                 arr[i] = BlockTypesCache.ReservedIDs.__RESERVED__;
                             }
-                        } else {
-                            arr = new char[4096];
+                            set.setBlocks(layer, arr);
                         }
-                        set.setBlocks(layer, arr);
                     } else {
                         set.setBlocks(layer, null);
                     }
                 }
             }
-            for (int layer = maxLayer; layer < set.getMaxSectionPosition(); layer++) {
+            for (int layer = maxLayer; layer <= set.getMaxSectionPosition(); layer++) {
                 if (set.hasSection(layer)) {
                     if (layer == maxLayer) {
                         char[] arr = set.loadIfPresent(layer);
@@ -92,10 +90,8 @@ public interface IBatchProcessor {
                             for (int i = index; i < arr.length; i++) {
                                 arr[i] = BlockTypesCache.ReservedIDs.__RESERVED__;
                             }
-                        } else {
-                            arr = new char[4096];
+                            set.setBlocks(layer, arr);
                         }
-                        set.setBlocks(layer, arr);
                     } else {
                         set.setBlocks(layer, null);
                     }
