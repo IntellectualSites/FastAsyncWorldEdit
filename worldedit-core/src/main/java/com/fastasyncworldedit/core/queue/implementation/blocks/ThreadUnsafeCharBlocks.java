@@ -222,7 +222,7 @@ public class ThreadUnsafeCharBlocks implements IChunkSet, IBlocks {
     }
 
     public void set(int x, int y, int z, char value) {
-        final int layer = y >> 4;
+        final int layer = (y >> 4) - minSectionPosition;
         final int index = (y & 15) << 8 | z << 4 | x;
         try {
             blocks[layer][index] = value;
