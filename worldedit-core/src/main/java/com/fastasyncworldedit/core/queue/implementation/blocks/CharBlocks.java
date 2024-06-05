@@ -204,7 +204,7 @@ public abstract class CharBlocks implements IBlocks {
 
     // Not synchronized as it refers to a synchronized method and includes nothing that requires synchronization
     public void set(int x, int y, int z, char value) {
-        final int layer = (y >> 4) - minSectionPosition;
+        final int layer = y >> 4;
         final int index = (y & 15) << 8 | z << 4 | x;
         try {
             set(layer, index, value);
