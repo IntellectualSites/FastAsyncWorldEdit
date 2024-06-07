@@ -3181,9 +3181,9 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
 
                 // transform
                 expression.evaluate(new double[]{scaled.x(), scaled.y(), scaled.z()}, timeout);
-                int xv = (int) Math.floor(x.getValue() * unit.x() + zero2.x());
-                int yv = (int) Math.floor(y.getValue() * unit.y() + zero2.y());
-                int zv = (int) Math.floor(z.getValue() * unit.z() + zero2.z());
+                int xv = (int) Math.floor(x.value() * unit.x() + zero2.x());
+                int yv = (int) Math.floor(y.value() * unit.y() + zero2.y());
+                int zv = (int) Math.floor(z.value() * unit.z() + zero2.z());
 
                 BlockState get;
                 if (yv >= minY && yv <= maxY) {
