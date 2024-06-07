@@ -21,27 +21,4 @@ package com.sk89q.worldedit.world.registry;
 
 public record SimpleItemMaterial(int maxStackSize, int maxDamage) implements ItemMaterial {
 
-    //FAWE start - keep compatibility
-
-    /**
-     * @return the max stack size for this material
-     * @deprecated use {@link #maxStackSize()}
-     */
-    @Deprecated(forRemoval = true, since = "TODO")
-    @Override
-    public int getMaxStackSize() {
-        return maxStackSize;
-    }
-
-    /**
-     * @return the max damage for this material
-     * @deprecated use {@link #maxDamage()}
-     */
-    @Deprecated(forRemoval = true, since = "TODO")
-    @Override
-    public int getMaxDamage() {
-        return maxDamage;
-    }
-    //FAWE end
-
 }

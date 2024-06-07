@@ -56,7 +56,7 @@ public record BiomeChange3D(BlockVector3 position, BiomeType previous, BiomeType
      * @return the position
      * @deprecated Use {@link #position()}.
      */
-    @Deprecated(forRemoval = true)
+    @Deprecated(forRemoval = true, since = "TODO")
     public BlockVector3 getPosition() {
         return position;
     }
@@ -67,7 +67,7 @@ public record BiomeChange3D(BlockVector3 position, BiomeType previous, BiomeType
      * @return the previous biome
      * @deprecated Use {@link #previous()}.
      */
-    @Deprecated(forRemoval = true)
+    @Deprecated(forRemoval = true, since = "TODO")
     public BiomeType getPrevious() {
         return previous;
     }
@@ -78,7 +78,7 @@ public record BiomeChange3D(BlockVector3 position, BiomeType previous, BiomeType
      * @return the current biome
      * @deprecated Use {@link #current()}.
      */
-    @Deprecated(forRemoval = true)
+    @Deprecated(forRemoval = true, since = "TODO")
     public BiomeType getCurrent() {
         return current;
     }

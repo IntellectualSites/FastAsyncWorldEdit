@@ -49,6 +49,7 @@ public class BiomeType implements RegistryItem, Keyed, BiomePattern {
      * @return The id
      * @since TODO
      */
+    @Override
     public String id() {
         return this.id;
     }
@@ -77,6 +78,7 @@ public class BiomeType implements RegistryItem, Keyed, BiomePattern {
      * @return The id
      * @deprecated use {@link #id()}
      */
+    @Deprecated(forRemoval = true, since = "TODO")
     @Override
     public String getId() {
         return this.id;
