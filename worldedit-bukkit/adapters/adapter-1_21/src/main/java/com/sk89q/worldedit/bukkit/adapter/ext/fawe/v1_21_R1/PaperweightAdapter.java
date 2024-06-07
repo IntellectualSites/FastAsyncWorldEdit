@@ -507,23 +507,7 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
         CraftWorld craftWorld = ((CraftWorld) location.getWorld());
         ServerLevel worldServer = craftWorld.getHandle();
 
-        String entityId = state.getType().id();
-
-        LinCompoundTag nativeTag = state.getNbt();
-        net.minecraft.nbt.CompoundTag tag;
-        if (nativeTag != null) {
-            tag = (net.minecraft.nbt.CompoundTag) fromNativeLin(nativeTag);
-            removeUnwantedEntityTagsRecursively(tag);
-        } else {
-            tag = new net.minecraft.nbt.CompoundTag();
-        }
-
-        tag.putString("id", entityId);
-
-        Entity createdEntity = EntityType.loadEntityRecursive(tag, craftWorld.getHandle(), (loadedEntity) -> {
-            loadedEntity.absMoveTo(location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
-            return loadedEntity;
-        });
+        Entity createdEntity = createEntityFromId(state.getType().id(), craftWorld.getHandle());
 
         if (createdEntity != null) {
             worldServer.addFreshEntityWithPassengers(createdEntity, SpawnReason.CUSTOM);
@@ -974,7 +958,7 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
     @Override
     public boolean generateFeature(ConfiguredFeatureType type, World world, EditSession session, BlockVector3 pt) {
         ServerLevel originalWorld = ((CraftWorld) world).getHandle();
-        ConfiguredFeature<?, ?> k = originalWorld.registryAccess().registryOrThrow(Registries.CONFIGURED_FEATURE).get(ResourceLocation.tryParse(type.getId()));
+        ConfiguredFeature<?, ?> k = originalWorld.registryAccess().registryOrThrow(Registries.CONFIGURED_FEATURE).get(ResourceLocation.tryParse(type.id()));
         ServerChunkCache chunkManager = originalWorld.getChunkSource();
         WorldGenLevel proxyLevel = PaperweightServerLevelDelegateProxy.newInstance(session, originalWorld, this);
         return k != null && k.place(proxyLevel, chunkManager.getGenerator(), random, new BlockPos(pt.x(), pt.y(), pt.z()));
@@ -983,7 +967,7 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
     @Override
     public boolean generateStructure(StructureType type, World world, EditSession session, BlockVector3 pt) {
         ServerLevel originalWorld = ((CraftWorld) world).getHandle();
-        Structure k = originalWorld.registryAccess().registryOrThrow(Registries.STRUCTURE).get(ResourceLocation.tryParse(type.getId()));
+        Structure k = originalWorld.registryAccess().registryOrThrow(Registries.STRUCTURE).get(ResourceLocation.tryParse(type.id()));
         if (k == null) {
             return false;
         }
