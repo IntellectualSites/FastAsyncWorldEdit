@@ -64,8 +64,8 @@ public class WorldRegionsRegion implements Region {
     public Iterator<BlockVector3> iterator() {
         Queue<BlockVector2> queue = new ArrayDeque<>(getChunks());
         return new Iterator<>() {
-            private final int by = min.getY();
-            private final int ty = max.getY();
+            private final int by = min.y();
+            private final int ty = max.y();
             private final MutableBlockVector3 mutable = new MutableBlockVector3();
 
             private BlockVector2 chunk = queue.poll();
@@ -156,7 +156,7 @@ public class WorldRegionsRegion implements Region {
         BlockVector3 min = getMinimumPoint();
         BlockVector3 max = getMaximumPoint();
 
-        return max.getX() - min.getX() + 1;
+        return max.x() - min.x() + 1;
     }
 
     /**
@@ -169,7 +169,7 @@ public class WorldRegionsRegion implements Region {
         BlockVector3 min = getMinimumPoint();
         BlockVector3 max = getMaximumPoint();
 
-        return max.getY() - min.getY() + 1;
+        return max.y() - min.y() + 1;
     }
 
     /**
@@ -182,7 +182,7 @@ public class WorldRegionsRegion implements Region {
         BlockVector3 min = getMinimumPoint();
         BlockVector3 max = getMaximumPoint();
 
-        return max.getZ() - min.getZ() + 1;
+        return max.z() - min.z() + 1;
     }
 
     @Override
@@ -233,8 +233,8 @@ public class WorldRegionsRegion implements Region {
 
                 return new Iterator<>() {
                     private final MutableBlockVector3 mutable = new MutableBlockVector3();
-                    private final int by = min.getY() >> 4;
-                    private final int ty = max.getY() >> 4;
+                    private final int by = min.y() >> 4;
+                    private final int ty = max.y() >> 4;
 
                     private BlockVector2 chunk = chunks.poll();
                     private int y;
@@ -267,7 +267,7 @@ public class WorldRegionsRegion implements Region {
 
             @Override
             public int size() {
-                return getChunks().size() * ((max.getY() >> 4) - (min.getY() >> 4));
+                return getChunks().size() * ((max.y() >> 4) - (min.y() >> 4));
             }
         };
     }

@@ -994,7 +994,7 @@ public class MCAChunk implements IChunk {
         tiles.entrySet().removeIf(e -> {
             BlockVector3 pos = e.getKey();
             return set
-                    .getBlock(pos.getBlockX(), pos.getBlockY(), pos.getBlockZ())
+                    .getBlock(pos.x(), pos.y(), pos.z())
                     .getOrdinalChar() != BlockTypesCache.ReservedIDs.__RESERVED__;
         });
         for (int layer = set.getMinSectionPosition(); layer <= set.getMaxSectionPosition(); layer++) {
