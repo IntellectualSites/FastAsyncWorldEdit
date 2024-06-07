@@ -158,4 +158,6 @@ public interface IQueueExtent<T extends IChunk> extends Flushable, Trimable, ICh
         return filter;
     }
 
+    void addFlushTask(Runnable task);
+
 }
