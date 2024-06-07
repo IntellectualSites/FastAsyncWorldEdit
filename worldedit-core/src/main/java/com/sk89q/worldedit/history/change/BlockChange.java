@@ -37,7 +37,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @param position the position
  * @param previous the previous block
- * @param current the current block
+ * @param current  the current block
  */
 public record BlockChange(BlockVector3 position, BaseBlock previous, BaseBlock current) implements Change {
 
@@ -55,9 +55,13 @@ public record BlockChange(BlockVector3 position, BaseBlock previous, BaseBlock c
      *
      * @param position the position
      * @param previous the previous block
-     * @param current the current block
+     * @param current  the current block
      */
-    public <BP extends BlockStateHolder<BP>, BC extends BlockStateHolder<BC>> BlockChange(BlockVector3 position, BP previous, BC current) {
+    public <BP extends BlockStateHolder<BP>, BC extends BlockStateHolder<BC>> BlockChange(
+            BlockVector3 position,
+            BP previous,
+            BC current
+    ) {
         this(position, previous.toBaseBlock(), current.toBaseBlock());
     }
 
