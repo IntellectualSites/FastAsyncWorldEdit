@@ -9,7 +9,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeManager;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.border.WorldBorder;
 import net.minecraft.world.level.chunk.ChunkAccess;
@@ -122,22 +121,7 @@ public class FaweBlockStateListPopulator extends BlockStateListPopulator {
 
     @Override
     public BlockState getBlockState(final BlockPos pos) {
-        BlockState state = world.getBlockState(pos);
-        try {
-            state = new BlockState(
-                    state.getBlock(),
-                    state.getValues(),
-                    PaperweightPlatformAdapter.getStatePropertiesCodec(state)
-            ) {
-                @Override
-                public boolean is(Block block) {
-                    return true;
-                }
-            };
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-        return state;
+        return world.getBlockState(pos);
     }
 
     @Override
