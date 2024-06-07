@@ -11,7 +11,6 @@ import com.fastasyncworldedit.core.math.IntPair;
 import com.fastasyncworldedit.core.util.MathMan;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.mojang.datafixers.util.Either;
-import com.mojang.serialization.MapCodec;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.bukkit.adapter.Refraction;
@@ -710,12 +709,6 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         }
         collector.throwIfPresent();
         return List.of();
-    }
-
-    public static MapCodec<net.minecraft.world.level.block.state.BlockState> getStatePropertiesCodec(
-            net.minecraft.world.level.block.state.BlockState state
-    ) throws IllegalAccessException {
-        return (MapCodec<net.minecraft.world.level.block.state.BlockState>) fieldPropertiesCodec.get(state);
     }
 
     record FakeIdMapBlock(int size) implements IdMap<net.minecraft.world.level.block.state.BlockState> {
