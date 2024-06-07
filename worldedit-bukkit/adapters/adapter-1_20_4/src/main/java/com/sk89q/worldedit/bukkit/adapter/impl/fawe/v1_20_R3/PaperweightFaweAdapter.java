@@ -581,7 +581,12 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
 
                     return null;
                 }
-                return new HashMap<>(populator.getLevel().capturedBlockStates);
+                Map<BlockPos, CraftBlockState> placedBlocks = populator.getList().stream().collect(Collectors.toMap(
+                        CraftBlockState::getPosition,
+                        craftBlockState -> craftBlockState
+                ));
+                placedBlocks.putAll(serverLevel.capturedBlockStates);
+                return placedBlocks;
             } finally {
                 serverLevel.captureBlockStates = false;
                 serverLevel.captureTreeGeneration = false;
@@ -625,6 +630,7 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
                         populator,
                         biome -> true
                 );
+
                 if (!structureStart.isValid()) {
                     return null;
                 } else {
