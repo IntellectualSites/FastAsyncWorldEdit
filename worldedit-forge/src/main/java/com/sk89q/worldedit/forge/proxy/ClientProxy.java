@@ -17,16 +17,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldedit.world.generation;
+package com.sk89q.worldedit.forge.proxy;
 
-import com.sk89q.worldedit.registry.Keyed;
-import com.sk89q.worldedit.registry.NamespacedRegistry;
+import com.sk89q.worldedit.forge.KeyHandler;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.MinecraftForge;
 
-public record ConfiguredFeatureType(String id) implements Keyed {
-    public static final NamespacedRegistry<ConfiguredFeatureType> REGISTRY = new NamespacedRegistry<>("configured feature type");
+@OnlyIn(Dist.CLIENT)
+public class ClientProxy implements CommonProxy {
 
     @Override
-    public String toString() {
-        return this.id;
+    public void registerHandlers() {
+        MinecraftForge.EVENT_BUS.register(new KeyHandler());
     }
+
 }
