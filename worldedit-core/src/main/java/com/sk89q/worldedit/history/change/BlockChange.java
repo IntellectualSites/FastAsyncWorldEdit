@@ -67,7 +67,7 @@ public record BlockChange(BlockVector3 position, BaseBlock previous, BaseBlock c
      * @return the position
      * @deprecated use {@link #position()}
      */
-    @Deprecated(forRemoval = true)
+    @Deprecated(forRemoval = true, since = "TODO")
     public BlockVector3 getPosition() {
         return position;
     }
@@ -78,7 +78,7 @@ public record BlockChange(BlockVector3 position, BaseBlock previous, BaseBlock c
      * @return the previous block
      * @deprecated use {@link #previous()}
      */
-    @Deprecated(forRemoval = true)
+    @Deprecated(forRemoval = true, since = "TODO")
     public BaseBlock getPrevious() {
         return previous;
     }
@@ -89,7 +89,7 @@ public record BlockChange(BlockVector3 position, BaseBlock previous, BaseBlock c
      * @return the current block
      * @deprecated use {@link #current()}
      */
-    @Deprecated(forRemoval = true)
+    @Deprecated(forRemoval = true, since = "TODO")
     public BaseBlock getCurrent() {
         return current;
     }
