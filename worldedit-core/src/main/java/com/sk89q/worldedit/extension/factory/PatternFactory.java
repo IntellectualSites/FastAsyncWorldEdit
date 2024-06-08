@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.extension.factory;
 
 import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.extension.factory.parser.mask.HotbarMaskParser;
 import com.fastasyncworldedit.core.extension.factory.parser.pattern.AngleColorPatternParser;
 import com.fastasyncworldedit.core.extension.factory.parser.pattern.AverageColorPatternParser;
 import com.fastasyncworldedit.core.extension.factory.parser.pattern.BiomePatternParser;
@@ -30,6 +31,7 @@ import com.fastasyncworldedit.core.extension.factory.parser.pattern.DarkenPatter
 import com.fastasyncworldedit.core.extension.factory.parser.pattern.DesaturatePatternParser;
 import com.fastasyncworldedit.core.extension.factory.parser.pattern.ExistingPatternParser;
 import com.fastasyncworldedit.core.extension.factory.parser.pattern.ExpressionPatternParser;
+import com.fastasyncworldedit.core.extension.factory.parser.pattern.HotbarPatternParser;
 import com.fastasyncworldedit.core.extension.factory.parser.pattern.LightenPatternParser;
 import com.fastasyncworldedit.core.extension.factory.parser.pattern.Linear2DPatternParser;
 import com.fastasyncworldedit.core.extension.factory.parser.pattern.Linear3DPatternParser;
@@ -116,6 +118,7 @@ public final class PatternFactory extends AbstractFactory<Pattern> {
         register(new DesaturatePatternParser(worldEdit));
         register(new ExistingPatternParser(worldEdit));
         register(new ExpressionPatternParser(worldEdit));
+        register(new HotbarPatternParser(worldEdit));
         register(new LightenPatternParser(worldEdit));
         register(new Linear2DPatternParser(worldEdit));
         register(new Linear3DPatternParser(worldEdit));
