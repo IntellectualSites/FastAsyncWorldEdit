@@ -87,7 +87,7 @@ public interface Mask {
         } else if (this instanceof Masks.AlwaysFalse) {
             return Masks.ALWAYS_TRUE;
         } else if (this instanceof Masks.NegatedMask) {
-            return ((Masks.NegatedMask) this).mask;
+            return ((Masks.NegatedMask) this).mask();
         }
         return new InverseMask(this);
     }

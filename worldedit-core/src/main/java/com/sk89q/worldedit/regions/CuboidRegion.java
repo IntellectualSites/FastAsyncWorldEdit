@@ -828,7 +828,7 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
                 return set;
             }
 
-            for (int layer = get.getMinSectionPosition(); layer < get.getMaxSectionPosition(); layer++) {
+            for (int layer = get.getMinSectionPosition(); layer <= get.getMaxSectionPosition(); layer++) {
                 if (!set.hasSection(layer)) {
                     continue;
                 }
@@ -912,7 +912,7 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
             boolean trimX = lowerX != 0 || upperX != 15;
             boolean trimZ = lowerZ != 0 || upperZ != 15;
 
-            for (int layer = get.getMinSectionPosition(); layer < get.getMaxSectionPosition(); layer++) {
+            for (int layer = get.getMinSectionPosition(); layer <= get.getMaxSectionPosition(); layer++) {
                 if (!set.hasSection(layer)) {
                     continue;
                 }

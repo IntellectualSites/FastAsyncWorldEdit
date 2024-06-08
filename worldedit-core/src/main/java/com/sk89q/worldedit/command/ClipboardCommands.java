@@ -340,7 +340,7 @@ public class ClipboardCommands {
             aliases = {"/download"},
             desc = "Downloads your clipboard through the configured web interface"
     )
-    @Deprecated
+    @Deprecated(forRemoval = true, since = "TODO")
     @CommandPermissions({"worldedit.clipboard.download"})
     public void download(
             final Actor actor,
@@ -402,10 +402,7 @@ public class ClipboardCommands {
             final Clipboard target;
             // If we have a transform, bake it into the copy
             if (!transform.isIdentity()) {
-                final FlattenedClipboardTransform result = FlattenedClipboardTransform.transform(clipboard, transform);
-                target = new BlockArrayClipboard(result.getTransformedRegion(), actor.getUniqueId());
-                target.setOrigin(clipboard.getOrigin());
-                Operations.completeLegacy(result.copyTo(target));
+                target = clipboard.transform(transform);
             } else {
                 target = clipboard;
             }

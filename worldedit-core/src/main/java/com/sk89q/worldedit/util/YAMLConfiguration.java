@@ -58,7 +58,7 @@ public class YAMLConfiguration extends LocalConfiguration {
 
         profile = config.getBoolean("debug", profile);
         traceUnflushedSessions = config.getBoolean("debugging.trace-unflushed-sessions", traceUnflushedSessions);
-        wandItem = convertLegacyItem(config.getString("wand-item", wandItem)).toLowerCase(Locale.ROOT);
+        wandItem = convertLegacyItem(config.getString("wand-item", wandItem));
 
         defaultChangeLimit = Math.max(-1, config.getInt(
                 "limits.max-blocks-changed.default", defaultChangeLimit));
@@ -130,7 +130,7 @@ public class YAMLConfiguration extends LocalConfiguration {
                 useInventoryCreativeOverride
         );
 
-        navigationWand = convertLegacyItem(config.getString("navigation-wand.item", navigationWand)).toLowerCase(Locale.ROOT);
+        navigationWand = convertLegacyItem(config.getString("navigation-wand.item", navigationWand));
         navigationWandMaxDistance = config.getInt("navigation-wand.max-distance", navigationWandMaxDistance);
         navigationUseGlass = config.getBoolean("navigation.use-glass", navigationUseGlass);
 

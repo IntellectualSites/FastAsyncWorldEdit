@@ -34,13 +34,13 @@ public class PassthroughItemMaterial implements ItemMaterial {
     }
 
     @Override
-    public int getMaxStackSize() {
-        return itemMaterial.getMaxStackSize();
+    public int maxStackSize() {
+        return itemMaterial.maxStackSize();
     }
 
     @Override
-    public int getMaxDamage() {
-        return itemMaterial.getMaxDamage();
+    public int maxDamage() {
+        return itemMaterial.maxDamage();
     }
 
 }

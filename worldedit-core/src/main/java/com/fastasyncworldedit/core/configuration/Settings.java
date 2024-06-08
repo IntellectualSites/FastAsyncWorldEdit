@@ -668,6 +668,13 @@ public class Settings extends Config {
         @Comment({"The web interface for clipboards", " - All schematics are anonymous and private", " - Downloads can be deleted by the user", " - Supports clipboard uploads, downloads and saves",})
         public String URL = "https://schem.intellectualsites.com/fawe/";
 
+        @Comment({"The url of the backend server (Arkitektonika)"})
+        public String ARKITEKTONIKA_BACKEND_URL = "https://api.schematic.cloud/";
+        @Comment({"The url used to generate a download link from.", "{key} will be replaced with the generated key"})
+        public String ARKITEKTONIKA_DOWNLOAD_URL = "https://schematic.cloud/download/{key}";
+        @Comment({"The url used to generate a deletion link from.", "{key} will be replaced with the generated key"})
+        public String ARKITEKTONIKA_DELETE_URL = "https://schematic.cloud/delete/{key}";
+
         @Comment("The maximum amount of time in seconds the plugin can attempt to load images for.")
         public int MAX_IMAGE_LOAD_TIME = 5;
 

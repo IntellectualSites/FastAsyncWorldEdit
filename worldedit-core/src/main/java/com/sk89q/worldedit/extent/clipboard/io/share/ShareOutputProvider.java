@@ -17,44 +17,21 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldedit.internal.expression;
+package com.sk89q.worldedit.extent.clipboard.io.share;
 
-/**
- * Represents the metadata for a named local slot.
- */
-public interface LocalSlot {
+import com.sk89q.worldedit.WorldEditException;
 
-    record Constant(double value) implements LocalSlot {
-        @Override
-        public String toString() {
-            return String.valueOf(value);
-        }
+import java.io.IOException;
+import java.io.OutputStream;
 
-    }
+@FunctionalInterface
+public interface ShareOutputProvider {
 
-    final class Variable implements LocalSlot {
-
-        private double value;
-
-        public Variable(double value) {
-            this.value = value;
-        }
-
-        public void setValue(double value) {
-            this.value = value;
-        }
-
-        @Override
-        public double value() {
-            return value;
-        }
-
-        @Override
-        public String toString() {
-            return String.valueOf(value);
-        }
-    }
-
-    double value();
-
+    /**
+     * Provides the share output to {@code stream}.
+     *
+     * @throws IOException if it failed
+     * @throws WorldEditException if WorldEdit failed to serialize to the stream
+     */
+    void writeTo(OutputStream stream) throws IOException, WorldEditException;
 }

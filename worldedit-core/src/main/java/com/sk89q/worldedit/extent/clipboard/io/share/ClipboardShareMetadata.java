@@ -17,44 +17,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldedit.internal.expression;
+package com.sk89q.worldedit.extent.clipboard.io.share;
+
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 
 /**
- * Represents the metadata for a named local slot.
+ * Items of metadata about shared clipboards.
+ *
+ * @param format the format of the clipboard
+ * @param name the name of the clipboard
+ * @param author the author of the clipboard
  */
-public interface LocalSlot {
-
-    record Constant(double value) implements LocalSlot {
-        @Override
-        public String toString() {
-            return String.valueOf(value);
-        }
-
-    }
-
-    final class Variable implements LocalSlot {
-
-        private double value;
-
-        public Variable(double value) {
-            this.value = value;
-        }
-
-        public void setValue(double value) {
-            this.value = value;
-        }
-
-        @Override
-        public double value() {
-            return value;
-        }
-
-        @Override
-        public String toString() {
-            return String.valueOf(value);
-        }
-    }
-
-    double value();
-
+public record ClipboardShareMetadata(ClipboardFormat format, String name, String author) {
 }
