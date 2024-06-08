@@ -25,7 +25,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 //FAWE start - implements RegistryItem
-public abstract class Category<T extends Keyed> implements RegistryItem {
+public abstract class Category<T extends Keyed> implements RegistryItem, Keyed {
 //FAWE end
 
     private final Set<T> set = new HashSet<>();
@@ -36,6 +36,7 @@ public abstract class Category<T extends Keyed> implements RegistryItem {
         this.id = id;
     }
 
+    @Override
     public final String id() {
         return this.id;
     }
