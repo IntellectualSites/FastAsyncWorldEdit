@@ -49,7 +49,7 @@ public class ItemType implements RegistryItem, Keyed {
                         .getRegistries().getItemRegistry().getName(this),
                 ""
         );
-        return name.isEmpty() ? getId() : name;
+        return name.isEmpty() ? id() : name;
     });
     @SuppressWarnings("this-escape")
     private transient final LazyReference<Component> richName = LazyReference.from(() ->
@@ -76,7 +76,7 @@ public class ItemType implements RegistryItem, Keyed {
     }
 
     @Override
-    public String getId() {
+    public String id() {
         return this.id;
     }
 
@@ -153,7 +153,7 @@ public class ItemType implements RegistryItem, Keyed {
 
     @Override
     public String toString() {
-        return getId();
+        return id();
     }
 
     @Override

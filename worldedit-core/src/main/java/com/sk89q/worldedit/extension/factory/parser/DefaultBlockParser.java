@@ -135,42 +135,42 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
     private String woolMapper(String string) {
         switch (string.toLowerCase(Locale.ROOT)) {
             case "white":
-                return BlockTypes.WHITE_WOOL.getId();
+                return BlockTypes.WHITE_WOOL.id();
             case "black":
-                return BlockTypes.BLACK_WOOL.getId();
+                return BlockTypes.BLACK_WOOL.id();
             case "blue":
-                return BlockTypes.BLUE_WOOL.getId();
+                return BlockTypes.BLUE_WOOL.id();
             case "brown":
-                return BlockTypes.BROWN_WOOL.getId();
+                return BlockTypes.BROWN_WOOL.id();
             case "cyan":
-                return BlockTypes.CYAN_WOOL.getId();
+                return BlockTypes.CYAN_WOOL.id();
             case "gray":
             case "grey":
-                return BlockTypes.GRAY_WOOL.getId();
+                return BlockTypes.GRAY_WOOL.id();
             case "green":
-                return BlockTypes.GREEN_WOOL.getId();
+                return BlockTypes.GREEN_WOOL.id();
             case "light_blue":
             case "lightblue":
-                return BlockTypes.LIGHT_BLUE_WOOL.getId();
+                return BlockTypes.LIGHT_BLUE_WOOL.id();
             case "light_gray":
             case "light_grey":
             case "lightgray":
             case "lightgrey":
-                return BlockTypes.LIGHT_GRAY_WOOL.getId();
+                return BlockTypes.LIGHT_GRAY_WOOL.id();
             case "lime":
-                return BlockTypes.LIME_WOOL.getId();
+                return BlockTypes.LIME_WOOL.id();
             case "magenta":
-                return BlockTypes.MAGENTA_WOOL.getId();
+                return BlockTypes.MAGENTA_WOOL.id();
             case "orange":
-                return BlockTypes.ORANGE_WOOL.getId();
+                return BlockTypes.ORANGE_WOOL.id();
             case "pink":
-                return BlockTypes.PINK_WOOL.getId();
+                return BlockTypes.PINK_WOOL.id();
             case "purple":
-                return BlockTypes.PURPLE_WOOL.getId();
+                return BlockTypes.PURPLE_WOOL.id();
             case "yellow":
-                return BlockTypes.YELLOW_WOOL.getId();
+                return BlockTypes.YELLOW_WOOL.id();
             case "red":
-                return BlockTypes.RED_WOOL.getId();
+                return BlockTypes.RED_WOOL.id();
             default:
                 return string;
         }
@@ -194,7 +194,7 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
                 if (input.indexOf('[') == -1 && input.indexOf(']') == -1) {
                     continue;
                 }
-                if (!type.getId().equalsIgnoreCase(input.substring(0, input.indexOf('[')))) {
+                if (!type.id().equalsIgnoreCase(input.substring(0, input.indexOf('[')))) {
                     continue;
                 }
                 String[] properties = input.substring(input.indexOf('[') + 1, input.indexOf(']')).split(",");
@@ -249,10 +249,10 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
                             throw new NoMatchException(Caption.of(
                                     "worldedit.error.parser.unknown-property",
                                     TextComponent.of(parts[0]),
-                                    TextComponent.of(type.getId())
+                                    TextComponent.of(type.id())
                             ));
                         } else {
-                            WorldEdit.logger.debug("Unknown property " + parts[0] + " for block " + type.getId());
+                            WorldEdit.logger.debug("Unknown property " + parts[0] + " for block " + type.id());
                         }
                         return Maps.newHashMap();
                     }
@@ -516,20 +516,20 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
             //FAWE start - per-limit disallowed blocks
             if (actor != null) {
                 if (!actor.hasPermission("worldedit.anyblock")
-                        && worldEdit.getConfiguration().disallowedBlocks.contains(blockType.getId().toLowerCase(Locale.ROOT))) {
+                        && worldEdit.getConfiguration().disallowedBlocks.contains(blockType.id().toLowerCase(Locale.ROOT))) {
                     throw new DisallowedUsageException(Caption.of(
                             "worldedit.error.disallowed-block",
-                            TextComponent.of(blockType.getId())
+                            TextComponent.of(blockType.id())
                     ));
                 }
                 FaweLimit limit = actor.getLimit();
                 if (!limit.isUnlimited()) {
                     // No need to account for blocked states/properties as it will simply return false in the equality check
                     // during contains.
-                    if (limit.DISALLOWED_BLOCKS.contains(blockType.getId().toLowerCase(Locale.ROOT))) {
+                    if (limit.DISALLOWED_BLOCKS.contains(blockType.id().toLowerCase(Locale.ROOT))) {
                         throw new DisallowedUsageException(Caption.of(
                                 "fawe.error.limit.disallowed-block",
-                                TextComponent.of(blockType.getId())
+                                TextComponent.of(blockType.id())
                         ));
                     }
                 }
@@ -559,14 +559,14 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
                 if (ent == null) {
                     throw new NoMatchException(Caption.of("worldedit.error.unknown-entity", TextComponent.of(mobName)));
                 }
-                mobName = ent.getId();
+                mobName = ent.id();
                 if (!worldEdit.getPlatformManager().queryCapability(Capability.USER_COMMANDS).isValidMobType(mobName)) {
                     throw new NoMatchException(Caption.of("worldedit.error.unknown-mob", TextComponent.of(mobName)));
                 }
                 return validate(context, new MobSpawnerBlock(state, mobName));
             } else {
                 //noinspection ConstantConditions
-                return validate(context, new MobSpawnerBlock(state, EntityTypes.PIG.getId()));
+                return validate(context, new MobSpawnerBlock(state, EntityTypes.PIG.id()));
             }
         } else if (blockType == BlockTypes.PLAYER_HEAD || blockType == BlockTypes.PLAYER_WALL_HEAD) {
             // allow setting type/player/rotation

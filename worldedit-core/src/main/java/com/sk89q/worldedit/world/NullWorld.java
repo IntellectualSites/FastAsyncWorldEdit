@@ -78,7 +78,7 @@ public class NullWorld extends AbstractWorld {
     //FAWE end
 
     @Override
-    public String getId() {
+    public String id() {
         return "null";
     }
 

@@ -2235,8 +2235,8 @@ public final class BlockTypes {
 
         throw new SuggestInputParseException(Caption.of("fawe.error.invalid-block-type", TextComponent.of(input)), () -> Stream.of(
                         BlockTypesCache.values)
-                .filter(b -> StringMan.blockStateMatches(inputLower, b.getId()))
-                .map(BlockType::getId)
+                .filter(b -> StringMan.blockStateMatches(inputLower, b.id()))
+                .map(BlockType::id)
                 .sorted(StringMan.blockStateComparator(inputLower))
                 .collect(Collectors.toList())
         );

@@ -101,7 +101,7 @@ public class DisallowedBlocksExtent extends AbstractDelegateExtent implements IB
     @SuppressWarnings("unchecked")
     private <B extends BlockStateHolder<B>> B checkBlock(B block) {
         if (blockedBlocks != null) {
-            if (blockedBlocks.contains(block.getBlockType().getId())) {
+            if (blockedBlocks.contains(block.getBlockType().id())) {
                 return (B) (block instanceof BlockState ? RESERVED : RESERVED.toBaseBlock()); // set to reserved/empty
             }
         }
@@ -140,7 +140,7 @@ public class DisallowedBlocksExtent extends AbstractDelegateExtent implements IB
                 }
                 BlockState state = BlockTypesCache.states[block];
                 if (blockedBlocks != null) {
-                    if (blockedBlocks.contains(state.getBlockType().getId())) {
+                    if (blockedBlocks.contains(state.getBlockType().id())) {
                         blocks[i] = BlockTypesCache.ReservedIDs.__RESERVED__;
                         continue;
                     }

@@ -419,7 +419,7 @@ public interface World extends Extent, Keyed, IChunkCache<IChunkGet> {
     }
 
     @Override
-    default String getId() {
+    default String id() {
         return getName().replace(" ", "_").toLowerCase(Locale.ROOT);
     }
 

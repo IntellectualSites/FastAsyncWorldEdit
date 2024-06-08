@@ -110,7 +110,7 @@ public class HistoryExtent extends AbstractDelegateExtent {
     @Override
     public boolean setBiome(BlockVector3 position, BiomeType newBiome) {
         BiomeType oldBiome = this.getBiome(position);
-        if (!oldBiome.getId().equals(newBiome.getId())) {
+        if (!oldBiome.id().equals(newBiome.id())) {
             this.changeSet.addBiomeChange(position.x(), position.y(), position.z(), oldBiome, newBiome);
             return getExtent().setBiome(position, newBiome);
         } else {
@@ -121,7 +121,7 @@ public class HistoryExtent extends AbstractDelegateExtent {
     @Override
     public boolean setBiome(int x, int y, int z, BiomeType newBiome) {
         BiomeType oldBiome = this.getBiome(mutable.setComponents(x, y, z));
-        if (!oldBiome.getId().equals(newBiome.getId())) {
+        if (!oldBiome.id().equals(newBiome.id())) {
             this.changeSet.addBiomeChange(x, y, z, oldBiome, newBiome);
             return getExtent().setBiome(x, y, z, newBiome);
         } else {

@@ -129,7 +129,7 @@ public class BaseItem implements NbtValued {
             }
         }
 
-        return getType().getId() + nbtString;
+        return getType().id() + nbtString;
     }
     //FAWE end
 }

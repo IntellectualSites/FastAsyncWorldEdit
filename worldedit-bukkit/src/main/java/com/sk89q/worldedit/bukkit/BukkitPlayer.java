@@ -162,7 +162,7 @@ public class BukkitPlayer extends AbstractPlayerActor {
         final PlayerInventory inv = player.getInventory();
         ItemStack newItem = BukkitAdapter.adapt(itemStack);
         TaskManager.taskManager().sync(() -> {
-            if (itemStack.getType().getId().equalsIgnoreCase(WorldEdit.getInstance().getConfiguration().wandItem)) {
+            if (itemStack.getType().id().equalsIgnoreCase(WorldEdit.getInstance().getConfiguration().wandItem)) {
                 inv.remove(newItem);
             }
             final ItemStack item = player.getInventory().getItemInMainHand();
@@ -267,7 +267,7 @@ public class BukkitPlayer extends AbstractPlayerActor {
 
     @Override
     public void setGameMode(GameMode gameMode) {
-        player.setGameMode(org.bukkit.GameMode.valueOf(gameMode.getId().toUpperCase(Locale.ROOT)));
+        player.setGameMode(org.bukkit.GameMode.valueOf(gameMode.id().toUpperCase(Locale.ROOT)));
     }
 
     @Override

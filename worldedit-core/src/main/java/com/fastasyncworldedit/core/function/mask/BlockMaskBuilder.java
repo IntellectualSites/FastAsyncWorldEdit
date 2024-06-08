@@ -183,7 +183,7 @@ public class BlockMaskBuilder {
                     builders = new ArrayList<>();
                     Pattern pattern = Pattern.compile("(minecraft:)?" + regex);
                     for (BlockType type : BlockTypesCache.values) {
-                        if (pattern.matcher(type.getId()).find()) {
+                        if (pattern.matcher(type.id()).find()) {
                             blockTypeList.add(type);
                             builders.add(new FuzzyStateAllowingBuilder(type));
                             add(type);
@@ -284,7 +284,7 @@ public class BlockMaskBuilder {
                 } else {
                     boolean success = false;
                     for (BlockType myType : BlockTypesCache.values) {
-                        if (myType.getId().matches("(minecraft:)?" + input)) {
+                        if (myType.id().matches("(minecraft:)?" + input)) {
                             add(myType);
                             success = true;
                         }
@@ -571,7 +571,7 @@ public class BlockMaskBuilder {
                 throw new IllegalArgumentException(String.format(
                         "Property %s cannot be applied to block type %s",
                         property.getName(),
-                        type.getId()
+                        type.id()
                 ));
             }
             masked.computeIfAbsent(property, k -> new ArrayList<>()).add(index);

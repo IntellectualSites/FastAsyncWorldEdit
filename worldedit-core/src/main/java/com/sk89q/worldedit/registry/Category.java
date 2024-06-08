@@ -36,7 +36,7 @@ public abstract class Category<T extends Keyed> implements RegistryItem {
         this.id = id;
     }
 
-    public final String getId() {
+    public final String id() {
         return this.id;
     }
 
@@ -81,7 +81,7 @@ public abstract class Category<T extends Keyed> implements RegistryItem {
 
     @Override
     public String toString() {
-        return getId();
+        return id();
     }
 
 }
