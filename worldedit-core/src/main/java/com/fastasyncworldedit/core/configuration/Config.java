@@ -100,6 +100,9 @@ public class Config {
     }
 
     public boolean load(File file) {
+        if (!file.exists()) {
+            return false;
+        }
         existingMigrateNodes = new ArrayList<>();
         YamlConfiguration yml = YamlConfiguration.loadConfiguration(file);
         for (String key : yml.getKeys(true)) {
