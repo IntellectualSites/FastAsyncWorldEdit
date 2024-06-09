@@ -132,12 +132,16 @@ public class FastSchematicWriterV3 implements ClipboardWriter {
                 char value = palette[ordinal];
                 if (value == Character.MIN_VALUE) {
                     palette[ordinal] = value = (char) ++index;
+                    // Write to palette
+                    blocks.writeNamedTag(baseBlock.getAsString(), value);
                 }
 
-                // Write to palette
-                blocks.writeNamedTag(baseBlock.getAsString(), value);
                 // Write to cache for "Data" Tag
-                dataBuf.write(value);
+
+                while ((value & -128) != 0) {
+                    dataBuf.write(value & 127 | 128);
+                    value >>>= 7;
+                }
 
                 CompoundBinaryTag tag;
                 if ((tag = baseBlock.getNbt()) != null) {
