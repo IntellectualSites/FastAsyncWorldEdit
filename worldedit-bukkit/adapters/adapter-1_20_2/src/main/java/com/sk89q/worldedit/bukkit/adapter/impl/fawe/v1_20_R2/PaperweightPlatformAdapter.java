@@ -141,14 +141,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             fieldTickingFluidCount.setAccessible(true);
             fieldTickingBlockCount = LevelChunkSection.class.getDeclaredField(Refraction.pickName("tickingBlockCount", "f"));
             fieldTickingBlockCount.setAccessible(true);
-            Field tmpFieldBiomes;
-            try {
-                // It seems to actually be biomes, but is apparently obfuscated to "i"
-                tmpFieldBiomes = LevelChunkSection.class.getDeclaredField("biomes");
-            } catch (NoSuchFieldException ignored) {
-                tmpFieldBiomes = LevelChunkSection.class.getDeclaredField("i");
-            }
-            fieldBiomes = tmpFieldBiomes;
+            fieldBiomes = LevelChunkSection.class.getDeclaredField(Refraction.pickName("biomes", "i"));
             fieldBiomes.setAccessible(true);
 
             Method getVisibleChunkIfPresent = ChunkMap.class.getDeclaredMethod(Refraction.pickName(
