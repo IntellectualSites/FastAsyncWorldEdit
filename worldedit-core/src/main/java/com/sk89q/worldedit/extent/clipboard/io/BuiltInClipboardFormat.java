@@ -19,8 +19,8 @@
 
 package com.sk89q.worldedit.extent.clipboard.io;
 
-import com.fastasyncworldedit.core.extent.clipboard.io.FastSchematicReader;
-import com.fastasyncworldedit.core.extent.clipboard.io.FastSchematicWriter;
+import com.fastasyncworldedit.core.extent.clipboard.io.FastSchematicReaderV2;
+import com.fastasyncworldedit.core.extent.clipboard.io.FastSchematicWriterV2;
 import com.fastasyncworldedit.core.extent.clipboard.io.schematic.MinecraftStructure;
 import com.fastasyncworldedit.core.extent.clipboard.io.schematic.PNGWriter;
 import com.fastasyncworldedit.core.internal.io.ResettableFileInputStream;
@@ -70,7 +70,7 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
             }
             BufferedInputStream buffered = new BufferedInputStream(inputStream);
             NBTInputStream nbtStream = new NBTInputStream(new BufferedInputStream(new GZIPInputStream(buffered)));
-            return new FastSchematicReader(nbtStream);
+            return new FastSchematicReaderV2(nbtStream);
         }
 
         @Override
@@ -83,7 +83,7 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
                 gzip = new ParallelGZIPOutputStream(outputStream);
             }
             NBTOutputStream nbtStream = new NBTOutputStream(new BufferedOutputStream(gzip));
-            return new FastSchematicWriter(nbtStream);
+            return new FastSchematicWriterV2(nbtStream);
         }
 
         @Override
@@ -271,7 +271,7 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
             }
             BufferedInputStream buffered = new BufferedInputStream(inputStream);
             NBTInputStream nbtStream = new NBTInputStream(new BufferedInputStream(new GZIPInputStream(buffered)));
-            FastSchematicReader reader = new FastSchematicReader(nbtStream);
+            FastSchematicReaderV2 reader = new FastSchematicReaderV2(nbtStream);
             reader.setBrokenEntities(true);
             return reader;
         }
@@ -286,7 +286,7 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
                 gzip = new ParallelGZIPOutputStream(outputStream);
             }
             NBTOutputStream nbtStream = new NBTOutputStream(new BufferedOutputStream(gzip));
-            FastSchematicWriter writer = new FastSchematicWriter(nbtStream);
+            FastSchematicWriterV2 writer = new FastSchematicWriterV2(nbtStream);
             writer.setBrokenEntities(true);
             return writer;
         }

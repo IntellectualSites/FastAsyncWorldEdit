@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.extent.clipboard.io.sponge;
 
 import com.fastasyncworldedit.core.Fawe;
+import com.fastasyncworldedit.core.extent.clipboard.io.FastSchematicWriterV2;
 import com.google.common.collect.ImmutableMap;
 import com.sk89q.jnbt.ByteArrayTag;
 import com.sk89q.jnbt.CompoundTag;
@@ -53,7 +54,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Writes schematic files using the Sponge Schematic Specification (Version 2).
  *
  * @deprecated Slow, resource intensive, but sometimes safer than using the recommended
- *         {@link com.fastasyncworldedit.core.extent.clipboard.io.FastSchematicWriter}.
+ *         {@link FastSchematicWriterV2}.
  *         Avoid using large clipboards to create schematics with this writer.
  */
 @Deprecated

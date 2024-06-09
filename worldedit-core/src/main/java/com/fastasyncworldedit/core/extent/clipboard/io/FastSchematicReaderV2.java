@@ -53,7 +53,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Reads schematic files using the Sponge Schematic Specification.
  */
-public class FastSchematicReader extends NBTSchematicReader {
+public class FastSchematicReaderV2 extends NBTSchematicReader {
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
     private final NBTInputStream inputStream;
@@ -88,7 +88,7 @@ public class FastSchematicReader extends NBTSchematicReader {
      *
      * @param inputStream the input stream to read from
      */
-    public FastSchematicReader(NBTInputStream inputStream) {
+    public FastSchematicReaderV2(NBTInputStream inputStream) {
         checkNotNull(inputStream);
         this.inputStream = inputStream;
         this.fixer = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).getDataFixer();
