@@ -40,4 +40,13 @@ public interface Brush {
      */
     void build(EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws MaxChangedBlocksException;
 
+    /**
+     * If this brush is expected to set blocks synchronously, i.e. from one thread (at a time)
+     *
+     * @since TODO
+     */
+    default boolean setsSynchronously() {
+        return true;
+    }
+
 }

@@ -44,6 +44,7 @@ import com.sk89q.worldedit.command.util.EntityRemover;
 import com.sk89q.worldedit.command.util.Logging;
 import com.sk89q.worldedit.command.util.PrintCommandHelp;
 import com.sk89q.worldedit.command.util.WorldEditAsyncCommandBuilder;
+import com.sk89q.worldedit.command.util.annotation.SynchronousSettingExpected;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
@@ -220,6 +221,7 @@ public class UtilityCommands {
     )
     @CommandPermissions("worldedit.fill")
     @Logging(PLACEMENT)
+    @SynchronousSettingExpected
     public int fill(
             Actor actor, LocalSession session, EditSession editSession,
             @Arg(desc = "The blocks to fill with")
@@ -310,6 +312,7 @@ public class UtilityCommands {
     )
     @CommandPermissions("worldedit.fill.recursive")
     @Logging(PLACEMENT)
+    @SynchronousSettingExpected
     public int fillr(
             Actor actor, LocalSession session, EditSession editSession,
             @Arg(desc = "The blocks to fill with")
@@ -341,6 +344,7 @@ public class UtilityCommands {
     )
     @CommandPermissions("worldedit.drain")
     @Logging(PLACEMENT)
+    @SynchronousSettingExpected
     public int drain(
             Actor actor, LocalSession session, EditSession editSession,
             //FAWE start - we take an expression over a double
@@ -369,6 +373,7 @@ public class UtilityCommands {
     )
     @CommandPermissions("worldedit.fixlava")
     @Logging(PLACEMENT)
+    @SynchronousSettingExpected
     public int fixLava(
             Actor actor, LocalSession session, EditSession editSession,
             @Arg(desc = "The radius to fix in")
@@ -388,6 +393,7 @@ public class UtilityCommands {
     )
     @CommandPermissions("worldedit.fixwater")
     @Logging(PLACEMENT)
+    @SynchronousSettingExpected
     public int fixWater(
             Actor actor, LocalSession session, EditSession editSession,
             @Arg(desc = "The radius to fix in")
@@ -407,6 +413,7 @@ public class UtilityCommands {
     )
     @CommandPermissions("worldedit.removeabove")
     @Logging(PLACEMENT)
+    @SynchronousSettingExpected
     public int removeAbove(
             Actor actor, World world, LocalSession session, EditSession editSession,
             @Arg(desc = "The apothem of the square to remove from", def = "1")
@@ -432,6 +439,7 @@ public class UtilityCommands {
     )
     @CommandPermissions("worldedit.removebelow")
     @Logging(PLACEMENT)
+    @SynchronousSettingExpected
     public int removeBelow(
             Actor actor, World world, LocalSession session, EditSession editSession,
             @Arg(desc = "The apothem of the square to remove from", def = "1")
@@ -457,6 +465,7 @@ public class UtilityCommands {
     )
     @CommandPermissions("worldedit.removenear")
     @Logging(PLACEMENT)
+    @SynchronousSettingExpected
     public int removeNear(
             Actor actor, LocalSession session, EditSession editSession,
             @Arg(desc = "The mask of blocks to remove")
@@ -519,6 +528,7 @@ public class UtilityCommands {
     )
     @CommandPermissions("worldedit.snow")
     @Logging(PLACEMENT)
+    @SynchronousSettingExpected
     public int snow(
             Actor actor, LocalSession session, EditSession editSession,
             @Arg(desc = "The radius of the cylinder to snow in", def = "10")
@@ -558,6 +568,7 @@ public class UtilityCommands {
     )
     @CommandPermissions("worldedit.thaw")
     @Logging(PLACEMENT)
+    @SynchronousSettingExpected
     public int thaw(
             Actor actor, LocalSession session, EditSession editSession,
             @Arg(desc = "The radius of the cylinder to thaw in", def = "10")
@@ -587,6 +598,7 @@ public class UtilityCommands {
     )
     @CommandPermissions("worldedit.green")
     @Logging(PLACEMENT)
+    @SynchronousSettingExpected
     public int green(
             Actor actor, LocalSession session, EditSession editSession,
             @Arg(desc = "The radius of the cylinder to convert in", def = "10")
@@ -621,6 +633,7 @@ public class UtilityCommands {
     )
     @CommandPermissions("worldedit.extinguish")
     @Logging(PLACEMENT)
+    @SynchronousSettingExpected
     public int extinguish(
             Actor actor, LocalSession session, EditSession editSession,
             @Arg(desc = "The radius of the square to remove in", def = "")
@@ -834,55 +847,6 @@ public class UtilityCommands {
             actor.print(Caption.of("fawe.worldedit.utility.nothing.confirmed"));
         }
     }
-
-//    @Command(
-//            name = "/hollowr",
-//            desc = "Hollow out a space recursively with a pattern"
-//    )
-//    @CommandPermissions("worldedit.hollowr")
-//    @Logging(PLACEMENT)
-//    public int hollowr(
-//            Actor actor,
-//            LocalSession session,
-//            EditSession editSession,
-//            @Arg(desc = "The radius to hollow out") Expression radiusExp,
-//            @ArgFlag(name = 'p', desc = "The blocks to fill with") Pattern pattern,
-//            @ArgFlag(name = 'm', desc = "The blocks remove", def = "") Mask mask
-//    ) throws WorldEditException {
-//        //FAWE start
-//        double radius = radiusExp.evaluate();
-//        //FAWE end
-//        radius = Math.max(1, radius);
-//        we.checkMaxRadius(radius);
-//        if (mask == null) {
-//            Mask mask = new MaskIntersection(
-//                    new RegionMask(new EllipsoidRegion(null, origin, Vector3.at(radius, radius, radius))),
-//                    new BoundedHeightMask(
-//                            Math.max(lowerBound, minY),
-//                            Math.min(maxY, origin.getBlockY())
-//                    ),
-//                    Masks.negate(new ExistingBlockMask(this))
-//            );
-//        }
-//
-//        // Want to replace blocks
-//        BlockReplace replace = new BlockReplace(this, pattern);
-//
-//        // Pick how we're going to visit blocks
-//        RecursiveVisitor visitor;
-//        //FAWE start - provide extent for preloading, min/max y
-//        if (recursive) {
-//            visitor = new RecursiveVisitor(mask, replace, (int) (radius * 2 + 1), minY, maxY, this);
-//        } else {
-//            visitor = new DownwardVisitor(mask, replace, origin.getBlockY(), (int) (radius * 2 + 1), minY, maxY, this);
-//        }
-//        //FAWE end
-//
-//        BlockVector3 pos = session.getPlacementPosition(actor);
-//        int affected = editSession.res(pos, pattern, radius, depth, true);
-//        actor.print(Caption.of("worldedit.fillr.created", TextComponent.of(affected)));
-//        return affected;
-//    }
 
     public static List<Map.Entry<URI, String>> filesToEntry(final File root, final List<File> files, final UUID uuid) {
         return files.stream()

@@ -30,7 +30,7 @@ public class SingleBlockStateMask extends ABlockMask {
 
     @Override
     public boolean test(BlockVector3 vector) {
-        int test = getExtent().getBlock(vector).getOrdinal();
+        int test = vector.getBlock(getExtent()).getOrdinal();
         return ordinal == test || isAir && test == 0;
     }
 
