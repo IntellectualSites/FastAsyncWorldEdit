@@ -30,7 +30,6 @@ import com.fastasyncworldedit.core.queue.IChunk;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.IChunkSet;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.function.mask.AbstractExtentMask;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
@@ -47,7 +46,6 @@ public class MaskingExtent extends AbstractDelegateExtent implements IBatchProce
 
     //FAWE start
     private final LongFunction<ChunkFilterBlock> getOrCreateFilterBlock;
-    private AbstractExtentMask extentMask;
     private Mask mask;
     //FAWE end
 

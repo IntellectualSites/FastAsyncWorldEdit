@@ -361,11 +361,6 @@ public class AbstractDelegateExtent implements Extent {
     public <T extends Filter> T apply(final Region region, final T filter, final boolean full) {
         return extent.apply(region, filter, full);
     }
-
-    @Override
-    public <T extends Filter> T apply(final Iterable<BlockVector3> positions, final T filter) {
-        return extent.apply(positions, filter);
-    }
     //FAWE end
 
     protected Operation commitBefore() {

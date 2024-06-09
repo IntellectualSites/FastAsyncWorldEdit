@@ -1724,6 +1724,7 @@ public class LocalSession implements TextureHolder {
      * @return an edit session
      */
     public EditSession createEditSession(Actor actor) {
+        //FAWE start
         return createEditSession(actor, null);
     }
 
@@ -1752,7 +1753,6 @@ public class LocalSession implements TextureHolder {
         }
 
         // Create an edit session
-        //FAWE start - we don't use the edit session builder yet
         EditSession editSession;
         EditSessionBuilder builder = WorldEdit.getInstance().newEditSessionBuilder().world(world);
         if (actor.isPlayer() && actor instanceof Player) {
