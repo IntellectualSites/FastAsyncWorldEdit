@@ -6,6 +6,7 @@ import com.sk89q.util.StringUtil;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import org.apache.logging.log4j.Logger;
 
+import javax.annotation.Nullable;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.PrintWriter;
@@ -32,6 +33,7 @@ public class Config {
     private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     private final Map<String, Object> removedKeyVals = new HashMap<>();
+    @Nullable
     private Map<String, Map.Entry<String, Object>> copyTo = new HashMap<>();
     private boolean performCopyTo = false;
     private List<String> existingMigrateNodes = null;
@@ -80,14 +82,16 @@ public class Config {
                     if (field.getAnnotation(Final.class) != null) {
                         return;
                     }
-                    copyTo.remove(key); // Remove if the config field is already written
-                    final Object finalValue = value;
-                    copyTo.replaceAll((copyToNode, entry) -> {
-                        if (!key.equals(entry.getKey())) {
-                            return entry;
-                        }
-                        return new AbstractMap.SimpleEntry<>(key, finalValue);
-                    });
+                    if (copyTo != null) {
+                        copyTo.remove(key); // Remove if the config field is already written
+                        final Object finalValue = value;
+                        copyTo.replaceAll((copyToNode, entry) -> {
+                            if (!key.equals(entry.getKey())) {
+                                return entry;
+                            }
+                            return new AbstractMap.SimpleEntry<>(key, finalValue);
+                        });
+                    }
                     Migrate migrate = field.getAnnotation(Migrate.class);
                     if (migrate != null) {
                         existingMigrateNodes.add(migrate.value());
