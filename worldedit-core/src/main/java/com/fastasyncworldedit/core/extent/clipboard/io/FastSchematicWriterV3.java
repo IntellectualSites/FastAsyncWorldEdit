@@ -5,7 +5,9 @@ import com.fastasyncworldedit.core.util.IOUtil;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.NBTConstants;
 import com.sk89q.jnbt.NBTOutputStream;
+import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extension.platform.Platform;
@@ -14,18 +16,22 @@ import com.sk89q.worldedit.extent.clipboard.io.ClipboardWriter;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
+import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import net.jpountz.lz4.LZ4BlockInputStream;
 import net.jpountz.lz4.LZ4BlockOutputStream;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
 
 @SuppressWarnings("removal") // Yes, JNBT is deprecated - we know
 public class FastSchematicWriterV3 implements ClipboardWriter {
@@ -91,91 +97,162 @@ public class FastSchematicWriterV3 implements ClipboardWriter {
                 offset.x(), offset.y(), offset.z()
         });
 
-        schematic.writeLazyCompoundTag("Blocks", out -> this.writeBlocks(out, clipboard, region));
+        schematic.writeLazyCompoundTag("Blocks", out -> this.writeBlocks(out, clipboard));
         if (clipboard.hasBiomes()) {
             schematic.writeLazyCompoundTag("Biomes", out -> this.writeBiomes(out, clipboard));
         }
         // Some clipboards have quite heavy operations on the getEntities method - only call once
         List<? extends Entity> entities;
         if (!(entities = clipboard.getEntities()).isEmpty()) {
-            schematic.writeLazyCompoundTag("Entities", out -> this.writeEntities(out, entities));
+            schematic.writeNamedTagName("Entities", NBTConstants.TYPE_LIST);
+            schematic.write(NBTConstants.TYPE_COMPOUND);
+            schematic.writeInt(entities.size());
+            for (final Entity entity : entities) {
+                this.writeEntity(schematic, clipboard, entity);
+            }
         }
     }
 
-    private void writeBlocks(NBTOutputStream blocks, Clipboard clipboard, Region region) throws IOException {
-        final Iterator<BlockVector3> iterator = clipboard.iterator(Order.YZX);
-        char[] palette = new char[BlockTypesCache.states.length];
-        int varIntBytesUsed = 0;
-        int tiles = 0;
-
-        try (ByteArrayOutputStream dataBytes = new ByteArrayOutputStream();
-             ByteArrayOutputStream tileBytes = new ByteArrayOutputStream();
-             LZ4BlockOutputStream dataBuf = new LZ4BlockOutputStream(dataBytes);
-             NBTOutputStream tileBuf = new NBTOutputStream(new LZ4BlockOutputStream(dataBytes))) {
-
-            // Write palette
-            blocks.writeNamedTagName("Palette", NBTConstants.TYPE_COMPOUND);
-            int index = 0;
-            BlockVector3 pos;
-            BaseBlock baseBlock;
-            while (iterator.hasNext()) {
-                pos = iterator.next();
-                baseBlock = clipboard.getFullBlock(pos);
-
-                // Make sure it's a valid ordinal or fallback to air
-                char ordinal = baseBlock.getOrdinalChar();
-                if (ordinal == BlockTypesCache.ReservedIDs.__RESERVED__) {
-                    ordinal = BlockTypesCache.ReservedIDs.AIR;
-                }
-
-                // If ordinal (= state) is not already in palette, add to palette and assign new index
-                char value = palette[ordinal];
-                if (value == Character.MIN_VALUE) {
-                    palette[ordinal] = value = (char) ++index;
-                    // Write to palette
-                    blocks.writeNamedTag(baseBlock.getAsString(), value);
-                }
-
-                // Write to cache for "Data" Tag
-
-                while ((value & -128) != 0) {
-                    dataBuf.write(value & 127 | 128);
-                    value >>>= 7;
-                }
-
-                CompoundBinaryTag tag;
-                if ((tag = baseBlock.getNbt()) != null) {
-                    tiles++;
-                    BlockVector3 posNormalized = pos.subtract(clipboard.getMinimumPoint());
-                    tileBuf.writeNamedTag("Id", baseBlock.getNbtId());
-                    tileBuf.writeNamedTag("Pos", new int[] {
-                            posNormalized.x(), posNormalized.y(), posNormalized.z()
-                    });
-                    tileBuf.writeNamedTag("Data", new CompoundTag(tag));
-                    tileBuf.write(NBTConstants.TYPE_END);
-                }
-            }
-            // End "Palette" Compound
-            blocks.writeByte(NBTConstants.TYPE_END);
-
-
-            // Write data
-            blocks.writeNamedTagName("Data", NBTConstants.TYPE_BYTE_ARRAY);
-            blocks.writeInt(varIntBytesUsed);
-            // Decompress cached data again
-            try (LZ4BlockInputStream reader = new LZ4BlockInputStream(new ByteArrayInputStream(dataBytes.toByteArray()))) {
-                IOUtil.copy(reader, blocks.getOutputStream());
-            }
+    private void writeBlocks(NBTOutputStream blocks, Clipboard clipboard) throws IOException {
+        final int[] tiles = new int[]{0};
+        try (ByteArrayOutputStream tileBytes = new ByteArrayOutputStream();
+             NBTOutputStream tileOut = new NBTOutputStream(new LZ4BlockOutputStream(tileBytes))) {
+            this.writePalette(
+                    blocks,
+                    BlockTypesCache.states.length,
+                    pos -> {
+                        BaseBlock block = pos.getFullBlock(clipboard);
+                        CompoundBinaryTag tag;
+                        if ((tag = block.getNbt()) != null) {
+                            tiles[0]++;
+                            BlockVector3 posNormalized = pos.subtract(clipboard.getMinimumPoint());
+                            try {
+                                tileOut.writeNamedTag("Id", block.getNbtId());
+                                tileOut.writeNamedTag("Pos", new int[]{
+                                        posNormalized.x(), posNormalized.y(), posNormalized.z()
+                                });
+                                tileOut.writeNamedTag("Data", new CompoundTag(tag));
+                                tileOut.write(NBTConstants.TYPE_END);
+                            } catch (IOException e) {
+                                throw new RuntimeException("Failed to write tile data", e);
+                            }
+                        }
+                        return block;
+                    },
+                    block -> {
+                        char ordinal = block.getOrdinalChar();
+                        if (ordinal == BlockTypesCache.ReservedIDs.__RESERVED__) {
+                            ordinal = BlockTypesCache.ReservedIDs.AIR;
+                        }
+                        return ordinal;
+                    },
+                    BlockStateHolder::getAsString,
+                    clipboard
+            );
 
             // Write Tiles
-            if (tiles > 0) {
+            if (tiles[0] > 0) {
                 blocks.writeNamedTagName("BlockEntities", NBTConstants.TYPE_LIST);
                 blocks.write(NBTConstants.TYPE_COMPOUND);
-                blocks.writeInt(tiles);
+                blocks.writeInt(tiles[0]);
                 // Decompress cached data again
                 try (LZ4BlockInputStream reader = new LZ4BlockInputStream(new ByteArrayInputStream(tileBytes.toByteArray()))) {
                     IOUtil.copy(reader, blocks.getOutputStream());
                 }
+            }
+        }
+    }
+
+    private void writeBiomes(NBTOutputStream biomes, Clipboard clipboard) throws IOException {
+        this.writePalette(
+                biomes, BiomeType.REGISTRY.size(),
+                pos -> pos.getBiome(clipboard),
+                biome -> (char) biome.getInternalId(),
+                BiomeType::id,
+                clipboard
+        );
+    }
+
+    private void writeEntity(NBTOutputStream blocks, Clipboard clipboard, Entity entity) throws IOException {
+        final BaseEntity state = entity.getState();
+        if (state == null) {
+            return;
+        }
+        blocks.writeNamedTag("Id", state.getType().id());
+
+        blocks.writeNamedTagName("Pos", NBTConstants.TYPE_LIST);
+        blocks.write(NBTConstants.TYPE_FLOAT);
+        blocks.write(3);
+        blocks.writeFloat((float) entity.getLocation().x() - clipboard.getMinimumPoint().x());
+        blocks.writeFloat((float) entity.getLocation().y() - clipboard.getMinimumPoint().y());
+        blocks.writeFloat((float) entity.getLocation().z() - clipboard.getMinimumPoint().z());
+
+        blocks.writeLazyCompoundTag("Data", data -> {
+            CompoundTag nbt = state.getNbtData();
+            if (nbt != null) {
+                final Map<String, Tag> value = nbt.getValue();
+                value.remove("id");
+                value.remove("Rotation");
+                value.forEach((s, tag) -> {
+                    try {
+                        data.writeNamedTag(s, tag);
+                    } catch (IOException e) {
+                        throw new RuntimeException("failed to write entity data", e);
+                    }
+                });
+            }
+
+            // Write rotation list
+            data.writeNamedTagName("Rotation", NBTConstants.TYPE_LIST);
+            data.write(NBTConstants.TYPE_FLOAT);
+            data.write(2);
+            data.writeFloat(entity.getLocation().getYaw());
+            data.writeFloat(entity.getLocation().getPitch());
+        });
+    }
+
+    private <T> void writePalette(
+            NBTOutputStream out, int capacity,
+            Function<BlockVector3, T> objectResolver,
+            Function<T, Character> ordinalResolver,
+            Function<T, String> paletteEntryResolver,
+            Clipboard clipboard
+    ) throws IOException {
+        int dataBytesUsed = 0;
+        try (ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+             LZ4BlockOutputStream dataOut = new LZ4BlockOutputStream(bytes)) {
+            int index = 0;
+            char[] palette = new char[capacity];
+            Arrays.fill(palette, Character.MAX_VALUE);
+            final Iterator<BlockVector3> iterator = clipboard.iterator(Order.YZX);
+            // Start Palette tag
+            out.writeNamedTagName("Palette", NBTConstants.TYPE_COMPOUND);
+            while (iterator.hasNext()) {
+                BlockVector3 pos = iterator.next();
+                T obj = objectResolver.apply(pos);
+                char ordinal = ordinalResolver.apply(obj);
+                char value = palette[ordinal];
+                if (value == Character.MAX_VALUE) {
+                    palette[ordinal] = value = (char) index++;
+                    if (index >= palette.length) {
+                        throw new IOException("insufficient palette capacity: " + palette.length + ", index: " + index);
+                    }
+                    out.writeNamedTag(paletteEntryResolver.apply(obj), value);
+                }
+                while ((value & -128) != 0) {
+                    dataBytesUsed++;
+                    dataOut.write(value & 127 | 128);
+                    value >>>= 7;
+                }
+            }
+            // End Palette tag
+            out.write(NBTConstants.TYPE_END);
+
+            // Write Data tag
+            try (LZ4BlockInputStream reader = new LZ4BlockInputStream(new ByteArrayInputStream(bytes.toByteArray()))) {
+                out.writeNamedTagName("Data", NBTConstants.TYPE_BYTE_ARRAY);
+                out.writeInt(dataBytesUsed);
+                IOUtil.copy(reader, dataOut);
             }
         }
     }
