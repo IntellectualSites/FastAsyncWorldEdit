@@ -21,6 +21,7 @@ package com.sk89q.worldedit.extent.clipboard.io;
 
 import com.fastasyncworldedit.core.extent.clipboard.io.FastSchematicReaderV2;
 import com.fastasyncworldedit.core.extent.clipboard.io.FastSchematicWriterV2;
+import com.fastasyncworldedit.core.extent.clipboard.io.FastSchematicWriterV3;
 import com.fastasyncworldedit.core.extent.clipboard.io.schematic.MinecraftStructure;
 import com.fastasyncworldedit.core.extent.clipboard.io.schematic.PNGWriter;
 import com.fastasyncworldedit.core.internal.io.ResettableFileInputStream;
@@ -57,6 +58,35 @@ import java.util.zip.GZIPOutputStream;
 public enum BuiltInClipboardFormat implements ClipboardFormat {
 
     //FAWE start - register fast clipboard io
+    FAST_NEW("new_fast") { // For testing purposes
+        @Override
+        public ClipboardReader getReader(final InputStream inputStream) throws IOException {
+            return SPONGE_V3_SCHEMATIC.getReader(inputStream);
+        }
+
+        @Override
+        public ClipboardWriter getWriter(OutputStream outputStream) throws IOException {
+            OutputStream gzip;
+            if (outputStream instanceof ParallelGZIPOutputStream || outputStream instanceof GZIPOutputStream) {
+                gzip = outputStream;
+            } else {
+                outputStream = new BufferedOutputStream(outputStream);
+                gzip = new ParallelGZIPOutputStream(outputStream);
+            }
+            NBTOutputStream nbtStream = new NBTOutputStream(new BufferedOutputStream(gzip));
+            return new FastSchematicWriterV3(nbtStream);
+        }
+
+        @Override
+        public boolean isFormat(final File file) {
+            return FAST.isFormat(file);
+        }
+
+        @Override
+        public String getPrimaryFileExtension() {
+            return FAST.getPrimaryFileExtension();
+        }
+    },
     FAST("fast", "fawe", "sponge", "schem") {
         @Override
         public String getPrimaryFileExtension() {

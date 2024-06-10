@@ -25,6 +25,7 @@ import net.jpountz.lz4.LZ4BlockOutputStream;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.DataOutput;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -89,9 +90,9 @@ public class FastSchematicWriterV3 implements ClipboardWriter {
         );
         schematic.writeLazyCompoundTag("Metadata", out -> this.writeMetadata(out, clipboard));
 
-        schematic.writeNamedTag("Width", region.getWidth());
-        schematic.writeNamedTag("Height", region.getHeight());
-        schematic.writeNamedTag("Length", region.getLength());
+        schematic.writeNamedTag("Width", (short) region.getWidth());
+        schematic.writeNamedTag("Height", (short) region.getHeight());
+        schematic.writeNamedTag("Length", (short) region.getLength());
 
         schematic.writeNamedTag("Offset", new int[]{
                 offset.x(), offset.y(), offset.z()
@@ -115,8 +116,9 @@ public class FastSchematicWriterV3 implements ClipboardWriter {
 
     private void writeBlocks(NBTOutputStream blocks, Clipboard clipboard) throws IOException {
         final int[] tiles = new int[]{0};
-        try (ByteArrayOutputStream tileBytes = new ByteArrayOutputStream();
-             NBTOutputStream tileOut = new NBTOutputStream(new LZ4BlockOutputStream(tileBytes))) {
+        final ByteArrayOutputStream tileBytes = new ByteArrayOutputStream();
+        try (LZ4BlockOutputStream lz4Stream = new LZ4BlockOutputStream(tileBytes);
+             NBTOutputStream tileOut = new NBTOutputStream(lz4Stream)) {
             this.writePalette(
                     blocks,
                     BlockTypesCache.states.length,
@@ -149,7 +151,8 @@ public class FastSchematicWriterV3 implements ClipboardWriter {
                     BlockStateHolder::getAsString,
                     clipboard
             );
-
+            lz4Stream.finish();
+        } finally {
             // Write Tiles
             if (tiles[0] > 0) {
                 blocks.writeNamedTagName("BlockEntities", NBTConstants.TYPE_LIST);
@@ -173,27 +176,27 @@ public class FastSchematicWriterV3 implements ClipboardWriter {
         );
     }
 
-    private void writeEntity(NBTOutputStream blocks, Clipboard clipboard, Entity entity) throws IOException {
+    private void writeEntity(NBTOutputStream out, Clipboard clipboard, Entity entity) throws IOException {
         final BaseEntity state = entity.getState();
         if (state == null) {
-            return;
+            throw new IOException("Entity has no state");
         }
-        blocks.writeNamedTag("Id", state.getType().id());
+        out.writeNamedTag("Id", state.getType().id());
 
-        blocks.writeNamedTagName("Pos", NBTConstants.TYPE_LIST);
-        blocks.write(NBTConstants.TYPE_FLOAT);
-        blocks.write(3);
-        blocks.writeFloat((float) entity.getLocation().x() - clipboard.getMinimumPoint().x());
-        blocks.writeFloat((float) entity.getLocation().y() - clipboard.getMinimumPoint().y());
-        blocks.writeFloat((float) entity.getLocation().z() - clipboard.getMinimumPoint().z());
+        out.writeNamedTagName("Pos", NBTConstants.TYPE_LIST);
+        out.write(NBTConstants.TYPE_FLOAT);
+        out.writeInt(3);
+        out.writeFloat((float) entity.getLocation().x() - clipboard.getMinimumPoint().x());
+        out.writeFloat((float) entity.getLocation().y() - clipboard.getMinimumPoint().y());
+        out.writeFloat((float) entity.getLocation().z() - clipboard.getMinimumPoint().z());
 
-        blocks.writeLazyCompoundTag("Data", data -> {
+        out.writeLazyCompoundTag("Data", data -> {
             CompoundTag nbt = state.getNbtData();
             if (nbt != null) {
-                final Map<String, Tag> value = nbt.getValue();
-                value.remove("id");
-                value.remove("Rotation");
-                value.forEach((s, tag) -> {
+                nbt.getValue().forEach((s, tag) -> {
+                    if (s.equals("id") || s.equals("Rotation")) {
+                        return;
+                    }
                     try {
                         data.writeNamedTag(s, tag);
                     } catch (IOException e) {
@@ -205,10 +208,12 @@ public class FastSchematicWriterV3 implements ClipboardWriter {
             // Write rotation list
             data.writeNamedTagName("Rotation", NBTConstants.TYPE_LIST);
             data.write(NBTConstants.TYPE_FLOAT);
-            data.write(2);
+            data.writeInt(2);
             data.writeFloat(entity.getLocation().getYaw());
             data.writeFloat(entity.getLocation().getPitch());
         });
+
+        out.write(NBTConstants.TYPE_END); // End the compound
     }
 
     private <T> void writePalette(
@@ -219,8 +224,8 @@ public class FastSchematicWriterV3 implements ClipboardWriter {
             Clipboard clipboard
     ) throws IOException {
         int dataBytesUsed = 0;
-        try (ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-             LZ4BlockOutputStream dataOut = new LZ4BlockOutputStream(bytes)) {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        try (LZ4BlockOutputStream dataOut = new LZ4BlockOutputStream(bytes)) {
             int index = 0;
             char[] palette = new char[capacity];
             Arrays.fill(palette, Character.MAX_VALUE);
@@ -244,15 +249,20 @@ public class FastSchematicWriterV3 implements ClipboardWriter {
                     dataOut.write(value & 127 | 128);
                     value >>>= 7;
                 }
+                dataOut.write(value);
+                dataBytesUsed++;
             }
             // End Palette tag
             out.write(NBTConstants.TYPE_END);
-
+            dataOut.finish();
+        } finally {
             // Write Data tag
-            try (LZ4BlockInputStream reader = new LZ4BlockInputStream(new ByteArrayInputStream(bytes.toByteArray()))) {
-                out.writeNamedTagName("Data", NBTConstants.TYPE_BYTE_ARRAY);
-                out.writeInt(dataBytesUsed);
-                IOUtil.copy(reader, dataOut);
+            if (dataBytesUsed > 0) {
+                try (LZ4BlockInputStream reader = new LZ4BlockInputStream(new ByteArrayInputStream(bytes.toByteArray()))) {
+                    out.writeNamedTagName("Data", NBTConstants.TYPE_BYTE_ARRAY);
+                    out.writeInt(dataBytesUsed);
+                    IOUtil.copy(reader, (DataOutput) out);
+                }
             }
         }
     }

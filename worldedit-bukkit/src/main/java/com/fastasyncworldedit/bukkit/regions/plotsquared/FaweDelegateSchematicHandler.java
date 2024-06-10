@@ -29,7 +29,7 @@ import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.BuiltInClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.MCEditSchematicReader;
-import com.sk89q.worldedit.extent.clipboard.io.SpongeSchematicReader;
+import com.sk89q.worldedit.extent.clipboard.io.sponge.SpongeSchematicV3Reader;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
@@ -249,8 +249,8 @@ public class FaweDelegateSchematicHandler {
                 return null;
             }
             try {
-                SpongeSchematicReader schematicReader =
-                        new SpongeSchematicReader(new NBTInputStream(new GZIPInputStream(is)));
+                SpongeSchematicV3Reader schematicReader =
+                        new SpongeSchematicV3Reader(new NBTInputStream(new GZIPInputStream(is)));
                 Clipboard clip = schematicReader.read();
                 return new Schematic(clip);
             } catch (IOException e2) {
