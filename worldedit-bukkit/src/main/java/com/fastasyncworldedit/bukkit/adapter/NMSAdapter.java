@@ -137,7 +137,7 @@ public class NMSAdapter implements FAWEPlatformAdapterImpl {
         if (!(chunk instanceof BukkitGetBlocks)) {
             throw new IllegalArgumentException("(IChunkGet) chunk not of type BukkitGetBlocks");
         }
-        ((BukkitGetBlocks) chunk).send(mask, lighting);
+        ((BukkitGetBlocks) chunk).send();
     }
 
 }

@@ -26,6 +26,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.IdMap;
 import net.minecraft.core.Registry;
 import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ChunkHolder;
 import net.minecraft.server.level.ChunkMap;
 import net.minecraft.server.level.ServerLevel;
@@ -333,7 +334,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
     }
 
     @SuppressWarnings("deprecation")
-    public static void sendChunk(ServerLevel nmsWorld, int chunkX, int chunkZ, boolean lighting) {
+    public static void sendChunk(Object chunk, ServerLevel nmsWorld, int chunkX, int chunkZ) {
         ChunkHolder chunkHolder = getPlayerChunk(nmsWorld, chunkX, chunkZ);
         if (chunkHolder == null) {
             return;
@@ -354,24 +355,28 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         if (levelChunk == null) {
             return;
         }
-        TaskManager.taskManager().task(() -> {
+        MinecraftServer.getServer().execute(() -> {
             ClientboundLevelChunkWithLightPacket packet;
             if (PaperLib.isPaper()) {
-                packet = new ClientboundLevelChunkWithLightPacket(
-                        levelChunk,
-                        nmsWorld.getChunkSource().getLightEngine(),
-                        null,
-                        null
-                        // last false is to not bother with x-ray
-                );
+                synchronized (chunk) {
+                    packet = new ClientboundLevelChunkWithLightPacket(
+                            levelChunk,
+                            nmsWorld.getChunkSource().getLightEngine(),
+                            null,
+                            null,
+                            false // last false is to not bother with x-ray
+                    );
+                }
             } else {
-                // deprecated on paper - deprecation suppressed
-                packet = new ClientboundLevelChunkWithLightPacket(
-                        levelChunk,
-                        nmsWorld.getChunkSource().getLightEngine(),
-                        null,
-                        null
-                );
+                synchronized (chunk) {
+                    // deprecated on paper - deprecation suppressed
+                    packet = new ClientboundLevelChunkWithLightPacket(
+                            levelChunk,
+                            nmsWorld.getChunkSource().getLightEngine(),
+                            null,
+                            null
+                    );
+                }
             }
             nearbyPlayers(nmsWorld, coordIntPair).forEach(p -> p.connection.send(packet));
         });
