@@ -184,11 +184,11 @@ public class FastSchematicWriterV3 implements ClipboardWriter {
         out.writeNamedTag("Id", state.getType().id());
 
         out.writeNamedTagName("Pos", NBTConstants.TYPE_LIST);
-        out.write(NBTConstants.TYPE_FLOAT);
+        out.write(NBTConstants.TYPE_DOUBLE);
         out.writeInt(3);
-        out.writeFloat((float) entity.getLocation().x() - clipboard.getMinimumPoint().x());
-        out.writeFloat((float) entity.getLocation().y() - clipboard.getMinimumPoint().y());
-        out.writeFloat((float) entity.getLocation().z() - clipboard.getMinimumPoint().z());
+        out.writeDouble(entity.getLocation().x() - clipboard.getMinimumPoint().x());
+        out.writeDouble(entity.getLocation().y() - clipboard.getMinimumPoint().y());
+        out.writeDouble(entity.getLocation().z() - clipboard.getMinimumPoint().z());
 
         out.writeLazyCompoundTag("Data", data -> {
             CompoundTag nbt = state.getNbtData();
