@@ -61,7 +61,7 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
     FAST_NEW("new_fast") { // For testing purposes
         @Override
         public ClipboardReader getReader(final InputStream inputStream) throws IOException {
-            return SPONGE_V3_SCHEMATIC.getReader(inputStream);
+            return SPONGE_V3_SCHEMATIC.getReader(inputStream); // TODO: use FastSchematicReaderV3 when finished
         }
 
         @Override
@@ -80,6 +80,36 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
         @Override
         public boolean isFormat(final File file) {
             return FAST.isFormat(file);
+            /**
+             * TODO: test if this actually works
+             * try (final DataInputStream stream = new DataInputStream(new GZIPInputStream(Files.newInputStream(file.toPath())));
+             *                  final NBTInputStream nbt = new NBTInputStream(stream)) {
+             *                 if (stream.readByte() != NBTConstants.TYPE_COMPOUND) {
+             *                     return false;
+             *                 }
+             *                 stream.readShort(); // TAG name length ("" = 0), no need to read name as no bytes are written for root tag
+             *                 if (stream.readByte() != NBTConstants.TYPE_COMPOUND) {
+             *                     return false;
+             *                 }
+             *                 stream.readShort(); // TAG name length ("Schematic" = 9)
+             *                 stream.skipNBytes(9); // "Schematic"
+             *
+             *                 // We can't guarantee the specific order of nbt data, so scan and skip, if required
+             *                 do {
+             *                     byte type = stream.readByte();
+             *                     String name = stream.readUTF();
+             *                     if (type == NBTConstants.TYPE_END) {
+             *                         return false;
+             *                     }
+             *                     if (type == NBTConstants.TYPE_INT && name.equals("Version")) {
+             *                         return stream.readInt() == FastSchematicWriterV3.CURRENT_VERSION;
+             *                     }
+             *                     nbt.readTagPayloadLazy(type, 1);
+             *                 } while (true);
+             *             } catch (IOException ignored) {
+             *             }
+             *             return false;
+             */
         }
 
         @Override

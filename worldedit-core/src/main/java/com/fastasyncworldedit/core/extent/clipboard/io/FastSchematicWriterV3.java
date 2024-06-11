@@ -5,7 +5,6 @@ import com.fastasyncworldedit.core.util.IOUtil;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.NBTConstants;
 import com.sk89q.jnbt.NBTOutputStream;
-import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
@@ -30,14 +29,13 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 
 @SuppressWarnings("removal") // Yes, JNBT is deprecated - we know
 public class FastSchematicWriterV3 implements ClipboardWriter {
 
-    private static final int CURRENT_VERSION = 3;
+    public static final int CURRENT_VERSION = 3;
 
     private static final int MAX_SIZE = Short.MAX_VALUE - Short.MIN_VALUE;
     private final NBTOutputStream outputStream;
