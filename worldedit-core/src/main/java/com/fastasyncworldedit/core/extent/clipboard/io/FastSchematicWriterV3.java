@@ -242,7 +242,7 @@ public class FastSchematicWriterV3 implements ClipboardWriter {
                     }
                     out.writeNamedTag(paletteEntryResolver.apply(obj), value);
                 }
-                while ((value & -128) != 0) {
+                if ((value & -128) != 0) {
                     dataBytesUsed++;
                     dataOut.write(value & 127 | 128);
                     value >>>= 7;
