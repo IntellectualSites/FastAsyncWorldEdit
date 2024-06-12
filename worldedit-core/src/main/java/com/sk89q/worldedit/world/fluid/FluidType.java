@@ -40,17 +40,18 @@ public class FluidType implements RegistryItem, Keyed {
     }
 
     /**
-     * Gets the ID of this block.
+     * Gets the ID of this fluid.
      *
      * @return The id
      * @since 2.11.0
      */
+    @Override
     public String id() {
         return this.id;
     }
 
     /**
-     * Gets the ID of this block.
+     * Gets the ID of this fluid.
      *
      * @return The id
      * @deprecated use {@link #id()}
