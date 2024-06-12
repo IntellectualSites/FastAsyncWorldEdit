@@ -444,7 +444,7 @@ public class MainUtil {
     @Nonnull
     public static CompoundTag setEntityInfo(@Nonnull CompoundTag tag, @Nonnull Entity entity) {
         Map<String, Tag> map = new HashMap<>(tag.getValue());
-        map.put("Id", new StringTag(entity.getState().getType().getId()));
+        map.put("Id", new StringTag(entity.getState().getType().id()));
         ListTag pos = (ListTag) map.get("Pos");
         if (pos != null) {
             Location loc = entity.getLocation();

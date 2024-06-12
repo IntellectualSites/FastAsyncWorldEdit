@@ -492,7 +492,7 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
     public org.bukkit.inventory.ItemStack adapt(BaseItemStack baseItemStack) {
         final RegistryAccess.Frozen registryAccess = DedicatedServer.getServer().registryAccess();
         ItemStack stack = new ItemStack(
-                registryAccess.registryOrThrow(Registries.ITEM).get(ResourceLocation.tryParse(baseItemStack.getType().getId())),
+                registryAccess.registryOrThrow(Registries.ITEM).get(ResourceLocation.tryParse(baseItemStack.getType().id())),
                 baseItemStack.getAmount()
         );
         final CompoundTag nbt = (net.minecraft.nbt.CompoundTag) fromNative(baseItemStack.getNbtData());
@@ -572,7 +572,7 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
                 .getServer()
                 .registryAccess()
                 .registryOrThrow(BIOME);
-        ResourceLocation resourceLocation = ResourceLocation.tryParse(biomeType.getId());
+        ResourceLocation resourceLocation = ResourceLocation.tryParse(biomeType.id());
         Biome biome = registry.get(resourceLocation);
         return registry.getId(biome);
     }

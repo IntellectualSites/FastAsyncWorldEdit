@@ -237,7 +237,7 @@ public class FastSchematicWriter implements ClipboardWriter {
                     if (!brokenEntities) {
                         loc = loc.setPosition(loc.add(min.toVector3()));
                     }
-                    values.put("Id", new StringTag(state.getType().getId()));
+                    values.put("Id", new StringTag(state.getType().id()));
                     values.put("Pos", writeVector(loc));
                     values.put("Rotation", writeRotation(entity.getLocation()));
 
@@ -297,7 +297,7 @@ public class FastSchematicWriter implements ClipboardWriter {
             for (int i = 0; i < paletteList.size(); i++) {
                 int ordinal = paletteList.get(i);
                 BiomeType state = BiomeTypes.get(ordinal);
-                out12.writeNamedTag(state.getId(), i);
+                out12.writeNamedTag(state.id(), i);
             }
         });
 

@@ -291,12 +291,12 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
     private static Block getBlockFromType(BlockType blockType) {
 
         return DedicatedServer.getServer().registryAccess().registryOrThrow(Registries.BLOCK).get(ResourceLocation.tryParse(
-                blockType.getId()));
+                blockType.id()));
     }
 
     private static Item getItemFromType(ItemType itemType) {
         return DedicatedServer.getServer().registryAccess().registryOrThrow(Registries.ITEM).get(ResourceLocation.tryParse(
-                itemType.getId()));
+                itemType.id()));
     }
 
     @Override
@@ -470,7 +470,7 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
         CraftWorld craftWorld = ((CraftWorld) location.getWorld());
         ServerLevel worldServer = craftWorld.getHandle();
 
-        Entity createdEntity = createEntityFromId(state.getType().getId(), craftWorld.getHandle());
+        Entity createdEntity = createEntityFromId(state.getType().id(), craftWorld.getHandle());
 
         if (createdEntity != null) {
             CompoundBinaryTag nativeTag = state.getNbt();
@@ -598,7 +598,7 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
     public org.bukkit.inventory.ItemStack adapt(BaseItemStack item) {
         final RegistryAccess.Frozen registryAccess = DedicatedServer.getServer().registryAccess();
         ItemStack stack = new ItemStack(
-                registryAccess.registryOrThrow(Registries.ITEM).get(ResourceLocation.tryParse(item.getType().getId())),
+                registryAccess.registryOrThrow(Registries.ITEM).get(ResourceLocation.tryParse(item.getType().id())),
                 item.getAmount()
         );
         final CompoundTag nbt = (net.minecraft.nbt.CompoundTag) fromNative(item.getNbtData());

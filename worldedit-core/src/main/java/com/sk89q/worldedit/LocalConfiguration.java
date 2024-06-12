@@ -196,7 +196,7 @@ public abstract class LocalConfiguration {
                 BlockTypes.BEDROCK
                 FAWE end*/
         );
-        return blockTypes.stream().filter(Objects::nonNull).map(BlockType::getId).toArray(String[]::new);
+        return blockTypes.stream().filter(Objects::nonNull).map(BlockType::id).toArray(String[]::new);
     }
 
     /**
@@ -277,7 +277,7 @@ public abstract class LocalConfiguration {
                 id = Integer.parseInt(splitter[0]);
                 data = Byte.parseByte(splitter[1]);
             }
-            item = LegacyMapper.getInstance().getItemFromLegacy(id, data).getId();
+            item = LegacyMapper.getInstance().getItemFromLegacy(id, data).id();
         } catch (Throwable ignored) {
         }
 

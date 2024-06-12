@@ -154,7 +154,7 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
                 String input = key.toString();
                 throw new SuggestInputParseException(Caption.of("fawe.error.invalid-block-type", TextComponent.of(input)), () -> Stream.of(
                                 BlockTypesCache.values)
-                        .map(BlockType::getId)
+                        .map(BlockType::id)
                         .filter(id -> StringMan.blockStateMatches(input, id))
                         .sorted(StringMan.blockStateComparator(input))
                         .collect(Collectors.toList())

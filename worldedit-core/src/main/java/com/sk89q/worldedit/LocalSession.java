@@ -1899,7 +1899,7 @@ public class LocalSession implements TextureHolder {
      */
     @Deprecated
     public String getWandItem() {
-        return wandItem.getType().getId();
+        return wandItem.getType().id();
     }
 
     /**
@@ -1910,7 +1910,7 @@ public class LocalSession implements TextureHolder {
      */
     @Deprecated
     public String getNavWandItem() {
-        return navWandItem.getType().getId();
+        return navWandItem.getType().id();
     }
 
     //FAWE start

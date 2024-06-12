@@ -230,7 +230,7 @@ public class BukkitServerInterface extends AbstractPlatform implements MultiUser
 
     //FAWE start
     @Override
-    public String getId() {
+    public String id() {
         return "intellectualsites:bukkit";
     }
     //FAWE end

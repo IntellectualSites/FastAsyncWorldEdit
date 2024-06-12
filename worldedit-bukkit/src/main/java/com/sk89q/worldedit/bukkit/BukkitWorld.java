@@ -224,7 +224,7 @@ public class BukkitWorld extends AbstractWorld {
     //FAWE end
 
     @Override
-    public String getId() {
+    public String id() {
         return getWorld().getName().replace(" ", "_").toLowerCase(Locale.ROOT);
     }
 
