@@ -823,7 +823,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                         nmsChunk.setUnsaved(true);
                         // send to player
                         if (Settings.settings().LIGHTING.MODE == 0 || !Settings.settings().LIGHTING.DELAY_PACKET_SENDING) {
-                            this.send(finalMask, finalLightUpdate);
+                            this.send();
                         }
                         if (finalizer != null) {
                             finalizer.run();
@@ -919,9 +919,9 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
     }
 
     @Override
-    public void send(int mask, boolean lighting) {
+    public void send() {
         synchronized (sendLock) {
-            PaperweightPlatformAdapter.sendChunk(serverLevel, chunkX, chunkZ, lighting);
+            PaperweightPlatformAdapter.sendChunk(this, serverLevel, chunkX, chunkZ);
         }
     }
 

@@ -929,10 +929,10 @@ public class TextureUtil implements TextureHolder {
                     }.getType();
 
                     for (BlockType blockType : BlockTypesCache.values) {
-                        if (!blockType.getMaterial().isFullCube() || blockType.getId().toLowerCase().contains("shulker")) {
+                        if (!blockType.getMaterial().isFullCube() || blockType.id().toLowerCase().contains("shulker")) {
                             continue;
                         }
-                        switch (blockType.getId().toLowerCase(Locale.ROOT)) {
+                        switch (blockType.id().toLowerCase(Locale.ROOT)) {
                             case "slime_block":
                             case "honey_block":
                             case "mob_spawner":
@@ -940,7 +940,7 @@ public class TextureUtil implements TextureHolder {
                                 continue;
                         }
                         int combined = blockType.getInternalId();
-                        String id = blockType.getId();
+                        String id = blockType.id();
                         String[] split = id.split(":", 2);
                         String name = split.length == 1 ? id : split[1];
                         String nameSpace = split.length == 1 ? "" : split[0];

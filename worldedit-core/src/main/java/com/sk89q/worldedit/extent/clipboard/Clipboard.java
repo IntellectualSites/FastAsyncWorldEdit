@@ -423,7 +423,7 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable, Fl
         if (pasteEntities) {
             for (Entity entity : this.getEntities()) {
                 // skip players on pasting schematic
-                if (entity.getState() != null && entity.getState().getType().getId()
+                if (entity.getState() != null && entity.getState().getType().id()
                         .equals("minecraft:player")) {
                     continue;
                 }

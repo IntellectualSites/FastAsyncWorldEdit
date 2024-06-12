@@ -243,7 +243,7 @@ public class SpongeSchematicV2Writer implements ClipboardWriter {
                 BlockVector3 pt = BlockVector3.at(x0, min.y(), z0);
                 BiomeType biome = clipboard.getBiome(pt);
 
-                String biomeKey = biome.getId();
+                String biomeKey = biome.id();
                 int biomeId;
                 if (palette.containsKey(biomeKey)) {
                     biomeId = palette.get(biomeKey);

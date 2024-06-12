@@ -66,7 +66,7 @@ public class BlockDataCyler implements DoubleActionBlockTool {
 
         if (!config.allowedDataCycleBlocks.isEmpty()
                 && !player.hasPermission("worldedit.override.data-cycler")
-                && !config.allowedDataCycleBlocks.contains(block.getBlockType().getId())) {
+                && !config.allowedDataCycleBlocks.contains(block.getBlockType().id())) {
             player.print(Caption.of("worldedit.tool.data-cycler.block-not-permitted"));
             return true;
         }

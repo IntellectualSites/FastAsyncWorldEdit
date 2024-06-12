@@ -236,7 +236,7 @@ public class CavesGen extends GenBase {
                                 BlockState material = chunk.getBlock(bx + local_x, local_y, bz + local_z);
                                 BlockState materialAbove = chunk.getBlock(bx + local_x, local_y + 1, bz + local_z);
                                 BlockType blockType = material.getBlockType();
-                                switch (blockType.getId()) {
+                                switch (blockType.id()) {
                                     case "minecraft:mycelium", "minecraft:grass_block" -> grassFound = true;
                                 }
                                 if (this.isSuitableBlock(material, materialAbove)) {
@@ -277,7 +277,7 @@ public class CavesGen extends GenBase {
     }
 
     protected boolean isSuitableBlock(BlockStateHolder material, BlockStateHolder materialAbove) {
-        return switch (material.getBlockType().getId()) {
+        return switch (material.getBlockType().id()) {
             case "minecraft:air", "minecraft:cave_air", "minecraft:void_air", "minecraft:water", "minecraft:lava", "minecraft:bedrock" -> false;
             default -> true;
         };

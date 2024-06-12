@@ -79,8 +79,6 @@ import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
-import com.sk89q.worldedit.world.item.ItemType;
-import com.sk89q.worldedit.world.item.ItemTypes;
 import com.sk89q.worldedit.world.storage.ChunkStore;
 import org.enginehub.piston.annotation.Command;
 import org.enginehub.piston.annotation.CommandContainer;
@@ -841,7 +839,7 @@ public class SelectionCommands {
                 toolTip = TextComponent.of(state.getAsString());
                 blockName = blockName.append(TextComponent.of("*"));
             } else {
-                toolTip = TextComponent.of(blockType.getId());
+                toolTip = TextComponent.of(blockType.id());
             }
             blockName = blockName.hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, toolTip));
             line.append(blockName);

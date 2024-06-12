@@ -441,7 +441,7 @@ public class BlockTransformExtent extends ResettableExtent {
                         if (Settings.settings().ENABLED_COMPONENTS.DEBUG) {
                             LOGGER.warn(String.format(
                                     "Index outside direction array length found for block:{%s} property:{%s}",
-                                    state.getBlockType().getId(),
+                                    state.getBlockType().id(),
                                     property.getName()
                             ));
                         }

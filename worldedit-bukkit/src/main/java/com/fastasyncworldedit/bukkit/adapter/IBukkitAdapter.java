@@ -166,10 +166,10 @@ public interface IBukkitAdapter {
      */
     default Material adapt(ItemType itemType) {
         checkNotNull(itemType);
-        if (!itemType.getId().startsWith("minecraft:")) {
+        if (!itemType.id().startsWith("minecraft:")) {
             throw new IllegalArgumentException("Bukkit only supports Minecraft items");
         }
-        return Material.getMaterial(itemType.getId().substring(10).toUpperCase(Locale.ROOT));
+        return Material.getMaterial(itemType.id().substring(10).toUpperCase(Locale.ROOT));
     }
 
     /**
@@ -180,10 +180,10 @@ public interface IBukkitAdapter {
      */
     default Material adapt(BlockType blockType) {
         checkNotNull(blockType);
-        if (!blockType.getId().startsWith("minecraft:")) {
+        if (!blockType.id().startsWith("minecraft:")) {
             throw new IllegalArgumentException("Bukkit only supports Minecraft blocks");
         }
-        String id = blockType.getId().substring(10).toUpperCase(Locale.ROOT);
+        String id = blockType.id().substring(10).toUpperCase(Locale.ROOT);
         return Material.getMaterial(id);
     }
 
@@ -293,11 +293,11 @@ public interface IBukkitAdapter {
     }
 
     default Biome adapt(BiomeType biomeType) {
-        if (!biomeType.getId().startsWith("minecraft:")) {
+        if (!biomeType.id().startsWith("minecraft:")) {
             throw new IllegalArgumentException("Bukkit only supports vanilla biomes");
         }
         try {
-            return Biome.valueOf(biomeType.getId().substring(10).toUpperCase(Locale.ROOT));
+            return Biome.valueOf(biomeType.id().substring(10).toUpperCase(Locale.ROOT));
         } catch (IllegalArgumentException e) {
             return null;
         }
