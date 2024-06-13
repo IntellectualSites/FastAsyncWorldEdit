@@ -29,7 +29,7 @@ public class Pre13HangingCompatibilityHandler implements EntityNBTCompatibilityH
 
     @Override
     public boolean isAffectedEntity(EntityType type, CompoundTag tag) {
-        if (!type.getId().startsWith("minecraft:")) {
+        if (!type.id().startsWith("minecraft:")) {
             return false;
         }
         boolean hasLegacyDirection = tag.containsKey("Dir") || tag.containsKey("Direction");

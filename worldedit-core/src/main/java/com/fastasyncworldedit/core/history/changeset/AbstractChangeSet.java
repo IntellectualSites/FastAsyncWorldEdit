@@ -297,7 +297,7 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
     public void add(BlockChange change) {
         try {
             BlockVector3 loc = change.getPosition();
-            BaseBlock from = change.getPrevious();
+            BaseBlock from = change.previous();
             BaseBlock to = change.getCurrent();
             add(loc, from, to);
         } catch (Exception e) {

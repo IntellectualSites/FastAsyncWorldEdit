@@ -41,7 +41,7 @@ public class NullBiomeRegistry implements BiomeRegistry {
     @Override
     public Component getRichName(BiomeType biomeType) {
         return Caption.of(
-                TranslationManager.makeTranslationKey("biome", biomeType.getId())
+                TranslationManager.makeTranslationKey("biome", biomeType.id())
         );
     }
 

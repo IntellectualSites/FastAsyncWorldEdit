@@ -183,7 +183,7 @@ public class MinecraftStructure implements ClipboardReader, ClipboardWriter {
 
             indexes.put(combined, (Integer) palette.size());
             HashMap<String, Object> paletteEntry = new HashMap<>();
-            paletteEntry.put("Name", type.getId());
+            paletteEntry.put("Name", type.id());
             if (block.getInternalId() != type.getInternalId()) {
                 Map<String, Object> properties = null;
                 for (AbstractProperty property : (List<AbstractProperty<?>>) type.getProperties()) {
@@ -239,7 +239,7 @@ public class MinecraftStructure implements ClipboardReader, ClipboardWriter {
                 Map<String, Tag> nbtMap = nbt.getValue();
                 // Replace rotation data
                 nbtMap.put("Rotation", writeRotation(entity.getLocation()));
-                nbtMap.put("id", new StringTag(state.getType().getId()));
+                nbtMap.put("id", new StringTag(state.getType().id()));
                 Map<String, Object> entityMap = FaweCache.INSTANCE.asMap("pos", pos, "blockPos", blockPos, "nbt", nbt);
                 entities.add(entityMap);
             }

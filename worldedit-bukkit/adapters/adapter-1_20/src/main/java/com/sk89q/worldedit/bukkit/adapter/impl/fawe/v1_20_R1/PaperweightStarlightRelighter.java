@@ -67,7 +67,7 @@ public class PaperweightStarlightRelighter extends StarlightRelighter<ServerLeve
             int x = pos.x;
             int z = pos.z;
             if (delay) { // we still need to send the block changes of that chunk
-                PaperweightPlatformAdapter.sendChunk(serverLevel, x, z, false);
+                PaperweightPlatformAdapter.sendChunk(pos, serverLevel, x, z);
             }
             serverLevel.getChunkSource().removeTicketAtLevel(FAWE_TICKET, pos, LIGHT_LEVEL, Unit.INSTANCE);
         }
