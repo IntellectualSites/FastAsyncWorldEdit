@@ -8,6 +8,7 @@ import com.sk89q.worldedit.bukkit.BukkitPlayer;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.entity.BaseEntity;
+import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.registry.state.Property;
@@ -16,7 +17,6 @@ import com.sk89q.worldedit.util.nbt.BinaryTag;
 import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
 import com.sk89q.worldedit.world.DataFixer;
 import com.sk89q.worldedit.world.biome.BiomeType;
-import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
@@ -113,6 +113,26 @@ public interface IDelegateBukkitImplAdapter<T> extends BukkitImplAdapter<T> {
     @Override
     default OptionalInt getInternalBlockStateId(BlockState state) {
         return getParent().getInternalBlockStateId(state);
+    }
+
+    @Override
+    default boolean clearContainerBlockContents(World world, BlockVector3 pt) {
+        return getParent().clearContainerBlockContents(world, pt);
+    }
+
+    @Override
+    default void setBiome(Location location, BiomeType biome) {
+        getParent().setBiome(location, biome);
+    }
+
+    @Override
+    default BiomeType getBiome(Location location) {
+        return getParent().getBiome(location);
+    }
+
+    @Override
+    default void sendBiomeUpdates(World world, Iterable<BlockVector2> chunks) {
+        getParent().sendBiomeUpdates(world, chunks);
     }
 
     @Override
