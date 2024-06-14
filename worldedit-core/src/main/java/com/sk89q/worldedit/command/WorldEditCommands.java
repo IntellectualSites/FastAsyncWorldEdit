@@ -22,6 +22,8 @@ package com.sk89q.worldedit.command;
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.FaweVersion;
 import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.configuration.Settings;
+import com.fastasyncworldedit.core.limit.FaweLimit;
 import com.fastasyncworldedit.core.util.UpdateNotification;
 import com.intellectualsites.paster.IncendoPaster;
 import com.sk89q.worldedit.LocalSession;
@@ -97,6 +99,8 @@ public class WorldEditCommands {
                 .getConfiguration()));
         //FAWE start
         Fawe.instance().setupConfigs();
+        FaweLimit.MAX.CONFIRM_LARGE =
+                Settings.settings().LIMITS.get("default").CONFIRM_LARGE || Settings.settings().GENERAL.LIMIT_UNLIMITED_CONFIRMS;
         //FAWE end
         actor.print(Caption.of("worldedit.reload.config"));
     }

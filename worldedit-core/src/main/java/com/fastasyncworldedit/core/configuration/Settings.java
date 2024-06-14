@@ -791,6 +791,11 @@ public class Settings extends Config {
         })
         public boolean UNSTUCK_ON_GENERATE = true;
 
+        @Comment({
+                "If unlimited limits should still require /confirm on large. Defaults to limits.default.confirm-large otherwise."
+        })
+        public boolean LIMIT_UNLIMITED_CONFIRMS = true;
+
     }
 
 }
