@@ -254,7 +254,7 @@ public final class ListTag<EV, E extends LinTag<EV>> extends Tag<Object, LinList
      * @param index the index
      * @return a list of tags
      */
-    public List<Tag<?, ?>> getList(int index) {
+    public List<? extends Tag<?, ?>> getList(int index) {
         return getListTag(index).getValue();
     }
 
