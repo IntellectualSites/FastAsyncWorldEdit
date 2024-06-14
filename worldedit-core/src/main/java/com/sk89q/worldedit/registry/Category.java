@@ -39,7 +39,7 @@ public abstract class Category<T extends Keyed> implements RegistryItem, Keyed {
         this.supplier = null;
     }
 
-    public Category(final String id, final Supplier<Set<T>> contentSupplier) {
+    public Category(String id, Supplier<Set<T>> contentSupplier) {
         this.id = id;
         this.supplier = contentSupplier;
     }
