@@ -19,6 +19,7 @@
 
 package com.sk89q.jnbt;
 
+import com.fastasyncworldedit.core.jnbt.NumberTag;
 import org.enginehub.linbus.tree.LinFloatTag;
 
 /**
@@ -26,7 +27,7 @@ import org.enginehub.linbus.tree.LinFloatTag;
  *
  * @deprecated Use {@link LinFloatTag}.
  */
-public final class FloatTag extends Tag<Float, LinFloatTag> {
+public final class FloatTag extends NumberTag<LinFloatTag> {
 
     /**
      * Creates the tag with an empty name.

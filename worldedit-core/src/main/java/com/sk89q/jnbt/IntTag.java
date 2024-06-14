@@ -19,6 +19,7 @@
 
 package com.sk89q.jnbt;
 
+import com.fastasyncworldedit.core.jnbt.NumberTag;
 import org.enginehub.linbus.tree.LinIntTag;
 
 /**
@@ -27,7 +28,7 @@ import org.enginehub.linbus.tree.LinIntTag;
  * @deprecated Use {@link LinIntTag}.
  */
 @Deprecated
-public final class IntTag extends Tag<Integer, LinIntTag> {
+public final class IntTag extends NumberTag<LinIntTag> {
 
     /**
      * Creates the tag with an empty name.

@@ -19,6 +19,7 @@
 
 package com.sk89q.jnbt;
 
+import com.fastasyncworldedit.core.jnbt.NumberTag;
 import org.enginehub.linbus.tree.LinByteTag;
 
 /**
@@ -27,7 +28,7 @@ import org.enginehub.linbus.tree.LinByteTag;
  * @deprecated Use {@link LinByteTag}.
  */
 @Deprecated
-public final class ByteTag extends Tag<Byte, LinByteTag> {
+public final class ByteTag extends NumberTag<LinByteTag> {
     /**
      * Creates the tag with an empty name.
      *
@@ -39,6 +40,11 @@ public final class ByteTag extends Tag<Byte, LinByteTag> {
 
     public ByteTag(LinByteTag tag) {
         super(tag);
+    }
+
+    @Override
+    public Byte getValue() {
+        return linTag.value();
     }
 
     //FAWE start

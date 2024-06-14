@@ -19,6 +19,7 @@
 
 package com.sk89q.jnbt;
 
+import com.fastasyncworldedit.core.jnbt.NumberTag;
 import org.enginehub.linbus.tree.LinShortTag;
 
 /**
@@ -27,7 +28,7 @@ import org.enginehub.linbus.tree.LinShortTag;
  * @deprecated Use {@link LinShortTag}.
  */
 @Deprecated
-public final class ShortTag extends Tag<Short, LinShortTag> {
+public final class ShortTag extends NumberTag<LinShortTag> {
     /**
      * Creates the tag with an empty name.
      *

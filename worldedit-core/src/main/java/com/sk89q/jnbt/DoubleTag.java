@@ -19,6 +19,7 @@
 
 package com.sk89q.jnbt;
 
+import com.fastasyncworldedit.core.jnbt.NumberTag;
 import org.enginehub.linbus.tree.LinDoubleTag;
 
 /**
@@ -27,7 +28,7 @@ import org.enginehub.linbus.tree.LinDoubleTag;
  * @deprecated Use {@link LinDoubleTag}.
  */
 @Deprecated
-public final class DoubleTag extends Tag<Double, LinDoubleTag> {
+public final class DoubleTag extends NumberTag<LinDoubleTag> {
 
     /**
      * Creates the tag with an empty name.
