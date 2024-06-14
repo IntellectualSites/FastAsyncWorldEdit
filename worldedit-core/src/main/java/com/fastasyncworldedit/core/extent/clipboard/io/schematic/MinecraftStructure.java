@@ -236,11 +236,11 @@ public class MinecraftStructure implements ClipboardReader, ClipboardWriter {
             BaseEntity state = entity.getState();
             if (state != null) {
                 CompoundTag nbt = state.getNbtData();
-                Map<String, Tag<?, ?>> nbtMap = nbt.getValue();
+                Map<String, Tag<?, ?>> nbtMap = new HashMap<>(nbt.getValue());
                 // Replace rotation data
                 nbtMap.put("Rotation", writeRotation(entity.getLocation()));
                 nbtMap.put("id", new StringTag(state.getType().id()));
-                Map<String, Object> entityMap = FaweCache.INSTANCE.asMap("pos", pos, "blockPos", blockPos, "nbt", nbt);
+                Map<String, Object> entityMap = FaweCache.INSTANCE.asMap("pos", pos, "blockPos", blockPos, "nbt", new CompoundTag(nbtMap));
                 entities.add(entityMap);
             }
         }
