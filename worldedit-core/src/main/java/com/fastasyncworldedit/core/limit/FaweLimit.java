@@ -27,6 +27,7 @@ public class FaweLimit {
     public boolean FAST_PLACEMENT = false;
     public boolean CONFIRM_LARGE = true;
     public boolean RESTRICT_HISTORY_TO_REGIONS = true;
+    public boolean ALLOW_LEGACY = true;
     public Set<String> STRIP_NBT = null;
     public boolean UNIVERSAL_DISALLOWED_BLOCKS = true;
     public Set<String> DISALLOWED_BLOCKS = null;
@@ -125,6 +126,7 @@ public class FaweLimit {
         MAX.RESTRICT_HISTORY_TO_REGIONS = false;
         MAX.STRIP_NBT = Collections.emptySet();
         MAX.UNIVERSAL_DISALLOWED_BLOCKS = false;
+        MAX.ALLOW_LEGACY = true;
         MAX.DISALLOWED_BLOCKS = Collections.emptySet();
         MAX.REMAP_PROPERTIES = Collections.emptySet();
         MAX.MAX_RADIUS = Integer.MAX_VALUE;
@@ -257,13 +259,13 @@ public class FaweLimit {
                 && !RESTRICT_HISTORY_TO_REGIONS
                 && (STRIP_NBT == null || STRIP_NBT.isEmpty())
                 // && !UNIVERSAL_DISALLOWED_BLOCKS --> do not include this, it effectively has no relevance
+                && ALLOW_LEGACY
                 && (DISALLOWED_BLOCKS == null || DISALLOWED_BLOCKS.isEmpty())
                 && (REMAP_PROPERTIES == null || REMAP_PROPERTIES.isEmpty())
                 && MAX_RADIUS == Integer.MAX_VALUE
                 && MAX_SUPER_PICKAXE_SIZE == Integer.MAX_VALUE
                 && MAX_BRUSH_RADIUS == Integer.MAX_VALUE
                 && MAX_BUTCHER_RADIUS == Integer.MAX_VALUE;
-
     }
 
     public void set(FaweLimit limit) {
@@ -284,6 +286,7 @@ public class FaweLimit {
         RESTRICT_HISTORY_TO_REGIONS = limit.RESTRICT_HISTORY_TO_REGIONS;
         STRIP_NBT = limit.STRIP_NBT;
         UNIVERSAL_DISALLOWED_BLOCKS = limit.UNIVERSAL_DISALLOWED_BLOCKS;
+        ALLOW_LEGACY = limit.ALLOW_LEGACY;
         DISALLOWED_BLOCKS = limit.DISALLOWED_BLOCKS;
         REMAP_PROPERTIES = limit.REMAP_PROPERTIES;
         MAX_RADIUS = limit.MAX_RADIUS;
@@ -311,6 +314,7 @@ public class FaweLimit {
         limit.RESTRICT_HISTORY_TO_REGIONS = RESTRICT_HISTORY_TO_REGIONS;
         limit.STRIP_NBT = STRIP_NBT;
         limit.UNIVERSAL_DISALLOWED_BLOCKS = UNIVERSAL_DISALLOWED_BLOCKS;
+        limit.ALLOW_LEGACY = ALLOW_LEGACY;
         limit.DISALLOWED_BLOCKS = DISALLOWED_BLOCKS;
         limit.REMAP_PROPERTIES = REMAP_PROPERTIES;
         limit.MAX_RADIUS = MAX_RADIUS;

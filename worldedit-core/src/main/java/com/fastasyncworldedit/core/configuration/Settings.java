@@ -191,6 +191,7 @@ public class Settings extends Config {
                     }
                 }
                 limit.UNIVERSAL_DISALLOWED_BLOCKS &= newLimit.UNIVERSAL_DISALLOWED_BLOCKS;
+                limit.ALLOW_LEGACY &= newLimit.ALLOW_LEGACY;
 
                 if (limit.DISALLOWED_BLOCKS == null) {
                     limit.DISALLOWED_BLOCKS = newLimit.DISALLOWED_BLOCKS.isEmpty() ? Collections.emptySet() : new HashSet<>(
@@ -439,6 +440,10 @@ public class Settings extends Config {
                 " - If fast-placement is disabled, this may cause edits to be slower."
         })
         public boolean UNIVERSAL_DISALLOWED_BLOCKS = true;
+        @Comment({
+                "If legacy, mumerical, blocks IDs should be able to be used (i.e. 12:2),"
+        })
+        public boolean ALLOW_LEGACY = true;
         @Comment({
                 "List of blocks to deny use of. Can be either an entire block type or a block with a specific property value.",
                 "Where block properties are specified, any blockstate with the property will be disallowed (e.g. all directions",
