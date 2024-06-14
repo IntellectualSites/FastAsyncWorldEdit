@@ -536,7 +536,7 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
                         Blocks.STRUCTURE_BLOCK.defaultBlockState()
                 ),
                 __ -> (net.minecraft.nbt.CompoundTag) fromNativeLin(nbtData)
-       ));
+        ));
     }
 
     @Override

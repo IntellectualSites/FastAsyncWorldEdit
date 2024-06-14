@@ -75,7 +75,7 @@ public class CompoundTag extends Tag<Object, LinCompoundTag> {
     public Map<String, Tag<?, ?>> getValue() {
         return ImmutableMap.copyOf(Maps.transformValues(
             linTag.value(),
-            tag -> (Tag<?, ?>) AdventureNBTConverter.toJnbtTag((LinTag) tag)
+            tag -> (Tag<?, ?>) LinBusConverter.toJnbtTag((LinTag) tag)
         ));
     }
 
@@ -371,7 +371,7 @@ public class CompoundTag extends Tag<Object, LinCompoundTag> {
     }
 
     public Vector3 getEntityPosition() {
-        List<?> posTags = getList("Pos");
+        List<? extends Tag<?, ?>> posTags = getList("Pos");
         double x = ((NumberTag) posTags.get(0)).getValue().doubleValue();
         double y = ((NumberTag) posTags.get(1)).getValue().doubleValue();
         double z = ((NumberTag) posTags.get(2)).getValue().doubleValue();
@@ -379,7 +379,7 @@ public class CompoundTag extends Tag<Object, LinCompoundTag> {
     }
 
     public Location getEntityLocation(Extent extent) {
-        List<?> rotTag = getList("Rotation");
+        List<? extends Tag<?, ?>> rotTag = getList("Rotation");
         float yaw = ((NumberTag) rotTag.get(0)).getValue().floatValue();
         float pitch = ((NumberTag) rotTag.get(1)).getValue().floatValue();
         return new Location(extent, getEntityPosition(), yaw, pitch);
@@ -396,7 +396,7 @@ public class CompoundTag extends Tag<Object, LinCompoundTag> {
         if (this.getValue().isEmpty()) {
             return raw;
         }
-        for (Map.Entry<String, ? extends Tag> entry : getValue().entrySet()) {
+        for (Map.Entry<String, Tag<?, ?>> entry : getValue().entrySet()) {
             raw.put(entry.getKey(), entry.getValue().toRaw());
         }
         return raw;

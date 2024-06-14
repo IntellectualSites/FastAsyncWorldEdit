@@ -9,7 +9,7 @@ import com.fastasyncworldedit.core.internal.io.FaweInputStream;
 import com.fastasyncworldedit.core.internal.io.FaweOutputStream;
 import com.fastasyncworldedit.core.jnbt.streamer.StreamDelegate;
 import com.fastasyncworldedit.core.jnbt.streamer.ValueReader;
-import com.sk89q.jnbt.AdventureNBTConverter;
+import com.sk89q.jnbt.LinBusConverter;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.IntTag;
 import com.sk89q.jnbt.NBTInputStream;
@@ -110,7 +110,7 @@ public class FastSchematicReader extends NBTSchematicReader {
             return tag;
         }
         //FAWE start - LinTag
-        return (CompoundTag) AdventureNBTConverter.fromLinBus(fixer.fixUp(
+        return (CompoundTag) LinBusConverter.fromLinBus(fixer.fixUp(
                 DataFixer.FixTypes.BLOCK_ENTITY,
                 tag.toLinTag(),
                 dataVersion
@@ -123,7 +123,7 @@ public class FastSchematicReader extends NBTSchematicReader {
             return tag;
         }
         //FAWE start - LinTag
-        return (CompoundTag) AdventureNBTConverter.fromLinBus(fixer.fixUp(
+        return (CompoundTag) LinBusConverter.fromLinBus(fixer.fixUp(
                 DataFixer.FixTypes.ENTITY,
                 tag.toLinTag(),
                 dataVersion

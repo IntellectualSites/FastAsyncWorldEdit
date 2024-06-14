@@ -49,7 +49,7 @@ import java.util.function.Function;
  * @deprecated JNBT is being removed in WE8.
  */
 @Deprecated(forRemoval = true)
-public class AdventureNBTConverter {
+public class LinBusConverter {
 
     private static final BiMap<Class<? extends Tag>, LinTagType<?>> TAG_TYPES =
             new ImmutableBiMap.Builder<Class<? extends Tag>, LinTagType<?>>()
@@ -123,7 +123,7 @@ public class AdventureNBTConverter {
         };
     }
 
-    private AdventureNBTConverter() {
+    private LinBusConverter() {
     }
 
     public static Tag fromLinBus(LinTag other) {

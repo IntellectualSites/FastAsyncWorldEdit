@@ -64,7 +64,7 @@ public final class NBTOutputStream extends OutputStream implements Closeable, Da
      * @throws IOException if an I/O error occurs.
      */
     public NBTOutputStream(OutputStream os) {
-            this(os instanceof DataOutput ? (DataOutput) os : new DataOutputStream(os));
+        this(os instanceof DataOutput ? (DataOutput) os : new DataOutputStream(os));
     }
 
     // Don't delete

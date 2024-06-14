@@ -21,7 +21,7 @@ package com.sk89q.worldedit.extent.clipboard.io;
 
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.google.common.collect.Maps;
-import com.sk89q.jnbt.AdventureNBTConverter;
+import com.sk89q.jnbt.LinBusConverter;
 import com.sk89q.jnbt.ByteArrayTag;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.IntArrayTag;
@@ -275,7 +275,7 @@ public class SpongeSchematicReader extends NBTSchematicReader {
                 values.remove("Pos");
                 if (fixer != null) {
                     //FAWE start - LinTag
-                    tileEntity = ((CompoundTag) AdventureNBTConverter.fromLinBus(fixer.fixUp(
+                    tileEntity = ((CompoundTag) LinBusConverter.fromLinBus(fixer.fixUp(
                             DataFixer.FixTypes.BLOCK_ENTITY,
                             new CompoundTag(values).toLinTag(),
                             dataVersion
@@ -422,7 +422,7 @@ public class SpongeSchematicReader extends NBTSchematicReader {
 
             if (fixer != null) {
                 //FAWE start - LinTag
-                entityTag = (CompoundTag) AdventureNBTConverter.fromLinBus(fixer.fixUp(
+                entityTag = (CompoundTag) LinBusConverter.fromLinBus(fixer.fixUp(
                         DataFixer.FixTypes.ENTITY,
                         entityTag.toLinTag(),
                         dataVersion

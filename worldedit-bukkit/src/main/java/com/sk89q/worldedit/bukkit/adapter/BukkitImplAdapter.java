@@ -27,7 +27,7 @@ import com.fastasyncworldedit.core.extent.processor.lighting.RelighterFactory;
 import com.fastasyncworldedit.core.queue.IBatchProcessor;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.implementation.packet.ChunkPacket;
-import com.sk89q.jnbt.AdventureNBTConverter;
+import com.sk89q.jnbt.LinBusConverter;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.blocks.BaseItemStack;
@@ -291,7 +291,7 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
 
     @Deprecated
     default Tag toNative(T foreign) {
-        return AdventureNBTConverter.toJnbtTag(toNativeLin(foreign));
+        return LinBusConverter.toJnbtTag(toNativeLin(foreign));
     }
 
     default LinTag<?> toNativeLin(T foreign) {
@@ -310,7 +310,7 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
         if (foreign == null) {
             return null;
         }
-        return fromNative(AdventureNBTConverter.toJnbtTag(foreign));
+        return fromNative(LinBusConverter.toJnbtTag(foreign));
     }
 
     @Nullable

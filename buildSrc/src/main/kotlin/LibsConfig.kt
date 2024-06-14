@@ -39,16 +39,14 @@ fun Project.applyLibrariesConfiguration() {
     group = "${rootProject.group}.worldedit-libs"
 
     val relocations = mapOf(
-            "net.kyori.text" to "com.sk89q.worldedit.util.formatting.text",
-            "net.kyori.minecraft" to "com.sk89q.worldedit.util.kyori"
+        "net.kyori.text" to "com.sk89q.worldedit.util.formatting.text",
+        "net.kyori.minecraft" to "com.sk89q.worldedit.util.kyori"
 
     )
 
     tasks.register<ShadowJar>("jar") {
         configurations = listOf(project.configurations["shade"])
         archiveClassifier.set("")
-
-        exclude("module-info.class")
 
         dependencies {
             exclude(dependency("com.google.guava:guava"))
@@ -140,7 +138,7 @@ fun Project.applyLibrariesConfiguration() {
             attribute(Category.CATEGORY_ATTRIBUTE, project.objects.named(Category.LIBRARY))
             attribute(Bundling.BUNDLING_ATTRIBUTE, project.objects.named(Bundling.SHADOWED))
             attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, project.objects.named(LibraryElements.JAR))
-            attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, 17)
+            attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, 21)
         }
         outgoing.artifact(tasks.named("jar"))
     }
@@ -155,7 +153,7 @@ fun Project.applyLibrariesConfiguration() {
             attribute(Category.CATEGORY_ATTRIBUTE, project.objects.named(Category.LIBRARY))
             attribute(Bundling.BUNDLING_ATTRIBUTE, project.objects.named(Bundling.SHADOWED))
             attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, project.objects.named(LibraryElements.JAR))
-            attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, 17)
+            attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, 21)
         }
         outgoing.artifact(tasks.named("jar"))
     }

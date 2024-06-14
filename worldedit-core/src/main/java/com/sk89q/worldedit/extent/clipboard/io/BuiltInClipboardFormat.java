@@ -118,6 +118,7 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
             return name.endsWith(".schematic") || name.endsWith(".mcedit") || name.endsWith(".mce");
         }
     },
+
     /**
      * @deprecated Slow, resource intensive, but sometimes safer than using the recommended
      *         {@link BuiltInClipboardFormat#FAST}.
