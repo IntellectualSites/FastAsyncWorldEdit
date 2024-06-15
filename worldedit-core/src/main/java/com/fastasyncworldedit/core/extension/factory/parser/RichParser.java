@@ -161,7 +161,7 @@ public abstract class RichParser<E> extends InputParser<E> implements AliasedPar
      * @return an array of extracted arguments.
      * @throws InputParseException if {@code requireClosing == true} and the count of [ != the count of ]
      */
-    protected String[] extractArguments(String input, boolean requireClosing) throws InputParseException {
+    protected static String[] extractArguments(String input, boolean requireClosing) throws InputParseException {
         int open = 0; // the "level"
         int openIndex = 0;
         int i = 0;
