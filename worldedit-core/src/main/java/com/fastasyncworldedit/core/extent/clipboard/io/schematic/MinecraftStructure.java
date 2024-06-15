@@ -19,7 +19,6 @@ import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldedit.registry.state.AbstractProperty;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.block.BaseBlock;
@@ -28,7 +27,6 @@ import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.entity.EntityTypes;
 import com.sk89q.worldedit.world.storage.NBTConversions;
-import it.unimi.dsi.fastutil.chars.Char2IntArrayMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import org.apache.logging.log4j.Logger;
 
@@ -168,7 +166,7 @@ public class MinecraftStructure implements ClipboardReader, ClipboardWriter {
         }
         Map<String, Object> structure = FaweCache.INSTANCE.asMap("version", 1, "author", owner);
         // ignored: version / owner
-        Char2IntArrayMap indexes = new Char2IntArrayMap();
+        Int2ObjectArrayMap<Integer> indexes = new Int2ObjectArrayMap<>();
         // Size
         structure.put("size", Arrays.asList(width, height, length));
         // Palette
