@@ -28,6 +28,7 @@ import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Countable;
 import com.sk89q.worldedit.world.World;
@@ -142,6 +143,7 @@ public class ParallelQueueExtent extends PassthroughExtent {
             final ForkJoinTask[] tasks = IntStream.range(0, size).mapToObj(i -> handler.submit(() -> {
                 try {
                     final Filter newFilter = filter.fork();
+                    final Region newRegion = region.clone();
                     // Create a chunk that we will reuse/reset for each operation
                     final SingleThreadQueueExtent queue = (SingleThreadQueueExtent) getNewQueue();
                     queue.setFastMode(fastmode);
@@ -163,7 +165,7 @@ public class ParallelQueueExtent extends PassthroughExtent {
                                     chunkX = pos.x();
                                     chunkZ = pos.z();
                                 }
-                                block = queue.apply(block, newFilter, region, chunkX, chunkZ, full);
+                                block = queue.apply(block, newFilter, newRegion, chunkX, chunkZ, full);
                             }
                             queue.flush();
                         } catch (Throwable t) {

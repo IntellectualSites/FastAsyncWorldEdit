@@ -71,7 +71,7 @@ public class PolyhedralRegion extends AbstractRegion {
     public PolyhedralRegion(PolyhedralRegion region) {
         this(region.world);
         vertices.addAll(region.vertices);
-        triangles.addAll(region.triangles);
+        region.triangles.forEach(triangle -> triangles.add(triangle.clone()));
         vertexBacklog.addAll(region.vertexBacklog);
 
         minimumPoint = region.minimumPoint;
