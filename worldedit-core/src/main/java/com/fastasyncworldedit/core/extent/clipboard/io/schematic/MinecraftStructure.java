@@ -28,6 +28,7 @@ import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.entity.EntityTypes;
 import com.sk89q.worldedit.world.storage.NBTConversions;
+import it.unimi.dsi.fastutil.chars.Char2IntArrayMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import org.apache.logging.log4j.Logger;
 
@@ -167,34 +168,30 @@ public class MinecraftStructure implements ClipboardReader, ClipboardWriter {
         }
         Map<String, Object> structure = FaweCache.INSTANCE.asMap("version", 1, "author", owner);
         // ignored: version / owner
-        Int2ObjectArrayMap<Integer> indexes = new Int2ObjectArrayMap<>();
+        Char2IntArrayMap indexes = new Char2IntArrayMap();
         // Size
         structure.put("size", Arrays.asList(width, height, length));
         // Palette
         ArrayList<HashMap<String, Object>> palette = new ArrayList<>();
         for (BlockVector3 point : region) {
             BlockState block = clipboard.getBlock(point);
-            int combined = block.getInternalId();
+            char ordinal = block.getOrdinalChar();
             BlockType type = block.getBlockType();
 
-            if (type == BlockTypes.STRUCTURE_VOID || indexes.containsKey(combined)) {
+            if (type == BlockTypes.STRUCTURE_VOID || indexes.containsKey(ordinal)) {
                 continue;
             }
 
-            indexes.put(combined, (Integer) palette.size());
+            indexes.put(ordinal, palette.size());
             HashMap<String, Object> paletteEntry = new HashMap<>();
             paletteEntry.put("Name", type.id());
             if (block.getInternalId() != type.getInternalId()) {
                 Map<String, Object> properties = null;
-                for (AbstractProperty property : (List<AbstractProperty<?>>) type.getProperties()) {
-                    int propIndex = property.getIndex(block.getInternalId());
-                    if (propIndex != 0) {
-                        if (properties == null) {
-                            properties = new HashMap<>();
-                        }
-                        Object value = property.getValues().get(propIndex);
-                        properties.put(property.getName(), value.toString());
+                for (Map.Entry<Property<?>, Object> entry : block.getStates().entrySet()) {
+                    if (properties == null) {
+                        properties = new HashMap<>();
                     }
+                    properties.put(entry.getKey().getName(), entry.getValue().toString());
                 }
                 if (properties != null) {
                     paletteEntry.put("Properties", properties);
@@ -211,16 +208,23 @@ public class MinecraftStructure implements ClipboardReader, ClipboardWriter {
         for (BlockVector3 point : region) {
             BaseBlock block = clipboard.getFullBlock(point);
             if (block.getBlockType() != BlockTypes.STRUCTURE_VOID) {
-                int combined = block.getInternalId();
-                int index = indexes.get(combined);
-                List<Integer> pos = Arrays.asList(point.x() - min.x(),
-                        point.y() - min.y(), point.z() - min.z()
+                char ordinal = block.getOrdinalChar();
+                int index = indexes.get(ordinal);
+                List<Integer> pos = Arrays.asList(
+                        point.x() - min.x(),
+                        point.y() - min.y(),
+                        point.z() - min.z()
                 );
                 if (!block.hasNbtData()) {
                     blocks.add(FaweCache.INSTANCE.asMap("state", index, "pos", pos));
                 } else {
+                    Map<String, Tag> tag = new HashMap<>(block.getNbtData().getValue());
+                    tag.remove("x");
+                    tag.remove("y");
+                    tag.remove("z");
+                    CompoundTag cTag = new CompoundTag(tag);
                     blocks.add(
-                            FaweCache.INSTANCE.asMap("state", index, "pos", pos, "nbt", block.getNbtData()));
+                            FaweCache.INSTANCE.asMap("state", index, "pos", pos, "nbt", cTag));
                 }
             }
         }
@@ -231,8 +235,16 @@ public class MinecraftStructure implements ClipboardReader, ClipboardWriter {
         ArrayList<Map<String, Object>> entities = new ArrayList<>();
         for (Entity entity : clipboard.getEntities()) {
             Location loc = entity.getLocation();
-            List<Double> pos = Arrays.asList(loc.x(), loc.y(), loc.z());
-            List<Integer> blockPos = Arrays.asList(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
+            List<Double> pos = Arrays.asList(
+                    loc.x() - min.x(),
+                    loc.y() - min.y(),
+                    loc.z() - min.z()
+            );
+            List<Integer> blockPos = Arrays.asList(
+                    loc.getBlockX() - min.x(),
+                    loc.getBlockY() - min.y(),
+                    loc.getBlockZ() - min.z()
+            );
             BaseEntity state = entity.getState();
             if (state != null) {
                 CompoundTag nbt = state.getNbtData();
