@@ -1572,6 +1572,10 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType MUSIC_DISC_CHIRP = init();
     @Nullable
+    public static final ItemType MUSIC_DISC_CREATOR = init();
+    @Nullable
+    public static final ItemType MUSIC_DISC_CREATOR_MUSIC_BOX = init();
+    @Nullable
     public static final ItemType MUSIC_DISC_FAR = init();
     @Nullable
     public static final ItemType MUSIC_DISC_MALL = init();
@@ -1581,6 +1585,8 @@ public final class ItemTypes {
     public static final ItemType MUSIC_DISC_OTHERSIDE = init();
     @Nullable
     public static final ItemType MUSIC_DISC_PIGSTEP = init();
+    @Nullable
+    public static final ItemType MUSIC_DISC_PRECIPICE = init();
     @Nullable
     public static final ItemType MUSIC_DISC_RELIC = init();
     @Nullable
