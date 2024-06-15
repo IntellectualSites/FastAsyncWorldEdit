@@ -412,8 +412,6 @@ public class EllipsoidRegion extends AbstractRegion {
                 return;
             }
 
-            block = block.initChunk(chunk.getX(), chunk.getZ());
-
             // Get the solid layers
             int cy = center.y();
             int diffYFull = MathMan.usqrt(diffY2);
