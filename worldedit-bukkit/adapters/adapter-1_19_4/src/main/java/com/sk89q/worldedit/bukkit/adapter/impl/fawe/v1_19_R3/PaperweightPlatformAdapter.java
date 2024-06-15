@@ -98,7 +98,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
 
     private static final Field fieldTickingFluidCount;
     private static final Field fieldTickingBlockCount;
-    private static final Field fieldNonEmptyBlockCount;
+    private static final Field fieldBiomes;
 
     private static final MethodHandle methodGetVisibleChunk;
 
@@ -139,8 +139,8 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             fieldTickingFluidCount.setAccessible(true);
             fieldTickingBlockCount = LevelChunkSection.class.getDeclaredField(Refraction.pickName("tickingBlockCount", "g"));
             fieldTickingBlockCount.setAccessible(true);
-            fieldNonEmptyBlockCount = LevelChunkSection.class.getDeclaredField(Refraction.pickName("nonEmptyBlockCount", "f"));
-            fieldNonEmptyBlockCount.setAccessible(true);
+            fieldBiomes = LevelChunkSection.class.getDeclaredField(Refraction.pickName("biomes", "j"));
+            fieldBiomes.setAccessible(true);
 
             Method getVisibleChunkIfPresent = ChunkMap.class.getDeclaredMethod(Refraction.pickName(
                     "getVisibleChunkIfPresent",
@@ -500,6 +500,14 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                 null
         );
         return new LevelChunkSection(layer, dataPaletteBlocks, biomes);
+    }
+
+    public static void setBiomesToChunkSection(LevelChunkSection section, PalettedContainer<Holder<Biome>> biomes) {
+        try {
+            fieldBiomes.set(section, biomes);
+        } catch (IllegalAccessException e) {
+            LOGGER.error("Could not set biomes to chunk section", e);
+        }
     }
 
     /**
