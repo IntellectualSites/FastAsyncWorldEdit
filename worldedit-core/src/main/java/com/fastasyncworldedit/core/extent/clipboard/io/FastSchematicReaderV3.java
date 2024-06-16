@@ -24,12 +24,14 @@ import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import it.unimi.dsi.fastutil.io.FastBufferedInputStream;
 import org.apache.logging.log4j.Logger;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Objects;
 import java.util.OptionalInt;
 import java.util.UUID;
 import java.util.function.BiConsumer;
@@ -65,7 +67,8 @@ public class FastSchematicReaderV3 implements ClipboardReader {
 
     private boolean needAdditionalIterate = true;
 
-    public FastSchematicReaderV3(InputStream stream) throws IOException {
+    public FastSchematicReaderV3(@NonNull InputStream stream) throws IOException {
+        Objects.requireNonNull(stream, "stream");
         if (stream instanceof FileInputStream fileInputStream) {
             stream = new ResettableFileInputStream(fileInputStream);
         } else if (!stream.markSupported()) {
