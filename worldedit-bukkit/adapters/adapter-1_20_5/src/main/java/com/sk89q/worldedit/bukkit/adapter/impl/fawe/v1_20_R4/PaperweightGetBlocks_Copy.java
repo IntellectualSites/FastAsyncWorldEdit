@@ -46,7 +46,7 @@ public class PaperweightGetBlocks_Copy implements IChunkGet {
     private final int maxHeight;
     final ServerLevel serverLevel;
     final LevelChunk levelChunk;
-    private PalettedContainer<Holder<Biome>>[] biomes = null;
+    private Holder<Biome>[][] biomes = null;
 
     protected PaperweightGetBlocks_Copy(LevelChunk levelChunk) {
         this.levelChunk = levelChunk;
@@ -145,7 +145,7 @@ public class PaperweightGetBlocks_Copy implements IChunkGet {
 
     @Override
     public BiomeType getBiomeType(int x, int y, int z) {
-        Holder<Biome> biome = biomes[(y >> 4) - getMinSectionPosition()].get(x >> 2, (y & 15) >> 2, z >> 2);
+        Holder<Biome> biome = biomes[(y >> 4) - getMinSectionPosition()][(y & 12) << 2 | (z & 12) | (x & 12) >> 2];
         return PaperweightPlatformAdapter.adapt(biome, serverLevel);
     }
 
@@ -174,10 +174,15 @@ public class PaperweightGetBlocks_Copy implements IChunkGet {
 
     protected void storeBiomes(int layer, PalettedContainerRO<Holder<Biome>> biomeData) {
         if (biomes == null) {
-            biomes = new PalettedContainer[getSectionCount()];
+            biomes = new Holder[getSectionCount()][];
+        }
+        if (biomes[layer] == null) {
+            biomes[layer] = new Holder[64];
         }
         if (biomeData instanceof PalettedContainer<Holder<Biome>> palettedContainer) {
-            biomes[layer] = palettedContainer.copy();
+            for (int i = 0; i < 64; i++) {
+                biomes[layer][i] = palettedContainer.get(i);
+            }
         } else {
             LOGGER.error(
                     "Cannot correctly save biomes to history. Expected class type {} but got {}",
