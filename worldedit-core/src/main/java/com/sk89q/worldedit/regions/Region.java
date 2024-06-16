@@ -483,7 +483,7 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
             }
             return set;
         } else {
-            return null;
+            return set;
         }
     }
 
