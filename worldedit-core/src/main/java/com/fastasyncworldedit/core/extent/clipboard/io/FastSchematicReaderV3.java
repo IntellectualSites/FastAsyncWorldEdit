@@ -148,7 +148,7 @@ public class FastSchematicReaderV3 implements ClipboardReader {
         if (clipboard == null) {
             throw new NullPointerException("Failed to read schematic: Clipboard is null");
         }
-        clipboard.setOrigin(this.offset);
+        clipboard.setOrigin(this.offset.multiply().multiply(-1));
         if (clipboard instanceof SimpleClipboard simpleClipboard && !this.offset.equals(BlockVector3.ZERO)) {
             clipboard = new BlockArrayClipboard(simpleClipboard, this.offset);
         }
