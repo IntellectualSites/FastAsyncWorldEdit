@@ -39,6 +39,7 @@ import com.sk89q.worldedit.extent.clipboard.io.sponge.SpongeSchematicV2Reader;
 import com.sk89q.worldedit.extent.clipboard.io.sponge.SpongeSchematicV2Writer;
 import com.sk89q.worldedit.extent.clipboard.io.sponge.SpongeSchematicV3Reader;
 import com.sk89q.worldedit.extent.clipboard.io.sponge.SpongeSchematicV3Writer;
+import it.unimi.dsi.fastutil.io.FastBufferedInputStream;
 import org.anarres.parallelgzip.ParallelGZIPOutputStream;
 
 import java.io.BufferedInputStream;
@@ -85,7 +86,8 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
 
         @Override
         public boolean isFormat(final File file) {
-            try (final DataInputStream stream = new DataInputStream(new GZIPInputStream(Files.newInputStream(file.toPath())));
+            try (final DataInputStream stream = new DataInputStream(new FastBufferedInputStream(new GZIPInputStream(Files.newInputStream(
+                    file.toPath()))));
                  final NBTInputStream nbt = new NBTInputStream(stream)) {
                 if (stream.readByte() != NBTConstants.TYPE_COMPOUND) {
                     return false;
@@ -150,7 +152,8 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
 
         @Override
         public boolean isFormat(File file) {
-            try (final DataInputStream stream = new DataInputStream(new GZIPInputStream(Files.newInputStream(file.toPath())));
+            try (final DataInputStream stream =
+                         new DataInputStream(new FastBufferedInputStream(new GZIPInputStream(Files.newInputStream(file.toPath()))));
                  final NBTInputStream nbt = new NBTInputStream(stream)) {
                 if (stream.readByte() != NBTConstants.TYPE_COMPOUND) {
                     return false;
@@ -208,7 +211,6 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
         }
     },
     SPONGE_V1_SCHEMATIC("sponge.1") {
-
         @Override
         public String getPrimaryFileExtension() {
             return "schem";
