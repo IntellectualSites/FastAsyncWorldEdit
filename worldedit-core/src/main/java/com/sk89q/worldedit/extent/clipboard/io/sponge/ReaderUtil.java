@@ -62,56 +62,64 @@ import static com.sk89q.worldedit.extent.clipboard.io.SchematicNbtUtil.requireTa
 /**
  * Common code shared between schematic readers.
  */
-class ReaderUtil {
+public class ReaderUtil { //FAWE - make public
+
     private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     static void checkSchematicVersion(int version, CompoundTag schematicTag) throws IOException {
         int schematicVersion = requireTag(schematicTag.getValue(), "Version", IntTag.class)
-            .getValue();
+                .getValue();
 
         checkState(
-            version == schematicVersion,
-            "Schematic is not version %s, but %s", version, schematicVersion
+                version == schematicVersion,
+                "Schematic is not version %s, but %s", version, schematicVersion
         );
     }
 
-    static VersionedDataFixer getVersionedDataFixer(Map<String, Tag> schematic, Platform platform,
-                                                    int liveDataVersion) throws IOException {
+    static VersionedDataFixer getVersionedDataFixer(
+            Map<String, Tag> schematic, Platform platform,
+            int liveDataVersion
+    ) throws IOException {
+        //FAWE - delegate to new method
+        return getVersionedDataFixer(requireTag(schematic, "DataVersion", IntTag.class).getValue(), platform, liveDataVersion);
+    }
+
+    //FAWE start - make getVersionedDataFixer without schematic compound + public
+    public static VersionedDataFixer getVersionedDataFixer(int schematicDataVersion, Platform platform, int liveDataVersion) {
         DataFixer fixer = null;
-        int dataVersion = requireTag(schematic, "DataVersion", IntTag.class).getValue();
-        if (dataVersion < 0) {
+        if (schematicDataVersion < 0) {
             LOGGER.warn(
-                "Schematic has an unknown data version ({}). Data may be incompatible.",
-                dataVersion
+                    "Schematic has an unknown data version ({}). Data may be incompatible.",
+                    schematicDataVersion
             );
-        } else if (dataVersion > liveDataVersion) {
+        } else if (schematicDataVersion > liveDataVersion) {
             LOGGER.warn(
-                "Schematic was made in a newer Minecraft version ({} > {})."
-                    + " Data may be incompatible.",
-                dataVersion, liveDataVersion
+                    "Schematic was made in a newer Minecraft version ({} > {})."
+                            + " Data may be incompatible.",
+                    schematicDataVersion, liveDataVersion
             );
-        } else if (dataVersion < liveDataVersion) {
+        } else if (schematicDataVersion < liveDataVersion) {
             fixer = platform.getDataFixer();
             if (fixer != null) {
                 LOGGER.debug(
-                    "Schematic was made in an older Minecraft version ({} < {}),"
-                        + " will attempt DFU.",
-                    dataVersion, liveDataVersion
+                        "Schematic was made in an older Minecraft version ({} < {}),"
+                                + " will attempt DFU.",
+                        schematicDataVersion, liveDataVersion
                 );
             } else {
                 LOGGER.info(
-                    "Schematic was made in an older Minecraft version ({} < {}),"
-                        + " but DFU is not available. Data may be incompatible.",
-                    dataVersion, liveDataVersion
+                        "Schematic was made in an older Minecraft version ({} < {}),"
+                                + " but DFU is not available. Data may be incompatible.",
+                        schematicDataVersion, liveDataVersion
                 );
             }
         }
-
-        return new VersionedDataFixer(dataVersion, fixer);
+        return new VersionedDataFixer(schematicDataVersion, fixer);
     }
+    //FAWE end
 
     static Map<Integer, BlockState> decodePalette(
-        Map<String, Tag> paletteObject, VersionedDataFixer fixer
+            Map<String, Tag> paletteObject, VersionedDataFixer fixer
     ) throws IOException {
         Map<Integer, BlockState> palette = new HashMap<>();
 
@@ -136,15 +144,15 @@ class ReaderUtil {
     }
 
     static void initializeClipboardFromBlocks(
-        Clipboard clipboard, Map<Integer, BlockState> palette, byte[] blocks, ListTag tileEntities,
-        VersionedDataFixer fixer, boolean dataIsNested
+            Clipboard clipboard, Map<Integer, BlockState> palette, byte[] blocks, ListTag tileEntities,
+            VersionedDataFixer fixer, boolean dataIsNested
     ) throws IOException {
         Map<BlockVector3, Map<String, Tag>> tileEntitiesMap = new HashMap<>();
         if (tileEntities != null) {
             List<Map<String, Tag>> tileEntityTags = tileEntities.getValue().stream()
-                .map(tag -> (CompoundTag) tag)
-                .map(CompoundTag::getValue)
-                .collect(Collectors.toList());
+                    .map(tag -> (CompoundTag) tag)
+                    .map(CompoundTag::getValue)
+                    .collect(Collectors.toList());
 
             for (Map<String, Tag> tileEntity : tileEntityTags) {
                 int[] pos = requireTag(tileEntity, "Pos", IntArrayTag.class).getValue();
@@ -168,8 +176,8 @@ class ReaderUtil {
                 values.put("id", tileEntity.get("Id"));
                 if (fixer.isActive()) {
                     tileEntity = ((CompoundTag) AdventureNBTConverter.fromAdventure(fixer.fixUp(
-                        DataFixer.FixTypes.BLOCK_ENTITY,
-                        new CompoundTag(values).asBinaryTag()
+                            DataFixer.FixTypes.BLOCK_ENTITY,
+                            new CompoundTag(values).asBinaryTag()
                     ))).getValue();
                 } else {
                     tileEntity = values;
@@ -191,7 +199,7 @@ class ReaderUtil {
                 Map<String, Tag> tileEntity = tileEntitiesMap.get(offsetPos);
                 if (tileEntity != null) {
                     clipboard.setBlock(
-                        offsetPos, state.toBaseBlock(new CompoundTag(tileEntity))
+                            offsetPos, state.toBaseBlock(new CompoundTag(tileEntity))
                     );
                 } else {
                     clipboard.setBlock(offsetPos, state);
@@ -222,8 +230,10 @@ class ReaderUtil {
         return BlockVector3.at(parts[0], parts[1], parts[2]);
     }
 
-    static void readEntities(BlockArrayClipboard clipboard, List<Tag> entList,
-                             VersionedDataFixer fixer, boolean positionIsRelative) throws IOException {
+    static void readEntities(
+            BlockArrayClipboard clipboard, List<Tag> entList,
+            VersionedDataFixer fixer, boolean positionIsRelative
+    ) throws IOException {
         if (entList.isEmpty()) {
             return;
         }
@@ -249,20 +259,21 @@ class ReaderUtil {
             }
             CompoundTag dataTag = dataTagBuilder.putString("id", id).build();
             dataTag = ((CompoundTag) AdventureNBTConverter.fromAdventure(fixer.fixUp(
-                DataFixer.FixTypes.ENTITY,
-                dataTag.asBinaryTag()
+                    DataFixer.FixTypes.ENTITY,
+                    dataTag.asBinaryTag()
             )));
 
             EntityType entityType = EntityTypes.get(id);
             if (entityType != null) {
-                Location location = NBTConversions.toLocation(clipboard,
-                    requireTag(tags, "Pos", ListTag.class),
-                    requireTag(dataTag.getValue(), "Rotation", ListTag.class)
+                Location location = NBTConversions.toLocation(
+                        clipboard,
+                        requireTag(tags, "Pos", ListTag.class),
+                        requireTag(dataTag.getValue(), "Rotation", ListTag.class)
                 );
                 BaseEntity state = new BaseEntity(entityType, dataTag);
                 if (positionIsRelative) {
                     location = location.setPosition(
-                        location.toVector().add(clipboard.getMinimumPoint().toVector3())
+                            location.toVector().add(clipboard.getMinimumPoint().toVector3())
                     );
                 }
                 clipboard.createEntity(location, state);
@@ -274,4 +285,5 @@ class ReaderUtil {
 
     private ReaderUtil() {
     }
+
 }

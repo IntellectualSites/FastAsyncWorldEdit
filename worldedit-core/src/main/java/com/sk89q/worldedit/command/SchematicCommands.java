@@ -396,7 +396,7 @@ public class SchematicCommands {
                             .isInSubDirectory(saveDir, file)) + ")"));
                     return;
                 }
-                if (format == null) {
+                if (format == null || !format.isFormat(file)) {
                     format = ClipboardFormats.findByFile(file);
                     if (format == null) {
                         actor.print(Caption.of("worldedit.schematic.unknown-format", TextComponent.of(formatName)));

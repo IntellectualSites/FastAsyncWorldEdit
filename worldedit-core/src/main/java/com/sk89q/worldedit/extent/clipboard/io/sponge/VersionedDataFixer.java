@@ -24,12 +24,12 @@ import com.sk89q.worldedit.world.DataFixer;
 
 import javax.annotation.Nullable;
 
-final class VersionedDataFixer {
+public final class VersionedDataFixer { //FAWE - public
     private final int dataVersion;
     @Nullable
     private final DataFixer fixer;
 
-    VersionedDataFixer(int dataVersion, @Nullable DataFixer fixer) {
+    public VersionedDataFixer(int dataVersion, @Nullable DataFixer fixer) { //FAWE - public
         this.dataVersion = dataVersion;
         this.fixer = fixer;
     }
