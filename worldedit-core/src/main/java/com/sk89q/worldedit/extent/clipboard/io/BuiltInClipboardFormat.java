@@ -67,13 +67,7 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
 
         @Override
         public ClipboardReader getReader(InputStream inputStream) throws IOException {
-            if (inputStream instanceof FileInputStream fileInputStream) {
-                inputStream = new ResettableFileInputStream(fileInputStream);
-            }
-            BufferedInputStream buffered = new BufferedInputStream(new GZIPInputStream(new BufferedInputStream(inputStream)));
-            DataInputStream dataInputStream = new DataInputStream(buffered);
-            NBTInputStream nbtStream = new NBTInputStream(buffered);
-            return new FastSchematicReaderV3(dataInputStream, nbtStream);
+            return new FastSchematicReaderV3(inputStream);
         }
 
         @Override

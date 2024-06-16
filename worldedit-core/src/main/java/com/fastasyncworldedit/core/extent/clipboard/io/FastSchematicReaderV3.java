@@ -2,6 +2,7 @@ package com.fastasyncworldedit.core.extent.clipboard.io;
 
 import com.fastasyncworldedit.core.extent.clipboard.LinearClipboard;
 import com.fastasyncworldedit.core.extent.clipboard.SimpleClipboard;
+import com.fastasyncworldedit.core.internal.io.ResettableFileInputStream;
 import com.fastasyncworldedit.core.internal.io.VarIntStreamIterator;
 import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.sk89q.jnbt.NBTConstants;
@@ -21,16 +22,20 @@ import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
+import it.unimi.dsi.fastutil.io.FastBufferedInputStream;
 import org.apache.logging.log4j.Logger;
 
+import java.io.BufferedInputStream;
 import java.io.DataInputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.Objects;
+import java.io.InputStream;
 import java.util.OptionalInt;
 import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.function.BooleanSupplier;
 import java.util.function.Function;
+import java.util.zip.GZIPInputStream;
 
 /**
  * ClipboardReader for the Sponge Schematic Format v3.
@@ -42,11 +47,13 @@ public class FastSchematicReaderV3 implements ClipboardReader {
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
 
-    private final DataInputStream dataInputStream;
-    private final NBTInputStream nbtInputStream;
+    private final InputStream resetableInputStream;
+    private final MutableBlockVector3 dimensions = MutableBlockVector3.at(0, 0, 0);
+
+    private DataInputStream dataInputStream;
+    private NBTInputStream nbtInputStream;
 
     private VersionedDataFixer dataFixer;
-    private MutableBlockVector3 dimensions = MutableBlockVector3.at(0, 0, 0);
     private BlockVector3 offset;
     private BlockState[] blockPalette;
     private BiomeType[] biomePalette;
@@ -58,29 +65,32 @@ public class FastSchematicReaderV3 implements ClipboardReader {
 
     private boolean needAdditionalIterate = true;
 
-    public FastSchematicReaderV3(
-            DataInputStream dataInputStream,
-            NBTInputStream nbtInputStream
-    ) throws IOException {
-        this.dataInputStream = Objects.requireNonNull(dataInputStream, "dataInputStream");
-        this.nbtInputStream = Objects.requireNonNull(nbtInputStream, "nbtInputStream");
-        if (!dataInputStream.markSupported()) {
-            throw new IOException("InputStream does not support mark");
+    public FastSchematicReaderV3(InputStream stream) throws IOException {
+        if (stream instanceof FileInputStream fileInputStream) {
+            stream = new ResettableFileInputStream(fileInputStream);
+        } else if (!stream.markSupported()) {
+            LOGGER.warn("InputStream does not support mark - will be wrapped using in memory buffer");
+            stream = new BufferedInputStream(stream);
         }
+        this.resetableInputStream = stream;
+        this.resetableInputStream.mark(Integer.MAX_VALUE);
     }
 
     @Override
     public Clipboard read(final UUID uuid, final Function<BlockVector3, Clipboard> createOutput) throws IOException {
-        dataInputStream.skipNBytes(1 + 2); // 1 Byte = TAG_Compound, 2 Bytes = Short (Length of tag name = "")
-        dataInputStream.skipNBytes(1 + 2 + 9); // as above + 9 bytes = "Schematic"
-        this.dataInputStream.mark(Integer.MAX_VALUE); // allow resets to basically the start of stream (file) - just skip header
-
         Clipboard clipboard = null;
 
         while (needAdditionalIterate) {
             this.needAdditionalIterate = false;
-            this.dataInputStream.reset();
-            this.dataInputStream.mark(Integer.MAX_VALUE);
+            this.resetableInputStream.reset();
+            this.resetableInputStream.mark(Integer.MAX_VALUE);
+            final FastBufferedInputStream buffer = new FastBufferedInputStream(new GZIPInputStream(this.resetableInputStream));
+            this.dataInputStream = new DataInputStream(buffer);
+            this.nbtInputStream = new NBTInputStream(buffer);
+
+            // Skip header
+            dataInputStream.skipNBytes(1 + 2); // 1 Byte = TAG_Compound, 2 Bytes = Short (Length of tag name = "")
+            dataInputStream.skipNBytes(1 + 2 + 9); // as above + 9 bytes = "Schematic"
 
             while (dataInputStream.readByte() != NBTConstants.TYPE_END) {
                 String tag = readTagName();
@@ -320,7 +330,7 @@ public class FastSchematicReaderV3 implements ClipboardReader {
 
     @Override
     public void close() throws IOException {
-        nbtInputStream.close(); // closes the DataInputStream implicitly
+        resetableInputStream.close(); // closes all underlying resources implicitly
     }
 
 }
