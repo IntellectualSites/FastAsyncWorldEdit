@@ -93,7 +93,6 @@ public class FastSchematicReaderV3 implements ClipboardReader {
         Clipboard clipboard = null;
 
         while (needAdditionalIterate) {
-            System.out.println("reset");
             this.needAdditionalIterate = false;
             this.resetableInputStream.reset();
             this.resetableInputStream.mark(Integer.MAX_VALUE);
@@ -108,7 +107,6 @@ public class FastSchematicReaderV3 implements ClipboardReader {
             byte type;
             while ((type = dataInputStream.readByte()) != NBTConstants.TYPE_END) {
                 String tag = readTagName();
-                System.out.println(type + ": " + tag);
                 switch (tag) {
                     case "Version" -> this.dataInputStream.skipNBytes(4); // We know it's v3 (skip 4 byte version int)
                     case "DataVersion" -> {
