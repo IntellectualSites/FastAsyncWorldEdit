@@ -17,13 +17,23 @@ public abstract class CharBlocks implements IBlocks {
     protected static final Section FULL = new Section() {
         @Override
         public char[] get(CharBlocks blocks, int layer) {
-            return blocks.blocks[layer];
+            char[] arr = blocks.blocks[layer];
+            if (arr == null) {
+                // Chunk probably trimmed mid-operations, but do nothing about it to avoid other issues
+                return EMPTY.get(blocks, layer, false);
+            }
+            return arr;
         }
 
         // Ignore aggressive switch here.
         @Override
         public char[] get(CharBlocks blocks, int layer, boolean aggressive) {
-            return blocks.blocks[layer];
+            char[] arr = blocks.blocks[layer];
+            if (arr == null) {
+                // Chunk probably trimmed mid-operations, but do nothing about it to avoid other issues
+                return EMPTY.get(blocks, layer, false);
+            }
+            return arr;
         }
 
         @Override
