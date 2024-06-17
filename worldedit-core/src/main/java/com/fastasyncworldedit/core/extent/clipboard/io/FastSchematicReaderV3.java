@@ -5,9 +5,12 @@ import com.fastasyncworldedit.core.extent.clipboard.SimpleClipboard;
 import com.fastasyncworldedit.core.internal.io.ResettableFileInputStream;
 import com.fastasyncworldedit.core.internal.io.VarIntStreamIterator;
 import com.fastasyncworldedit.core.math.MutableBlockVector3;
+import com.fastasyncworldedit.core.math.MutableVector3;
+import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.NBTConstants;
 import com.sk89q.jnbt.NBTInputStream;
 import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
@@ -16,14 +19,20 @@ import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
 import com.sk89q.worldedit.extent.clipboard.io.sponge.VersionedDataFixer;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.Vector3;
+import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.util.concurrency.LazyReference;
+import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
 import com.sk89q.worldedit.world.DataFixer;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
+import com.sk89q.worldedit.world.entity.EntityType;
 import it.unimi.dsi.fastutil.io.FastBufferedInputStream;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.util.TriConsumer;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.io.BufferedInputStream;
@@ -84,6 +93,7 @@ public class FastSchematicReaderV3 implements ClipboardReader {
         Clipboard clipboard = null;
 
         while (needAdditionalIterate) {
+            System.out.println("reset");
             this.needAdditionalIterate = false;
             this.resetableInputStream.reset();
             this.resetableInputStream.mark(Integer.MAX_VALUE);
@@ -95,8 +105,10 @@ public class FastSchematicReaderV3 implements ClipboardReader {
             dataInputStream.skipNBytes(1 + 2); // 1 Byte = TAG_Compound, 2 Bytes = Short (Length of tag name = "")
             dataInputStream.skipNBytes(1 + 2 + 9); // as above + 9 bytes = "Schematic"
 
-            while (dataInputStream.readByte() != NBTConstants.TYPE_END) {
+            byte type;
+            while ((type = dataInputStream.readByte()) != NBTConstants.TYPE_END) {
                 String tag = readTagName();
+                System.out.println(type + ": " + tag);
                 switch (tag) {
                     case "Version" -> this.dataInputStream.skipNBytes(4); // We know it's v3 (skip 4 byte version int)
                     case "DataVersion" -> {
@@ -112,6 +124,7 @@ public class FastSchematicReaderV3 implements ClipboardReader {
                     }
                     case "Width", "Height", "Length" -> {
                         if (clipboard != null) {
+                            this.dataInputStream.skipNBytes(2); // Skip short value
                             continue;
                         }
                         if (tag.equals("Width")) {
@@ -137,11 +150,16 @@ public class FastSchematicReaderV3 implements ClipboardReader {
                     case "Blocks" -> {
                         if (clipboard == null) {
                             needAdditionalIterate = true;
+                            this.nbtInputStream.readTagPayloadLazy(NBTConstants.TYPE_COMPOUND, 0);
                         } else {
                             this.readBlocks(clipboard);
                         }
                     }
                     case "Biomes" -> {
+                        if (biomesWritten) {
+                            this.nbtInputStream.readTagPayloadLazy(NBTConstants.TYPE_COMPOUND, 0);
+                            continue;
+                        }
                         if (clipboard == null) {
                             needAdditionalIterate = true;
                         } else {
@@ -149,11 +167,20 @@ public class FastSchematicReaderV3 implements ClipboardReader {
                         }
                     }
                     case "Entities" -> {
+                        if (entitiesWritten) {
+                            this.nbtInputStream.readTagPayloadLazy(NBTConstants.TYPE_LIST, 0);
+                            continue;
+                        }
                         if (clipboard == null) {
                             needAdditionalIterate = true;
+                            this.nbtInputStream.readTagPayloadLazy(NBTConstants.TYPE_LIST, 0);
                         } else {
                             this.readEntities(clipboard);
                         }
+                    }
+                    default -> {
+                        LOGGER.warn("Unknown tag {} with name {} - skipping", type, tag);
+                        this.nbtInputStream.readTagPayloadLazy(type, 0);
                     }
                 }
             }
@@ -173,7 +200,6 @@ public class FastSchematicReaderV3 implements ClipboardReader {
         return this.dataVersion > -1 ? OptionalInt.of(this.dataVersion) : OptionalInt.empty();
     }
 
-    // TODO: BlockEntities
     private void readBlocks(Clipboard target) throws IOException {
         BiConsumer<Integer, Character> blockStateApplier;
         if (target instanceof LinearClipboard linearClipboard) {
@@ -212,11 +238,16 @@ public class FastSchematicReaderV3 implements ClipboardReader {
                         }
                         return;
                     }
-                    // TODO: Process block entities
                     try {
-                        this.nbtInputStream.readTagPayloadLazy(type, 0);
+                        // Can't write TileEntities if block itself are non-existent
+                        if (!blocksWritten) {
+                            needAdditionalIterate = true;
+                            this.nbtInputStream.readTagPayloadLazy(NBTConstants.TYPE_LIST, 0);
+                            return;
+                        }
+                        this.readTileEntities(target);
                     } catch (IOException e) {
-                        throw new RuntimeException(e);
+                        LOGGER.warn("Failed to read tile entities", e);
                     }
                 }
         );
@@ -262,8 +293,107 @@ public class FastSchematicReaderV3 implements ClipboardReader {
     }
 
     private void readEntities(Clipboard target) throws IOException {
-        // TODO
-        this.nbtInputStream.readTagPayloadLazy(NBTConstants.TYPE_LIST, 0);
+        if (this.dataInputStream.read() != NBTConstants.TYPE_COMPOUND) {
+            throw new IOException("Expected a compound block for entity");
+        }
+        readEntityContainers((id, pos, data) -> {
+            final EntityType entityType = EntityType.REGISTRY.get(id);
+            if (entityType == null) {
+                LOGGER.warn("Unknown entity {} @ {},{},{} - skipping", id, pos.x(), pos.y(), pos.z());
+                return;
+            }
+            // Back and forth conversion, because setTile only supports JNBT CompoundTag
+            // whereas DataFixer can only handle BinaryTagCompound...
+            CompoundBinaryTag tag = this.dataFixer.fixUp(DataFixer.FixTypes.ENTITY, data.asBinaryTag());
+            if (tag == null) {
+                LOGGER.warn("Failed to fix-up entity for {} @ {},{},{} - skipping", id, pos.x(), pos.y(), pos.z());
+                return;
+            }
+            if (target.createEntity(new Location(target, pos), new BaseEntity(entityType, LazyReference.computed(tag))) == null) {
+                LOGGER.warn("Failed to create entity - does the clipboard support entities?");
+            }
+        });
+        this.entitiesWritten = true;
+    }
+
+    private void readTileEntities(Clipboard target) throws IOException {
+        if (this.dataInputStream.read() != NBTConstants.TYPE_COMPOUND) {
+            throw new IOException("Expected a compound block for tile entity");
+        }
+        readEntityContainers((id, pos, data) -> {
+            // Back and forth conversion, because setTile only supports JNBT CompoundTag
+            // whereas DataFixer can only handle BinaryTagCompound...
+            CompoundBinaryTag tag = this.dataFixer.fixUp(DataFixer.FixTypes.BLOCK_ENTITY, data.asBinaryTag());
+            if (tag == null) {
+                LOGGER.warn("Failed to fix-up tile entity for {} @ {},{},{} - skipping",
+                        id, pos.blockX(), pos.blockY(), pos.blockZ()
+                );
+                return;
+            }
+            if (!target.setTile(pos.blockX(), pos.blockY(), pos.blockZ(), new CompoundTag(tag))) {
+                LOGGER.warn("Failed to set tile entity - does the clipboard support tile entities?");
+            }
+        });
+    }
+
+    private void readEntityContainers(TriConsumer<String, Vector3, CompoundTag> writer) throws IOException {
+        MutableVector3 pos = new MutableVector3();
+        CompoundTag tag;
+        String id;
+        int count = this.dataInputStream.readInt();
+        byte type;
+        while (count-- > 0) {
+            pos.setComponents(Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE);
+            tag = null;
+            id = null;
+            while ((type = this.dataInputStream.readByte()) != NBTConstants.TYPE_END) {
+                switch (type) {
+                    // Depending on the type of entity container (tile vs "normal") the pos consists of either doubles or ints
+                    case NBTConstants.TYPE_INT_ARRAY -> {
+                        if (!readTagName().equals("Pos")) {
+                            throw new IOException("Expected INT_ARRAY tag to be Pos");
+                        }
+                        this.dataInputStream.skipNBytes(4); // count of following ints - for pos = 3
+                        pos.mutX(this.dataInputStream.readInt());
+                        pos.mutY(this.dataInputStream.readInt());
+                        pos.mutZ(this.dataInputStream.readInt());
+                    }
+                    case NBTConstants.TYPE_LIST -> {
+                        if (!readTagName().equals("Pos")) {
+                            throw new IOException("Expected LIST tag to be Pos");
+                        }
+                        if (this.dataInputStream.readByte() != NBTConstants.TYPE_DOUBLE) {
+                            throw new IOException("Expected LIST Pos tag to contain DOUBLE");
+                        }
+                        this.dataInputStream.skipNBytes(4); // count of following doubles - for pos = 3
+                        pos.mutX(this.dataInputStream.readDouble());
+                        pos.mutY(this.dataInputStream.readDouble());
+                        pos.mutZ(this.dataInputStream.readDouble());
+                    }
+                    case NBTConstants.TYPE_STRING -> {
+                        if (!readTagName().equals("Id")) {
+                            throw new IOException("Expected STRING tag to be Id");
+                        }
+                        id = this.dataInputStream.readUTF();
+                    }
+                    case NBTConstants.TYPE_COMPOUND -> {
+                        if (!readTagName().equals("Data")) {
+                            throw new IOException("Expected COMPOUND tag to be Data");
+                        }
+                        tag = (CompoundTag) this.nbtInputStream.readTagPayload(NBTConstants.TYPE_COMPOUND, 0);
+                    }
+                    default -> throw new IOException("Unexpected tag in compound: " + type);
+                }
+            }
+            // Data can be actually null is not required somehow?
+            if (tag == null) {
+                continue;
+            }
+            if (id == null) {
+                throw new IOException("Missing Id tag in compound");
+            }
+            writer.accept(id, pos, tag);
+        }
     }
 
     /**
@@ -281,9 +411,6 @@ public class FastSchematicReaderV3 implements ClipboardReader {
             BiConsumer<Integer, Character> paletteDataApplier,
             BiConsumer<Byte, String> additionalTag
     ) throws IOException {
-        if (dataAlreadyWritten.getAsBoolean()) {
-            return;
-        }
         boolean hasPalette = paletteAlreadyInitialized.getAsBoolean();
         byte type;
         String tag;
@@ -291,7 +418,7 @@ public class FastSchematicReaderV3 implements ClipboardReader {
             tag = readTagName();
             if (tag.equals("Palette")) {
                 if (hasPalette) {
-                    // Skip data, as palette already exists
+                    // Skip palette, as already exists
                     this.nbtInputStream.readTagPayloadLazy(NBTConstants.TYPE_COMPOUND, 0);
                 } else {
                     // Read all palette entries
@@ -305,9 +432,15 @@ public class FastSchematicReaderV3 implements ClipboardReader {
                 continue;
             }
             if (tag.equals("Data")) {
+                if (dataAlreadyWritten.getAsBoolean()) {
+                    // Skip data, as already written
+                    this.nbtInputStream.readTagPayloadLazy(NBTConstants.TYPE_BYTE_ARRAY, 0);
+                    continue;
+                }
                 // No palette or dimensions are yet available - will need to read Data next round
                 if (!hasPalette || !areDimensionsAvailable()) {
                     this.needAdditionalIterate = true;
+                    this.nbtInputStream.readTagPayloadLazy(NBTConstants.TYPE_BYTE_ARRAY, 0);
                     return;
                 }
                 int length = this.dataInputStream.readInt();
