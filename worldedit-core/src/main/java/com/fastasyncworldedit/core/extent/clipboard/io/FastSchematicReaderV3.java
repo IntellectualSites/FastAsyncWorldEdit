@@ -309,7 +309,7 @@ public class FastSchematicReaderV3 implements ClipboardReader {
                 LOGGER.warn("Failed to fix-up entity for {} @ {},{},{} - skipping", id, pos.x(), pos.y(), pos.z());
                 return;
             }
-            if (target.createEntity(new Location(target, pos), new BaseEntity(entityType, LazyReference.computed(tag))) == null) {
+            if (target.createEntity(new Location(target, pos), new BaseEntity(entityType, new CompoundTag(tag))) == null) {
                 LOGGER.warn("Failed to create entity - does the clipboard support entities?");
             }
         });
