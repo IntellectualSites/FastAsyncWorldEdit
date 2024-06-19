@@ -106,7 +106,8 @@ public class MaskingExtent extends AbstractDelegateExtent implements IBatchProce
     @Override
     public IChunkSet processSet(final IChunk chunk, final IChunkGet get, final IChunkSet set) {
         final ChunkFilterBlock filter = getOrCreateFilterBlock.apply(Thread.currentThread().getId());
-        return filter.filter(chunk, get, set, MaskingExtent.this);
+        filter.initChunk(chunk.getX(), chunk.getZ());
+        return filter.filter(chunk, get, set, this);
     }
 
     @Override
