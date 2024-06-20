@@ -86,7 +86,8 @@ public class FastSchematicReaderV3 implements ClipboardReader {
         if (stream instanceof FileInputStream fileInputStream) {
             stream = new ResettableFileInputStream(fileInputStream);
         } else if (!stream.markSupported()) {
-            LOGGER.warn("InputStream does not support mark - will be wrapped using in memory buffer");
+            // TODO: How to handle remote schematics using URL streams? (-> SchematicCommands.java L350-352)
+            // LOGGER.warn("InputStream does not support mark - will be wrapped using in memory buffer");
             stream = new BufferedInputStream(stream);
         }
         this.resetableInputStream = stream;
