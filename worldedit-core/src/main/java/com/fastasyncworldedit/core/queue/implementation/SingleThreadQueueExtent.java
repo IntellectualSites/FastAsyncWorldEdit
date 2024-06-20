@@ -473,7 +473,7 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
     }
 
     @Override
-    public ChunkFilterBlock initFilterBlock() {
+    public ChunkFilterBlock createFilterBlock() {
         return new CharFilterBlock(this);
     }
 

@@ -37,14 +37,14 @@ public abstract class FaweParser<T> extends InputParser<T> implements AliasedPar
         for (int i = 0; i < toParse.length(); i++) {
             char c = toParse.charAt(i);
             switch (c) {
-                case ',', '&' -> {
+                case ',', '&', ' ' -> {
                     if (expression) {
                         continue;
                     }
                     String result = toParse.substring(last, i);
                     if (!result.isEmpty()) {
                         inputs.add(result);
-                        and.add(c == '&');
+                        and.add(c == '&' || c == ' ');
                     } else {
                         throw new InputParseException(Caption.of("fawe.error.parse.invalid-dangling-character", c));
                     }
