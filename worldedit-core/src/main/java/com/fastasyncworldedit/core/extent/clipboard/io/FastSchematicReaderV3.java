@@ -65,7 +65,6 @@ import java.util.zip.GZIPInputStream;
 public class FastSchematicReaderV3 implements ClipboardReader {
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
-    private static final int CONTENT_DATA_TAGS = 3; // Blocks, Biomes, Entities
 
     private final InputStream resetableInputStream;
     private final MutableBlockVector3 dimensions = MutableBlockVector3.at(0, 0, 0);
@@ -81,7 +80,7 @@ public class FastSchematicReaderV3 implements ClipboardReader {
     private int dataVersion = -1;
 
 
-    public FastSchematicReaderV3(@NonNull InputStream stream) throws IOException {
+    public FastSchematicReaderV3(@NonNull InputStream stream) {
         Objects.requireNonNull(stream, "stream");
         if (stream instanceof FileInputStream fileInputStream) {
             stream = new ResettableFileInputStream(fileInputStream);
