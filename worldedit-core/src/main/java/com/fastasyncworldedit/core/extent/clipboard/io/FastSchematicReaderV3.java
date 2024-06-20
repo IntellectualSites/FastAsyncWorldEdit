@@ -21,7 +21,6 @@ import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.util.Location;
-import com.sk89q.worldedit.util.concurrency.LazyReference;
 import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
 import com.sk89q.worldedit.world.DataFixer;
 import com.sk89q.worldedit.world.biome.BiomeType;
@@ -40,8 +39,10 @@ import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.OptionalInt;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.function.BooleanSupplier;
@@ -53,13 +54,22 @@ import java.util.zip.GZIPInputStream;
  * Not necessarily much faster than {@link com.sk89q.worldedit.extent.clipboard.io.sponge.SpongeSchematicV3Reader}, but uses a
  * stream based approach to keep the memory overhead minimal (especially in larger schematics)
  */
+
+/**
+ * TODO: - Validate FileChannel reset performance (especially for network drive / remote backed storage)
+ * TODO: ^ try to compare speed and memory / cpu usage when - instead of resetting the stream - caching the palette using LZ4 /
+ * TODO    ZSTD until other data is available
+ * TODO: fix tile entity locations (+ validate entity location)
+ */
 @SuppressWarnings("removal") // JNBT
 public class FastSchematicReaderV3 implements ClipboardReader {
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
+    private static final int CONTENT_DATA_TAGS = 3; // Blocks, Biomes, Entities
 
     private final InputStream resetableInputStream;
     private final MutableBlockVector3 dimensions = MutableBlockVector3.at(0, 0, 0);
+    private final Set<String> remainingTags = new HashSet<>();
 
     private DataInputStream dataInputStream;
     private NBTInputStream nbtInputStream;
@@ -70,11 +80,6 @@ public class FastSchematicReaderV3 implements ClipboardReader {
     private BiomeType[] biomePalette;
     private int dataVersion = -1;
 
-    private boolean blocksWritten = false;
-    private boolean biomesWritten = false;
-    private boolean entitiesWritten = false;
-
-    private boolean needAdditionalIterate = true;
 
     public FastSchematicReaderV3(@NonNull InputStream stream) throws IOException {
         Objects.requireNonNull(stream, "stream");
@@ -92,105 +97,81 @@ public class FastSchematicReaderV3 implements ClipboardReader {
     public Clipboard read(final UUID uuid, final Function<BlockVector3, Clipboard> createOutput) throws IOException {
         Clipboard clipboard = null;
 
-        while (needAdditionalIterate) {
-            this.needAdditionalIterate = false;
-            this.resetableInputStream.reset();
-            this.resetableInputStream.mark(Integer.MAX_VALUE);
-            final FastBufferedInputStream buffer = new FastBufferedInputStream(new GZIPInputStream(this.resetableInputStream));
-            this.dataInputStream = new DataInputStream(buffer);
-            this.nbtInputStream = new NBTInputStream(buffer);
+        this.setSubStreams();
+        skipHeader(this.dataInputStream);
 
-            // Skip header
-            dataInputStream.skipNBytes(1 + 2); // 1 Byte = TAG_Compound, 2 Bytes = Short (Length of tag name = "")
-            dataInputStream.skipNBytes(1 + 2 + 9); // as above + 9 bytes = "Schematic"
+        byte type;
+        String tag;
+        while ((type = dataInputStream.readByte()) != NBTConstants.TYPE_END) {
+            tag = readTagName();
+            switch (tag) {
+                case "DataVersion" -> {
+                    this.dataVersion = this.dataInputStream.readInt();
+                    this.dataFixer = new VersionedDataFixer(
+                            this.dataVersion,
+                            WorldEdit
+                                    .getInstance()
+                                    .getPlatformManager()
+                                    .queryCapability(Capability.WORLD_EDITING)
+                                    .getDataFixer()
+                    );
+                }
+                case "Offset" -> readOffset();
+                case "Width" -> this.dimensions.mutX(this.dataInputStream.readShort() & 0xFFFF);
+                case "Height" -> this.dimensions.mutY(this.dataInputStream.readShort() & 0xFFFF);
+                case "Length" -> this.dimensions.mutZ(this.dataInputStream.readShort() & 0xFFFF);
+                case "Blocks" -> readBlocks(clipboard);
+                case "Biomes" -> readBiomes(clipboard);
+                case "Entities" -> readEntities(clipboard);
+                default -> this.nbtInputStream.readTagPayloadLazy(type, 0);
+            }
+            if (clipboard == null && this.areDimensionsAvailable()) {
+                clipboard = createOutput.apply(this.dimensions);
+            }
+        }
 
-            byte type;
+        if (clipboard == null) {
+            throw new IOException("Invalid schematic - missing dimensions");
+        }
+        if (dataFixer == null) {
+            throw new IOException("Invalid schematic - missing DataVersion");
+        }
+
+        outer:
+        while (!this.remainingTags.isEmpty()) {
+            this.reset();
+            skipHeader(this.dataInputStream);
             while ((type = dataInputStream.readByte()) != NBTConstants.TYPE_END) {
-                String tag = readTagName();
+                tag = readTagName();
+                if (!this.remainingTags.remove(tag)) {
+                    this.nbtInputStream.readTagPayloadLazy(type, 0);
+                    continue;
+                }
                 switch (tag) {
-                    case "Version" -> this.dataInputStream.skipNBytes(4); // We know it's v3 (skip 4 byte version int)
-                    case "DataVersion" -> {
-                        this.dataVersion = this.dataInputStream.readInt();
-                        this.dataFixer = new VersionedDataFixer(
-                                this.dataVersion,
-                                WorldEdit
-                                        .getInstance()
-                                        .getPlatformManager()
-                                        .queryCapability(Capability.WORLD_EDITING)
-                                        .getDataFixer()
-                        );
-                    }
-                    case "Width", "Height", "Length" -> {
-                        if (clipboard != null) {
-                            this.dataInputStream.skipNBytes(2); // Skip short value
-                            continue;
-                        }
-                        if (tag.equals("Width")) {
-                            this.dimensions.mutX(this.dataInputStream.readShort() & 0xFFFF);
-                        } else if (tag.equals("Height")) {
-                            this.dimensions.mutY(this.dataInputStream.readShort() & 0xFFFF);
-                        } else {
-                            this.dimensions.mutZ(this.dataInputStream.readShort() & 0xFFFF);
-                        }
-                        if (areDimensionsAvailable()) {
-                            clipboard = createOutput.apply(this.dimensions);
-                        }
-                    }
-                    case "Offset" -> {
-                        this.dataInputStream.skipNBytes(4); // Array Length field (4 byte int)
-                        this.offset = BlockVector3.at(
-                                this.dataInputStream.readInt(),
-                                this.dataInputStream.readInt(),
-                                this.dataInputStream.readInt()
-                        );
-                    }
-                    case "Metadata" -> this.nbtInputStream.readTagPayloadLazy(NBTConstants.TYPE_COMPOUND, 0); // Skip metadata
-                    case "Blocks" -> {
-                        if (clipboard == null) {
-                            needAdditionalIterate = true;
-                            this.nbtInputStream.readTagPayloadLazy(NBTConstants.TYPE_COMPOUND, 0);
-                        } else {
-                            this.readBlocks(clipboard);
-                        }
-                    }
-                    case "Biomes" -> {
-                        if (biomesWritten) {
-                            this.nbtInputStream.readTagPayloadLazy(NBTConstants.TYPE_COMPOUND, 0);
-                            continue;
-                        }
-                        if (clipboard == null) {
-                            needAdditionalIterate = true;
-                        } else {
-                            this.readBiomes(clipboard);
-                        }
-                    }
-                    case "Entities" -> {
-                        if (entitiesWritten) {
-                            this.nbtInputStream.readTagPayloadLazy(NBTConstants.TYPE_LIST, 0);
-                            continue;
-                        }
-                        if (clipboard == null) {
-                            needAdditionalIterate = true;
-                            this.nbtInputStream.readTagPayloadLazy(NBTConstants.TYPE_LIST, 0);
-                        } else {
-                            this.readEntities(clipboard);
-                        }
-                    }
-                    default -> {
-                        LOGGER.warn("Unknown tag {} with name {} - skipping", type, tag);
-                        this.nbtInputStream.readTagPayloadLazy(type, 0);
-                    }
+                    case "Blocks" -> readBlocks(clipboard);
+                    case "Biomes" -> readBiomes(clipboard);
+                    case "Entities" -> readEntities(clipboard);
+                    default -> this.nbtInputStream.readTagPayloadLazy(type, 0); // Should never happen, but just in case
+                }
+                if (this.remainingTags.isEmpty()) {
+                    break outer;
                 }
             }
         }
-        if (clipboard == null) {
-            throw new NullPointerException("Failed to read schematic: Clipboard is null");
-        }
-        clipboard.setOrigin(this.offset.multiply().multiply(-1));
+        clipboard.setOrigin(this.offset.multiply(-1));
         if (clipboard instanceof SimpleClipboard simpleClipboard && !this.offset.equals(BlockVector3.ZERO)) {
             clipboard = new BlockArrayClipboard(simpleClipboard, this.offset);
         }
         return clipboard;
+    }
+
+    private void readOffset() throws IOException {
+        this.dataInputStream.skipNBytes(4); // Array Length field (4 byte int)
+        this.offset = BlockVector3.at(
+                this.dataInputStream.readInt(),
+                this.dataInputStream.readInt(),
+                this.dataInputStream.readInt()
+        );
     }
 
     @Override
@@ -213,9 +194,9 @@ public class FastSchematicReaderV3 implements ClipboardReader {
         }
         this.blockPalette = new BlockState[BlockTypesCache.states.length];
         readPalette(
+                target != null,
+                "Blocks",
                 () -> this.blockPalette.length == 0,
-                () -> this.blocksWritten,
-                () -> this.blocksWritten = true,
                 (value, index) -> {
                     value = dataFixer.fixUp(DataFixer.FixTypes.BLOCK_STATE, value);
                     try {
@@ -228,21 +209,24 @@ public class FastSchematicReaderV3 implements ClipboardReader {
                 blockStateApplier,
                 (type, tag) -> {
                     if (!tag.equals("BlockEntities")) {
-                        LOGGER.warn("Found additional tag in block palette: {}. Will skip tag.", tag);
+                        LOGGER.warn("Found additional tag in block palette: {} (0x{}). Will skip tag.", tag, type);
                         try {
-                            this.nbtInputStream.readTagPayloadLazy(type, 0);
+                            this.nbtInputStream.readTagPayloadLazy(NBTConstants.TYPE_LIST, 0);
                         } catch (IOException e) {
                             LOGGER.error("Failed to skip additional tag", e);
                         }
                         return;
                     }
-                    try {
-                        // Can't write TileEntities if block itself are non-existent
-                        if (!blocksWritten) {
-                            needAdditionalIterate = true;
-                            this.nbtInputStream.readTagPayloadLazy(NBTConstants.TYPE_LIST, 0);
-                            return;
+                    if (target == null || dataFixer == null) {
+                        try {
+                            this.nbtInputStream.readTagPayloadLazy(type, 0);
+                        } catch (IOException e) {
+                            LOGGER.error("Failed to skip tile entities", e);
                         }
+                        this.remainingTags.add("Blocks");
+                        return;
+                    }
+                    try {
                         this.readTileEntities(target);
                     } catch (IOException e) {
                         LOGGER.warn("Failed to read tile entities", e);
@@ -266,9 +250,9 @@ public class FastSchematicReaderV3 implements ClipboardReader {
         }
         this.biomePalette = new BiomeType[BiomeType.REGISTRY.size()];
         readPalette(
+                target != null,
+                "Biomes",
                 () -> this.biomePalette.length == 0,
-                () -> this.biomesWritten,
-                () -> this.biomesWritten = true,
                 (value, index) -> {
                     value = dataFixer.fixUp(DataFixer.FixTypes.BIOME, value);
                     BiomeType biomeType = BiomeTypes.get(value);
@@ -280,11 +264,10 @@ public class FastSchematicReaderV3 implements ClipboardReader {
                 },
                 biomeApplier,
                 (type, tag) -> {
-                    LOGGER.warn("Found additional tag in biome palette: {}. Will skip tag.", tag);
                     try {
                         this.nbtInputStream.readTagPayloadLazy(type, 0);
                     } catch (IOException e) {
-                        LOGGER.error("Failed to skip additional tag", e);
+                        LOGGER.error("Failed to skip additional tag in biome container: {}", tag, e);
                     }
                 }
         );
@@ -311,10 +294,14 @@ public class FastSchematicReaderV3 implements ClipboardReader {
                 LOGGER.warn("Failed to create entity - does the clipboard support entities?");
             }
         });
-        this.entitiesWritten = true;
     }
 
     private void readTileEntities(Clipboard target) throws IOException {
+        if (target == null || this.dataFixer == null) {
+            this.nbtInputStream.readTagPayloadLazy(NBTConstants.TYPE_LIST, 0);
+            this.remainingTags.add("Entities");
+            return;
+        }
         if (this.dataInputStream.read() != NBTConstants.TYPE_COMPOUND) {
             throw new IOException("Expected a compound block for tile entity");
         }
@@ -402,9 +389,9 @@ public class FastSchematicReaderV3 implements ClipboardReader {
      * @param paletteDataApplier Invoked for each 'Data' entry using the data index and the palette index at the data index
      */
     private void readPalette(
+            boolean hasClipboard,
+            String rootTag,
             BooleanSupplier paletteAlreadyInitialized,
-            BooleanSupplier dataAlreadyWritten,
-            Runnable firstWrite,
             BiConsumer<String, Character> paletteInitializer,
             BiConsumer<Integer, Character> paletteDataApplier,
             BiConsumer<Byte, String> additionalTag
@@ -418,37 +405,41 @@ public class FastSchematicReaderV3 implements ClipboardReader {
                 if (hasPalette) {
                     // Skip palette, as already exists
                     this.nbtInputStream.readTagPayloadLazy(NBTConstants.TYPE_COMPOUND, 0);
-                } else {
-                    // Read all palette entries
-                    while (this.dataInputStream.readByte() != NBTConstants.TYPE_END) {
-                        String value = this.dataInputStream.readUTF();
-                        char index = (char) this.dataInputStream.readInt();
-                        paletteInitializer.accept(value, index);
-                    }
-                    hasPalette = true;
+                    continue;
                 }
+                if (this.dataFixer == null) {
+                    this.remainingTags.add(rootTag);
+                    this.nbtInputStream.readTagPayloadLazy(NBTConstants.TYPE_COMPOUND, 0);
+                    continue;
+                }
+                // Read all palette entries
+                while (this.dataInputStream.readByte() != NBTConstants.TYPE_END) {
+                    String value = this.dataInputStream.readUTF();
+                    char index = (char) this.dataInputStream.readInt();
+                    paletteInitializer.accept(value, index);
+                }
+                hasPalette = true;
                 continue;
             }
             if (tag.equals("Data")) {
-                if (dataAlreadyWritten.getAsBoolean()) {
-                    // Skip data, as already written
+                // No palette or dimensions are yet available - will need to read Data next round
+                if (!hasPalette || this.dataFixer == null || !hasClipboard) {
+                    this.remainingTags.add(rootTag); // mark for read next iteration
                     this.nbtInputStream.readTagPayloadLazy(NBTConstants.TYPE_BYTE_ARRAY, 0);
                     continue;
                 }
-                // No palette or dimensions are yet available - will need to read Data next round
-                if (!hasPalette || !areDimensionsAvailable()) {
-                    this.needAdditionalIterate = true;
-                    this.nbtInputStream.readTagPayloadLazy(NBTConstants.TYPE_BYTE_ARRAY, 0);
-                    return;
-                }
                 int length = this.dataInputStream.readInt();
                 // Write data into clipboard
-                firstWrite.run();
                 int i = 0;
-                for (var iter = new VarIntStreamIterator(this.dataInputStream, length); iter.hasNext(); i++) {
-                    paletteDataApplier.accept(i, (char) iter.nextInt());
+                if (needsVarIntReading(length)) {
+                    for (var iter = new VarIntStreamIterator(this.dataInputStream, length); iter.hasNext(); i++) {
+                        paletteDataApplier.accept(i, (char) iter.nextInt());
+                    }
+                    continue;
                 }
-                continue;
+                while (i < length) {
+                    paletteDataApplier.accept(i++, (char) this.dataInputStream.readUnsignedByte());
+                }
             }
             additionalTag.accept(type, tag);
         }
@@ -465,6 +456,33 @@ public class FastSchematicReaderV3 implements ClipboardReader {
     @Override
     public void close() throws IOException {
         resetableInputStream.close(); // closes all underlying resources implicitly
+    }
+
+    private void setSubStreams() throws IOException {
+        final FastBufferedInputStream buffer = new FastBufferedInputStream(new GZIPInputStream(this.resetableInputStream));
+        this.dataInputStream = new DataInputStream(buffer);
+        this.nbtInputStream = new NBTInputStream(buffer);
+    }
+
+    private void reset() throws IOException {
+        this.resetableInputStream.reset();
+        this.resetableInputStream.mark(Integer.MAX_VALUE);
+        this.setSubStreams();
+    }
+
+    private boolean needsVarIntReading(int byteArrayLength) {
+        return byteArrayLength > this.dimensions.x() * this.dimensions.y() * this.dimensions.z();
+    }
+
+    /**
+     * Skips the schematic header including the root compound (empty name) and the root's child compound ("Schematic")
+     *
+     * @param dataInputStream The stream containing the schematic data to skip
+     * @throws IOException on I/O error
+     */
+    private static void skipHeader(DataInputStream dataInputStream) throws IOException {
+        dataInputStream.skipNBytes(1 + 2); // 1 Byte = TAG_Compound, 2 Bytes = Short (Length of tag name = "")
+        dataInputStream.skipNBytes(1 + 2 + 9); // as above + 9 bytes = "Schematic"
     }
 
 }
