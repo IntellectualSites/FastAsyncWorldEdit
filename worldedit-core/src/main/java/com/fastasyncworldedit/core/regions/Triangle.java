@@ -7,9 +7,13 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.polyhedron.Edge;
 
-public class Triangle {
+public class Triangle implements Cloneable {
 
     public static double RADIUS = 0.5;
+
+    private final BlockVector3 pos1;
+    private final BlockVector3 pos2;
+    private final BlockVector3 pos3;
 
     private final double[][] verts = new double[3][3];
     private final double[] center = new double[3];
@@ -28,6 +32,9 @@ public class Triangle {
     private final double b;
 
     public Triangle(BlockVector3 pos1, BlockVector3 pos2, BlockVector3 pos3) {
+        this.pos1 = pos1;
+        this.pos2 = pos2;
+        this.pos3 = pos3;
         verts[0] = new double[]{pos1.x(), pos1.y(), pos1.z()};
         verts[1] = new double[]{pos2.x(), pos2.y(), pos2.z()};
         verts[2] = new double[]{pos3.x(), pos3.y(), pos3.z()};
@@ -288,6 +295,11 @@ public class Triangle {
             return false;
         }
         return dot(normal, vmax) >= 0.0f;
+    }
+
+    @Override
+    public Triangle clone() {
+        return new Triangle(pos1, pos2, pos3);
     }
 
 }

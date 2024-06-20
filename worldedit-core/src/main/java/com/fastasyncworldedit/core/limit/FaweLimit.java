@@ -1,6 +1,7 @@
 package com.fastasyncworldedit.core.limit;
 
 import com.fastasyncworldedit.core.FaweCache;
+import com.fastasyncworldedit.core.configuration.Settings;
 
 import java.util.Collections;
 import java.util.Set;
@@ -121,7 +122,8 @@ public class FaweLimit {
         MAX.SCHEM_FILE_SIZE_LIMIT = Integer.MAX_VALUE;
         MAX.MAX_EXPRESSION_MS = 50;
         MAX.FAST_PLACEMENT = true;
-        MAX.CONFIRM_LARGE = true;
+        MAX.CONFIRM_LARGE =
+                Settings.settings().LIMITS.get("default").CONFIRM_LARGE || Settings.settings().GENERAL.LIMIT_UNLIMITED_CONFIRMS;
         MAX.RESTRICT_HISTORY_TO_REGIONS = false;
         MAX.STRIP_NBT = Collections.emptySet();
         MAX.UNIVERSAL_DISALLOWED_BLOCKS = false;
