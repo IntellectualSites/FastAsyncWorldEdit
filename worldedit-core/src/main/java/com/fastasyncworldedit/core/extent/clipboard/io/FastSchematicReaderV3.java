@@ -59,13 +59,13 @@ import java.util.function.Function;
 import java.util.zip.GZIPInputStream;
 
 /**
+ * TODO: fix tile entity locations (+ validate entity location)
+ */
+
+/**
  * ClipboardReader for the Sponge Schematic Format v3.
  * Not necessarily much faster than {@link com.sk89q.worldedit.extent.clipboard.io.sponge.SpongeSchematicV3Reader}, but uses a
  * stream based approach to keep the memory overhead minimal (especially in larger schematics)
- */
-
-/**le
- * TODO: fix tile entity locations (+ validate entity location)
  */
 @SuppressWarnings("removal") // JNBT
 public class FastSchematicReaderV3 implements ClipboardReader {
@@ -101,12 +101,17 @@ public class FastSchematicReaderV3 implements ClipboardReader {
 
     public FastSchematicReaderV3(@NonNull InputStream stream) {
         Objects.requireNonNull(stream, "stream");
-        if (stream instanceof FileInputStream fileInputStream) {
+        if (stream instanceof ResettableFileInputStream) {
+            stream.mark(Integer.MAX_VALUE);
+            this.remainingTags = new HashSet<>();
+        } else if (stream instanceof FileInputStream fileInputStream) {
             stream = new ResettableFileInputStream(fileInputStream);
             stream.mark(Integer.MAX_VALUE);
             this.remainingTags = new HashSet<>();
+        } else if (stream instanceof FastBufferedInputStream || stream instanceof BufferedInputStream) {
+            this.remainingTags = null;
         } else {
-            stream = new BufferedInputStream(stream);
+            stream = new FastBufferedInputStream(stream);
             this.remainingTags = null;
         }
         this.parentStream = stream;
