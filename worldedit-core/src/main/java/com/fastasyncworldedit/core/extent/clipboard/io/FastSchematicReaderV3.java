@@ -62,6 +62,7 @@ import java.util.zip.GZIPInputStream;
  * ClipboardReader for the Sponge Schematic Format v3.
  * Not necessarily much faster than {@link com.sk89q.worldedit.extent.clipboard.io.sponge.SpongeSchematicV3Reader}, but uses a
  * stream based approach to keep the memory overhead minimal (especially in larger schematics)
+ * @since TODO
  */
 @SuppressWarnings("removal") // JNBT
 public class FastSchematicReaderV3 implements ClipboardReader {

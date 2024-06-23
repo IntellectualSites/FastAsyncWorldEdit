@@ -32,6 +32,12 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 
+/**
+ * Faster, stream-based implementation of {@link com.sk89q.worldedit.extent.clipboard.io.sponge.SpongeSchematicV3Writer} for
+ * writing schematics conforming the sponge schematic v3 format.
+ *
+ * @since TODO
+ */
 @SuppressWarnings("removal") // Yes, JNBT is deprecated - we know
 public class FastSchematicWriterV3 implements ClipboardWriter {
 
@@ -61,15 +67,6 @@ public class FastSchematicWriterV3 implements ClipboardWriter {
             throw new IllegalArgumentException("Region length too large for schematic: " + region.getWidth());
         }
 
-        /*
-         * {
-         *     "": {
-         *         "Schematic": {
-         *             //...
-         *         }
-         *     }
-         * }
-         */
         this.outputStream.writeLazyCompoundTag(
                 "", root -> root.writeLazyCompoundTag("Schematic", out -> this.write2(out, clipboard))
         );
