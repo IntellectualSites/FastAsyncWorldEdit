@@ -64,7 +64,7 @@ import java.util.zip.GZIPOutputStream;
 public enum BuiltInClipboardFormat implements ClipboardFormat {
 
     //FAWE start - register fast clipboard io
-    FAST_V3("fast", "fawe", "schem") { // For testing purposes
+    FAST_V3("fast", "fawe", "schem") {
 
         @Override
         public ClipboardReader getReader(InputStream inputStream) throws IOException {
