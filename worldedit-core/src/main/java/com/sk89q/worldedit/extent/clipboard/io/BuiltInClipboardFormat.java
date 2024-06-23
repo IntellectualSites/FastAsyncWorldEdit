@@ -296,7 +296,7 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
             return true;
         }
     },
-    SPONGE_V3_SCHEMATIC("sponge.3", "slow", "safe") {
+    SPONGE_V3_SCHEMATIC("sponge.3", "slow", "safe") { // FAWE edit aliases for fast
         @Override
         public String getPrimaryFileExtension() {
             return "schem";

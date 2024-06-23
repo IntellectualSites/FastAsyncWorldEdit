@@ -59,10 +59,6 @@ import java.util.function.Function;
 import java.util.zip.GZIPInputStream;
 
 /**
- * TODO: fix tile entity locations (+ validate entity location)
- */
-
-/**
  * ClipboardReader for the Sponge Schematic Format v3.
  * Not necessarily much faster than {@link com.sk89q.worldedit.extent.clipboard.io.sponge.SpongeSchematicV3Reader}, but uses a
  * stream based approach to keep the memory overhead minimal (especially in larger schematics)
@@ -350,7 +346,6 @@ public class FastSchematicReaderV3 implements ClipboardReader {
             final NBTOutputStream cacheStream = new NBTOutputStream(this.getDataCacheWriter());
             cacheStream.writeByte(CACHE_IDENTIFIER_ENTITIES);
             cacheStream.writeTagPayload(this.nbtInputStream.readTagPayload(NBTConstants.TYPE_LIST, 0));
-            System.out.println("Wrote entities to cache");
             return;
         }
         if (this.dataInputStream.read() != NBTConstants.TYPE_COMPOUND) {
@@ -437,6 +432,7 @@ public class FastSchematicReaderV3 implements ClipboardReader {
                         if (!stream.readUTF().equals("Data")) {
                             throw new IOException("Expected COMPOUND tag to be Data");
                         }
+                        //noinspection deprecation
                         tag = ((CompoundTag) nbtStream.readTagPayload(NBTConstants.TYPE_COMPOUND, 0)).asBinaryTag();
                     }
                     default -> throw new IOException("Unexpected tag in compound: " + type);
@@ -631,6 +627,7 @@ public class FastSchematicReaderV3 implements ClipboardReader {
     }
 
     private EntityTransformer provideTileEntityTransformer(Clipboard clipboard) {
+        //noinspection deprecation
         return (x, y, z, id, tag) -> clipboard.setTile(
                 MathMan.roundInt(x + clipboard.getMinimumPoint().x()),
                 MathMan.roundInt(y + clipboard.getMinimumPoint().y()),

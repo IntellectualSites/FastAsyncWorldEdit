@@ -125,12 +125,14 @@ public class FastSchematicWriterV3 implements ClipboardWriter {
                         CompoundBinaryTag tag;
                         if ((tag = block.getNbt()) != null) {
                             tiles[0]++;
-                            BlockVector3 posNormalized = pos.subtract(clipboard.getMinimumPoint());
                             try {
                                 tileOut.writeNamedTag("Id", block.getNbtId());
                                 tileOut.writeNamedTag("Pos", new int[]{
-                                        posNormalized.x(), posNormalized.y(), posNormalized.z()
+                                        pos.x() - clipboard.getMinimumPoint().x(),
+                                        pos.y() - clipboard.getMinimumPoint().y(),
+                                        pos.z() - clipboard.getMinimumPoint().z()
                                 });
+                                //noinspection deprecation
                                 tileOut.writeNamedTag("Data", new CompoundTag(tag));
                                 tileOut.write(NBTConstants.TYPE_END);
                             } catch (IOException e) {
@@ -189,6 +191,7 @@ public class FastSchematicWriterV3 implements ClipboardWriter {
         out.writeDouble(entity.getLocation().z() - clipboard.getMinimumPoint().z());
 
         out.writeLazyCompoundTag("Data", data -> {
+            //noinspection deprecation
             CompoundTag nbt = state.getNbtData();
             if (nbt != null) {
                 nbt.getValue().forEach((s, tag) -> {
