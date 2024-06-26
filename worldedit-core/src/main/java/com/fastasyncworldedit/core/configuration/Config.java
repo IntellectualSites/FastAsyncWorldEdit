@@ -320,10 +320,11 @@ public class Config {
                     String node = toNodeName(field.getName());
                     node = parentNode == null ? node : parentNode + "." + node;
                     Map.Entry<String, Object> entry = copyTo.remove(node);
+                    Object copiedVal;
                     if (entry == null) {
-                        copyTo.put(node,new AbstractMap.SimpleEntry<>(copiedFrom.value(), null));
-                    } else {
-                        field.set(instance, entry.getValue());
+                        copyTo.put(node, new AbstractMap.SimpleEntry<>(copiedFrom.value(), null));
+                    } else if ((copiedVal = entry.getValue()) != null) {
+                        field.set(instance, copiedVal);
                     }
                 }
                 Create create = field.getAnnotation(Create.class);
