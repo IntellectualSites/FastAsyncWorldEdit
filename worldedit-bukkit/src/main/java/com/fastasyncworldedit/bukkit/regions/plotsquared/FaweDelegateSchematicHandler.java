@@ -36,10 +36,12 @@ import com.sk89q.worldedit.regions.CuboidRegion;
 import net.jpountz.lz4.LZ4BlockInputStream;
 import org.anarres.parallelgzip.ParallelGZIPOutputStream;
 import org.apache.logging.log4j.Logger;
+import org.enginehub.linbus.stream.LinBinaryIO;
 
 import javax.annotation.Nonnull;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.DataInputStream;
 import java.io.EOFException;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -250,7 +252,7 @@ public class FaweDelegateSchematicHandler {
             }
             try {
                 SpongeSchematicV3Reader schematicReader =
-                        new SpongeSchematicV3Reader(new NBTInputStream(new GZIPInputStream(is)));
+                        new SpongeSchematicV3Reader(LinBinaryIO.read(new DataInputStream(new GZIPInputStream(is))));
                 Clipboard clip = schematicReader.read();
                 return new Schematic(clip);
             } catch (IOException e2) {
