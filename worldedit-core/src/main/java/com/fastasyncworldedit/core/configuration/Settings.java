@@ -518,6 +518,9 @@ public class Settings extends Config {
         public int DELETE_AFTER_DAYS = 7;
         @Comment("Delete history in memory on logout (does not effect disk)")
         public boolean DELETE_ON_LOGOUT = true;
+        @Comment("Delete history on disk on logout")
+        @CopiedFrom("history.delete-on-logout")
+        public boolean DELETE_DISK_ON_LOGOUT = false;
         @Comment({
                 "If history should be enabled by default for plugins using WorldEdit:",
                 " - It is faster to have disabled",
