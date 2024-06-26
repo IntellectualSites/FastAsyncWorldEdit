@@ -12,6 +12,6 @@ repositories {
 
 dependencies {
     // url=https://repo.papermc.io/service/rest/repository/browse/maven-public/io/papermc/paper/dev-bundle/1.20.6-R0.1-SNAPSHOT/
-    the<PaperweightUserDependenciesExtension>().paperDevBundle("1.20.6-R0.1-20240604.210637-112")
+    the<PaperweightUserDependenciesExtension>().paperDevBundle("1.20.6-R0.1-20240617.192752-122")
     compileOnly(libs.paperlib)
 }
