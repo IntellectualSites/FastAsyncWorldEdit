@@ -78,7 +78,6 @@ import java.util.stream.Collectors;
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class PaperweightDataConverters extends DataFixerBuilder implements com.sk89q.worldedit.world.DataFixer {
 
-    //FAWE start - LinTag
     @SuppressWarnings("unchecked")
     @Override
     public <T> T fixUp(FixType<T> type, T original, int srcVer) {
@@ -115,7 +114,6 @@ public class PaperweightDataConverters extends DataFixerBuilder implements com.s
         net.minecraft.nbt.CompoundTag fixed = convert(LegacyType.ENTITY, tag, srcVer);
         return (LinCompoundTag) adapter.toNativeLin(fixed);
     }
-    //FAWE end
 
     private String fixBlockState(String blockState, int srcVer) {
         net.minecraft.nbt.CompoundTag stateNBT = stateToNBT(blockState);

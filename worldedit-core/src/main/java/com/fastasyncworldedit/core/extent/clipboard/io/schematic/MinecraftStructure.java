@@ -216,7 +216,7 @@ public class MinecraftStructure implements ClipboardReader, ClipboardWriter {
                 if (!block.hasNbtData()) {
                     blocks.add(FaweCache.INSTANCE.asMap("state", index, "pos", pos));
                 } else {
-                    Map<String, Tag> tag = new HashMap<>(block.getNbtData().getValue());
+                    Map<String, Tag<?, ?>> tag = new HashMap<>(block.getNbtData().getValue());
                     tag.remove("x");
                     tag.remove("y");
                     tag.remove("z");
