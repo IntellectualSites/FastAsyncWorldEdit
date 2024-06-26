@@ -233,7 +233,7 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
 
         try {
             Class.forName("org.spigotmc.SpigotConfig");
-            SpigotConfig.config.set("world-settings.worldeditregentempworld.verbose", false);
+            SpigotConfig.config.set("world-settings.faweregentempworld.verbose", false);
         } catch (ClassNotFoundException ignored) {
         }
     }
@@ -704,7 +704,7 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
         Path tempDir = Files.createTempDirectory("WorldEditWorldGen");
         LevelStorageSource levelStorage = LevelStorageSource.createDefault(tempDir);
         ResourceKey<LevelStem> worldDimKey = getWorldDimKey(env);
-        try (LevelStorageSource.LevelStorageAccess session = levelStorage.createAccess("worldeditregentempworld", worldDimKey)) {
+        try (LevelStorageSource.LevelStorageAccess session = levelStorage.createAccess("faweregentempworld", worldDimKey)) {
             ServerLevel originalWorld = ((CraftWorld) bukkitWorld).getHandle();
             PrimaryLevelData levelProperties = (PrimaryLevelData) originalWorld.getServer()
                 .getWorldData().overworldData();
@@ -716,7 +716,7 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
                 : originalOpts;
 
             LevelSettings newWorldSettings = new LevelSettings(
-                "worldeditregentempworld",
+                "faweregentempworld",
                 levelProperties.settings.gameType(),
                 levelProperties.settings.hardcore(),
                 levelProperties.settings.difficulty(),
@@ -763,7 +763,7 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
             try {
                 @SuppressWarnings("unchecked")
                 Map<String, World> map = (Map<String, World>) serverWorldsField.get(Bukkit.getServer());
-                map.remove("worldeditregentempworld");
+                map.remove("faweregentempworld");
             } catch (IllegalAccessException ignored) {
             }
             SafeFiles.tryHardToDeleteDir(tempDir);
