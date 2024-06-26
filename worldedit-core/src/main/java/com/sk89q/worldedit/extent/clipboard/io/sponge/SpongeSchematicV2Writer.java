@@ -19,18 +19,6 @@
 
 package com.sk89q.worldedit.extent.clipboard.io.sponge;
 
-import com.fastasyncworldedit.core.Fawe;
-import com.fastasyncworldedit.core.extent.clipboard.io.FastSchematicWriterV2;
-import com.google.common.collect.ImmutableMap;
-import com.sk89q.jnbt.ByteArrayTag;
-import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.jnbt.IntArrayTag;
-import com.sk89q.jnbt.IntTag;
-import com.sk89q.jnbt.ListTag;
-import com.sk89q.jnbt.NBTOutputStream;
-import com.sk89q.jnbt.ShortTag;
-import com.sk89q.jnbt.StringTag;
-import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extension.platform.Platform;
@@ -40,38 +28,30 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
+import it.unimi.dsi.fastutil.objects.Object2IntLinkedOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntMaps;
+import org.enginehub.linbus.stream.LinBinaryIO;
+import org.enginehub.linbus.tree.LinCompoundTag;
+import org.enginehub.linbus.tree.LinListTag;
+import org.enginehub.linbus.tree.LinRootEntry;
+import org.enginehub.linbus.tree.LinTagType;
 
 import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Writes schematic files using the Sponge Schematic Specification (Version 2).
- *
- * @deprecated Slow, resource intensive, but sometimes safer than using the recommended
- *         {@link FastSchematicWriterV2}.
- *         Avoid using large clipboards to create schematics with this writer.
  */
-@Deprecated
 public class SpongeSchematicV2Writer implements ClipboardWriter {
 
     private static final int CURRENT_VERSION = 2;
 
     private static final int MAX_SIZE = Short.MAX_VALUE - Short.MIN_VALUE;
-    private final NBTOutputStream outputStream;
+    private final DataOutputStream outputStream;
 
-    /**
-     * Create a new schematic writer.
-     *
-     * @param outputStream the output stream to write to
-     */
-    public SpongeSchematicV2Writer(NBTOutputStream outputStream) {
-        checkNotNull(outputStream);
+    public SpongeSchematicV2Writer(DataOutputStream outputStream) {
         this.outputStream = outputStream;
     }
 
@@ -81,17 +61,16 @@ public class SpongeSchematicV2Writer implements ClipboardWriter {
         // between upstream and FAWE
         clipboard.flush();
         //FAWE end
-        // For now always write the latest version. Maybe provide support for earlier if more appear.
-        outputStream.writeNamedTag("Schematic", new CompoundTag(write2(clipboard)));
+        LinBinaryIO.write(outputStream, new LinRootEntry("Schematic", write2(clipboard)));
     }
 
     /**
      * Writes a version 2 schematic file.
      *
      * @param clipboard The clipboard
-     * @return The schematic map
+     * @return the schematic tag
      */
-    private Map<String, Tag> write2(Clipboard clipboard) {
+    private LinCompoundTag write2(Clipboard clipboard) {
         Region region = clipboard.getRegion();
         BlockVector3 origin = clipboard.getOrigin();
         BlockVector3 min = region.getMinimumPoint();
@@ -110,52 +89,49 @@ public class SpongeSchematicV2Writer implements ClipboardWriter {
             throw new IllegalArgumentException("Length of region too large for a .schematic");
         }
 
-        Map<String, Tag> schematic = new HashMap<>();
-        schematic.put("Version", new IntTag(CURRENT_VERSION));
-        schematic.put("DataVersion", new IntTag(
-                WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).getDataVersion()));
+        LinCompoundTag.Builder schematic = LinCompoundTag.builder();
+        schematic.putInt("Version", CURRENT_VERSION);
+        schematic.putInt("DataVersion",
+                WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).getDataVersion()
+        );
 
-        Map<String, Tag> metadata = new HashMap<>();
-        metadata.put("WEOffsetX", new IntTag(offset.x()));
-        metadata.put("WEOffsetY", new IntTag(offset.y()));
-        metadata.put("WEOffsetZ", new IntTag(offset.z()));
-        metadata.put("FAWEVersion", new IntTag(Fawe.instance().getVersion().build));
+        LinCompoundTag.Builder metadata = LinCompoundTag.builder();
+        metadata.putInt("WEOffsetX", offset.x());
+        metadata.putInt("WEOffsetY", offset.y());
+        metadata.putInt("WEOffsetZ", offset.z());
 
-        Map<String, Tag> worldEditSection = new HashMap<>();
-        worldEditSection.put("Version", new StringTag(WorldEdit.getVersion()));
-        worldEditSection.put("EditingPlatform", new StringTag(WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).getId()));
-        worldEditSection.put("Offset", new IntArrayTag(new int[] {
-                offset.getBlockX(), offset.getBlockY(), offset.getBlockZ()
-        }));
+        LinCompoundTag.Builder worldEditSection = LinCompoundTag.builder();
+        worldEditSection.putString("Version", WorldEdit.getVersion());
+        worldEditSection.putString("EditingPlatform",
+                WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).id()
+        );
+        worldEditSection.putIntArray("Offset", new int[]{offset.x(), offset.y(), offset.z()});
 
-        Map<String, Tag> platformsSection = new HashMap<>();
+        LinCompoundTag.Builder platformsSection = LinCompoundTag.builder();
         for (Platform platform : WorldEdit.getInstance().getPlatformManager().getPlatforms()) {
-            platformsSection.put(platform.getId(), new CompoundTag(ImmutableMap.of(
-                    "Name", new StringTag(platform.getPlatformName()),
-                    "Version", new StringTag(platform.getPlatformVersion())
-            )));
+            platformsSection.put(platform.id(), LinCompoundTag
+                    .builder()
+                    .putString("Name", platform.getPlatformName())
+                    .putString("Version", platform.getPlatformVersion())
+                    .build());
         }
-        worldEditSection.put("Platforms", new CompoundTag(platformsSection));
+        worldEditSection.put("Platforms", platformsSection.build());
 
-        metadata.put("WorldEdit", new CompoundTag(worldEditSection));
+        metadata.put("WorldEdit", worldEditSection.build());
 
-        schematic.put("Metadata", new CompoundTag(metadata));
+        schematic.put("Metadata", metadata.build());
 
-        schematic.put("Width", new ShortTag((short) width));
-        schematic.put("Height", new ShortTag((short) height));
-        schematic.put("Length", new ShortTag((short) length));
+        schematic.putShort("Width", (short) width);
+        schematic.putShort("Height", (short) height);
+        schematic.putShort("Length", (short) length);
 
         // The Sponge format Offset refers to the 'min' points location in the world. That's our 'Origin'
-        schematic.put("Offset", new IntArrayTag(new int[]{
-                min.x(),
-                min.y(),
-                min.z(),
-        }));
+        schematic.putIntArray("Offset", new int[]{min.x(), min.y(), min.z(),});
 
         int paletteMax = 0;
-        Map<String, Integer> palette = new HashMap<>();
+        Object2IntMap<String> palette = new Object2IntLinkedOpenHashMap<>();
 
-        List<CompoundTag> tileEntities = new ArrayList<>();
+        LinListTag.Builder<LinCompoundTag> tileEntities = LinListTag.builder(LinTagType.compoundTag());
 
         ByteArrayOutputStream buffer = new ByteArrayOutputStream(width * height * length);
 
@@ -167,8 +143,9 @@ public class SpongeSchematicV2Writer implements ClipboardWriter {
                     int x0 = min.x() + x;
                     BlockVector3 point = BlockVector3.at(x0, y0, z0);
                     BaseBlock block = clipboard.getFullBlock(point);
-                    if (block.getNbtData() != null) {
-                        Map<String, Tag> values = new HashMap<>(block.getNbtData().getValue());
+                    LinCompoundTag nbt = block.getNbt();
+                    if (nbt != null) {
+                        LinCompoundTag.Builder values = nbt.toBuilder();
 
                         values.remove("id"); // Remove 'id' if it exists. We want 'Id'
 
@@ -177,16 +154,16 @@ public class SpongeSchematicV2Writer implements ClipboardWriter {
                         values.remove("y");
                         values.remove("z");
 
-                        values.put("Id", new StringTag(block.getNbtId()));
-                        values.put("Pos", new IntArrayTag(new int[]{x, y, z}));
+                        values.putString("Id", block.getNbtId());
+                        values.putIntArray("Pos", new int[]{x, y, z});
 
-                        tileEntities.add(new CompoundTag(values));
+                        tileEntities.add(values.build());
                     }
 
                     String blockKey = block.toImmutableState().getAsString();
                     int blockId;
                     if (palette.containsKey(blockKey)) {
-                        blockId = palette.get(blockKey);
+                        blockId = palette.getInt(blockKey);
                     } else {
                         blockId = paletteMax;
                         palette.put(blockKey, blockId);
@@ -202,14 +179,14 @@ public class SpongeSchematicV2Writer implements ClipboardWriter {
             }
         }
 
-        schematic.put("PaletteMax", new IntTag(paletteMax));
+        schematic.putInt("PaletteMax", paletteMax);
 
-        Map<String, Tag> paletteTag = new HashMap<>();
-        palette.forEach((key, value) -> paletteTag.put(key, new IntTag(value)));
+        LinCompoundTag.Builder paletteTag = LinCompoundTag.builder();
+        Object2IntMaps.fastForEach(palette, e -> paletteTag.putInt(e.getKey(), e.getIntValue()));
 
-        schematic.put("Palette", new CompoundTag(paletteTag));
-        schematic.put("BlockData", new ByteArrayTag(buffer.toByteArray()));
-        schematic.put("BlockEntities", new ListTag(CompoundTag.class, tileEntities));
+        schematic.put("Palette", paletteTag.build());
+        schematic.putByteArray("BlockData", buffer.toByteArray());
+        schematic.put("BlockEntities", tileEntities.build());
 
         // version 2 stuff
         if (clipboard.hasBiomes()) {
@@ -217,16 +194,16 @@ public class SpongeSchematicV2Writer implements ClipboardWriter {
         }
 
         if (!clipboard.getEntities().isEmpty()) {
-            ListTag value = WriterUtil.encodeEntities(clipboard, false);
+            LinListTag<LinCompoundTag> value = WriterUtil.encodeEntities(clipboard, false);
             if (value != null) {
                 schematic.put("Entities", value);
             }
         }
 
-        return schematic;
+        return schematic.build();
     }
 
-    private void writeBiomes(Clipboard clipboard, Map<String, Tag> schematic) {
+    private void writeBiomes(Clipboard clipboard, LinCompoundTag.Builder schematic) {
         BlockVector3 min = clipboard.getMinimumPoint();
         int width = clipboard.getRegion().getWidth();
         int length = clipboard.getRegion().getLength();
@@ -234,7 +211,7 @@ public class SpongeSchematicV2Writer implements ClipboardWriter {
         ByteArrayOutputStream buffer = new ByteArrayOutputStream(width * length);
 
         int paletteMax = 0;
-        Map<String, Integer> palette = new HashMap<>();
+        Object2IntMap<String> palette = new Object2IntLinkedOpenHashMap<>();
 
         for (int z = 0; z < length; z++) {
             int z0 = min.z() + z;
@@ -246,7 +223,7 @@ public class SpongeSchematicV2Writer implements ClipboardWriter {
                 String biomeKey = biome.id();
                 int biomeId;
                 if (palette.containsKey(biomeKey)) {
-                    biomeId = palette.get(biomeKey);
+                    biomeId = palette.getInt(biomeKey);
                 } else {
                     biomeId = paletteMax;
                     palette.put(biomeKey, biomeId);
@@ -261,13 +238,13 @@ public class SpongeSchematicV2Writer implements ClipboardWriter {
             }
         }
 
-        schematic.put("BiomePaletteMax", new IntTag(paletteMax));
+        schematic.putInt("BiomePaletteMax", paletteMax);
 
-        Map<String, Tag> paletteTag = new HashMap<>();
-        palette.forEach((key, value) -> paletteTag.put(key, new IntTag(value)));
+        LinCompoundTag.Builder paletteTag = LinCompoundTag.builder();
+        Object2IntMaps.fastForEach(palette, e -> paletteTag.putInt(e.getKey(), e.getIntValue()));
 
-        schematic.put("BiomePalette", new CompoundTag(paletteTag));
-        schematic.put("BiomeData", new ByteArrayTag(buffer.toByteArray()));
+        schematic.put("BiomePalette", paletteTag.build());
+        schematic.putByteArray("BiomeData", buffer.toByteArray());
     }
 
     @Override

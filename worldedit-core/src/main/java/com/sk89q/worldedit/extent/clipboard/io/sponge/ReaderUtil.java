@@ -19,14 +19,7 @@
 
 package com.sk89q.worldedit.extent.clipboard.io.sponge;
 
-import com.sk89q.jnbt.AdventureNBTConverter;
-import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.jnbt.CompoundTagBuilder;
-import com.sk89q.jnbt.IntArrayTag;
-import com.sk89q.jnbt.IntTag;
-import com.sk89q.jnbt.ListTag;
-import com.sk89q.jnbt.StringTag;
-import com.sk89q.jnbt.Tag;
+
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.BaseEntity;
@@ -39,25 +32,31 @@ import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.internal.util.VarIntIterator;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.util.concurrency.LazyReference;
 import com.sk89q.worldedit.world.DataFixer;
+import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.entity.EntityTypes;
 import com.sk89q.worldedit.world.storage.NBTConversions;
+import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import org.apache.logging.log4j.Logger;
+import org.enginehub.linbus.tree.LinCompoundTag;
+import org.enginehub.linbus.tree.LinIntArrayTag;
+import org.enginehub.linbus.tree.LinIntTag;
+import org.enginehub.linbus.tree.LinListTag;
+import org.enginehub.linbus.tree.LinTagType;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkState;
-import static com.sk89q.worldedit.extent.clipboard.io.SchematicNbtUtil.getTag;
-import static com.sk89q.worldedit.extent.clipboard.io.SchematicNbtUtil.requireTag;
 
 /**
  * Common code shared between schematic readers.
@@ -66,9 +65,8 @@ public class ReaderUtil { //FAWE - make public
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
 
-    static void checkSchematicVersion(int version, CompoundTag schematicTag) throws IOException {
-        int schematicVersion = requireTag(schematicTag.getValue(), "Version", IntTag.class)
-                .getValue();
+    static void checkSchematicVersion(int version, LinCompoundTag schematicTag) throws IOException {
+        int schematicVersion = getSchematicVersion(schematicTag);
 
         checkState(
                 version == schematicVersion,
@@ -76,12 +74,19 @@ public class ReaderUtil { //FAWE - make public
         );
     }
 
+    public static int getSchematicVersion(LinCompoundTag schematicTag) throws IOException {
+        return schematicTag.getTag("Version", LinTagType.intTag()).valueAsInt();
+    }
+
     static VersionedDataFixer getVersionedDataFixer(
-            Map<String, Tag> schematic, Platform platform,
+            LinCompoundTag schematic, Platform platform,
             int liveDataVersion
-    ) throws IOException {
-        //FAWE - delegate to new method
-        return getVersionedDataFixer(requireTag(schematic, "DataVersion", IntTag.class).getValue(), platform, liveDataVersion);
+    ) {
+        //FAWE start - call fawe method without NBT component requirement
+        return getVersionedDataFixer(schematic.getTag("DataVersion", LinTagType.intTag()).valueAsInt(), platform,
+                liveDataVersion
+        );
+        //FAWE end
     }
 
     //FAWE start - make getVersionedDataFixer without schematic compound + public
@@ -119,7 +124,7 @@ public class ReaderUtil { //FAWE - make public
     //FAWE end
 
     static Map<Integer, BlockState> decodePalette(
-            Map<String, Tag> paletteObject, VersionedDataFixer fixer
+            LinCompoundTag paletteObject, VersionedDataFixer fixer
     ) throws IOException {
         Map<Integer, BlockState> palette = new HashMap<>();
 
@@ -128,12 +133,15 @@ public class ReaderUtil { //FAWE - make public
         parserContext.setTryLegacy(false);
         parserContext.setPreferringWildcard(false);
 
-        for (String palettePart : paletteObject.keySet()) {
-            int id = requireTag(paletteObject, palettePart, IntTag.class).getValue();
-            palettePart = fixer.fixUp(DataFixer.FixTypes.BLOCK_STATE, palettePart);
+        for (var palettePart : paletteObject.value().entrySet()) {
+            if (!(palettePart.getValue() instanceof LinIntTag idTag)) {
+                throw new IOException("Invalid palette entry: " + palettePart);
+            }
+            int id = idTag.valueAsInt();
+            String paletteName = fixer.fixUp(DataFixer.FixTypes.BLOCK_STATE, palettePart.getKey());
             BlockState state;
             try {
-                state = WorldEdit.getInstance().getBlockFactory().parseFromInput(palettePart, parserContext).toImmutableState();
+                state = WorldEdit.getInstance().getBlockFactory().parseFromInput(paletteName, parserContext).toImmutableState();
             } catch (InputParseException e) {
                 LOGGER.warn("Invalid BlockState in palette: " + palettePart + ". Block will be replaced with air.");
                 state = BlockTypes.AIR.getDefaultState();
@@ -144,43 +152,24 @@ public class ReaderUtil { //FAWE - make public
     }
 
     static void initializeClipboardFromBlocks(
-            Clipboard clipboard, Map<Integer, BlockState> palette, byte[] blocks, ListTag tileEntities,
+            Clipboard clipboard, Map<Integer, BlockState> palette, byte[] blocks, LinListTag<LinCompoundTag> tileEntities,
             VersionedDataFixer fixer, boolean dataIsNested
     ) throws IOException {
-        Map<BlockVector3, Map<String, Tag>> tileEntitiesMap = new HashMap<>();
+        Map<BlockVector3, LinCompoundTag> tileEntitiesMap = new HashMap<>();
         if (tileEntities != null) {
-            List<Map<String, Tag>> tileEntityTags = tileEntities.getValue().stream()
-                    .map(tag -> (CompoundTag) tag)
-                    .map(CompoundTag::getValue)
-                    .collect(Collectors.toList());
-
-            for (Map<String, Tag> tileEntity : tileEntityTags) {
-                int[] pos = requireTag(tileEntity, "Pos", IntArrayTag.class).getValue();
-                final BlockVector3 pt = clipboard.getMinimumPoint().add(pos[0], pos[1], pos[2]);
-                Map<String, Tag> values;
-                if (dataIsNested) {
-                    CompoundTag dataTag = getTag(tileEntity, "Data", CompoundTag.class);
-                    if (dataTag != null) {
-                        values = new LinkedHashMap<>(dataTag.getValue());
-                    } else {
-                        values = new LinkedHashMap<>();
-                    }
-                } else {
-                    values = new LinkedHashMap<>(tileEntity);
-                    values.remove("Id");
-                    values.remove("Pos");
-                }
-                values.put("x", new IntTag(pt.getBlockX()));
-                values.put("y", new IntTag(pt.getBlockY()));
-                values.put("z", new IntTag(pt.getBlockZ()));
-                values.put("id", tileEntity.get("Id"));
+            for (LinCompoundTag tileEntity : tileEntities.value()) {
+                final BlockVector3 pt = clipboard.getMinimumPoint().add(
+                        decodeBlockVector3(tileEntity.getTag("Pos", LinTagType.intArrayTag()))
+                );
+                LinCompoundTag.Builder values = extractData(dataIsNested, tileEntity);
+                values.putInt("x", pt.x());
+                values.putInt("y", pt.y());
+                values.putInt("z", pt.z());
+                values.put("id", tileEntity.value().get("Id"));
                 if (fixer.isActive()) {
-                    tileEntity = ((CompoundTag) AdventureNBTConverter.fromAdventure(fixer.fixUp(
-                            DataFixer.FixTypes.BLOCK_ENTITY,
-                            new CompoundTag(values).asBinaryTag()
-                    ))).getValue();
+                    tileEntity = fixer.fixUp(DataFixer.FixTypes.BLOCK_ENTITY, values.build());
                 } else {
-                    tileEntity = values;
+                    tileEntity = values.build();
                 }
                 tileEntitiesMap.put(pt, tileEntity);
             }
@@ -196,17 +185,23 @@ public class ReaderUtil { //FAWE - make public
             BlockVector3 rawPos = decodePositionFromDataIndex(width, length, index);
             try {
                 BlockVector3 offsetPos = clipboard.getMinimumPoint().add(rawPos);
-                Map<String, Tag> tileEntity = tileEntitiesMap.get(offsetPos);
-                if (tileEntity != null) {
-                    clipboard.setBlock(
-                            offsetPos, state.toBaseBlock(new CompoundTag(tileEntity))
-                    );
-                } else {
-                    clipboard.setBlock(offsetPos, state);
-                }
+                LinCompoundTag tileEntity = tileEntitiesMap.get(offsetPos);
+                clipboard.setBlock(offsetPos, state.toBaseBlock(tileEntity));
             } catch (WorldEditException e) {
                 throw new IOException("Failed to load a block in the schematic", e);
             }
+        }
+    }
+
+    private static LinCompoundTag.Builder extractData(boolean dataIsNested, LinCompoundTag tag) {
+        if (dataIsNested) {
+            LinCompoundTag dataTag = tag.findTag("Data", LinTagType.compoundTag());
+            return dataTag != null ? dataTag.toBuilder() : LinCompoundTag.builder();
+        } else {
+            LinCompoundTag.Builder values = tag.toBuilder();
+            values.remove("Id");
+            values.remove("Pos");
+            return values;
         }
     }
 
@@ -219,11 +214,11 @@ public class ReaderUtil { //FAWE - make public
         return BlockVector3.at(x, y, z);
     }
 
-    static BlockVector3 decodeBlockVector3(@Nullable IntArrayTag tag) throws IOException {
+    static BlockVector3 decodeBlockVector3(@Nullable LinIntArrayTag tag) throws IOException {
         if (tag == null) {
             return BlockVector3.ZERO;
         }
-        int[] parts = tag.getValue();
+        int[] parts = tag.value();
         if (parts.length != 3) {
             throw new IOException("Invalid block vector specified in schematic.");
         }
@@ -231,46 +226,26 @@ public class ReaderUtil { //FAWE - make public
     }
 
     static void readEntities(
-            BlockArrayClipboard clipboard, List<Tag> entList,
+            BlockArrayClipboard clipboard, List<? extends LinCompoundTag> entList,
             VersionedDataFixer fixer, boolean positionIsRelative
-    ) throws IOException {
+    ) {
         if (entList.isEmpty()) {
             return;
         }
-        for (Tag et : entList) {
-            if (!(et instanceof CompoundTag)) {
-                continue;
-            }
-            CompoundTag entityTag = (CompoundTag) et;
-            Map<String, Tag> tags = entityTag.getValue();
-            String id = requireTag(tags, "Id", StringTag.class).getValue();
-            CompoundTagBuilder dataTagBuilder = CompoundTagBuilder.create();
-            if (positionIsRelative) {
-                // then we're in version 3
-                CompoundTag subTag = getTag(entityTag.getValue(), "Data", CompoundTag.class);
-                if (subTag != null) {
-                    dataTagBuilder.putAll(subTag.getValue());
-                }
-            } else {
-                // version 2
-                dataTagBuilder.putAll(tags);
-                dataTagBuilder.remove("Id");
-                dataTagBuilder.remove("Pos");
-            }
-            CompoundTag dataTag = dataTagBuilder.putString("id", id).build();
-            dataTag = ((CompoundTag) AdventureNBTConverter.fromAdventure(fixer.fixUp(
-                    DataFixer.FixTypes.ENTITY,
-                    dataTag.asBinaryTag()
-            )));
+        for (LinCompoundTag entityTag : entList) {
+            String id = entityTag.getTag("Id", LinTagType.stringTag()).value();
+            LinCompoundTag.Builder values = extractData(positionIsRelative, entityTag);
+            LinCompoundTag dataTag = values.putString("id", id).build();
+            dataTag = fixer.fixUp(DataFixer.FixTypes.ENTITY, dataTag);
 
             EntityType entityType = EntityTypes.get(id);
             if (entityType != null) {
                 Location location = NBTConversions.toLocation(
                         clipboard,
-                        requireTag(tags, "Pos", ListTag.class),
-                        requireTag(dataTag.getValue(), "Rotation", ListTag.class)
+                        entityTag.getListTag("Pos", LinTagType.doubleTag()),
+                        dataTag.getListTag("Rotation", LinTagType.floatTag())
                 );
-                BaseEntity state = new BaseEntity(entityType, dataTag);
+                BaseEntity state = new BaseEntity(entityType, LazyReference.computed(dataTag));
                 if (positionIsRelative) {
                     location = location.setPosition(
                             location.toVector().add(clipboard.getMinimumPoint().toVector3())
@@ -281,6 +256,25 @@ public class ReaderUtil { //FAWE - make public
                 LOGGER.warn("Unknown entity when pasting schematic: " + id);
             }
         }
+    }
+
+    static Int2ObjectMap<BiomeType> readBiomePalette(VersionedDataFixer fixer, LinCompoundTag paletteTag, Logger logger) throws
+            IOException {
+        Int2ObjectMap<BiomeType> palette = new Int2ObjectLinkedOpenHashMap<>(paletteTag.value().size());
+        for (var palettePart : paletteTag.value().entrySet()) {
+            String key = palettePart.getKey();
+            key = fixer.fixUp(DataFixer.FixTypes.BIOME, key);
+            BiomeType biome = BiomeTypes.get(key);
+            if (biome == null) {
+                logger.warn("Unknown biome type :" + key
+                        + " in palette. Are you missing a mod or using a schematic made in a newer version of Minecraft?");
+            }
+            if (!(palettePart.getValue() instanceof LinIntTag idTag)) {
+                throw new IOException("Biome mapped to non-Int tag.");
+            }
+            palette.put(idTag.valueAsInt(), biome);
+        }
+        return palette;
     }
 
     private ReaderUtil() {

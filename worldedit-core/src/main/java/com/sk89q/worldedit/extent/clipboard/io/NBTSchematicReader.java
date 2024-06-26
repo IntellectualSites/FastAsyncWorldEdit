@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.extent.clipboard.io;
 
 import com.sk89q.jnbt.Tag;
+import org.enginehub.linbus.tree.LinCompoundTag;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
@@ -27,7 +28,10 @@ import java.util.Map;
 
 /**
  * Base class for NBT schematic readers.
+ *
+ * @deprecated These utility methods are provided by {@link LinCompoundTag} now.
  */
+@Deprecated
 public abstract class NBTSchematicReader implements ClipboardReader {
 
     protected static <T extends Tag<?, ?>> T requireTag(Map<String, Tag<?, ?>> items, String key, Class<T> expected) throws IOException {
