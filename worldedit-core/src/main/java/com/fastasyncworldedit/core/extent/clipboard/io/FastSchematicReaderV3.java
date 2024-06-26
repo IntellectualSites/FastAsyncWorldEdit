@@ -23,7 +23,6 @@ import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.concurrency.LazyReference;
-import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
 import com.sk89q.worldedit.world.DataFixer;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
@@ -38,6 +37,7 @@ import net.jpountz.lz4.LZ4BlockOutputStream;
 import org.apache.logging.log4j.Logger;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.enginehub.linbus.tree.LinCompoundTag;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.io.BufferedInputStream;
@@ -50,6 +50,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Objects;
 import java.util.OptionalInt;
 import java.util.Set;
@@ -62,6 +63,7 @@ import java.util.zip.GZIPInputStream;
  * ClipboardReader for the Sponge Schematic Format v3.
  * Not necessarily much faster than {@link com.sk89q.worldedit.extent.clipboard.io.sponge.SpongeSchematicV3Reader}, but uses a
  * stream based approach to keep the memory overhead minimal (especially in larger schematics)
+ *
  * @since TODO
  */
 @SuppressWarnings("removal") // JNBT
@@ -385,11 +387,11 @@ public class FastSchematicReaderV3 implements ClipboardReader {
     private void readEntityContainers(
             DataInputStream stream,
             NBTInputStream nbtStream,
-            DataFixer.FixType<CompoundBinaryTag> fixType,
+            DataFixer.FixType<LinCompoundTag> fixType,
             EntityTransformer transformer
     ) throws IOException {
         double x, y, z;
-        CompoundBinaryTag tag;
+        LinCompoundTag tag;
         String id;
         byte type;
         int count = stream.readInt();
@@ -433,8 +435,10 @@ public class FastSchematicReaderV3 implements ClipboardReader {
                         if (!stream.readUTF().equals("Data")) {
                             throw new IOException("Expected COMPOUND tag to be Data");
                         }
-                        //noinspection deprecation
-                        tag = ((CompoundTag) nbtStream.readTagPayload(NBTConstants.TYPE_COMPOUND, 0)).asBinaryTag();
+                        if (!(nbtStream.readTagPayload(NBTConstants.TYPE_COMPOUND, 0).toLinTag() instanceof LinCompoundTag lin)) {
+                            throw new IOException("Data tag could not be read into LinCompoundTag");
+                        }
+                        tag = lin;
                     }
                     default -> throw new IOException("Unexpected tag in compound: " + type);
                 }
@@ -446,7 +450,7 @@ public class FastSchematicReaderV3 implements ClipboardReader {
                 throw new IOException("Missing position for entity " + id);
             }
             if (tag == null) {
-                transformer.transform(x, y, z, id, CompoundBinaryTag.empty());
+                transformer.transform(x, y, z, id, LinCompoundTag.of(Map.of()));
                 continue;
             }
             tag = this.dataFixer.fixUp(fixType, tag);
@@ -771,7 +775,7 @@ public class FastSchematicReaderV3 implements ClipboardReader {
          * @param id  the entity id as a resource location (e.g. {@code minecraft:sheep}).
          * @param tag the - already fixed, if required - nbt data of the entity.
          */
-        void transform(double x, double y, double z, String id, CompoundBinaryTag tag);
+        void transform(double x, double y, double z, String id, LinCompoundTag tag);
 
     }
 

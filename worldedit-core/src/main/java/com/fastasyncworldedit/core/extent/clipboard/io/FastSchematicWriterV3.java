@@ -14,13 +14,13 @@ import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardWriter;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import net.jpountz.lz4.LZ4BlockInputStream;
 import net.jpountz.lz4.LZ4BlockOutputStream;
+import org.enginehub.linbus.tree.LinCompoundTag;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -119,7 +119,7 @@ public class FastSchematicWriterV3 implements ClipboardWriter {
                     BlockTypesCache.states.length,
                     pos -> {
                         BaseBlock block = pos.getFullBlock(clipboard);
-                        CompoundBinaryTag tag;
+                        LinCompoundTag tag;
                         if ((tag = block.getNbt()) != null) {
                             tiles[0]++;
                             try {
