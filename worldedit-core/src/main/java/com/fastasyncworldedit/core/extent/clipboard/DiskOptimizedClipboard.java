@@ -586,7 +586,7 @@ public class DiskOptimizedClipboard extends LinearClipboard {
                         for (BlockArrayClipboard.ClipboardEntity entity : entities) {
                             if (entity.getState() != null && entity.getState().getNbtData() != null) {
                                 CompoundTag data = entity.getState().getNbtData();
-                                HashMap<String, Tag> value = new HashMap<>(data.getValue());
+                                HashMap<String, Tag<?, ?>> value = new HashMap<>(data.getValue());
                                 List<DoubleTag> pos = new ArrayList<>(3);
                                 pos.add(new DoubleTag(entity.getLocation().x()));
                                 pos.add(new DoubleTag(entity.getLocation().x()));
@@ -710,7 +710,7 @@ public class DiskOptimizedClipboard extends LinearClipboard {
 
     @Override
     public boolean setTile(int x, int y, int z, CompoundTag tag) {
-        final Map<String, Tag> values = new HashMap<>(tag.getValue());
+        final Map<String, Tag<?, ?>> values = new HashMap<>(tag.getValue());
         values.put("x", new IntTag(x));
         values.put("y", new IntTag(y));
         values.put("z", new IntTag(z));

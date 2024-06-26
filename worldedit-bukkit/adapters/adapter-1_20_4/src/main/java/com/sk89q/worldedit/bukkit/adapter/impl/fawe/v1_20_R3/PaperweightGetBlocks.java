@@ -737,7 +737,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                         Iterator<CompoundTag> iterator = entities.iterator();
                         while (iterator.hasNext()) {
                             final CompoundTag nativeTag = iterator.next();
-                            final Map<String, Tag> entityTagMap = nativeTag.getValue();
+                            final Map<String, Tag<?, ?>> entityTagMap = nativeTag.getValue();
                             final StringTag idTag = (StringTag) entityTagMap.get("Id");
                             final ListTag posTag = (ListTag) entityTagMap.get("Pos");
                             final ListTag rotTag = (ListTag) entityTagMap.get("Rotation");

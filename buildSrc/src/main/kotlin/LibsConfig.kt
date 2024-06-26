@@ -40,8 +40,7 @@ fun Project.applyLibrariesConfiguration() {
 
     val relocations = mapOf(
         "net.kyori.text" to "com.sk89q.worldedit.util.formatting.text",
-        "net.kyori.minecraft" to "com.sk89q.worldedit.util.kyori",
-        "net.kyori.adventure.nbt" to "com.sk89q.worldedit.util.nbt"
+        "net.kyori.minecraft" to "com.sk89q.worldedit.util.kyori"
 
     )
 
@@ -53,9 +52,14 @@ fun Project.applyLibrariesConfiguration() {
             exclude(dependency("com.google.guava:guava"))
             exclude(dependency("com.google.code.gson:gson"))
             exclude(dependency("com.google.errorprone:error_prone_annotations"))
+            exclude(dependency("com.google.guava:failureaccess"))
             exclude(dependency("org.checkerframework:checker-qual"))
+            exclude(dependency("org.jetbrains:annotations"))
             exclude(dependency("org.apache.logging.log4j:log4j-api"))
             exclude(dependency("com.google.code.findbugs:jsr305"))
+            exclude {
+                it.moduleGroup == "org.jetbrains.kotlin"
+            }
         }
 
         relocations.forEach { (from, to) ->
@@ -67,11 +71,19 @@ fun Project.applyLibrariesConfiguration() {
             .filterIsInstance<ModuleDependency>()
             .map { it.copy() }
             .map { dependency ->
-                dependency.artifact {
-                    name = dependency.name
-                    type = artifactType
-                    extension = "jar"
-                    classifier = artifactType
+                val category = dependency.attributes.getAttribute(Category.CATEGORY_ATTRIBUTE)?.name
+                if (category == Category.REGULAR_PLATFORM || category == Category.ENFORCED_PLATFORM) {
+                    return@map dependency
+                }
+                try {
+                    dependency.artifact {
+                        name = dependency.name
+                        type = artifactType
+                        extension = "jar"
+                        classifier = artifactType
+                    }
+                } catch (e: Exception) {
+                    throw RuntimeException("Failed to add artifact to dependency: $dependency", e)
                 }
                 dependency
             }
@@ -85,6 +97,10 @@ fun Project.applyLibrariesConfiguration() {
         from({
             altConfigFiles("sources")
         })
+
+        // Yeet module-info's
+        exclude("module-info.java")
+
         relocations.forEach { (from, to) ->
             val filePattern = Regex("(.*)${from.replace('.', '/')}((?:/|$).*)")
             val textPattern = Regex.fromLiteral(from)

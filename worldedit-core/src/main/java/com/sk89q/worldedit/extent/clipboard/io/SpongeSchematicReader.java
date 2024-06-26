@@ -21,7 +21,7 @@ package com.sk89q.worldedit.extent.clipboard.io;
 
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.google.common.collect.Maps;
-import com.sk89q.jnbt.AdventureNBTConverter;
+import com.sk89q.jnbt.LinBusConverter;
 import com.sk89q.jnbt.ByteArrayTag;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.IntArrayTag;
@@ -64,7 +64,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.OptionalInt;
-import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -97,7 +96,7 @@ public class SpongeSchematicReader extends NBTSchematicReader {
     @Override
     public Clipboard read() throws IOException {
         CompoundTag schematicTag = getBaseTag();
-        Map<String, Tag> schematic = schematicTag.getValue();
+        Map<String, Tag<?, ?>> schematic = schematicTag.getValue();
 
         final Platform platform = WorldEdit.getInstance().getPlatformManager()
                 .queryCapability(Capability.WORLD_EDITING);
@@ -147,7 +146,7 @@ public class SpongeSchematicReader extends NBTSchematicReader {
     public OptionalInt getDataVersion() {
         try {
             CompoundTag schematicTag = getBaseTag();
-            Map<String, Tag> schematic = schematicTag.getValue();
+            Map<String, Tag<?, ?>> schematic = schematicTag.getValue();
             if (schematicVersion == 1) {
                 return OptionalInt.of(Constants.DATA_VERSION_MC_1_13_2);
             } else if (schematicVersion == 2) {
@@ -168,7 +167,7 @@ public class SpongeSchematicReader extends NBTSchematicReader {
         CompoundTag schematicTag = (CompoundTag) rootTag.getTag();
 
         // Check
-        Map<String, Tag> schematic = schematicTag.getValue();
+        Map<String, Tag<?, ?>> schematic = schematicTag.getValue();
 
         // Be lenient about the specific nesting level of the Schematic tag
         // Also allows checking the version from newer versions of the specification
@@ -184,7 +183,7 @@ public class SpongeSchematicReader extends NBTSchematicReader {
     private BlockArrayClipboard readVersion1(CompoundTag schematicTag) throws IOException {
         BlockVector3 origin;
         Region region;
-        Map<String, Tag> schematic = schematicTag.getValue();
+        Map<String, Tag<?, ?>> schematic = schematicTag.getValue();
 
         int width = requireTag(schematic, "Width", ShortTag.class).getValue();
         int height = requireTag(schematic, "Height", ShortTag.class).getValue();
@@ -206,7 +205,7 @@ public class SpongeSchematicReader extends NBTSchematicReader {
         CompoundTag metadataTag = getTag(schematic, "Metadata", CompoundTag.class);
         if (metadataTag != null && metadataTag.containsKey("WEOffsetX")) {
             // We appear to have WorldEdit Metadata
-            Map<String, Tag> metadata = metadataTag.getValue();
+            Map<String, Tag<?, ?>> metadata = metadataTag.getValue();
             int offsetX = requireTag(metadata, "WEOffsetX", IntTag.class).getValue();
             int offsetY = requireTag(metadata, "WEOffsetY", IntTag.class).getValue();
             int offsetZ = requireTag(metadata, "WEOffsetZ", IntTag.class).getValue();
@@ -219,7 +218,7 @@ public class SpongeSchematicReader extends NBTSchematicReader {
         }
 
         IntTag paletteMaxTag = getTag(schematic, "PaletteMax", IntTag.class);
-        Map<String, Tag> paletteObject = requireTag(schematic, "Palette", CompoundTag.class).getValue();
+        Map<String, Tag<?, ?>> paletteObject = requireTag(schematic, "Palette", CompoundTag.class).getValue();
         if (paletteMaxTag != null && paletteObject.size() != paletteMaxTag.getValue()) {
             throw new IOException("Block palette size does not match expected size.");
         }
@@ -248,21 +247,17 @@ public class SpongeSchematicReader extends NBTSchematicReader {
 
         byte[] blocks = requireTag(schematic, "BlockData", ByteArrayTag.class).getValue();
 
-        Map<BlockVector3, Map<String, Tag>> tileEntitiesMap = new HashMap<>();
+        Map<BlockVector3, Map<String, Tag<?, ?>>> tileEntitiesMap = new HashMap<>();
         ListTag tileEntities = getTag(schematic, "BlockEntities", ListTag.class);
         if (tileEntities == null) {
             tileEntities = getTag(schematic, "TileEntities", ListTag.class);
         }
         if (tileEntities != null) {
-            List<Map<String, Tag>> tileEntityTags = tileEntities.getValue().stream()
-                    .map(tag -> (CompoundTag) tag)
-                    .map(CompoundTag::getValue)
-                    .collect(Collectors.toList());
-
-            for (Map<String, Tag> tileEntity : tileEntityTags) {
+            for (Object tileTag : tileEntities.getValue()) {
+                Map<String, Tag<?, ?>> tileEntity = ((CompoundTag) tileTag).getValue();
                 int[] pos = requireTag(tileEntity, "Pos", IntArrayTag.class).getValue();
                 final BlockVector3 pt = BlockVector3.at(pos[0], pos[1], pos[2]);
-                Map<String, Tag> values = Maps.newHashMap(tileEntity);
+                Map<String, Tag<?, ?>> values = Maps.newHashMap(tileEntity);
                 values.put("x", new IntTag(pt.x()));
                 values.put("y", new IntTag(pt.y()));
                 values.put("z", new IntTag(pt.z()));
@@ -279,10 +274,10 @@ public class SpongeSchematicReader extends NBTSchematicReader {
                 values.remove("Id");
                 values.remove("Pos");
                 if (fixer != null) {
-                    //FAWE start - BinaryTag
-                    tileEntity = ((CompoundTag) AdventureNBTConverter.fromAdventure(fixer.fixUp(
+                    //FAWE start - LinTag
+                    tileEntity = ((CompoundTag) LinBusConverter.fromLinBus(fixer.fixUp(
                             DataFixer.FixTypes.BLOCK_ENTITY,
-                            new CompoundTag(values).asBinaryTag(),
+                            new CompoundTag(values).toLinTag(),
                             dataVersion
                     ))).getValue();
                     //FAWE end
@@ -341,7 +336,7 @@ public class SpongeSchematicReader extends NBTSchematicReader {
     }
 
     private Clipboard readVersion2(BlockArrayClipboard version1, CompoundTag schematicTag) throws IOException {
-        Map<String, Tag> schematic = schematicTag.getValue();
+        Map<String, Tag<?, ?>> schematic = schematicTag.getValue();
         if (schematic.containsKey("BiomeData")) {
             readBiomes(version1, schematic);
         }
@@ -351,7 +346,7 @@ public class SpongeSchematicReader extends NBTSchematicReader {
         return version1;
     }
 
-    private void readBiomes(BlockArrayClipboard clipboard, Map<String, Tag> schematic) throws IOException {
+    private void readBiomes(BlockArrayClipboard clipboard, Map<String, Tag<?, ?>> schematic) throws IOException {
         ByteArrayTag dataTag = requireTag(schematic, "BiomeData", ByteArrayTag.class);
         IntTag maxTag = requireTag(schematic, "BiomePaletteMax", IntTag.class);
         CompoundTag paletteTag = requireTag(schematic, "BiomePalette", CompoundTag.class);
@@ -361,7 +356,7 @@ public class SpongeSchematicReader extends NBTSchematicReader {
             throw new IOException("Biome palette size does not match expected size.");
         }
 
-        for (Entry<String, Tag> palettePart : paletteTag.getValue().entrySet()) {
+        for (Entry<String, Tag<?, ?>> palettePart : paletteTag.getValue().entrySet()) {
             String key = palettePart.getKey();
             if (fixer != null) {
                 key = fixer.fixUp(DataFixer.FixTypes.BIOME, key, dataVersion);
@@ -411,7 +406,7 @@ public class SpongeSchematicReader extends NBTSchematicReader {
         }
     }
 
-    private void readEntities(BlockArrayClipboard clipboard, Map<String, Tag> schematic) throws IOException {
+    private void readEntities(BlockArrayClipboard clipboard, Map<String, Tag<?, ?>> schematic) throws IOException {
         List<Tag> entList = requireTag(schematic, "Entities", ListTag.class).getValue();
         if (entList.isEmpty()) {
             return;
@@ -421,15 +416,15 @@ public class SpongeSchematicReader extends NBTSchematicReader {
                 continue;
             }
             CompoundTag entityTag = (CompoundTag) et;
-            Map<String, Tag> tags = entityTag.getValue();
+            Map<String, Tag<?, ?>> tags = entityTag.getValue();
             String id = requireTag(tags, "Id", StringTag.class).getValue();
             entityTag = entityTag.createBuilder().putString("id", id).remove("Id").build();
 
             if (fixer != null) {
-                //FAWE start - BinaryTag
-                entityTag = (CompoundTag) AdventureNBTConverter.fromAdventure(fixer.fixUp(
+                //FAWE start - LinTag
+                entityTag = (CompoundTag) LinBusConverter.fromLinBus(fixer.fixUp(
                         DataFixer.FixTypes.ENTITY,
-                        entityTag.asBinaryTag(),
+                        entityTag.toLinTag(),
                         dataVersion
                 ));
                 //FAWE end

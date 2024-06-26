@@ -19,17 +19,12 @@
 
 package com.sk89q.worldedit.world.chunk;
 
-import com.fastasyncworldedit.core.util.NbtUtils;
+import com.google.common.collect.ImmutableMap;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.util.concurrency.LazyReference;
-import com.sk89q.worldedit.util.nbt.BinaryTag;
-import com.sk89q.worldedit.util.nbt.BinaryTagTypes;
-import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
-import com.sk89q.worldedit.util.nbt.IntBinaryTag;
-import com.sk89q.worldedit.util.nbt.ListBinaryTag;
 import com.sk89q.worldedit.world.DataException;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
@@ -39,10 +34,14 @@ import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.entity.EntityTypes;
 import com.sk89q.worldedit.world.storage.InvalidFormatException;
+import org.enginehub.linbus.tree.LinCompoundTag;
+import org.enginehub.linbus.tree.LinIntArrayTag;
+import org.enginehub.linbus.tree.LinListTag;
+import org.enginehub.linbus.tree.LinTag;
+import org.enginehub.linbus.tree.LinTagType;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -51,26 +50,28 @@ import java.util.Map;
  */
 public class AnvilChunk13 implements Chunk {
 
-    protected final CompoundBinaryTag rootTag;
+    protected final LinCompoundTag rootTag;
+
     private final BlockState[][] blocks;
     //FAWE start - biome and entity restore
     protected BiomeType[] biomes;
-    //FAWE end
-    private Map<BlockVector3, CompoundBinaryTag> tileEntities;
-    //FAWE start - biome and entity restore
     private List<BaseEntity> entities;
     //FAWE end
+    private Map<BlockVector3, LinCompoundTag> tileEntities;
+    private final int rootX;
+    private final int rootZ;
+
 
     /**
      * Construct the chunk with a compound tag.
      *
      * @param tag the tag to read
      * @throws DataException on a data error
-     * @deprecated Use {@link #AnvilChunk13(CompoundBinaryTag)}
+     * @deprecated Use {@link #AnvilChunk13(LinCompoundTag)}
      */
     @Deprecated
     public AnvilChunk13(CompoundTag tag) throws DataException {
-        this(tag.asBinaryTag());
+        this(tag.toLinTag());
     }
 
     /**
@@ -79,53 +80,58 @@ public class AnvilChunk13 implements Chunk {
      * @param tag the tag to read
      * @throws DataException on a data error
      */
-    public AnvilChunk13(CompoundBinaryTag tag) throws DataException {
+    public AnvilChunk13(LinCompoundTag tag) throws DataException {
         rootTag = tag;
+
+        rootX = rootTag.getTag("xPos", LinTagType.intTag()).valueAsInt();
+        rootZ = rootTag.getTag("zPos", LinTagType.intTag()).valueAsInt();
 
         blocks = new BlockState[16][];
 
-        ListBinaryTag sections = NbtUtils.getChildTag(rootTag, "Sections", BinaryTagTypes.LIST);
+        LinListTag<LinTag<?>> sections = rootTag.getTag("Sections", LinTagType.listTag());
 
-        for (BinaryTag rawSectionTag : sections) {
-            if (!(rawSectionTag instanceof CompoundBinaryTag)) {
+        for (LinTag<?> rawSectionTag : sections.value()) {
+            if (!(rawSectionTag instanceof LinCompoundTag sectionTag)) {
                 continue;
             }
 
-            CompoundBinaryTag sectionTag = (CompoundBinaryTag) rawSectionTag;
-            if (sectionTag.get("Y") == null) {
+            var sectionYTag = sectionTag.findTag("Y", LinTagType.byteTag());
+            if (sectionYTag == null) {
                 continue; // Empty section.
             }
 
-            int y = NbtUtils.getChildTag(sectionTag, "Y", BinaryTagTypes.BYTE).value();
+            int y = sectionYTag.value();
             if (y < 0 || y >= 16) {
                 continue;
             }
 
             // parse palette
-            ListBinaryTag paletteEntries = sectionTag.getList("Palette", BinaryTagTypes.COMPOUND);
-            int paletteSize = paletteEntries.size();
+            LinListTag<LinCompoundTag> paletteEntries = sectionTag.getTag(
+                    "Palette", LinTagType.listTag()
+            ).asTypeChecked(LinTagType.compoundTag());
+            int paletteSize = paletteEntries.value().size();
             if (paletteSize == 0) {
                 continue;
             }
             BlockState[] palette = new BlockState[paletteSize];
             for (int paletteEntryId = 0; paletteEntryId < paletteSize; paletteEntryId++) {
-                CompoundBinaryTag paletteEntry = (CompoundBinaryTag) paletteEntries.get(paletteEntryId);
-                BlockType type = BlockTypes.get(paletteEntry.getString("Name"));
+                LinCompoundTag paletteEntry = paletteEntries.get(paletteEntryId);
+                String blockType = paletteEntry.getTag("Name", LinTagType.stringTag()).value();
+                BlockType type = BlockTypes.get(blockType);
                 if (type == null) {
-                    throw new InvalidFormatException("Invalid block type: " + paletteEntry.getString("Name"));
+                    throw new InvalidFormatException("Invalid block type: " + blockType);
                 }
                 BlockState blockState = type.getDefaultState();
-                if (paletteEntry.get("Properties") != null) {
-                    CompoundBinaryTag properties = NbtUtils.getChildTag(paletteEntry, "Properties", BinaryTagTypes.COMPOUND);
+                var propertiesTag = paletteEntry.findTag("Properties", LinTagType.compoundTag());
+                if (propertiesTag != null) {
                     for (Property<?> property : blockState.getStates().keySet()) {
-                        if (properties.get(property.getName()) != null) {
-                            String value = properties.getString(property.getName());
+                        var propertyName = propertiesTag.findTag(property.getName(), LinTagType.stringTag());
+                        if (propertyName != null) {
+                            String value = propertyName.value();
                             try {
                                 blockState = getBlockStateWith(blockState, property, value);
                             } catch (IllegalArgumentException e) {
-                                throw new InvalidFormatException("Invalid block state for " + blockState
-                                        .getBlockType()
-                                        .id() + ", " + property.getName() + ": " + value);
+                                throw new InvalidFormatException("Invalid block state for " + blockState.getBlockType().id() + ", " + property.getName() + ": " + value);
                             }
                         }
                     }
@@ -134,7 +140,7 @@ public class AnvilChunk13 implements Chunk {
             }
 
             // parse block states
-            long[] blockStatesSerialized = NbtUtils.getChildTag(sectionTag, "BlockStates", BinaryTagTypes.LONG_ARRAY).value();
+            long[] blockStatesSerialized = sectionTag.getTag("BlockStates", LinTagType.longArrayTag()).value();
 
             BlockState[] chunkSectionBlocks = new BlockState[16 * 16 * 16];
             blocks[y] = chunkSectionBlocks;
@@ -143,8 +149,7 @@ public class AnvilChunk13 implements Chunk {
         }
     }
 
-    protected void readBlockStates(BlockState[] palette, long[] blockStatesSerialized, BlockState[] chunkSectionBlocks) throws
-            InvalidFormatException {
+    protected void readBlockStates(BlockState[] palette, long[] blockStatesSerialized, BlockState[] chunkSectionBlocks) throws InvalidFormatException {
         int paletteBits = 4;
         while ((1 << paletteBits) < palette.length) {
             ++paletteBits;
@@ -163,7 +168,7 @@ public class AnvilChunk13 implements Chunk {
                     throw new InvalidFormatException("Too short block state table");
                 }
                 currentSerializedValue = blockStatesSerialized[nextSerializedItem++];
-                localBlockId |= (int) ((currentSerializedValue & ((1 << bitsNextLong) - 1)) << remainingBits);
+                localBlockId |= (int) (currentSerializedValue & ((1L << bitsNextLong) - 1)) << remainingBits;
                 currentSerializedValue >>>= bitsNextLong;
                 remainingBits = 64 - bitsNextLong;
             } else {
@@ -185,27 +190,23 @@ public class AnvilChunk13 implements Chunk {
     /**
      * Used to load the tile entities.
      */
-    private void populateTileEntities() throws DataException {
-        tileEntities = new HashMap<>();
-        if (rootTag.get("TileEntities") == null) {
-            return;
+    private Map<BlockVector3, LinCompoundTag> populateTileEntities() {
+        LinListTag<LinCompoundTag> tags = rootTag.findListTag(
+                "TileEntities", LinTagType.compoundTag()
+        );
+        if (tags == null) {
+            return ImmutableMap.of();
         }
-        ListBinaryTag tags = NbtUtils.getChildTag(rootTag, "TileEntities", BinaryTagTypes.LIST);
-
-        for (BinaryTag tag : tags) {
-            if (!(tag instanceof CompoundBinaryTag)) {
-                throw new InvalidFormatException("CompoundTag expected in TileEntities");
-            }
-
-            CompoundBinaryTag t = (CompoundBinaryTag) tag;
-
-            int x = ((IntBinaryTag) t.get("x")).value();
-            int y = ((IntBinaryTag) t.get("y")).value();
-            int z = ((IntBinaryTag) t.get("z")).value();
+        var tileEntities = ImmutableMap.<BlockVector3, LinCompoundTag>builderWithExpectedSize(tags.value().size());
+        for (LinCompoundTag tag : tags.value()) {
+            int x = tag.getTag("x", LinTagType.intTag()).valueAsInt();
+            int y = tag.getTag("y", LinTagType.intTag()).valueAsInt();
+            int z = tag.getTag("z", LinTagType.intTag()).valueAsInt();
 
             BlockVector3 vec = BlockVector3.at(x, y, z);
-            tileEntities.put(vec, t);
+            tileEntities.put(vec, tag);
         }
+        return tileEntities.build();
     }
 
     /**
@@ -215,26 +216,21 @@ public class AnvilChunk13 implements Chunk {
      *
      * @param position the position
      * @return the compound tag for that position, which may be null
-     * @throws DataException thrown if there is a data error
      */
     @Nullable
-    private CompoundBinaryTag getBlockTileEntity(BlockVector3 position) throws DataException {
+    private LinCompoundTag getBlockTileEntity(BlockVector3 position) {
         if (tileEntities == null) {
-            populateTileEntities();
+            this.tileEntities = populateTileEntities();
         }
 
-        CompoundBinaryTag values = tileEntities.get(position);
-
-        return values;
+        return tileEntities.get(position);
     }
 
     @Override
     public BaseBlock getBlock(BlockVector3 position) throws DataException {
-        //FAWE start - simplified
-        int x = position.x() & 15;
+        int x = position.x() - rootX * 16;
         int y = position.y();
-        int z = position.z() & 15;
-        //FAWE end
+        int z = position.z() - rootZ * 16;
 
         int section = y >> 4;
         int yIndex = y & 0x0F;
@@ -246,15 +242,10 @@ public class AnvilChunk13 implements Chunk {
         BlockState[] sectionBlocks = blocks[section];
         BlockState state = sectionBlocks != null ? sectionBlocks[(yIndex << 8) | (z << 4) | x] : BlockTypes.AIR.getDefaultState();
 
-        CompoundBinaryTag tileEntity = getBlockTileEntity(position);
+        LinCompoundTag tileEntity = getBlockTileEntity(position);
 
-        if (tileEntity != null) {
-            return state.toBaseBlock(tileEntity);
-        }
-
-        return state.toBaseBlock();
-    }
-    //FAWE start - biome and entity restore
+        return state.toBaseBlock(tileEntity);
+    }    //FAWE start - biome and entity restore
 
     @Override
     public BiomeType getBiome(final BlockVector3 position) throws DataException {
@@ -277,21 +268,20 @@ public class AnvilChunk13 implements Chunk {
     /**
      * Used to load the biomes.
      */
-    private void populateEntities() throws DataException {
+    private void populateEntities() {
         entities = new ArrayList<>();
-        if (rootTag.get("Entities") == null) {
+        LinListTag<LinCompoundTag> tags = rootTag.findListTag(
+                "Entities", LinTagType.compoundTag()
+        );
+        if (tags == null) {
             return;
         }
-        ListBinaryTag tags = NbtUtils.getChildTag(rootTag, "Entities", BinaryTagTypes.LIST);
 
-        for (BinaryTag tag : tags) {
-            if (!(tag instanceof CompoundBinaryTag)) {
-                throw new InvalidFormatException("CompoundTag expected in Entities");
-            }
-
-            CompoundBinaryTag t = (CompoundBinaryTag) tag;
-
-            entities.add(new BaseEntity(EntityTypes.get(t.getString("id")), LazyReference.computed(t)));
+        for (LinCompoundTag tag : tags.value()) {
+            entities.add(new BaseEntity(
+                    EntityTypes.get(tag.getTag("id", LinTagType.stringTag()).value()),
+                    LazyReference.computed(tag)
+            ));
         }
 
     }
@@ -299,12 +289,13 @@ public class AnvilChunk13 implements Chunk {
     /**
      * Used to load the biomes.
      */
-    private void populateBiomes() throws DataException {
+    private void populateBiomes() {
         biomes = new BiomeType[256];
-        if (rootTag.get("Biomes") == null) {
+        LinIntArrayTag biomeTag = rootTag.findTag("Biomes", LinTagType.intArrayTag());
+        if (biomeTag == null) {
             return;
         }
-        int[] stored = NbtUtils.getChildTag(rootTag, "Biomes", BinaryTagTypes.INT_ARRAY).value();
+        int[] stored = biomeTag.value();
         for (int i = 0; i < 256; i++) {
             biomes[i] = BiomeTypes.getLegacy(stored[i]);
         }
