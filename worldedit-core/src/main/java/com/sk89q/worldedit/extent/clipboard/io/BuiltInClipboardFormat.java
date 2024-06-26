@@ -284,9 +284,8 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
                 CompoundTag schematicTag = (CompoundTag) rootTag.getTag();
 
                 // Check
-                Map<String, Tag> schematic = schematicTag.getValue();
-                Tag versionTag = schematic.get("Version");
-                if (!(versionTag instanceof IntTag) || ((IntTag) versionTag).getValue() != 2) {
+                Map<String, Tag<?, ?>> schematic = schematicTag.getValue();
+                if (!schematic.containsKey("Version")) {
                     return false;
                 }
             } catch (Exception e) {

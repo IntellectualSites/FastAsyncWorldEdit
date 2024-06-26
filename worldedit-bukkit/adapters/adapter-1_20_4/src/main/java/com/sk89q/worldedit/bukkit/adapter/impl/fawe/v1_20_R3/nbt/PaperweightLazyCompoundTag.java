@@ -6,8 +6,8 @@ import com.sk89q.jnbt.ListTag;
 import com.sk89q.jnbt.StringTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
-import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
 import net.minecraft.nbt.NumericTag;
+import org.enginehub.linbus.tree.LinCompoundTag;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -36,7 +36,7 @@ public class PaperweightLazyCompoundTag extends LazyCompoundTag {
 
     @Override
     @SuppressWarnings("unchecked")
-    public Map<String, Tag> getValue() {
+    public Map<String, Tag<?, ?>> getValue() {
         if (compoundTag == null) {
             compoundTag = (CompoundTag) WorldEditPlugin.getInstance().getBukkitImplAdapter().toNative(compoundTagSupplier.get());
         }
@@ -44,9 +44,9 @@ public class PaperweightLazyCompoundTag extends LazyCompoundTag {
     }
 
     @Override
-    public CompoundBinaryTag asBinaryTag() {
+    public LinCompoundTag toLinTag() {
         getValue();
-        return compoundTag.asBinaryTag();
+        return compoundTag.toLinTag();
     }
 
     public boolean containsKey(String key) {
@@ -94,10 +94,10 @@ public class PaperweightLazyCompoundTag extends LazyCompoundTag {
     }
 
     @SuppressWarnings("unchecked")
-    public List<Tag> getList(String key) {
+    public List<? extends Tag<?, ?>> getList(String key) {
         net.minecraft.nbt.Tag tag = compoundTagSupplier.get().get(key);
         if (tag instanceof net.minecraft.nbt.ListTag nbtList) {
-            ArrayList<Tag> list = new ArrayList<>();
+            ArrayList<Tag<?, ?>> list = new ArrayList<>();
             for (net.minecraft.nbt.Tag elem : nbtList) {
                 if (elem instanceof net.minecraft.nbt.CompoundTag compoundTag) {
                     list.add(new PaperweightLazyCompoundTag(compoundTag));
@@ -120,7 +120,7 @@ public class PaperweightLazyCompoundTag extends LazyCompoundTag {
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends Tag> List<T> getList(String key, Class<T> listType) {
+    public <T extends Tag<?, ?>> List<T> getList(String key, Class<T> listType) {
         ListTag listTag = getListTag(key);
         if (listTag.getType().equals(listType)) {
             return (List<T>) listTag.getValue();

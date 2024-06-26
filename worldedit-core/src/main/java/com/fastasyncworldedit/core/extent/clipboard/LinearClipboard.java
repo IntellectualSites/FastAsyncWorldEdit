@@ -106,7 +106,7 @@ public abstract class LinearClipboard extends SimpleClipboard {
     @Nullable
     @Override
     public Entity createEntity(Location location, BaseEntity entity, UUID uuid) {
-        Map<String, Tag> map = new HashMap<>(entity.getNbtData().getValue());
+        Map<String, Tag<?, ?>> map = new HashMap<>(entity.getNbtData().getValue());
         NBTUtils.addUUIDToMap(map, uuid);
         entity.setNbtData(new CompoundTag(map));
         BlockArrayClipboard.ClipboardEntity ret = new BlockArrayClipboard.ClipboardEntity(location, entity);

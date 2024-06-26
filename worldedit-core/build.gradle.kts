@@ -46,7 +46,6 @@ dependencies {
     implementation(libs.findbugs)
     implementation(libs.rhino)
     compileOnly(libs.adventureApi)
-    compileOnlyApi(libs.adventureNbt)
     compileOnlyApi(libs.adventureMiniMessage)
     implementation(libs.zstd) { isTransitive = false }
     compileOnly(libs.paster)
@@ -56,10 +55,10 @@ dependencies {
     antlr(libs.antlr4)
     implementation(libs.antlr4Runtime)
     implementation(libs.jsonSimple) { isTransitive = false }
+    implementation(platform(libs.linBus.bom))
 
     // Tests
     testRuntimeOnly(libs.log4jCore)
-    testImplementation(libs.adventureNbt)
     testImplementation(libs.parallelgzip)
 }
 

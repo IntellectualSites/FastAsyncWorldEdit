@@ -10,9 +10,10 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.util.concurrency.LazyReference;
-import com.sk89q.worldedit.util.nbt.TagStringIO;
 import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.item.ItemTypes;
+import org.enginehub.linbus.format.snbt.LinStringIO;
+import org.enginehub.linbus.tree.LinCompoundTag;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -36,7 +37,10 @@ public final class BaseItemAdapter implements JsonDeserializer<BaseItem>, JsonSe
             return new BaseItem(itemType);
         }
         try {
-            return new BaseItem(itemType, LazyReference.computed(TagStringIO.get().asCompound(nbt.getAsString())));
+            return new BaseItem(
+                    itemType,
+                    LazyReference.computed(LinCompoundTag.readFrom(LinStringIO.readFromString(nbt.getAsString())))
+            );
         } catch (IOException e) {
             throw new JsonParseException("Could not deserialize BaseItem", e);
         }
@@ -50,12 +54,8 @@ public final class BaseItemAdapter implements JsonDeserializer<BaseItem>, JsonSe
     ) {
         JsonObject obj = new JsonObject();
         obj.add("itemType", jsonSerializationContext.serialize(baseItem.getType()));
-        try {
-            obj.add("nbt", baseItem.getNbt() == null ? null : new JsonPrimitive(TagStringIO.get().asString(baseItem.getNbt())));
-            return obj;
-        } catch (IOException e) {
-            throw new JsonParseException("Could not deserialize BaseItem", e);
-        }
+        obj.add("nbt", baseItem.getNbt() == null ? null : new JsonPrimitive(LinStringIO.writeToString(baseItem.getNbt())));
+        return obj;
     }
 
 }

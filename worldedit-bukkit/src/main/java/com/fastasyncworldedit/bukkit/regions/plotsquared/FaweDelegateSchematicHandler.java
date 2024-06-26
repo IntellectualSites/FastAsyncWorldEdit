@@ -194,7 +194,7 @@ public class FaweDelegateSchematicHandler {
             } else {
                 try (OutputStream stream = new FileOutputStream(tmp);
                      NBTOutputStream output = new NBTOutputStream(new ParallelGZIPOutputStream(stream))) {
-                    Map<String, Tag> map = tag.getValue();
+                    Map<String, Tag<?, ?>> map = tag.getValue();
                     output.writeNamedTag("Schematic", map.getOrDefault("Schematic", tag));
                 }
             }
@@ -226,7 +226,7 @@ public class FaweDelegateSchematicHandler {
                 try {
                     try (ParallelGZIPOutputStream gzip = new ParallelGZIPOutputStream(output)) {
                         try (NBTOutputStream nos = new NBTOutputStream(gzip)) {
-                            Map<String, Tag> map = weTag.getValue();
+                            Map<String, Tag<?, ?>> map = weTag.getValue();
                             nos.writeNamedTag("Schematic", map.getOrDefault("Schematic", weTag));
                         }
                     }

@@ -149,7 +149,7 @@ public class FastSchematicWriterV2 implements ClipboardWriter {
                 BaseBlock block = pos.getFullBlock(finalClipboard);
                 CompoundTag nbt = block.getNbtData();
                 if (nbt != null) {
-                    Map<String, Tag> values = new HashMap<>(nbt.getValue());
+                    Map<String, Tag<?, ?>> values = new HashMap<>(nbt.getValue());
 
                     // Positions are kept in NBT, we don't want that.
                     values.remove("x");
@@ -223,7 +223,7 @@ public class FastSchematicWriterV2 implements ClipboardWriter {
                 BaseEntity state = entity.getState();
 
                 if (state != null) {
-                    Map<String, Tag> values = new HashMap<>();
+                    Map<String, Tag<?, ?>> values = new HashMap<>();
 
                     // Put NBT provided data
                     CompoundTag rawTag = state.getNbtData();

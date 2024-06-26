@@ -27,7 +27,7 @@ import com.fastasyncworldedit.core.extent.processor.lighting.RelighterFactory;
 import com.fastasyncworldedit.core.queue.IBatchProcessor;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.implementation.packet.ChunkPacket;
-import com.sk89q.jnbt.AdventureNBTConverter;
+import com.sk89q.jnbt.LinBusConverter;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.blocks.BaseItemStack;
@@ -41,8 +41,6 @@ import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.SideEffect;
 import com.sk89q.worldedit.util.formatting.text.Component;
-import com.sk89q.worldedit.util.nbt.BinaryTag;
-import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
 import com.sk89q.worldedit.world.DataFixer;
 import com.sk89q.worldedit.world.RegenOptions;
 import com.sk89q.worldedit.world.biome.BiomeType;
@@ -61,6 +59,8 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.enginehub.linbus.tree.LinCompoundTag;
+import org.enginehub.linbus.tree.LinTag;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
@@ -183,7 +183,7 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
      * @param pos     The position
      * @param nbtData The NBT Data
      */
-    void sendFakeNBT(Player player, BlockVector3 pos, CompoundBinaryTag nbtData);
+    void sendFakeNBT(Player player, BlockVector3 pos, LinCompoundTag nbtData);
 
     /**
      * Make the client think it has operator status.
@@ -291,11 +291,11 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
 
     @Deprecated
     default Tag toNative(T foreign) {
-        return AdventureNBTConverter.fromAdventure(toNativeBinary(foreign));
+        return LinBusConverter.toJnbtTag(toNativeLin(foreign));
     }
 
-    default BinaryTag toNativeBinary(T foreign) {
-        return toNative(foreign).asBinaryTag();
+    default LinTag<?> toNativeLin(T foreign) {
+        return toNative(foreign).toLinTag();
     }
 
     @Deprecated
@@ -303,14 +303,14 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
         if (foreign == null) {
             return null;
         }
-        return fromNativeBinary(foreign.asBinaryTag());
+        return fromNativeLin(foreign.toLinTag());
     }
 
-    default T fromNativeBinary(BinaryTag foreign) {
+    default T fromNativeLin(LinTag<?> foreign) {
         if (foreign == null) {
             return null;
         }
-        return fromNative(AdventureNBTConverter.fromAdventure(foreign));
+        return fromNative(LinBusConverter.toJnbtTag(foreign));
     }
 
     @Nullable

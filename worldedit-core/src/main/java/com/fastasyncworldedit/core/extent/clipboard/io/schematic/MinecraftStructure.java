@@ -70,7 +70,7 @@ public class MinecraftStructure implements ClipboardReader, ClipboardWriter {
             throw new IOException("Root tag has name - are you sure this is a structure?");
         }
 
-        Map<String, Tag> tags = ((CompoundTag) rootTag.getTag()).getValue();
+        Map<String, Tag<?, ?>> tags = ((CompoundTag) rootTag.getTag()).getValue();
 
         ListTag size = (ListTag) tags.get("size");
         int width = size.getInt(0);
@@ -89,13 +89,13 @@ public class MinecraftStructure implements ClipboardReader, ClipboardWriter {
             BlockState[] combinedArray = new BlockState[palette.size()];
             for (int i = 0; i < palette.size(); i++) {
                 CompoundTag compound = palette.get(i);
-                Map<String, Tag> map = compound.getValue();
+                Map<String, Tag<?, ?>> map = compound.getValue();
                 String name = ((StringTag) map.get("Name")).getValue();
                 BlockType type = BlockTypes.get(name);
                 BlockState state = type.getDefaultState();
                 CompoundTag properties = (CompoundTag) map.get("Properties");
                 if (properties != null) {
-                    for (Map.Entry<String, Tag> entry : properties.getValue().entrySet()) {
+                    for (Map.Entry<String, Tag<?, ?>> entry : properties.getValue().entrySet()) {
                         String key = entry.getKey();
                         String value = ((StringTag) entry.getValue()).getValue();
                         Property<Object> property = type.getProperty(key);
@@ -108,7 +108,7 @@ public class MinecraftStructure implements ClipboardReader, ClipboardWriter {
             List<CompoundTag> blocksList = (List<CompoundTag>) tags.get("blocks").getValue();
             try {
                 for (CompoundTag compound : blocksList) {
-                    Map<String, Tag> blockMap = compound.getValue();
+                    Map<String, Tag<?, ?>> blockMap = compound.getValue();
                     IntTag stateTag = (IntTag) blockMap.get("state");
                     ListTag posTag = (ListTag) blockMap.get("pos");
                     BlockState state = combinedArray[stateTag.getValue()];
@@ -136,7 +136,7 @@ public class MinecraftStructure implements ClipboardReader, ClipboardWriter {
         if (entities != null) {
             List<CompoundTag> entityList = (List<CompoundTag>) (List<?>) entities.getValue();
             for (CompoundTag entityEntry : entityList) {
-                Map<String, Tag> entityEntryMap = entityEntry.getValue();
+                Map<String, Tag<?, ?>> entityEntryMap = entityEntry.getValue();
                 ListTag posTag = (ListTag) entityEntryMap.get("pos");
                 CompoundTag nbtTag = (CompoundTag) entityEntryMap.get("nbt");
                 String id = nbtTag.getString("Id");
@@ -216,7 +216,7 @@ public class MinecraftStructure implements ClipboardReader, ClipboardWriter {
                 if (!block.hasNbtData()) {
                     blocks.add(FaweCache.INSTANCE.asMap("state", index, "pos", pos));
                 } else {
-                    Map<String, Tag> tag = new HashMap<>(block.getNbtData().getValue());
+                    Map<String, Tag<?, ?>> tag = new HashMap<>(block.getNbtData().getValue());
                     tag.remove("x");
                     tag.remove("y");
                     tag.remove("z");
@@ -246,7 +246,7 @@ public class MinecraftStructure implements ClipboardReader, ClipboardWriter {
             BaseEntity state = entity.getState();
             if (state != null) {
                 CompoundTag nbt = state.getNbtData();
-                Map<String, Tag> nbtMap = new HashMap<>(nbt.getValue());
+                Map<String, Tag<?, ?>> nbtMap = new HashMap<>(nbt.getValue());
                 // Replace rotation data
                 nbtMap.put("Rotation", writeRotation(entity.getLocation()));
                 nbtMap.put("id", new StringTag(state.getType().id()));
