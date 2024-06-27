@@ -472,9 +472,9 @@ public abstract class PlacementStateProcessor extends AbstractDelegateExtent imp
         if (block.getOrdinalChar() != newOrdinal) {
             BlockState newState = BlockTypesCache.states[newOrdinal];
             orDefault.setBlock(set.x(), set.y(), set.z(), newState);
-            LinCompoundTag nbt = block.getNbt();
+            CompoundTag nbt = block.getNbtData();
             if (nbt != null && newState.getBlockType() == block.getBlockType()) {
-                orDefault.setTile(set.x(), set.y(), set.z(), new CompoundTag(nbt));
+                orDefault.setTile(set.x(), set.y(), set.z(), nbt);
             }
             return true;
         }
