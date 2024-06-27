@@ -219,6 +219,12 @@ public class PaperweightFaweWorldNativeAccess implements WorldNativeAccess<Level
     }
 
     @Override
+    public void updateBlock(BlockPos pos, net.minecraft.world.level.block.state.BlockState oldState, net.minecraft.world.level.block.state.BlockState newState) {
+        Level world = getLevel();
+        newState.onPlace(world, pos, oldState, false);
+    }
+
+    @Override
     public void onBlockStateChange(
             BlockPos blockPos,
             net.minecraft.world.level.block.state.BlockState oldState,

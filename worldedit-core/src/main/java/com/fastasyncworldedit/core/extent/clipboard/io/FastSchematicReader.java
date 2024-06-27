@@ -109,26 +109,22 @@ public class FastSchematicReader extends NBTSchematicReader {
         if (fixer == null || dataVersion == -1) {
             return tag;
         }
-        //FAWE start - LinTag
         return (CompoundTag) LinBusConverter.fromLinBus(fixer.fixUp(
                 DataFixer.FixTypes.BLOCK_ENTITY,
                 tag.toLinTag(),
                 dataVersion
         ));
-        //FAWE end
     }
 
     private CompoundTag fixEntity(CompoundTag tag) {
         if (fixer == null || dataVersion == -1) {
             return tag;
         }
-        //FAWE start - LinTag
         return (CompoundTag) LinBusConverter.fromLinBus(fixer.fixUp(
                 DataFixer.FixTypes.ENTITY,
                 tag.toLinTag(),
                 dataVersion
         ));
-        //FAWE end
     }
 
     private String fixBiome(String biomePalettePart) {

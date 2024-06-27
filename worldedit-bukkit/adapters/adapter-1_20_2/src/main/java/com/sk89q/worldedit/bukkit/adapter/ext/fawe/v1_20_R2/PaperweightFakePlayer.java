@@ -41,7 +41,7 @@ class PaperweightFakePlayer extends ServerPlayer {
     private static final GameProfile FAKE_WORLDEDIT_PROFILE = new GameProfile(UUID.nameUUIDFromBytes("worldedit".getBytes()), "[WorldEdit]");
     private static final Vec3 ORIGIN = new Vec3(0.0D, 0.0D, 0.0D);
     private static final ClientInformation FAKE_CLIENT_INFO = new ClientInformation(
-            "en_US", 16, ChatVisiblity.FULL, true, 0, HumanoidArm.LEFT, false, false
+        "en_US", 16, ChatVisiblity.FULL, true, 0, HumanoidArm.LEFT, false, false
     );
 
     PaperweightFakePlayer(ServerLevel world) {
