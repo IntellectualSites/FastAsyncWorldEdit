@@ -268,7 +268,6 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
     ) {
         int minSection = Math.max(get.getMinSectionPosition(), getMinimumY() >> 4);
         int maxSection = Math.min(get.getMaxSectionPosition(), getMaximumY() >> 4);
-        block = block.initChunk(chunk.getX(), chunk.getZ());
         for (int layer = minSection; layer <= maxSection; layer++) {
             if ((!full && !get.hasSection(layer)) || !filter.appliesLayer(chunk, layer)) {
                 return;
@@ -483,7 +482,7 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
             }
             return set;
         } else {
-            return null;
+            return set;
         }
     }
 

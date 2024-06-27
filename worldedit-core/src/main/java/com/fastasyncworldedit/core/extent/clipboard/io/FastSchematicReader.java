@@ -9,7 +9,7 @@ import com.fastasyncworldedit.core.internal.io.FaweInputStream;
 import com.fastasyncworldedit.core.internal.io.FaweOutputStream;
 import com.fastasyncworldedit.core.jnbt.streamer.StreamDelegate;
 import com.fastasyncworldedit.core.jnbt.streamer.ValueReader;
-import com.sk89q.jnbt.AdventureNBTConverter;
+import com.sk89q.jnbt.LinBusConverter;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.IntTag;
 import com.sk89q.jnbt.NBTInputStream;
@@ -109,9 +109,9 @@ public class FastSchematicReader extends NBTSchematicReader {
         if (fixer == null || dataVersion == -1) {
             return tag;
         }
-        return (CompoundTag) AdventureNBTConverter.fromAdventure(fixer.fixUp(
+        return (CompoundTag) LinBusConverter.fromLinBus(fixer.fixUp(
                 DataFixer.FixTypes.BLOCK_ENTITY,
-                tag.asBinaryTag(),
+                tag.toLinTag(),
                 dataVersion
         ));
     }
@@ -120,9 +120,9 @@ public class FastSchematicReader extends NBTSchematicReader {
         if (fixer == null || dataVersion == -1) {
             return tag;
         }
-        return (CompoundTag) AdventureNBTConverter.fromAdventure(fixer.fixUp(
+        return (CompoundTag) LinBusConverter.fromLinBus(fixer.fixUp(
                 DataFixer.FixTypes.ENTITY,
-                tag.asBinaryTag(),
+                tag.toLinTag(),
                 dataVersion
         ));
     }
@@ -340,7 +340,7 @@ public class FastSchematicReader extends NBTSchematicReader {
                     y = pos[1];
                     z = pos[2];
                 }
-                Map<String, Tag> values = new HashMap<>(tile.getValue());
+                Map<String, Tag<?, ?>> values = new HashMap<>(tile.getValue());
                 Tag id = values.get("Id");
                 if (id != null) {
                     values.put("x", new IntTag(x));
@@ -367,7 +367,7 @@ public class FastSchematicReader extends NBTSchematicReader {
         // entities
         if (entities != null && !entities.isEmpty()) {
             for (Map<String, Object> entRaw : entities) {
-                Map<String, Tag> value = new HashMap<>(FaweCache.INSTANCE.asTag(entRaw).getValue());
+                Map<String, Tag<?, ?>> value = new HashMap<>(FaweCache.INSTANCE.asTag(entRaw).getValue());
                 StringTag id = (StringTag) value.get("Id");
                 if (id == null) {
                     id = (StringTag) value.get("id");

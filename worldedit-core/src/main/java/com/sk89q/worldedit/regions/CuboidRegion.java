@@ -755,7 +755,6 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
     ) {
         int chunkX = chunk.getX();
         int chunkZ = chunk.getZ();
-        block = block.initChunk(chunkX, chunkZ);
 
         //Chunk entry is an "interior chunk" in regards to the entire region, so filter the chunk whole instead of partially
         if ((minX + 15) >> 4 <= chunkX && (maxX - 15) >> 4 >= chunkX && (minZ + 15) >> 4 <= chunkZ && (maxZ - 15) >> 4 >= chunkZ) {

@@ -1,5 +1,6 @@
 package com.fastasyncworldedit.bukkit.regions;
 
+import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.regions.FaweMask;
 import com.fastasyncworldedit.core.regions.RegionWrapper;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
@@ -158,6 +159,9 @@ public class WorldGuardFeature extends BukkitMaskManager implements Listener {
 
     @Override
     public FaweMask getMask(com.sk89q.worldedit.entity.Player wePlayer, MaskType type, boolean isWhitelist) {
+        if (isWhitelist && Settings.settings().REGION_RESTRICTIONS_OPTIONS.WORLDGUARD_REGION_BLACKLIST) {
+            return new FaweMask(RegionWrapper.GLOBAL());
+        }
         final Player player = BukkitAdapter.adapt(wePlayer);
         final LocalPlayer localplayer = this.worldguard.wrapPlayer(player);
         final Location location = player.getLocation();

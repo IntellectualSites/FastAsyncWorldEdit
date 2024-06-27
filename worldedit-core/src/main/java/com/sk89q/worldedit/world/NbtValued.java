@@ -23,7 +23,7 @@ import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.internal.util.DeprecationUtil;
 import com.sk89q.worldedit.internal.util.NonAbstractForCompatibility;
 import com.sk89q.worldedit.util.concurrency.LazyReference;
-import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
+import org.enginehub.linbus.tree.LinCompoundTag;
 
 import javax.annotation.Nullable;
 
@@ -66,7 +66,7 @@ public interface NbtValued {
     @Deprecated
     @Nullable
     default CompoundTag getNbtData() {
-        CompoundBinaryTag tag = getNbt();
+        LinCompoundTag tag = getNbt();
         return tag == null ? null : new CompoundTag(tag);
     }
 
@@ -78,7 +78,7 @@ public interface NbtValued {
      */
     @Deprecated
     default void setNbtData(@Nullable CompoundTag nbtData) {
-        setNbtReference(nbtData == null ? null : LazyReference.from(nbtData::asBinaryTag));
+        setNbtReference(nbtData == null ? null : LazyReference.from(nbtData::toLinTag));
     }
 
     /**
@@ -96,11 +96,12 @@ public interface NbtValued {
             delegateParams = {}
     )
     @Nullable
-    default LazyReference<CompoundBinaryTag> getNbtReference() {
+    default LazyReference<LinCompoundTag> getNbtReference() {
         DeprecationUtil.checkDelegatingOverride(getClass());
 
+        @SuppressWarnings("deprecation")
         CompoundTag nbtData = getNbtData();
-        return nbtData == null ? null : LazyReference.from(nbtData::asBinaryTag);
+        return nbtData == null ? null : LazyReference.from(nbtData::toLinTag);
     }
 
     /**
@@ -109,8 +110,8 @@ public interface NbtValued {
      * @return compound tag, or null
      */
     @Nullable
-    default CompoundBinaryTag getNbt() {
-        LazyReference<CompoundBinaryTag> ref = getNbtReference();
+    default LinCompoundTag getNbt() {
+        LazyReference<LinCompoundTag> ref = getNbtReference();
         return ref == null ? null : ref.getValue();
     }
 
@@ -119,11 +120,12 @@ public interface NbtValued {
      *
      * @param nbtData NBT data, or null if no data
      */
+    @SuppressWarnings("deprecation")
     @NonAbstractForCompatibility(
             delegateName = "setNbtData",
             delegateParams = {CompoundTag.class}
     )
-    default void setNbtReference(@Nullable LazyReference<CompoundBinaryTag> nbtData) {
+    default void setNbtReference(@Nullable LazyReference<LinCompoundTag> nbtData) {
         DeprecationUtil.checkDelegatingOverride(getClass());
 
         setNbtData(nbtData == null ? null : new CompoundTag(nbtData.getValue()));
@@ -134,7 +136,7 @@ public interface NbtValued {
      *
      * @param nbtData NBT data, or null if no data
      */
-    default void setNbt(@Nullable CompoundBinaryTag nbtData) {
+    default void setNbt(@Nullable LinCompoundTag nbtData) {
         setNbtReference(nbtData == null ? null : LazyReference.computed(nbtData));
     }
     //FAWE end

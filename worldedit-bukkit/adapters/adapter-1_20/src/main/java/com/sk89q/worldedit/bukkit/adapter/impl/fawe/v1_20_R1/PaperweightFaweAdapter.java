@@ -35,9 +35,6 @@ import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.SideEffect;
 import com.sk89q.worldedit.util.SideEffectSet;
 import com.sk89q.worldedit.util.formatting.text.Component;
-import com.sk89q.worldedit.util.nbt.BinaryTag;
-import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
-import com.sk89q.worldedit.util.nbt.StringBinaryTag;
 import com.sk89q.worldedit.world.RegenOptions;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
@@ -83,6 +80,9 @@ import org.bukkit.craftbukkit.v1_20_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_20_R1.util.CraftNamespacedKey;
 import org.bukkit.entity.Player;
+import org.enginehub.linbus.tree.LinCompoundTag;
+import org.enginehub.linbus.tree.LinStringTag;
+import org.enginehub.linbus.tree.LinTag;
 
 import javax.annotation.Nullable;
 import java.lang.ref.WeakReference;
@@ -274,7 +274,7 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
             BlockEntity blockEntity = chunk.getBlockEntity(blockPos, LevelChunk.EntityCreationType.CHECK);
             if (blockEntity != null) {
                 net.minecraft.nbt.CompoundTag tag = blockEntity.saveWithId();
-                return state.toBaseBlock((CompoundBinaryTag) toNativeBinary(tag));
+                return state.toBaseBlock((LinCompoundTag) toNativeLin(tag));
             }
         }
 
@@ -302,14 +302,14 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
 
         if (id != null) {
             EntityType type = com.sk89q.worldedit.world.entity.EntityTypes.get(id);
-            Supplier<CompoundBinaryTag> saveTag = () -> {
+            Supplier<LinCompoundTag> saveTag = () -> {
                 final net.minecraft.nbt.CompoundTag minecraftTag = new net.minecraft.nbt.CompoundTag();
                 PaperweightPlatformAdapter.readEntityIntoTag(mcEntity, minecraftTag);
                 //add Id for AbstractChangeSet to work
-                final CompoundBinaryTag tag = (CompoundBinaryTag) toNativeBinary(minecraftTag);
-                final Map<String, BinaryTag> tags = NbtUtils.getCompoundBinaryTagValues(tag);
-                tags.put("Id", StringBinaryTag.of(id));
-                return CompoundBinaryTag.from(tags);
+                final LinCompoundTag tag = (LinCompoundTag) toNativeLin(minecraftTag);
+                final Map<String, LinTag<?>> tags = NbtUtils.getLinCompoundTagValues(tag);
+                tags.put("Id", LinStringTag.of(id));
+                return LinCompoundTag.of(tags);
             };
             return new LazyBaseEntity(type, saveTag);
         } else {
@@ -514,7 +514,7 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
     public BaseItemStack adapt(org.bukkit.inventory.ItemStack itemStack) {
         final ItemStack nmsStack = CraftItemStack.asNMSCopy(itemStack);
         final BaseItemStack weStack = new BaseItemStack(BukkitAdapter.asItemType(itemStack.getType()), itemStack.getAmount());
-        weStack.setNbt(((CompoundBinaryTag) toNativeBinary(nmsStack.getTag())));
+        weStack.setNbt(((LinCompoundTag) toNativeLin(nmsStack.getTag())));
         return weStack;
     }
 

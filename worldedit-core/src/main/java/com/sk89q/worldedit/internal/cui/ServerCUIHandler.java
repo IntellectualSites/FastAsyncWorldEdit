@@ -29,9 +29,9 @@ import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.RegionSelector;
 import com.sk89q.worldedit.regions.selector.CuboidRegionSelector;
 import com.sk89q.worldedit.util.Location;
-import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import org.enginehub.linbus.tree.LinCompoundTag;
 
 import javax.annotation.Nullable;
 
@@ -135,9 +135,6 @@ public class ServerCUIHandler {
                 Math.min(Math.min(player.getWorld().getMaxY(), posY + MAX_DISTANCE), posY + 3)
         );
 
-        //FAWE start - CBT > Map<String, Tag>
-        CompoundBinaryTag.Builder structureTag = CompoundBinaryTag.builder();
-
         posX -= x;
         posY -= y;
         posZ -= z;
@@ -147,7 +144,7 @@ public class ServerCUIHandler {
             return null;
         }
 
-        //FAWE start - see comment of CBT
+        LinCompoundTag.Builder structureTag = LinCompoundTag.builder();
         structureTag.putString("name", "worldedit:" + player.getName());
         structureTag.putString("author", player.getName());
         structureTag.putString("metadata", "");

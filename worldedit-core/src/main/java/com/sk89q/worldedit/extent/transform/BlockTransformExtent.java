@@ -401,7 +401,7 @@ public class BlockTransformExtent extends ResettableExtent {
                     );
 
                     if (newDirection != null) {
-                        Map<String, Tag> values = new HashMap<>(tag.getValue());
+                        Map<String, Tag<?, ?>> values = new HashMap<>(tag.getValue());
                         values.put("Rot", new ByteTag((byte) MCDirections.toRotation(newDirection)));
                         tag = new CompoundTag(values);
                     }

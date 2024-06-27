@@ -14,7 +14,7 @@ mapmanager = "1.8.0-SNAPSHOT"
 griefprevention = "17.0.0"
 griefdefender = "2.1.0-SNAPSHOT"
 residence = "4.5._13.1"
-towny = "0.100.2.14"
+towny = "0.100.3.2"
 plotsquared = "7.3.8"
 
 # Third party
@@ -40,6 +40,7 @@ paperlib = "1.0.8"
 paster = "1.1.6"
 vault = "1.7.1"
 serverlib = "2.3.6"
+linbus = "0.1.0"
 ## Internal
 text-adapter = "3.0.6"
 text = "3.0.4"
@@ -78,7 +79,6 @@ bstatsBase = { group = "org.bstats", name = "bstats-base", version.ref = "bstats
 bstatsBukkit = { group = "org.bstats", name = "bstats-bukkit", version.ref = "bstats" }
 sparsebitset = { group = "com.zaxxer", name = "SparseBitSet", version.ref = "sparsebitset" }
 parallelgzip = { group = "org.anarres", name = "parallelgzip", version.ref = "parallelgzip" }
-adventureNbt = { group = "net.kyori", name = "adventure-nbt", version.ref = "adventure" }
 truezip = { group = "de.schlichtherle", name = "truezip", version.ref = "truezip" }
 autoValueAnnotations = { group = "com.google.auto.value", name = "auto-value-annotations", version.ref = "auto-value" }
 autoValue = { group = "com.google.auto.value", name = "auto-value", version.ref = "auto-value" }
@@ -101,6 +101,11 @@ paster = { group = "com.intellectualsites.paster", name = "Paster", version.ref 
 vault = { group = "com.github.MilkBowl", name = "VaultAPI", version.ref = "vault" }
 serverlib = { group = "dev.notmyfault.serverlib", name = "ServerLib", version.ref = "serverlib" }
 checkerqual = { group = "org.checkerframework", name = "checker-qual", version.ref = "checkerqual" }
+linBus-bom = { group = "org.enginehub.lin-bus", name = "lin-bus-bom", version.ref = "linbus" }
+linBus-common = { group = "org.enginehub.lin-bus", name = "lin-bus-common" }
+linBus-stream = { group = "org.enginehub.lin-bus", name = "lin-bus-stream" }
+linBus-tree = { group = "org.enginehub.lin-bus", name = "lin-bus-tree" }
+linBus-format-snbt = { group = "org.enginehub.lin-bus.format", name = "lin-bus-format-snbt" }
 
 # Internal
 ## Text

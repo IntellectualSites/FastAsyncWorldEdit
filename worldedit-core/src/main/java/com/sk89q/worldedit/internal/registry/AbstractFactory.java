@@ -21,6 +21,9 @@ package com.sk89q.worldedit.internal.registry;
 
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.extension.factory.parser.AliasedParser;
+import com.fastasyncworldedit.core.extension.factory.parser.FaweParser;
+import com.fastasyncworldedit.core.extension.factory.parser.pattern.RichPatternParser;
+import com.sk89q.util.StringUtil;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.NoMatchException;
@@ -43,7 +46,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public abstract class AbstractFactory<E> {
 
     protected final WorldEdit worldEdit;
-    private final List<InputParser<E>> parsers = new ArrayList<>();
+    //FAWE start
+    protected final List<InputParser<E>> parsers = new ArrayList<>();
+    private final FaweParser<E> richParser;
+    //FWAE end
 
     /**
      * Create a new factory.
@@ -52,11 +58,26 @@ public abstract class AbstractFactory<E> {
      * @param defaultParser the parser to fall back to
      */
     protected AbstractFactory(WorldEdit worldEdit, InputParser<E> defaultParser) {
+        //FAWE start
+        this(worldEdit, defaultParser, null);
+    }
+
+    /**
+     * Create a new factory with a given rich parser for FAWE rich parsing
+     *
+     * @param worldEdit     the WorldEdit instance
+     * @param defaultParser the parser to fall back to
+     * @param richParser    the rich parser
+     * @since TODO
+     */
+    protected AbstractFactory(WorldEdit worldEdit, InputParser<E> defaultParser, FaweParser<E> richParser) {
         checkNotNull(worldEdit);
         checkNotNull(defaultParser);
         this.worldEdit = worldEdit;
         this.parsers.add(defaultParser);
+        this.richParser = richParser;
     }
+    //FAWE end
 
     /**
      * Gets an immutable list of parsers.
@@ -71,7 +92,7 @@ public abstract class AbstractFactory<E> {
         return Collections.unmodifiableList(parsers);
     }
 
-    //FAWE start - javadoc
+    //FAWE start
 
     /**
      * Parse a string and context to each {@link InputParser} added to this factory. If no result found, throws {@link InputParseException}
@@ -81,20 +102,26 @@ public abstract class AbstractFactory<E> {
      * @return parsed result
      * @throws InputParseException if no result found
      */
-    //FAWE end
     public E parseFromInput(String input, ParserContext context) throws InputParseException {
-        E match;
-
-        for (InputParser<E> parser : parsers) {
-            match = parser.parseFromInput(input, context);
-
-            if (match != null) {
-                return match;
+        List<E> parsed = new ArrayList<>();
+        for (String component : StringUtil.split(input,' ', '[', ']')) {
+            if (component.isEmpty()) {
+                continue;
             }
+
+            if (richParser != null) {
+                E match = richParser.parseFromInput(component, context);
+                if (match != null) {
+                    parsed.add(match);
+                    continue;
+                }
+            }
+            parseFromParsers(context, parsed, component);
         }
 
-        throw new NoMatchException(Caption.of("worldedit.error.no-match", TextComponent.of(input)));
+        return getParsed(input, parsed);
     }
+    //FAWE end
 
     @Deprecated
     public List<String> getSuggestions(String input) {
@@ -132,5 +159,49 @@ public abstract class AbstractFactory<E> {
             return ((AliasedParser) p).getMatchedAliases().contains(alias);
         });
     }
+
+    //FAWE start
+    protected void parseFromParsers(final ParserContext context, final List<E> parsed, final String component) {
+        E match = null;
+        for (InputParser<E> parser : getParsers()) {
+            match = parser.parseFromInput(component, context);
+
+            if (match != null) {
+                break;
+            }
+        }
+        if (match == null) {
+            throw new NoMatchException(Caption.of("worldedit.error.no-match", TextComponent.of(component)));
+        }
+        parsed.add(match);
+    }
+
+    /**
+     * Parses a pattern without considering parsing through the {@link RichPatternParser}, therefore not accepting
+     * "richer" parsing where &amp; and , are used. Exists to prevent stack overflows.
+     *
+     * @param input   input string
+     * @param context input context
+     * @return parsed result
+     * @throws InputParseException if no result found
+     */
+    public E parseWithoutRich(String input, ParserContext context) throws InputParseException {
+        List<E> parsed = new ArrayList<>();
+
+        for (String component : StringUtil.split(input, ' ', '[', ']')) {
+            if (component.isEmpty()) {
+                continue;
+            }
+
+            parseFromParsers(context, parsed, component);
+        }
+
+        return getParsed(input, parsed);
+    }
+
+    protected E getParsed(final String input, final List<E> parsed) {
+        return parsed.isEmpty() ? null : parsed.get(0);
+    }
+    //FAWE end
 
 }

@@ -2,6 +2,7 @@ package com.fastasyncworldedit.core;
 
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.internal.exception.FaweException;
+import com.fastasyncworldedit.core.limit.FaweLimit;
 import com.fastasyncworldedit.core.queue.implementation.QueueHandler;
 import com.fastasyncworldedit.core.util.CachedTextureUtil;
 import com.fastasyncworldedit.core.util.CleanTextureUtil;
@@ -105,6 +106,8 @@ public class Fawe {
          * Implementation dependent stuff
          */
         this.setupConfigs();
+        FaweLimit.MAX.CONFIRM_LARGE =
+                Settings.settings().LIMITS.get("default").CONFIRM_LARGE || Settings.settings().GENERAL.LIMIT_UNLIMITED_CONFIRMS;
         TaskManager.IMP = this.implementation.getTaskManager();
 
         TaskManager.taskManager().async(() -> {
