@@ -63,8 +63,14 @@ public class PaperweightServerLevelDelegateProxy implements InvocationHandler {
             return null;
         }
         BlockEntity newEntity = tileEntity.getType().create(blockPos, getBlockState(blockPos));
-        newEntity.loadWithComponents((CompoundTag) adapter.fromNativeLin(this.editSession.getFullBlock(BlockVector3.at(blockPos.getX(),
-                blockPos.getY(), blockPos.getZ())).getNbtReference().getValue()), MinecraftServer.getServer().registryAccess());
+        newEntity.loadWithComponents(
+                (CompoundTag) adapter.fromNativeLin(this.editSession.getFullBlock(BlockVector3.at(
+                        blockPos.getX(),
+                        blockPos.getY(),
+                        blockPos.getZ()
+                )).getNbtReference().getValue()),
+                MinecraftServer.getServer().registryAccess()
+        );
 
         return newEntity;
     }
