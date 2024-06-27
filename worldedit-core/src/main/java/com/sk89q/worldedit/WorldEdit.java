@@ -21,6 +21,7 @@ package com.sk89q.worldedit;
 
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.exception.BrushRadiusLimitException;
+import com.fastasyncworldedit.core.exception.OutsideWorldBoundsException;
 import com.fastasyncworldedit.core.exception.RadiusLimitException;
 import com.fastasyncworldedit.core.extension.factory.TransformFactory;
 import com.fastasyncworldedit.core.extent.ResettableExtent;
@@ -46,6 +47,7 @@ import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extension.platform.Locatable;
 import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.extension.platform.PlatformManager;
+import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.pattern.Pattern;
@@ -521,6 +523,20 @@ public final class WorldEdit {
         int max = actor.getLimit().MAX_BRUSH_RADIUS;
         if (max > 0 && radius > max) {
             throw new BrushRadiusLimitException(max);
+        }
+    }
+
+    /**
+     * Check if the given position is contained by the extent's min/max height
+     *
+     * @param position Position to check
+     * @param extent   Extent to check in
+     * @throws OutsideWorldBoundsException If the position is outside the world height limits
+     * @since TODO
+     */
+    public void checkExtentHeightBounds(BlockVector3 position, Extent extent) {
+        if (position.y() < extent.getMinY() || position.y() > extent.getMaxY()) {
+            throw new OutsideWorldBoundsException(position.y());
         }
     }
     //FAWE end
