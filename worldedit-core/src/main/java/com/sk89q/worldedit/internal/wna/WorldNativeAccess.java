@@ -146,7 +146,9 @@ public interface WorldNativeAccess<NC, NBS, NP> {
 
     void markBlockChanged(NC chunk, NP position);
 
-    void notifyNeighbors(NP pos, NBS oldState, NBS newState);
+    void notifyNeighbors(NP pos, NBS oldState, NBS newState);;
+
+    void updateBlock(NP pos, NBS oldState, NBS newState);
 
     void updateNeighbors(NP pos, NBS oldState, NBS newState, int recursionLimit);
 
