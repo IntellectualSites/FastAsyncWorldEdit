@@ -51,6 +51,7 @@ public abstract class Scroll implements ScrollTool {
         parserContext.setActor(player);
         parserContext.setWorld(player.getWorld());
         parserContext.setSession(session);
+        parserContext.setTryLegacy(player.getLimit().ALLOW_LEGACY);
         switch (mode) {
             case CLIPBOARD:
                 if (arguments.size() != 2) {

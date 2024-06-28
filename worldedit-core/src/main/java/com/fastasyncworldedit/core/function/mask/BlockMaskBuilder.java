@@ -9,6 +9,7 @@ import com.fastasyncworldedit.core.util.MutableCharSequence;
 import com.fastasyncworldedit.core.util.StringMan;
 import com.fastasyncworldedit.core.world.block.BlanketBaseBlock;
 import com.sk89q.worldedit.extension.input.InputParseException;
+import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.BlockMask;
 import com.sk89q.worldedit.registry.state.AbstractProperty;
@@ -53,6 +54,7 @@ public class BlockMaskBuilder {
 
     private static final long[] ALL = new long[0];
     private final long[][] bitSets;
+    private final ParserContext context;
     private boolean[] ordinals;
     private boolean optimizedStates = true;
 
@@ -60,8 +62,28 @@ public class BlockMaskBuilder {
         this(new long[BlockTypes.size()][]);
     }
 
+    /**
+     * Create a new instance with a given {@link ParserContext} to use if parsing regex
+     *
+     * @since TODO
+     */
+    public BlockMaskBuilder(ParserContext context) {
+        this(new long[BlockTypes.size()][], context);
+    }
+
     protected BlockMaskBuilder(long[][] bitSets) {
         this.bitSets = bitSets;
+        this.context = new ParserContext();
+    }
+
+    /**
+     * Create a new instance with a given {@link ParserContext} to use if parsing regex
+     *
+     * @since TODO
+     */
+    protected BlockMaskBuilder(long[][] bitSets, ParserContext context) {
+        this.bitSets = bitSets;
+        this.context = context;
     }
 
     private boolean handleRegex(BlockType blockType, PropertyKey key, String regex, FuzzyStateAllowingBuilder builder) {
@@ -173,7 +195,7 @@ public class BlockMaskBuilder {
                 List<BlockType> blockTypeList;
                 List<FuzzyStateAllowingBuilder> builders;
                 if (StringMan.isAlphanumericUnd(charSequence)) {
-                    BlockType type = BlockTypes.parse(charSequence.toString());
+                    BlockType type = BlockTypes.parse(charSequence.toString(), context);
                     blockTypeList = Collections.singletonList(type);
                     builders = Collections.singletonList(new FuzzyStateAllowingBuilder(type));
                     add(type);
@@ -280,7 +302,7 @@ public class BlockMaskBuilder {
                 }
             } else {
                 if (StringMan.isAlphanumericUnd(input)) {
-                    add(BlockTypes.parse(input));
+                    add(BlockTypes.parse(input, context));
                 } else {
                     boolean success = false;
                     for (BlockType myType : BlockTypesCache.values) {

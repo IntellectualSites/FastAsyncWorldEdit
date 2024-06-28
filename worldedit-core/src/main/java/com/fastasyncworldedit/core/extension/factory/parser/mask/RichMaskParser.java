@@ -143,7 +143,7 @@ public class RichMaskParser extends FaweParser<Mask> {
                             int end = command.lastIndexOf(']');
                             mask = parseFromInput(command.substring(1, end == -1 ? command.length() : end), context);
                         } else {
-                            BlockMaskBuilder builder = new BlockMaskBuilder();
+                            BlockMaskBuilder builder = new BlockMaskBuilder(context);
                             try {
                                 builder.addRegex(full);
                             } catch (InputParseException ignored) {
