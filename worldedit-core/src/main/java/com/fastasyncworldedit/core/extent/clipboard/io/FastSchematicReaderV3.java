@@ -15,9 +15,11 @@ import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.platform.Capability;
+import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
+import com.sk89q.worldedit.extent.clipboard.io.sponge.ReaderUtil;
 import com.sk89q.worldedit.extent.clipboard.io.sponge.VersionedDataFixer;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -129,15 +131,10 @@ public class FastSchematicReaderV3 implements ClipboardReader {
             tag = this.dataInputStream.readUTF();
             switch (tag) {
                 case "DataVersion" -> {
+                    final Platform platform =
+                            WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING);
                     this.dataVersion = this.dataInputStream.readInt();
-                    this.dataFixer = new VersionedDataFixer(
-                            this.dataVersion,
-                            WorldEdit
-                                    .getInstance()
-                                    .getPlatformManager()
-                                    .queryCapability(Capability.WORLD_EDITING)
-                                    .getDataFixer()
-                    );
+                    this.dataFixer = ReaderUtil.getVersionedDataFixer(this.dataVersion, platform, platform.getDataVersion());
                 }
                 case "Offset" -> {
                     this.dataInputStream.skipNBytes(4); // Array Length field (4 byte int)
