@@ -387,7 +387,7 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
                 chunkGenerator,
                 structureTemplateManager,
                 threadedLevelLightEngine,
-                null
+                originalChunkProvider.chunkMap.worldGenContext.mainThreadMailBox()
         );
         return true;
     }
