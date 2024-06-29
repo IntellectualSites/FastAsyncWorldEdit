@@ -16,6 +16,7 @@ import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.io.file.SafeFiles;
 import com.sk89q.worldedit.world.RegenOptions;
+import io.papermc.lib.PaperLib;
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
@@ -191,6 +192,9 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
 
     public PaperweightRegen(org.bukkit.World originalBukkitWorld, Region region, Extent target, RegenOptions options) {
         super(originalBukkitWorld, region, target, options);
+        if (PaperLib.isPaper()) {
+            throw new UnsupportedOperationException("Regeneration currently not support on Paper due to the new generation system");
+        }
     }
 
     @Override
