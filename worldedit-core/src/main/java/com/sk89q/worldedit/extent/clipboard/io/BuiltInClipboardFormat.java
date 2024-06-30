@@ -50,7 +50,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Arrays;
 import java.util.Locale;
 import java.util.Set;
 import java.util.zip.GZIPInputStream;
@@ -84,13 +83,8 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
 
         @Override
         public boolean isFormat(final InputStream inputStream) {
-            try (final DataInputStream stream = new DataInputStream(new BufferedInputStream(new GZIPInputStream(inputStream)));
+            try (final DataInputStream stream = new DataInputStream(new FastBufferedInputStream(new GZIPInputStream(inputStream)));
                  final NBTInputStream nbt = new NBTInputStream(stream)) {
-                stream.mark(SPONGE_V3_MAGIC.length);
-                if (Arrays.equals(stream.readNBytes(SPONGE_V3_MAGIC.length), SPONGE_V3_MAGIC)) {
-                    return stream.readInt() == FastSchematicWriterV3.CURRENT_VERSION;
-                }
-                stream.reset();
                 if (stream.readByte() != NBTConstants.TYPE_COMPOUND) {
                     return false;
                 }
@@ -400,37 +394,10 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
     };
     //FAWE end
 
-    private static final byte[] SPONGE_V2_MAGIC = new byte[]{
-            0x10, // TAG_Compound
-            0x00, 0x09, // len("Schematic") - unsigned short
-            0x53, 0x63, 0x68, 0x65, 0x6D, 0x61, 0x74, 0x69, 0x63, // "Schematic" (modified UTF-8)
-            0x03, // TAG_INT
-            0x00, 0x07, // len("Version") - unsigned short
-            0x56, 0x65, 0x72, 0x73, 0x69, 0x6F, 0x6E  // "Version" (modified UTF-8)
-    };
-
-    private static final byte[] SPONGE_V3_MAGIC = new byte[]{
-            0x10, // TAG_Compound
-            0x00, 0x00, // len("") - unsigned short (no following bytes for string because there is none)
-            0x10, // TAG_Compound
-            0x00, 0x09, // len("Schematic") - unsigned short
-            0x53, 0x63, 0x68, 0x65, 0x6D, 0x61, 0x74, 0x69, 0x63, // "Schematic" (modified UTF-8)
-            0x03, // TAG_INT
-            0x00, 0x07, // len("Version") - unsigned short
-            0x56, 0x65, 0x72, 0x73, 0x69, 0x6F, 0x6E  // "Version" (modified UTF-8)
-    };
-
     private static boolean detectOldSpongeSchematic(InputStream inputStream, int version) {
         //FAWE start - dont utilize linbus - WorldEdit approach is not really streamed
-        try (final DataInputStream stream = new DataInputStream(new BufferedInputStream(new GZIPInputStream(inputStream)));
+        try (final DataInputStream stream = new DataInputStream(new FastBufferedInputStream(new GZIPInputStream(inputStream)));
              final NBTInputStream nbt = new NBTInputStream(stream)) {
-            stream.mark(SPONGE_V2_MAGIC.length);
-            // If magic sequence found, return early (schematic was created by FAWE)
-            if (Arrays.equals(stream.readNBytes(SPONGE_V2_MAGIC.length), SPONGE_V2_MAGIC)) {
-                return stream.readInt() == version;
-            }
-            stream.reset();
-
             if (stream.readByte() != NBTConstants.TYPE_COMPOUND) {
                 return false;
             }
