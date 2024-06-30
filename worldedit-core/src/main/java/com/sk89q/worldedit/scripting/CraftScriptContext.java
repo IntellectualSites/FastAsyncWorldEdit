@@ -183,6 +183,7 @@ public class CraftScriptContext extends CraftScriptEnvironment {
         context.setSession(session);
         context.setRestricted(!allAllowed);
         context.setPreferringWildcard(false);
+        context.setTryLegacy(player.getLimit().ALLOW_LEGACY);
 
         return controller.getBlockFactory().parseFromListInput(input, context).stream().findFirst().orElse(null);
     }
@@ -212,6 +213,7 @@ public class CraftScriptContext extends CraftScriptEnvironment {
         context.setActor(player);
         context.setWorld(player.getWorld());
         context.setSession(session);
+        context.setTryLegacy(player.getLimit().ALLOW_LEGACY);
         return controller.getPatternFactory().parseFromInput(list, context);
     }
 
@@ -230,6 +232,7 @@ public class CraftScriptContext extends CraftScriptEnvironment {
         context.setWorld(player.getWorld());
         context.setSession(session);
         context.setRestricted(!allBlocksAllowed);
+        context.setTryLegacy(player.getLimit().ALLOW_LEGACY);
         return controller.getBlockFactory().parseFromListInput(list, context);
     }
 

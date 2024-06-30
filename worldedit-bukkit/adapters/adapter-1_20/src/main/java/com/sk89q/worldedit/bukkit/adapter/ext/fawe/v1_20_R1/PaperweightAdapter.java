@@ -561,24 +561,42 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    private static final LoadingCache<net.minecraft.world.level.block.state.properties.Property, Property<?>> PROPERTY_CACHE = CacheBuilder.newBuilder().build(new CacheLoader<net.minecraft.world.level.block.state.properties.Property, Property<?>>() {
-        @Override
-        public Property<?> load(net.minecraft.world.level.block.state.properties.Property state) throws Exception {
-            if (state instanceof net.minecraft.world.level.block.state.properties.BooleanProperty) {
-                return new BooleanProperty(state.getName(), ImmutableList.copyOf(state.getPossibleValues()));
-            } else if (state instanceof DirectionProperty) {
-                return new DirectionalProperty(state.getName(),
-                        (List<Direction>) state.getPossibleValues().stream().map(e -> Direction.valueOf(((StringRepresentable) e).getSerializedName().toUpperCase(Locale.ROOT))).collect(Collectors.toList()));
-            } else if (state instanceof net.minecraft.world.level.block.state.properties.EnumProperty) {
-                return new EnumProperty(state.getName(),
-                        (List<String>) state.getPossibleValues().stream().map(e -> ((StringRepresentable) e).getSerializedName()).collect(Collectors.toList()));
-            } else if (state instanceof net.minecraft.world.level.block.state.properties.IntegerProperty) {
-                return new IntegerProperty(state.getName(), ImmutableList.copyOf(state.getPossibleValues()));
-            } else {
-                throw new IllegalArgumentException("WorldEdit needs an update to support " + state.getClass().getSimpleName());
-            }
-        }
-    });
+    private static final LoadingCache<net.minecraft.world.level.block.state.properties.Property, Property<?>> PROPERTY_CACHE = CacheBuilder
+            .newBuilder()
+            .build(new CacheLoader<>() {
+                @Override
+                public Property<?> load(net.minecraft.world.level.block.state.properties.Property state) {
+                    if (state instanceof net.minecraft.world.level.block.state.properties.BooleanProperty) {
+                        return new BooleanProperty(state.getName(), ImmutableList.copyOf(state.getPossibleValues()));
+                    } else if (state instanceof DirectionProperty) {
+                        return new DirectionalProperty(
+                                state.getName(),
+                                new ArrayList<>((List<Direction>) state
+                                        .getPossibleValues()
+                                        .stream()
+                                        .map(e -> Direction.valueOf(((StringRepresentable) e)
+                                                .getSerializedName()
+                                                .toUpperCase(Locale.ROOT)))
+                                        .toList())
+                        );
+                    } else if (state instanceof net.minecraft.world.level.block.state.properties.EnumProperty) {
+                        return new EnumProperty(
+                                state.getName(),
+                                new ArrayList<>((List<String>) state
+                                        .getPossibleValues()
+                                        .stream()
+                                        .map(e -> ((StringRepresentable) e).getSerializedName())
+                                        .toList())
+                        );
+                    } else if (state instanceof net.minecraft.world.level.block.state.properties.IntegerProperty) {
+                        return new IntegerProperty(state.getName(), ImmutableList.copyOf(state.getPossibleValues()));
+                    } else {
+                        throw new IllegalArgumentException("WorldEdit needs an update to support " + state
+                                .getClass()
+                                .getSimpleName());
+                    }
+                }
+            });
 
     @SuppressWarnings({ "rawtypes" })
     @Override
