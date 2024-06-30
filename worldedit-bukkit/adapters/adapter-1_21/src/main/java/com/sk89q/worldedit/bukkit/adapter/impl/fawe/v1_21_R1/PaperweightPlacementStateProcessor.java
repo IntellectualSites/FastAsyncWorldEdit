@@ -82,8 +82,8 @@ public class PaperweightPlacementStateProcessor extends PlacementStateProcessor 
                 new BlockHitResult(pos, side, blockPos, false),
                 side.getOpposite()
         ));
-        return newState == null ? BlockTypesCache.ReservedIDs.AIR :
-                adapter.ibdIDToOrdinal(Block.BLOCK_STATE_REGISTRY.getId(newState));
+        return newState == null ? BlockTypesCache.ReservedIDs.AIR : adapter.ibdIDToOrdinal(Block.BLOCK_STATE_REGISTRY.getId(
+                newState));
     }
 
     @Override

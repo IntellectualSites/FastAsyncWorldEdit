@@ -20,8 +20,8 @@ import javax.annotation.Nullable;
 public class PaperweightLevelProxy extends ServerLevel {
 
     protected ServerLevel serverLevel;
-    private PaperweightFaweAdapter adapter;
     private PaperweightPlacementStateProcessor processor;
+    private PaperweightFaweAdapter adapter;
 
     @SuppressWarnings("DataFlowIssue")
     private PaperweightLevelProxy() {
