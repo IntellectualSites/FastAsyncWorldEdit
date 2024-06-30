@@ -103,11 +103,11 @@ public class FastSchematicWriterV2 implements ClipboardWriter {
 
         final DataOutput rawStream = outputStream.getOutputStream();
         outputStream.writeLazyCompoundTag("Schematic", out -> {
+            out.writeNamedTag("Version", CURRENT_VERSION);
             out.writeNamedTag(
                     "DataVersion",
                     WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).getDataVersion()
             );
-            out.writeNamedTag("Version", CURRENT_VERSION);
             out.writeNamedTag("Width", (short) width);
             out.writeNamedTag("Height", (short) height);
             out.writeNamedTag("Length", (short) length);
