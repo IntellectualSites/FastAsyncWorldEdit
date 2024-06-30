@@ -332,7 +332,7 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
     }
 
     @Override
-    public WorldNativeAccess<?, ?, ?> createWorldNativeAccess(org.bukkit.World world) {
+    public WorldNativeAccess<?, ?, ?> createWorldNativeAccess(World world) {
         return new PaperweightFaweWorldNativeAccess(this, new WeakReference<>(getServerLevel(world)));
     }
 
@@ -483,7 +483,7 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
     }
 
     @Override
-    public void sendFakeChunk(org.bukkit.World world, Player player, ChunkPacket chunkPacket) {
+    public void sendFakeChunk(World world, Player player, ChunkPacket chunkPacket) {
         ServerLevel nmsWorld = getServerLevel(world);
         ChunkHolder map = PaperweightPlatformAdapter.getPlayerChunk(nmsWorld, chunkPacket.getChunkX(), chunkPacket.getChunkZ());
         if (map != null && wasAccessibleSinceLastSave(map)) {
@@ -518,7 +518,7 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
     }
 
     @Override
-    public boolean canPlaceAt(org.bukkit.World world, BlockVector3 blockVector3, BlockState blockState) {
+    public boolean canPlaceAt(World world, BlockVector3 blockVector3, BlockState blockState) {
         int internalId = BlockStateIdAccess.getBlockStateId(blockState);
         net.minecraft.world.level.block.state.BlockState blockState1 = Block.stateById(internalId);
         return blockState1.hasPostProcess(
@@ -747,12 +747,12 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
     }
 
     @Override
-    public boolean regenerate(org.bukkit.World bukkitWorld, Region region, Extent target, RegenOptions options) throws Exception {
+    public boolean regenerate(World bukkitWorld, Region region, Extent target, RegenOptions options) throws Exception {
         return new PaperweightRegen(bukkitWorld, region, target, options).regenerate();
     }
 
     @Override
-    public IChunkGet get(org.bukkit.World world, int chunkX, int chunkZ) {
+    public IChunkGet get(World world, int chunkX, int chunkZ) {
         return new PaperweightGetBlocks(world, chunkX, chunkZ);
     }
 
