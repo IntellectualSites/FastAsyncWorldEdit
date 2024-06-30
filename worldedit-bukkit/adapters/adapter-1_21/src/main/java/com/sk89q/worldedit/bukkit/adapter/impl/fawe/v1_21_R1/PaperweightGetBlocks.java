@@ -389,8 +389,6 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
 
     @Override
     public Set<com.sk89q.worldedit.entity.Entity> getFullEntities() {
-        getSections(true);
-        getChunk();
         List<Entity> entities = PaperweightPlatformAdapter.getEntities(ensureLoaded(serverLevel, chunkX, chunkZ));
         if (entities.isEmpty()) {
             return Collections.emptySet();
