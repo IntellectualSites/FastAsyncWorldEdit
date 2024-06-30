@@ -296,7 +296,7 @@ public class FastSchematicReaderV3 implements ClipboardReader {
         readPalette(
                 target != null,
                 CACHE_IDENTIFIER_BLOCK,
-                () -> this.blockPalette.length == 0,
+                () -> this.blockPalette[0] != null,
                 this.provideBlockPaletteInitializer(),
                 this.getBlockWriter(target),
                 (type, tag) -> {
@@ -322,7 +322,7 @@ public class FastSchematicReaderV3 implements ClipboardReader {
         readPalette(
                 target != null,
                 CACHE_IDENTIFIER_BIOMES,
-                () -> this.biomePalette.length == 0,
+                () -> this.biomePalette[0] != null,
                 this.provideBiomePaletteInitializer(),
                 this.getBiomeWriter(target),
                 (type, tag) -> {
@@ -578,9 +578,6 @@ public class FastSchematicReaderV3 implements ClipboardReader {
     }
 
     private PaletteDataApplier getBiomeWriter(Clipboard target) {
-        if (target instanceof LinearClipboard linearClipboard) {
-            return (index, ordinal) -> linearClipboard.setBiome(index, this.biomePalette[ordinal]);
-        }
         return (index, ordinal) -> indexToPosition(index, (x, y, z) -> target.setBiome(x, y, z, this.biomePalette[ordinal]));
     }
 
