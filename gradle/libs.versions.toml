@@ -1,6 +1,6 @@
 [versions]
 # Minecraft expectations
-paper = "1.20.6-R0.1-SNAPSHOT"
+paper = "1.21-R0.1-SNAPSHOT"
 fastutil = "8.5.9"
 guava = "31.1-jre"
 log4j = "2.19.0"
