@@ -68,7 +68,7 @@ public abstract class AbstractFactory<E> {
      * @param worldEdit     the WorldEdit instance
      * @param defaultParser the parser to fall back to
      * @param richParser    the rich parser
-     * @since TODO
+     * @since 2.11.0
      */
     protected AbstractFactory(WorldEdit worldEdit, InputParser<E> defaultParser, FaweParser<E> richParser) {
         checkNotNull(worldEdit);
