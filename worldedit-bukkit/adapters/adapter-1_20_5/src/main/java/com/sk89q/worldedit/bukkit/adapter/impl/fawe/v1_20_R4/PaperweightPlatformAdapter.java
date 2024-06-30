@@ -44,7 +44,6 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.state.StateHolder;
 import net.minecraft.world.level.chunk.GlobalPalette;
 import net.minecraft.world.level.chunk.HashMapPalette;
 import net.minecraft.world.level.chunk.LevelChunk;
@@ -96,8 +95,6 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
     private static final Field fieldTickingBlockCount;
     private static final Field fieldBiomes;
 
-    private static final Field fieldPropertiesCodec;
-
     private static final MethodHandle methodGetVisibleChunk;
 
     private static final Field fieldThreadingDetector;
@@ -145,9 +142,6 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             }
             fieldBiomes = tmpFieldBiomes;
             fieldBiomes.setAccessible(true);
-
-            fieldPropertiesCodec = StateHolder.class.getDeclaredField(Refraction.pickName("propertiesCodec", "f"));
-            fieldPropertiesCodec.setAccessible(true);
 
             Method getVisibleChunkIfPresent = ChunkMap.class.getDeclaredMethod(Refraction.pickName(
                     "getVisibleChunkIfPresent",

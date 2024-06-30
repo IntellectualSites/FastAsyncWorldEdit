@@ -1,6 +1,5 @@
 package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_21_R1;
 
-import it.unimi.dsi.fastutil.objects.Reference2ObjectArrayMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
@@ -10,7 +9,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeManager;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.Property;
+import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.level.border.WorldBorder;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkSource;
@@ -18,7 +17,8 @@ import net.minecraft.world.level.chunk.status.ChunkStatus;
 import net.minecraft.world.level.lighting.LevelLightEngine;
 import net.minecraft.world.level.material.FluidState;
 import org.bukkit.craftbukkit.util.BlockStateListPopulator;
-import org.jetbrains.annotations.Nullable;
+
+import javax.annotation.Nullable;
 
 public class FaweBlockStateListPopulator extends BlockStateListPopulator {
 
@@ -67,6 +67,11 @@ public class FaweBlockStateListPopulator extends BlockStateListPopulator {
     @Override
     public int getSeaLevel() {
         return world.getSeaLevel();
+    }
+
+    @Override
+    public FeatureFlagSet enabledFeatures() {
+        return world.enabledFeatures();
     }
 
     @Override
