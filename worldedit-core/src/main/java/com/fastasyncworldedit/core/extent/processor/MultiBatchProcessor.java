@@ -121,7 +121,7 @@ public class MultiBatchProcessor implements IBatchProcessor {
         for (IBatchProcessor processor : processors) {
             try {
                 // We do NOT want to edit blocks in post processing
-                if (processor.getScope() != ProcessorScope.READING_SET_BLOCKS) {
+                if (processor.getScope() != ProcessorScope.READING_BLOCKS) {
                     continue;
                 }
                 futures.add(processor.postProcessSet(chunk, get, set));
@@ -152,7 +152,7 @@ public class MultiBatchProcessor implements IBatchProcessor {
         for (IBatchProcessor processor : processors) {
             try {
                 // We do NOT want to edit blocks in post processing
-                if (processor.getScope() != ProcessorScope.READING_SET_BLOCKS) {
+                if (processor.getScope() != ProcessorScope.READING_BLOCKS) {
                     continue;
                 }
                 processor.postProcess(chunk, get, set);
@@ -185,6 +185,14 @@ public class MultiBatchProcessor implements IBatchProcessor {
             }
         }
         return true;
+    }
+
+    @Override
+    public IChunkGet processGet(IChunkGet get) {
+        for (IBatchProcessor processor : this.processors) {
+            get = processor.processGet(get);
+        }
+        return get;
     }
 
     @Override

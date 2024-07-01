@@ -112,7 +112,7 @@ public class PaperweightPostProcessor implements IBatchProcessor {
 
     @Override
     public ProcessorScope getScope() {
-        return ProcessorScope.READING_SET_BLOCKS;
+        return ProcessorScope.READING_BLOCKS;
     }
 
     private boolean wasAdjacentToWater(char[] get, char[] set, int i, int x, int y, int z) {

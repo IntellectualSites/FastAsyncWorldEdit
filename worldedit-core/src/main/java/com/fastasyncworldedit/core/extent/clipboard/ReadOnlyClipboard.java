@@ -45,17 +45,17 @@ public abstract class ReadOnlyClipboard extends SimpleClipboard {
         return of(() -> extent, region);
     }
 
-    public static ReadOnlyClipboard of(Extent extent, final Region region, boolean copyEntities, boolean copyBiomes) {
-        Fawe.instance().getQueueHandler().unCache();
-        return of(() -> extent, region, copyEntities, copyBiomes);
-    }
-
     public static ReadOnlyClipboard of(Supplier<Extent> supplier, final Region region) {
         return of(supplier, region, true, false);
     }
 
     public static ReadOnlyClipboard of(Supplier<Extent> supplier, final Region region, boolean copyEntities, boolean copyBiomes) {
-        return new WorldCopyClipboard(supplier, region, copyEntities, copyBiomes);
+        return of(supplier.get(), region, copyEntities, copyBiomes);
+    }
+
+    public static ReadOnlyClipboard of(Extent extent, final Region region, boolean copyEntities, boolean copyBiomes) {
+        Fawe.instance().getQueueHandler().unCache();
+        return WorldCopyClipboard.of(extent, region, copyEntities, copyBiomes);
     }
 
     private static Supplier<Extent> supply() {
