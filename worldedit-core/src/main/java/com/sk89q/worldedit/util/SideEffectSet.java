@@ -19,7 +19,6 @@
 
 package com.sk89q.worldedit.util;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 
 import java.util.Arrays;
@@ -31,7 +30,12 @@ import java.util.stream.Collectors;
 
 public class SideEffectSet {
 
-    private static final SideEffectSet DEFAULT = new SideEffectSet();
+    //FAWE start - assign value map
+    private static final SideEffectSet DEFAULT = new SideEffectSet(
+            Arrays.stream(SideEffect.values())
+                    .filter(SideEffect::isExposed)
+                    .collect(Collectors.toMap(Function.identity(), SideEffect::getDefaultValue)));
+    //FAWE end
     private static final SideEffectSet NONE = new SideEffectSet(
         Arrays.stream(SideEffect.values())
             .filter(SideEffect::isExposed)
@@ -41,12 +45,6 @@ public class SideEffectSet {
     private final Map<SideEffect, SideEffect.State> sideEffects;
     private final Set<SideEffect> appliedSideEffects;
     private final boolean appliesAny;
-
-    //FAWE start
-    private SideEffectSet() {
-        this(ImmutableMap.of());
-    }
-    //FAWE end
 
     public SideEffectSet(Map<SideEffect, SideEffect.State> sideEffects) {
         this.sideEffects = Maps.immutableEnumMap(sideEffects);
@@ -60,6 +58,27 @@ public class SideEffectSet {
         appliesAny = sideEffects.isEmpty() || !appliedSideEffects.isEmpty(); // Empty side effects implies default
         //FAWE end
     }
+
+    //FAWE start - simple overload method for setting side effects
+
+    /**
+     * Create a new {@link SideEffectSet} with the given side effect set to "on"
+     *
+     * @since TODO
+     */
+    public SideEffectSet with(SideEffect sideEffect) {
+        return with(sideEffect, SideEffect.State.ON);
+    }
+
+    /**
+     * Create a new {@link SideEffectSet} with the given side effect set to "off"
+     *
+     * @since TODO
+     */
+    public SideEffectSet without(SideEffect sideEffect) {
+        return with(sideEffect, SideEffect.State.OFF);
+    }
+    //FAWE end
 
     public SideEffectSet with(SideEffect sideEffect, SideEffect.State state) {
         Map<SideEffect, SideEffect.State> entries = this.sideEffects.isEmpty()
@@ -102,5 +121,24 @@ public class SideEffectSet {
     public static SideEffectSet none() {
         return NONE;
     }
+
+    //FAWE start
+
+    /**
+     * API-friendly side effect set.
+     * Sets:
+     *  - Heightmaps
+     *  - Lighting (if set to mode 1 or 2 in config)
+     * Does not set:
+     *  - History
+     *  - Neighbours
+     *  - Lighting (if set to mode 0 in config
+     *
+     * @since TODO
+     */
+    public static SideEffectSet api() {
+        return defaults().without(SideEffect.HISTORY);
+    }
+    //FAWE end
 
 }

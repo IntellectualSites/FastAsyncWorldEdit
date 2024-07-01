@@ -436,7 +436,6 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
                 } catch (EOFException ignored) {
                 } catch (Exception e) {
                     e.printStackTrace();
-                    e.printStackTrace();
                 }
                 try {
                     is.close();

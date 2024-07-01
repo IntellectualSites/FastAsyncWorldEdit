@@ -27,6 +27,7 @@ import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.util.SideEffectSet;
 import com.sk89q.worldedit.world.World;
 import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
 import org.apache.logging.log4j.Logger;
@@ -68,6 +69,7 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
     private boolean[] faweExceptionReasonsUsed = new boolean[FaweException.Type.values().length];
     private int lastException = Integer.MIN_VALUE;
     private int exceptionCount = 0;
+    private SideEffectSet sideEffectSet = SideEffectSet.defaults();
 
     public SingleThreadQueueExtent() {
     }
@@ -111,6 +113,16 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
     }
 
     @Override
+    public void setSideEffectSet(SideEffectSet sideEffectSet) {
+        this.sideEffectSet = sideEffectSet;
+    }
+
+    @Override
+    public SideEffectSet getSideEffectSet() {
+        return sideEffectSet;
+    }
+
+    @Override
     public int getMinY() {
         return minY;
     }
@@ -118,6 +130,10 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
     @Override
     public int getMaxY() {
         return maxY;
+    }
+
+    public World getWorld() {
+        return world;
     }
 
     /**
@@ -278,8 +294,14 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
     private ChunkHolder poolOrCreate(int chunkX, int chunkZ) {
         ChunkHolder next = create(false);
         next.init(this, chunkX, chunkZ);
-        next.setFastMode(isFastMode());
         return next;
+    }
+
+    @Override
+    public IQueueChunk wrap(IQueueChunk chunk) {
+        chunk.setFastMode(isFastMode());
+        chunk.setSideEffectSet(getSideEffectSet());
+        return chunk;
     }
 
     @Override

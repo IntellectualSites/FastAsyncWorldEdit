@@ -21,6 +21,7 @@ package com.sk89q.worldedit.function.mask;
 
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
@@ -140,6 +141,15 @@ public class BlockTypeMask extends AbstractExtentMask {
     public boolean test(BlockType block) {
         return types[block.getInternalId()];
     }
+
+    /**
+     * Test a block state against this block type mask
+     *
+     * @since TODO
+     */
+    public <B extends BlockStateHolder<B>> boolean test(B blockStateHolder) {
+        return types[blockStateHolder.getBlockType().getInternalId()];
+    }
     //FAWE end
 
     @Nullable
@@ -149,7 +159,7 @@ public class BlockTypeMask extends AbstractExtentMask {
     }
 
     @Override
-    public Mask copy() {
+    public BlockTypeMask copy() {
         return new BlockTypeMask(getExtent(), types.clone(), hasAir);
     }
 

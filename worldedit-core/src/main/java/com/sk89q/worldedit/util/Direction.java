@@ -21,9 +21,13 @@ package com.sk89q.worldedit.util;
 
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
+import com.sk89q.worldedit.registry.state.DirectionalProperty;
+import com.sk89q.worldedit.registry.state.Property;
+import com.sk89q.worldedit.world.block.BlockState;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -36,32 +40,32 @@ import java.util.OptionalInt;
 public enum Direction {
 
     //FAWE start - left, right
-    NORTH(Vector3.at(0, 0, -1), Flag.CARDINAL, 3, 1),
-    EAST(Vector3.at(1, 0, 0), Flag.CARDINAL, 0, 2),
-    SOUTH(Vector3.at(0, 0, 1), Flag.CARDINAL, 1, 3),
-    WEST(Vector3.at(-1, 0, 0), Flag.CARDINAL, 2, 0),
+    NORTH(Vector3.at(0, 0, -1), Flag.CARDINAL, 3, 1), // 0
+    EAST(Vector3.at(1, 0, 0), Flag.CARDINAL, 0, 2), // 1
+    SOUTH(Vector3.at(0, 0, 1), Flag.CARDINAL, 1, 3), // 2
+    WEST(Vector3.at(-1, 0, 0), Flag.CARDINAL, 2, 0), // 3
 
-    UP(Vector3.at(0, 1, 0), Flag.UPRIGHT, -1, -1),
-    DOWN(Vector3.at(0, -1, 0), Flag.UPRIGHT, -1, -1),
+    UP(Vector3.at(0, 1, 0), Flag.UPRIGHT, -1, -1), // 4
+    DOWN(Vector3.at(0, -1, 0), Flag.UPRIGHT, -1, -1), // 5
 
-    NORTHEAST(Vector3.at(1, 0, -1), Flag.ORDINAL, 7, 8),
-    NORTHWEST(Vector3.at(-1, 0, -1), Flag.ORDINAL, 9, 6),
-    SOUTHEAST(Vector3.at(1, 0, 1), Flag.ORDINAL, 6, 9),
-    SOUTHWEST(Vector3.at(-1, 0, 1), Flag.ORDINAL, 8, 7),
+    NORTHEAST(Vector3.at(1, 0, -1), Flag.ORDINAL, 7, 8), // 6
+    NORTHWEST(Vector3.at(-1, 0, -1), Flag.ORDINAL, 9, 6), // 7
+    SOUTHEAST(Vector3.at(1, 0, 1), Flag.ORDINAL, 6, 9), // 8
+    SOUTHWEST(Vector3.at(-1, 0, 1), Flag.ORDINAL, 8, 7), // 9
 
-    WEST_NORTHWEST(Vector3.at(-Math.cos(Math.PI / 8), 0, -Math.sin(Math.PI / 8)), Flag.SECONDARY_ORDINAL, 9, 6),
-    WEST_SOUTHWEST(Vector3.at(-Math.cos(Math.PI / 8), 0, Math.sin(Math.PI / 8)), Flag.SECONDARY_ORDINAL, 8, 7),
-    NORTH_NORTHWEST(Vector3.at(-Math.sin(Math.PI / 8), 0, -Math.cos(Math.PI / 8)), Flag.SECONDARY_ORDINAL, 9, 6),
-    NORTH_NORTHEAST(Vector3.at(Math.sin(Math.PI / 8), 0, -Math.cos(Math.PI / 8)), Flag.SECONDARY_ORDINAL, 7, 8),
-    EAST_NORTHEAST(Vector3.at(Math.cos(Math.PI / 8), 0, -Math.sin(Math.PI / 8)), Flag.SECONDARY_ORDINAL, 7, 8),
-    EAST_SOUTHEAST(Vector3.at(Math.cos(Math.PI / 8), 0, Math.sin(Math.PI / 8)), Flag.SECONDARY_ORDINAL, 6, 9),
-    SOUTH_SOUTHEAST(Vector3.at(Math.sin(Math.PI / 8), 0, Math.cos(Math.PI / 8)), Flag.SECONDARY_ORDINAL, 6, 9),
-    SOUTH_SOUTHWEST(Vector3.at(-Math.sin(Math.PI / 8), 0, Math.cos(Math.PI / 8)), Flag.SECONDARY_ORDINAL, 8, 7),
+    WEST_NORTHWEST(Vector3.at(-Math.cos(Math.PI / 8), 0, -Math.sin(Math.PI / 8)), Flag.SECONDARY_ORDINAL, 18, 14), // 11
+    WEST_SOUTHWEST(Vector3.at(-Math.cos(Math.PI / 8), 0, Math.sin(Math.PI / 8)), Flag.SECONDARY_ORDINAL, 17, 13), // 12
+    NORTH_NORTHWEST(Vector3.at(-Math.sin(Math.PI / 8), 0, -Math.cos(Math.PI / 8)), Flag.SECONDARY_ORDINAL, 12, 15), // 13
+    NORTH_NORTHEAST(Vector3.at(Math.sin(Math.PI / 8), 0, -Math.cos(Math.PI / 8)), Flag.SECONDARY_ORDINAL, 11, 16), // 14
+    EAST_NORTHEAST(Vector3.at(Math.cos(Math.PI / 8), 0, -Math.sin(Math.PI / 8)), Flag.SECONDARY_ORDINAL, 13, 17), // 15
+    EAST_SOUTHEAST(Vector3.at(Math.cos(Math.PI / 8), 0, Math.sin(Math.PI / 8)), Flag.SECONDARY_ORDINAL, 14, 18), // 16
+    SOUTH_SOUTHEAST(Vector3.at(Math.sin(Math.PI / 8), 0, Math.cos(Math.PI / 8)), Flag.SECONDARY_ORDINAL, 15, 12), // 17
+    SOUTH_SOUTHWEST(Vector3.at(-Math.sin(Math.PI / 8), 0, Math.cos(Math.PI / 8)), Flag.SECONDARY_ORDINAL, 16, 11), // 18
 
-    ASCENDING_NORTH(Vector3.at(0, 1, -1), Flag.ASCENDING_CARDINAL, 3 + 18, 1 + 18),
-    ASCENDING_EAST(Vector3.at(1, 1, 0), Flag.ASCENDING_CARDINAL, 0 + 18, 2 + 18),
-    ASCENDING_SOUTH(Vector3.at(0, 1, 1), Flag.ASCENDING_CARDINAL, 1 + 18, 3 + 18),
-    ASCENDING_WEST(Vector3.at(-1, 1, 0), Flag.ASCENDING_CARDINAL, 2 + 18, 0 + 18),
+    ASCENDING_NORTH(Vector3.at(0, 1, -1), Flag.ASCENDING_CARDINAL, 3 + 18, 1 + 18), // 19
+    ASCENDING_EAST(Vector3.at(1, 1, 0), Flag.ASCENDING_CARDINAL, 0 + 18, 2 + 18), // 20
+    ASCENDING_SOUTH(Vector3.at(0, 1, 1), Flag.ASCENDING_CARDINAL, 1 + 18, 3 + 18), // 21
+    ASCENDING_WEST(Vector3.at(-1, 1, 0), Flag.ASCENDING_CARDINAL, 2 + 18, 0 + 18), // 22
     ;
     //FAWE end
 
@@ -95,12 +99,18 @@ public enum Direction {
         return map.get(sequence);
     }
 
+    /**
+     * Get the direction 90 degrees left (anti-clockwise) of this direction if possible, else return this direction
+     */
     public Direction getLeft() {
-        return left != -1 ? values()[left] : null;
+        return left != -1 ? values()[left] : this;
     }
 
+    /**
+     * Get the direction 90 degrees right (clockwise) of this direction if possible, else return this direction
+     */
     public Direction getRight() {
-        return right != -1 ? values()[right] : null;
+        return right != -1 ? values()[right] : this;
     }
 
     public double getX() {
@@ -346,5 +356,46 @@ public enum Direction {
 
     }
 
-}
+    //FAWE start - utility methods for block states
 
+    /**
+     * Get the directions associated with the given block state, e.g. the connections a fence makes or the direction stairs face
+     *
+     * @since TODO
+     */
+    public static EnumSet<Direction> getDirections(BlockState state) {
+        EnumSet<Direction> directions = EnumSet.noneOf(Direction.class);
+        for (Property<?> property : state.getBlockType().getProperties()) {
+            if (property instanceof DirectionalProperty dirProp) {
+                directions.add(state.getState(dirProp));
+                continue;
+            }
+            Object value = state.getState(property);
+            if (!(value instanceof String str)) {
+                if (value instanceof Integer i) {
+                    fromRotationIndex(i).ifPresent(directions::add);
+                } else if (value instanceof Boolean b && b) {
+                    try {
+                        directions.add(Direction.valueOf(property.getName().toUpperCase(Locale.ROOT)));
+                    } catch (IllegalArgumentException ignored) {
+                    }
+                }
+                continue;
+            }
+            switch (str.toLowerCase(Locale.ROOT)) {
+                case "upper", "ceiling", "up", "top" -> directions.add(Direction.UP);
+                case "lower", "floor", "down", "bottom", "y" -> directions.add(Direction.DOWN);
+                case "double", "wall" -> {} // Do nothing
+                case "south" -> directions.add(Direction.SOUTH);
+                case "x", "east" -> directions.add(Direction.EAST);
+                case "z", "north" -> directions.add(Direction.NORTH);
+                case "west" -> directions.add(Direction.WEST);
+                case "hinge" -> {} // Do nothing for now
+                case "shape" -> {} // Do nothing for now
+            }
+        }
+        return directions;
+    }
+    //FAWE end
+
+}
