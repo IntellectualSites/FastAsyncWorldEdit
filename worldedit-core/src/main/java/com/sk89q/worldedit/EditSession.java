@@ -3881,7 +3881,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     @Override
     public void addSchems(Region region, Mask mask, List<ClipboardHolder> clipboards, int rarity, boolean rotate) throws
             WorldEditException {
-        spawnResource(region, new SchemGen(mask, this, clipboards, rotate), rarity, 1);
+        spawnResource(region, new SchemGen(mask, this, clipboards, rotate, region), rarity, 1);
     }
 
     @Override

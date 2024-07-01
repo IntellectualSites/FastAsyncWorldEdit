@@ -645,10 +645,10 @@ public class BrushCommands {
     @CommandPermissions("worldedit.brush.populateschematic")
     public void scatterSchemBrush(
             Player player, InjectedValueAccess context,
-            @Arg(desc = "Mask")
-                    Mask mask,
             @Arg(name = "clipboard", desc = "Clipboard uri")
                     String clipboardStr,
+            @Arg(desc = "Mask of block to place on. Defaults to solid blocks.", def = "")
+                    Mask mask,
             @Arg(desc = "Expression", def = "30")
                     Expression radius,
             @Arg(desc = "double", def = "50")
