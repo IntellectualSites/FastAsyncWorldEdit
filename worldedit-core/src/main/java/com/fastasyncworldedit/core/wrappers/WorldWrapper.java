@@ -36,6 +36,8 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
+import com.sk89q.worldedit.world.generation.ConfiguredFeatureType;
+import com.sk89q.worldedit.world.generation.StructureType;
 import com.sk89q.worldedit.world.weather.WeatherType;
 
 import javax.annotation.Nullable;
@@ -132,12 +134,10 @@ public class WorldWrapper extends AbstractWorld {
         return parent.playEffect(position, type, data);
     }
 
-    //FAWE start - allow block break effect of non-legacy blocks
     @Override
     public boolean playBlockBreakEffect(Vector3 position, BlockType type) {
         return parent.playBlockBreakEffect(position, type);
     }
-    //FAWE end
 
     @Override
     public boolean queueBlockBreakEffect(Platform server, BlockVector3 position, BlockType blockType, double priority) {
@@ -206,12 +206,10 @@ public class WorldWrapper extends AbstractWorld {
         return parent.getName();
     }
 
-    //FAWE start - allow history to read an unloaded world's name
     @Override
     public String getNameUnsafe() {
         return parent.getNameUnsafe();
     }
-    //FAWE end
 
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block, boolean notifyAndLight) throws
@@ -261,12 +259,15 @@ public class WorldWrapper extends AbstractWorld {
         });
     }
 
-    //FAWE start
     @Override
     public Collection<BaseItemStack> getBlockDrops(final BlockVector3 position) {
         return TaskManager.taskManager().sync(() -> parent.getBlockDrops(position));
     }
-    //FAWE end
+
+    @Override
+    public boolean canPlaceAt(final BlockVector3 position, final BlockState blockState) {
+        return parent.canPlaceAt(position, blockState);
+    }
 
     @Override
     public boolean regenerate(Region region, EditSession session) {
@@ -286,6 +287,16 @@ public class WorldWrapper extends AbstractWorld {
         } catch (MaxChangedBlocksException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public boolean generateStructure(final StructureType type, final EditSession editSession, final BlockVector3 position) {
+        return parent.generateStructure(type, editSession, position);
+    }
+
+    @Override
+    public boolean generateFeature(final ConfiguredFeatureType type, final EditSession editSession, final BlockVector3 position) {
+        return parent.generateFeature(type, editSession, position);
     }
 
     @Override

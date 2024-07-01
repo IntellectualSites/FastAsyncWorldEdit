@@ -9,14 +9,17 @@ import com.fastasyncworldedit.core.queue.IBatchProcessor;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.implementation.packet.ChunkPacket;
 import com.fastasyncworldedit.core.util.NbtUtils;
+import com.fastasyncworldedit.core.util.TaskManager;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.mojang.serialization.Codec;
 import com.sk89q.jnbt.Tag;
+import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
+import com.sk89q.worldedit.bukkit.adapter.ext.fawe.v1_21_R1.PaperweightAdapter;
 import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_21_R1.nbt.PaperweightLazyCompoundTag;
 import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_21_R1.regen.PaperweightRegen;
 import com.sk89q.worldedit.entity.BaseEntity;
@@ -44,12 +47,15 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import com.sk89q.worldedit.world.entity.EntityType;
+import com.sk89q.worldedit.world.generation.ConfiguredFeatureType;
+import com.sk89q.worldedit.world.generation.StructureType;
 import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 import io.papermc.lib.PaperLib;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.SectionPos;
 import net.minecraft.core.WritableRegistry;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.registries.Registries;
@@ -60,17 +66,24 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.server.level.ChunkHolder;
+import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
+import net.minecraft.world.level.levelgen.structure.Structure;
+import net.minecraft.world.level.levelgen.structure.StructureStart;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -79,6 +92,7 @@ import org.bukkit.World;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.craftbukkit.CraftWorld;
+import org.bukkit.craftbukkit.block.CraftBlockState;
 import org.bukkit.craftbukkit.block.data.CraftBlockData;
 import org.bukkit.craftbukkit.entity.CraftEntity;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
@@ -124,7 +138,7 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
         }
     }
 
-    private final com.sk89q.worldedit.bukkit.adapter.ext.fawe.v1_21_R1.PaperweightAdapter parent;
+    private final PaperweightAdapter parent;
     // ------------------------------------------------------------------------
     // Code that may break between versions of Minecraft
     // ------------------------------------------------------------------------
@@ -135,7 +149,7 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
     private Map<String, List<Property<?>>> allBlockProperties = null;
 
     public PaperweightFaweAdapter() throws NoSuchFieldException, NoSuchMethodException {
-        this.parent = new com.sk89q.worldedit.bukkit.adapter.ext.fawe.v1_21_R1.PaperweightAdapter();
+        this.parent = new PaperweightAdapter();
     }
 
     @Nullable
@@ -299,7 +313,7 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
     }
 
     @Override
-    public WorldNativeAccess<?, ?, ?> createWorldNativeAccess(org.bukkit.World world) {
+    public WorldNativeAccess<?, ?, ?> createWorldNativeAccess(World world) {
         return new PaperweightFaweWorldNativeAccess(this, new WeakReference<>(getServerLevel(world)));
     }
 
@@ -444,7 +458,7 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
     }
 
     @Override
-    public void sendFakeChunk(org.bukkit.World world, Player player, ChunkPacket chunkPacket) {
+    public void sendFakeChunk(World world, Player player, ChunkPacket chunkPacket) {
         ServerLevel nmsWorld = getServerLevel(world);
         ChunkHolder map = PaperweightPlatformAdapter.getPlayerChunk(nmsWorld, chunkPacket.getChunkX(), chunkPacket.getChunkZ());
         if (map != null && wasAccessibleSinceLastSave(map)) {
@@ -479,7 +493,7 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
     }
 
     @Override
-    public boolean canPlaceAt(org.bukkit.World world, BlockVector3 blockVector3, BlockState blockState) {
+    public boolean canPlaceAt(World world, BlockVector3 blockVector3, BlockState blockState) {
         int internalId = BlockStateIdAccess.getBlockStateId(blockState);
         net.minecraft.world.level.block.state.BlockState blockState1 = Block.stateById(internalId);
         return blockState1.hasPostProcess(
@@ -529,6 +543,169 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
     }
 
     @Override
+    public boolean generateFeature(ConfiguredFeatureType feature, World world, EditSession editSession, BlockVector3 pt) {
+        //FAWE start
+        ServerLevel serverLevel = ((CraftWorld) world).getHandle();
+        ChunkGenerator generator = serverLevel.getMinecraftWorld().getChunkSource().getGenerator();
+
+        ConfiguredFeature<?, ?> configuredFeature = serverLevel
+                .registryAccess()
+                .registryOrThrow(Registries.CONFIGURED_FEATURE)
+                .get(ResourceLocation.tryParse(feature.id()));
+        FaweBlockStateListPopulator populator = new FaweBlockStateListPopulator(serverLevel);
+
+        Map<BlockPos, CraftBlockState> placed = TaskManager.taskManager().sync(() -> {
+            serverLevel.captureTreeGeneration = true;
+            serverLevel.captureBlockStates = true;
+            try {
+                if (!configuredFeature.place(
+                        populator,
+                        generator,
+                        serverLevel.random,
+                        new BlockPos(pt.x(), pt.y(), pt.z())
+                )) {
+                    return null;
+                }
+                Map<BlockPos, CraftBlockState> placedBlocks = populator.getList().stream().collect(Collectors.toMap(
+                        CraftBlockState::getPosition,
+                        craftBlockState -> craftBlockState
+                ));
+                placedBlocks.putAll(serverLevel.capturedBlockStates);
+                return placedBlocks;
+            } finally {
+                serverLevel.captureBlockStates = false;
+                serverLevel.captureTreeGeneration = false;
+                serverLevel.capturedBlockStates.clear();
+            }
+        });
+
+        return placeFeatureIntoSession(editSession, populator, placed);
+        //FAWE end
+    }
+
+    @Override
+    public boolean generateStructure(StructureType type, World world, EditSession editSession, BlockVector3 pt) {
+        ServerLevel serverLevel = ((CraftWorld) world).getHandle();
+        Structure k = serverLevel
+                .registryAccess()
+                .registryOrThrow(Registries.STRUCTURE)
+                .get(ResourceLocation.tryParse(type.id()));
+        if (k == null) {
+            return false;
+        }
+
+        ServerChunkCache chunkManager = serverLevel.getChunkSource();
+
+        ChunkPos chunkPos = new ChunkPos(new BlockPos(pt.x(), pt.y(), pt.z()));
+
+        //FAWE start
+        FaweBlockStateListPopulator populator = new FaweBlockStateListPopulator(serverLevel);
+        Map<BlockPos, CraftBlockState> placed = TaskManager.taskManager().sync(() -> {
+            serverLevel.captureTreeGeneration = true;
+            serverLevel.captureBlockStates = true;
+            try {
+                StructureStart structureStart = k.generate(
+                        serverLevel.registryAccess(),
+                        chunkManager.getGenerator(),
+                        chunkManager.getGenerator().getBiomeSource(),
+                        chunkManager.randomState(),
+                        serverLevel.getStructureManager(),
+                        serverLevel.getSeed(),
+                        chunkPos,
+                        0,
+                        populator,
+                        biome -> true
+                );
+                if (!structureStart.isValid()) {
+                    return null;
+                } else {
+                    BoundingBox boundingBox = structureStart.getBoundingBox();
+                    ChunkPos min = new ChunkPos(
+                            SectionPos.blockToSectionCoord(boundingBox.minX()),
+                            SectionPos.blockToSectionCoord(boundingBox.minZ())
+                    );
+                    ChunkPos max = new ChunkPos(
+                            SectionPos.blockToSectionCoord(boundingBox.maxX()),
+                            SectionPos.blockToSectionCoord(boundingBox.maxZ())
+                    );
+                    ChunkPos.rangeClosed(min, max).forEach((chunkPosx) -> structureStart.placeInChunk(
+                            populator,
+                            serverLevel.structureManager(),
+                            chunkManager.getGenerator(),
+                            serverLevel.getRandom(),
+                            new BoundingBox(
+                                    chunkPosx.getMinBlockX(),
+                                    serverLevel.getMinBuildHeight(),
+                                    chunkPosx.getMinBlockZ(),
+                                    chunkPosx.getMaxBlockX(),
+                                    serverLevel.getMaxBuildHeight(),
+                                    chunkPosx.getMaxBlockZ()
+                            ),
+                            chunkPosx
+                    ));
+                    Map<BlockPos, CraftBlockState> placedBlocks = populator.getList().stream().collect(Collectors.toMap(
+                            CraftBlockState::getPosition,
+                            craftBlockState -> craftBlockState
+                    ));
+                    placedBlocks.putAll(serverLevel.capturedBlockStates);
+                    return placedBlocks;
+                }
+            } finally {
+                serverLevel.captureBlockStates = false;
+                serverLevel.captureTreeGeneration = false;
+                serverLevel.capturedBlockStates.clear();
+            }
+        });
+
+        return placeFeatureIntoSession(editSession, populator, placed);
+        //FAWE end
+    }
+
+    private boolean placeFeatureIntoSession(
+            final EditSession editSession,
+            final FaweBlockStateListPopulator populator,
+            final Map<BlockPos, CraftBlockState> placed
+    ) {
+        if (placed == null || placed.isEmpty()) {
+            return false;
+        }
+
+        for (Map.Entry<BlockPos, CraftBlockState> entry : placed.entrySet()) {
+            CraftBlockState craftBlockState = entry.getValue();
+            if (entry.getValue() == null) {
+                continue;
+            }
+            BlockPos pos = entry.getKey();
+            editSession.setBlock(pos.getX(), pos.getY(), pos.getZ(), BukkitAdapter.adapt(craftBlockState.getBlockData()));
+            BlockEntity blockEntity = populator.getBlockEntity(pos);
+            if (blockEntity != null) {
+                net.minecraft.nbt.CompoundTag tag = blockEntity.saveWithId(DedicatedServer.getServer().registryAccess());
+                editSession.setTile(pos.getX(), pos.getY(), pos.getZ(), (com.sk89q.jnbt.CompoundTag) toNative(tag));
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public void setupFeatures() {
+        DedicatedServer server = ((CraftServer) Bukkit.getServer()).getServer();
+
+        // Features
+        for (ResourceLocation name : server.registryAccess().registryOrThrow(Registries.CONFIGURED_FEATURE).keySet()) {
+            if (ConfiguredFeatureType.REGISTRY.get(name.toString()) == null) {
+                ConfiguredFeatureType.REGISTRY.register(name.toString(), new ConfiguredFeatureType(name.toString()));
+            }
+        }
+
+        // Structures
+        for (ResourceLocation name : server.registryAccess().registryOrThrow(Registries.STRUCTURE).keySet()) {
+            if (StructureType.REGISTRY.get(name.toString()) == null) {
+                StructureType.REGISTRY.register(name.toString(), new StructureType(name.toString()));
+            }
+        }
+    }
+
+    @Override
     public BaseItemStack adapt(org.bukkit.inventory.ItemStack itemStack) {
         final RegistryAccess.Frozen registryAccess = DedicatedServer.getServer().registryAccess();
         final ItemStack nmsStack = CraftItemStack.asNMSCopy(itemStack);
@@ -557,12 +734,12 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
     }
 
     @Override
-    public boolean regenerate(org.bukkit.World bukkitWorld, Region region, Extent target, RegenOptions options) throws Exception {
+    public boolean regenerate(World bukkitWorld, Region region, Extent target, RegenOptions options) throws Exception {
         return new PaperweightRegen(bukkitWorld, region, target, options).regenerate();
     }
 
     @Override
-    public IChunkGet get(org.bukkit.World world, int chunkX, int chunkZ) {
+    public IChunkGet get(World world, int chunkX, int chunkZ) {
         return new PaperweightGetBlocks(world, chunkX, chunkZ);
     }
 

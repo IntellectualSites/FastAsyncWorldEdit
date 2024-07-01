@@ -19,7 +19,6 @@
 
 package com.sk89q.worldedit.bukkit.adapter.ext.fawe.v1_20_R3;
 
-import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.internal.block.BlockStateIdAccess;
 import com.sk89q.worldedit.internal.wna.WorldNativeAccess;

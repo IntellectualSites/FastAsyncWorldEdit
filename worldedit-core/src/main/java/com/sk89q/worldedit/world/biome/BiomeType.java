@@ -75,7 +75,7 @@ public class BiomeType implements RegistryItem, Keyed, BiomePattern {
     /**
      * Gets the ID of this biome.
      *
-     * @return The id
+     * @return the id
      * @deprecated use {@link #id()}
      */
     @Deprecated(forRemoval = true, since = "2.11.0")
