@@ -3,8 +3,8 @@ package com.fastasyncworldedit.bukkit.regions.plotsquared;
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.FaweAPI;
 import com.fastasyncworldedit.core.FaweCache;
-import com.fastasyncworldedit.core.extent.clipboard.io.FastSchematicReader;
-import com.fastasyncworldedit.core.extent.clipboard.io.FastSchematicWriter;
+import com.fastasyncworldedit.core.extent.clipboard.io.FastSchematicReaderV2;
+import com.fastasyncworldedit.core.extent.clipboard.io.FastSchematicWriterV2;
 import com.fastasyncworldedit.core.jnbt.CompressedCompoundTag;
 import com.fastasyncworldedit.core.jnbt.CompressedSchematicTag;
 import com.fastasyncworldedit.core.util.IOUtil;
@@ -29,17 +29,19 @@ import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.BuiltInClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.MCEditSchematicReader;
-import com.sk89q.worldedit.extent.clipboard.io.SpongeSchematicReader;
+import com.sk89q.worldedit.extent.clipboard.io.sponge.SpongeSchematicV3Reader;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import net.jpountz.lz4.LZ4BlockInputStream;
 import org.anarres.parallelgzip.ParallelGZIPOutputStream;
 import org.apache.logging.log4j.Logger;
+import org.enginehub.linbus.stream.LinBinaryIO;
 
 import javax.annotation.Nonnull;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.DataInputStream;
 import java.io.EOFException;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -182,7 +184,7 @@ public class FaweDelegateSchematicHandler {
                     try (OutputStream stream = new FileOutputStream(tmp);
                          NBTOutputStream output = new NBTOutputStream(
                                  new BufferedOutputStream(new ParallelGZIPOutputStream(stream)))) {
-                        new FastSchematicWriter(output).write(clipboard);
+                        new FastSchematicWriterV2(output).write(clipboard);
                     }
                 } else {
                     try (OutputStream stream = new FileOutputStream(tmp);
@@ -239,7 +241,7 @@ public class FaweDelegateSchematicHandler {
 
     public Schematic getSchematic(@Nonnull InputStream is) {
         try {
-            FastSchematicReader schematicReader = new FastSchematicReader(
+            FastSchematicReaderV2 schematicReader = new FastSchematicReaderV2(
                     new NBTInputStream(new BufferedInputStream(new GZIPInputStream(new BufferedInputStream(is)))));
             Clipboard clip = schematicReader.read();
             return new Schematic(clip);
@@ -249,8 +251,8 @@ public class FaweDelegateSchematicHandler {
                 return null;
             }
             try {
-                SpongeSchematicReader schematicReader =
-                        new SpongeSchematicReader(new NBTInputStream(new GZIPInputStream(is)));
+                SpongeSchematicV3Reader schematicReader =
+                        new SpongeSchematicV3Reader(LinBinaryIO.read(new DataInputStream(new GZIPInputStream(is))));
                 Clipboard clip = schematicReader.read();
                 return new Schematic(clip);
             } catch (IOException e2) {

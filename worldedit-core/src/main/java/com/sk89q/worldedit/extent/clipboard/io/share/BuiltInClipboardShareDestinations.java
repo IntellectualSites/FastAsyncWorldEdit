@@ -61,7 +61,7 @@ public enum BuiltInClipboardShareDestinations implements ClipboardShareDestinati
 
             PasteMetadata pasteMetadata = new PasteMetadata();
             pasteMetadata.author = metadata.author();
-            pasteMetadata.extension = "schem";
+            pasteMetadata.extension = metadata.format().getPrimaryFileExtension();
             pasteMetadata.name = metadata.name();
             EngineHubPaste pasteService = new EngineHubPaste();
 
@@ -75,7 +75,7 @@ public enum BuiltInClipboardShareDestinations implements ClipboardShareDestinati
 
         @Override
         public ClipboardFormat getDefaultFormat() {
-            return BuiltInClipboardFormat.SPONGE_SCHEMATIC;
+            return BuiltInClipboardFormat.SPONGE_V2_SCHEMATIC;
         }
 
         @Override
@@ -119,13 +119,14 @@ public enum BuiltInClipboardShareDestinations implements ClipboardShareDestinati
 
         @Override
         public ClipboardFormat getDefaultFormat() {
-            return BuiltInClipboardFormat.FAST;
+            return BuiltInClipboardFormat.FAST_V3;
         }
 
         @Override
         public boolean supportsFormat(final ClipboardFormat format) {
-            return format == BuiltInClipboardFormat.SPONGE_SCHEMATIC ||
-                    format == BuiltInClipboardFormat.FAST ||
+            return format == BuiltInClipboardFormat.SPONGE_V2_SCHEMATIC ||
+                    format == BuiltInClipboardFormat.FAST_V3 ||
+                    format == BuiltInClipboardFormat.FAST_V2 ||
                     format == BuiltInClipboardFormat.MCEDIT_SCHEMATIC;
         }
     };
