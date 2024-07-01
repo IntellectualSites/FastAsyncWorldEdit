@@ -59,7 +59,7 @@ public class StackTool implements BlockTool {
         }
         BlockBag bag = session.getBlockBag(player);
 
-        try (EditSession editSession = session.createEditSession(player)) {
+        try (EditSession editSession = session.createEditSession(player, null, true)) {
             BlockStateHolder<?> block = editSession.getFullBlock(clicked.toVector().toBlockPoint());
 
             try {

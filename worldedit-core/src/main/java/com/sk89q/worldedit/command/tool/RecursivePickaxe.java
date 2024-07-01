@@ -79,7 +79,7 @@ public class RecursivePickaxe implements BlockTool {
             return false;
         }
 
-        try (EditSession editSession = session.createEditSession(player, "RecursivePickaxe")) {
+        try (EditSession editSession = session.createEditSession(player, "RecursivePickaxe", true)) {
             editSession.getSurvivalExtent().setToolUse(config.superPickaxeManyDrop);
 
             //FAWE start

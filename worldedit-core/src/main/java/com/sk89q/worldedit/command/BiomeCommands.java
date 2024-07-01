@@ -30,6 +30,7 @@ import com.sk89q.worldedit.command.util.Logging;
 import com.sk89q.worldedit.command.util.WorldEditAsyncCommandBuilder;
 import com.sk89q.worldedit.command.util.annotation.Confirm;
 import com.sk89q.worldedit.command.util.annotation.Preload;
+import com.sk89q.worldedit.command.util.annotation.SynchronousSettingExpected;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Capability;
@@ -179,6 +180,7 @@ public class BiomeCommands {
     )
     @Logging(REGION)
     @Preload(Preload.PreloadCheck.PRELOAD)
+    @SynchronousSettingExpected // TODO improve using filter/chunk-based-placement
     @Confirm(Confirm.Processor.REGION)
     @CommandPermissions("worldedit.biome.set")
     public void setBiome(

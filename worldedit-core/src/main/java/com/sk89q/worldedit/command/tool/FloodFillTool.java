@@ -82,7 +82,7 @@ public class FloodFillTool implements BlockTool {
             return true;
         }
 
-        try (EditSession editSession = session.createEditSession(player, "FloodFillTool")) {
+        try (EditSession editSession = session.createEditSession(player, "FloodFillTool", true)) {
             try {
                 //FAWE start - Respect masks
                 Mask mask = initialType.toMask(editSession);
