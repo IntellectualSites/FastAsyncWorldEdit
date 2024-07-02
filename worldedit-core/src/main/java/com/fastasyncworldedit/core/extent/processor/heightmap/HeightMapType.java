@@ -17,19 +17,19 @@ public enum HeightMapType {
     MOTION_BLOCKING {
         @Override
         public boolean includes(BlockState state) {
-            return state.getMaterial().isSolid() || HeightMapType.hasFluid(state);
+            return state.getMaterial().isMovementBlocker() || HeightMapType.hasFluid(state);
         }
     },
     MOTION_BLOCKING_NO_LEAVES {
         @Override
         public boolean includes(BlockState state) {
-            return (state.getMaterial().isSolid() || HeightMapType.hasFluid(state)) && !HeightMapType.isLeaf(state);
+            return (state.getMaterial().isMovementBlocker() || HeightMapType.hasFluid(state)) && !HeightMapType.isLeaf(state);
         }
     },
     OCEAN_FLOOR {
         @Override
         public boolean includes(BlockState state) {
-            return state.getMaterial().isSolid();
+            return state.getMaterial().isMovementBlocker();
         }
     },
     WORLD_SURFACE {
