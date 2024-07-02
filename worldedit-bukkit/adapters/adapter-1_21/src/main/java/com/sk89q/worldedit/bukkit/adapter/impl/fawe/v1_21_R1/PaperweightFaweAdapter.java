@@ -555,10 +555,10 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
         return parent.fromNative(foreign);
     }
 
-//    @Override
-//    public boolean regenerate(org.bukkit.World bukkitWorld, Region region, Extent target, RegenOptions options) throws Exception {
-//        return new PaperweightRegen(bukkitWorld, region, target, options).regenerate();
-//    }
+    @Override
+    public boolean regenerate(org.bukkit.World bukkitWorld, Region region, Extent target, RegenOptions options) throws Exception {
+        throw new UnsupportedOperationException("Regen support for 1.21 not yet implemented.");
+    }
 
     @Override
     public IChunkGet get(org.bukkit.World world, int chunkX, int chunkZ) {
