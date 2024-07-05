@@ -366,17 +366,16 @@ public class Fawe {
             );
         }
         if (Settings.settings().HISTORY.DELETE_DISK_ON_LOGOUT && Settings.settings().HISTORY.USE_DATABASE) {
-            LOGGER.warn("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-            LOGGER.warn("!!!                                                                 !!!");
-            LOGGER.warn("!!!    Using history database whilst deleting disk history!         !!!");
-            LOGGER.warn("!!!    You will not be able to #rollback edits after a user logs    !!!");
-            LOGGER.warn("!!!    logs out, recommended to disable delete-disk-on-logout if    !!!");
-            LOGGER.warn("!!!    you want to have full history rollback functionality.        !!!");
-            LOGGER.warn("!!!    Disable use-database if you want do not mind not having      !!!");
-            LOGGER.warn("!!!    having rollback functionality and wish to disable this       !!!");
-            LOGGER.warn("!!!    warning.                                                     !!!");
-            LOGGER.warn("!!!                                                                 !!!");
-            LOGGER.warn("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            LOGGER.warn("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            LOGGER.warn("!!!                                                                !!!");
+            LOGGER.warn("!!!    Using history database whilst deleting disk history!        !!!");
+            LOGGER.warn("!!!    You will not be able to rollback edits after a user logs    !!!");
+            LOGGER.warn("!!!    out, recommended to disable delete-disk-on-logout if you    !!!");
+            LOGGER.warn("!!!    you want to have full history rollback functionality.       !!!");
+            LOGGER.warn("!!!    Disable use-database if you do not need to have rollback    !!!");
+            LOGGER.warn("!!!    functionality and wish to disable this warning.             !!!");
+            LOGGER.warn("!!!                                                                !!!");
+            LOGGER.warn("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         }
         try {
             byte[] in = new byte[0];
