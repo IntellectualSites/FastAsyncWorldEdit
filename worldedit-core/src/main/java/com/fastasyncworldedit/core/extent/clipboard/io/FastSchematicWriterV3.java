@@ -61,10 +61,10 @@ public class FastSchematicWriterV3 implements ClipboardWriter {
             throw new IllegalArgumentException("Region width too large for schematic: " + region.getWidth());
         }
         if (region.getHeight() > MAX_SIZE) {
-            throw new IllegalArgumentException("Region height too large for schematic: " + region.getWidth());
+            throw new IllegalArgumentException("Region height too large for schematic: " + region.getHeight());
         }
         if (region.getLength() > MAX_SIZE) {
-            throw new IllegalArgumentException("Region length too large for schematic: " + region.getWidth());
+            throw new IllegalArgumentException("Region length too large for schematic: " + region.getLength());
         }
 
         this.outputStream.writeLazyCompoundTag(
