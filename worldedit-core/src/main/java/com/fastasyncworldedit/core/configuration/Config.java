@@ -224,7 +224,7 @@ public class Config {
     /**
      * Indicates that a field's default value should match another input if the config is otherwise already generated
      *
-     * @since TODO
+     * @since 2.11.0
      */
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.FIELD})

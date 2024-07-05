@@ -122,7 +122,7 @@ public class BlockVector2 {
      * Get the X coordinate.
      *
      * @return the x coordinate
-     * @since TODO
+     * @since 2.11.0
      */
     public int x() {
         return x;
@@ -134,7 +134,7 @@ public class BlockVector2 {
      * @return the x coordinate
      * @deprecated use {@link #x()} instead
      */
-    @Deprecated(forRemoval = true, since = "TODO")
+    @Deprecated(forRemoval = true, since = "2.11.0")
     public int getX() {
         return x;
     }
@@ -145,7 +145,7 @@ public class BlockVector2 {
      * @return the x coordinate
      * @deprecated use {@link #x()} instead
      */
-    @Deprecated(forRemoval = true, since = "TODO")
+    @Deprecated(forRemoval = true, since = "2.11.0")
     public int getBlockX() {
         return x;
     }
@@ -164,7 +164,7 @@ public class BlockVector2 {
      * Get the Z coordinate.
      *
      * @return the z coordinate
-     * @since TODO
+     * @since 2.11.0
      */
     public int z() {
         return z;
@@ -176,7 +176,7 @@ public class BlockVector2 {
      * @return the z coordinate
      * @deprecated use {@link #z()} instead
      */
-    @Deprecated(forRemoval = true, since = "TODO")
+    @Deprecated(forRemoval = true, since = "2.11.0")
     public int getZ() {
         return z;
     }
@@ -187,7 +187,7 @@ public class BlockVector2 {
      * @return the z coordinate
      * @deprecated use {@link #z()} instead
      */
-    @Deprecated(forRemoval = true, since = "TODO")
+    @Deprecated(forRemoval = true, since = "2.11.0")
     public int getBlockZ() {
         return z;
     }

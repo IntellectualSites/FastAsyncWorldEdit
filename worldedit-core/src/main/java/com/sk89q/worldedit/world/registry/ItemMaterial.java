@@ -29,7 +29,7 @@ public interface ItemMaterial {
      * @return the maximum quantity
      * @deprecated Use {@link #maxStackSize()} instead.
      */
-    @Deprecated(forRemoval = true, since = "TODO")
+    @Deprecated(forRemoval = true, since = "2.11.0")
     default int getMaxStackSize() {
         return maxStackSize();
     }
@@ -38,7 +38,7 @@ public interface ItemMaterial {
      * Gets the the maximum quantity of this item that can be in a single stack.
      *
      * @return the maximum quantity
-     * @since TODO
+     * @since 2.11.0
      */
     @NonAbstractForCompatibility(delegateName = "getMaxStackSize", delegateParams = {})
     default int maxStackSize() {
@@ -52,7 +52,7 @@ public interface ItemMaterial {
      * @return the maximum damage, or 0 if not applicable
      * @deprecated Use {@link #maxDamage()} instead.
      */
-    @Deprecated(forRemoval = true, since = "TODO")
+    @Deprecated(forRemoval = true, since = "2.11.0")
     default int getMaxDamage() {
         return maxDamage();
     }
@@ -61,7 +61,7 @@ public interface ItemMaterial {
      * Gets the the maximum damage this item can take before being broken.
      *
      * @return the maximum damage, or 0 if not applicable
-     * @since TODO
+     * @since 2.11.0
      */
     @NonAbstractForCompatibility(delegateName = "getMaxDamage", delegateParams = {})
     default int maxDamage() {

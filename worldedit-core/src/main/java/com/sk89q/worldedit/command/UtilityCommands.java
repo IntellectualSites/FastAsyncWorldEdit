@@ -242,6 +242,7 @@ public class UtilityCommands {
         we.checkMaxRadius(depth, actor);
 
         BlockVector3 pos = session.getPlacementPosition(actor);
+        we.checkExtentHeightBounds(pos, editSession);
         int affected = editSession.fillDirection(pos, pattern, radius, depth, direction);
         actor.print(Caption.of("worldedit.fill.created", TextComponent.of(affected)));
         return affected;
@@ -330,6 +331,7 @@ public class UtilityCommands {
         we.checkMaxRadius(radius, actor);
 
         BlockVector3 pos = session.getPlacementPosition(actor);
+        we.checkExtentHeightBounds(pos, editSession);
         int affected = editSession.fillXZ(pos, pattern, radius, depth, true);
         actor.print(Caption.of("worldedit.fillr.created", TextComponent.of(affected)));
         return affected;
@@ -357,7 +359,9 @@ public class UtilityCommands {
         double radius = radiusExp.evaluate();
         radius = Math.max(0, radius);
         we.checkMaxRadius(radius, actor);
-        int affected = editSession.drainArea(session.getPlacementPosition(actor), radius, waterlogged, plants);
+        BlockVector3 pos = session.getPlacementPosition(actor);
+        we.checkExtentHeightBounds(pos, editSession);
+        int affected = editSession.drainArea(pos, radius, waterlogged, plants);
         actor.print(Caption.of("worldedit.drain.drained", TextComponent.of(affected)));
         return affected;
     }
@@ -376,7 +380,9 @@ public class UtilityCommands {
     ) throws WorldEditException {
         radius = Math.max(0, radius);
         we.checkMaxRadius(radius, actor);
-        int affected = editSession.fixLiquid(session.getPlacementPosition(actor), radius, BlockTypes.LAVA);
+        BlockVector3 pos = session.getPlacementPosition(actor);
+        we.checkExtentHeightBounds(pos, editSession);
+        int affected = editSession.fixLiquid(pos, radius, BlockTypes.LAVA);
         actor.print(Caption.of("worldedit.fixlava.fixed", TextComponent.of(affected)));
         return affected;
     }
@@ -395,7 +401,9 @@ public class UtilityCommands {
     ) throws WorldEditException {
         radius = Math.max(0, radius);
         we.checkMaxRadius(radius, actor);
-        int affected = editSession.fixLiquid(session.getPlacementPosition(actor), radius, BlockTypes.WATER);
+        BlockVector3 pos = session.getPlacementPosition(actor);
+        we.checkExtentHeightBounds(pos, editSession);
+        int affected = editSession.fixLiquid(pos, radius, BlockTypes.WATER);
         actor.print(Caption.of("worldedit.fixwater.fixed", TextComponent.of(affected)));
         return affected;
     }

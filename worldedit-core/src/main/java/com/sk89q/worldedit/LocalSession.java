@@ -1352,7 +1352,7 @@ public class LocalSession implements TextureHolder {
      * @param item the item type
      * @param tool the tool to set, which can be {@code null}
      * @throws InvalidToolBindException if the item can't be bound to that item
-     * @since TODO
+     * @since 2.11.0
      */
     public void setTool(BaseItem item, @Nullable Tool tool) throws InvalidToolBindException {
         if (item.getType().hasBlockType()) {
@@ -1919,7 +1919,7 @@ public class LocalSession implements TextureHolder {
      * Get the preferred wand item for this user, or {@code null} to use the default
      *
      * @return item id of wand item, or {@code null}
-     * @since TODO
+     * @since 2.11.0
      */
     public BaseItem getWandBaseItem() {
         return wandItem == null ? null : new BaseItem(wandItem.getType(), wandItem.getNbtReference());
@@ -1929,7 +1929,7 @@ public class LocalSession implements TextureHolder {
      * Get the preferred navigation wand item for this user, or {@code null} to use the default
      *
      * @return item id of nav wand item, or {@code null}
-     * @since TODO
+     * @since 2.11.0
      */
     public BaseItem getNavWandBaseItem() {
         return navWandItem == null ? null : new BaseItem(navWandItem.getType(), navWandItem.getNbtReference());

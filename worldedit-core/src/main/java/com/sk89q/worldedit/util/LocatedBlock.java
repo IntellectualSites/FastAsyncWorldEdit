@@ -40,7 +40,7 @@ public record LocatedBlock(BlockVector3 location, BaseBlock block) {
      * @return The location
      * @deprecated This class is now a record. Use {@link #location()} instead.
      */
-    @Deprecated(forRemoval = true, since = "TODO")
+    @Deprecated(forRemoval = true, since = "2.11.0")
     public BlockVector3 getLocation() {
         return this.location;
     }
@@ -51,7 +51,7 @@ public record LocatedBlock(BlockVector3 location, BaseBlock block) {
      * @return The block
      * @deprecated This class is now a record. Use {@link #block()} instead.
      */
-    @Deprecated(forRemoval = true, since = "TODO")
+    @Deprecated(forRemoval = true, since = "2.11.0")
     public BaseBlock getBlock() {
         return this.block;
     }
