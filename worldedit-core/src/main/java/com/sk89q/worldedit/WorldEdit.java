@@ -468,7 +468,7 @@ public final class WorldEdit {
     /**
      * @deprecated Use {@link WorldEdit#checkMaxBrushRadius(Expression, Actor)}
      */
-    @Deprecated(forRemoval = true, since = "TODO")
+    @Deprecated(forRemoval = true, since = "2.11.0")
     public void checkMaxBrushRadius(Expression radius) throws MaxBrushRadiusException {
         double val = radius.evaluate();
         checkArgument(val >= 0, "Radius must be a positive number.");
@@ -485,7 +485,7 @@ public final class WorldEdit {
      * @param radius Radius to check
      * @param actor  Actor to check for
      * @throws MaxRadiusException If given radius larger than allowed
-     * @since TODO
+     * @since 2.11.0
      */
     public void checkMaxRadius(double radius, Actor actor) {
         int max = actor.getLimit().MAX_RADIUS;
@@ -500,7 +500,7 @@ public final class WorldEdit {
      * @param radius Radius to check
      * @param actor  Actor to check for
      * @throws MaxRadiusException If given radius larger than allowed
-     * @since TODO
+     * @since 2.11.0
      */
     public void checkMaxBrushRadius(double radius, Actor actor) {
         int max = actor.getLimit().MAX_BRUSH_RADIUS;
@@ -515,7 +515,7 @@ public final class WorldEdit {
      * @param expression Radius to check
      * @param actor      Actor to check for
      * @throws BrushRadiusLimitException If given radius larger than allowed
-     * @since TODO
+     * @since 2.11.0
      */
     public void checkMaxBrushRadius(Expression expression, Actor actor) {
         double radius = expression.evaluate();
@@ -532,7 +532,7 @@ public final class WorldEdit {
      * @param position Position to check
      * @param extent   Extent to check in
      * @throws OutsideWorldBoundsException If the position is outside the world height limits
-     * @since TODO
+     * @since 2.11.0
      */
     public void checkExtentHeightBounds(BlockVector3 position, Extent extent) {
         if (position.y() < extent.getMinY() || position.y() > extent.getMaxY()) {

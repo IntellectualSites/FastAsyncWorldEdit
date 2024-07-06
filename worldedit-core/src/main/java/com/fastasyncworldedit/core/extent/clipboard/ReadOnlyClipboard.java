@@ -2,13 +2,10 @@ package com.fastasyncworldedit.core.extent.clipboard;
 
 import com.fastasyncworldedit.core.Fawe;
 import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.jnbt.NBTUtils;
-import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.session.request.Request;
@@ -18,9 +15,7 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 import javax.annotation.Nullable;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.function.Supplier;
 
@@ -75,6 +70,16 @@ public abstract class ReadOnlyClipboard extends SimpleClipboard {
             }
             throw new IllegalStateException("No world");
         };
+    }
+
+    @Override
+    public BlockVector3 getMinimumPoint() {
+        return region.getMinimumPoint();
+    }
+
+    @Override
+    public BlockVector3 getMaximumPoint() {
+        return region.getMaximumPoint();
     }
 
     @Override

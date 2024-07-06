@@ -57,7 +57,7 @@ public record Vector2(double x, double z) {
      * @return the x coordinate
      * @deprecated use {@link #x()} instead
      */
-    @Deprecated(forRemoval = true, since = "TODO")
+    @Deprecated(forRemoval = true, since = "2.11.0")
     public double getX() {
         return x;
     }
@@ -66,7 +66,7 @@ public record Vector2(double x, double z) {
      * Get the X coordinate, aligned to the block grid.
      *
      * @return the block-aligned x coordinate
-     * @since TODO
+     * @since 2.11.0
      */
     public int blockX() {
         return MathMan.roundInt(x);
@@ -86,7 +86,7 @@ public record Vector2(double x, double z) {
      * Get the Z coordinate, aligned to the block grid.
      *
      * @return the block-aligned z coordinate
-     * @since TODO
+     * @since 2.11.0
      */
     public int blockZ() {
         return MathMan.roundInt(z);
@@ -98,7 +98,7 @@ public record Vector2(double x, double z) {
      * @return the z coordinate
      * @deprecated use {@link #z()} instead
      */
-    @Deprecated(forRemoval = true, since = "TODO")
+    @Deprecated(forRemoval = true, since = "2.11.0")
     public double getZ() {
         return z;
     }

@@ -340,7 +340,7 @@ public class ClipboardCommands {
             aliases = {"/download"},
             desc = "Downloads your clipboard through the configured web interface"
     )
-    @Deprecated(forRemoval = true, since = "TODO")
+    @Deprecated(forRemoval = true, since = "2.11.0")
     @CommandPermissions({"worldedit.clipboard.download"})
     public void download(
             final Actor actor,

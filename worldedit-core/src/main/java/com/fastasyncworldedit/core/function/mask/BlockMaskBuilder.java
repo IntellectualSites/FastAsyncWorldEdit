@@ -65,7 +65,7 @@ public class BlockMaskBuilder {
     /**
      * Create a new instance with a given {@link ParserContext} to use if parsing regex
      *
-     * @since TODO
+     * @since 2.11.0
      */
     public BlockMaskBuilder(ParserContext context) {
         this(new long[BlockTypes.size()][], context);
@@ -79,7 +79,7 @@ public class BlockMaskBuilder {
     /**
      * Create a new instance with a given {@link ParserContext} to use if parsing regex
      *
-     * @since TODO
+     * @since 2.11.0
      */
     protected BlockMaskBuilder(long[][] bitSets, ParserContext context) {
         this.bitSets = bitSets;

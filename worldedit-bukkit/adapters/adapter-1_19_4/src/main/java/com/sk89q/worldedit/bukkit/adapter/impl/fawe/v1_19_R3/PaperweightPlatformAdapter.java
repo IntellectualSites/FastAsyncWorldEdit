@@ -350,27 +350,23 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         MinecraftServer.getServer().execute(() -> {
             ClientboundLevelChunkWithLightPacket packet;
             if (PaperLib.isPaper()) {
-                synchronized (chunk) {
-                    packet = new ClientboundLevelChunkWithLightPacket(
-                            levelChunk,
-                            nmsWorld.getChunkSource().getLightEngine(),
-                            null,
-                            null,
-                            true,
-                            false // last false is to not bother with x-ray
-                    );
-                }
+                packet = new ClientboundLevelChunkWithLightPacket(
+                        levelChunk,
+                        nmsWorld.getChunkSource().getLightEngine(),
+                        null,
+                        null,
+                        true,
+                        false // last false is to not bother with x-ray
+                );
             } else {
-                synchronized (chunk) {
-                    // deprecated on paper - deprecation suppressed
-                    packet = new ClientboundLevelChunkWithLightPacket(
-                            levelChunk,
-                            nmsWorld.getChunkSource().getLightEngine(),
-                            null,
-                            null,
-                            true
-                    );
-                }
+                // deprecated on paper - deprecation suppressed
+                packet = new ClientboundLevelChunkWithLightPacket(
+                        levelChunk,
+                        nmsWorld.getChunkSource().getLightEngine(),
+                        null,
+                        null,
+                        true
+                );
             }
             nearbyPlayers(nmsWorld, coordIntPair).forEach(p -> p.connection.send(packet));
         });

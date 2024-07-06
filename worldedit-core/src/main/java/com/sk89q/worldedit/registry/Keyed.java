@@ -33,7 +33,7 @@ public interface Keyed {
      * @return an id
      * @deprecated Use {@link #id()} instead.
      */
-    @Deprecated(forRemoval = true, since = "TODO")
+    @Deprecated(forRemoval = true, since = "2.11.0")
     default String getId() {
         return id();
     }
@@ -43,7 +43,7 @@ public interface Keyed {
      * may have additional restrictions.
      *
      * @return an id
-     * @since TODO
+     * @since 2.11.0
      */
     @NonAbstractForCompatibility(delegateName = "getId", delegateParams = {})
     default String id() {

@@ -178,7 +178,7 @@ public abstract class BlockVector3 {
      * Get the X coordinate.
      *
      * @return the x coordinate
-     * @since TODO
+     * @since 2.11.0
      */
     public abstract int x();
     //FAWE end
@@ -189,7 +189,7 @@ public abstract class BlockVector3 {
      * @return the x coordinate
      * @deprecated use {@link #x()} instead
      */
-    @Deprecated(forRemoval = true, since = "TODO")
+    @Deprecated(forRemoval = true, since = "2.11.0")
     public int getX() {
         return this.x(); //FAWE - access abstract getter instead of local field
     }
@@ -200,7 +200,7 @@ public abstract class BlockVector3 {
      * @return the x coordinate
      * @deprecated use {@link #x()} instead
      */
-    @Deprecated(forRemoval = true, since = "TODO")
+    @Deprecated(forRemoval = true, since = "2.11.0")
     public int getBlockX() {
         return this.x(); //FAWE - access abstract getter instead of local field
     }
@@ -223,7 +223,7 @@ public abstract class BlockVector3 {
      * Get the Y coordinate.
      *
      * @return the y coordinate
-     * @since TODO
+     * @since 2.11.0
      */
     public abstract int y();
     //FAWE end
@@ -234,7 +234,7 @@ public abstract class BlockVector3 {
      * @return the y coordinate
      * @deprecated use {@link #y()} instead
      */
-    @Deprecated(forRemoval = true, since = "TODO")
+    @Deprecated(forRemoval = true, since = "2.11.0")
     public int getY() {
         return this.y(); //FAWE - access abstract getter instead of local field
     }
@@ -245,7 +245,7 @@ public abstract class BlockVector3 {
      * @return the y coordinate
      * @deprecated use {@link #y()} instead
      */
-    @Deprecated(forRemoval = true, since = "TODO")
+    @Deprecated(forRemoval = true, since = "2.11.0")
     public int getBlockY() {
         return this.y(); //FAWE - access abstract getter instead of local field
     }
@@ -267,7 +267,7 @@ public abstract class BlockVector3 {
      * Get the Z coordinate.
      *
      * @return the Z coordinate
-     * @since TODO
+     * @since 2.11.0
      */
     public abstract int z();
     //FAWE end
@@ -278,7 +278,7 @@ public abstract class BlockVector3 {
      * @return the z coordinate
      * @deprecated use {@link #z()} instead
      */
-    @Deprecated(forRemoval = true, since = "TODO")
+    @Deprecated(forRemoval = true, since = "2.11.0")
     public int getZ() {
         return this.z(); //FAWE - access abstract getter instead of local field
     }
@@ -289,7 +289,7 @@ public abstract class BlockVector3 {
      * @return the z coordinate
      * @deprecated use {@link #z()} instead
      */
-    @Deprecated(forRemoval = true, since = "TODO")
+    @Deprecated(forRemoval = true, since = "2.11.0")
     public int getBlockZ() {
         return this.z(); //FAWE - access abstract getter instead of local field
     }
