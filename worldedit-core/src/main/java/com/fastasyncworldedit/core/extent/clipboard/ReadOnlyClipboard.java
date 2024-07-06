@@ -73,6 +73,16 @@ public abstract class ReadOnlyClipboard extends SimpleClipboard {
     }
 
     @Override
+    public BlockVector3 getMinimumPoint() {
+        return region.getMinimumPoint();
+    }
+
+    @Override
+    public BlockVector3 getMaximumPoint() {
+        return region.getMaximumPoint();
+    }
+
+    @Override
     public Region getRegion() {
         return region;
     }

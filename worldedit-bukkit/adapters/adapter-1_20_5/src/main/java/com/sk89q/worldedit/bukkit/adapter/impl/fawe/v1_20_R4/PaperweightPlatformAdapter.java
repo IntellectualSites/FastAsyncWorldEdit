@@ -140,7 +140,14 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             fieldTickingFluidCount.setAccessible(true);
             fieldTickingBlockCount = LevelChunkSection.class.getDeclaredField(Refraction.pickName("tickingBlockCount", "f"));
             fieldTickingBlockCount.setAccessible(true);
-            fieldBiomes = LevelChunkSection.class.getDeclaredField(Refraction.pickName("biomes", "i"));
+            Field tmpFieldBiomes;
+            try {
+                // Seems it's sometimes biomes and sometimes "i". Idk this is just easier than having to try to deal with it
+                tmpFieldBiomes = LevelChunkSection.class.getDeclaredField("biomes"); // apparently unobf
+            } catch (NoSuchFieldException ignored) {
+                tmpFieldBiomes = LevelChunkSection.class.getDeclaredField("i"); // apparently obf
+            }
+            fieldBiomes = tmpFieldBiomes;
             fieldBiomes.setAccessible(true);
 
             Method getVisibleChunkIfPresent = ChunkMap.class.getDeclaredMethod(Refraction.pickName(
@@ -353,25 +360,21 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         MinecraftServer.getServer().execute(() -> {
             ClientboundLevelChunkWithLightPacket packet;
             if (PaperLib.isPaper()) {
-                synchronized (chunk) {
-                    packet = new ClientboundLevelChunkWithLightPacket(
-                            levelChunk,
-                            nmsWorld.getChunkSource().getLightEngine(),
-                            null,
-                            null,
-                            false // last false is to not bother with x-ray
-                    );
-                }
+                packet = new ClientboundLevelChunkWithLightPacket(
+                        levelChunk,
+                        nmsWorld.getChunkSource().getLightEngine(),
+                        null,
+                        null,
+                        false // last false is to not bother with x-ray
+                );
             } else {
-                synchronized (chunk) {
-                    // deprecated on paper - deprecation suppressed
-                    packet = new ClientboundLevelChunkWithLightPacket(
-                            levelChunk,
-                            nmsWorld.getChunkSource().getLightEngine(),
-                            null,
-                            null
-                    );
-                }
+                // deprecated on paper - deprecation suppressed
+                packet = new ClientboundLevelChunkWithLightPacket(
+                        levelChunk,
+                        nmsWorld.getChunkSource().getLightEngine(),
+                        null,
+                        null
+                );
             }
             nearbyPlayers(nmsWorld, coordIntPair).forEach(p -> p.connection.send(packet));
         });

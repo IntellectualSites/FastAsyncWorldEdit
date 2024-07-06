@@ -93,7 +93,7 @@ public class TransformExtent extends BlockTransformExtent {
     @Override
     public BiomeType getBiomeType(int x, int y, int z) {
         BlockVector3 p = getPos(x, y, z);
-        return super.getBiomeType(p.x(), y, p.z());
+        return super.getBiomeType(p.x(), p.y(), p.z());
     }
 
     @Override
