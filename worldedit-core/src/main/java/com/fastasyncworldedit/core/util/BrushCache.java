@@ -82,7 +82,7 @@ public final class BrushCache {
         }
 
         CompoundTag nbt = item.getNbtData();
-        Map<String, Tag> map;
+        Map<String, Tag<?, ?>> map;
         if (nbt == null) {
             if (tool == null) {
                 item.setNbtData(null);
@@ -92,9 +92,10 @@ public final class BrushCache {
         } else {
             map = nbt.getValue();
         }
+        item.setNbtData(nbt);
         brushCache.remove(getKey(item));
         CompoundTag display = (CompoundTag) map.get("display");
-        Map<String, Tag> displayMap;
+        Map<String, Tag<?, ?>> displayMap;
         return tool;
     }
 

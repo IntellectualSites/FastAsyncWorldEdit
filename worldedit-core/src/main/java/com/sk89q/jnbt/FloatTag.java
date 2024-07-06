@@ -20,17 +20,14 @@
 package com.sk89q.jnbt;
 
 import com.fastasyncworldedit.core.jnbt.NumberTag;
-import com.sk89q.worldedit.util.nbt.FloatBinaryTag;
+import org.enginehub.linbus.tree.LinFloatTag;
 
 /**
  * The {@code TAG_Float} tag.
  *
- * @deprecated Use {@link FloatBinaryTag}.
+ * @deprecated Use {@link LinFloatTag}.
  */
-@Deprecated
-public final class FloatTag extends NumberTag {
-
-    private final FloatBinaryTag innerTag;
+public final class FloatTag extends NumberTag<LinFloatTag> {
 
     /**
      * Creates the tag with an empty name.
@@ -38,23 +35,16 @@ public final class FloatTag extends NumberTag {
      * @param value the value of the tag
      */
     public FloatTag(float value) {
-        super();
-        this.innerTag = FloatBinaryTag.of(value);
+        this(LinFloatTag.of(value));
     }
 
-    public FloatTag(FloatBinaryTag adventureTag) {
-        super();
-        this.innerTag = adventureTag;
-    }
-
-    @Override
-    public FloatBinaryTag asBinaryTag() {
-        return this.innerTag;
+    public FloatTag(LinFloatTag tag) {
+        super(tag);
     }
 
     @Override
     public Float getValue() {
-        return innerTag.value();
+        return linTag.value();
     }
 
     //FAWE start

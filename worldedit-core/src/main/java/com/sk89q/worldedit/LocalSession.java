@@ -76,7 +76,6 @@ import com.sk89q.worldedit.util.Countable;
 import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.util.Identifiable;
 import com.sk89q.worldedit.util.SideEffectSet;
-import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -84,6 +83,8 @@ import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.snapshot.experimental.Snapshot;
 import com.zaxxer.sparsebits.SparseBitSet;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import org.enginehub.linbus.tree.LinCompoundTag;
+import org.enginehub.linbus.tree.LinTagType;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -1351,7 +1352,7 @@ public class LocalSession implements TextureHolder {
      * @param item the item type
      * @param tool the tool to set, which can be {@code null}
      * @throws InvalidToolBindException if the item can't be bound to that item
-     * @since TODO
+     * @since 2.11.0
      */
     public void setTool(BaseItem item, @Nullable Tool tool) throws InvalidToolBindException {
         if (item.getType().hasBlockType()) {
@@ -1513,13 +1514,13 @@ public class LocalSession implements TextureHolder {
 
         BaseBlock block = ServerCUIHandler.createStructureBlock(player);
         if (block != null) {
-            CompoundBinaryTag tags = Objects.requireNonNull(
-                    block.getNbt(), "createStructureBlock should return nbt"
+            LinCompoundTag tags = Objects.requireNonNull(
+                block.getNbt(), "createStructureBlock should return nbt"
             );
             BlockVector3 tempCuiTemporaryBlock = BlockVector3.at(
-                    tags.getInt("x"),
-                    tags.getInt("y"),
-                    tags.getInt("z")
+                tags.getTag("x", LinTagType.intTag()).valueAsInt(),
+                tags.getTag("y", LinTagType.intTag()).valueAsInt(),
+                tags.getTag("z", LinTagType.intTag()).valueAsInt()
             );
             // If it's null, we don't need to do anything. The old was already removed.
             if (cuiTemporaryBlock != null && !tempCuiTemporaryBlock.equals(cuiTemporaryBlock)) {
@@ -1933,7 +1934,7 @@ public class LocalSession implements TextureHolder {
      * Get the preferred wand item for this user, or {@code null} to use the default
      *
      * @return item id of wand item, or {@code null}
-     * @since TODO
+     * @since 2.11.0
      */
     public BaseItem getWandBaseItem() {
         return wandItem == null ? null : new BaseItem(wandItem.getType(), wandItem.getNbtReference());
@@ -1943,7 +1944,7 @@ public class LocalSession implements TextureHolder {
      * Get the preferred navigation wand item for this user, or {@code null} to use the default
      *
      * @return item id of nav wand item, or {@code null}
-     * @since TODO
+     * @since 2.11.0
      */
     public BaseItem getNavWandBaseItem() {
         return navWandItem == null ? null : new BaseItem(navWandItem.getType(), navWandItem.getNbtReference());

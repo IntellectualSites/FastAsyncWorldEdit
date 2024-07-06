@@ -45,8 +45,8 @@ import com.sk89q.worldedit.registry.state.AbstractProperty;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.util.concurrency.LazyReference;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
+import org.enginehub.linbus.tree.LinCompoundTag;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -420,7 +420,7 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
     //FAWE end
 
     @Override
-    public BaseBlock toBaseBlock(LazyReference<CompoundBinaryTag> compoundTag) {
+    public BaseBlock toBaseBlock(LazyReference<LinCompoundTag> compoundTag) {
         if (compoundTag == null) {
             return toBaseBlock();
         }

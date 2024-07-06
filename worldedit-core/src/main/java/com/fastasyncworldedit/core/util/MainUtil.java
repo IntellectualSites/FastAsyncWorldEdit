@@ -427,7 +427,7 @@ public class MainUtil {
      */
     @Nonnull
     public static CompoundTag setPosition(@Nonnull CompoundTag tag, int x, int y, int z) {
-        Map<String, Tag> value = new HashMap<>(tag.getValue());
+        Map<String, Tag<?, ?>> value = new HashMap<>(tag.getValue());
         value.put("x", new IntTag(x));
         value.put("y", new IntTag(y));
         value.put("z", new IntTag(z));
@@ -443,7 +443,7 @@ public class MainUtil {
      */
     @Nonnull
     public static CompoundTag setEntityInfo(@Nonnull CompoundTag tag, @Nonnull Entity entity) {
-        Map<String, Tag> map = new HashMap<>(tag.getValue());
+        Map<String, Tag<?, ?>> map = new HashMap<>(tag.getValue());
         map.put("Id", new StringTag(entity.getState().getType().id()));
         ListTag pos = (ListTag) map.get("Pos");
         if (pos != null) {

@@ -77,7 +77,7 @@ public class PolyhedralRegion extends AbstractRegion {
         minimumPoint = region.minimumPoint;
         maximumPoint = region.maximumPoint;
         centerAccum = region.centerAccum;
-        lastTriangle = region.lastTriangle;
+        lastTriangle = lastTriangle == null ? null : region.lastTriangle.clone();
     }
 
     /**

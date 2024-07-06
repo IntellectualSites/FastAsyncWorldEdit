@@ -9,15 +9,13 @@ import com.sk89q.worldedit.internal.block.BlockStateIdAccess;
 import com.sk89q.worldedit.internal.wna.WorldNativeAccess;
 import com.sk89q.worldedit.util.SideEffect;
 import com.sk89q.worldedit.util.SideEffectSet;
-import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
 import com.sk89q.worldedit.world.block.BlockState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ChunkHolder;
-import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.FullChunkStatus;
+import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -25,6 +23,7 @@ import net.minecraft.world.level.chunk.LevelChunk;
 import org.bukkit.craftbukkit.v1_20_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_20_R1.block.data.CraftBlockData;
 import org.bukkit.event.block.BlockPhysicsEvent;
+import org.enginehub.linbus.tree.LinCompoundTag;
 
 import javax.annotation.Nullable;
 import java.lang.ref.WeakReference;
@@ -133,14 +132,14 @@ public class PaperweightFaweWorldNativeAccess implements WorldNativeAccess<Level
     }
 
     @Override
-    public boolean updateTileEntity(BlockPos blockPos, CompoundBinaryTag tag) {
+    public boolean updateTileEntity(BlockPos blockPos, LinCompoundTag tag) {
         // We will assume that the tile entity was created for us,
         // though we do not do this on the other versions
         BlockEntity blockEntity = getLevel().getBlockEntity(blockPos);
         if (blockEntity == null) {
             return false;
         }
-        net.minecraft.nbt.Tag nativeTag = paperweightFaweAdapter.fromNativeBinary(tag);
+        net.minecraft.nbt.Tag nativeTag = paperweightFaweAdapter.fromNativeLin(tag);
         blockEntity.load((CompoundTag) nativeTag);
         return true;
     }
@@ -216,6 +215,12 @@ public class PaperweightFaweWorldNativeAccess implements WorldNativeAccess<Level
         }
         newState.triggerEvent(level, blockPos, NOTIFY, recursionLimit);
         newState.updateIndirectNeighbourShapes(level, blockPos, NOTIFY, recursionLimit);
+    }
+
+    @Override
+    public void updateBlock(BlockPos pos, net.minecraft.world.level.block.state.BlockState oldState, net.minecraft.world.level.block.state.BlockState newState) {
+        Level world = getLevel();
+        newState.onPlace(world, pos, oldState, false);
     }
 
     @Override

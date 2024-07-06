@@ -35,8 +35,6 @@ import com.mojang.datafixers.DataFixer;
 import com.mojang.datafixers.DataFixerBuilder;
 import com.mojang.datafixers.schemas.Schema;
 import com.mojang.serialization.Dynamic;
-import com.sk89q.worldedit.bukkit.adapter.ext.fawe.v1_20_R3.PaperweightAdapter;
-import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.chat.Component;
@@ -49,7 +47,9 @@ import net.minecraft.util.datafix.fixes.References;
 import net.minecraft.world.item.DyeColor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.enginehub.linbus.tree.LinCompoundTag;
 
+import javax.annotation.Nullable;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -63,7 +63,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
-import javax.annotation.Nullable;
 
 /**
  * Handles converting all Pre 1.13.2 data using the Legacy DataFix System (ported to 1.13.2)
@@ -79,16 +78,15 @@ import javax.annotation.Nullable;
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class PaperweightDataConverters extends DataFixerBuilder implements com.sk89q.worldedit.world.DataFixer {
 
-    //FAWE start - BinaryTag
     @SuppressWarnings("unchecked")
     @Override
     public <T> T fixUp(FixType<T> type, T original, int srcVer) {
         if (type == FixTypes.CHUNK) {
-            return (T) fixChunk((CompoundBinaryTag) original, srcVer);
+            return (T) fixChunk((LinCompoundTag) original, srcVer);
         } else if (type == FixTypes.BLOCK_ENTITY) {
-            return (T) fixBlockEntity((CompoundBinaryTag) original, srcVer);
+            return (T) fixBlockEntity((LinCompoundTag) original, srcVer);
         } else if (type == FixTypes.ENTITY) {
-            return (T) fixEntity((CompoundBinaryTag) original, srcVer);
+            return (T) fixEntity((LinCompoundTag) original, srcVer);
         } else if (type == FixTypes.BLOCK_STATE) {
             return (T) fixBlockState((String) original, srcVer);
         } else if (type == FixTypes.ITEM_TYPE) {
@@ -99,24 +97,23 @@ public class PaperweightDataConverters extends DataFixerBuilder implements com.s
         return original;
     }
 
-    private CompoundBinaryTag fixChunk(CompoundBinaryTag originalChunk, int srcVer) {
-        net.minecraft.nbt.CompoundTag tag = (net.minecraft.nbt.CompoundTag) adapter.fromNativeBinary(originalChunk);
+    private LinCompoundTag fixChunk(LinCompoundTag originalChunk, int srcVer) {
+        net.minecraft.nbt.CompoundTag tag = (net.minecraft.nbt.CompoundTag) adapter.fromNativeLin(originalChunk);
         net.minecraft.nbt.CompoundTag fixed = convert(LegacyType.CHUNK, tag, srcVer);
-        return (CompoundBinaryTag) adapter.toNativeBinary(fixed);
+        return (LinCompoundTag) adapter.toNativeLin(fixed);
     }
 
-    private CompoundBinaryTag fixBlockEntity(CompoundBinaryTag origTileEnt, int srcVer) {
-        net.minecraft.nbt.CompoundTag tag = (net.minecraft.nbt.CompoundTag) adapter.fromNativeBinary(origTileEnt);
+    private LinCompoundTag fixBlockEntity(LinCompoundTag origTileEnt, int srcVer) {
+        net.minecraft.nbt.CompoundTag tag = (net.minecraft.nbt.CompoundTag) adapter.fromNativeLin(origTileEnt);
         net.minecraft.nbt.CompoundTag fixed = convert(LegacyType.BLOCK_ENTITY, tag, srcVer);
-        return (CompoundBinaryTag) adapter.toNativeBinary(fixed);
+        return (LinCompoundTag) adapter.toNativeLin(fixed);
     }
 
-    private CompoundBinaryTag fixEntity(CompoundBinaryTag origEnt, int srcVer) {
-        net.minecraft.nbt.CompoundTag tag = (net.minecraft.nbt.CompoundTag) adapter.fromNativeBinary(origEnt);
+    private LinCompoundTag fixEntity(LinCompoundTag origEnt, int srcVer) {
+        net.minecraft.nbt.CompoundTag tag = (net.minecraft.nbt.CompoundTag) adapter.fromNativeLin(origEnt);
         net.minecraft.nbt.CompoundTag fixed = convert(LegacyType.ENTITY, tag, srcVer);
-        return (CompoundBinaryTag) adapter.toNativeBinary(fixed);
+        return (LinCompoundTag) adapter.toNativeLin(fixed);
     }
-    //FAWE end
 
     private String fixBlockState(String blockState, int srcVer) {
         net.minecraft.nbt.CompoundTag stateNBT = stateToNBT(blockState);

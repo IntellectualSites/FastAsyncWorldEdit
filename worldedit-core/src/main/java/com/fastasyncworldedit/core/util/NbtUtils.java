@@ -1,13 +1,12 @@
 package com.fastasyncworldedit.core.util;
 
-import com.sk89q.worldedit.util.nbt.BinaryTag;
-import com.sk89q.worldedit.util.nbt.BinaryTagType;
-import com.sk89q.worldedit.util.nbt.BinaryTagTypes;
-import com.sk89q.worldedit.util.nbt.ByteBinaryTag;
-import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
-import com.sk89q.worldedit.util.nbt.IntBinaryTag;
-import com.sk89q.worldedit.util.nbt.ShortBinaryTag;
 import com.sk89q.worldedit.world.storage.InvalidFormatException;
+import org.enginehub.linbus.tree.LinByteTag;
+import org.enginehub.linbus.tree.LinCompoundTag;
+import org.enginehub.linbus.tree.LinIntTag;
+import org.enginehub.linbus.tree.LinShortTag;
+import org.enginehub.linbus.tree.LinTag;
+import org.enginehub.linbus.tree.LinTagType;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,9 +22,9 @@ public class NbtUtils {
      * @return child tag
      * @throws InvalidFormatException if the format of the items is invalid
      */
-    public static <T extends BinaryTag> T getChildTag(CompoundBinaryTag tag, String key, BinaryTagType<T> expected) throws
+    public static <T extends LinTag> T getChildTag(LinCompoundTag tag, String key, LinTagType expected) throws
             InvalidFormatException {
-        BinaryTag childTag = tag.get(key);
+        LinTag childTag = tag.value().get(key);
         if (childTag == null) {
             throw new InvalidFormatException("Missing a \"" + key + "\" tag");
         }
@@ -48,35 +47,35 @@ public class NbtUtils {
      * @throws InvalidFormatException if the format of the items is invalid
      * @since 2.1.0
      */
-    public static int getInt(CompoundBinaryTag tag, String key) throws InvalidFormatException {
-        BinaryTag childTag = tag.get(key);
+    public static int getInt(LinCompoundTag tag, String key) throws InvalidFormatException {
+        LinTag childTag = tag.value().get(key);
         if (childTag == null) {
             throw new InvalidFormatException("Missing a \"" + key + "\" tag");
         }
 
-        BinaryTagType<?> type = childTag.type();
-        if (type == BinaryTagTypes.INT) {
-            return ((IntBinaryTag) childTag).intValue();
+        LinTagType<?> type = childTag.type();
+        if (type == LinTagType.intTag()) {
+            return ((LinIntTag) childTag).value();
         }
-        if (type == BinaryTagTypes.BYTE) {
-            return ((ByteBinaryTag) childTag).intValue();
+        if (type == LinTagType.byteTag()) {
+            return ((LinByteTag) childTag).value();
         }
-        if (type == BinaryTagTypes.SHORT) {
-            return ((ShortBinaryTag) childTag).intValue();
+        if (type == LinTagType.shortTag()) {
+            return ((LinShortTag) childTag).value();
         }
         throw new InvalidFormatException(key + " tag is not of int, short or byte tag type.");
     }
 
     /**
-     * Get a mutable map of the values stored inside a {@link CompoundBinaryTag}
+     * Get a mutable map of the values stored inside a {@link LinCompoundTag}
      *
-     * @param tag {@link CompoundBinaryTag} to get values for
+     * @param tag {@link LinCompoundTag} to get values for
      * @return Mutable map of values
      * @since 2.1.0
      */
-    public static Map<String, BinaryTag> getCompoundBinaryTagValues(CompoundBinaryTag tag) {
-        Map<String, BinaryTag> value = new HashMap<>();
-        tag.forEach((e) -> value.put(e.getKey(), e.getValue()));
+    public static Map<String, LinTag<?>> getLinCompoundTagValues(LinCompoundTag tag) {
+        Map<String, LinTag<?>> value = new HashMap<>();
+        value.putAll(tag.value());
         return value;
     }
 

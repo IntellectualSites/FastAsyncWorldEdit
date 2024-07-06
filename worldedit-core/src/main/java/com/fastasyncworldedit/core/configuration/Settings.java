@@ -191,6 +191,7 @@ public class Settings extends Config {
                     }
                 }
                 limit.UNIVERSAL_DISALLOWED_BLOCKS &= newLimit.UNIVERSAL_DISALLOWED_BLOCKS;
+                limit.ALLOW_LEGACY &= newLimit.ALLOW_LEGACY;
 
                 if (limit.DISALLOWED_BLOCKS == null) {
                     limit.DISALLOWED_BLOCKS = newLimit.DISALLOWED_BLOCKS.isEmpty() ? Collections.emptySet() : new HashSet<>(
@@ -440,6 +441,10 @@ public class Settings extends Config {
         })
         public boolean UNIVERSAL_DISALLOWED_BLOCKS = true;
         @Comment({
+                "If legacy, mumerical, blocks IDs should be able to be used (i.e. 12:2),"
+        })
+        public boolean ALLOW_LEGACY = true;
+        @Comment({
                 "List of blocks to deny use of. Can be either an entire block type or a block with a specific property value.",
                 "Where block properties are specified, any blockstate with the property will be disallowed (e.g. all directions",
                 "of a waterlogged fence). For blocking/remapping of all occurrences of a property like waterlogged, see",
@@ -518,6 +523,9 @@ public class Settings extends Config {
         public int DELETE_AFTER_DAYS = 7;
         @Comment("Delete history in memory on logout (does not effect disk)")
         public boolean DELETE_ON_LOGOUT = true;
+        @Comment("Delete history on disk on logout")
+        @CopiedFrom("history.delete-on-logout")
+        public boolean DELETE_DISK_ON_LOGOUT = false;
         @Comment({
                 "If history should be enabled by default for plugins using WorldEdit:",
                 " - It is faster to have disabled",

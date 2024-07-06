@@ -8,15 +8,13 @@ import com.sk89q.worldedit.bukkit.BukkitPlayer;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.entity.BaseEntity;
+import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.util.Direction;
-import com.sk89q.worldedit.util.nbt.BinaryTag;
-import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
 import com.sk89q.worldedit.world.DataFixer;
 import com.sk89q.worldedit.world.biome.BiomeType;
-import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
@@ -33,6 +31,8 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.enginehub.linbus.tree.LinCompoundTag;
+import org.enginehub.linbus.tree.LinTag;
 
 import javax.annotation.Nullable;
 import java.util.Map;
@@ -81,7 +81,7 @@ public interface IDelegateBukkitImplAdapter<T> extends BukkitImplAdapter<T> {
     }
 
     @Override
-    default void sendFakeNBT(Player player, BlockVector3 pos, CompoundBinaryTag nbtData) {
+    default void sendFakeNBT(Player player, BlockVector3 pos, LinCompoundTag nbtData) {
         getParent().sendFakeNBT(player, pos, nbtData);
     }
 
@@ -116,6 +116,26 @@ public interface IDelegateBukkitImplAdapter<T> extends BukkitImplAdapter<T> {
     }
 
     @Override
+    default boolean clearContainerBlockContents(World world, BlockVector3 pt) {
+        return getParent().clearContainerBlockContents(world, pt);
+    }
+
+    @Override
+    default void setBiome(Location location, BiomeType biome) {
+        getParent().setBiome(location, biome);
+    }
+
+    @Override
+    default BiomeType getBiome(Location location) {
+        return getParent().getBiome(location);
+    }
+
+    @Override
+    default void sendBiomeUpdates(World world, Iterable<BlockVector2> chunks) {
+        getParent().sendBiomeUpdates(world, chunks);
+    }
+
+    @Override
     default BlockMaterial getMaterial(BlockType blockType) {
         return getParent().getMaterial(blockType);
     }
@@ -131,8 +151,8 @@ public interface IDelegateBukkitImplAdapter<T> extends BukkitImplAdapter<T> {
     }
 
     @Override
-    default BinaryTag toNativeBinary(T foreign) {
-        return getParent().toNativeBinary(foreign);
+    default LinTag<?> toNativeLin(T foreign) {
+        return getParent().toNativeLin(foreign);
     }
 
     @Override
@@ -141,8 +161,8 @@ public interface IDelegateBukkitImplAdapter<T> extends BukkitImplAdapter<T> {
     }
 
     @Override
-    default T fromNativeBinary(BinaryTag foreign) {
-        return getParent().fromNativeBinary(foreign);
+    default T fromNativeLin(LinTag foreign) {
+        return getParent().fromNativeLin(foreign);
     }
 
     @Override

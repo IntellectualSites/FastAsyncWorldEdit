@@ -104,7 +104,7 @@ public class SignBlock extends BaseBlock {
 
     @Override
     public CompoundTag getNbtData() {
-        Map<String, Tag> values = new HashMap<>();
+        Map<String, Tag<?, ?>> values = new HashMap<>();
         if (isLegacy()) {
             values.put("Text1", new StringTag(text[0]));
             values.put("Text2", new StringTag(text[1]));
@@ -112,7 +112,7 @@ public class SignBlock extends BaseBlock {
             values.put("Text4", new StringTag(text[3]));
         } else {
             ListTag messages = new ListTag(StringTag.class, Arrays.stream(text).map(StringTag::new).collect(Collectors.toList()));
-            Map<String, Tag> frontTextTag = new HashMap<>();
+            Map<String, Tag<?, ?>> frontTextTag = new HashMap<>();
             frontTextTag.put("messages", messages);
             values.put("front_text", new CompoundTag(frontTextTag));
         }
@@ -125,9 +125,9 @@ public class SignBlock extends BaseBlock {
             return;
         }
 
-        Map<String, Tag> values = rootTag.getValue();
+        Map<String, Tag<?, ?>> values = rootTag.getValue();
 
-        Tag t;
+        Tag<?, ?> t;
 
         text = new String[]{EMPTY, EMPTY, EMPTY, EMPTY};
 

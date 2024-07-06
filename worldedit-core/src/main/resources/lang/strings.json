@@ -166,6 +166,7 @@
   "fawe.cancel.reason.no.region.not.added": "Not added to region",
   "fawe.cancel.reason.player-only": "This operation requires a player, and cannot be executed from console, or without an actor.",
   "fawe.cancel.reason.actor-required": "This operation requires an actor.",
+  "fawe.cancel.reason.world.limit": "This operation cannot be performed at y={0} as it is outside world limits.",
   "fawe.cancel.worldedit.failed.load.chunk": "Skipped loading chunk: {0};{1}. Try increasing chunk-wait.",
   "fawe.navigation.no.block": "No block in sight! (or too far)",
   "fawe.selection.sel.max": "{0} points maximum.",

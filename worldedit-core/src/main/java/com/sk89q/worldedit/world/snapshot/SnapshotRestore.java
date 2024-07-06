@@ -28,12 +28,15 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
-import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
-import com.sk89q.worldedit.util.nbt.ListBinaryTag;
 import com.sk89q.worldedit.world.DataException;
 import com.sk89q.worldedit.world.chunk.Chunk;
 import com.sk89q.worldedit.world.storage.ChunkStore;
 import com.sk89q.worldedit.world.storage.MissingChunkException;
+import org.enginehub.linbus.tree.LinCompoundTag;
+import org.enginehub.linbus.tree.LinDoubleTag;
+import org.enginehub.linbus.tree.LinFloatTag;
+import org.enginehub.linbus.tree.LinListTag;
+import org.enginehub.linbus.tree.LinTagType;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -197,14 +200,14 @@ public class SnapshotRestore {
                 if (restoreEntities) {
                     try {
                         for (BaseEntity entity : chunk.getEntities()) {
-                            CompoundBinaryTag tag = entity.getNbtReference().getValue();
-                            ListBinaryTag pos = tag.getList("Pos");
-                            ListBinaryTag rotation = tag.getList("Rotation");
-                            double x = pos.getDouble(0);
-                            double y = pos.getDouble(1);
-                            double z = pos.getDouble(2);
-                            float yRot = rotation.getFloat(0);
-                            float xRot = rotation.getFloat(1);
+                            LinCompoundTag tag = entity.getNbtReference().getValue();
+                            LinListTag<LinDoubleTag> pos = tag.getListTag("Pos", LinTagType.doubleTag());
+                            LinListTag<LinFloatTag> rotation = tag.getListTag("Rotation", LinTagType.floatTag());
+                            double x = pos.get(0).value();
+                            double y = pos.get(1).value();
+                            double z = pos.get(2).value();
+                            float yRot = rotation.get(0).value();
+                            float xRot = rotation.get(1).value();
                             Location location = new Location(editSession.getWorld(), x, y, z, yRot, xRot);
                             BlockVector3 blockVector3 = BlockVector3.at(x, y, z);
                             if (region.contains(blockVector3) && (editSession.getMask() == null

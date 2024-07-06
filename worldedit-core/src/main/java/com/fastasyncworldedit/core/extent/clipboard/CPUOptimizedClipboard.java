@@ -152,7 +152,7 @@ public class CPUOptimizedClipboard extends LinearClipboard {
     public Collection<CompoundTag> getTileEntities() {
         convertTilesToIndex();
         nbtMapIndex.replaceAll((index, tag) -> {
-            Map<String, Tag> values = new HashMap<>(tag.getValue());
+            Map<String, Tag<?, ?>> values = new HashMap<>(tag.getValue());
             if (!values.containsKey("x")) {
                 int y = index / getArea();
                 index -= y * getArea();
@@ -176,7 +176,7 @@ public class CPUOptimizedClipboard extends LinearClipboard {
     }
 
     private boolean setTile(int index, CompoundTag tag) {
-        final Map<String, Tag> values = new HashMap<>(tag.getValue());
+        final Map<String, Tag<?, ?>> values = new HashMap<>(tag.getValue());
         values.remove("x");
         values.remove("y");
         values.remove("z");

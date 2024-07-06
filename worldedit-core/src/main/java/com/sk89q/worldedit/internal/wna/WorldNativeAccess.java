@@ -19,17 +19,14 @@
 
 package com.sk89q.worldedit.internal.wna;
 
-import com.google.common.collect.ImmutableMap;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.util.SideEffect;
 import com.sk89q.worldedit.util.SideEffectSet;
-import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
-import com.sk89q.worldedit.util.nbt.IntBinaryTag;
-import com.sk89q.worldedit.util.nbt.StringBinaryTag;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
+import org.enginehub.linbus.tree.LinCompoundTag;
 
 import javax.annotation.Nullable;
 
@@ -68,17 +65,15 @@ public interface WorldNativeAccess<NC, NBS, NP> {
 
         // Create the TileEntity
         if (successful || old == newState) {
-            if (block instanceof BaseBlock) {
-                BaseBlock baseBlock = (BaseBlock) block;
-                //FAWE start - use CompoundBinaryTag over CompoundTag
-                CompoundBinaryTag tag = baseBlock.getNbt();
+            if (block instanceof BaseBlock baseBlock) {
+                LinCompoundTag tag = baseBlock.getNbt();
                 if (tag != null) {
-                    tag = tag.put(ImmutableMap.of(
-                            "id", StringBinaryTag.of(baseBlock.getNbtId()),
-                            "x", IntBinaryTag.of(position.x()),
-                            "y", IntBinaryTag.of(position.y()),
-                            "z", IntBinaryTag.of(position.z())
-                    ));
+                    tag = tag.toBuilder()
+                        .putString("id", baseBlock.getNbtId())
+                        .putInt("x", position.getX())
+                        .putInt("y", position.getY())
+                        .putInt("z", position.getZ())
+                        .build();
 
                     // update if TE changed as well
                     successful = updateTileEntity(pos, tag);
@@ -143,7 +138,7 @@ public interface WorldNativeAccess<NC, NBS, NP> {
 
     void updateLightingForBlock(NP position);
 
-    boolean updateTileEntity(NP position, CompoundBinaryTag tag);
+    boolean updateTileEntity(NP position, LinCompoundTag tag);
 
     void notifyBlockUpdate(NC chunk, NP position, NBS oldState, NBS newState);
 
@@ -151,7 +146,9 @@ public interface WorldNativeAccess<NC, NBS, NP> {
 
     void markBlockChanged(NC chunk, NP position);
 
-    void notifyNeighbors(NP pos, NBS oldState, NBS newState);
+    void notifyNeighbors(NP pos, NBS oldState, NBS newState);;
+
+    void updateBlock(NP pos, NBS oldState, NBS newState);
 
     void updateNeighbors(NP pos, NBS oldState, NBS newState, int recursionLimit);
 

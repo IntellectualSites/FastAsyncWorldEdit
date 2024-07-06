@@ -510,6 +510,7 @@ public class GeneralCommands {
                     parserContext.setWorld(worldArg);
                     parserContext.setSession(session);
                     parserContext.setExtent(editSession);
+                    parserContext.setTryLegacy(actor.getLimit().ALLOW_LEGACY);
                     Mask mask = worldEdit.getMaskFactory().parseFromInput(arg, parserContext);
                     util = TextureUtil.fromMask(mask);
                 }
