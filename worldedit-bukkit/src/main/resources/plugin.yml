@@ -135,6 +135,7 @@ permissions:
       worldedit.brush.options.transform: true
       worldedit.brush.options.scroll: true
       worldedit.brush.options.visualize: true
+      worldedit.tool.none: true
       worldedit.tool.deltree: true
       worldedit.tool.farwand: true
       worldedit.tool.lrbuild: true
