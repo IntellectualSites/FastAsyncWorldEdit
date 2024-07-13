@@ -19,6 +19,7 @@ import javax.annotation.Nullable;
 
 public class PaperweightLevelProxy extends ServerLevel {
 
+    protected ServerLevel serverLevel;
     private PaperweightFaweAdapter adapter;
     private PaperweightPlacementStateProcessor processor;
 
@@ -28,7 +29,7 @@ public class PaperweightLevelProxy extends ServerLevel {
         throw new IllegalStateException("Cannot be instantiated");
     }
 
-    public static PaperweightLevelProxy getInstance(PaperweightPlacementStateProcessor processor) {
+    public static PaperweightLevelProxy getInstance(ServerLevel serverLevel, PaperweightPlacementStateProcessor processor) {
         Unsafe unsafe = ReflectionUtils.getUnsafe();
 
         PaperweightLevelProxy newLevel;
@@ -39,6 +40,7 @@ public class PaperweightLevelProxy extends ServerLevel {
         }
         newLevel.processor = processor;
         newLevel.adapter = ((PaperweightFaweAdapter) WorldEditPlugin.getInstance().getBukkitImplAdapter());
+        newLevel.serverLevel = serverLevel;
         return newLevel;
     }
 
@@ -92,6 +94,16 @@ public class PaperweightLevelProxy extends ServerLevel {
             return false;
         }
         return getBlockState(pos).getFluidState().is(FluidTags.WATER);
+    }
+
+    @Override
+    public int getHeight() {
+        return serverLevel.getHeight();
+    }
+
+    @Override
+    public int getMinBuildHeight() {
+        return serverLevel.getMinBuildHeight();
     }
 
 }

@@ -1,6 +1,9 @@
 package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_20_R2;
 
 import com.fastasyncworldedit.core.extent.processor.PlacementStateProcessor;
+import com.fastasyncworldedit.core.util.ExtentTraverser;
+import com.fastasyncworldedit.core.wrappers.WorldWrapper;
+import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.BlockTypeMask;
@@ -8,12 +11,14 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Direction;
+import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
+import org.bukkit.craftbukkit.v1_20_R2.CraftWorld;
 
 import javax.annotation.Nullable;
 import java.util.Map;
@@ -29,7 +34,18 @@ public class PaperweightPlacementStateProcessor extends PlacementStateProcessor 
 
     public PaperweightPlacementStateProcessor(Extent extent, BlockTypeMask mask, Region region) {
         super(extent, mask, region);
-        this.proxyLevel = PaperweightLevelProxy.getInstance(this);
+        World world = ExtentTraverser.getWorldFromExtent(extent);
+        if (world == null) {
+            throw new UnsupportedOperationException(
+                    "World is required for PlacementStateProcessor but none found in given extent.");
+        }
+        BukkitWorld bukkitWorld;
+        if (world instanceof WorldWrapper wrapper) {
+            bukkitWorld = (BukkitWorld) wrapper.getParent();
+        } else {
+            bukkitWorld = (BukkitWorld) world;
+        }
+        this.proxyLevel = PaperweightLevelProxy.getInstance(((CraftWorld) bukkitWorld.getWorld()).getHandle(), this);
         this.mutableBlockPlaceContext = new PaperweightFaweMutableBlockPlaceContext(proxyLevel);
     }
 
@@ -42,7 +58,18 @@ public class PaperweightPlacementStateProcessor extends PlacementStateProcessor 
             AtomicBoolean finished
     ) {
         super(extent, mask, crossChunkSecondPasses, threadProcessors, region, finished);
-        this.proxyLevel = PaperweightLevelProxy.getInstance(this);
+        World world = ExtentTraverser.getWorldFromExtent(extent);
+        if (world == null) {
+            throw new UnsupportedOperationException(
+                    "World is required for PlacementStateProcessor but none found in given extent.");
+        }
+        BukkitWorld bukkitWorld;
+        if (world instanceof WorldWrapper wrapper) {
+            bukkitWorld = (BukkitWorld) wrapper.getParent();
+        } else {
+            bukkitWorld = (BukkitWorld) world;
+        }
+        this.proxyLevel = PaperweightLevelProxy.getInstance(((CraftWorld) bukkitWorld.getWorld()).getHandle(), this);
         this.mutableBlockPlaceContext = new PaperweightFaweMutableBlockPlaceContext(proxyLevel);
     }
 

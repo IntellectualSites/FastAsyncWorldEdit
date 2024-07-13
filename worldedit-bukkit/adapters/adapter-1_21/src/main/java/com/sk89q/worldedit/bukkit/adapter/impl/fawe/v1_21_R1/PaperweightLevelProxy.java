@@ -96,4 +96,14 @@ public class PaperweightLevelProxy extends ServerLevel {
         return getBlockState(pos).getFluidState().is(FluidTags.WATER);
     }
 
+    @Override
+    public int getHeight() {
+        return serverLevel.getHeight();
+    }
+
+    @Override
+    public int getMinBuildHeight() {
+        return serverLevel.getMinBuildHeight();
+    }
+
 }
