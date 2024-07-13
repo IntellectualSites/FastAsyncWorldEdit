@@ -392,6 +392,10 @@ public abstract class PlacementStateProcessor extends AbstractDelegateExtent imp
     }
 
     private char getBlockOrdinal(int blockX, int blockY, int blockZ, BlockState state) {
+        char override = getOverrideBlockOrdinal(blockX, blockY, blockZ, state);
+        if (override != BlockTypesCache.ReservedIDs.__RESERVED__) {
+            return override;
+        }
         EnumSet<Direction> dirs = Direction.getDirections(state);
         Direction clickedFaceDirection = null; // This should be always be set by the below.
         Set<String> states = state.getStates().keySet().stream().map(Property::getName).collect(Collectors.toSet());
@@ -434,6 +438,17 @@ public abstract class PlacementStateProcessor extends AbstractDelegateExtent imp
             }
         }
         return getStateAtFor(blockX, blockY, blockZ, state, clickPos, clickedFaceDirection, clickedBlock);
+    }
+
+    protected char getOverrideBlockOrdinal(int blockX, int blockY, int blockZ, BlockState state) {
+        if (BlockCategories.TALL_FLOWERS.contains(state)) {
+            PropertyKey propertyKey = PropertyKey.HALF;
+            BlockState plantState = extent.getBlock(blockX, blockY - 1, blockZ).getBlockType().equals(state.getBlockType())
+                    ? state.with(propertyKey, "upper")
+                    : state.with(propertyKey, "lower");
+            return plantState.getOrdinalChar();
+        }
+        return BlockTypesCache.ReservedIDs.__RESERVED__;
     }
 
     @Override
