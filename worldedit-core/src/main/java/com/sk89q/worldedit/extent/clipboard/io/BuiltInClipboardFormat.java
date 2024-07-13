@@ -19,28 +19,38 @@
 
 package com.sk89q.worldedit.extent.clipboard.io;
 
-import com.fastasyncworldedit.core.extent.clipboard.io.FastSchematicReader;
-import com.fastasyncworldedit.core.extent.clipboard.io.FastSchematicWriter;
+import com.fastasyncworldedit.core.extent.clipboard.io.FastSchematicReaderV2;
+import com.fastasyncworldedit.core.extent.clipboard.io.FastSchematicReaderV3;
+import com.fastasyncworldedit.core.extent.clipboard.io.FastSchematicWriterV2;
+import com.fastasyncworldedit.core.extent.clipboard.io.FastSchematicWriterV3;
 import com.fastasyncworldedit.core.extent.clipboard.io.schematic.MinecraftStructure;
 import com.fastasyncworldedit.core.extent.clipboard.io.schematic.PNGWriter;
 import com.fastasyncworldedit.core.internal.io.ResettableFileInputStream;
 import com.google.common.collect.ImmutableSet;
-import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.jnbt.NBTConstants;
 import com.sk89q.jnbt.NBTInputStream;
 import com.sk89q.jnbt.NBTOutputStream;
 import com.sk89q.jnbt.NamedTag;
-import com.sk89q.jnbt.Tag;
+import com.sk89q.worldedit.extent.clipboard.io.sponge.SpongeSchematicV1Reader;
+import com.sk89q.worldedit.extent.clipboard.io.sponge.SpongeSchematicV2Reader;
+import com.sk89q.worldedit.extent.clipboard.io.sponge.SpongeSchematicV2Writer;
+import com.sk89q.worldedit.extent.clipboard.io.sponge.SpongeSchematicV3Reader;
+import com.sk89q.worldedit.extent.clipboard.io.sponge.SpongeSchematicV3Writer;
+import it.unimi.dsi.fastutil.io.FastBufferedInputStream;
 import org.anarres.parallelgzip.ParallelGZIPOutputStream;
+import org.enginehub.linbus.stream.LinBinaryIO;
+import org.enginehub.linbus.tree.LinRootEntry;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
@@ -48,23 +58,14 @@ import java.util.zip.GZIPOutputStream;
 /**
  * A collection of supported clipboard formats.
  */
+@SuppressWarnings("removal") //FAWE: suppress JNBT deprecations
 public enum BuiltInClipboardFormat implements ClipboardFormat {
 
     //FAWE start - register fast clipboard io
-    FAST("fast", "fawe", "sponge", "schem") {
-        @Override
-        public String getPrimaryFileExtension() {
-            return "schem";
-        }
-
+    FAST_V3("fast", "fawe", "schem") {
         @Override
         public ClipboardReader getReader(InputStream inputStream) throws IOException {
-            if (inputStream instanceof FileInputStream) {
-                inputStream = new ResettableFileInputStream((FileInputStream) inputStream);
-            }
-            BufferedInputStream buffered = new BufferedInputStream(inputStream);
-            NBTInputStream nbtStream = new NBTInputStream(new BufferedInputStream(new GZIPInputStream(buffered)));
-            return new FastSchematicReader(nbtStream);
+            return new FastSchematicReaderV3(inputStream);
         }
 
         @Override
@@ -77,13 +78,77 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
                 gzip = new ParallelGZIPOutputStream(outputStream);
             }
             NBTOutputStream nbtStream = new NBTOutputStream(new BufferedOutputStream(gzip));
-            return new FastSchematicWriter(nbtStream);
+            return new FastSchematicWriterV3(nbtStream);
         }
 
         @Override
-        public boolean isFormat(File file) {
-            String name = file.getName().toLowerCase(Locale.ROOT);
-            return name.endsWith(".schem") || name.endsWith(".sponge");
+        public boolean isFormat(final InputStream inputStream) {
+            try (final DataInputStream stream = new DataInputStream(new FastBufferedInputStream(new GZIPInputStream(inputStream)));
+                 final NBTInputStream nbt = new NBTInputStream(stream)) {
+                if (stream.readByte() != NBTConstants.TYPE_COMPOUND) {
+                    return false;
+                }
+                stream.skipNBytes(2); // TAG name length ("" = 0), no need to read name as no bytes are written for root tag
+                if (stream.readByte() != NBTConstants.TYPE_COMPOUND) {
+                    return false;
+                }
+                stream.skipNBytes(2); // TAG name length ("Schematic" = 9)
+                stream.skipNBytes(9); // "Schematic"
+
+                // We can't guarantee the specific order of nbt data, so scan and skip, if required
+                do {
+                    byte type = stream.readByte();
+                    String name = stream.readUTF();
+                    if (type == NBTConstants.TYPE_END) {
+                        return false;
+                    }
+                    if (type == NBTConstants.TYPE_INT && name.equals("Version")) {
+                        return stream.readInt() == FastSchematicWriterV3.CURRENT_VERSION;
+                    }
+                    nbt.readTagPayloadLazy(type, 0);
+                } while (true);
+            } catch (IOException ignored) {
+            }
+            return false;
+        }
+
+        @Override
+        public String getPrimaryFileExtension() {
+            return "schem";
+        }
+    },
+    FAST_V2("fast.2", "fawe.2", "schem.2") {
+        @Override
+        public String getPrimaryFileExtension() {
+            return "schem";
+        }
+
+        @Override
+        public ClipboardReader getReader(InputStream inputStream) throws IOException {
+            if (inputStream instanceof FileInputStream) {
+                inputStream = new ResettableFileInputStream((FileInputStream) inputStream);
+            }
+            BufferedInputStream buffered = new BufferedInputStream(inputStream);
+            NBTInputStream nbtStream = new NBTInputStream(new BufferedInputStream(new GZIPInputStream(buffered)));
+            return new FastSchematicReaderV2(nbtStream);
+        }
+
+        @Override
+        public ClipboardWriter getWriter(OutputStream outputStream) throws IOException {
+            OutputStream gzip;
+            if (outputStream instanceof ParallelGZIPOutputStream || outputStream instanceof GZIPOutputStream) {
+                gzip = outputStream;
+            } else {
+                outputStream = new BufferedOutputStream(outputStream);
+                gzip = new ParallelGZIPOutputStream(outputStream);
+            }
+            NBTOutputStream nbtStream = new NBTOutputStream(new BufferedOutputStream(gzip));
+            return new FastSchematicWriterV2(nbtStream);
+        }
+
+        @Override
+        public boolean isFormat(InputStream inputStream) {
+            return detectOldSpongeSchematic(inputStream, FastSchematicWriterV2.CURRENT_VERSION);
         }
 
     },
@@ -113,9 +178,39 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
         }
 
         @Override
-        public boolean isFormat(File file) {
-            String name = file.getName().toLowerCase(Locale.ROOT);
-            return name.endsWith(".schematic") || name.endsWith(".mcedit") || name.endsWith(".mce");
+        public boolean isFormat(InputStream inputStream) {
+            LinRootEntry rootEntry;
+            try {
+                DataInputStream stream = new DataInputStream(new GZIPInputStream(inputStream));
+                rootEntry = LinBinaryIO.readUsing(stream, LinRootEntry::readFrom);
+            } catch (Exception e) {
+                return false;
+            }
+            if (!rootEntry.name().equals("Schematic")) {
+                return false;
+            }
+            return rootEntry.value().value().containsKey("Materials");
+        }
+    },
+    SPONGE_V1_SCHEMATIC("sponge.1") {
+        @Override
+        public String getPrimaryFileExtension() {
+            return "schem";
+        }
+
+        @Override
+        public ClipboardReader getReader(InputStream inputStream) throws IOException {
+            return new SpongeSchematicV1Reader(LinBinaryIO.read(new DataInputStream(new GZIPInputStream(inputStream))));
+        }
+
+        @Override
+        public ClipboardWriter getWriter(OutputStream outputStream) throws IOException {
+            throw new IOException("This format does not support saving");
+        }
+
+        @Override
+        public boolean isFormat(InputStream inputStream) {
+            return detectOldSpongeSchematic(inputStream, 1);
         }
     },
 
@@ -125,7 +220,8 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
      *         Avoid using with any large schematics/clipboards for reading/writing.
      */
     @Deprecated
-    SPONGE_SCHEMATIC("slow", "safe") {
+    SPONGE_V2_SCHEMATIC("slow.2", "safe.2", "sponge.2") { // FAWE - edit aliases for fast
+
         @Override
         public String getPrimaryFileExtension() {
             return "schem";
@@ -133,38 +229,43 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
 
         @Override
         public ClipboardReader getReader(InputStream inputStream) throws IOException {
-            NBTInputStream nbtStream = new NBTInputStream(new GZIPInputStream(inputStream));
-            return new SpongeSchematicReader(nbtStream);
+            return new SpongeSchematicV2Reader(LinBinaryIO.read(new DataInputStream(new GZIPInputStream(inputStream))));
         }
 
         @Override
         public ClipboardWriter getWriter(OutputStream outputStream) throws IOException {
-            NBTOutputStream nbtStream = new NBTOutputStream(new GZIPOutputStream(outputStream));
-            return new SpongeSchematicWriter(nbtStream);
+            return new SpongeSchematicV2Writer(new DataOutputStream(new GZIPOutputStream(outputStream)));
+        }
+
+        @Override
+        public boolean isFormat(InputStream inputStream) {
+            return detectOldSpongeSchematic(inputStream, 2);
+        }
+    },
+    SPONGE_V3_SCHEMATIC("sponge.3", "slow", "safe") { // FAWE - edit aliases for fast
+
+        @Override
+        public String getPrimaryFileExtension() {
+            return "schem";
+        }
+
+        @Override
+        public ClipboardReader getReader(InputStream inputStream) throws IOException {
+            return new SpongeSchematicV3Reader(LinBinaryIO.read(new DataInputStream(new GZIPInputStream(inputStream))));
+        }
+
+        @Override
+        public ClipboardWriter getWriter(OutputStream outputStream) throws IOException {
+            return new SpongeSchematicV3Writer(new DataOutputStream(new GZIPOutputStream(outputStream)));
         }
 
         @Override
         public boolean isFormat(File file) {
-            try (NBTInputStream str = new NBTInputStream(new GZIPInputStream(new FileInputStream(file)))) {
-                NamedTag rootTag = str.readNamedTag();
-                if (!rootTag.getName().equals("Schematic")) {
-                    return false;
-                }
-                CompoundTag schematicTag = (CompoundTag) rootTag.getTag();
-
-                // Check
-                Map<String, Tag<?, ?>> schematic = schematicTag.getValue();
-                if (!schematic.containsKey("Version")) {
-                    return false;
-                }
-            } catch (Exception e) {
-                return false;
-            }
-
-            return true;
+            //FAWE start - delegate to stream-based isFormat approach of fast impl
+            return FAST_V3.isFormat(file);
+            //FAWE end
         }
     },
-
     //FAWE start - recover schematics with bad entity data & register other clipboard formats
     BROKENENTITY("brokenentity", "legacyentity", "le", "be", "brokenentities", "legacyentities") {
         @Override
@@ -179,7 +280,7 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
             }
             BufferedInputStream buffered = new BufferedInputStream(inputStream);
             NBTInputStream nbtStream = new NBTInputStream(new BufferedInputStream(new GZIPInputStream(buffered)));
-            FastSchematicReader reader = new FastSchematicReader(nbtStream);
+            FastSchematicReaderV2 reader = new FastSchematicReaderV2(nbtStream);
             reader.setBrokenEntities(true);
             return reader;
         }
@@ -194,7 +295,7 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
                 gzip = new ParallelGZIPOutputStream(outputStream);
             }
             NBTOutputStream nbtStream = new NBTOutputStream(new BufferedOutputStream(gzip));
-            FastSchematicWriter writer = new FastSchematicWriter(nbtStream);
+            FastSchematicWriterV2 writer = new FastSchematicWriterV2(nbtStream);
             writer.setBrokenEntities(true);
             return writer;
         }
@@ -232,9 +333,37 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
         }
 
         @Override
-        public boolean isFormat(File file) {
-            String name = file.getName().toLowerCase(Locale.ROOT);
-            return name.endsWith(".nbt");
+        public boolean isFormat(InputStream inputStream) {
+            try (final DataInputStream stream = new DataInputStream(new FastBufferedInputStream(new GZIPInputStream(inputStream)));
+                 final NBTInputStream nbt = new NBTInputStream(stream)) {
+                if (stream.readByte() != NBTConstants.TYPE_COMPOUND) {
+                    return false;
+                }
+                NamedTag namedTag = nbt.readNamedTag();
+                if (!namedTag.getName().isEmpty()) {
+                    return false;
+                }
+
+                // We can't guarantee the specific order of nbt data, so scan and skip, if required
+                do {
+                    byte type = stream.readByte();
+                    String name = stream.readUTF();
+                    if (type == NBTConstants.TYPE_END) {
+                        return false;
+                    }
+                    if (type == NBTConstants.TYPE_LIST && name.equals("size")) {
+                        return true;
+                    }
+                    nbt.readTagPayloadLazy(type, 0);
+                } while (true);
+            } catch (IOException ignored) {
+            }
+            return false;
+        }
+
+        @Override
+        public boolean isFormat(final File file) {
+            return file.getName().toLowerCase(Locale.ROOT).endsWith(".nbt") && super.isFormat(file);
         }
     },
 
@@ -263,6 +392,53 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
             return "png";
         }
     };
+    //FAWE end
+
+    private static boolean detectOldSpongeSchematic(InputStream inputStream, int version) {
+        //FAWE start - dont utilize linbus - WorldEdit approach is not really streamed
+        try (final DataInputStream stream = new DataInputStream(new FastBufferedInputStream(new GZIPInputStream(inputStream)));
+             final NBTInputStream nbt = new NBTInputStream(stream)) {
+            if (stream.readByte() != NBTConstants.TYPE_COMPOUND) {
+                return false;
+            }
+            stream.skipNBytes(2); // TAG name length ("Schematic" = 9)
+            stream.skipNBytes(9); // "Schematic"
+
+            // We can't guarantee the specific order of nbt data, so scan and skip, if required
+            do {
+                byte type = stream.readByte();
+                String name = stream.readUTF();
+                if (type == NBTConstants.TYPE_END) {
+                    return false;
+                }
+                if (type == NBTConstants.TYPE_INT && name.equals("Version")) {
+                    return stream.readInt() == version;
+                }
+                nbt.readTagPayloadLazy(type, 0);
+            } while (true);
+        } catch (IOException ignored) {
+        }
+        return false;
+    }
+
+    /**
+     * For backwards compatibility, this points to the Sponge Schematic Specification (Version 2)
+     * format. This should not be used going forwards.
+     *
+     * @deprecated Use {@link #SPONGE_V2_SCHEMATIC} or {@link #SPONGE_V3_SCHEMATIC}
+     */
+    @Deprecated
+    public static final BuiltInClipboardFormat SPONGE_SCHEMATIC = SPONGE_V2_SCHEMATIC;
+
+    //FAWE start
+    /**
+     * For backwards compatibility, this points to the fast implementation of the Sponge Schematic Specification (Version 2)
+     * format. This should not be used going forwards.
+     *
+     * @deprecated Use {@link #FAST_V2} or {@link #FAST_V3}
+     */
+    @Deprecated
+    public static final BuiltInClipboardFormat FAST = FAST_V2;
     //FAWE end
 
     private final ImmutableSet<String> aliases;
