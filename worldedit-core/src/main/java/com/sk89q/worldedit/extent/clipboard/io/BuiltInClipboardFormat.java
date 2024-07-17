@@ -168,7 +168,6 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
             }
             return super.isFormat(file);
         }
-
     },
     //FAWE end
 
@@ -239,6 +238,11 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
         public boolean isFormat(InputStream inputStream) {
             return detectOldSpongeSchematic(inputStream, 1);
         }
+
+        @Override
+        public boolean isFormat(File file) {
+            return MCEDIT_SCHEMATIC.isFormat(file);
+        }
     },
 
     /**
@@ -267,6 +271,11 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
         @Override
         public boolean isFormat(InputStream inputStream) {
             return detectOldSpongeSchematic(inputStream, 2);
+        }
+
+        @Override
+        public boolean isFormat(File file) {
+            return FAST_V2.isFormat(file);
         }
     },
     SPONGE_V3_SCHEMATIC("sponge.3", "slow", "safe") { // FAWE - edit aliases for fast
