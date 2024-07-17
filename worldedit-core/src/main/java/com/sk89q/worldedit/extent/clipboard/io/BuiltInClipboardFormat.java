@@ -113,6 +113,15 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
         }
 
         @Override
+        public boolean isFormat(File file) {
+            String name = file.getName().toLowerCase(Locale.ROOT);
+            if (name.endsWith(".schematic") || name.endsWith(".mcedit") || name.endsWith(".mce")) {
+                return false;
+            }
+            return super.isFormat(file);
+        }
+
+        @Override
         public String getPrimaryFileExtension() {
             return "schem";
         }
@@ -151,6 +160,15 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
             return detectOldSpongeSchematic(inputStream, FastSchematicWriterV2.CURRENT_VERSION);
         }
 
+        @Override
+        public boolean isFormat(File file) {
+            String name = file.getName().toLowerCase(Locale.ROOT);
+            if (name.endsWith(".schematic") || name.endsWith(".mcedit") || name.endsWith(".mce")) {
+                return false;
+            }
+            return super.isFormat(file);
+        }
+
     },
     //FAWE end
 
@@ -175,6 +193,15 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
             throw new IOException("The formats `.schematic`, `.mcedit` and `.mce` are discontinued on versions newer than " +
                     "1.12 and superseded by the sponge schematic implementation known for `.schem` files.");
             //FAWE end
+        }
+
+        @Override
+        public boolean isFormat(File file) {
+            String name = file.getName().toLowerCase(Locale.ROOT);
+            if (!name.endsWith(".schematic") && !name.endsWith(".mcedit") && !name.endsWith(".mce")) {
+                return false;
+            }
+            return super.isFormat(file);
         }
 
         @Override
