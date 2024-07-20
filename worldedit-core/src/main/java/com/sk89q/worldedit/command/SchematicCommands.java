@@ -417,7 +417,8 @@ public class SchematicCommands {
         } catch (IllegalArgumentException e) {
             actor.print(Caption.of("worldedit.schematic.unknown-filename", TextComponent.of(filename)));
         } catch (URISyntaxException | IOException e) {
-            actor.print(Caption.of("worldedit.schematic.file-not-exist", TextComponent.of(Objects.toString(e.getMessage()))));
+            String caption = noExplicitFormat ? "fawe.worldedit.schematic.schematic.load-failure" : "worldedit.schematic.file-not-exist";
+            actor.print(Caption.of(caption, TextComponent.of(Objects.toString(e.getMessage()))));
             LOGGER.warn("Failed to load a saved clipboard", e);
         } finally {
             if (in != null) {
