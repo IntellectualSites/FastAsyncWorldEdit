@@ -68,6 +68,7 @@
   "fawe.worldedit.schematic.schematic.loaded": "{0} loaded. Paste it with //paste",
   "fawe.worldedit.schematic.schematic.saved": "{0} saved.",
   "fawe.worldedit.schematic.schematic.none": "No files found.",
+  "fawe.worldedit.schematic.schematic.load-failure": "File could not be read or it does not exist: {0}. If you are specifying a format, you may not be specifying the correct one. Sponge schematic v2 and v3 both use the .schem file extension. To allow FAWE to select the format, do not specify one.",
   "fawe.worldedit.clipboard.clipboard.uri.not.found": "You do not have {0} loaded",
   "fawe.worldedit.clipboard.clipboard.cleared": "Clipboard cleared",
   "fawe.worldedit.clipboard.clipboard.invalid.format": "Unknown clipboard format:  {0}",
