@@ -356,7 +356,7 @@ public class SchematicCommands {
                 File dir = Settings.settings().PATHS.PER_PLAYER_SCHEMATICS ? new File(saveDir, actor.getUniqueId().toString()) : saveDir;
                 File file;
                 if (filename.startsWith("#")) {
-                    format = ClipboardFormats.findByAlias(formatName);
+                    format = noExplicitFormat ? null : ClipboardFormats.findByAlias(formatName);
                     String[] extensions;
                     if (format != null) {
                         extensions = format.getFileExtensions().toArray(new String[0]);
@@ -396,7 +396,7 @@ public class SchematicCommands {
                             .isInSubDirectory(saveDir, file)) + ")"));
                     return;
                 }
-                if (format == null) {
+                if (format == null || noExplicitFormat) {
                     format = ClipboardFormats.findByFile(file);
                     if (format == null) {
                         actor.print(Caption.of("worldedit.schematic.unknown-format", TextComponent.of(formatName)));
