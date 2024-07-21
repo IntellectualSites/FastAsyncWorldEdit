@@ -48,9 +48,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Writes schematic files using the Sponge schematic format.
  */
-public class FastSchematicWriter implements ClipboardWriter {
+public class FastSchematicWriterV2 implements ClipboardWriter {
 
-    private static final int CURRENT_VERSION = 2;
+    public static final int CURRENT_VERSION = 2;
 
     private static final int MAX_SIZE = Short.MAX_VALUE - Short.MIN_VALUE;
     private final NBTOutputStream outputStream;
@@ -61,7 +61,7 @@ public class FastSchematicWriter implements ClipboardWriter {
      *
      * @param outputStream the output stream to write to
      */
-    public FastSchematicWriter(NBTOutputStream outputStream) {
+    public FastSchematicWriterV2(NBTOutputStream outputStream) {
         checkNotNull(outputStream);
         this.outputStream = outputStream;
     }
@@ -103,11 +103,11 @@ public class FastSchematicWriter implements ClipboardWriter {
 
         final DataOutput rawStream = outputStream.getOutputStream();
         outputStream.writeLazyCompoundTag("Schematic", out -> {
+            out.writeNamedTag("Version", CURRENT_VERSION);
             out.writeNamedTag(
                     "DataVersion",
                     WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).getDataVersion()
             );
-            out.writeNamedTag("Version", CURRENT_VERSION);
             out.writeNamedTag("Width", (short) width);
             out.writeNamedTag("Height", (short) height);
             out.writeNamedTag("Length", (short) length);

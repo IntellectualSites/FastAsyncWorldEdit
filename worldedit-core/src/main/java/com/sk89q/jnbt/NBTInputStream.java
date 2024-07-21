@@ -572,7 +572,7 @@ public final class NBTInputStream implements Closeable {
      * @return the tag
      * @throws IOException if an I/O error occurs.
      */
-    private Tag readTagPayload(int type, int depth) throws IOException {
+    public Tag readTagPayload(int type, int depth) throws IOException { //FAWE - public
         switch (type) {
             case NBTConstants.TYPE_END:
                 if (depth == 0) {
