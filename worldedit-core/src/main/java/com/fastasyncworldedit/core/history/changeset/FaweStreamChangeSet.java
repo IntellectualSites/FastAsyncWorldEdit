@@ -37,8 +37,8 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
 
     public static final int HEADER_SIZE = 9;
     private static final int VERSION = 2;
-    // equivalent to Short#MIN_VALUE three times
-    private static final byte[] MAGIC_NEW_RELATIVE = new byte[]{(byte) 128, 0, (byte) 128, 0, (byte) 128, 0};
+    // equivalent to Short#MIN_VALUE three times stored with [(x) & 0xff, ((rx) >> 8) & 0xff]
+    private static final byte[] MAGIC_NEW_RELATIVE = new byte[]{0, (byte) 128, 0, (byte) 128, 0, (byte) 128};
     private int mode;
     private final int compression;
     private final int minY;
