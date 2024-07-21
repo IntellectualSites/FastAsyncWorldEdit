@@ -28,8 +28,9 @@ body:
       multiple: false
       options:
         - '1.21'
-        - '1.20.5/6'
-        - '1.20'
+        - '1.20.6'
+        - '1.20.4'
+        - '1.20.2'
     validations:
       required: true
 
