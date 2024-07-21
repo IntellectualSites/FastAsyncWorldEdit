@@ -306,7 +306,7 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
     }
 
     public boolean isEmpty() {
-        return queue.isEmpty() && workerSemaphore.availablePermits() == 1 && size() == 0;
+        return queue.isEmpty() && workerSemaphore.availablePermits() == 1 && longSize() == 0;
     }
 
     public void add(BlockVector3 loc, BaseBlock from, BaseBlock to) {

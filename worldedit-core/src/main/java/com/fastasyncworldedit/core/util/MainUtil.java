@@ -217,7 +217,7 @@ public class MainUtil {
 //        } else if (changeSet instanceof CPUOptimizedChangeSet) {
 //            return changeSet.size() + 32;
         } else if (changeSet != null) {
-            return changeSet.size() * 128L;
+            return changeSet.longSize() * 128; // Approx
         } else {
             return 0;
         }

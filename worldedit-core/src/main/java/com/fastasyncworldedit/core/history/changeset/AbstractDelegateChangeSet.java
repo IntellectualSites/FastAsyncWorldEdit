@@ -177,6 +177,11 @@ public class AbstractDelegateChangeSet extends AbstractChangeSet {
     }
 
     @Override
+    public long longSize() {
+        return parent.longSize();
+    }
+
+    @Override
     public void delete() {
         parent.delete();
     }

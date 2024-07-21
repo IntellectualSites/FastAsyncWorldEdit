@@ -500,7 +500,7 @@ public class LocalSession implements TextureHolder {
             if (Settings.settings().HISTORY.USE_DISK) {
                 LocalSession.MAX_HISTORY_SIZE = Integer.MAX_VALUE;
             }
-            if (changeSet.size() == 0) {
+            if (changeSet.longSize() == 0) {
                 return;
             }
             loadSessionHistoryFromDisk(player.getUniqueId(), world);
