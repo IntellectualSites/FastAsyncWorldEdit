@@ -23,7 +23,7 @@ fun Project.applyCommonJavaConfiguration(sourcesJar: Boolean, banSlf4j: Boolean 
                 val disabledLint = listOf(
                         "processing", "path", "fallthrough", "serial", "overloads", "this-escape",
                 )
-                options.release.set(17)
+                options.release.set(21)
                 options.compilerArgs.addAll(listOf("-Xlint:all") + disabledLint.map { "-Xlint:-$it" })
                 options.isDeprecation = true
                 options.encoding = "UTF-8"
