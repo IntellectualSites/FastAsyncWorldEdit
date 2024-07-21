@@ -192,12 +192,13 @@ public class BlockVectorSet extends AbstractCollection<BlockVector3> implements 
     }
 
     public boolean remove(int x, int y, int z) {
-        int pair = MathMan.pair((short) (x >> 11), (short) (z >> 11));
-        LocalBlockVectorSet localMap = localSets.get(pair);
+        int indexedY = (y + 128) >> 9;
+        long triple = MathMan.tripleWorldCoord((x >> 11), indexedY, (z >> 11));
+        LocalBlockVectorSet localMap = localSets.get(triple);
         if (localMap != null) {
-            if (localMap.remove(x & 2047, y, z & 2047)) {
+            if (localMap.remove(x & 2047, ((y + 128) & 511) - 128, z & 2047)) {
                 if (localMap.isEmpty()) {
-                    localSets.remove(pair);
+                    localSets.remove(triple);
                 }
                 return true;
             }
