@@ -302,9 +302,7 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
 
     @Override
     public int size() {
-        // Flush so we can accurately get the size
-        flush();
-        return (int) blockSize;
+        return (int) longSize();
     }
 
     public abstract int getCompressedSize();
