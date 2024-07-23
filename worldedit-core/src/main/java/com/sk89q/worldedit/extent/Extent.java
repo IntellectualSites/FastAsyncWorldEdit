@@ -216,7 +216,7 @@ public interface Extent extends InputExtent, OutputExtent {
      */
 
     /**
-     * Returns the highest solid 'terrain' block.
+     * Returns the highest solid 'terrain' (movement-blocking) block.
      *
      * @param x    the X coordinate
      * @param z    the Z coordinate
@@ -225,6 +225,9 @@ public interface Extent extends InputExtent, OutputExtent {
      * @return height of highest block found or 'minY'
      */
     default int getHighestTerrainBlock(final int x, final int z, int minY, int maxY) {
+        maxY = Math.min(maxY, getMaxY());
+        minY = Math.max(getMinY(), minY);
+
         for (int y = maxY; y >= minY; --y) {
             BlockState block = getBlock(x, y, z);
             if (block.getBlockType().getMaterial().isMovementBlocker()) {
@@ -235,7 +238,7 @@ public interface Extent extends InputExtent, OutputExtent {
     }
 
     /**
-     * Returns the highest solid 'terrain' block.
+     * Returns the highest block matching the given mask.
      *
      * @param x      the X coordinate
      * @param z      the Z coordinate
@@ -245,6 +248,9 @@ public interface Extent extends InputExtent, OutputExtent {
      * @return height of highest block found or 'minY'
      */
     default int getHighestTerrainBlock(final int x, final int z, int minY, int maxY, Mask filter) {
+        if (filter == null) {
+            return getHighestTerrainBlock(x, z, minY, maxY);
+        }
         maxY = Math.min(maxY, getMaxY());
         minY = Math.max(getMinY(), minY);
 
@@ -259,9 +265,7 @@ public interface Extent extends InputExtent, OutputExtent {
     }
 
     /**
-     * Returns the nearest surface layer (up/down from start)
-     * <p>
-     * TODO: Someone understand this..?
+     * Returns the nearest surface layer (up/down from start), where a layer is 1/16th of a block to allow for snow, liquid, etc.
      *
      * @param x    x to search from
      * @param z    y to search from
@@ -271,6 +275,9 @@ public interface Extent extends InputExtent, OutputExtent {
      * @return nearest surface layer
      */
     default int getNearestSurfaceLayer(int x, int z, int y, int minY, int maxY) {
+        maxY = Math.min(maxY, getMaxY());
+        minY = Math.max(getMinY(), minY);
+
         int clearanceAbove = maxY - y;
         int clearanceBelow = y - minY;
         int clearance = Math.min(clearanceAbove, clearanceBelow);
@@ -331,6 +338,9 @@ public interface Extent extends InputExtent, OutputExtent {
      * @return The y value of the nearest terrain block
      */
     default int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY, int failedMin, int failedMax, Mask mask) {
+        maxY = Math.min(maxY, getMaxY());
+        minY = Math.max(getMinY(), minY);
+
         y = Math.max(minY, Math.min(maxY, y));
         int clearanceAbove = maxY - y;
         int clearanceBelow = y - minY;
@@ -438,6 +448,9 @@ public interface Extent extends InputExtent, OutputExtent {
             int failedMax,
             boolean ignoreAir
     ) {
+        maxY = Math.min(maxY, getMaxY());
+        minY = Math.max(getMinY(), minY);
+
         y = Math.max(minY, Math.min(maxY, y));
         int clearanceAbove = maxY - y;
         int clearanceBelow = y - minY;
@@ -494,7 +507,7 @@ public interface Extent extends InputExtent, OutputExtent {
 
     default void addSchems(Region region, Mask mask, List<ClipboardHolder> clipboards, int rarity, boolean rotate) throws
             WorldEditException {
-        spawnResource(region, new SchemGen(mask, this, clipboards, rotate), rarity, 1);
+        spawnResource(region, new SchemGen(mask, this, clipboards, rotate, region), rarity, 1);
     }
 
     default void spawnResource(Region region, Resource gen, int rarity, int frequency) throws WorldEditException {
