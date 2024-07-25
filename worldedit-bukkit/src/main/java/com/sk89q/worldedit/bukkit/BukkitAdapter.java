@@ -83,6 +83,7 @@ public enum BukkitAdapter {
 
     static {
         TO_BLOCK_CONTEXT.setRestricted(false);
+        TO_BLOCK_CONTEXT.setTryLegacy(false);
     }
 
     /**
