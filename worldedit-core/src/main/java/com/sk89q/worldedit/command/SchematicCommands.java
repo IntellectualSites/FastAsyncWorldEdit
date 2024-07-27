@@ -421,6 +421,9 @@ public class SchematicCommands {
         } catch (URISyntaxException | IOException e) {
             actor.print(Caption.of("worldedit.schematic.file-not-exist", TextComponent.of(Objects.toString(e.getMessage()))));
             LOGGER.warn("Failed to load a saved clipboard", e);
+        } catch (Exception e) {
+            actor.print(Caption.of("fawe.worldedit.schematic.schematic.load-failure", TextComponent.of(e.getMessage())));
+            LOGGER.error("Error loading a schematic", e);
         } finally {
             if (in != null) {
                 try {
