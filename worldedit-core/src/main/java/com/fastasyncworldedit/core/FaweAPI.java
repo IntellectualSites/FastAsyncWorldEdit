@@ -116,7 +116,10 @@ public class FaweAPI {
      * @param file the file to load
      * @return a clipboard containing the schematic
      * @see ClipboardFormat
+     * @deprecated Opens streams that are not then closed. Use {@link ClipboardFormats#findByFile(File)} and its relevant
+     *         methods to allow closing created streams/closing the reader (which will close the stream(s))
      */
+    @Deprecated(forRemoval = true, since = "TODO")
     public static Clipboard load(File file) throws IOException {
         return ClipboardFormats.findByFile(file).load(file);
     }
