@@ -127,6 +127,10 @@ public abstract class BlockVector3 {
     }
 
     //FAWE start
+    public boolean isAt(int x, int y, int z) {
+        return x() == x && y() == y && z() == z;
+    }
+
     public MutableBlockVector3 setComponents(double x, double y, double z) {
         return new MutableBlockVector3((int) x, (int) y, (int) z);
     }

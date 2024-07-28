@@ -30,8 +30,21 @@ public final class LinkedFilter<T extends Filter, S extends Filter> extends Dele
     }
 
     @Override
-    public LinkedFilter<LinkedFilter<T, S>, Filter> newInstance(Filter other) {
+    public LinkedFilter<? extends Filter, ? extends Filter> newInstance(Filter other) {
+        if (other == this) {
+            return this;
+        }
+        // Assume parent filter forked and there we do not want to continue using this instances parent in the new instance
+        if (getParent() == other || getParent().getClass().equals(other.getClass())) {
+            return new LinkedFilter<>(other, child);
+        }
         return new LinkedFilter<>(this, other);
+    }
+
+    @Override
+    public void finish() {
+        getParent().finish();
+        getChild().finish();
     }
 
 }

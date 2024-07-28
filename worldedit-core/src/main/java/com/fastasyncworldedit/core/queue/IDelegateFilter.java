@@ -48,6 +48,11 @@ public interface IDelegateFilter extends Filter {
         return this;
     }
 
+    @Override
+    default void finish() {
+        getParent().finish();
+    }
+
     Filter newInstance(Filter other);
 
 }

@@ -24,6 +24,7 @@ import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_21_R1.nbt.PaperweightLazy
 import com.sk89q.worldedit.internal.Constants;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.util.SideEffect;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
@@ -816,15 +817,16 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                 if (bitMask == 0 && biomes == null && !lightUpdate) {
                     callback = null;
                 } else {
-                    int finalMask = bitMask != 0 ? bitMask : lightUpdate ? set.getBitMask() : 0;
-                    boolean finalLightUpdate = lightUpdate;
+                    final int finalBitMask = bitMask;
                     callback = () -> {
                         // Set Modified
                         nmsChunk.setLightCorrect(true); // Set Modified
                         nmsChunk.mustNotSave = false;
                         nmsChunk.setUnsaved(true);
                         // send to player
-                        if (Settings.settings().LIGHTING.MODE == 0 || !Settings.settings().LIGHTING.DELAY_PACKET_SENDING || finalMask == 0 && biomes != null) {
+                        if (!set
+                                .getSideEffectSet()
+                                .shouldApply(SideEffect.LIGHTING) || !Settings.settings().LIGHTING.DELAY_PACKET_SENDING || finalBitMask == 0 && biomes != null) {
                             this.send();
                         }
                         if (finalizer != null) {

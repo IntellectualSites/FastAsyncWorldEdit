@@ -15,6 +15,7 @@ import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.util.SideEffectSet;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -50,6 +51,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     private boolean isInit = false; // Lighting handles queue differently. It relies on the chunk cache and not doing init.
     private boolean createCopy = false;
     private long initTime = -1L;
+    private SideEffectSet sideEffectSet;
 
     private ChunkHolder() {
         this.delegate = NULL;
@@ -157,6 +159,16 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     public boolean hasBiomes(final int layer) {
         // No need to go through delegate. hasBiomes is SET only.
         return chunkSet != null && chunkSet.hasBiomes(layer);
+    }
+
+    @Override
+    public void setSideEffectSet(SideEffectSet sideEffectSet) {
+        this.sideEffectSet = sideEffectSet;
+    }
+
+    @Override
+    public SideEffectSet getSideEffectSet() {
+        return sideEffectSet;
     }
 
     public boolean isInit() {
@@ -898,7 +910,6 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     public synchronized void filterBlocks(Filter filter, ChunkFilterBlock block, @Nullable Region region, boolean full) {
         final IChunkGet get = getOrCreateGet();
         final IChunkSet set = getOrCreateSet();
-        set.setFastMode(fastmode);
         try {
             block.filter(this, get, set, filter, region, full);
         } finally {
@@ -967,13 +978,21 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         return chunkSet;
     }
 
+    public final IChunkSet getChunkSet() {
+        return chunkSet;
+    }
+
     /**
      * Create a wrapped set object
      * - The purpose of wrapping is to allow different extents to intercept / alter behavior
      * - e.g., caching, optimizations, filtering
      */
     private IChunkSet newWrappedSet() {
-        return extent.getCachedSet(chunkX, chunkZ);
+        IChunkSet set = extent.getCachedSet(chunkX, chunkZ);
+        set.setFastMode(fastmode);
+        set.setSideEffectSet(sideEffectSet);
+        set.setBitMask(bitMask);
+        return set;
     }
 
     /**
@@ -1004,7 +1023,6 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     @Override
     public synchronized T call() {
         if (chunkSet != null && !chunkSet.isEmpty()) {
-            chunkSet.setBitMask(bitMask);
             IChunkSet copy = chunkSet.createCopy();
             return this.call(copy, () -> {
                 // Do nothing
