@@ -208,7 +208,6 @@ public class ClipboardFormats {
             }
         }
         return null;
-
     }
 
     public static MultiClipboardHolder loadAllFromInput(
