@@ -7,6 +7,7 @@ import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.extent.processor.heightmap.HeightMapType;
 import com.fastasyncworldedit.core.math.BitArrayUnstretched;
+import com.fastasyncworldedit.core.math.IntPair;
 import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.IChunkSet;
@@ -106,6 +107,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
     private final ServerLevel serverLevel;
     private final int chunkX;
     private final int chunkZ;
+    private final IntPair chunkPos;
     private final int minHeight;
     private final int maxHeight;
     private final int minSectionPosition;
@@ -140,6 +142,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
         this.blockLight = new DataLayer[getSectionCount()];
         this.biomeRegistry = serverLevel.registryAccess().registryOrThrow(BIOME);
         this.biomeHolderIdMap = biomeRegistry.asHolderIdMap();
+        this.chunkPos = new IntPair(chunkX, chunkZ);
     }
 
     public int getChunkX() {
@@ -505,6 +508,8 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                                             biomeData
                                     );
                                     if (PaperweightPlatformAdapter.setSectionAtomic(
+                                            serverLevel.getWorld().getName(),
+                                            chunkPos,
                                             levelChunkSections,
                                             null,
                                             newSection,
@@ -582,6 +587,8 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                                     biomeData
                             );
                             if (PaperweightPlatformAdapter.setSectionAtomic(
+                                    serverLevel.getWorld().getName(),
+                                    chunkPos,
                                     levelChunkSections,
                                     null,
                                     newSection,
@@ -647,6 +654,8 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                                     biomeData != null ? biomeData : (PalettedContainer<Holder<Biome>>) existingSection.getBiomes()
                             );
                             if (!PaperweightPlatformAdapter.setSectionAtomic(
+                                    serverLevel.getWorld().getName(),
+                                    chunkPos,
                                     levelChunkSections,
                                     existingSection,
                                     newSection,
@@ -930,7 +939,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
     @Override
     public void send() {
         synchronized (sendLock) {
-            PaperweightPlatformAdapter.sendChunk(this, serverLevel, chunkX, chunkZ);
+            PaperweightPlatformAdapter.sendChunk(new IntPair(chunkX, chunkZ), serverLevel, chunkX, chunkZ);
         }
     }
 

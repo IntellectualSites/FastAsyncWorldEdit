@@ -2,6 +2,7 @@ package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_21_R1;
 
 import com.fastasyncworldedit.bukkit.adapter.StarlightRelighter;
 import com.fastasyncworldedit.core.configuration.Settings;
+import com.fastasyncworldedit.core.math.IntPair;
 import com.fastasyncworldedit.core.queue.IQueueExtent;
 import net.minecraft.server.level.ChunkMap;
 import net.minecraft.server.level.ServerLevel;
@@ -70,7 +71,7 @@ public class PaperweightStarlightRelighter extends StarlightRelighter<ServerLeve
             int x = pos.x;
             int z = pos.z;
             if (delay) { // we still need to send the block changes of that chunk
-                PaperweightPlatformAdapter.sendChunk(pos, serverLevel, x, z);
+                PaperweightPlatformAdapter.sendChunk(new IntPair(x, z), serverLevel, x, z);
             }
             serverLevel.getChunkSource().removeTicketAtLevel(FAWE_TICKET, pos, LIGHT_LEVEL, Unit.INSTANCE);
         }
