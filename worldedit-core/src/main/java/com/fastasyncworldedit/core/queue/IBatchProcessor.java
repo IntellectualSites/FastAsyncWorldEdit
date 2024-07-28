@@ -61,7 +61,7 @@ public interface IBatchProcessor {
     }
 
     /**
-     * Convert this processor into an Extent based processor instead of a queue batch based on.
+     * Convert this processor into an Extent based processor instead of a queue batch based one.
      */
     @Nullable
     Extent construct(Extent child);

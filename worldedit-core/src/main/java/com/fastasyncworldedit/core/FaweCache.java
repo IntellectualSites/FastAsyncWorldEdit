@@ -192,17 +192,22 @@ public enum FaweCache implements Trimable {
             Type.OUTSIDE_REGION
     );
     public static final FaweException MAX_CHECKS = new FaweException(
-            Caption.of("fawe.cancel.reason.max" + ".checks"),
+            Caption.of("fawe.cancel.reason.max.checks"),
+            Type.MAX_CHECKS,
+            true
+    );
+    public static final FaweException MAX_FAILS = new FaweException(
+            Caption.of("fawe.cancel.reason.max.fails"),
             Type.MAX_CHECKS,
             true
     );
     public static final FaweException MAX_CHANGES = new FaweException(
-            Caption.of("fawe.cancel.reason.max" + ".changes"),
+            Caption.of("fawe.cancel.reason.max.changes"),
             Type.MAX_CHANGES,
             false
     );
     public static final FaweException LOW_MEMORY = new FaweException(
-            Caption.of("fawe.cancel.reason.low" + ".memory"),
+            Caption.of("fawe.cancel.reason.low.memory"),
             Type.LOW_MEMORY,
             false
     );

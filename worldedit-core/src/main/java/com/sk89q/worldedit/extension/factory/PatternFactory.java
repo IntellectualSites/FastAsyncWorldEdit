@@ -60,7 +60,9 @@ import com.sk89q.worldedit.extension.factory.parser.pattern.RandomPatternParser;
 import com.sk89q.worldedit.extension.factory.parser.pattern.RandomStatePatternParser;
 import com.sk89q.worldedit.extension.factory.parser.pattern.SingleBlockPatternParser;
 import com.sk89q.worldedit.extension.factory.parser.pattern.TypeOrStateApplyingPatternParser;
+import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.NoMatchException;
+import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.function.pattern.RandomPattern;
 import com.sk89q.worldedit.internal.registry.AbstractFactory;
@@ -128,6 +130,13 @@ public final class PatternFactory extends AbstractFactory<Pattern> {
         register(new SurfaceRandomOffsetPatternParser(worldEdit));
         register(new TypeSwapPatternParser(worldEdit));
         register(new VoronoiPatternParser(worldEdit));
+    }
+
+    //FAWE start - rich pattern parsing
+
+    @Override
+    public Pattern parseFromInput(String input, ParserContext context) throws InputParseException {
+        return super.parseFromInput(input, context);
     }
 
     @Override
