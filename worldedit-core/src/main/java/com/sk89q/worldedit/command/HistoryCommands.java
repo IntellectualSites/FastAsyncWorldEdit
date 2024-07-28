@@ -27,7 +27,6 @@ import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.command.util.annotation.Confirm;
-import com.sk89q.worldedit.command.util.annotation.SynchronousSettingExpected;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
@@ -62,7 +61,6 @@ public class HistoryCommands {
             desc = "Undoes the last action (from history)"
     )
     @CommandPermissions({"worldedit.history.undo", "worldedit.history.undo.self"})
-    @SynchronousSettingExpected
     public void undo(
             Actor actor, LocalSession session,
             @Confirm(Confirm.Processor.LIMIT) @Arg(desc = "Number of undoes to perform", def = "1")
@@ -110,7 +108,6 @@ public class HistoryCommands {
             desc = "Redoes the last action (from history)"
     )
     @CommandPermissions({"worldedit.history.redo", "worldedit.history.redo.self"})
-    @SynchronousSettingExpected
     public void redo(
             Actor actor, LocalSession session,
             @Confirm(Confirm.Processor.LIMIT) @Arg(desc = "Number of redoes to perform", def = "1")

@@ -35,7 +35,6 @@ import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.command.util.Logging;
 import com.sk89q.worldedit.command.util.annotation.Confirm;
 import com.sk89q.worldedit.command.util.annotation.Preload;
-import com.sk89q.worldedit.command.util.annotation.SynchronousSettingExpected;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.function.GroundFunction;
@@ -226,7 +225,6 @@ public class RegionCommands {
     )
     @CommandPermissions("worldedit.region.line")
     @Logging(REGION)
-    @SynchronousSettingExpected
     public int line(
             Actor actor, EditSession editSession,
             @Selection Region region,
@@ -259,7 +257,6 @@ public class RegionCommands {
     @CommandPermissions("worldedit.region.curve")
     @Logging(REGION)
     @Confirm(Confirm.Processor.REGION)
-    @SynchronousSettingExpected
     public int curve(
             Actor actor, EditSession editSession,
             @Selection Region region,
@@ -318,7 +315,6 @@ public class RegionCommands {
     @CommandPermissions("worldedit.region.overlay")
     @Logging(REGION)
     @Confirm(Confirm.Processor.REGION)
-    @SynchronousSettingExpected // TODO improve using filter/chunk-based-placement
     public int overlay(
             Actor actor, EditSession editSession, @Selection Region region,
             @Arg(desc = "The pattern of blocks to overlay")
@@ -337,7 +333,6 @@ public class RegionCommands {
     @Logging(REGION)
     @Preload(Preload.PreloadCheck.PRELOAD)
     @Confirm(Confirm.Processor.REGION)
-    @SynchronousSettingExpected // TODO improve using filter/chunk-based-placement
     public void lay(
             Actor actor,
             EditSession editSession,
@@ -374,7 +369,6 @@ public class RegionCommands {
     )
     @Logging(REGION)
     @CommandPermissions("worldedit.region.center")
-    @SynchronousSettingExpected
     public int center(
             Actor actor, EditSession editSession, @Selection Region region,
             @Arg(desc = "The pattern of blocks to set")
@@ -392,8 +386,6 @@ public class RegionCommands {
     @CommandPermissions("worldedit.region.naturalize")
     @Logging(REGION)
     @Confirm(Confirm.Processor.REGION)
-    @SynchronousSettingExpected // TODO improve using filter/chunk-based-placement
-    @Preload(Preload.PreloadCheck.PRELOAD)
     public int naturalize(Actor actor, EditSession editSession, @Selection Region region) throws WorldEditException {
         int affected = editSession.naturalizeCuboidBlocks(region);
         actor.print(Caption.of("worldedit.naturalize.naturalized", TextComponent.of(affected)));
@@ -445,7 +437,6 @@ public class RegionCommands {
     @Logging(REGION)
     @Preload(Preload.PreloadCheck.PRELOAD)
     @Confirm(Confirm.Processor.REGION)
-    @SynchronousSettingExpected
     public int smooth(
             Actor actor, EditSession editSession, @Selection Region region,
             @Arg(desc = "# of iterations to perform", def = "1")
@@ -519,7 +510,6 @@ public class RegionCommands {
     @CommandPermissions("worldedit.region.snowsmooth")
     @Logging(REGION)
     @Preload(Preload.PreloadCheck.PRELOAD)
-    @SynchronousSettingExpected
     @Confirm(Confirm.Processor.REGION)
     public int snowSmooth(
             Actor actor, EditSession editSession, @Selection Region region,
@@ -546,7 +536,6 @@ public class RegionCommands {
     @CommandPermissions("worldedit.region.move")
     @Logging(ORIENTATION_REGION)
     @Preload(Preload.PreloadCheck.PRELOAD)
-    @SynchronousSettingExpected
     @Confirm(Confirm.Processor.REGION)
     public int move(
             Actor actor, World world, EditSession editSession, LocalSession session,
@@ -610,7 +599,6 @@ public class RegionCommands {
     @CommandPermissions("worldedit.region.fall")
     @Logging(ORIENTATION_REGION)
     @Preload(Preload.PreloadCheck.PRELOAD)
-    @SynchronousSettingExpected
     @Confirm(Confirm.Processor.REGION)
     public void fall(
             Actor actor, EditSession editSession,
@@ -630,7 +618,6 @@ public class RegionCommands {
     )
     @CommandPermissions("worldedit.region.stack")
     @Preload(Preload.PreloadCheck.PRELOAD)
-    @SynchronousSettingExpected
     @Logging(ORIENTATION_REGION)
     public int stack(
             Actor actor, World world, EditSession editSession, LocalSession session,
@@ -696,7 +683,6 @@ public class RegionCommands {
     )
     @CommandPermissions("worldedit.regen")
     @Logging(REGION)
-    @SynchronousSettingExpected
     @Confirm(Confirm.Processor.REGION)
     void regenerate(
             Actor actor, World world, LocalSession session, EditSession editSession,
@@ -751,7 +737,6 @@ public class RegionCommands {
     @CommandPermissions("worldedit.region.deform")
     @Logging(ALL)
     @Preload(Preload.PreloadCheck.PRELOAD)
-    @SynchronousSettingExpected
     @Confirm(Confirm.Processor.REGION)
     public int deform(
             Actor actor, LocalSession session, EditSession editSession,
@@ -829,7 +814,6 @@ public class RegionCommands {
     @CommandPermissions("worldedit.region.hollow")
     @Logging(REGION)
     @Preload(Preload.PreloadCheck.PRELOAD)
-    @SynchronousSettingExpected
     @Confirm(Confirm.Processor.REGION)
     public int hollow(
             Actor actor, EditSession editSession,
@@ -864,7 +848,6 @@ public class RegionCommands {
     @CommandPermissions("worldedit.region.forest")
     @Logging(REGION)
     @Preload(Preload.PreloadCheck.PRELOAD)
-    @SynchronousSettingExpected
     @Confirm(Confirm.Processor.REGION)
     public int forest(
             Actor actor, EditSession editSession, @Selection Region region,
@@ -886,7 +869,6 @@ public class RegionCommands {
     @CommandPermissions("worldedit.region.flora")
     @Logging(REGION)
     @Preload(Preload.PreloadCheck.PRELOAD)
-    @SynchronousSettingExpected
     @Confirm(Confirm.Processor.REGION)
     public int flora(
             Actor actor, EditSession editSession, @Selection Region region,

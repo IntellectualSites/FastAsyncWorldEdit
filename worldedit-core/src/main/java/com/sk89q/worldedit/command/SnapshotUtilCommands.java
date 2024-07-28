@@ -28,7 +28,6 @@ import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.command.util.Logging;
-import com.sk89q.worldedit.command.util.annotation.SynchronousSettingExpected;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
@@ -67,7 +66,6 @@ public class SnapshotUtilCommands {
     )
     @Logging(REGION)
     @CommandPermissions("worldedit.snapshots.restore")
-    @SynchronousSettingExpected
     public void restore(
             Actor actor, World world, LocalSession session, EditSession editSession,
             @Arg(name = "snapshot", desc = "The snapshot to restore", def = "")

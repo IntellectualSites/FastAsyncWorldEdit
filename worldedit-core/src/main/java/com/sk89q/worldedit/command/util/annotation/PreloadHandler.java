@@ -11,7 +11,7 @@ import java.lang.reflect.Method;
 import java.util.Optional;
 
 /**
- * Initialises preloading of chunks.
+ * Logs called commands to a logger.
  */
 public class PreloadHandler implements CommandCallListener {
 

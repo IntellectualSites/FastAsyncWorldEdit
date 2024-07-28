@@ -992,15 +992,15 @@ public class BrushCommands {
                     Expression radius,
             @Arg(desc = "Command to run")
                     List<String> input,
-            @Switch(name = 'h', desc = "Hide any printed output")
-                    boolean hide
+            @Switch(name = 'p', desc = "Show any printed output")
+                    boolean print
     ) throws WorldEditException {
         worldEdit.checkMaxBrushRadius(
                 radius,
                 context.injectedValue(Key.of(Player.class)).orElseThrow(() -> new IllegalStateException("No player"))
         );
         String cmd = StringMan.join(input, " ");
-        set(context, new CommandBrush(cmd, !hide), "worldedit.brush.command").setSize(radius);
+        set(context, new CommandBrush(cmd, print), "worldedit.brush.command").setSize(radius);
     }
 
     @Command(

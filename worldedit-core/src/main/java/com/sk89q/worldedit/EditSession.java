@@ -308,7 +308,16 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * @return Limit remaining
      */
     public FaweLimit getLimitUsed() {
-        return originalLimit.getLimitUsed(limit);
+        FaweLimit newLimit = new FaweLimit();
+        newLimit.MAX_ACTIONS = originalLimit.MAX_ACTIONS - limit.MAX_ACTIONS;
+        newLimit.MAX_CHANGES = originalLimit.MAX_CHANGES - limit.MAX_CHANGES;
+        newLimit.MAX_FAILS = originalLimit.MAX_FAILS - limit.MAX_FAILS;
+        newLimit.MAX_CHECKS = originalLimit.MAX_CHECKS - limit.MAX_CHECKS;
+        newLimit.MAX_ITERATIONS = originalLimit.MAX_ITERATIONS - limit.MAX_ITERATIONS;
+        newLimit.MAX_BLOCKSTATES = originalLimit.MAX_BLOCKSTATES - limit.MAX_BLOCKSTATES;
+        newLimit.MAX_ENTITIES = originalLimit.MAX_ENTITIES - limit.MAX_ENTITIES;
+        newLimit.MAX_HISTORY = limit.MAX_HISTORY;
+        return newLimit;
     }
 
     /**

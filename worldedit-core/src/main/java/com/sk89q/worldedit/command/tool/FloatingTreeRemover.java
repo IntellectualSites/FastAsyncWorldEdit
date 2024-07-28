@@ -86,7 +86,7 @@ public class FloatingTreeRemover implements BlockTool {
             return true;
         }
 
-        try (EditSession editSession = session.createEditSession(player, "FloatingTreeRemover", true)) {
+        try (EditSession editSession = session.createEditSession(player, "FloatingTreeRemover")) {
             try {
                 final Set<BlockVector3> blockSet = bfs(world, clicked.toVector().toBlockPoint());
                 if (blockSet == null) {

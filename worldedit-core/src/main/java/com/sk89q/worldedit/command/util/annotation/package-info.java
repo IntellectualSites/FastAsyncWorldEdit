@@ -8,7 +8,6 @@
  * {@link com.sk89q.worldedit.command.util.annotation.PatternList},
  * {@link com.sk89q.worldedit.command.util.annotation.Preload},
  * {@link com.sk89q.worldedit.command.util.annotation.PreloadHandler},
- * {@link com.sk89q.worldedit.command.util.annotation.SynchronousSettingExpected},
  * {@link com.sk89q.worldedit.command.util.annotation.Step},
  * {@link com.sk89q.worldedit.command.util.annotation.Time}
  */

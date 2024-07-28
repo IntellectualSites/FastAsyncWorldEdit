@@ -89,7 +89,7 @@ public class BlockDataCyler implements DoubleActionBlockTool {
                 Property<Object> objProp = (Property<Object>) currentProperty;
                 BaseBlock newBlock = block.with(objProp, currentProperty.getValues().get(index));
 
-                try (EditSession editSession = session.createEditSession(player, null, true)) {
+                try (EditSession editSession = session.createEditSession(player)) {
                     try {
                         editSession.setBlock(blockPoint, newBlock);
                         player.print(Caption.of(

@@ -204,7 +204,7 @@ public class BlockMask extends ABlockMask {
 
     @Override
     public boolean test(BlockVector3 vector) {
-        int test = vector.getBlock(getExtent()).getOrdinal();
+        int test = getExtent().getBlock(vector).getOrdinal();
         return ordinals[test] || replacesAir() && test == 0;
     }
 

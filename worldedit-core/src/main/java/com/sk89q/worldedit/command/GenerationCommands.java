@@ -38,7 +38,6 @@ import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.command.util.Logging;
 import com.sk89q.worldedit.command.util.annotation.Confirm;
 import com.sk89q.worldedit.command.util.annotation.Preload;
-import com.sk89q.worldedit.command.util.annotation.SynchronousSettingExpected;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.function.mask.Mask;
@@ -105,7 +104,6 @@ public class GenerationCommands {
     )
     @CommandPermissions("worldedit.generation.cylinder")
     @Logging(PLACEMENT)
-    @SynchronousSettingExpected
     public int hcyl(
             Actor actor, LocalSession session, EditSession editSession,
             @Arg(desc = "The pattern of blocks to generate")
@@ -154,7 +152,6 @@ public class GenerationCommands {
     )
     @CommandPermissions("worldedit.generation.cylinder")
     @Logging(PLACEMENT)
-    @SynchronousSettingExpected
     public int cyl(
             Actor actor, LocalSession session, EditSession editSession,
             @Arg(desc = "The pattern of blocks to generate")
@@ -200,7 +197,6 @@ public class GenerationCommands {
     )
     @CommandPermissions("worldedit.generation.cone")
     @Logging(PLACEMENT)
-    @SynchronousSettingExpected
     public int cone(Actor actor, LocalSession session, EditSession editSession,
            @Arg(desc = "The pattern of blocks to generate")
                Pattern pattern,
@@ -247,7 +243,6 @@ public class GenerationCommands {
     )
     @CommandPermissions("worldedit.generation.sphere")
     @Logging(PLACEMENT)
-    @SynchronousSettingExpected
     public int hsphere(
             Actor actor, LocalSession session, EditSession editSession,
             @Arg(desc = "The pattern of blocks to generate")
@@ -267,7 +262,6 @@ public class GenerationCommands {
     )
     @CommandPermissions("worldedit.generation.sphere")
     @Logging(PLACEMENT)
-    @SynchronousSettingExpected
     public int sphere(
             Actor actor, LocalSession session, EditSession editSession,
             @Arg(desc = "The pattern of blocks to generate")
@@ -319,7 +313,6 @@ public class GenerationCommands {
     )
     @CommandPermissions("worldedit.generation.forest")
     @Logging(POSITION)
-    @SynchronousSettingExpected
     public int forestGen(
             Actor actor, LocalSession session, EditSession editSession,
             @Arg(desc = "The size of the forest, in blocks", def = "10")
@@ -344,7 +337,6 @@ public class GenerationCommands {
     )
     @CommandPermissions("worldedit.generation.pumpkins")
     @Logging(POSITION)
-    @SynchronousSettingExpected
     public int pumpkins(
             Actor actor, LocalSession session, EditSession editSession,
             @Arg(desc = "The size of the patch", def = "10")
@@ -365,7 +357,6 @@ public class GenerationCommands {
     )
     @CommandPermissions("worldedit.generation.pyramid")
     @Logging(PLACEMENT)
-    @SynchronousSettingExpected
     public int hollowPyramid(
             Actor actor, LocalSession session, EditSession editSession,
             @Arg(desc = "The pattern of blocks to set")
@@ -382,7 +373,6 @@ public class GenerationCommands {
     )
     @CommandPermissions("worldedit.generation.pyramid")
     @Logging(PLACEMENT)
-    @SynchronousSettingExpected
     public int pyramid(
             Actor actor, LocalSession session, EditSession editSession,
             @Arg(desc = "The pattern of blocks to set")
@@ -410,7 +400,6 @@ public class GenerationCommands {
     )
     @CommandPermissions("worldedit.generation.shape")
     @Logging(ALL)
-    @SynchronousSettingExpected
     @Confirm(Confirm.Processor.REGION)
     public int generate(
             Actor actor, LocalSession session, EditSession editSession,
@@ -497,7 +486,6 @@ public class GenerationCommands {
     @CommandPermissions("worldedit.generation.shape.biome")
     @Logging(ALL)
     @Preload(Preload.PreloadCheck.PRELOAD)
-    @SynchronousSettingExpected
     @Confirm(Confirm.Processor.REGION)
     public int generateBiome(
             Actor actor, LocalSession session, EditSession editSession,
@@ -576,7 +564,6 @@ public class GenerationCommands {
     @CommandPermissions("worldedit.generation.caves")
     @Logging(PLACEMENT)
     @Preload(Preload.PreloadCheck.PRELOAD)
-    @SynchronousSettingExpected
     @Confirm(Confirm.Processor.REGION)
     public void caves(
             Actor actor, LocalSession session, EditSession editSession, @Selection Region region,
@@ -615,7 +602,6 @@ public class GenerationCommands {
     @CommandPermissions("worldedit.generation.ore")
     @Logging(PLACEMENT)
     @Preload(Preload.PreloadCheck.PRELOAD)
-    @SynchronousSettingExpected
     @Confirm(Confirm.Processor.REGION)
     public void ores(
             Actor actor,
@@ -635,7 +621,6 @@ public class GenerationCommands {
             desc = "Generate an image"
     )
     @CommandPermissions("worldedit.generation.image")
-    @SynchronousSettingExpected
     @Logging(PLACEMENT)
     public void image(
             Actor actor,
@@ -700,7 +685,6 @@ public class GenerationCommands {
     @CommandPermissions("worldedit.generation.ore")
     @Logging(PLACEMENT)
     @Preload(Preload.PreloadCheck.PRELOAD)
-    @SynchronousSettingExpected
     @Confirm(Confirm.Processor.REGION)
     public void ore(
             Actor actor,
@@ -735,9 +719,8 @@ public class GenerationCommands {
             desc = "Creates a distorted sphere"
     )
     @Logging(PLACEMENT)
-    @SynchronousSettingExpected
     @CommandPermissions("worldedit.generation.blob")
-    public int blob(
+    public int blobBrush(
             Actor actor, LocalSession session, EditSession editSession,
             @Arg(desc = "Pattern")
                     Pattern pattern,

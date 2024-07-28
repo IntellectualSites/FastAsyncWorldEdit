@@ -56,7 +56,7 @@ public class BlockStateMask extends AbstractExtentMask {
     //FAWE start
     @Override
     public boolean test(BlockVector3 vector) {
-        return test(vector.getBlock(getExtent()));
+        return test(getExtent().getBlock(vector));
     }
 
     @Override
