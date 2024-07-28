@@ -108,6 +108,7 @@ public final class EditSessionBuilder {
     private boolean compiled;
     private boolean wrapped;
     private SideEffectSet sideEffectSet = null;
+    private boolean expectSynchronousSetting = false;
 
     private @Nullable
     World world;
@@ -419,6 +420,15 @@ public final class EditSessionBuilder {
         return setDirty();
     }
 
+    public EditSessionBuilder expectSynchronousSetting(boolean expectSynchronousSetting) {
+        this.expectSynchronousSetting = expectSynchronousSetting;
+        return setDirty();
+    }
+
+    public boolean isExpectingSynchronousSetting() {
+        return this.expectSynchronousSetting;
+    }
+
     /**
      * Set the side effects to be used with this edit
      *
@@ -674,7 +684,11 @@ public final class EditSessionBuilder {
                 };
             }
             if (limit != null && !limit.isUnlimited()) {
-                this.extent = new LimitExtent(this.extent, limit, onErrorMessage);
+                this.extent = new LimitExtent(this.extent, limit, onErrorMessage, placeChunks && combineStages, expectSynchronousSetting);
+                // Only process if we're not necessarily going to catch tiles via Extent#setBlock, e.g. because using PQE methods
+                if (placeChunks && combineStages && !expectSynchronousSetting) {
+                    queue.addProcessor((LimitExtent) this.extent);
+                }
             }
             this.extent = wrapExtent(this.extent, eventBus, event, EditSession.Stage.BEFORE_HISTORY);
         }

@@ -1731,7 +1731,20 @@ public class LocalSession implements TextureHolder {
     }
 
     public EditSession createEditSession(Actor actor, String command) {
-        //FAWE end
+        return createEditSession(actor, command, false);
+    }
+
+    /**
+     * Construct a new edit session.
+     *
+     * @param actor                    the actor
+     * @param command                  the command executed resulting in the creation of the edit session
+     * @param expectSynchronousSetting if it is expected that blocks will only be set synchronously, i.e. from one thread (at a
+     *                                 time)
+     * @return an edit session
+     * @since TODO
+     */
+    public EditSession createEditSession(Actor actor, String command, boolean expectSynchronousSetting) {
         checkNotNull(actor);
 
         World world = null;
@@ -1740,6 +1753,7 @@ public class LocalSession implements TextureHolder {
         } else if (actor instanceof Locatable && ((Locatable) actor).getExtent() instanceof World) {
             world = (World) ((Locatable) actor).getExtent();
         }
+        //FAWE end
 
         // Create an edit session
         EditSessionBuilder builder = WorldEdit.getInstance().newEditSessionBuilder().world(world);
@@ -1752,6 +1766,7 @@ public class LocalSession implements TextureHolder {
         builder.command(command);
         builder.fastMode(this.fastMode);
         builder.setSideEffectSet(this.sideEffectSet);
+        builder.expectSynchronousSetting(expectSynchronousSetting);
 
         EditSession editSession = builder.build();
 

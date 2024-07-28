@@ -50,6 +50,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Collections;
 import java.util.Locale;
 import java.util.Set;
 import java.util.zip.GZIPInputStream;
@@ -125,6 +126,11 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
         public String getPrimaryFileExtension() {
             return "schem";
         }
+
+        @Override
+        public Set<String> getExplicitFileExtensions() {
+            return Set.of("schem3", "sponge3", "fast3");
+        }
     },
     FAST_V2("fast.2", "fawe.2", "schem.2") {
         @Override
@@ -167,6 +173,11 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
                 return false;
             }
             return super.isFormat(file);
+        }
+
+        @Override
+        public Set<String> getExplicitFileExtensions() {
+            return Set.of("schem2", "sponge2", "fast2");
         }
     },
     //FAWE end
@@ -217,6 +228,11 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
             }
             return rootEntry.value().value().containsKey("Materials");
         }
+
+        @Override
+        public Set<String> getExplicitFileExtensions() {
+            return Set.of("mcedit", "schem1", "sponge1", "fast1");
+        }
     },
     SPONGE_V1_SCHEMATIC("sponge.1") {
         @Override
@@ -242,6 +258,11 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
         @Override
         public boolean isFormat(File file) {
             return MCEDIT_SCHEMATIC.isFormat(file);
+        }
+
+        @Override
+        public Set<String> getExplicitFileExtensions() {
+            return Collections.emptySet();
         }
     },
 
@@ -277,6 +298,11 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
         public boolean isFormat(File file) {
             return FAST_V2.isFormat(file);
         }
+
+        @Override
+        public Set<String> getExplicitFileExtensions() {
+            return Collections.emptySet();
+        }
     },
     SPONGE_V3_SCHEMATIC("sponge.3", "slow", "safe") { // FAWE - edit aliases for fast
 
@@ -300,6 +326,11 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
             //FAWE start - delegate to stream-based isFormat approach of fast impl
             return FAST_V3.isFormat(file);
             //FAWE end
+        }
+
+        @Override
+        public Set<String> getExplicitFileExtensions() {
+            return Collections.emptySet();
         }
     },
     //FAWE start - recover schematics with bad entity data & register other clipboard formats
@@ -341,6 +372,10 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
             return false;
         }
 
+        @Override
+        public Set<String> getExplicitFileExtensions() {
+            return Collections.emptySet();
+        }
     },
 
     /**
@@ -401,6 +436,11 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
         public boolean isFormat(final File file) {
             return file.getName().toLowerCase(Locale.ROOT).endsWith(".nbt") && super.isFormat(file);
         }
+
+        @Override
+        public Set<String> getExplicitFileExtensions() {
+            return Set.of("nbt");
+        }
     },
 
     /**
@@ -426,6 +466,11 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
         @Override
         public String getPrimaryFileExtension() {
             return "png";
+        }
+
+        @Override
+        public Set<String> getExplicitFileExtensions() {
+            return Set.of("png");
         }
     };
     //FAWE end

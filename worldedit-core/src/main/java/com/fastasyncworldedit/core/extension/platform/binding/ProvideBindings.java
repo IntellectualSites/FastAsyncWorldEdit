@@ -3,7 +3,11 @@ package com.fastasyncworldedit.core.extension.platform.binding;
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.database.DBHandler;
 import com.fastasyncworldedit.core.database.RollbackDatabase;
+import com.fastasyncworldedit.core.extent.LimitExtent;
+import com.fastasyncworldedit.core.extent.processor.ExtentBatchProcessorHolder;
+import com.fastasyncworldedit.core.internal.exception.FaweException;
 import com.fastasyncworldedit.core.regions.FaweMaskManager;
+import com.fastasyncworldedit.core.util.ExtentTraverser;
 import com.fastasyncworldedit.core.util.TextureUtil;
 import com.fastasyncworldedit.core.util.image.ImageUtil;
 import com.sk89q.worldedit.EditSession;
@@ -11,6 +15,7 @@ import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.command.argument.Arguments;
 import com.sk89q.worldedit.command.util.annotation.AllowedRegion;
+import com.sk89q.worldedit.command.util.annotation.SynchronousSettingExpected;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.platform.Actor;
@@ -25,6 +30,7 @@ import org.enginehub.piston.inject.Key;
 import org.enginehub.piston.util.ValueProvider;
 
 import java.awt.image.BufferedImage;
+import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.Optional;
 
@@ -52,11 +58,33 @@ public class ProvideBindings extends Bindings {
 
     @Binding
     public EditSession editSession(LocalSession localSession, Actor actor, InjectedValueAccess context) {
+        Method commandMethod =
+                context.injectedValue(Key.of(InjectedValueStore.class)).get().injectedValue(Key.of(Method.class)).get();
+
         Arguments arguments = context.injectedValue(Key.of(Arguments.class)).orElse(null);
         String command = arguments == null ? null : arguments.get();
-        EditSession editSession = localSession.createEditSession(actor, command);
-        editSession.enableStandardMode();
-        Request.request().setEditSession(editSession);
+        boolean synchronousSetting = commandMethod.getAnnotation(SynchronousSettingExpected.class) != null;
+        EditSessionHolder holder = context.injectedValue(Key.of(EditSessionHolder.class)).orElse(null);
+        EditSession editSession = holder != null ? holder.session() : null;
+        if (editSession == null) {
+            editSession = localSession.createEditSession(actor, command, synchronousSetting);
+            editSession.enableStandardMode();
+        } else {
+            LimitExtent limitExtent = new ExtentTraverser<>(editSession).findAndGet(LimitExtent.class);
+            if (limitExtent != null) {
+                limitExtent.setProcessing(!synchronousSetting);
+                if (!synchronousSetting) {
+                    ExtentBatchProcessorHolder processorHolder = new ExtentTraverser<>(editSession).findAndGet(
+                            ExtentBatchProcessorHolder.class);
+                    if (processorHolder != null) {
+                        processorHolder.addProcessor(limitExtent);
+                    } else {
+                        throw new FaweException(Caption.of("fawe.error.no-process-non-synchronous-edit"));
+                    }
+                }
+            }
+            Request.request().setEditSession(editSession);
+        }
         return editSession;
     }
 

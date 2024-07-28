@@ -645,10 +645,10 @@ public class BrushCommands {
     @CommandPermissions("worldedit.brush.populateschematic")
     public void scatterSchemBrush(
             Player player, InjectedValueAccess context,
-            @Arg(desc = "Mask")
-                    Mask mask,
             @Arg(name = "clipboard", desc = "Clipboard uri")
                     String clipboardStr,
+            @Arg(desc = "Mask of block to place on. Defaults to solid blocks.", def = "")
+                    Mask mask,
             @Arg(desc = "Expression", def = "30")
                     Expression radius,
             @Arg(desc = "double", def = "50")
@@ -992,15 +992,15 @@ public class BrushCommands {
                     Expression radius,
             @Arg(desc = "Command to run")
                     List<String> input,
-            @Switch(name = 'p', desc = "Show any printed output")
-                    boolean print
+            @Switch(name = 'h', desc = "Hide any printed output")
+                    boolean hide
     ) throws WorldEditException {
         worldEdit.checkMaxBrushRadius(
                 radius,
                 context.injectedValue(Key.of(Player.class)).orElseThrow(() -> new IllegalStateException("No player"))
         );
         String cmd = StringMan.join(input, " ");
-        set(context, new CommandBrush(cmd, print), "worldedit.brush.command").setSize(radius);
+        set(context, new CommandBrush(cmd, !hide), "worldedit.brush.command").setSize(radius);
     }
 
     @Command(

@@ -125,6 +125,13 @@ public interface ClipboardFormat {
     //FAWE start
 
     /**
+     * Get the explicit file extensions (e.g. .schem2) this format is commonly known to use.
+     *
+     * @return The explicit file extensions this format might be known by
+     */
+    Set<String> getExplicitFileExtensions();
+
+    /**
      * Sets the actor's clipboard.
      *
      * @param actor       the actor

@@ -53,6 +53,7 @@ import com.sk89q.worldedit.extension.factory.parser.mask.NoiseMaskParser;
 import com.sk89q.worldedit.extension.factory.parser.mask.OffsetMaskParser;
 import com.sk89q.worldedit.extension.factory.parser.mask.RegionMaskParser;
 import com.sk89q.worldedit.extension.factory.parser.mask.SolidMaskParser;
+import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.NoMatchException;
 import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.function.mask.Mask;
@@ -131,6 +132,11 @@ public final class MaskFactory extends AbstractFactory<Mask> {
     }
 
     //FAWE start - rich mask parsing
+
+    @Override
+    public Mask parseFromInput(String input, ParserContext context) throws InputParseException {
+        return super.parseFromInput(input, context);
+    }
 
     @Override
     protected Mask getParsed(final String input, final List<Mask> masks) {
