@@ -115,7 +115,7 @@ public interface IQueueExtent<T extends IChunk> extends Flushable, Trimable, ICh
      * A filter block is used to iterate over blocks / positions. Essentially combines BlockVector3,
      * Extent and BlockState functions in a way that avoids lookups.
      */
-    ChunkFilterBlock initFilterBlock();
+    ChunkFilterBlock createFilterBlock();
 
     /**
      * Returns the number of chunks in this queue.
@@ -129,7 +129,14 @@ public interface IQueueExtent<T extends IChunk> extends Flushable, Trimable, ICh
      */
     boolean isEmpty();
 
-    default ChunkFilterBlock apply(ChunkFilterBlock block, Filter filter, Region region, int chunkX, int chunkZ, boolean full) {
+    default ChunkFilterBlock apply(
+            @Nullable ChunkFilterBlock block,
+            Filter filter,
+            Region region,
+            int chunkX,
+            int chunkZ,
+            boolean full
+    ) {
         if (!filter.appliesChunk(chunkX, chunkZ)) {
             return block;
         }
@@ -139,8 +146,9 @@ public interface IQueueExtent<T extends IChunk> extends Flushable, Trimable, ICh
         if (newChunk != null) {
             chunk = newChunk;
             if (block == null) {
-                block = this.initFilterBlock();
+                block = this.createFilterBlock();
             }
+            block.initChunk(chunkX, chunkZ);
             chunk.filterBlocks(filter, block, region, full);
         }
         this.submit(chunk);
@@ -152,7 +160,7 @@ public interface IQueueExtent<T extends IChunk> extends Flushable, Trimable, ICh
         final Set<BlockVector2> chunks = region.getChunks();
         ChunkFilterBlock block = null;
         for (BlockVector2 chunk : chunks) {
-            block = apply(block, filter, region, chunk.getX(), chunk.getZ(), full);
+            block = apply(block, filter, region, chunk.x(), chunk.z(), full);
         }
         flush();
         return filter;

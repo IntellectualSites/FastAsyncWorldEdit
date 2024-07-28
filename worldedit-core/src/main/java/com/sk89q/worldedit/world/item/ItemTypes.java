@@ -105,6 +105,10 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType ARMOR_STAND = init();
     @Nullable
+    public static final ItemType ARMADILLO_SCUTE = init();
+    @Nullable
+    public static final ItemType ARMADILLO_SPAWN_EGG = init();
+    @Nullable
     public static final ItemType ARMS_UP_POTTERY_SHERD = init();
     @Nullable
     public static final ItemType ARROW = init();
@@ -297,6 +301,10 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType BLUE_WOOL = init();
     @Nullable
+    public static final ItemType BOGGED_SPAWN_EGG = init();
+    @Nullable
+    public static final ItemType BOLT_ARMOR_TRIM_SMITHING_TEMPLATE = init();
+    @Nullable
     public static final ItemType BONE = init();
     @Nullable
     public static final ItemType BONE_BLOCK = init();
@@ -318,6 +326,8 @@ public final class ItemTypes {
     public static final ItemType BRAIN_CORAL_FAN = init();
     @Nullable
     public static final ItemType BREAD = init();
+    @Nullable
+    public static final ItemType BREEZE_ROD = init();
     @Nullable
     public static final ItemType BREEZE_SPAWN_EGG = init();
     @Nullable
@@ -971,6 +981,12 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType FLINT_AND_STEEL = init();
     @Nullable
+    public static final ItemType FLOW_ARMOR_TRIM_SMITHING_TEMPLATE = init();
+    @Nullable
+    public static final ItemType FLOW_BANNER_PATTERN = init();
+    @Nullable
+    public static final ItemType FLOW_POTTERY_SHERD = init();
+    @Nullable
     public static final ItemType FLOWER_BANNER_PATTERN = init();
     @Nullable
     public static final ItemType FLOWER_POT = init();
@@ -1132,6 +1148,10 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType GUNPOWDER = init();
     @Nullable
+    public static final ItemType GUSTER_BANNER_PATTERN = init();
+    @Nullable
+    public static final ItemType GUSTER_POTTERY_SHERD = init();
+    @Nullable
     public static final ItemType HANGING_ROOTS = init();
     @Nullable
     public static final ItemType HAY_BLOCK = init();
@@ -1141,6 +1161,8 @@ public final class ItemTypes {
     public static final ItemType HEART_POTTERY_SHERD = init();
     @Nullable
     public static final ItemType HEARTBREAK_POTTERY_SHERD = init();
+    @Nullable
+    public static final ItemType HEAVY_CORE = init();
     @Nullable
     public static final ItemType HEAVY_WEIGHTED_PRESSURE_PLATE = init();
     @Nullable
@@ -1403,6 +1425,8 @@ public final class ItemTypes {
     public static final ItemType LODESTONE = init();
     @Nullable
     public static final ItemType LOOM = init();
+    @Nullable
+    public static final ItemType MACE = init();
     @Nullable
     public static final ItemType MAGENTA_BANNER = init();
     @Nullable
@@ -1667,6 +1691,10 @@ public final class ItemTypes {
     public static final ItemType OCELOT_SPAWN_EGG = init();
     @Nullable
     public static final ItemType OCHRE_FROGLIGHT = init();
+    @Nullable
+    public static final ItemType OMINOUS_BOTTLE = init();
+    @Nullable
+    public static final ItemType OMINOUS_TRIAL_KEY = init();
     @Nullable
     public static final ItemType ORANGE_BANNER = init();
     @Nullable
@@ -2075,6 +2103,8 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType SCAFFOLDING = init();
     @Nullable
+    public static final ItemType SCRAPE_POTTERY_SHERD = init();
+    @Nullable
     public static final ItemType SCULK = init();
     @Nullable
     public static final ItemType SCULK_CATALYST = init();
@@ -2085,6 +2115,7 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType SCULK_VEIN = init();
     @Nullable
+    @Deprecated
     public static final ItemType SCUTE = init();
     @Nullable
     public static final ItemType SEA_LANTERN = init();
@@ -2424,9 +2455,13 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType TURTLE_HELMET = init();
     @Nullable
+    public static final ItemType TURTLE_SCUTE = init();
+    @Nullable
     public static final ItemType TURTLE_SPAWN_EGG = init();
     @Nullable
     public static final ItemType TWISTING_VINES = init();
+    @Nullable
+    public static final ItemType VAULT = init();
     @Nullable
     public static final ItemType VERDANT_FROGLIGHT = init();
     @Nullable
@@ -2614,6 +2649,8 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType WILD_ARMOR_TRIM_SMITHING_TEMPLATE = init();
     @Nullable
+    public static final ItemType WIND_CHARGE = init();
+    @Nullable
     public static final ItemType WITCH_SPAWN_EGG = init();
     @Nullable
     public static final ItemType WITHER_ROSE = init();
@@ -2623,6 +2660,8 @@ public final class ItemTypes {
     public static final ItemType WITHER_SKELETON_SPAWN_EGG = init();
     @Nullable
     public static final ItemType WITHER_SPAWN_EGG = init();
+    @Nullable
+    public static final ItemType WOLF_ARMOR = init();
     @Nullable
     public static final ItemType WOLF_SPAWN_EGG = init();
     @Nullable

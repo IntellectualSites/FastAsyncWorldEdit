@@ -29,8 +29,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
@@ -81,7 +79,7 @@ public class StripNBTExtent extends AbstractDelegateExtent implements IBatchProc
             return block;
         }
         CompoundTag nbt = localBlock.getNbtData();
-        Map<String, Tag> value = new HashMap<>(nbt.getValue());
+        Map<String, Tag<?, ?>> value = new HashMap<>(nbt.getValue());
         for (String key : strip) {
             value.remove(key);
         }
@@ -93,7 +91,7 @@ public class StripNBTExtent extends AbstractDelegateExtent implements IBatchProc
             return entity;
         }
         CompoundTag nbt = entity.getNbtData();
-        Map<String, Tag> value = new HashMap<>(nbt.getValue());
+        Map<String, Tag<?, ?>> value = new HashMap<>(nbt.getValue());
         for (String key : strip) {
             value.remove(key);
         }
@@ -110,7 +108,7 @@ public class StripNBTExtent extends AbstractDelegateExtent implements IBatchProc
         }
         boolean isBv3ChunkMap = tiles instanceof BlockVector3ChunkMap;
         for (final Map.Entry<BlockVector3, CompoundTag> entry : tiles.entrySet()) {
-            ImmutableMap.Builder<String, Tag> map = ImmutableMap.builder();
+            ImmutableMap.Builder<String, Tag<?, ?>> map = ImmutableMap.builder();
             final AtomicBoolean isStripped = new AtomicBoolean(false);
             entry.getValue().getValue().forEach((k, v) -> {
                 if (strip.contains(k.toLowerCase())) {
@@ -132,7 +130,7 @@ public class StripNBTExtent extends AbstractDelegateExtent implements IBatchProc
         Iterator<CompoundTag> iterator = entities.iterator();
         while (iterator.hasNext()) {
             CompoundTag entity = iterator.next();
-            ImmutableMap.Builder<String, Tag> map = ImmutableMap.builder();
+            ImmutableMap.Builder<String, Tag<?, ?>> map = ImmutableMap.builder();
             final AtomicBoolean isStripped = new AtomicBoolean(false);
             entity.getValue().forEach((k, v) -> {
                 if (strip.contains(k.toUpperCase(Locale.ROOT))) {

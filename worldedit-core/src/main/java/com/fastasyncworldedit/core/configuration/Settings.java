@@ -2,6 +2,7 @@ package com.fastasyncworldedit.core.configuration;
 
 import com.fastasyncworldedit.core.limit.FaweLimit;
 import com.fastasyncworldedit.core.limit.PropertyRemap;
+import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
@@ -79,6 +80,8 @@ public class Settings extends Config {
     @Create
     public REGION_RESTRICTIONS_OPTIONS REGION_RESTRICTIONS_OPTIONS;
     @Create
+    public GENERAL GENERAL;
+    @Create
     public ConfigBlock<LIMITS> LIMITS;
 
     private Settings() {
@@ -138,12 +141,34 @@ public class Settings extends Config {
                 );
                 limit.MAX_FAILS = Math.max(limit.MAX_FAILS, newLimit.MAX_FAILS != -1 ? newLimit.MAX_FAILS : Integer.MAX_VALUE);
                 limit.MAX_ITERATIONS = Math.max(
-                        limit.MAX_ITERATIONS,
-                        newLimit.MAX_ITERATIONS != -1 ? newLimit.MAX_ITERATIONS : Integer.MAX_VALUE
+                        limit.MAX_ITERATIONS, newLimit.MAX_ITERATIONS != -1 ? newLimit.MAX_ITERATIONS : Integer.MAX_VALUE);
+                limit.MAX_RADIUS = Math.max(
+                        limit.MAX_RADIUS,
+                        newLimit.MAX_RADIUS != -1 ? newLimit.MAX_RADIUS : Integer.MAX_VALUE
+                );
+                limit.MAX_SUPER_PICKAXE_SIZE = Math.max(
+                        limit.MAX_SUPER_PICKAXE_SIZE,
+                        newLimit.MAX_SUPER_PICKAXE_SIZE != -1 ? newLimit.MAX_SUPER_PICKAXE_SIZE : Integer.MAX_VALUE
+                );
+                limit.MAX_BRUSH_RADIUS = Math.max(
+                        limit.MAX_BRUSH_RADIUS,
+                        newLimit.MAX_BRUSH_RADIUS != -1 ? newLimit.MAX_BRUSH_RADIUS : Integer.MAX_VALUE
+                );
+                limit.MAX_BUTCHER_RADIUS = Math.max(
+                        limit.MAX_BUTCHER_RADIUS,
+                        newLimit.MAX_BUTCHER_RADIUS != -1 ? newLimit.MAX_BUTCHER_RADIUS : Integer.MAX_VALUE
                 );
                 limit.MAX_HISTORY = Math.max(
                         limit.MAX_HISTORY,
                         newLimit.MAX_HISTORY_MB != -1 ? newLimit.MAX_HISTORY_MB : Integer.MAX_VALUE
+                );
+                limit.SCHEM_FILE_NUM_LIMIT = Math.max(
+                        limit.SCHEM_FILE_NUM_LIMIT,
+                        newLimit.SCHEM_FILE_NUM_LIMIT != -1 ? newLimit.SCHEM_FILE_NUM_LIMIT : Integer.MAX_VALUE
+                );
+                limit.SCHEM_FILE_SIZE_LIMIT = Math.max(
+                        limit.SCHEM_FILE_SIZE_LIMIT,
+                        newLimit.SCHEM_FILE_SIZE_LIMIT != -1 ? newLimit.SCHEM_FILE_SIZE_LIMIT : Integer.MAX_VALUE
                 );
                 limit.MAX_EXPRESSION_MS = Math.max(
                         limit.MAX_EXPRESSION_MS,
@@ -166,6 +191,7 @@ public class Settings extends Config {
                     }
                 }
                 limit.UNIVERSAL_DISALLOWED_BLOCKS &= newLimit.UNIVERSAL_DISALLOWED_BLOCKS;
+                limit.ALLOW_LEGACY &= newLimit.ALLOW_LEGACY;
 
                 if (limit.DISALLOWED_BLOCKS == null) {
                     limit.DISALLOWED_BLOCKS = newLimit.DISALLOWED_BLOCKS.isEmpty() ? Collections.emptySet() : new HashSet<>(
@@ -342,6 +368,14 @@ public class Settings extends Config {
         public int MAX_ITERATIONS = 1000;
         @Comment("Max allowed entities (e.g. cows)")
         public int MAX_ENTITIES = 1337;
+        @Comment("Max allowed radius (e.g. for //sphere)")
+        public int MAX_RADIUS = LocalConfiguration.MAX_RADIUS;
+        @Comment("Max allowed superpickaxe size")
+        public int MAX_SUPER_PICKAXE_SIZE = LocalConfiguration.MAX_SUPER_RADIUS;
+        @Comment("Max allowed brush radius")
+        public int MAX_BRUSH_RADIUS = LocalConfiguration.MAX_BRUSH_RADIUS;
+        @Comment("Max allowed butcher radius")
+        public int MAX_BUTCHER_RADIUS = LocalConfiguration.MAX_BUTCHER_RADIUS;
         @Comment({
                 "Blockstates include Banner, Beacon, BrewingStand, Chest, CommandBlock, ",
                 "CreatureSpawner, Dispenser, Dropper, EndGateway, Furnace, Hopper, Jukebox, ",
@@ -353,6 +387,18 @@ public class Settings extends Config {
                 " - History on disk or memory will be deleted",
         })
         public int MAX_HISTORY_MB = -1;
+        @Comment({
+                "Sets a maximum limit (in kb) for the size of a player's schematics directory (per-player mode only)",
+                "Set to -1 to disable"
+        })
+        @Migrate("experimental.per-player-file-size-limit")
+        public int SCHEM_FILE_SIZE_LIMIT = -1;
+        @Comment({
+                "Sets a maximum limit for the amount of schematics in a player's schematics directory (per-player mode only)",
+                "Set to -1 to disable"
+        })
+        @Migrate("experimental.per-player-file-num-limit")
+        public int SCHEM_FILE_NUM_LIMIT = -1;
         @Comment("Maximum time in milliseconds //calc can execute")
         public int MAX_EXPRESSION_MS = 50;
         @Comment({
@@ -394,6 +440,10 @@ public class Settings extends Config {
                 " - If fast-placement is disabled, this may cause edits to be slower."
         })
         public boolean UNIVERSAL_DISALLOWED_BLOCKS = true;
+        @Comment({
+                "If legacy, mumerical, blocks IDs should be able to be used (i.e. 12:2),"
+        })
+        public boolean ALLOW_LEGACY = true;
         @Comment({
                 "List of blocks to deny use of. Can be either an entire block type or a block with a specific property value.",
                 "Where block properties are specified, any blockstate with the property will be disallowed (e.g. all directions",
@@ -473,6 +523,9 @@ public class Settings extends Config {
         public int DELETE_AFTER_DAYS = 7;
         @Comment("Delete history in memory on logout (does not effect disk)")
         public boolean DELETE_ON_LOGOUT = true;
+        @Comment("Delete history on disk on logout")
+        @CopiedFrom("history.delete-on-logout")
+        public boolean DELETE_DISK_ON_LOGOUT = false;
         @Comment({
                 "If history should be enabled by default for plugins using WorldEdit:",
                 " - It is faster to have disabled",
@@ -511,7 +564,7 @@ public class Settings extends Config {
                 " - A larger value will use slightly less CPU time",
                 " - A smaller value will reduce memory usage",
                 " - A value too small may break some operations (deform?)",
-                " - Values smaller than the configurated parallel-threads are not accepted",
+                " - Values smaller than the configured parallel-threads are not accepted",
                 " - It is recommended this option be at least 4x greater than parallel-threads"
 
         })
@@ -543,12 +596,6 @@ public class Settings extends Config {
                 " - Enable to improve performance at the expense of memory",
         })
         public boolean POOL = true;
-
-        @Comment({
-                "When using fastmode do not bother to tick existing/placed blocks/fluids",
-                "Only works in versions up to 1.17.1"
-        })
-        public boolean NO_TICK_FASTMODE = true;
 
         public static class PROGRESS {
 
@@ -621,18 +668,6 @@ public class Settings extends Config {
         })
         public boolean ALLOW_TICK_FLUIDS = false;
 
-        @Comment({
-                "Sets a maximum limit (in kb) for the size of a player's schematics directory (per-player mode only)",
-                "Set to -1 to disable"
-        })
-        public int PER_PLAYER_FILE_SIZE_LIMIT = -1;
-
-        @Comment({
-                "Sets a maximum limit for the amount of schematics in a player's schematics directory (per-player mode only)",
-                "Set to -1 to disable"
-        })
-        public int PER_PLAYER_FILE_NUM_LIMIT = -1;
-
     }
 
     @Comment({"Web/HTTP connection related settings"})
@@ -640,6 +675,13 @@ public class Settings extends Config {
 
         @Comment({"The web interface for clipboards", " - All schematics are anonymous and private", " - Downloads can be deleted by the user", " - Supports clipboard uploads, downloads and saves",})
         public String URL = "https://schem.intellectualsites.com/fawe/";
+
+        @Comment({"The url of the backend server (Arkitektonika)"})
+        public String ARKITEKTONIKA_BACKEND_URL = "https://api.schematic.cloud/";
+        @Comment({"The url used to generate a download link from.", "{key} will be replaced with the generated key"})
+        public String ARKITEKTONIKA_DOWNLOAD_URL = "https://schematic.cloud/download/{key}";
+        @Comment({"The url used to generate a deletion link from.", "{key} will be replaced with the generated key"})
+        public String ARKITEKTONIKA_DELETE_URL = "https://schematic.cloud/delete/{key}";
 
         @Comment("The maximum amount of time in seconds the plugin can attempt to load images for.")
         public int MAX_IMAGE_LOAD_TIME = 5;
@@ -747,6 +789,20 @@ public class Settings extends Config {
         public int MODE = 1;
         @Comment({"If existing lighting should be removed before relighting"})
         public boolean REMOVE_FIRST = true;
+
+    }
+
+    public static class GENERAL {
+
+        @Comment({
+                "If the player should be relocated/unstuck when a generation command would bury them",
+        })
+        public boolean UNSTUCK_ON_GENERATE = true;
+
+        @Comment({
+                "If unlimited limits should still require /confirm on large. Defaults to limits.default.confirm-large otherwise."
+        })
+        public boolean LIMIT_UNLIMITED_CONFIRMS = true;
 
     }
 

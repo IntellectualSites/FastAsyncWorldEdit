@@ -235,15 +235,15 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
     default boolean isGlobal() {
         BlockVector3 pos1 = getMinimumPoint();
         BlockVector3 pos2 = getMaximumPoint();
-        return pos1.getBlockX() == Integer.MIN_VALUE && pos1.getBlockZ() == Integer.MIN_VALUE && pos2.getBlockX() == Integer.MAX_VALUE && pos2
-                .getBlockZ() == Integer.MAX_VALUE
-                && pos1.getBlockY() <= WorldEdit
+        return pos1.x() == Integer.MIN_VALUE && pos1.z() == Integer.MIN_VALUE && pos2.x() == Integer.MAX_VALUE && pos2
+                .z() == Integer.MAX_VALUE
+                && pos1.y() <= WorldEdit
                 .getInstance()
                 .getPlatformManager()
                 .queryCapability(
                         Capability.WORLD_EDITING)
                 .versionMinY()
-                && pos2.getBlockY() >= WorldEdit
+                && pos2.y() >= WorldEdit
                 .getInstance()
                 .getPlatformManager()
                 .queryCapability(Capability.WORLD_EDITING)
@@ -251,11 +251,11 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
     }
 
     default int getMinimumY() {
-        return getMinimumPoint().getY();
+        return getMinimumPoint().y();
     }
 
     default int getMaximumY() {
-        return getMaximumPoint().getY();
+        return getMaximumPoint().y();
     }
 
     default void filter(
@@ -268,7 +268,6 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
     ) {
         int minSection = Math.max(get.getMinSectionPosition(), getMinimumY() >> 4);
         int maxSection = Math.min(get.getMaxSectionPosition(), getMaximumY() >> 4);
-        block = block.initChunk(chunk.getX(), chunk.getZ());
         for (int layer = minSection; layer <= maxSection; layer++) {
             if ((!full && !get.hasSection(layer)) || !filter.appliesLayer(chunk, layer)) {
                 return;
@@ -385,7 +384,7 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
         int tz = bz + 15;
         BlockVector3 min = getMinimumPoint();
         BlockVector3 max = getMaximumPoint();
-        return tx >= min.getX() && bx <= max.getX() && tz >= min.getZ() && bz <= max.getZ();
+        return tx >= min.x() && bx <= max.x() && tz >= min.z() && bz <= max.z();
     }
 
     @Override
@@ -397,7 +396,7 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
 
         BlockVector3 min = getMinimumPoint();
         BlockVector3 max = getMaximumPoint();
-        if (tx >= min.getX() && bx <= max.getX() && tz >= min.getZ() && bz <= max.getZ()) {
+        if (tx >= min.x() && bx <= max.x() && tz >= min.z() && bz <= max.z()) {
             // contains some
             boolean processExtra = false;
             for (int layer = getMinimumY() >> 4; layer <= getMaximumY() >> 4; layer++) {
@@ -451,7 +450,7 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
 
         BlockVector3 min = getMinimumPoint();
         BlockVector3 max = getMaximumPoint();
-        if (tx >= min.getX() && bx <= max.getX() && tz >= min.getZ() && bz <= max.getZ()) {
+        if (tx >= min.x() && bx <= max.x() && tz >= min.z() && bz <= max.z()) {
             // contains some
             boolean processExtra = false;
             for (int layer = getMinimumY() >> 4; layer <= getMaximumY() >> 4; layer++) {
@@ -483,7 +482,7 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
             }
             return set;
         } else {
-            return null;
+            return set;
         }
     }
 

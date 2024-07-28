@@ -90,7 +90,7 @@ public class LocalBlockVectorSet implements BlockVector3Set {
     @Override
     public boolean contains(Object o) {
         if (o instanceof BlockVector3 v) {
-            return contains(v.getBlockX(), v.getBlockY(), v.getBlockZ());
+            return contains(v.x(), v.y(), v.z());
         }
         return false;
     }
@@ -100,14 +100,7 @@ public class LocalBlockVectorSet implements BlockVector3Set {
         return new LocalBlockVectorSet(offsetX, offsetY, offsetZ, set.clone());
     }
 
-    /**
-     * If a radius is contained by the set
-     *
-     * @param x      x radius center
-     * @param y      y radius center
-     * @param z      z radius center
-     * @return if radius is contained by the set
-     */
+    @Override
     public boolean containsRadius(int x, int y, int z, int radius) {
         if (radius <= 0) {
             return contains(x, y, z);
@@ -130,9 +123,11 @@ public class LocalBlockVectorSet implements BlockVector3Set {
             return false;
         }
         for (int xx = -radius; xx <= radius; xx++) {
+            int rx = x + xx;
             for (int yy = -radius; yy <= radius; yy++) {
+                int ry = y + yy;
                 for (int zz = -radius; zz <= radius; zz++) {
-                    if (contains(x + xx, y + yy, z + zz)) {
+                    if (contains(rx, ry, z + zz)) {
                         return true;
                     }
                 }
@@ -141,27 +136,13 @@ public class LocalBlockVectorSet implements BlockVector3Set {
         return false;
     }
 
-    /**
-     * Set the offset applied to values when storing and reading to keep the values within -1024 to 1023. Uses default y offset
-     * of 128 to allow -64 -> 320 world height use.
-     *
-     * @param x x offset
-     * @param z z offset
-     */
+    @Override
     public void setOffset(int x, int z) {
         this.offsetX = x;
         this.offsetZ = z;
     }
 
-    /**
-     * Set the offset applied to values when storing and reading to keep the x and z values within -1024 to 1023. Y values
-     * require keeping withing -256 and 255.
-     *
-     * @param x x offset
-     * @param y y offset
-     * @param z z offset
-     * @since 2.2.0
-     */
+    @Override
     public void setOffset(int x, int y, int z) {
         this.offsetX = x;
         this.offsetY = y;
@@ -321,14 +302,14 @@ public class LocalBlockVectorSet implements BlockVector3Set {
      */
     @Override
     public boolean add(BlockVector3 vector) {
-        return add(vector.getBlockX(), vector.getBlockY(), vector.getBlockZ());
+        return add(vector.x(), vector.y(), vector.z());
     }
 
     private int getIndex(BlockVector3 vector) {
         return MathMan.tripleSearchCoords(
-                vector.getBlockX() - offsetX,
-                vector.getBlockY() - offsetY,
-                vector.getBlockZ() - offsetZ
+                vector.x() - offsetX,
+                vector.y() - offsetY,
+                vector.z() - offsetZ
         );
     }
 
@@ -361,7 +342,7 @@ public class LocalBlockVectorSet implements BlockVector3Set {
     public boolean remove(Object o) {
         if (o instanceof BlockVector3) {
             BlockVector3 v = (BlockVector3) o;
-            return remove(v.getBlockX(), v.getBlockY(), v.getBlockZ());
+            return remove(v.x(), v.y(), v.z());
         }
         return false;
     }

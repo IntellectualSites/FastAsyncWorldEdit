@@ -121,7 +121,7 @@ public abstract class Spline {
      * 2 dimensional "cross" product. cross2D(v1, v2) = |v1|*|v2|*sin(theta) or v1 X v2 taking Y to be 0
      */
     private double cross2D(Vector2 v1, Vector2 v2) {
-        return v1.getX() * v2.getZ() - v2.getX() * v1.getZ();
+        return v1.x() * v2.z() - v2.x() * v1.z();
     }
 
     /**
@@ -144,7 +144,7 @@ public abstract class Spline {
         // Calculate rotation from spline
 
         Vector3 deriv = interpolation.get1stDerivative(position);
-        Vector2 deriv2D = Vector2.at(deriv.getX(), deriv.getZ()).normalize();
+        Vector2 deriv2D = Vector2.at(deriv.x(), deriv.z()).normalize();
         double angle = Math.toDegrees(
                 -Math.atan2(cross2D(direction, deriv2D), direction.dot(deriv2D))
         );

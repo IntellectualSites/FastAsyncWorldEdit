@@ -3,8 +3,8 @@ package com.fastasyncworldedit.bukkit.regions.plotsquared;
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.FaweAPI;
 import com.fastasyncworldedit.core.FaweCache;
-import com.fastasyncworldedit.core.extent.clipboard.io.FastSchematicReader;
-import com.fastasyncworldedit.core.extent.clipboard.io.FastSchematicWriter;
+import com.fastasyncworldedit.core.extent.clipboard.io.FastSchematicReaderV2;
+import com.fastasyncworldedit.core.extent.clipboard.io.FastSchematicWriterV2;
 import com.fastasyncworldedit.core.jnbt.CompressedCompoundTag;
 import com.fastasyncworldedit.core.jnbt.CompressedSchematicTag;
 import com.fastasyncworldedit.core.util.IOUtil;
@@ -29,17 +29,19 @@ import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.BuiltInClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.MCEditSchematicReader;
-import com.sk89q.worldedit.extent.clipboard.io.SpongeSchematicReader;
+import com.sk89q.worldedit.extent.clipboard.io.sponge.SpongeSchematicV3Reader;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import net.jpountz.lz4.LZ4BlockInputStream;
 import org.anarres.parallelgzip.ParallelGZIPOutputStream;
 import org.apache.logging.log4j.Logger;
+import org.enginehub.linbus.stream.LinBinaryIO;
 
 import javax.annotation.Nonnull;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.DataInputStream;
 import java.io.EOFException;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -94,15 +96,15 @@ public class FaweDelegateSchematicHandler {
                 return;
             }
             BlockVector3 dimension = schematic.getClipboard().getDimensions();
-            final int WIDTH = dimension.getX();
-            final int LENGTH = dimension.getZ();
-            final int HEIGHT = dimension.getY();
+            final int WIDTH = dimension.x();
+            final int LENGTH = dimension.z();
+            final int HEIGHT = dimension.y();
             final int worldHeight = plot.getArea().getMaxGenHeight() - plot.getArea().getMinGenHeight() + 1;
             // Validate dimensions
             CuboidRegion region = plot.getLargestRegion();
             boolean sizeMismatch =
-                    ((region.getMaximumPoint().getX() - region.getMinimumPoint().getX() + xOffset + 1) < WIDTH) || (
-                            (region.getMaximumPoint().getZ() - region.getMinimumPoint().getZ() + zOffset + 1) < LENGTH) || (HEIGHT
+                    ((region.getMaximumPoint().x() - region.getMinimumPoint().x() + xOffset + 1) < WIDTH) || (
+                            (region.getMaximumPoint().z() - region.getMinimumPoint().z() + zOffset + 1) < LENGTH) || (HEIGHT
                             > worldHeight);
             if (!Settings.Schematics.PASTE_MISMATCHES && sizeMismatch) {
                 if (actor != null) {
@@ -111,8 +113,8 @@ public class FaweDelegateSchematicHandler {
                 TaskManager.runTask(whenDone);
                 return;
             }
-            if (((region.getMaximumPoint().getX() - region.getMinimumPoint().getX() + xOffset + 1) < WIDTH) || (
-                    (region.getMaximumPoint().getZ() - region.getMinimumPoint().getZ() + zOffset + 1) < LENGTH) || (HEIGHT
+            if (((region.getMaximumPoint().x() - region.getMinimumPoint().x() + xOffset + 1) < WIDTH) || (
+                    (region.getMaximumPoint().z() - region.getMinimumPoint().z() + zOffset + 1) < LENGTH) || (HEIGHT
                     > worldHeight)) {
                 if (whenDone != null) {
                     TaskManager.runTask(whenDone);
@@ -141,7 +143,7 @@ public class FaweDelegateSchematicHandler {
                         } else {
                             y_offset_actual = yOffset + pw.getMinBuildHeight() + editSession.getHighestTerrainBlock(region
                                     .getMinimumPoint()
-                                    .getX() + 1, region.getMinimumPoint().getZ() + 1, pw.getMinGenHeight(), pw.getMaxGenHeight()
+                                    .x() + 1, region.getMinimumPoint().z() + 1, pw.getMinGenHeight(), pw.getMaxGenHeight()
                             );
                         }
                     }
@@ -150,7 +152,7 @@ public class FaweDelegateSchematicHandler {
                 }
 
                 final BlockVector3 to = BlockVector3
-                        .at(region.getMinimumPoint().getX() + xOffset, y_offset_actual, region.getMinimumPoint().getZ() + zOffset);
+                        .at(region.getMinimumPoint().x() + xOffset, y_offset_actual, region.getMinimumPoint().z() + zOffset);
                 final Clipboard clipboard = schematic.getClipboard();
                 clipboard.setOrigin(clipboard.getRegion().getMinimumPoint());
                 clipboard.paste(editSession, to, true, false, true);
@@ -182,7 +184,7 @@ public class FaweDelegateSchematicHandler {
                     try (OutputStream stream = new FileOutputStream(tmp);
                          NBTOutputStream output = new NBTOutputStream(
                                  new BufferedOutputStream(new ParallelGZIPOutputStream(stream)))) {
-                        new FastSchematicWriter(output).write(clipboard);
+                        new FastSchematicWriterV2(output).write(clipboard);
                     }
                 } else {
                     try (OutputStream stream = new FileOutputStream(tmp);
@@ -194,7 +196,7 @@ public class FaweDelegateSchematicHandler {
             } else {
                 try (OutputStream stream = new FileOutputStream(tmp);
                      NBTOutputStream output = new NBTOutputStream(new ParallelGZIPOutputStream(stream))) {
-                    Map<String, Tag> map = tag.getValue();
+                    Map<String, Tag<?, ?>> map = tag.getValue();
                     output.writeNamedTag("Schematic", map.getOrDefault("Schematic", tag));
                 }
             }
@@ -226,7 +228,7 @@ public class FaweDelegateSchematicHandler {
                 try {
                     try (ParallelGZIPOutputStream gzip = new ParallelGZIPOutputStream(output)) {
                         try (NBTOutputStream nos = new NBTOutputStream(gzip)) {
-                            Map<String, Tag> map = weTag.getValue();
+                            Map<String, Tag<?, ?>> map = weTag.getValue();
                             nos.writeNamedTag("Schematic", map.getOrDefault("Schematic", weTag));
                         }
                     }
@@ -239,7 +241,7 @@ public class FaweDelegateSchematicHandler {
 
     public Schematic getSchematic(@Nonnull InputStream is) {
         try {
-            FastSchematicReader schematicReader = new FastSchematicReader(
+            FastSchematicReaderV2 schematicReader = new FastSchematicReaderV2(
                     new NBTInputStream(new BufferedInputStream(new GZIPInputStream(new BufferedInputStream(is)))));
             Clipboard clip = schematicReader.read();
             return new Schematic(clip);
@@ -249,8 +251,8 @@ public class FaweDelegateSchematicHandler {
                 return null;
             }
             try {
-                SpongeSchematicReader schematicReader =
-                        new SpongeSchematicReader(new NBTInputStream(new GZIPInputStream(is)));
+                SpongeSchematicV3Reader schematicReader =
+                        new SpongeSchematicV3Reader(LinBinaryIO.read(new DataInputStream(new GZIPInputStream(is))));
                 Clipboard clip = schematicReader.read();
                 return new Schematic(clip);
             } catch (IOException e2) {

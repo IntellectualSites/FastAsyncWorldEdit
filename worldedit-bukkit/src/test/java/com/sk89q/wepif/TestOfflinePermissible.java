@@ -246,6 +246,11 @@ public class TestOfflinePermissible implements OfflinePlayer, Permissible {
     }
 
     @Override
+    public @Nullable Location getRespawnLocation() {
+        return null;
+    }
+
+    @Override
     public void incrementStatistic(@Nonnull Statistic statistic) throws IllegalArgumentException {
 
     }
@@ -362,6 +367,11 @@ public class TestOfflinePermissible implements OfflinePlayer, Permissible {
 
     @Override
     public @Nullable Location getLastDeathLocation() {
+        return null;
+    }
+
+    @Override
+    public @Nullable Location getLocation() {
         return null;
     }
 

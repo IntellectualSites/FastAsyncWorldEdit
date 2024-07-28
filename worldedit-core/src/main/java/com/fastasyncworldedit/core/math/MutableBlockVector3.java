@@ -21,11 +21,11 @@ public class MutableBlockVector3 extends BlockVector3 {
     }
 
     public MutableBlockVector3(BlockVector3 other) {
-        this(other.getX(), other.getY(), other.getZ());
+        this(other.x(), other.y(), other.z());
     }
 
     public MutableBlockVector3 setComponents(BlockVector3 other) {
-        return setComponents(other.getBlockX(), other.getBlockY(), other.getBlockZ());
+        return setComponents(other.x(), other.y(), other.z());
     }
 
     private int x;
@@ -47,18 +47,34 @@ public class MutableBlockVector3 extends BlockVector3 {
     }
 
     @Override
-    public final int getX() {
+    public final int x() {
         return x;
     }
 
     @Override
-    public final int getY() {
+    public final int y() {
         return y;
     }
 
     @Override
-    public final int getZ() {
+    public final int z() {
         return z;
+    }
+
+    @Override
+    public BlockVector3 getMinimum(BlockVector3 v2) {
+        this.x = Math.min(v2.x(), x);
+        this.y = Math.min(v2.y(), y);
+        this.z = Math.min(v2.z(), z);
+        return this;
+    }
+
+    @Override
+    public BlockVector3 getMaximum(BlockVector3 v2) {
+        this.x = Math.max(v2.x(), x);
+        this.y = Math.max(v2.y(), y);
+        this.z = Math.max(v2.z(), z);
+        return this;
     }
 
     @Override

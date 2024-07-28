@@ -21,10 +21,10 @@ package com.sk89q.worldedit.entity;
 
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.util.concurrency.LazyReference;
-import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
 import com.sk89q.worldedit.world.NbtValued;
 import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.entity.EntityTypes;
+import org.enginehub.linbus.tree.LinCompoundTag;
 
 import javax.annotation.Nullable;
 
@@ -47,7 +47,7 @@ public class BaseEntity implements NbtValued {
 
     private final EntityType type;
     @Nullable
-    private LazyReference<CompoundBinaryTag> nbtData;
+    private LazyReference<LinCompoundTag> nbtData;
 
     /**
      * Create a new base entity.
@@ -56,6 +56,7 @@ public class BaseEntity implements NbtValued {
      * @param nbtData NBT data
      * @deprecated Use {@link BaseEntity#BaseEntity(EntityType, LazyReference)}
      */
+    @SuppressWarnings("this-escape")
     @Deprecated
     public BaseEntity(EntityType type, CompoundTag nbtData) {
         this(type);
@@ -68,7 +69,7 @@ public class BaseEntity implements NbtValued {
      * @param type    the entity type
      * @param nbtData NBT data
      */
-    public BaseEntity(EntityType type, LazyReference<CompoundBinaryTag> nbtData) {
+    public BaseEntity(EntityType type, LazyReference<LinCompoundTag> nbtData) {
         this(type);
         setNbtReference(nbtData);
     }
@@ -87,6 +88,7 @@ public class BaseEntity implements NbtValued {
      *
      * @param other the object to clone
      */
+    @SuppressWarnings("this-escape")
     public BaseEntity(BaseEntity other) {
         checkNotNull(other);
         this.type = other.getType();
@@ -95,12 +97,12 @@ public class BaseEntity implements NbtValued {
 
     @Nullable
     @Override
-    public LazyReference<CompoundBinaryTag> getNbtReference() {
+    public LazyReference<LinCompoundTag> getNbtReference() {
         return nbtData;
     }
 
     @Override
-    public void setNbtReference(@Nullable LazyReference<CompoundBinaryTag> nbtData) {
+    public void setNbtReference(@Nullable LazyReference<LinCompoundTag> nbtData) {
         this.nbtData = nbtData;
     }
 

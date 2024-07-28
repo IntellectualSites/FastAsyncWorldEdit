@@ -35,7 +35,7 @@ public record RecurseBrush(boolean dfs) implements Brush {
             DFSRecursiveVisitor visitor = new DFSRecursiveVisitor(mask, replace, Integer.MAX_VALUE, Integer.MAX_VALUE) {
                 @Override
                 public boolean isVisitable(BlockVector3 from, BlockVector3 to) {
-                    int y = to.getBlockY();
+                    int y = to.y();
                     return y < maxY && radMask.test(to) && super.isVisitable(from, to);
                 }
             };
@@ -45,7 +45,7 @@ public record RecurseBrush(boolean dfs) implements Brush {
             RecursiveVisitor visitor = new RecursiveVisitor(mask, replace, radius, editSession.getMinY(), editSession.getMaxY()) {
                 @Override
                 public boolean isVisitable(BlockVector3 from, BlockVector3 to) {
-                    int y = to.getBlockY();
+                    int y = to.y();
                     return y < maxY && super.isVisitable(from, to);
                 }
             };

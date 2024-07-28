@@ -62,9 +62,9 @@ public class SurfaceRandomOffsetPattern extends AbstractPattern {
                 next = buffer[i];
                 BlockVector3 dir = BreadthFirstSearch.DIAGONAL_DIRECTIONS[i];
                 next.setComponents(
-                        cur.getBlockX() + dir.getBlockX(),
-                        cur.getBlockY() + dir.getBlockY(),
-                        cur.getBlockZ() + dir.getBlockZ()
+                        cur.x() + dir.x(),
+                        cur.y() + dir.y(),
+                        cur.z() + dir.z()
                 );
                 if (allowed(next)) {
                     allowed[index++] = next;
@@ -74,7 +74,7 @@ public class SurfaceRandomOffsetPattern extends AbstractPattern {
                 return cur;
             }
             next = allowed[ThreadLocalRandom.current().nextInt(index)];
-            cur.setComponents(next.getBlockX(), next.getBlockY(), next.getBlockZ());
+            cur.setComponents(next.x(), next.y(), next.z());
         }
         return cur;
     }
@@ -85,9 +85,9 @@ public class SurfaceRandomOffsetPattern extends AbstractPattern {
         if (!block.getBlockType().getMaterial().isMovementBlocker()) {
             return false;
         }
-        int x = v.getBlockX();
-        int y = v.getBlockY();
-        int z = v.getBlockZ();
+        int x = v.x();
+        int y = v.y();
+        int z = v.z();
         v.mutY(y + 1);
         if (y < maxY && canPassthrough(v)) {
             v.mutY(y);
@@ -127,6 +127,16 @@ public class SurfaceRandomOffsetPattern extends AbstractPattern {
     private boolean canPassthrough(BlockVector3 v) {
         BaseBlock block = pattern.applyBlock(v);
         return !block.getBlockType().getMaterial().isMovementBlocker();
+    }
+
+    @Override
+    public BlockVector3 size() {
+        return BlockVector3.at(moves, moves, moves);
+    }
+
+    @Override
+    public Pattern fork() {
+        return new SurfaceRandomOffsetPattern(this.pattern.fork(), this.moves, this.minY, this.maxY);
     }
 
 }

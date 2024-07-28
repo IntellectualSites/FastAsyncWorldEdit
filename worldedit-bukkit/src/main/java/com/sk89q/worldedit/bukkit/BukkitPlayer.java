@@ -45,7 +45,6 @@ import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.util.formatting.text.adapter.bukkit.TextAdapter;
 import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
-import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
@@ -61,6 +60,7 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.permissions.PermissionAttachment;
+import org.enginehub.linbus.tree.LinCompoundTag;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -162,7 +162,7 @@ public class BukkitPlayer extends AbstractPlayerActor {
         final PlayerInventory inv = player.getInventory();
         ItemStack newItem = BukkitAdapter.adapt(itemStack);
         TaskManager.taskManager().sync(() -> {
-            if (itemStack.getType().getId().equalsIgnoreCase(WorldEdit.getInstance().getConfiguration().wandItem)) {
+            if (itemStack.getType().id().equalsIgnoreCase(WorldEdit.getInstance().getConfiguration().wandItem)) {
                 inv.remove(newItem);
             }
             final ItemStack item = player.getInventory().getItemInMainHand();
@@ -242,9 +242,9 @@ public class BukkitPlayer extends AbstractPlayerActor {
         //FAWE end
         return TaskManager.taskManager().sync(() -> player.teleport(new Location(
                 finalWorld,
-                pos.getX(),
-                pos.getY(),
-                pos.getZ(),
+                pos.x(),
+                pos.y(),
+                pos.z(),
                 yaw,
                 pitch
         )));
@@ -267,7 +267,7 @@ public class BukkitPlayer extends AbstractPlayerActor {
 
     @Override
     public void setGameMode(GameMode gameMode) {
-        player.setGameMode(org.bukkit.GameMode.valueOf(gameMode.getId().toUpperCase(Locale.ROOT)));
+        player.setGameMode(org.bukkit.GameMode.valueOf(gameMode.id().toUpperCase(Locale.ROOT)));
     }
 
     @Override
@@ -422,7 +422,7 @@ public class BukkitPlayer extends AbstractPlayerActor {
 
     @Override
     public <B extends BlockStateHolder<B>> void sendFakeBlock(BlockVector3 pos, B block) {
-        Location loc = new Location(player.getWorld(), pos.getX(), pos.getY(), pos.getZ());
+        Location loc = new Location(player.getWorld(), pos.x(), pos.y(), pos.z());
         if (block == null) {
             player.sendBlockChange(loc, player.getWorld().getBlockAt(loc).getBlockData());
         } else {
@@ -430,7 +430,7 @@ public class BukkitPlayer extends AbstractPlayerActor {
             BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
             if (adapter != null) {
                 if (block.getBlockType() == BlockTypes.STRUCTURE_BLOCK && block instanceof BaseBlock) {
-                    CompoundBinaryTag nbt = ((BaseBlock) block).getNbt();
+                    LinCompoundTag nbt = ((BaseBlock) block).getNbt();
                     if (nbt != null) {
                         adapter.sendFakeNBT(player, pos, nbt);
                         adapter.sendFakeOP(player);

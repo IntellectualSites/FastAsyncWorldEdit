@@ -50,9 +50,9 @@ public class BlendBall implements Brush {
         final int outsetSize = (int) (size + 1);
         double brushSizeSquared = size * size;
 
-        int tx = position.getBlockX();
-        int ty = position.getBlockY();
-        int tz = position.getBlockZ();
+        int tx = position.x();
+        int ty = position.y();
+        int tz = position.z();
 
         int[] frequency = new int[BlockTypes.size()];
 

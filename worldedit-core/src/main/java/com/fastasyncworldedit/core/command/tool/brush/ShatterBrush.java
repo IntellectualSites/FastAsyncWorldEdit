@@ -3,6 +3,7 @@ package com.fastasyncworldedit.core.command.tool.brush;
 import com.fastasyncworldedit.core.function.mask.SurfaceMask;
 import com.fastasyncworldedit.core.math.LocalBlockVectorSet;
 import com.fastasyncworldedit.core.math.MutableBlockVector3;
+import com.fastasyncworldedit.core.util.collection.BlockVector3Set;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.function.mask.Mask;
@@ -24,7 +25,7 @@ public class ShatterBrush extends ScatterBrush {
     @Override
     public void apply(
             final EditSession editSession,
-            final LocalBlockVectorSet placed,
+            final BlockVector3Set placed,
             final BlockVector3 position,
             Pattern p,
             double size
@@ -34,7 +35,7 @@ public class ShatterBrush extends ScatterBrush {
     @Override
     public void finish(
             EditSession editSession,
-            LocalBlockVectorSet placed,
+            BlockVector3Set placed,
             final BlockVector3 position,
             Pattern pattern,
             double size
@@ -79,13 +80,13 @@ public class ShatterBrush extends ScatterBrush {
                     }
                     for (int i1 = 0; i1 < BreadthFirstSearch.DIAGONAL_DIRECTIONS.length; i1++) {
                         BlockVector3 direction = BreadthFirstSearch.DIAGONAL_DIRECTIONS[i1];
-                        int x2 = x + direction.getBlockX();
-                        int y2 = y + direction.getBlockY();
-                        int z2 = z + direction.getBlockZ();
+                        int x2 = x + direction.x();
+                        int y2 = y + direction.y();
+                        int z2 = z + direction.z();
                         // Check boundary
-                        int dx = position.getBlockX() - x2;
-                        int dy = position.getBlockY() - y2;
-                        int dz = position.getBlockZ() - z2;
+                        int dx = position.x() - x2;
+                        int dy = position.y() - y2;
+                        int dz = position.z() - z2;
                         int dSqr = (dx * dx) + (dy * dy) + (dz * dz);
                         if (dSqr <= radius2) {
                             BlockVector3 bv = mutable.setComponents(x2, y2, z2);

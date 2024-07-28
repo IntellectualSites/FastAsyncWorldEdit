@@ -30,8 +30,8 @@ import com.sk89q.worldedit.internal.util.NonAbstractForCompatibility;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.util.concurrency.LazyReference;
-import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
+import org.enginehub.linbus.tree.LinCompoundTag;
 
 import java.util.Locale;
 import java.util.Map;
@@ -158,7 +158,7 @@ public interface BlockStateHolder<B extends BlockStateHolder<B>> extends TileEnt
      */
     @Deprecated
     default BaseBlock toBaseBlock(CompoundTag compoundTag) {
-        return toBaseBlock(compoundTag == null ? null : LazyReference.from(compoundTag::asBinaryTag));
+        return toBaseBlock(compoundTag == null ? null : LazyReference.from(compoundTag::toLinTag));
     }
 
     /**
@@ -169,11 +169,12 @@ public interface BlockStateHolder<B extends BlockStateHolder<B>> extends TileEnt
      *         This must be overridden by new subclasses. See {@link NonAbstractForCompatibility}
      *         for details
      */
+    @SuppressWarnings("deprecation")
     @NonAbstractForCompatibility(
             delegateName = "toBaseBlock",
             delegateParams = {CompoundTag.class}
     )
-    default BaseBlock toBaseBlock(LazyReference<CompoundBinaryTag> compoundTag) {
+    default BaseBlock toBaseBlock(LazyReference<LinCompoundTag> compoundTag) {
         DeprecationUtil.checkDelegatingOverride(getClass());
 
         return toBaseBlock(compoundTag == null ? null : new CompoundTag(compoundTag.getValue()));
@@ -185,7 +186,7 @@ public interface BlockStateHolder<B extends BlockStateHolder<B>> extends TileEnt
      * @param compoundTag The NBT Data to apply
      * @return The BaseBlock
      */
-    default BaseBlock toBaseBlock(CompoundBinaryTag compoundTag) {
+    default BaseBlock toBaseBlock(LinCompoundTag compoundTag) {
         return toBaseBlock(compoundTag == null ? null : LazyReference.computed(compoundTag));
     }
 
@@ -204,14 +205,14 @@ public interface BlockStateHolder<B extends BlockStateHolder<B>> extends TileEnt
 
     default String getAsString() {
         if (getStates().isEmpty()) {
-            return this.getBlockType().getId();
+            return this.getBlockType().id();
         } else {
             String properties = getStates().entrySet().stream()
                     .map(entry -> entry.getKey().getName()
                             + "="
                             + entry.getValue().toString().toLowerCase(Locale.ROOT))
                     .collect(Collectors.joining(","));
-            return this.getBlockType().getId() + "[" + properties + "]";
+            return this.getBlockType().id() + "[" + properties + "]";
         }
     }
 

@@ -38,9 +38,9 @@ public class PositionTransformExtent extends ResettableExtent {
         if (min == null) {
             min = pos;
         }
-        mutable.mutX(pos.getX() - min.getX());
-        mutable.mutY(pos.getY() - min.getY());
-        mutable.mutZ(pos.getZ() - min.getZ());
+        mutable.mutX(pos.x() - min.x());
+        mutable.mutY(pos.y() - min.y());
+        mutable.mutZ(pos.z() - min.z());
         MutableVector3 tmp = new MutableVector3(transform.apply(mutable.toVector3()));
         return min.add(tmp.roundHalfUp().toBlockPoint());
     }
@@ -49,9 +49,9 @@ public class PositionTransformExtent extends ResettableExtent {
         if (min == null) {
             min = BlockVector3.at(x, y, z);
         }
-        mutable.mutX(x - min.getX());
-        mutable.mutY(y - min.getY());
-        mutable.mutZ(z - min.getZ());
+        mutable.mutX(x - min.x());
+        mutable.mutY(y - min.y());
+        mutable.mutZ(z - min.z());
         MutableVector3 tmp = new MutableVector3(transform.apply(mutable.toVector3()));
         return min.add(tmp.roundHalfUp().toBlockPoint());
     }
@@ -73,10 +73,10 @@ public class PositionTransformExtent extends ResettableExtent {
 
     @Override
     public BiomeType getBiome(BlockVector3 position) {
-        mutable.mutX(position.getBlockX());
-        mutable.mutZ(position.getBlockZ());
-        mutable.mutY(position.getBlockY());
-        return super.getBiome(getPos(mutable.getX(), mutable.getY(), mutable.getZ()));
+        mutable.mutX(position.x());
+        mutable.mutZ(position.z());
+        mutable.mutY(position.y());
+        return super.getBiome(getPos(mutable.x(), mutable.y(), mutable.z()));
     }
 
     @Override
@@ -92,10 +92,10 @@ public class PositionTransformExtent extends ResettableExtent {
 
     @Override
     public boolean setBiome(BlockVector3 position, BiomeType biome) {
-        mutable.mutX(position.getBlockX());
-        mutable.mutZ(position.getBlockZ());
-        mutable.mutY(position.getBlockY());
-        return super.setBiome(getPos(mutable.getX(), mutable.getY(), mutable.getZ()), biome);
+        mutable.mutX(position.x());
+        mutable.mutZ(position.z());
+        mutable.mutY(position.y());
+        return super.setBiome(getPos(mutable.x(), mutable.y(), mutable.z()), biome);
     }
 
     public void setTransform(Transform transform) {

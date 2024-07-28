@@ -176,8 +176,8 @@ public class ImageUtil {
     }
 
     public static BufferedImage load(URI uri) throws InputParseException {
-        try {
-            return MainUtil.readImage(getInputStream(uri));
+        try (final InputStream stream = getInputStream(uri)) {
+            return MainUtil.readImage(stream);
         } catch (IOException e) {
             throw new InputParseException(TextComponent.of(e.getMessage()));
         }
@@ -190,7 +190,7 @@ public class ImageUtil {
                 File file = new File(uri.getPath());
                 return new FileInputStream(file);
             }
-            return new URL(uriStr).openStream();
+            return MainUtil.readImageStream(uri);
         } catch (IOException e) {
             throw new InputParseException(TextComponent.of(e.getMessage()));
         }

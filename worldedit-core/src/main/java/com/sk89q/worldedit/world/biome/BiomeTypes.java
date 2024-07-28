@@ -291,7 +291,7 @@ public final class BiomeTypes {
     }
 
     public static BiomeType register(final BiomeType biome) {
-        return BiomeType.REGISTRY.register(biome.getId(), biome);
+        return BiomeType.REGISTRY.register(biome.id(), biome);
     }
 
     public static BiomeType getLegacy(int legacyId) {

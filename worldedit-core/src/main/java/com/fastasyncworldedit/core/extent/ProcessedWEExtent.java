@@ -80,12 +80,12 @@ public class ProcessedWEExtent extends AbstractDelegateExtent {
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 location, B block)
             throws WorldEditException {
-        return setBlock(location.getBlockX(), location.getBlockY(), location.getBlockZ(), block);
+        return setBlock(location.x(), location.y(), location.z(), block);
     }
 
     @Override
     public BlockState getBlock(BlockVector3 location) {
-        return getBlock(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+        return getBlock(location.x(), location.y(), location.z());
     }
 
     @Override

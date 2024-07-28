@@ -15,21 +15,21 @@ public class Vector3Impl extends Vector3 {
     }
 
     public Vector3Impl(Vector3 other) {
-        this(other.getX(), other.getY(), other.getZ());
+        this(other.x(), other.y(), other.z());
     }
 
     @Override
-    public final double getX() {
+    public final double x() {
         return x;
     }
 
     @Override
-    public final double getY() {
+    public final double y() {
         return y;
     }
 
     @Override
-    public final double getZ() {
+    public final double z() {
         return z;
     }
 

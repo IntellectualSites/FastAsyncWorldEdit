@@ -149,7 +149,7 @@ public class ToolCommands {
             throws InvalidToolBindException {
         //FAWE start
         isBrush = session.getTool(player) instanceof BrushTool;
-        session.setTool(player.getItemInHand(HandSide.MAIN_HAND).getType(), null);
+        session.setTool(player.getItemInHand(HandSide.MAIN_HAND), null);
         //FAWE end
         player.print(Caption.of(isBrush ? "worldedit.brush.none.equip" : "worldedit.tool.none.equip"));
     }
@@ -163,7 +163,7 @@ public class ToolCommands {
             String translationKey
     ) throws InvalidToolBindException {
         BaseItemStack itemStack = player.getItemInHand(HandSide.MAIN_HAND);
-        session.setTool(itemStack.getType(), tool);
+        session.setTool(itemStack, tool);
         player.print(Caption.of(translationKey, itemStack.getRichName()));
         sendUnbindInstruction(player, UNBIND_COMMAND_COMPONENT);
     }
@@ -297,10 +297,11 @@ public class ToolCommands {
                     int range
     ) throws WorldEditException {
 
-        LocalConfiguration config = we.getConfiguration();
-
-        if (range > config.maxSuperPickaxeSize) {
-            player.print(Caption.of("worldedit.tool.superpickaxe.max-range", TextComponent.of(config.maxSuperPickaxeSize)));
+        if (range > player.getLimit().MAX_SUPER_PICKAXE_SIZE) {
+            player.print(Caption.of(
+                    "worldedit.tool.superpickaxe.max-range",
+                    TextComponent.of(player.getLimit().MAX_SUPER_PICKAXE_SIZE)
+            ));
             return;
         }
         setTool(player, session, new FloodFillTool(range, pattern), "worldedit.tool.floodfill.equip");

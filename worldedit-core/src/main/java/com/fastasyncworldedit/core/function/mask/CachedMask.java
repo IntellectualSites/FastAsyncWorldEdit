@@ -60,9 +60,9 @@ public class CachedMask extends AbstractDelegateMask implements ResettableMask {
 
     @Override
     public boolean test(BlockVector3 vector) {
-        int x = vector.getX();
-        int y = vector.getY();
-        int z = vector.getZ();
+        int x = vector.x();
+        int y = vector.y();
+        int z = vector.z();
         try {
             boolean check = cache_checked.add(x, y, z);
             if (!check) {
@@ -88,9 +88,9 @@ public class CachedMask extends AbstractDelegateMask implements ResettableMask {
         if (!hasExtent || !(extent instanceof AbstractExtentMask)) {
             return test(vector);
         }
-        int x = vector.getX();
-        int y = vector.getY();
-        int z = vector.getZ();
+        int x = vector.x();
+        int y = vector.y();
+        int z = vector.z();
         AbstractExtentMask mask = (AbstractExtentMask) getMask();
         try {
             boolean check = cache_checked.add(x, y, z);

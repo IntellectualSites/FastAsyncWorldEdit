@@ -5,6 +5,7 @@ import com.fastasyncworldedit.core.function.mask.RadiusMask;
 import com.fastasyncworldedit.core.function.mask.SurfaceMask;
 import com.fastasyncworldedit.core.math.BlockVectorSet;
 import com.fastasyncworldedit.core.math.LocalBlockVectorSet;
+import com.fastasyncworldedit.core.util.collection.BlockVector3Set;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.command.tool.brush.Brush;
@@ -64,16 +65,17 @@ public class ScatterBrush implements Brush {
             length = 1;
             visited.add(position);
         }
-        LocalBlockVectorSet placed = new LocalBlockVectorSet();
-        placed.setOffset(position.getX(), position.getZ());
+        BlockVector3 patternSize = pattern.size();
+        BlockVector3Set placed = BlockVector3Set.getAppropriateVectorSet(patternSize.add(distance, distance, distance));
+        placed.setOffset(position.x(), position.y(), position.z());
         int maxFails = 1000;
         for (int i = 0; i < count; i++) {
             int index = ThreadLocalRandom.current().nextInt(length);
             BlockVector3 pos = visited.get(index);
             if (pos != null && canApply(pos)) {
-                int x = pos.getBlockX();
-                int y = pos.getBlockY();
-                int z = pos.getBlockZ();
+                int x = pos.x();
+                int y = pos.y();
+                int z = pos.z();
                 if (placed.containsRadius(x, y, z, distance)) {
                     if (maxFails-- <= 0) {
                         break;
@@ -88,7 +90,20 @@ public class ScatterBrush implements Brush {
         finish(editSession, placed, position, pattern, size);
     }
 
+    /**
+     * @deprecated Use {@link ScatterBrush#finish(EditSession, BlockVector3Set, BlockVector3, Pattern, double)}
+     */
+    @Deprecated(forRemoval = true, since = "2.9.2")
     public void finish(EditSession editSession, LocalBlockVectorSet placed, BlockVector3 pos, Pattern pattern, double size) {
+        finish(editSession, (BlockVector3Set) placed, pos, pattern, size);
+    }
+
+    /**
+     * Complete the scatter brush process.
+     *
+     * @since 2.9.2
+     */
+    public void finish(EditSession editSession, BlockVector3Set placed, BlockVector3 pos, Pattern pattern, double size) {
     }
 
     public boolean canApply(BlockVector3 pos) {
@@ -99,7 +114,22 @@ public class ScatterBrush implements Brush {
         return surface.direction(pt);
     }
 
+
+    /**
+     * @deprecated Use {@link ScatterBrush#apply(EditSession, BlockVector3Set, BlockVector3, Pattern, double)}
+     */
+    @Deprecated(forRemoval = true, since = "2.9.2")
     public void apply(EditSession editSession, LocalBlockVectorSet placed, BlockVector3 pt, Pattern p, double size) throws
+            MaxChangedBlocksException {
+        apply(editSession, (BlockVector3Set) placed, pt, p, size);
+    }
+
+    /**
+     * Apply the scatter brush to a given position
+     *
+     * @since 2.9.2
+     */
+    public void apply(EditSession editSession, BlockVector3Set placed, BlockVector3 pt, Pattern p, double size) throws
             MaxChangedBlocksException {
         editSession.setBlock(pt, p);
     }

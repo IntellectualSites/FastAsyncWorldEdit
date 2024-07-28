@@ -52,8 +52,8 @@ public interface IChunkExtent<T extends IChunk> extends Extent {
 
     @Override
     default boolean setBiome(BlockVector3 position, BiomeType biome) {
-        final IChunk chunk = getOrCreateChunk(position.getX() >> 4, position.getZ() >> 4);
-        return chunk.setBiome(position.getX() & 15, position.getY(), position.getZ() & 15, biome);
+        final IChunk chunk = getOrCreateChunk(position.x() >> 4, position.z() >> 4);
+        return chunk.setBiome(position.x() & 15, position.y(), position.z() & 15, biome);
     }
 
     @Override
@@ -76,8 +76,8 @@ public interface IChunkExtent<T extends IChunk> extends Extent {
 
     @Override
     default BiomeType getBiome(BlockVector3 position) {
-        final IChunk chunk = getOrCreateChunk(position.getX() >> 4, position.getZ() >> 4);
-        return chunk.getBiomeType(position.getX() & 15, position.getY(), position.getZ() & 15);
+        final IChunk chunk = getOrCreateChunk(position.x() >> 4, position.z() >> 4);
+        return chunk.getBiomeType(position.x() & 15, position.y(), position.z() & 15);
     }
 
     @Override
@@ -124,14 +124,14 @@ public interface IChunkExtent<T extends IChunk> extends Extent {
     @Override
     default Entity createEntity(Location location, BaseEntity entity, UUID uuid) {
         final IChunk chunk = getOrCreateChunk(location.getBlockX() >> 4, location.getBlockZ() >> 4);
-        Map<String, Tag> map = new HashMap<>(entity.getNbtData().getValue()); //do not modify original entity data
+        Map<String, Tag<?, ?>> map = new HashMap<>(entity.getNbtData().getValue()); //do not modify original entity data
         map.put("Id", new StringTag(entity.getType().getName()));
 
         //Set pos
         List<DoubleTag> posList = new ArrayList<>();
-        posList.add(new DoubleTag(location.getX()));
-        posList.add(new DoubleTag(location.getY()));
-        posList.add(new DoubleTag(location.getZ()));
+        posList.add(new DoubleTag(location.x()));
+        posList.add(new DoubleTag(location.y()));
+        posList.add(new DoubleTag(location.z()));
         map.put("Pos", new ListTag(DoubleTag.class, posList));
 
         NBTUtils.addUUIDToMap(map, uuid);

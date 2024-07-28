@@ -21,7 +21,6 @@ package com.sk89q.worldedit.world.block;
 
 import com.fastasyncworldedit.core.registry.state.PropertyKey;
 import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.TileEntityBlock;
 import com.sk89q.worldedit.extent.Extent;
@@ -29,13 +28,13 @@ import com.sk89q.worldedit.extent.OutputExtent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.util.concurrency.LazyReference;
-import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
-import com.sk89q.worldedit.util.nbt.TagStringIO;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
+import org.enginehub.linbus.format.snbt.LinStringIO;
+import org.enginehub.linbus.tree.LinCompoundTag;
+import org.enginehub.linbus.tree.LinTagType;
 
 import javax.annotation.Nullable;
-import java.io.IOException;
 import java.util.Map;
 import java.util.Objects;
 
@@ -54,7 +53,7 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
 
     private final BlockState blockState;
     @Nullable
-    private final LazyReference<CompoundBinaryTag> nbtData;
+    private final LazyReference<LinCompoundTag> nbtData;
 
     //FAWE start
 
@@ -93,7 +92,7 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
      */
     @Deprecated
     public BaseBlock(BlockState state, CompoundTag nbtData) {
-        this(state, LazyReference.from(checkNotNull(nbtData)::asBinaryTag));
+        this(state, LazyReference.from(checkNotNull(nbtData)::toLinTag));
     }
     //FAWE end
 
@@ -104,7 +103,7 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
      * @param state   The block state
      * @param nbtData NBT data, which must be provided
      */
-    protected BaseBlock(BlockState state, LazyReference<CompoundBinaryTag> nbtData) {
+    protected BaseBlock(BlockState state, LazyReference<LinCompoundTag> nbtData) {
         checkNotNull(nbtData);
         this.blockState = state;
         this.nbtData = nbtData;
@@ -165,21 +164,21 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
 
     @Override
     public String getNbtId() {
-        LazyReference<CompoundBinaryTag> nbtData = this.nbtData;
+        LazyReference<LinCompoundTag> nbtData = this.nbtData;
         if (nbtData == null) {
             return "";
         }
-        return nbtData.getValue().getString("id");
+        return nbtData.getValue().getTag("id", LinTagType.stringTag()).value();
     }
 
     @Nullable
     @Override
-    public LazyReference<CompoundBinaryTag> getNbtReference() {
+    public LazyReference<LinCompoundTag> getNbtReference() {
         return this.nbtData;
     }
 
     @Override
-    public void setNbtReference(@Nullable LazyReference<CompoundBinaryTag> nbtData) {
+    public void setNbtReference(@Nullable LazyReference<LinCompoundTag> nbtData) {
         throw new UnsupportedOperationException("This class is immutable.");
     }
 
@@ -244,7 +243,7 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
     }
 
     @Override
-    public BaseBlock toBaseBlock(LazyReference<CompoundBinaryTag> compoundTag) {
+    public BaseBlock toBaseBlock(LazyReference<LinCompoundTag> compoundTag) {
         if (compoundTag == null) {
             return this.blockState.toBaseBlock();
         } else if (compoundTag == this.nbtData) {
@@ -300,20 +299,20 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
 
     @Override
     public int hashCode() {
-        return getOrdinal();
+        int ret = getOrdinal() << 3;
+        LinCompoundTag nbtData = getNbt();
+        if (nbtData != null) {
+            ret += nbtData.hashCode();
+        }
+        return ret;
     }
     //FAWE end
 
     @Override
     public String toString() {
         String nbtString = "";
-        CompoundBinaryTag nbtData = getNbt();
         if (nbtData != null) {
-            try {
-                nbtString = TagStringIO.get().asString(nbtData);
-            } catch (IOException e) {
-                WorldEdit.logger.error("Failed to serialize NBT of Block", e);
-            }
+            nbtString = LinStringIO.writeToString(nbtData.getValue());
         }
 
         return blockState.getAsString() + nbtString;

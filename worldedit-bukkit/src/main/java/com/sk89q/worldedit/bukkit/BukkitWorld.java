@@ -224,7 +224,7 @@ public class BukkitWorld extends AbstractWorld {
     //FAWE end
 
     @Override
-    public String getId() {
+    public String id() {
         return getWorld().getName().replace(" ", "_").toLowerCase(Locale.ROOT);
     }
 
@@ -247,7 +247,7 @@ public class BukkitWorld extends AbstractWorld {
         //FAWE start - safe edit region
         testCoords(pt);
         //FAWE end
-        return getWorld().getBlockAt(pt.getBlockX(), pt.getBlockY(), pt.getBlockZ()).getLightLevel();
+        return getWorld().getBlockAt(pt.x(), pt.y(), pt.z()).getLightLevel();
     }
 
     @Override
@@ -284,7 +284,7 @@ public class BukkitWorld extends AbstractWorld {
             return false;
         }
 
-        Block block = getWorld().getBlockAt(pt.getBlockX(), pt.getBlockY(), pt.getBlockZ());
+        Block block = getWorld().getBlockAt(pt.x(), pt.y(), pt.z());
         BlockState state = PaperLib.getBlockState(block, false).getState();
         if (!(state instanceof InventoryHolder)) {
             return false;
@@ -327,12 +327,12 @@ public class BukkitWorld extends AbstractWorld {
         treeTypeMapping.put(TreeGenerator.TreeType.RANDOM_MUSHROOM, TreeType.BROWN_MUSHROOM);
         for (TreeGenerator.TreeType type : TreeGenerator.TreeType.values()) {
             if (treeTypeMapping.get(type) == null) {
-                LOGGER.error("No TreeType mapping for TreeGenerator.TreeType." + type);
                 //FAWE start
+                LOGGER.info("No TreeType mapping for TreeGenerator.TreeType." + type);
                 LOGGER.info("The above message is displayed because your FAWE version is newer than {}" +
                         " and contains features of future minecraft versions which do not exist in {} hence the tree type" +
-                        "{} is not available. This is not an error. This version will work on your version of Minecraft." +
-                        "This is an informative message only.", Bukkit.getVersion(), Bukkit.getVersion(), type);
+                        " {} is not available. This is not an error. This version of FAWE will work on your version of " +
+                        " Minecraft. This is an informative message only.", Bukkit.getVersion(), Bukkit.getVersion(), type);
                 //FAWE end
             }
         }
@@ -363,8 +363,8 @@ public class BukkitWorld extends AbstractWorld {
         //FAWE end
         World world = getWorld();
         //FAWE start
-        int X = pt.getBlockX() >> 4;
-        int Z = pt.getBlockZ() >> 4;
+        int X = pt.x() >> 4;
+        int Z = pt.z() >> 4;
         if (Fawe.isMainThread()) {
             world.getChunkAt(X, Z);
         } else if (PaperLib.isPaper()) {
@@ -413,7 +413,7 @@ public class BukkitWorld extends AbstractWorld {
     public void fixAfterFastMode(Iterable<BlockVector2> chunks) {
         World world = getWorld();
         for (BlockVector2 chunkPos : chunks) {
-            world.refreshChunk(chunkPos.getBlockX(), chunkPos.getBlockZ());
+            world.refreshChunk(chunkPos.x(), chunkPos.z());
         }
     }
 
@@ -495,13 +495,13 @@ public class BukkitWorld extends AbstractWorld {
         //FAWE start - safe edit region
         testCoords(pt);
         //FAWE end
-        getWorld().getBlockAt(pt.getBlockX(), pt.getBlockY(), pt.getBlockZ()).breakNaturally();
+        getWorld().getBlockAt(pt.x(), pt.y(), pt.z()).breakNaturally();
     }
 
     //FAWE start
     @Override
     public Collection<BaseItemStack> getBlockDrops(BlockVector3 position) {
-        return getWorld().getBlockAt(position.getBlockX(), position.getBlockY(), position.getBlockZ()).getDrops().stream()
+        return getWorld().getBlockAt(position.x(), position.y(), position.z()).getDrops().stream()
                 .map(BukkitAdapter::adapt).collect(Collectors.toList());
     }
     //FAWE end
@@ -538,7 +538,7 @@ public class BukkitWorld extends AbstractWorld {
             }
         }
         if (WorldEditPlugin.getInstance().getLocalConfiguration().unsupportedVersionEditing) {
-            Block bukkitBlock = getWorld().getBlockAt(position.getBlockX(), position.getBlockY(), position.getBlockZ());
+            Block bukkitBlock = getWorld().getBlockAt(position.x(), position.y(), position.z());
             return BukkitAdapter.adapt(bukkitBlock.getBlockData());
         } else {
             throw new RuntimeException(new UnsupportedVersionEditException());
@@ -562,7 +562,7 @@ public class BukkitWorld extends AbstractWorld {
                 }
             }
         }
-        Block bukkitBlock = getWorld().getBlockAt(position.getBlockX(), position.getBlockY(), position.getBlockZ());
+        Block bukkitBlock = getWorld().getBlockAt(position.x(), position.y(), position.z());
         bukkitBlock.setBlockData(BukkitAdapter.adapt(block), sideEffects.doesApplyAny());
         return true;
     }
@@ -584,8 +584,8 @@ public class BukkitWorld extends AbstractWorld {
         if (!Settings.settings().REGION_RESTRICTIONS_OPTIONS.RESTRICT_TO_SAFE_RANGE) {
             return;
         }
-        int x = position.getX();
-        int z = position.getZ();
+        int x = position.x();
+        int z = position.z();
         if (x > 30000000 || z > 30000000 || x < -30000000 || z < -30000000) {
             throw FaweCache.OUTSIDE_SAFE_REGION;
         }
@@ -636,9 +636,9 @@ public class BukkitWorld extends AbstractWorld {
         testCoords(position);
         //FAWE end
         if (HAS_3D_BIOMES) {
-            return BukkitAdapter.adapt(getWorld().getBiome(position.getBlockX(), position.getBlockY(), position.getBlockZ()));
+            return BukkitAdapter.adapt(getWorld().getBiome(position.x(), position.y(), position.z()));
         } else {
-            return BukkitAdapter.adapt(getWorld().getBiome(position.getBlockX(), position.getBlockZ()));
+            return BukkitAdapter.adapt(getWorld().getBiome(position.x(), position.z()));
         }
     }
 
@@ -649,9 +649,9 @@ public class BukkitWorld extends AbstractWorld {
         testCoords(position);
         //FAWE end
         if (HAS_3D_BIOMES) {
-            getWorld().setBiome(position.getBlockX(), position.getBlockY(), position.getBlockZ(), BukkitAdapter.adapt(biome));
+            getWorld().setBiome(position.x(), position.y(), position.z(), BukkitAdapter.adapt(biome));
         } else {
-            getWorld().setBiome(position.getBlockX(), position.getBlockZ(), BukkitAdapter.adapt(biome));
+            getWorld().setBiome(position.x(), position.z(), BukkitAdapter.adapt(biome));
         }
         return true;
     }

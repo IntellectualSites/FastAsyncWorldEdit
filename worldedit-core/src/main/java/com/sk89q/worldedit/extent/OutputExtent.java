@@ -60,7 +60,7 @@ public interface OutputExtent {
      */
     @Deprecated
     default <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 position, T block) throws WorldEditException {
-        return setBlock(position.getX(), position.getY(), position.getZ(), block);
+        return setBlock(position.x(), position.y(), position.z(), block);
     }
 
     // The defaults need to remain for compatibility (the actual implementation still needs to override one of these)
@@ -148,7 +148,7 @@ public interface OutputExtent {
      * @param value    light level to set
      */
     default void setBlockLight(BlockVector3 position, int value) {
-        setBlockLight(position.getX(), position.getY(), position.getZ(), value);
+        setBlockLight(position.x(), position.y(), position.z(), value);
     }
 
     default void setBlockLight(int x, int y, int z, int value) {
@@ -161,7 +161,7 @@ public interface OutputExtent {
      * @param value    light level to set
      */
     default void setSkyLight(BlockVector3 position, int value) {
-        setSkyLight(position.getX(), position.getY(), position.getZ(), value);
+        setSkyLight(position.x(), position.y(), position.z(), value);
     }
     //FAWE end
 

@@ -30,9 +30,9 @@ public class OffsetTransform extends ResettableExtent {
 
     @Override
     public boolean setBiome(BlockVector3 location, BiomeType biome) {
-        int x = location.getX() + dx;
-        int y = location.getX() + dy;
-        int z = location.getX() + dz;
+        int x = location.x() + dx;
+        int y = location.x() + dy;
+        int z = location.x() + dz;
         if (!getExtent().contains(x, y, z)) {
             return false;
         }
@@ -53,9 +53,9 @@ public class OffsetTransform extends ResettableExtent {
     @Override
     public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 location, T block)
             throws WorldEditException {
-        int x = location.getX() + dx;
-        int y = location.getX() + dy;
-        int z = location.getX() + dz;
+        int x = location.x() + dx;
+        int y = location.x() + dy;
+        int z = location.x() + dz;
         if (!getExtent().contains(x, y, z)) {
             return false;
         }

@@ -349,7 +349,7 @@ public class GeneralCommands {
         if (world == null) {
             actor.print(Caption.of("worldedit.world.remove"));
         } else {
-            actor.print(Caption.of("worldedit.world.set", TextComponent.of(world.getId())));
+            actor.print(Caption.of("worldedit.world.set", TextComponent.of(world.id())));
         }
     }
 
@@ -510,6 +510,7 @@ public class GeneralCommands {
                     parserContext.setWorld(worldArg);
                     parserContext.setSession(session);
                     parserContext.setExtent(editSession);
+                    parserContext.setTryLegacy(actor.getLimit().ALLOW_LEGACY);
                     Mask mask = worldEdit.getMaskFactory().parseFromInput(arg, parserContext);
                     util = TextureUtil.fromMask(mask);
                 }
@@ -641,7 +642,7 @@ public class GeneralCommands {
                 if (itemsOnly && searchType.hasBlockType()) {
                     continue;
                 }
-                final String id = searchType.getId();
+                final String id = searchType.id();
                 if (id.contains(idMatch)) {
                     Component name = searchType.getRichName();
                     results.put(id, TextComponent.builder()

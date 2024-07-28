@@ -63,13 +63,13 @@ public class SolidRandomOffsetPattern extends AbstractPattern {
 
     @Override
     public BaseBlock applyBlock(BlockVector3 position) {
-        mutable.mutX(position.getX() + r.nextInt(dx2) - dx);
-        mutable.mutY(position.getY() + r.nextInt(dy2) - dy);
-        mutable.mutZ(position.getZ() + r.nextInt(dz2) - dz);
-        if (mutable.getY() < minY || mutable.getY() > maxY) {
+        mutable.mutX(position.x() + r.nextInt(dx2) - dx);
+        mutable.mutY(position.y() + r.nextInt(dy2) - dy);
+        mutable.mutZ(position.z() + r.nextInt(dz2) - dz);
+        if (mutable.y() < minY || mutable.y() > maxY) {
             return BlockTypes.AIR.getDefaultState().toBaseBlock();
         }
-        if (mutable.getY() < minY || mutable.getY() > maxY) {
+        if (mutable.y() < minY || mutable.y() > maxY) {
             return BlockTypes.AIR.getDefaultState().toBaseBlock();
         }
         BaseBlock block = pattern.applyBlock(mutable);
@@ -81,10 +81,10 @@ public class SolidRandomOffsetPattern extends AbstractPattern {
 
     @Override
     public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
-        mutable.mutX(set.getX() + r.nextInt(dx2) - dx);
-        mutable.mutY(set.getY() + r.nextInt(dy2) - dy);
-        mutable.mutZ(set.getZ() + r.nextInt(dz2) - dz);
-        if (mutable.getY() < extent.getMinY() || mutable.getY() > extent.getMaxY()) {
+        mutable.mutX(set.x() + r.nextInt(dx2) - dx);
+        mutable.mutY(set.y() + r.nextInt(dy2) - dy);
+        mutable.mutZ(set.z() + r.nextInt(dz2) - dz);
+        if (mutable.y() < extent.getMinY() || mutable.y() > extent.getMaxY()) {
             return false;
         }
         BaseBlock block = pattern.applyBlock(mutable);
@@ -92,6 +92,11 @@ public class SolidRandomOffsetPattern extends AbstractPattern {
             return pattern.apply(extent, get, mutable);
         }
         return pattern.apply(extent, get, set);
+    }
+
+    @Override
+    public Pattern fork() {
+        return new SolidRandomOffsetPattern(this.pattern.fork(), this.dx, this.dy, this.dz, this.minY, this.maxY);
     }
 
 }

@@ -60,6 +60,7 @@ public class BlockType implements Keyed, Pattern {
     private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     private final String id;
+    @SuppressWarnings("this-escape")
     private final LazyReference<FuzzyBlockState> emptyFuzzy
             = LazyReference.from(() -> new FuzzyBlockState(this));
     //FAWE start
@@ -123,7 +124,7 @@ public class BlockType implements Keyed, Pattern {
      * @return The id
      */
     @Override
-    public String getId() {
+    public String id() {
         return this.id;
     }
 
@@ -134,13 +135,13 @@ public class BlockType implements Keyed, Pattern {
 
     //FAWE start
     public String getNamespace() {
-        String id = getId();
+        String id = id();
         int i = id.indexOf(':');
         return i == -1 ? "minecraft" : id.substring(0, i);
     }
 
     public String getResource() {
-        String id = getId();
+        String id = id();
         return id.substring(id.indexOf(':') + 1);
     }
     //FAWE end
@@ -155,7 +156,7 @@ public class BlockType implements Keyed, Pattern {
     public String getName() {
         String name = this.name.getValue();
         if (name == null || name.isEmpty()) {
-            return getId();
+            return id();
         }
         return name;
     }
@@ -179,7 +180,7 @@ public class BlockType implements Keyed, Pattern {
             LOGGER.error(
                     "Attempted to load blockstate with id {} of type {} outside of state ordinals length. Using default state.",
                     propertyId,
-                    getId()
+                    id()
             );
             return settings.defaultState;
         }
@@ -188,7 +189,7 @@ public class BlockType implements Keyed, Pattern {
             LOGGER.error(
                     "Attempted to load blockstate with ordinal {} of type {} outside of states length. Using default state. Using default state.",
                     ordinal,
-                    getId()
+                    id()
             );
             return settings.defaultState;
         }
@@ -404,7 +405,7 @@ public class BlockType implements Keyed, Pattern {
 
     @Override
     public String toString() {
-        return getId();
+        return id();
     }
 
     //FAWE start

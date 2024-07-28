@@ -27,7 +27,7 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BaseBlock;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
@@ -41,7 +41,7 @@ public class RandomPattern extends AbstractPattern {
 
     //FAWE start - SimpleRandom > Random, LHS<P> > List
     private final SimpleRandom random;
-    private Map<Pattern, Double> weights = new HashMap<>();
+    private Map<Pattern, Double> weights = new LinkedHashMap<>();
     private RandomCollection<Pattern> collection;
     private LinkedHashSet<Pattern> patterns = new LinkedHashSet<>();
     //FAWE end
@@ -66,6 +66,13 @@ public class RandomPattern extends AbstractPattern {
         this.weights = parent.weights;
         this.collection = RandomCollection.of(weights, random);
         this.patterns = parent.patterns;
+    }
+
+    private RandomPattern(SimpleRandom random, Map<Pattern, Double> weights) {
+        this.random = random;
+        this.weights = weights;
+        this.collection = RandomCollection.of(weights, random);
+        this.patterns = new LinkedHashSet<>(weights.keySet());
     }
     //FAWE end
 
@@ -100,13 +107,21 @@ public class RandomPattern extends AbstractPattern {
 
     @Override
     public BaseBlock applyBlock(BlockVector3 position) {
-        return collection.next(position.getBlockX(), position.getBlockY(), position.getBlockZ()).applyBlock(position);
+        return collection.next(position.x(), position.y(), position.z()).applyBlock(position);
     }
 
     @Override
     public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
-        return collection.next(get.getBlockX(), get.getBlockY(), get.getBlockZ()).apply(extent, get, set);
+        return collection.next(get.x(), get.y(), get.z()).apply(extent, get, set);
     }
+
+    @Override
+    public Pattern fork() {
+        final LinkedHashMap<Pattern, Double> newWeights = new LinkedHashMap<>();
+        this.weights.forEach((p, w) -> newWeights.put(p.fork(), w));
+        return new RandomPattern(this.random, newWeights);
+    }
+
     //FAWE end
 
 }

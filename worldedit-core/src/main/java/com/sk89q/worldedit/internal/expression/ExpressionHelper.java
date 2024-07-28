@@ -40,6 +40,12 @@ public class ExpressionHelper {
         }
     }
 
+    public static void check(boolean condition, int positionInLine, String message) {
+        if (!condition) {
+            throw evalException(positionInLine, message);
+        }
+    }
+
     public static int getErrorPosition(Token token) {
         return token.getCharPositionInLine();
     }
@@ -49,14 +55,18 @@ public class ExpressionHelper {
     }
 
     public static EvaluationException evalException(Token token, String message) {
+        return evalException(getErrorPosition(token), message);
+    }
+
+    public static EvaluationException evalException(int positionInLine, String message) {
         return new EvaluationException(
-                getErrorPosition(token),
-                message
+            positionInLine,
+            message
         );
     }
 
-    public static void checkIterations(int iterations, ParserRuleContext ctx) {
-        check(iterations <= 256, ctx, "Loop exceeded 256 iterations");
+    public static void checkIterations(int iterations, int positionInLine) {
+        check(iterations <= 256, positionInLine, "Loop exceeded 256 iterations");
     }
 
     public static MethodHandle resolveFunction(
@@ -72,10 +82,10 @@ public class ExpressionHelper {
                 // last param is the array, turn that varargs
                 int keptParams = nParams - 1;
                 function = function.asCollector(
-                        // collect into the last array
-                        function.type().parameterType(nParams - 1),
-                        // collect the variable args (args over kept)
-                        ctx.args.size() - keptParams
+                    // collect into the last array
+                    function.type().parameterType(nParams - 1),
+                    // collect the variable args (args over kept)
+                    ctx.args.size() - keptParams
                 );
                 // re-wrap it for the inner arguments
                 function = function.asType(function.type().wrap());

@@ -35,10 +35,10 @@ public class RelativePattern extends AbstractPattern implements ResettablePatter
         if (origin == null) {
             origin = pos;
         }
-        mutable.mutX(pos.getX() - origin.getX());
-        mutable.mutY(pos.getY() - origin.getY());
-        mutable.mutZ(pos.getZ() - origin.getZ());
-        if (mutable.getY() < minY || mutable.getY() > maxY) {
+        mutable.mutX(pos.x() - origin.x());
+        mutable.mutY(pos.y() - origin.y());
+        mutable.mutZ(pos.z() - origin.z());
+        if (mutable.y() < minY || mutable.y() > maxY) {
             return BlockTypes.AIR.getDefaultState().toBaseBlock();
         }
         return pattern.applyBlock(mutable);
@@ -49,10 +49,10 @@ public class RelativePattern extends AbstractPattern implements ResettablePatter
         if (origin == null) {
             origin = set;
         }
-        mutable.mutX(set.getX() - origin.getX());
-        mutable.mutY(set.getY() - origin.getY());
-        mutable.mutZ(set.getZ() - origin.getZ());
-        if (mutable.getY() < extent.getMinY() || mutable.getY() > extent.getMaxY()) {
+        mutable.mutX(set.x() - origin.x());
+        mutable.mutY(set.y() - origin.y());
+        mutable.mutZ(set.z() - origin.z());
+        if (mutable.y() < extent.getMinY() || mutable.y() > extent.getMaxY()) {
             return false;
         }
         return pattern.apply(extent, get, mutable);
@@ -61,6 +61,13 @@ public class RelativePattern extends AbstractPattern implements ResettablePatter
     @Override
     public void reset() {
         origin = null;
+    }
+
+    @Override
+    public Pattern fork() {
+        RelativePattern forked = new RelativePattern(this.pattern.fork(), this.minY, this.maxY);
+        forked.origin = this.origin; // maintain origin for forks
+        return forked;
     }
 
 }

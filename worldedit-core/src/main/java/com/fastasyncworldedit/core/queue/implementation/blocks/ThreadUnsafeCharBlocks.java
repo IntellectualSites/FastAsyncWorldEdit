@@ -218,11 +218,11 @@ public class ThreadUnsafeCharBlocks implements IChunkSet, IBlocks {
 
     @Override
     public boolean setBiome(BlockVector3 position, BiomeType biome) {
-        return setBiome(position.getX(), position.getY(), position.getZ(), biome);
+        return setBiome(position.x(), position.y(), position.z(), biome);
     }
 
     public void set(int x, int y, int z, char value) {
-        final int layer = y >> 4;
+        final int layer = (y >> 4) - minSectionPosition;
         final int index = (y & 15) << 8 | z << 4 | x;
         try {
             blocks[layer][index] = value;

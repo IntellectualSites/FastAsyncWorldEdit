@@ -64,26 +64,47 @@ public class RollbackDatabase extends AsyncNotifyQueue {
     public Future<Boolean> init() {
         return call(() -> {
             try (PreparedStatement stmt = connection.prepareStatement("CREATE TABLE IF NOT EXISTS`" + this.prefix +
-                    "edits` (`player` BLOB(16) NOT NULL,`id` INT NOT NULL, `time` INT NOT NULL,`x1`" +
-                    "INT NOT NULL,`x2` INT NOT NULL,`z1` INT NOT NULL,`z2` INT NOT NULL,`y1`" +
-                    "INT NOT NULL, `y2` INT NOT NULL, `size` INT NOT NULL, `command` VARCHAR, PRIMARY KEY (player, id))")) {
+                    "_edits` (`player` BLOB(16) NOT NULL,`id` INT NOT NULL, `time` INT NOT NULL,`x1` " +
+                    "INT NOT NULL,`x2` INT NOT NULL,`z1` INT NOT NULL,`z2` INT NOT NULL,`y1` " +
+                    "INT NOT NULL, `y2` INT NOT NULL, `size` BIGINT NOT NULL, `command` VARCHAR, PRIMARY KEY (player, id))")) {
                 stmt.executeUpdate();
             }
-            try (PreparedStatement stmt = connection.prepareStatement("ALTER TABLE`" + this.prefix + "edits` ADD COLUMN `command` VARCHAR")) {
+            String alterTablePrefix = "ALTER TABLE`" + this.prefix + "edits` ";
+            try (PreparedStatement stmt =
+                         connection.prepareStatement(alterTablePrefix + "ADD COLUMN `command` VARCHAR")) {
                 stmt.executeUpdate();
             } catch (SQLException ignored) {
             } // Already updated
-            try (PreparedStatement stmt = connection.prepareStatement("ALTER TABLE`" + this.prefix + "edits` ADD SIZE INT DEFAULT 0 NOT NULL")) {
+            try (PreparedStatement stmt =
+                         connection.prepareStatement(alterTablePrefix + "ADD COLUMN `size` BIGINT DEFAULT 0 NOT NULL")) {
                 stmt.executeUpdate();
             } catch (SQLException ignored) {
             } // Already updated
+
+            boolean migrated = false;
+            try (PreparedStatement stmt =
+                         connection.prepareStatement("INSERT INTO `" + this.prefix + "_edits` " +
+                                 "(player, id, time, x1, x2, z1, z2, y1, y2, size, command) " +
+                                 "SELECT player, id, time, x1, x2, z1, z2, y1, y2, size, command " +
+                                 "FROM `" + this.prefix + "edits`")) {
+
+                stmt.executeUpdate();
+                migrated = true;
+            } catch (SQLException ignored) {
+            } // Already updated
+            if (migrated) {
+                try (PreparedStatement stmt = connection.prepareStatement("DROP TABLE `" + this.prefix + "edits`")) {
+                    stmt.executeUpdate();
+                }
+            }
             return true;
         });
     }
 
     public Future<Integer> delete(UUID uuid, int id) {
         return call(() -> {
-            try (PreparedStatement stmt = connection.prepareStatement("DELETE FROM`" + this.prefix + "edits` WHERE `player`=? AND `id`=?")) {
+            try (PreparedStatement stmt = connection.prepareStatement("DELETE FROM`" + this.prefix + "_edits` WHERE `player`=? " +
+                    "AND `id`=?")) {
                 stmt.setBytes(1, toBytes(uuid));
                 stmt.setInt(2, id);
                 return stmt.executeUpdate();
@@ -94,7 +115,7 @@ public class RollbackDatabase extends AsyncNotifyQueue {
     public Future<RollbackOptimizedHistory> getEdit(@Nonnull UUID uuid, int id) {
         return call(() -> {
             try (PreparedStatement stmt = connection.prepareStatement("SELECT * FROM`" + this.prefix +
-                    "edits` WHERE `player`=? AND `id`=?")) {
+                    "_edits` WHERE `player`=? AND `id`=?")) {
                 stmt.setBytes(1, toBytes(uuid));
                 stmt.setInt(2, id);
                 ResultSet result = stmt.executeQuery();
@@ -119,7 +140,7 @@ public class RollbackDatabase extends AsyncNotifyQueue {
         CuboidRegion region = new CuboidRegion(BlockVector3.at(x1, y1, z1), BlockVector3.at(x2, y2, z2));
 
         long time = result.getInt("time") * 1000L;
-        long size = result.getInt("size");
+        long size = result.getLong("size");
 
         String command = result.getString("command");
 
@@ -135,7 +156,7 @@ public class RollbackDatabase extends AsyncNotifyQueue {
         long now = System.currentTimeMillis() / 1000;
         final int then = (int) (now - diff);
         return call(() -> {
-            try (PreparedStatement stmt = connection.prepareStatement("DELETE FROM`" + this.prefix + "edits` WHERE `time`<?")) {
+            try (PreparedStatement stmt = connection.prepareStatement("DELETE FROM`" + this.prefix + "_edits` WHERE `time`<?")) {
                 stmt.setInt(1, then);
                 return stmt.executeUpdate();
             }
@@ -159,28 +180,33 @@ public class RollbackDatabase extends AsyncNotifyQueue {
         Future<Integer> future = call(() -> {
             try {
                 int count = 0;
-                String stmtStr;
+                String stmtStr = """
+                                SELECT * FROM `%s_edits`
+                                  WHERE `time` > ?
+                                    AND `x2` >= ?
+                                    AND `x1` <= ?
+                                    AND `z2` >= ?
+                                    AND `z1` <= ?
+                                    AND `y2` >= ?
+                                    AND `y1` <= ?
+                                """;
+                if (uuid != null) {
+                    stmtStr += "\n    AND `player`= ?";
+                }
                 if (ascending) {
-                    if (uuid == null) {
-                        stmtStr = "SELECT * FROM`%sedits` WHERE `time`>? AND `x2`>=? AND `x1`<=? AND `z2`>=? AND `z1`<=? AND " +
-                                "`y2`>=? AND `y1`<=? ORDER BY `time` , `id`";
-                    } else {
-                        stmtStr = "SELECT * FROM`%sedits` WHERE `time`>? AND `x2`>=? AND `x1`<=? AND `z2`>=? AND `z1`<=? AND " +
-                                "`y2`>=? AND `y1`<=? AND `player`=? ORDER BY `time` ASC, `id` ASC";
-                    }
+                    stmtStr += "\n  ORDER BY `time` ASC, `id` ASC";
                 } else {
-                    stmtStr = "SELECT * FROM`%sedits` WHERE `time`>? AND `x2`>=? AND `x1`<=? AND `z2`>=? AND `z1`<=? AND " +
-                            "`y2`>=? AND `y1`<=? AND `player`=? ORDER BY `time` DESC, `id` DESC";
+                    stmtStr += "\n  ORDER BY `time` DESC, `id` DESC";
                 }
                 try (PreparedStatement stmt = connection.prepareStatement(stmtStr.formatted(this.prefix))) {
                     stmt.setInt(1, (int) (minTime / 1000));
-                    stmt.setInt(2, pos1.getBlockX());
-                    stmt.setInt(3, pos2.getBlockX());
-                    stmt.setInt(4, pos1.getBlockZ());
-                    stmt.setInt(5, pos2.getBlockZ());
+                    stmt.setInt(2, pos1.x());
+                    stmt.setInt(3, pos2.x());
+                    stmt.setInt(4, pos1.z());
+                    stmt.setInt(5, pos2.z());
                     // Keep 128 offset for backwards-compatibility
-                    stmt.setInt(6, pos1.getBlockY() - 128);
-                    stmt.setInt(7, pos2.getBlockY() - 128);
+                    stmt.setInt(6, pos1.y() - 128);
+                    stmt.setInt(7, pos2.y() - 128);
                     if (uuid != null) {
                         byte[] uuidBytes = toBytes(uuid);
                         stmt.setBytes(8, uuidBytes);
@@ -197,7 +223,8 @@ public class RollbackDatabase extends AsyncNotifyQueue {
                 }
                 if (delete && uuid != null) {
                     try (PreparedStatement stmt = connection.prepareStatement("DELETE FROM`" + this.prefix +
-                            "edits` WHERE `player`=? AND `time`>? AND `x2`>=? AND `x1`<=? AND `y2`>=? AND `y1`<=? AND `z2`>=? AND `z1`<=?")) {
+                            "_edits` WHERE `player`=? AND `time`>? AND `x2`>=? AND `x1`<=? AND `y2`>=? AND `y1`<=? AND `z2`>=? " +
+                            "AND `z1`<=?")) {
                         byte[] uuidBytes = ByteBuffer
                                 .allocate(16)
                                 .putLong(uuid.getMostSignificantBits())
@@ -205,13 +232,13 @@ public class RollbackDatabase extends AsyncNotifyQueue {
                                 .array();
                         stmt.setBytes(1, uuidBytes);
                         stmt.setInt(2, (int) (minTime / 1000));
-                        stmt.setInt(3, pos1.getBlockX());
-                        stmt.setInt(4, pos2.getBlockX());
-                        stmt.setInt(5, pos1.getBlockZ());
-                        stmt.setInt(6, pos2.getBlockZ());
+                        stmt.setInt(3, pos1.x());
+                        stmt.setInt(4, pos2.x());
+                        stmt.setInt(5, pos1.z());
+                        stmt.setInt(6, pos2.z());
                         // Keep 128 offset for backwards-compatibility
-                        stmt.setInt(7, pos1.getBlockY() - 128);
-                        stmt.setInt(8, pos2.getBlockY() - 128);
+                        stmt.setInt(7, pos1.y() - 128);
+                        stmt.setInt(8, pos2.y() - 128);
                     }
                 }
                 return count;
@@ -244,7 +271,7 @@ public class RollbackDatabase extends AsyncNotifyQueue {
         RollbackOptimizedHistory[] copy = IntStream.range(0, size)
                 .mapToObj(i -> historyChanges.poll()).toArray(RollbackOptimizedHistory[]::new);
 
-        try (PreparedStatement stmt = connection.prepareStatement("INSERT OR REPLACE INTO`" + this.prefix + "edits`" +
+        try (PreparedStatement stmt = connection.prepareStatement("INSERT OR REPLACE INTO`" + this.prefix + "_edits`" +
                 " (`player`,`id`,`time`,`x1`,`x2`,`z1`,`z2`,`y1`,`y2`,`command`,`size`) VALUES(?,?,?,?,?,?,?,?,?,?,?)")) {
             // `player`,`id`,`time`,`x1`,`x2`,`z1`,`z2`,`y1`,`y2`,`command`,`size`) VALUES(?,?,?,?,?,?,?,?,?,?,?)"
             for (RollbackOptimizedHistory change : copy) {
@@ -257,15 +284,15 @@ public class RollbackDatabase extends AsyncNotifyQueue {
                 BlockVector3 pos1 = change.getMinimumPoint();
                 BlockVector3 pos2 = change.getMaximumPoint();
 
-                stmt.setInt(4, pos1.getX());
-                stmt.setInt(5, pos2.getX());
-                stmt.setInt(6, pos1.getZ());
-                stmt.setInt(7, pos2.getZ());
+                stmt.setInt(4, pos1.x());
+                stmt.setInt(5, pos2.x());
+                stmt.setInt(6, pos1.z());
+                stmt.setInt(7, pos2.z());
                 // Keep 128 offset for backwards-compatibility
-                stmt.setInt(8, pos1.getY() - 128);
-                stmt.setInt(9, pos2.getY() - 128);
+                stmt.setInt(8, pos1.y() - 128);
+                stmt.setInt(9, pos2.y() - 128);
                 stmt.setString(10, change.getCommand());
-                stmt.setInt(11, change.size());
+                stmt.setLong(11, change.longSize());
                 stmt.executeUpdate();
                 stmt.clearParameters();
             }

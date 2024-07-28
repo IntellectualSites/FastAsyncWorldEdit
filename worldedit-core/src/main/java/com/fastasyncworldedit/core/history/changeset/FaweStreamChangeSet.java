@@ -25,6 +25,7 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -35,10 +36,17 @@ import java.util.NoSuchElementException;
 public abstract class FaweStreamChangeSet extends AbstractChangeSet {
 
     public static final int HEADER_SIZE = 9;
-    private static final int version = 1;
+    private static final int VERSION = 2;
+    // equivalent to Short#MIN_VALUE three times stored with [(x) & 0xff, ((rx) >> 8) & 0xff]
+    private static final byte[] MAGIC_NEW_RELATIVE = new byte[]{0, (byte) 128, 0, (byte) 128, 0, (byte) 128};
     private int mode;
     private final int compression;
     private final int minY;
+
+    protected long blockSize;
+    private int originX;
+    private int originZ;
+    private int version;
 
     protected FaweStreamIdDelegate idDel;
     protected FaweStreamPositionDelegate posDel;
@@ -192,6 +200,20 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
                     int rx = -lx + (lx = x);
                     int ry = -ly + (ly = y);
                     int rz = -lz + (lz = z);
+                    // Use LE/GE to ensure we don't accidentally write MAGIC_NEW_RELATIVE
+                    if (rx >= Short.MAX_VALUE || rz >= Short.MAX_VALUE || rx <= Short.MIN_VALUE || rz <= Short.MIN_VALUE) {
+                        stream.write(MAGIC_NEW_RELATIVE);
+                        stream.write((byte) (x >> 24));
+                        stream.write((byte) (x >> 16));
+                        stream.write((byte) (x >> 8));
+                        stream.write((byte) (x));
+                        stream.write((byte) (z >> 24));
+                        stream.write((byte) (z >> 16));
+                        stream.write((byte) (z >> 8));
+                        stream.write((byte) (z));
+                        rx = 0;
+                        rz = 0;
+                    }
                     stream.write((rx) & 0xff);
                     stream.write(((rx) >> 8) & 0xff);
                     stream.write((rz) & 0xff);
@@ -203,6 +225,12 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
                 @Override
                 public int readX(FaweInputStream is) throws IOException {
                     is.readFully(buffer);
+                    // Don't break reading version 1 history (just in case)
+                    if (version == 2 && Arrays.equals(buffer, MAGIC_NEW_RELATIVE)) {
+                        lx = ((is.read() << 24) + (is.read() << 16) + (is.read() << 8) + is.read());
+                        lz = ((is.read() << 24) + (is.read() << 16) + (is.read() << 8) + is.read());
+                        is.readFully(buffer);
+                    }
                     return lx = lx + ((buffer[0] & 0xFF) | (buffer[1] << 8));
                 }
 
@@ -222,7 +250,7 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
     public void writeHeader(OutputStream os, int x, int y, int z) throws IOException {
         os.write(mode);
         // Allows for version detection of history in case of changes to format.
-        os.write(version);
+        os.write(VERSION);
         setOrigin(x, z);
         os.write((byte) (x >> 24));
         os.write((byte) (x >> 16));
@@ -238,8 +266,8 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
     public void readHeader(InputStream is) throws IOException {
         // skip mode
         int mode = is.read();
-        int version = is.read();
-        if (version != FaweStreamChangeSet.version) {
+        version = is.read();
+        if (version != 1 && version != VERSION) { // version 1 is fine
             throw new UnsupportedOperationException(String.format("Version %s history not supported!", version));
         }
         // origin
@@ -266,10 +294,15 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
     }
 
     @Override
-    public int size() {
+    public long longSize() {
         // Flush so we can accurately get the size
         flush();
         return blockSize;
+    }
+
+    @Override
+    public int size() {
+        return (int) longSize();
     }
 
     public abstract int getCompressedSize();
@@ -303,11 +336,6 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
     public abstract NBTInputStream getTileCreateIS() throws IOException;
 
     public abstract NBTInputStream getTileRemoveIS() throws IOException;
-
-    protected int blockSize;
-
-    private int originX;
-    private int originZ;
 
     public void setOrigin(int x, int z) {
         originX = x;
@@ -353,7 +381,7 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
             os.write((byte) (z));
             // only need to store biomes in the 4x4x4 chunks so only need one byte for y still (signed byte -128 -> 127)
             //  means -512 -> 508. Add 128 to avoid negative value casting.
-            os.write((byte) (y + 32));
+            os.write((byte) (y + 128));
             os.writeVarInt(from.getInternalId());
             os.writeVarInt(to.getInternalId());
         } catch (IOException e) {

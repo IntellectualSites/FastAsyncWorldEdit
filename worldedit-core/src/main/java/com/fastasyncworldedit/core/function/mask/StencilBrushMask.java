@@ -64,13 +64,13 @@ public class StencilBrushMask extends AbstractExtentMask {
     @Override
     public boolean test(BlockVector3 vector) {
         if (solid.test(vector)) {
-            int dx = vector.getBlockX() - center.getBlockX();
-            int dy = vector.getBlockY() - center.getBlockY();
-            int dz = vector.getBlockZ() - center.getBlockZ();
+            int dx = vector.x() - center.x();
+            int dy = vector.y() - center.y();
+            int dz = vector.z() - center.z();
 
             Vector3 srcPos = transform.apply(mutable.setComponents(dx, dy, dz));
-            dx = MathMan.roundInt(srcPos.getX());
-            dz = MathMan.roundInt(srcPos.getZ());
+            dx = MathMan.roundInt(srcPos.x());
+            dz = MathMan.roundInt(srcPos.z());
 
             int distance = dx * dx + dz * dz;
             if (distance > size2 || Math.abs(dx) > 256 || Math.abs(dz) > 256) {
@@ -83,7 +83,7 @@ public class StencilBrushMask extends AbstractExtentMask {
                 return true;
             }
             if (val >= 255 || ThreadLocalRandom.current().nextInt(maxY) < val) {
-                editSession.setBlock(vector.getBlockX(), vector.getBlockY(), vector.getBlockZ(), pattern);
+                editSession.setBlock(vector.x(), vector.y(), vector.z(), pattern);
             }
             return true;
         }

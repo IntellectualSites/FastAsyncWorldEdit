@@ -24,6 +24,10 @@ import java.util.concurrent.Callable;
 
 public interface Paster {
 
-    Callable<URL> paste(String content);
+    default Callable<URL> paste(String content) {
+        return paste(content, new PasteMetadata());
+    }
+
+    Callable<URL> paste(String content, PasteMetadata metadata);
 
 }

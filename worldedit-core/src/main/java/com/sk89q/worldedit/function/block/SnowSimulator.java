@@ -105,7 +105,7 @@ public class SnowSimulator implements LayerFunction {
 
 
         // Can't put snow this far up
-        if (position.getBlockY() == this.extent.getMaximumPoint().getBlockY()) {
+        if (position.y() == this.extent.getMaximumPoint().y()) {
             return false;
         }
 
@@ -116,7 +116,7 @@ public class SnowSimulator implements LayerFunction {
         if (!above.getBlockType().getMaterial().isAir() && (!stack || above.getBlockType() != BlockTypes.SNOW)) {
             return false;
             //FAWE start
-        } else if (!block.getBlockType().getId().toLowerCase(Locale.ROOT).contains("ice") && this.extent.getEmittedLight(
+        } else if (!block.getBlockType().id().toLowerCase(Locale.ROOT).contains("ice") && this.extent.getEmittedLight(
                 abovePosition) > 10) {
             return false;
         } else if (!block.getBlockType().getMaterial().isFullCube()) {
@@ -132,7 +132,7 @@ public class SnowSimulator implements LayerFunction {
                 return false;
             }
             //FAWE end
-        } else if (!block.getBlockType().getId().toLowerCase(Locale.ROOT).contains("ice") && block
+        } else if (!block.getBlockType().id().toLowerCase(Locale.ROOT).contains("ice") && block
                 .getBlockType()
                 .getMaterial()
                 .isTranslucent()) {

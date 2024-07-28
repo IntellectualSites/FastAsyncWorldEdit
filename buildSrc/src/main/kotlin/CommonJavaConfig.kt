@@ -21,9 +21,9 @@ fun Project.applyCommonJavaConfiguration(sourcesJar: Boolean, banSlf4j: Boolean 
             .matching { it.name == "compileJava" || it.name == "compileTestJava" }
             .configureEach {
                 val disabledLint = listOf(
-                        "processing", "path", "fallthrough", "serial"
+                        "processing", "path", "fallthrough", "serial", "overloads", "this-escape",
                 )
-                options.release.set(17)
+                options.release.set(21)
                 options.compilerArgs.addAll(listOf("-Xlint:all") + disabledLint.map { "-Xlint:-$it" })
                 options.isDeprecation = true
                 options.encoding = "UTF-8"
@@ -31,7 +31,7 @@ fun Project.applyCommonJavaConfiguration(sourcesJar: Boolean, banSlf4j: Boolean 
             }
 
     configurations.all {
-        attributes.attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, 17)
+        attributes.attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, 21)
     }
 
     tasks.withType<Test>().configureEach {
@@ -61,7 +61,7 @@ fun Project.applyCommonJavaConfiguration(sourcesJar: Boolean, banSlf4j: Boolean 
                     "https://jd.advntr.dev/api/latest/",
                     "https://logging.apache.org/log4j/2.x/javadoc/log4j-api/",
                     "https://www.antlr.org/api/Java/",
-                    "https://jd.papermc.io/paper/1.20/",
+                    "https://jd.papermc.io/paper/1.21/",
                     "https://intellectualsites.github.io/fastasyncworldedit-javadocs/worldedit-core/"
             )
             docTitle = "${rootProject.name}-${project.description}" +  " " + "${rootProject.version}"

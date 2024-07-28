@@ -12,6 +12,10 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
+/**
+ * @deprecated Unused internal, will be removed in v3
+ */
+@Deprecated(forRemoval = true, since = "2.9.2")
 public class TransformExtent extends BlockTransformExtent {
 
     private final MutableVector3 mutable1 = new MutableVector3();
@@ -51,13 +55,13 @@ public class TransformExtent extends BlockTransformExtent {
         if (min == null) {
             min = pos;
         }
-        mutable1.mutX(pos.getX() - min.getX());
-        mutable1.mutY(pos.getY() - min.getY());
-        mutable1.mutZ(pos.getZ() - min.getZ());
+        mutable1.mutX(pos.x() - min.x());
+        mutable1.mutY(pos.y() - min.y());
+        mutable1.mutZ(pos.z() - min.z());
         Vector3 tmp = getTransform().apply(mutable1);
-        mutable2.mutX(tmp.getX() + min.getX());
-        mutable2.mutY(tmp.getY() + min.getY());
-        mutable2.mutZ(tmp.getZ() + min.getZ());
+        mutable2.mutX(tmp.x() + min.x());
+        mutable2.mutY(tmp.y() + min.y());
+        mutable2.mutZ(tmp.z() + min.z());
         return mutable2;
     }
 
@@ -65,20 +69,20 @@ public class TransformExtent extends BlockTransformExtent {
         if (min == null) {
             min = BlockVector3.at(x, y, z);
         }
-        mutable1.mutX(x - min.getX());
-        mutable1.mutY(y - min.getY());
-        mutable1.mutZ(z - min.getZ());
+        mutable1.mutX(x - min.x());
+        mutable1.mutY(y - min.y());
+        mutable1.mutZ(z - min.z());
         Vector3 tmp = getTransform().apply(mutable1);
-        mutable2.mutX(tmp.getX() + min.getX());
-        mutable2.mutY(tmp.getY() + min.getY());
-        mutable2.mutZ(tmp.getZ() + min.getZ());
+        mutable2.mutX(tmp.x() + min.x());
+        mutable2.mutY(tmp.y() + min.y());
+        mutable2.mutZ(tmp.z() + min.z());
         return tmp.toBlockPoint();
     }
 
     @Override
     public BlockState getBlock(int x, int y, int z) {
         BlockVector3 p = getPos(x, y, z);
-        return transform(super.getBlock(p.getX(), p.getY(), p.getZ()));
+        return transform(super.getBlock(p.x(), p.y(), p.z()));
     }
 
     @Override
@@ -89,7 +93,7 @@ public class TransformExtent extends BlockTransformExtent {
     @Override
     public BiomeType getBiomeType(int x, int y, int z) {
         BlockVector3 p = getPos(x, y, z);
-        return super.getBiomeType(p.getX(), y, p.getZ());
+        return super.getBiomeType(p.x(), p.y(), p.z());
     }
 
     @Override
@@ -110,7 +114,7 @@ public class TransformExtent extends BlockTransformExtent {
     @Override
     public boolean setBiome(int x, int y, int z, BiomeType biome) {
         BlockVector3 p = getPos(x, y, z);
-        return super.setBiome(p.getX(), p.getY(), p.getZ(), biome);
+        return super.setBiome(p.x(), p.y(), p.z(), biome);
     }
 
 }

@@ -37,13 +37,13 @@ import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Capability;
-import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardWriter;
-import com.sk89q.worldedit.function.operation.Operations;
+import com.sk89q.worldedit.extent.clipboard.io.share.ClipboardShareDestination;
+import com.sk89q.worldedit.extent.clipboard.io.share.ClipboardShareMetadata;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.math.transform.Transform;
@@ -79,6 +79,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -90,6 +91,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.Callable;
+import java.util.function.Consumer;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
 import java.util.regex.Pattern;
@@ -313,7 +315,7 @@ public class SchematicCommands {
             Actor actor, LocalSession session,
             @Arg(desc = "File name.")
                     String filename,
-            //FAWE start - random rotation
+            //FAWE start - use format-name, random rotation
             @Arg(desc = "Format name.", def = "")
                     String formatName,
             @Switch(name = 'r', desc = "Apply random rotation to the clipboard")
@@ -354,7 +356,7 @@ public class SchematicCommands {
                 File dir = Settings.settings().PATHS.PER_PLAYER_SCHEMATICS ? new File(saveDir, actor.getUniqueId().toString()) : saveDir;
                 File file;
                 if (filename.startsWith("#")) {
-                    format = ClipboardFormats.findByAlias(formatName);
+                    format = noExplicitFormat ? null : ClipboardFormats.findByAlias(formatName);
                     String[] extensions;
                     if (format != null) {
                         extensions = format.getFileExtensions().toArray(new String[0]);
@@ -374,11 +376,13 @@ public class SchematicCommands {
                         actor.print(Caption.of("fawe.error.no-perm", "worldedit.schematic.load.other"));
                         return;
                     }
-                    if (noExplicitFormat && filename.matches(".*\\.[\\w].*")) {
-                        format = ClipboardFormats
-                                .findByExtension(filename.substring(filename.lastIndexOf('.') + 1));
-                    } else {
+                    if (!noExplicitFormat) {
                         format = ClipboardFormats.findByAlias(formatName);
+                    } else if (filename.matches(".*\\.[\\w].*")) {
+                        format = ClipboardFormats
+                                .findByExplicitExtension(filename.substring(filename.lastIndexOf('.') + 1));
+                    } else {
+                        format = null;
                     }
                     file = MainUtil.resolve(dir, filename, format, false);
                 }
@@ -417,6 +421,9 @@ public class SchematicCommands {
         } catch (URISyntaxException | IOException e) {
             actor.print(Caption.of("worldedit.schematic.file-not-exist", TextComponent.of(Objects.toString(e.getMessage()))));
             LOGGER.warn("Failed to load a saved clipboard", e);
+        } catch (Exception e) {
+            actor.print(Caption.of("fawe.worldedit.schematic.schematic.load-failure", TextComponent.of(e.getMessage())));
+            LOGGER.error("Error loading a schematic", e);
         } finally {
             if (in != null) {
                 try {
@@ -437,8 +444,8 @@ public class SchematicCommands {
             Actor actor, LocalSession session,
             @Arg(desc = "File name.")
                     String filename,
-            @Arg(desc = "Format name.", def = "fast")
-                    String formatName,
+            @Arg(desc = "Format name.", def = "fast") //FAWE: def: sponge -> fast
+                ClipboardFormat format,
             @Switch(name = 'f', desc = "Overwrite an existing file.")
                     boolean allowOverwrite,
             //FAWE start
@@ -464,12 +471,6 @@ public class SchematicCommands {
         //FAWE start
         if (!global && Settings.settings().PATHS.PER_PLAYER_SCHEMATICS) {
             dir = new File(dir, actor.getUniqueId().toString());
-        }
-
-        ClipboardFormat format = ClipboardFormats.findByAlias(formatName);
-        if (format == null) {
-            actor.print(Caption.of("worldedit.schematic.unknown-format", TextComponent.of(formatName)));
-            return;
         }
 
         boolean other = false;
@@ -535,6 +536,105 @@ public class SchematicCommands {
                 )
                 .buildAndExec(worldEdit.getExecutorService());
     }
+
+    @Command(
+            name = "share",
+            desc = "Share your clipboard as a schematic online"
+    )
+    @CommandPermissions({ "worldedit.clipboard.share", "worldedit.schematic.share" })
+    public void share(Actor actor, LocalSession session,
+                      @Arg(desc = "Schematic name. Defaults to name-millis", def = "")
+                          String schematicName,
+                      @Arg(desc = "Share location", def = "arkitektonika") //FAWE: def: ehpaste -> arkitektonika
+                          ClipboardShareDestination destination,
+                      @Arg(desc = "Format name", def = "fast") //FAWE: def: sponge -> fast
+                          ClipboardFormat format) throws WorldEditException {
+        if (worldEdit.getPlatformManager().queryCapability(Capability.GAME_HOOKS).getDataVersion() == -1) {
+            actor.printError(TranslatableComponent.of("worldedit.schematic.unsupported-minecraft-version"));
+            return;
+        }
+
+        if (format == null) {
+            format = destination.getDefaultFormat();
+        }
+
+        if (!destination.supportsFormat(format)) {
+            actor.printError(Caption.of( //FAWE: TranslatableComponent -> Caption
+                "worldedit.schematic.share.unsupported-format",
+                TextComponent.of(destination.getName()),
+                TextComponent.of(format.getName())
+            ));
+            return;
+        }
+
+        ClipboardHolder holder = session.getClipboard();
+
+        SchematicShareTask task = new SchematicShareTask(actor, holder, destination, format, schematicName);
+        AsyncCommandBuilder.wrap(task, actor)
+                .registerWithSupervisor(worldEdit.getSupervisor(), "Sharing schematic")
+                .setDelayMessage(TranslatableComponent.of("worldedit.schematic.save.saving"))
+                .setWorkingMessage(TranslatableComponent.of("worldedit.schematic.save.still-saving"))
+                .onSuccess("Shared", (consumer -> consumer.accept(actor)))
+                .onFailure("Failed to share schematic", worldEdit.getPlatformManager().getPlatformCommandManager().getExceptionConverter())
+                .buildAndExec(worldEdit.getExecutorService());
+    }
+
+    @Command(
+            name = "delete",
+            aliases = {"d"},
+            desc = "Delete a saved schematic"
+    )
+    @CommandPermissions("worldedit.schematic.delete")
+    public void delete(
+            Actor actor, LocalSession session,
+            @Arg(desc = "File name.")
+            String filename
+    ) throws WorldEditException, IOException {
+        LocalConfiguration config = worldEdit.getConfiguration();
+        //FAWE start
+        File working = worldEdit.getWorkingDirectoryPath(config.saveDir).toFile();
+        File dir = Settings.settings().PATHS.PER_PLAYER_SCHEMATICS ? new File(working, actor.getUniqueId().toString()) : working;
+        List<File> files = new ArrayList<>();
+
+        if (filename.equalsIgnoreCase("*")) {
+            files.addAll(getFiles(session.getClipboard()));
+        } else {
+            File f = MainUtil.resolveRelative(new File(dir, filename));
+            files.add(f);
+        }
+
+        if (files.isEmpty()) {
+            actor.print(Caption.of("worldedit.schematic.delete.does-not-exist", TextComponent.of(filename)));
+            return;
+        }
+        for (File f : files) {
+            if (!MainUtil.isInSubDirectory(working, f) || !f.exists()) {
+                actor.print(Caption.of("worldedit.schematic.delete.does-not-exist", TextComponent.of(filename)));
+                continue;
+            }
+            if (Settings.settings().PATHS.PER_PLAYER_SCHEMATICS && !MainUtil.isInSubDirectory(dir, f) && !actor.hasPermission(
+                    "worldedit.schematic.delete.other")) {
+                actor.print(Caption.of("fawe.error.no-perm", "worldedit.schematic.delete.other"));
+                continue;
+            }
+            if (!deleteFile(f)) {
+                actor.print(Caption.of("worldedit.schematic.delete.failed", TextComponent.of(filename)));
+                continue;
+            }
+            actor.print(Caption.of("worldedit.schematic.delete.deleted", filename));
+        }
+        //FAWE end
+    }
+
+    //FAWE start
+    private boolean deleteFile(File file) {
+        if (file.delete()) {
+            new File(file.getParentFile(), "." + file.getName() + ".cached").delete();
+            return true;
+        }
+        return false;
+    }
+    //FAWE end
 
     @Command(
             name = "formats",
@@ -700,10 +800,10 @@ public class SchematicCommands {
 
         String headerBytesElem = String.format("%.1fkb", totalBytes / 1000.0);
 
-        if (Settings.settings().PATHS.PER_PLAYER_SCHEMATICS && Settings.settings().EXPERIMENTAL.PER_PLAYER_FILE_SIZE_LIMIT > -1) {
+        if (Settings.settings().PATHS.PER_PLAYER_SCHEMATICS && actor.getLimit().SCHEM_FILE_SIZE_LIMIT > -1) {
             headerBytesElem += String.format(
                     " / %dkb",
-                    Settings.settings().EXPERIMENTAL.PER_PLAYER_FILE_SIZE_LIMIT
+                    actor.getLimit().SCHEM_FILE_SIZE_LIMIT
             );
         }
 
@@ -720,68 +820,11 @@ public class SchematicCommands {
 
     }
 
-    @Command(
-            name = "delete",
-            aliases = {"d"},
-            desc = "Delete a saved schematic"
-    )
-    @CommandPermissions("worldedit.schematic.delete")
-    public void delete(
-            Actor actor, LocalSession session,
-            @Arg(desc = "File name.")
-                    String filename
-    ) throws WorldEditException, IOException {
-        LocalConfiguration config = worldEdit.getConfiguration();
-        File working = worldEdit.getWorkingDirectoryPath(config.saveDir).toFile();
-        //FAWE start
-        File dir = Settings.settings().PATHS.PER_PLAYER_SCHEMATICS ? new File(working, actor.getUniqueId().toString()) : working;
-        List<File> files = new ArrayList<>();
-
-        if (filename.equalsIgnoreCase("*")) {
-            files.addAll(getFiles(session.getClipboard()));
-        } else {
-            File f = MainUtil.resolveRelative(new File(dir, filename));
-            files.add(f);
-        }
-
-        if (files.isEmpty()) {
-            actor.print(Caption.of("worldedit.schematic.delete.does-not-exist", TextComponent.of(filename)));
-            return;
-        }
-        for (File f : files) {
-            if (!MainUtil.isInSubDirectory(working, f) || !f.exists()) {
-                actor.print(Caption.of("worldedit.schematic.delete.does-not-exist", TextComponent.of(filename)));
-                continue;
-            }
-            if (Settings.settings().PATHS.PER_PLAYER_SCHEMATICS && !MainUtil.isInSubDirectory(dir, f) && !actor.hasPermission(
-                    "worldedit.schematic.delete.other")) {
-                actor.print(Caption.of("fawe.error.no-perm", "worldedit.schematic.delete.other"));
-                continue;
-            }
-            if (!deleteFile(f)) {
-                actor.print(Caption.of("worldedit.schematic.delete.failed", TextComponent.of(filename)));
-                continue;
-            }
-            actor.print(Caption.of("worldedit.schematic.delete.deleted", filename));
-        }
-        //FAWE end
-    }
-
-    //FAWE start
-    private boolean deleteFile(File file) {
-        if (file.delete()) {
-            new File(file.getParentFile(), "." + file.getName() + ".cached").delete();
-            return true;
-        }
-        return false;
-    }
-    //FAWE end
-
     private static class SchematicLoadTask implements Callable<ClipboardHolder> {
 
         private final Actor actor;
-        private final ClipboardFormat format;
         private final File file;
+        private final ClipboardFormat format;
 
         SchematicLoadTask(Actor actor, File file, ClipboardFormat format) {
             this.actor = actor;
@@ -804,14 +847,40 @@ public class SchematicCommands {
 
     }
 
-    private static class SchematicSaveTask implements Callable<Void> {
+    private abstract static class SchematicOutputTask<T> implements Callable<T> {
+        protected final Actor actor;
+        protected final ClipboardFormat format;
+        protected final ClipboardHolder holder;
 
+        SchematicOutputTask(
+                Actor actor,
+                ClipboardFormat format,
+                ClipboardHolder holder
+        ) {
+            this.actor = actor;
+            this.format = format;
+            this.holder = holder;
+        }
+
+        protected void writeToOutputStream(OutputStream outputStream) throws IOException, WorldEditException {
+            Clipboard clipboard = holder.getClipboard();
+            Transform transform = holder.getTransform();
+            Clipboard target = clipboard.transform(transform);
+
+            try (Closer closer = Closer.create()) {
+                OutputStream stream = closer.register(outputStream);
+                BufferedOutputStream bos = closer.register(new BufferedOutputStream(stream));
+                ClipboardWriter writer = closer.register(format.getWriter(bos));
+                writer.write(target);
+            }
+        }
+    }
+
+    private static class SchematicSaveTask extends SchematicOutputTask<Void> {
         private final Actor actor;
-        private final ClipboardFormat format;
-        private final ClipboardHolder holder;
+        private File file; //FAWE: un-finalize
         private final boolean overwrite;
-        private final File rootDir;
-        private File file;
+        private final File rootDir; //FAWE: add root-dir
 
         SchematicSaveTask(
                 Actor actor,
@@ -821,12 +890,11 @@ public class SchematicCommands {
                 ClipboardHolder holder,
                 boolean overwrite
         ) {
+            super(actor, format, holder);
             this.actor = actor;
             this.file = file;
-            this.rootDir = rootDir;
-            this.format = format;
-            this.holder = holder;
             this.overwrite = overwrite;
+            this.rootDir = rootDir; //FAWE: add root-dir
         }
 
         @Override
@@ -837,7 +905,7 @@ public class SchematicCommands {
 
             //FAWE start
             boolean checkFilesize = Settings.settings().PATHS.PER_PLAYER_SCHEMATICS
-                    && Settings.settings().EXPERIMENTAL.PER_PLAYER_FILE_SIZE_LIMIT > -1;
+                    && actor.getLimit().SCHEM_FILE_SIZE_LIMIT > -1;
 
             double directorysizeKb = 0;
             String curFilepath = file.getAbsolutePath();
@@ -867,7 +935,7 @@ public class SchematicCommands {
             }
 
 
-            if (Settings.settings().PATHS.PER_PLAYER_SCHEMATICS && Settings.settings().EXPERIMENTAL.PER_PLAYER_FILE_NUM_LIMIT > -1) {
+            if (Settings.settings().PATHS.PER_PLAYER_SCHEMATICS && actor.getLimit().SCHEM_FILE_NUM_LIMIT > -1) {
 
                 if (numFiles == -1) {
                     numFiles = 0;
@@ -880,7 +948,7 @@ public class SchematicCommands {
                         }
                     }
                 }
-                int limit = Settings.settings().EXPERIMENTAL.PER_PLAYER_FILE_NUM_LIMIT;
+                int limit = actor.getLimit().SCHEM_FILE_NUM_LIMIT;
 
                 if (numFiles >= limit) {
                     TextComponent noSlotsErr = TextComponent.of( //TODO - to be moved into captions/translatablecomponents
@@ -899,10 +967,7 @@ public class SchematicCommands {
             if (transform.isIdentity()) {
                 target = clipboard;
             } else {
-                FlattenedClipboardTransform result = FlattenedClipboardTransform.transform(clipboard, transform);
-                target = new BlockArrayClipboard(result.getTransformedRegion());
-                target.setOrigin(clipboard.getOrigin());
-                Operations.completeLegacy(result.copyTo(target));
+                target = clipboard.transform(transform);
             }
 
             try (Closer closer = Closer.create()) {
@@ -931,7 +996,7 @@ public class SchematicCommands {
                     if (checkFilesize) {
 
                         double curKb = filesizeKb + directorysizeKb;
-                        int allocatedKb = Settings.settings().EXPERIMENTAL.PER_PLAYER_FILE_SIZE_LIMIT;
+                        int allocatedKb = actor.getLimit().SCHEM_FILE_SIZE_LIMIT;
 
                         if (overwrite) {
                             curKb -= oldKbOverwritten;
@@ -966,11 +1031,11 @@ public class SchematicCommands {
                         actor.print(kbRemainingNotif);
                     }
 
-                    if (Settings.settings().PATHS.PER_PLAYER_SCHEMATICS && Settings.settings().EXPERIMENTAL.PER_PLAYER_FILE_NUM_LIMIT > -1) {
+                    if (Settings.settings().PATHS.PER_PLAYER_SCHEMATICS && actor.getLimit().SCHEM_FILE_NUM_LIMIT > -1) {
 
                         TextComponent slotsRemainingNotif = TextComponent.of(
                                 //TODO - to be moved into captions/translatablecomponents
-                                "You have " + (Settings.settings().EXPERIMENTAL.PER_PLAYER_FILE_NUM_LIMIT - numFiles)
+                                "You have " + (actor.getLimit().SCHEM_FILE_NUM_LIMIT - numFiles)
                                         + " schematic file slots left.",
                                 TextColor.GRAY
                         );
@@ -984,7 +1049,34 @@ public class SchematicCommands {
             //FAWE end
             return null;
         }
+    }
 
+    private static class SchematicShareTask extends SchematicOutputTask<Consumer<Actor>> {
+        private final Actor actor;
+        private final String name;
+        private final ClipboardShareDestination destination;
+
+        SchematicShareTask(Actor actor,
+                           ClipboardHolder holder,
+                           ClipboardShareDestination destination,
+                           ClipboardFormat format,
+                           String name) {
+            super(actor, format, holder);
+            this.actor = actor;
+            this.name = name;
+            this.destination = destination;
+        }
+
+        @Override
+        public Consumer<Actor> call() throws Exception {
+            ClipboardShareMetadata metadata = new ClipboardShareMetadata(
+                format,
+                this.actor.getName(),
+                name == null ? actor.getName() + "-" + System.currentTimeMillis() : name
+            );
+
+            return destination.share(metadata, this::writeToOutputStream);
+        }
     }
 
     private static class SchematicListTask implements Callable<Component> {

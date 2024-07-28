@@ -17,17 +17,17 @@ public class SingleFilterBlock extends AbstractSingleFilterBlock {
     }
 
     @Override
-    public int getX() {
+    public int x() {
         return x;
     }
 
     @Override
-    public int getY() {
+    public int y() {
         return y;
     }
 
     @Override
-    public int getZ() {
+    public int z() {
         return z;
     }
 

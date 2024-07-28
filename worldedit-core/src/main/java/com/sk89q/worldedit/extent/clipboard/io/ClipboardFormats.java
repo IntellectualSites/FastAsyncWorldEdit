@@ -66,6 +66,7 @@ public class ClipboardFormats {
     private static final Map<String, ClipboardFormat> aliasMap = new HashMap<>();
     // FAWE start - keep order of ClipboardFormat entries -> prefer FAST over SPONGE_SCHEMATIC
     private static final Multimap<String, ClipboardFormat> fileExtensionMap = Multimaps.newMultimap(new HashMap<>(), LinkedHashSet::new);
+    private static final Multimap<String, ClipboardFormat> explicitFileExtensionMap = Multimaps.newMultimap(new HashMap<>(), LinkedHashSet::new);
     // FAWE end
     private static final List<ClipboardFormat> registeredFormats = new ArrayList<>();
 
@@ -73,7 +74,7 @@ public class ClipboardFormats {
         checkNotNull(format);
 
         for (String key : format.getAliases()) {
-            String lowKey = key.toLowerCase(Locale.ENGLISH);
+            String lowKey = key.toLowerCase(Locale.ROOT);
             ClipboardFormat old = aliasMap.put(lowKey, format);
             if (old != null) {
                 aliasMap.put(lowKey, old);
@@ -83,8 +84,12 @@ public class ClipboardFormats {
             }
         }
         for (String ext : format.getFileExtensions()) {
-            String lowExt = ext.toLowerCase(Locale.ENGLISH);
+            String lowExt = ext.toLowerCase(Locale.ROOT);
             fileExtensionMap.put(lowExt, format);
+        }
+        for (String ext : format.getExplicitFileExtensions()) {
+            String lowExt = ext.toLowerCase(Locale.ROOT);
+            explicitFileExtensionMap.put(lowExt, format);
         }
         registeredFormats.add(format);
     }
@@ -104,7 +109,7 @@ public class ClipboardFormats {
     @Nullable
     public static ClipboardFormat findByAlias(String alias) {
         checkNotNull(alias);
-        return aliasMap.get(alias.toLowerCase(Locale.ENGLISH).trim());
+        return aliasMap.get(alias.toLowerCase(Locale.ROOT).trim());
     }
 
     /**
@@ -147,6 +152,18 @@ public class ClipboardFormats {
         return fileExtensionMap.keySet().toArray(new String[fileExtensionMap.keySet().size()]);
     }
 
+    //FAWE start
+
+    /**
+     * A mapping from explicit extensions (e.g. .schem2) to formats.
+     *
+     * @return a multimap from a file extension to the potential matching formats.
+     */
+    public static Multimap<String, ClipboardFormat> getExplicitFileExtensionMap() {
+        return Multimaps.unmodifiableMultimap(explicitFileExtensionMap);
+    }
+    //FAWE end
+
     private ClipboardFormats() {
     }
 
@@ -157,12 +174,34 @@ public class ClipboardFormats {
      *
      * @param extension the extension
      * @return the format, otherwise null if one cannot be detected
+     * @deprecated DO NOT USE. Sponge formats 2 and 3 both use .schem by default.
      */
     @Nullable
+    @Deprecated(forRemoval = true, since = "TODO")
     public static ClipboardFormat findByExtension(String extension) {
         checkNotNull(extension);
 
         Collection<Entry<String, ClipboardFormat>> entries = getFileExtensionMap().entries();
+        for (Map.Entry<String, ClipboardFormat> entry : entries) {
+            if (entry.getKey().equalsIgnoreCase(extension)) {
+                return entry.getValue();
+            }
+        }
+        return null;
+
+    }
+
+    /**
+     * Detect the format given an explicit extension, e.g. ".schem2"
+     *
+     * @param extension the extension
+     * @return the format, otherwise null if one cannot be detected
+     */
+    @Nullable
+    public static ClipboardFormat findByExplicitExtension(String extension) {
+        checkNotNull(extension);
+
+        Collection<Entry<String, ClipboardFormat>> entries = getExplicitFileExtensionMap().entries();
         for (Map.Entry<String, ClipboardFormat> entry : entries) {
             if (entry.getKey().equalsIgnoreCase(extension)) {
                 return entry.getValue();
@@ -231,7 +270,7 @@ public class ClipboardFormats {
             }
             if (format == null && input.matches(".*\\.[\\w].*")) {
                 String extension = input.substring(input.lastIndexOf('.') + 1);
-                format = findByExtension(extension);
+                format = findByExplicitExtension(extension);
             }
             f = MainUtil.resolve(dir, input, format, true);
         }
@@ -302,7 +341,7 @@ public class ClipboardFormats {
                     byte[] buffer = new byte[8192];
                     while ((entry = zip.getNextEntry()) != null) {
                         String filename = entry.getName();
-                        ClipboardFormat format = findByExtension(filename);
+                        ClipboardFormat format = findByExtension(filename); // FIXME
                         if (format != null) {
                             FastByteArrayOutputStream out = new FastByteArrayOutputStream();
                             int len;

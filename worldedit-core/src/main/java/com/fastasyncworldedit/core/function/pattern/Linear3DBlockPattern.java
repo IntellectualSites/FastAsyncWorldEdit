@@ -7,8 +7,15 @@ import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BaseBlock;
 
+import java.util.Arrays;
+
 import static java.lang.Math.floorDiv;
 
+/**
+ * @deprecated replaced by {@link com.sk89q.worldedit.function.pattern.RandomPattern}
+ * combined with {@link com.fastasyncworldedit.core.math.random.Linear3DRandom}.
+ */
+@Deprecated(forRemoval = true, since = "2.9.2")
 public class Linear3DBlockPattern extends AbstractPattern {
 
     private final Pattern[] patternsArray;
@@ -33,8 +40,8 @@ public class Linear3DBlockPattern extends AbstractPattern {
 
     @Override
     public BaseBlock applyBlock(BlockVector3 position) {
-        int index = (position.getBlockX() / this.xScale
-                + position.getBlockY() / this.yScale + position.getBlockZ() / this.zScale) % patternsArray.length;
+        int index = (position.x() / this.xScale
+                + position.y() / this.yScale + position.z() / this.zScale) % patternsArray.length;
         if (index < 0) {
             index += patternsArray.length;
         }
@@ -43,12 +50,18 @@ public class Linear3DBlockPattern extends AbstractPattern {
 
     @Override
     public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
-        int index = (floorDiv(get.getBlockX(), this.xScale)
-                + floorDiv(get.getBlockY(), this.yScale) + floorDiv(get.getBlockZ(), this.zScale)) % patternsArray.length;
+        int index = (floorDiv(get.x(), this.xScale)
+                + floorDiv(get.y(), this.yScale) + floorDiv(get.z(), this.zScale)) % patternsArray.length;
         if (index < 0) {
             index += patternsArray.length;
         }
         return patternsArray[index].apply(extent, get, set);
+    }
+
+    @Override
+    public Pattern fork() {
+        final Pattern[] forked = Arrays.stream(this.patternsArray).map(Pattern::fork).toArray(Pattern[]::new);
+        return new Linear3DBlockPattern(forked, this.xScale, this.yScale, this.zScale);
     }
 
 }

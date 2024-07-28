@@ -230,7 +230,7 @@ public class BukkitServerInterface extends AbstractPlatform implements MultiUser
 
     //FAWE start
     @Override
-    public String getId() {
+    public String id() {
         return "intellectualsites:bukkit";
     }
     //FAWE end
@@ -305,9 +305,6 @@ public class BukkitServerInterface extends AbstractPlatform implements MultiUser
     public IBatchProcessor getPlatformPostProcessor(boolean fastMode) {
         boolean tickFluid = Settings.settings().EXPERIMENTAL.ALLOW_TICK_FLUIDS;
         if (!tickFluid) {
-            return null;
-        }
-        if (Settings.settings().QUEUE.NO_TICK_FASTMODE && fastMode) {
             return null;
         }
         return this.plugin.getBukkitImplAdapter().getTickingPostProcessor();

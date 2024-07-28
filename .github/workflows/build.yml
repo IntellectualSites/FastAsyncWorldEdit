@@ -11,13 +11,13 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
       - name: Validate Gradle Wrapper
-        uses: gradle/wrapper-validation-action@v1
+        uses: gradle/actions/wrapper-validation@v3
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           cache: gradle
-          java-version: 17
+          java-version: 21
       - name: Clean Build
         run: ./gradlew clean build --no-daemon
       - name: Determine release status

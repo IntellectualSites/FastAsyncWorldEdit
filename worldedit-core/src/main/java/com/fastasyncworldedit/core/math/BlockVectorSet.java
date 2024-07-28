@@ -50,9 +50,9 @@ public class BlockVectorSet extends AbstractCollection<BlockVector3> implements 
                     int cx = (int) MathMan.untripleWorldCoordX(triple);
                     int cy = (int) MathMan.untripleWorldCoordY(triple);
                     int cz = (int) MathMan.untripleWorldCoordZ(triple);
-                    pos.mutX((cx << 11) + pos.getBlockX());
-                    pos.mutY((cy << 9) + pos.getBlockY());
-                    pos.mutZ((cz << 11) + pos.getBlockZ());
+                    pos.mutX((cx << 11) + pos.x());
+                    pos.mutY((cy << 9) + pos.y());
+                    pos.mutZ((cz << 11) + pos.z());
                     return pos.toImmutable();
                 }
             }
@@ -79,9 +79,52 @@ public class BlockVectorSet extends AbstractCollection<BlockVector3> implements 
     }
 
     @Override
+    public void setOffset(final int x, final int z) {
+        // Do nothing
+    }
+
+    @Override
+    public void setOffset(final int x, final int y, final int z) {
+        // Do nothing
+    }
+
+    @Override
+    public boolean containsRadius(final int x, final int y, final int z, final int radius) {
+        if (radius <= 0) {
+            return contains(x, y, z);
+        }
+        // Quick corners check
+        if (!contains(x - radius, y, z - radius)) {
+            return false;
+        }
+        if (!contains(x + radius, y, z + radius)) {
+            return false;
+        }
+        if (!contains(x - radius, y, z + radius)) {
+            return false;
+        }
+        if (!contains(x + radius, y, z - radius)) {
+            return false;
+        }
+        // Slow but if someone wants to think of an elegant way then feel free to add it
+        for (int xx = -radius; xx <= radius; xx++) {
+            int rx = x + xx;
+            for (int yy = -radius; yy <= radius; yy++) {
+                int ry = y + yy;
+                for (int zz = -radius; zz <= radius; zz++) {
+                    if (contains(rx, ry, z + zz)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    @Override
     public boolean contains(Object o) {
         if (o instanceof BlockVector3 v) {
-            return contains(v.getBlockX(), v.getBlockY(), v.getBlockZ());
+            return contains(v.x(), v.y(), v.z());
         }
         return false;
     }
@@ -123,9 +166,9 @@ public class BlockVectorSet extends AbstractCollection<BlockVector3> implements 
                 int cy = (int) MathMan.untripleWorldCoordY(triple);
                 int cz = (int) MathMan.untripleWorldCoordZ(triple);
                 return mutable.setComponents(
-                        (cx << 11) + localPos.getBlockX(),
-                        (cy << 9) + localPos.getBlockY(),
-                        (cz << 11) + localPos.getBlockZ()
+                        (cx << 11) + localPos.x(),
+                        (cy << 9) + localPos.y(),
+                        (cz << 11) + localPos.z()
                 );
             }
         };
@@ -133,7 +176,7 @@ public class BlockVectorSet extends AbstractCollection<BlockVector3> implements 
 
     @Override
     public boolean add(BlockVector3 vector) {
-        return add(vector.getBlockX(), vector.getBlockY(), vector.getBlockZ());
+        return add(vector.x(), vector.y(), vector.z());
     }
 
     public boolean add(int x, int y, int z) {
@@ -149,12 +192,13 @@ public class BlockVectorSet extends AbstractCollection<BlockVector3> implements 
     }
 
     public boolean remove(int x, int y, int z) {
-        int pair = MathMan.pair((short) (x >> 11), (short) (z >> 11));
-        LocalBlockVectorSet localMap = localSets.get(pair);
+        int indexedY = (y + 128) >> 9;
+        long triple = MathMan.tripleWorldCoord((x >> 11), indexedY, (z >> 11));
+        LocalBlockVectorSet localMap = localSets.get(triple);
         if (localMap != null) {
-            if (localMap.remove(x & 2047, y, z & 2047)) {
+            if (localMap.remove(x & 2047, ((y + 128) & 511) - 128, z & 2047)) {
                 if (localMap.isEmpty()) {
-                    localSets.remove(pair);
+                    localSets.remove(triple);
                 }
                 return true;
             }
@@ -166,7 +210,7 @@ public class BlockVectorSet extends AbstractCollection<BlockVector3> implements 
     @Override
     public boolean remove(Object o) {
         if (o instanceof BlockVector3 v) {
-            return remove(v.getBlockX(), v.getBlockY(), v.getBlockZ());
+            return remove(v.x(), v.y(), v.z());
         }
         return false;
     }

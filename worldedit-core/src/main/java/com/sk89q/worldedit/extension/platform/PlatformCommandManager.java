@@ -24,6 +24,7 @@ import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.extension.platform.binding.Bindings;
 import com.fastasyncworldedit.core.extension.platform.binding.ConsumeBindings;
+import com.fastasyncworldedit.core.extension.platform.binding.EditSessionHolder;
 import com.fastasyncworldedit.core.extension.platform.binding.PrimitiveBindings;
 import com.fastasyncworldedit.core.extension.platform.binding.ProvideBindings;
 import com.fastasyncworldedit.core.internal.command.MethodInjector;
@@ -86,6 +87,8 @@ import com.sk89q.worldedit.command.WorldEditCommandsRegistration;
 import com.sk89q.worldedit.command.argument.Arguments;
 import com.sk89q.worldedit.command.argument.BooleanConverter;
 import com.sk89q.worldedit.command.argument.Chunk3dVectorConverter;
+import com.sk89q.worldedit.command.argument.ClipboardFormatConverter;
+import com.sk89q.worldedit.command.argument.ClipboardShareDestinationConverter;
 import com.sk89q.worldedit.command.argument.CommaSeparatedValuesConverter;
 import com.sk89q.worldedit.command.argument.DirectionConverter;
 import com.sk89q.worldedit.command.argument.DirectionVectorConverter;
@@ -152,7 +155,6 @@ import org.enginehub.piston.inject.MemoizingValueAccess;
 import org.enginehub.piston.inject.MergedValueAccess;
 import org.enginehub.piston.part.SubCommandPart;
 import org.enginehub.piston.suggestion.Suggestion;
-import org.enginehub.piston.util.HelpGenerator;
 import org.enginehub.piston.util.ValueProvider;
 
 import javax.annotation.Nonnull;
@@ -173,7 +175,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-
 
 /**
  * Handles the registration and invocation of commands.
@@ -226,7 +227,6 @@ public final class PlatformCommandManager {
                         new ConfirmHandler(),
                         new PreloadHandler()
                         //FAWE end
-
                 ));
         // setup separate from main constructor
         // ensures that everything is definitely assigned
@@ -272,6 +272,8 @@ public final class PlatformCommandManager {
         SideEffectConverter.register(commandManager);
         HeightConverter.register(commandManager);
         OffsetConverter.register(worldEdit, commandManager);
+        ClipboardFormatConverter.register(commandManager);
+        ClipboardShareDestinationConverter.register(commandManager);
         //FAWE start
         commandManager.registerConverter(
                 Key.of(com.sk89q.worldedit.function.pattern.Pattern.class, Annotations.patternList()),
@@ -309,20 +311,6 @@ public final class PlatformCommandManager {
                 }
         );
         //FAWE start
-        /*
-        globalInjectedValues.injectValue(Key.of(EditSession.class),
-                context -> {
-                    LocalSession localSession = context.injectedValue(Key.of(LocalSession.class))
-                            .orElseThrow(() -> new IllegalStateException("No LocalSession"));
-                    return context.injectedValue(Key.of(Actor.class))
-                            .map(actor -> {
-                                EditSession editSession = localSession.createEditSession(actor);
-                                editSession.enableStandardMode();
-                                Request.request().setEditSession(editSession);
-                                return editSession;
-                            });
-                });
-        */
         // TODO: Ping @MattBDev to reimplement 2020-02-04
 //        globalInjectedValues.injectValue(Key.of(CFICommands.CFISettings.class),
 //                context -> context.injectedValue(Key.of(Actor.class))
@@ -604,7 +592,6 @@ public final class PlatformCommandManager {
     void registerCommandsWith(Platform platform) {
         LOGGER.info("Registering commands with " + platform.getClass().getCanonicalName());
 
-
         LocalConfiguration config = platform.getConfiguration();
         boolean logging = config.logCommands;
         String path = config.logFile;
@@ -864,10 +851,10 @@ public final class PlatformCommandManager {
         store.injectValue(Key.of(InjectedValueStore.class), ValueProvider.constant(store));
         store.injectValue(Key.of(Event.class), ValueProvider.constant(event));
         //FAWE start - allow giving editsessions
-        if (event instanceof CommandEvent) {
-            EditSession session = ((CommandEvent) event).getSession();
+        if (event instanceof CommandEvent commandEvent) {
+            EditSession session = commandEvent.getSession();
             if (session != null) {
-                store.injectValue(Key.of(EditSession.class), context -> Optional.of(session));
+                store.injectValue(Key.of(EditSessionHolder.class), context -> Optional.of(new EditSessionHolder(session)));
             }
         }
         //FAWE end

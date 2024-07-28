@@ -97,11 +97,11 @@ public class RichMaskParser extends FaweParser<Mask> {
                                 )),
                                 () -> {
                                     if (full.length() == 1) {
-                                        return new ArrayList<>(worldEdit.getMaskFactory().getSuggestions(""));
+                                        return new ArrayList<>(worldEdit.getMaskFactory().getSuggestions("", context));
                                     }
                                     return new ArrayList<>(worldEdit
                                             .getMaskFactory()
-                                            .getSuggestions(command.toLowerCase(Locale.ROOT)));
+                                            .getSuggestions(command.toLowerCase(Locale.ROOT), context));
                                 }
                         );
                     }
@@ -143,7 +143,7 @@ public class RichMaskParser extends FaweParser<Mask> {
                             int end = command.lastIndexOf(']');
                             mask = parseFromInput(command.substring(1, end == -1 ? command.length() : end), context);
                         } else {
-                            BlockMaskBuilder builder = new BlockMaskBuilder();
+                            BlockMaskBuilder builder = new BlockMaskBuilder(context);
                             try {
                                 builder.addRegex(full);
                             } catch (InputParseException ignored) {
@@ -164,11 +164,11 @@ public class RichMaskParser extends FaweParser<Mask> {
                                         )),
                                         () -> {
                                             if (full.length() == 1) {
-                                                return new ArrayList<>(worldEdit.getMaskFactory().getSuggestions(""));
+                                                return new ArrayList<>(worldEdit.getMaskFactory().getSuggestions("", context));
                                             }
                                             return new ArrayList<>(worldEdit
                                                     .getMaskFactory()
-                                                    .getSuggestions(command.toLowerCase(Locale.ROOT)));
+                                                    .getSuggestions(command.toLowerCase(Locale.ROOT), context));
                                         }
                                 );
                             }

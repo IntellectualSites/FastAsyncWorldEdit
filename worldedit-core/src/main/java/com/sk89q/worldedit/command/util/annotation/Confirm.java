@@ -3,7 +3,6 @@ package com.sk89q.worldedit.command.util.annotation;
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.util.task.InterruptableCondition;
 import com.sk89q.worldedit.IncompleteRegionException;
-import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.command.argument.Arguments;
 import com.sk89q.worldedit.event.Event;
 import com.sk89q.worldedit.event.platform.CommandEvent;
@@ -57,7 +56,7 @@ public @interface Confirm {
                         .orElseThrow(IncompleteRegionException::new);
                 BlockVector3 pos1 = region.getMinimumPoint();
                 BlockVector3 pos2 = region.getMaximumPoint();
-                long area = (pos2.getX() - pos1.getX()) * (pos2.getZ() - pos1.getZ() + 1)
+                long area = (pos2.x() - pos1.x()) * (pos2.z() - pos1.z() + 1)
                         * (long) value;
                 long max = 2 << 18;
                 if (max != -1 && area > max) {
@@ -75,7 +74,7 @@ public @interface Confirm {
                 if (checkExisting(context)) {
                     return true;
                 }
-                int max = WorldEdit.getInstance().getConfiguration().maxRadius;
+                int max = actor.getLimit().MAX_RADIUS;
                 if (max != -1 && value > max) {
                     actor.print(Caption.of("fawe.cancel.reason.confirm.radius",
                             value, max, getArgs(context)

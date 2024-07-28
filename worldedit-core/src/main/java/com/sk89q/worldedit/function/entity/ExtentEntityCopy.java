@@ -206,9 +206,9 @@ public class ExtentEntityCopy implements EntityFunction {
                     BlockVector3 newLeash = transform.apply(tilePosition.subtract(from)).add(to).toBlockPoint();
                     return new BaseEntity(state.getType(), tag.createBuilder()
                             .put("Leash", leashCompound.createBuilder()
-                                    .putInt("X", newLeash.getBlockX())
-                                    .putInt("Y", newLeash.getBlockY())
-                                    .putInt("Z", newLeash.getBlockZ())
+                                    .putInt("X", newLeash.x())
+                                    .putInt("Y", newLeash.y())
+                                    .putInt("Z", newLeash.z())
                                     .build()
                             ).build());
                 }
@@ -226,9 +226,9 @@ public class ExtentEntityCopy implements EntityFunction {
                 BlockVector3 newTilePosition = transform.apply(tilePosition.subtract(from)).add(to).toBlockPoint();
 
                 CompoundTagBuilder builder = tag.createBuilder()
-                        .putInt("TileX", newTilePosition.getBlockX())
-                        .putInt("TileY", newTilePosition.getBlockY())
-                        .putInt("TileZ", newTilePosition.getBlockZ());
+                        .putInt("TileX", newTilePosition.x())
+                        .putInt("TileY", newTilePosition.y())
+                        .putInt("TileZ", newTilePosition.z());
 
                 if (hasFacing) {
                     boolean isPainting = state.getType() == EntityTypes.PAINTING; // Paintings have different facing values

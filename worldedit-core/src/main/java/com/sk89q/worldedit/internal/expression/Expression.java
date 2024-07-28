@@ -24,6 +24,7 @@ import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.antlr.ExpressionLexer;
 import com.sk89q.worldedit.antlr.ExpressionParser;
 import com.sk89q.worldedit.internal.expression.invoke.ExpressionCompiler;
+import com.sk89q.worldedit.regions.shape.WorldEditExpressionEnvironment;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -199,7 +200,9 @@ public class Expression implements Cloneable {
 
     //FAWE start
     public Expression clone() {
-        return new Expression(initialExpression, new HashSet<>(providedSlots));
+        Expression expression = new Expression(initialExpression, new HashSet<>(providedSlots));
+        expression.setEnvironment(getEnvironment().clone());
+        return expression;
     }
     //FAWE end
 

@@ -1,6 +1,7 @@
 package com.fastasyncworldedit.core.function.pattern;
 
 import com.sk89q.worldedit.function.pattern.AbstractPattern;
+import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.internal.expression.EvaluationException;
 import com.sk89q.worldedit.internal.expression.Expression;
 import com.sk89q.worldedit.internal.expression.ExpressionException;
@@ -49,12 +50,17 @@ public class ExpressionPattern extends AbstractPattern {
             if (expression.getEnvironment() instanceof WorldEditExpressionEnvironment) {
                 ((WorldEditExpressionEnvironment) expression.getEnvironment()).setCurrentBlock(vector.toVector3());
             }
-            double combined = expression.evaluate(vector.getX(), vector.getY(), vector.getZ());
+            double combined = expression.evaluate(vector.x(), vector.y(), vector.z());
             return BlockState.getFromOrdinal((int) combined).toBaseBlock();
         } catch (EvaluationException e) {
             e.printStackTrace();
             return BlockTypes.AIR.getDefaultState().toBaseBlock();
         }
+    }
+
+    @Override
+    public Pattern fork() {
+        return new ExpressionPattern(this.expression.clone());
     }
 
 }

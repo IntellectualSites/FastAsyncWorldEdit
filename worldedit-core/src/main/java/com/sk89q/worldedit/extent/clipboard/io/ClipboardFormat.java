@@ -35,6 +35,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URL;
+import java.nio.file.Files;
 import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -82,7 +83,29 @@ public interface ClipboardFormat {
      * @param file the file
      * @return true if the given file is of this format
      */
-    boolean isFormat(File file);
+    default boolean isFormat(File file) {
+        try (InputStream stream = Files.newInputStream(file.toPath())) {
+            return isFormat(stream);
+        } catch (IOException e) {
+            return false;
+        }
+    }
+
+    /**
+     * Return whether the given stream is of this format.
+     *
+     * @apiNote The caller is responsible for the following:
+     *     <ul>
+     *         <li>Closing the input stream</li>
+     *     </ul>
+     *
+     * @param inputStream The stream
+     * @return true if the given stream is of this format
+     * @since TODO
+     */
+    default boolean isFormat(InputStream inputStream) {
+        return false;
+    }
 
     /**
      * Get the file extension this format primarily uses.
@@ -100,6 +123,13 @@ public interface ClipboardFormat {
     Set<String> getFileExtensions();
 
     //FAWE start
+
+    /**
+     * Get the explicit file extensions (e.g. .schem2) this format is commonly known to use.
+     *
+     * @return The explicit file extensions this format might be known by
+     */
+    Set<String> getExplicitFileExtensions();
 
     /**
      * Sets the actor's clipboard.

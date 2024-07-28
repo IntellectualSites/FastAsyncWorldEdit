@@ -23,26 +23,39 @@ import com.fastasyncworldedit.core.registry.RegistryItem;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Supplier;
 
 //FAWE start - implements RegistryItem
-public abstract class Category<T extends Keyed> implements RegistryItem {
+public abstract class Category<T extends Keyed> implements RegistryItem, Keyed {
 //FAWE end
 
     private final Set<T> set = new HashSet<>();
+    private final Supplier<Set<T>> supplier;
     protected final String id;
     private boolean empty = true;
 
-    protected Category(final String id) {
+    public Category(final String id) {
         this.id = id;
+        this.supplier = null;
     }
 
-    public final String getId() {
+    public Category(String id, Supplier<Set<T>> contentSupplier) {
+        this.id = id;
+        this.supplier = contentSupplier;
+    }
+
+    @Override
+    public final String id() {
         return this.id;
     }
 
     public final Set<T> getAll() {
         if (this.empty) {
-            this.set.addAll(this.load());
+            if (supplier != null) {
+                this.set.addAll(this.supplier.get());
+            } else {
+                this.set.addAll(this.load());
+            }
             this.empty = false;
         }
         return this.set;
@@ -61,6 +74,14 @@ public abstract class Category<T extends Keyed> implements RegistryItem {
         return internalId;
     }
 
+    /**
+     * Loads the contents of this category from the platform.
+     *
+     * @return The loaded contents of the category
+     * @deprecated The load system will be removed in a future WorldEdit release. The registries should be populated by
+     *     the platforms via the supplier constructor.
+     */
+    @Deprecated
     protected abstract Set<T> load();
     //FAWE end
 
@@ -81,7 +102,7 @@ public abstract class Category<T extends Keyed> implements RegistryItem {
 
     @Override
     public String toString() {
-        return getId();
+        return id();
     }
 
 }

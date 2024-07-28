@@ -91,9 +91,7 @@ public class AbstractDelegateExtent implements Extent {
 
     @Override
     public BlockState getBlock(BlockVector3 position) {
-        //FAWE start - return coordinates
-        return extent.getBlock(position.getX(), position.getY(), position.getZ());
-        //FAWE end
+        return extent.getBlock(position);
     }
 
     @Override
@@ -103,9 +101,7 @@ public class AbstractDelegateExtent implements Extent {
 
     @Override
     public BaseBlock getFullBlock(BlockVector3 position) {
-        //FAWE start - return coordinates
-        return extent.getFullBlock(position.getX(), position.getY(), position.getZ());
-        //FAWE end
+        return extent.getFullBlock(position);
     }
 
     //FAWE start
@@ -117,9 +113,7 @@ public class AbstractDelegateExtent implements Extent {
 
     @Override
     public BaseBlock getFullBlock(int x, int y, int z) {
-        //FAWE start - return coordinates
         return extent.getFullBlock(x, y, z);
-        //FAWE end
     }
 
     @Override
@@ -375,9 +369,7 @@ public class AbstractDelegateExtent implements Extent {
 
     @Override
     public BiomeType getBiome(BlockVector3 position) {
-        //FAWE start - switch top x,y,z
-        return extent.getBiomeType(position.getX(), position.getY(), position.getZ());
-        //FAWE end
+        return extent.getBiome(position);
     }
 
     //FAWE start
@@ -420,9 +412,7 @@ public class AbstractDelegateExtent implements Extent {
     @Override
     public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 position, T block)
             throws WorldEditException {
-        //FAWE start - switch to x,y,z
-        return extent.setBlock(position.getX(), position.getY(), position.getZ(), block);
-        //FAWE end
+        return extent.setBlock(position, block);
     }
 
     //FAWE start
@@ -447,9 +437,7 @@ public class AbstractDelegateExtent implements Extent {
 
     @Override
     public boolean setBiome(BlockVector3 position, BiomeType biome) {
-        //FAWE start - switch to x,y,z
-        return extent.setBiome(position.getX(), position.getY(), position.getZ(), biome);
-        //FAWE end
+        return extent.setBiome(position, biome);
     }
 
     //FAWE start

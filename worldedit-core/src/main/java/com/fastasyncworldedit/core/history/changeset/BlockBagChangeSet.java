@@ -68,9 +68,9 @@ public class BlockBagChangeSet extends AbstractDelegateChangeSet {
 
     @Override
     public void add(BlockVector3 loc, BaseBlock from, BaseBlock to) {
-        int x = loc.getBlockX();
-        int y = loc.getBlockY();
-        int z = loc.getBlockZ();
+        int x = loc.x();
+        int y = loc.y();
+        int z = loc.z();
         add(x, y, z, from, to);
     }
 
@@ -112,7 +112,7 @@ public class BlockBagChangeSet extends AbstractDelegateChangeSet {
     @Override
     public void addTileCreate(CompoundTag nbt) {
         if (nbt.containsKey("items")) {
-            Map<String, Tag> map = new HashMap<>(nbt.getValue());
+            Map<String, Tag<?, ?>> map = new HashMap<>(nbt.getValue());
             map.remove("items");
         }
         super.addTileCreate(nbt);

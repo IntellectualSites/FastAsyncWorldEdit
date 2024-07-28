@@ -38,6 +38,9 @@ import org.apache.logging.log4j.Logger;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.imageio.ImageIO;
+import javax.imageio.ImageReadParam;
+import javax.imageio.ImageReader;
+import javax.imageio.stream.ImageInputStream;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.BufferedOutputStream;
@@ -56,6 +59,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
@@ -70,6 +76,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -91,6 +98,10 @@ import static java.lang.System.arraycopy;
 public class MainUtil {
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
+    private static final String CURL_USER_AGENT = "curl/8.1.1";
+    private static final HttpClient HTTP_CLIENT = HttpClient.newBuilder()
+            .followRedirects(HttpClient.Redirect.NORMAL)
+            .build();
 
     public static List<String> filter(String prefix, List<String> suggestions) {
         if (prefix.isEmpty()) {
@@ -206,7 +217,7 @@ public class MainUtil {
 //        } else if (changeSet instanceof CPUOptimizedChangeSet) {
 //            return changeSet.size() + 32;
         } else if (changeSet != null) {
-            return changeSet.size() * 128L;
+            return changeSet.longSize() * 128; // Approx
         } else {
             return 0;
         }
@@ -416,7 +427,7 @@ public class MainUtil {
      */
     @Nonnull
     public static CompoundTag setPosition(@Nonnull CompoundTag tag, int x, int y, int z) {
-        Map<String, Tag> value = new HashMap<>(tag.getValue());
+        Map<String, Tag<?, ?>> value = new HashMap<>(tag.getValue());
         value.put("x", new IntTag(x));
         value.put("y", new IntTag(y));
         value.put("z", new IntTag(z));
@@ -432,16 +443,16 @@ public class MainUtil {
      */
     @Nonnull
     public static CompoundTag setEntityInfo(@Nonnull CompoundTag tag, @Nonnull Entity entity) {
-        Map<String, Tag> map = new HashMap<>(tag.getValue());
-        map.put("Id", new StringTag(entity.getState().getType().getId()));
+        Map<String, Tag<?, ?>> map = new HashMap<>(tag.getValue());
+        map.put("Id", new StringTag(entity.getState().getType().id()));
         ListTag pos = (ListTag) map.get("Pos");
         if (pos != null) {
             Location loc = entity.getLocation();
             // Create a copy, because the list is immutable...
             List<Tag> posList = new ArrayList<>(pos.getValue());
-            posList.set(0, new DoubleTag(loc.getX()));
-            posList.set(1, new DoubleTag(loc.getY()));
-            posList.set(2, new DoubleTag(loc.getZ()));
+            posList.set(0, new DoubleTag(loc.x()));
+            posList.set(1, new DoubleTag(loc.y()));
+            posList.set(2, new DoubleTag(loc.z()));
             map.put("Pos", new ListTag(pos.getType(), posList));
         }
         return new CompoundTag(map);
@@ -519,12 +530,57 @@ public class MainUtil {
         return destFile;
     }
 
-    public static BufferedImage readImage(InputStream in) throws IOException {
-        return MainUtil.toRGB(ImageIO.read(in));
+    public static BufferedImage readImage(InputStream stream) throws IOException {
+        final ImageInputStream imageStream = ImageIO.createImageInputStream(stream);
+        if (imageStream == null) {
+            throw new IOException("Can't find suitable ImageInputStream");
+        }
+        Iterator<ImageReader> iter = ImageIO.getImageReaders(imageStream);
+        if (!iter.hasNext()) {
+            throw new IOException("Could not get image reader from stream.");
+        }
+        ImageReader reader = iter.next();
+        ImageReadParam param = reader.getDefaultReadParam();
+        reader.setInput(imageStream, true, true);
+        BufferedImage bi;
+        try {
+            bi = reader.read(0, param);
+        } finally {
+            reader.dispose();
+            stream.close();
+            imageStream.close();
+        }
+        return MainUtil.toRGB(bi);
     }
 
     public static BufferedImage readImage(URL url) throws IOException {
-        return readImage(url.openStream());
+        try (final InputStream stream = readImageStream(url.toURI())) {
+            return readImage(stream);
+        } catch (URISyntaxException e) {
+            throw new IOException("failed to parse url to uri reference", e);
+        }
+    }
+
+    public static InputStream readImageStream(final URI uri) throws IOException {
+        try {
+            HttpRequest.Builder requestBuilder = HttpRequest.newBuilder(uri).GET();
+
+            if (uri.getHost().equalsIgnoreCase("i.imgur.com")) {
+                requestBuilder = requestBuilder.setHeader("User-Agent", CURL_USER_AGENT);
+            }
+
+            final HttpResponse<InputStream> response = HTTP_CLIENT.send(
+                    requestBuilder.build(),
+                    HttpResponse.BodyHandlers.ofInputStream()
+            );
+            final InputStream body = response.body();
+            if (response.statusCode() > 299) {
+                throw new IOException("Expected 2xx as response code, but received " + response.statusCode());
+            }
+            return body;
+        } catch (InterruptedException e) {
+            throw new IOException("request was interrupted", e);
+        }
     }
 
     public static BufferedImage readImage(File file) throws IOException {

@@ -116,7 +116,10 @@ public class FaweAPI {
      * @param file the file to load
      * @return a clipboard containing the schematic
      * @see ClipboardFormat
+     * @deprecated Opens streams that are not then closed. Use {@link ClipboardFormats#findByFile(File)} and its relevant
+     *         methods to allow closing created streams/closing the reader (which will close the stream(s))
      */
+    @Deprecated(forRemoval = true, since = "TODO")
     public static Clipboard load(File file) throws IOException {
         return ClipboardFormats.findByFile(file).load(file);
     }
@@ -339,11 +342,11 @@ public class FaweAPI {
         final BlockVector3 bot = selection.getMinimumPoint();
         final BlockVector3 top = selection.getMaximumPoint();
 
-        final int minX = bot.getBlockX() >> 4;
-        final int minZ = bot.getBlockZ() >> 4;
+        final int minX = bot.x() >> 4;
+        final int minZ = bot.z() >> 4;
 
-        final int maxX = top.getBlockX() >> 4;
-        final int maxZ = top.getBlockZ() >> 4;
+        final int maxX = top.x() >> 4;
+        final int maxZ = top.z() >> 4;
 
         int count = 0;
 

@@ -1,7 +1,6 @@
 package com.fastasyncworldedit.core.util.collection;
 
 import com.fastasyncworldedit.core.FaweCache;
-import com.fastasyncworldedit.core.math.MutableBlockVector2;
 import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -167,9 +166,9 @@ public final class MemBlockSet extends BlockSet {
             @Override
             public boolean contains(Object o) {
                 if (o instanceof BlockVector2 other) {
-                    IRow rowx = rows[other.getX() - getChunkOffsetX()];
+                    IRow rowx = rows[other.x() - getChunkOffsetX()];
                     if (rowx instanceof RowX) {
-                        return ((RowX) rowx).rows[other.getZ() - getChunkOffsetZ()] instanceof RowZ;
+                        return ((RowX) rowx).rows[other.z() - getChunkOffsetZ()] instanceof RowZ;
                     }
                 }
                 return false;
@@ -269,11 +268,11 @@ public final class MemBlockSet extends BlockSet {
             @Override
             public boolean contains(Object o) {
                 if (o instanceof BlockVector3 other) {
-                    IRow rowx = rows[other.getX() - getChunkOffsetX()];
+                    IRow rowx = rows[other.x() - getChunkOffsetX()];
                     if (rowx instanceof RowX) {
-                        IRow rowz = ((RowX) rowx).rows[other.getZ()];
+                        IRow rowz = ((RowX) rowx).rows[other.z()];
                         if (rowz instanceof RowZ) {
-                            return ((RowZ) rowz).rows[other.getY() - (minSectionPosition << 4) - getChunkOffsetZ()] instanceof RowY;
+                            return ((RowZ) rowz).rows[other.y() - (minSectionPosition << 4) - getChunkOffsetZ()] instanceof RowY;
                         }
                     }
                 }

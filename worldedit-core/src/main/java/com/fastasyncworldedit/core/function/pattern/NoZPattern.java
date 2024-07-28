@@ -24,16 +24,21 @@ public class NoZPattern extends AbstractPattern {
 
     @Override
     public BaseBlock applyBlock(BlockVector3 pos) {
-        mutable.mutX(pos.getX());
-        mutable.mutY(pos.getY());
+        mutable.mutX(pos.x());
+        mutable.mutY(pos.y());
         return pattern.applyBlock(mutable);
     }
 
     @Override
     public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
-        mutable.mutX(get.getX());
-        mutable.mutY(get.getY());
+        mutable.mutX(get.x());
+        mutable.mutY(get.y());
         return pattern.apply(extent, mutable, set);
+    }
+
+    @Override
+    public Pattern fork() {
+        return new NoZPattern(this.pattern.fork());
     }
 
 }

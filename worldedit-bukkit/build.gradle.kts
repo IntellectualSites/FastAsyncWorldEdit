@@ -36,6 +36,7 @@ repositories {
         name = "Glaremasters"
         url = uri("https://repo.glaremasters.me/repository/towny/")
     }
+    maven("https://s01.oss.sonatype.org/content/repositories/snapshots/") // TODO Remove when 4.17.0 is released
     flatDir { dir(File("src/main/resources")) }
 }
 
@@ -169,16 +170,13 @@ tasks.named<ShadowJar>("shadowJar") {
             include(dependency("it.unimi.dsi:fastutil"))
         }
         relocate("org.incendo.serverlib", "com.fastasyncworldedit.serverlib") {
-            include(dependency("dev.notmyfault.serverlib:ServerLib:2.3.4"))
+            include(dependency("dev.notmyfault.serverlib:ServerLib:2.3.6"))
         }
         relocate("com.intellectualsites.paster", "com.fastasyncworldedit.paster") {
             include(dependency("com.intellectualsites.paster:Paster"))
         }
         relocate("org.lz4", "com.fastasyncworldedit.core.lz4") {
             include(dependency("org.lz4:lz4-java:1.8.0"))
-        }
-        relocate("net.kyori", "com.fastasyncworldedit.core.adventure") {
-            include(dependency("net.kyori:adventure-nbt:4.15.0"))
         }
         relocate("com.zaxxer", "com.fastasyncworldedit.core.math") {
             include(dependency("com.zaxxer:SparseBitSet:1.3"))
@@ -210,7 +208,7 @@ tasks {
         versionNumber.set("${project.version}")
         versionType.set("release")
         uploadFile.set(file("build/libs/${rootProject.name}-Bukkit-${project.version}.jar"))
-        gameVersions.addAll(listOf("1.20.4", "1.20.3", "1.20.2", "1.20.1", "1.20", "1.19.4", "1.18.2", "1.17.1"))
+        gameVersions.addAll(listOf("1.21", "1.20.6", "1.20.5", "1.20.3", "1.20.2", "1.20.1", "1.20", "1.19.4"))
         loaders.addAll(listOf("paper", "spigot"))
         changelog.set("The changelog is available on GitHub: https://github.com/IntellectualSites/" +
                 "FastAsyncWorldEdit/releases/tag/${project.version}")

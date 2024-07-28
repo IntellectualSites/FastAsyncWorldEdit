@@ -141,13 +141,13 @@ public class Deform implements Contextual<Operation> {
                 zero = max.add(min).multiply(0.5);
                 unit = max.subtract(zero);
 
-                if (unit.getX() == 0) {
+                if (unit.x() == 0) {
                     unit = unit.withX(1.0);
                 }
-                if (unit.getY() == 0) {
+                if (unit.y() == 0) {
                     unit = unit.withY(1.0);
                 }
-                if (unit.getZ() == 0) {
+                if (unit.z() == 0) {
                     unit = unit.withZ(1.0);
                 }
                 break;
@@ -167,24 +167,14 @@ public class Deform implements Contextual<Operation> {
         );
     }
 
-    private static final class DeformOperation implements Operation {
-
-        private final Extent destination;
-        private final Region region;
-        private final Vector3 zero;
-        private final Vector3 unit;
-        private final String expression;
-        private final int timeout;
-
-        private DeformOperation(Extent destination, Region region, Vector3 zero, Vector3 unit, String expression, int timeout) {
-            this.destination = destination;
-            this.region = region;
-            this.zero = zero;
-            this.unit = unit;
-            this.expression = expression;
-            this.timeout = timeout;
-        }
-
+    private record DeformOperation(
+        Extent destination,
+        Region region,
+        Vector3 zero,
+        Vector3 unit,
+        String expression, //FAWE: Expression -> String
+        int timeout
+    ) implements Operation {
         @Override
         public Operation resume(RunContext run) throws WorldEditException {
             try {

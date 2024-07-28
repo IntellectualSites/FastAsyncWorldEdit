@@ -2,18 +2,15 @@ package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_20_R3;
 
 import com.google.common.base.Suppliers;
 import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.util.ReflectionUtil;
-import com.sk89q.worldedit.bukkit.adapter.Refraction;
 import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_20_R3.nbt.PaperweightLazyCompoundTag;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.EmptyBlockGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
-import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.material.PushReaction;
 import org.bukkit.craftbukkit.v1_20_R3.block.data.CraftBlockData;
 
@@ -21,7 +18,6 @@ public class PaperweightBlockMaterial implements BlockMaterial {
 
     private final Block block;
     private final BlockState blockState;
-    private final boolean isTranslucent;
     private final CraftBlockData craftBlockData;
     private final org.bukkit.Material craftMaterial;
     private final int opacity;
@@ -36,11 +32,6 @@ public class PaperweightBlockMaterial implements BlockMaterial {
         this.blockState = blockState;
         this.craftBlockData = CraftBlockData.fromData(blockState);
         this.craftMaterial = craftBlockData.getMaterial();
-        BlockBehaviour.Properties blockInfo = ReflectionUtil.getField(BlockBehaviour.class, block,
-                Refraction.pickName("properties", "aP"));
-        this.isTranslucent = !(boolean) ReflectionUtil.getField(BlockBehaviour.Properties.class, blockInfo,
-                Refraction.pickName("canOcclude", "n")
-        );
         opacity = blockState.getLightBlock(EmptyBlockGetter.INSTANCE, BlockPos.ZERO);
         BlockEntity tileEntity = !(block instanceof EntityBlock) ? null : ((EntityBlock) block).newBlockEntity(
                 BlockPos.ZERO,
@@ -75,7 +66,7 @@ public class PaperweightBlockMaterial implements BlockMaterial {
 
     @Override
     public boolean isOpaque() {
-        return blockState.isOpaque();
+        return blockState.canOcclude();
     }
 
     @Override
@@ -85,14 +76,13 @@ public class PaperweightBlockMaterial implements BlockMaterial {
 
     @Override
     public boolean isLiquid() {
-        // TODO: Better check ?
-        return block instanceof LiquidBlock;
+        return !blockState.getFluidState().is(Fluids.EMPTY);
     }
 
     @Override
     public boolean isSolid() {
-        // TODO: Replace
-        return blockState.isSolid();
+        // No access to world -> EmptyBlockGetter
+        return blockState.isSolidRender(EmptyBlockGetter.INSTANCE, BlockPos.ZERO);
     }
 
     @Override
@@ -158,7 +148,7 @@ public class PaperweightBlockMaterial implements BlockMaterial {
 
     @Override
     public boolean isTranslucent() {
-        return isTranslucent;
+        return !blockState.canOcclude();
     }
 
     @Override

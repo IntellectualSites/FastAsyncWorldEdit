@@ -168,7 +168,7 @@ public class RegionIntersection extends AbstractRegion {
         for (Region region : regions) {
             BlockVector3 regMin = region.getMinimumPoint();
             BlockVector3 regMax = region.getMaximumPoint();
-            if (tx >= regMin.getX() && bx <= regMax.getX() && tz >= regMin.getZ() && bz <= regMax.getZ()) {
+            if (tx >= regMin.x() && bx <= regMax.x() && tz >= regMin.z() && bz <= regMax.z()) {
                 intersecting.add(region);
             }
         }
@@ -204,8 +204,8 @@ public class RegionIntersection extends AbstractRegion {
         for (Region region : regions) {
             BlockVector3 regMin = region.getMinimumPoint();
             BlockVector3 regMax = region.getMaximumPoint();
-            if (tx >= regMin.getX() && bx <= regMax.getX() && tz >= regMin.getZ() && bz <= regMax.getZ()) {
-                return region.processSet(chunk, get, set, true);
+            if (tx >= regMin.x() && bx <= regMax.x() && tz >= regMin.z() && bz <= regMax.z()) {
+                set = region.processSet(chunk, get, set, true);
             }
         }
         return set; // default return set as no "blacklist" regions contained the chunk

@@ -192,17 +192,22 @@ public enum FaweCache implements Trimable {
             Type.OUTSIDE_REGION
     );
     public static final FaweException MAX_CHECKS = new FaweException(
-            Caption.of("fawe.cancel.reason.max" + ".checks"),
+            Caption.of("fawe.cancel.reason.max.checks"),
+            Type.MAX_CHECKS,
+            true
+    );
+    public static final FaweException MAX_FAILS = new FaweException(
+            Caption.of("fawe.cancel.reason.max.fails"),
             Type.MAX_CHECKS,
             true
     );
     public static final FaweException MAX_CHANGES = new FaweException(
-            Caption.of("fawe.cancel.reason.max" + ".changes"),
+            Caption.of("fawe.cancel.reason.max.changes"),
             Type.MAX_CHANGES,
             false
     );
     public static final FaweException LOW_MEMORY = new FaweException(
-            Caption.of("fawe.cancel.reason.low" + ".memory"),
+            Caption.of("fawe.cancel.reason.low.memory"),
             Type.LOW_MEMORY,
             false
     );
@@ -532,7 +537,7 @@ public enum FaweCache implements Trimable {
     }
 
     public CompoundTag asTag(Map<String, Object> value) {
-        HashMap<String, Tag> map = new HashMap<>();
+        HashMap<String, Tag<?, ?>> map = new HashMap<>();
         for (Map.Entry<String, Object> entry : value.entrySet()) {
             Object child = entry.getValue();
             Tag tag = asTag(child);
@@ -612,12 +617,38 @@ public enum FaweCache implements Trimable {
     /*
     Thread stuff
      */
+
+    /**
+     * Create a new blocking executor with default name and FaweCache logger
+     *
+     * @return new blocking executor
+     */
     public ThreadPoolExecutor newBlockingExecutor() {
+        return newBlockingExecutor("FAWE Blocking Executor - %d");
+    }
+
+    /**
+     * Create a new blocking executor with specified name and FaweCache logger
+     *
+     * @return new blocking executor
+     * @since 2.9.0
+     */
+    public ThreadPoolExecutor newBlockingExecutor(String name) {
+        return newBlockingExecutor(name, LOGGER);
+    }
+
+    /**
+     * Create a new blocking executor with specified name and logger
+     *
+     * @return new blocking executor
+     * @since 2.9.0
+     */
+    public ThreadPoolExecutor newBlockingExecutor(String name, Logger logger) {
         int nThreads = Settings.settings().QUEUE.PARALLEL_THREADS;
         ArrayBlockingQueue<Runnable> queue = new ArrayBlockingQueue<>(nThreads, true);
         return new ThreadPoolExecutor(nThreads, nThreads,
                 0L, TimeUnit.MILLISECONDS, queue,
-                new ThreadFactoryBuilder().setNameFormat("FAWE Blocking Executor - %d").build(),
+                new ThreadFactoryBuilder().setNameFormat(name).build(),
                 new ThreadPoolExecutor.CallerRunsPolicy()
         ) {
 
@@ -652,10 +683,10 @@ public enum FaweCache implements Trimable {
                         int hash = throwable.getMessage() != null ? throwable.getMessage().hashCode() : 0;
                         if (hash != lastException) {
                             lastException = hash;
-                            LOGGER.catching(throwable);
+                            logger.catching(throwable);
                             count = 0;
                         } else if (count < Settings.settings().QUEUE.PARALLEL_THREADS) {
-                            LOGGER.warn(throwable.getMessage());
+                            logger.warn(throwable.getMessage());
                             count++;
                         }
                     }
@@ -665,10 +696,10 @@ public enum FaweCache implements Trimable {
             private void handleFaweException(FaweException e) {
                 FaweException.Type type = e.getType();
                 if (e.getType() == FaweException.Type.OTHER) {
-                    LOGGER.catching(e);
+                    logger.catching(e);
                 } else if (!faweExceptionReasonsUsed[type.ordinal()]) {
                     faweExceptionReasonsUsed[type.ordinal()] = true;
-                    LOGGER.warn("FaweException: " + e.getMessage());
+                    logger.warn("FaweException: " + e.getMessage());
                 }
             }
         };

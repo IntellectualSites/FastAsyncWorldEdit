@@ -38,11 +38,11 @@ public class GravityBrush implements Brush {
     public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws
             MaxChangedBlocksException {
         //FAWE start - Ours operates differently to upstream, but does the same
-        double endY = position.getY() + size;
-        double startPerformY = Math.max(editSession.getMinY(), position.getY() - size);
+        double endY = position.y() + size;
+        double startPerformY = Math.max(editSession.getMinY(), position.y() - size);
         double startCheckY = fullHeight ? editSession.getMinY() : startPerformY;
-        for (double x = position.getX() + size; x > position.getX() - size; --x) {
-            for (double z = position.getZ() + size; z > position.getZ() - size; --z) {
+        for (double x = position.x() + size; x > position.x() - size; --x) {
+            for (double z = position.z() + size; z > position.z() - size; --z) {
                 double freeSpot = startCheckY;
                 for (double y = startCheckY; y <= endY; y++) {
                     BlockState block = editSession.getBlock((int) x, (int) y, (int) z);

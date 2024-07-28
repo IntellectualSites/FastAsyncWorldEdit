@@ -49,6 +49,7 @@ public class BlocksMaskParser extends InputParser<Mask> {
         ParserContext tempContext = new ParserContext(context);
         tempContext.setRestricted(false);
         tempContext.setPreferringWildcard(true);
+        tempContext.setTryLegacy(context.isTryingLegacy());
         try {
             Set<BaseBlock> holders = worldEdit.getBlockFactory().parseFromListInput(component, tempContext);
             if (holders.isEmpty()) {

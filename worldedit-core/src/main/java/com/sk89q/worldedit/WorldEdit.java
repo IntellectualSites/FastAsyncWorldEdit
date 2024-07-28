@@ -20,6 +20,9 @@
 package com.sk89q.worldedit;
 
 import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.exception.BrushRadiusLimitException;
+import com.fastasyncworldedit.core.exception.OutsideWorldBoundsException;
+import com.fastasyncworldedit.core.exception.RadiusLimitException;
 import com.fastasyncworldedit.core.extension.factory.TransformFactory;
 import com.fastasyncworldedit.core.extent.ResettableExtent;
 import com.google.common.base.Throwables;
@@ -44,6 +47,7 @@ import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extension.platform.Locatable;
 import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.extension.platform.PlatformManager;
+import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.pattern.Pattern;
@@ -437,7 +441,9 @@ public final class WorldEdit {
      *
      * @param radius the radius
      * @throws MaxRadiusException if the radius is bigger than the configured radius
+     * @deprecated Use {@link WorldEdit#checkMaxRadius(double, Actor)}
      */
+    @Deprecated
     public void checkMaxRadius(double radius) throws MaxRadiusException {
         if (getConfiguration().maxRadius > 0 && radius > getConfiguration().maxRadius) {
             throw new MaxRadiusException();
@@ -449,7 +455,9 @@ public final class WorldEdit {
      *
      * @param radius the radius
      * @throws MaxBrushRadiusException if the radius is bigger than the configured radius
+     * @deprecated Use {@link WorldEdit#checkMaxBrushRadius(double, Actor)}
      */
+    @Deprecated
     public void checkMaxBrushRadius(double radius) throws MaxBrushRadiusException {
         if (getConfiguration().maxBrushRadius > 0 && radius > getConfiguration().maxBrushRadius) {
             throw new MaxBrushRadiusException();
@@ -457,6 +465,10 @@ public final class WorldEdit {
     }
 
     //FAWE start
+    /**
+     * @deprecated Use {@link WorldEdit#checkMaxBrushRadius(Expression, Actor)}
+     */
+    @Deprecated(forRemoval = true, since = "2.11.0")
     public void checkMaxBrushRadius(Expression radius) throws MaxBrushRadiusException {
         double val = radius.evaluate();
         checkArgument(val >= 0, "Radius must be a positive number.");
@@ -464,6 +476,67 @@ public final class WorldEdit {
             if (val > getConfiguration().maxBrushRadius) {
                 throw new MaxBrushRadiusException();
             }
+        }
+    }
+
+    /**
+     * Check the given radius against the give actor's limit.
+     *
+     * @param radius Radius to check
+     * @param actor  Actor to check for
+     * @throws MaxRadiusException If given radius larger than allowed
+     * @since 2.11.0
+     */
+    public void checkMaxRadius(double radius, Actor actor) {
+        int max = actor.getLimit().MAX_RADIUS;
+        if (max > 0 && radius > max) {
+            throw new RadiusLimitException(max);
+        }
+    }
+
+    /**
+     * Check the given radius against the give actor's limit.
+     *
+     * @param radius Radius to check
+     * @param actor  Actor to check for
+     * @throws MaxRadiusException If given radius larger than allowed
+     * @since 2.11.0
+     */
+    public void checkMaxBrushRadius(double radius, Actor actor) {
+        int max = actor.getLimit().MAX_BRUSH_RADIUS;
+        if (max > 0 && radius > max) {
+            throw new RadiusLimitException(max);
+        }
+    }
+
+    /**
+     * Check the given radius against the give actor's limit.
+     *
+     * @param expression Radius to check
+     * @param actor      Actor to check for
+     * @throws BrushRadiusLimitException If given radius larger than allowed
+     * @since 2.11.0
+     */
+    public void checkMaxBrushRadius(Expression expression, Actor actor) {
+        double radius = expression.evaluate();
+        checkArgument(radius >= 0, "Radius must be a positive number.");
+        int max = actor.getLimit().MAX_BRUSH_RADIUS;
+        if (max > 0 && radius > max) {
+            throw new BrushRadiusLimitException(max);
+        }
+    }
+
+    /**
+     * Check if the given position is contained by the extent's min/max height
+     *
+     * @param position Position to check
+     * @param extent   Extent to check in
+     * @throws OutsideWorldBoundsException If the position is outside the world height limits
+     * @since 2.11.0
+     */
+    public void checkExtentHeightBounds(BlockVector3 position, Extent extent) {
+        if (position.y() < extent.getMinY() || position.y() > extent.getMaxY()) {
+            throw new OutsideWorldBoundsException(position.y());
         }
     }
     //FAWE end

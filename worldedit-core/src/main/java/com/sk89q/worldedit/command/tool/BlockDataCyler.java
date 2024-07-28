@@ -66,7 +66,7 @@ public class BlockDataCyler implements DoubleActionBlockTool {
 
         if (!config.allowedDataCycleBlocks.isEmpty()
                 && !player.hasPermission("worldedit.override.data-cycler")
-                && !config.allowedDataCycleBlocks.contains(block.getBlockType().getId())) {
+                && !config.allowedDataCycleBlocks.contains(block.getBlockType().id())) {
             player.print(Caption.of("worldedit.tool.data-cycler.block-not-permitted"));
             return true;
         }
@@ -89,7 +89,7 @@ public class BlockDataCyler implements DoubleActionBlockTool {
                 Property<Object> objProp = (Property<Object>) currentProperty;
                 BaseBlock newBlock = block.with(objProp, currentProperty.getValues().get(index));
 
-                try (EditSession editSession = session.createEditSession(player)) {
+                try (EditSession editSession = session.createEditSession(player, null, true)) {
                     try {
                         editSession.setBlock(blockPoint, newBlock);
                         player.print(Caption.of(

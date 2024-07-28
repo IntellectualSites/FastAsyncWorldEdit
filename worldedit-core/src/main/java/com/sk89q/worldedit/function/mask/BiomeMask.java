@@ -94,7 +94,7 @@ public class BiomeMask extends AbstractExtentMask {
 
     @Override
     public boolean test(BlockVector3 vector) {
-        BiomeType biome = getExtent().getBiome(vector);
+        BiomeType biome = vector.getBiome(getExtent());
         return biomes.contains(biome);
     }
 

@@ -65,11 +65,11 @@ public class CopyPastaBrush implements Brush, ResettableTool {
                 mask = Masks.alwaysTrue();
             }
             final ResizableClipboardBuilder builder = new ResizableClipboardBuilder(editSession.getWorld());
-            final int minY = position.getBlockY();
+            final int minY = position.y();
             mask = new AbstractDelegateMask(mask) {
                 @Override
                 public boolean test(BlockVector3 vector) {
-                    if (super.test(vector) && vector.getBlockY() >= minY) {
+                    if (super.test(vector) && vector.y() >= minY) {
                         BaseBlock block = editSession.getFullBlock(vector);
                         if (!block.getBlockType().getMaterial().isAir()) {
                             builder.add(vector, BlockTypes.AIR.getDefaultState().toBaseBlock(), block);
@@ -91,7 +91,7 @@ public class CopyPastaBrush implements Brush, ResettableTool {
             newClipboard.setOrigin(position);
             ClipboardHolder holder = new ClipboardHolder(newClipboard);
             session.setClipboard(holder);
-            int blocks = builder.size();
+            long blocks = builder.longSize();
             player.print(Caption.of("fawe.worldedit.copy.command.copy", blocks));
         } else {
             AffineTransform transform = null;

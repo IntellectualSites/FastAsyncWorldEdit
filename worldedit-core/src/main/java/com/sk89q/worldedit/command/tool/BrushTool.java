@@ -380,7 +380,7 @@ public class BrushTool
                 pitch = 23 - (pitch / 4);
                 d += (int) (Math.sin(Math.toRadians(pitch)) * 50);
                 final Vector3 vector = loc.getDirection().withY(0).normalize().multiply(d)
-                        .add(loc.getX(), loc.getY(), loc.getZ());
+                        .add(loc.x(), loc.y(), loc.z());
                 return offset(vector, loc).toBlockPoint();
             }
             case TARGET_POINT_HEIGHT: {
@@ -440,7 +440,7 @@ public class BrushTool
                     Caption.of("fawe.error.no-perm", StringMan.join(current.getPermissions(), ",")));
             return false;
         }
-        try (EditSession editSession = session.createEditSession(player, current.toString())) {
+        try (EditSession editSession = session.createEditSession(player, current.toString(), brush.setsSynchronously())) {
             Location target = player.getBlockTrace(getRange(), true, traceMask);
 
             if (target == null) {
@@ -477,7 +477,7 @@ public class BrushTool
             try {
                 new PatternTraverser(current).reset(editSession);
                 double size = current.getSize();
-                WorldEdit.getInstance().checkMaxBrushRadius(size);
+                WorldEdit.getInstance().checkMaxBrushRadius(size, player);
                 brush.build(editSession, target.toBlockPoint(), current.getMaterial(), size);
             } catch (MaxChangedBlocksException e) {
                 player.print(Caption.of("worldedit.tool.max-block-changes"));

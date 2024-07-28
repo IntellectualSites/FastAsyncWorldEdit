@@ -26,7 +26,7 @@ public abstract class ABlockMask extends AbstractExtentMask {
 
     @Override
     public boolean test(BlockVector3 vector) {
-        return test(getExtent().getBlock(vector));
+        return test(vector.getBlock(getExtent()));
     }
 
     public abstract boolean test(BlockState state);
@@ -40,7 +40,7 @@ public abstract class ABlockMask extends AbstractExtentMask {
                 List<BlockState> all = type.getAllStates();
                 hasAll = all.stream().map(this::test).reduce(true, (a, b) -> a && b);
                 if (hasAll) {
-                    strings.add(type.getId());
+                    strings.add(type.id());
                 } else {
                     for (BlockState state : all) {
                         if (test(state)) {

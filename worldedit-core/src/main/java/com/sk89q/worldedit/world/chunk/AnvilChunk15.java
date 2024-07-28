@@ -19,14 +19,14 @@
 
 package com.sk89q.worldedit.world.chunk;
 
-import com.fastasyncworldedit.core.util.NbtUtils;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.util.nbt.BinaryTagTypes;
-import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
 import com.sk89q.worldedit.world.DataException;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
+import org.enginehub.linbus.tree.LinCompoundTag;
+import org.enginehub.linbus.tree.LinIntArrayTag;
+import org.enginehub.linbus.tree.LinTagType;
 
 /**
  * The chunk format for Minecraft 1.15 and newer
@@ -38,7 +38,7 @@ public class AnvilChunk15 extends AnvilChunk13 {
      *
      * @param tag the tag to read
      * @throws DataException on a data error
-     * @deprecated Use {@link #AnvilChunk15(CompoundBinaryTag)}
+     * @deprecated Use {@link #AnvilChunk15(LinCompoundTag)}
      */
     @Deprecated
     public AnvilChunk15(CompoundTag tag) throws DataException {
@@ -51,7 +51,7 @@ public class AnvilChunk15 extends AnvilChunk13 {
      * @param tag the tag to read
      * @throws DataException on a data error
      */
-    public AnvilChunk15(CompoundBinaryTag tag) throws DataException {
+    public AnvilChunk15(LinCompoundTag tag) throws DataException {
         super(tag);
     }
 
@@ -60,18 +60,19 @@ public class AnvilChunk15 extends AnvilChunk13 {
         if (biomes == null) {
             populateBiomes();
         }
-        int x = (position.getX() & 15) >> 2;
-        int y = position.getY() >> 2;
-        int z = (position.getZ() & 15) >> 2;
+        int x = (position.x() & 15) >> 2;
+        int y = position.y() >> 2;
+        int z = (position.z() & 15) >> 2;
         return biomes[y << 4 | z << 2 | x];
     }
 
     private void populateBiomes() throws DataException {
         biomes = new BiomeType[1024];
-        if (rootTag.get("Biomes") == null) {
+        LinIntArrayTag biomeTag = rootTag.findTag("Biomes", LinTagType.intArrayTag());
+        if (biomeTag == null) {
             return;
         }
-        int[] stored = NbtUtils.getChildTag(rootTag, "Biomes", BinaryTagTypes.INT_ARRAY).value();
+        int[] stored = biomeTag.value();
         for (int i = 0; i < 1024; i++) {
             biomes[i] = BiomeTypes.getLegacy(stored[i]);
         }

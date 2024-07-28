@@ -29,9 +29,9 @@ import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.RegionSelector;
 import com.sk89q.worldedit.regions.selector.CuboidRegionSelector;
 import com.sk89q.worldedit.util.Location;
-import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import org.enginehub.linbus.tree.LinCompoundTag;
 
 import javax.annotation.Nullable;
 
@@ -79,9 +79,9 @@ public class ServerCUIHandler {
                 try {
                     CuboidRegion region = ((CuboidRegionSelector) regionSelector).getRegion();
 
-                    posX = region.getMinimumPoint().getBlockX();
-                    posY = region.getMinimumPoint().getBlockY();
-                    posZ = region.getMinimumPoint().getBlockZ();
+                    posX = region.getMinimumPoint().x();
+                    posY = region.getMinimumPoint().y();
+                    posZ = region.getMinimumPoint().z();
 
                     width = region.getWidth();
                     height = region.getHeight();
@@ -104,9 +104,9 @@ public class ServerCUIHandler {
                 }
 
                 // Just select the point.
-                posX = point.getBlockX();
-                posY = point.getBlockY();
-                posZ = point.getBlockZ();
+                posX = point.x();
+                posY = point.y();
+                posZ = point.z();
                 width = 1;
                 height = 1;
                 length = 1;
@@ -128,15 +128,12 @@ public class ServerCUIHandler {
         double rotX = location.getYaw();
         double rotY = location.getPitch();
         double xz = Math.cos(Math.toRadians(rotY));
-        int x = (int) (location.getX() - (-xz * Math.sin(Math.toRadians(rotX))) * 12);
-        int z = (int) (location.getZ() - (xz * Math.cos(Math.toRadians(rotX))) * 12);
+        int x = (int) (location.x() - (-xz * Math.sin(Math.toRadians(rotX))) * 12);
+        int z = (int) (location.z() - (xz * Math.cos(Math.toRadians(rotX))) * 12);
         int y = Math.max(
                 player.getWorld().getMinY(),
                 Math.min(Math.min(player.getWorld().getMaxY(), posY + MAX_DISTANCE), posY + 3)
         );
-
-        //FAWE start - CBT > Map<String, Tag>
-        CompoundBinaryTag.Builder structureTag = CompoundBinaryTag.builder();
 
         posX -= x;
         posY -= y;
@@ -147,7 +144,7 @@ public class ServerCUIHandler {
             return null;
         }
 
-        //FAWE start - see comment of CBT
+        LinCompoundTag.Builder structureTag = LinCompoundTag.builder();
         structureTag.putString("name", "worldedit:" + player.getName());
         structureTag.putString("author", player.getName());
         structureTag.putString("metadata", "");
@@ -165,7 +162,7 @@ public class ServerCUIHandler {
         structureTag.putString("mode", "SAVE");
         structureTag.putByte("ignoreEntities", (byte) 1);
         structureTag.putByte("showboundingbox", (byte) 1);
-        structureTag.putString("id", BlockTypes.STRUCTURE_BLOCK.getId());
+        structureTag.putString("id", BlockTypes.STRUCTURE_BLOCK.id());
 
         return BlockTypes.STRUCTURE_BLOCK.getDefaultState().toBaseBlock(structureTag.build());
         //FAWE end

@@ -391,9 +391,9 @@ public class BlockTransformExtent extends ResettableExtent {
                 if (direction != null) {
                     Vector3 applyAbsolute = transform.apply(direction.toVector());
                     Vector3 applyOrigin = transform.apply(Vector3.ZERO);
-                    applyAbsolute.mutX(applyAbsolute.getX() - applyOrigin.getX());
-                    applyAbsolute.mutY(applyAbsolute.getY() - applyOrigin.getY());
-                    applyAbsolute.mutZ(applyAbsolute.getZ() - applyOrigin.getZ());
+                    applyAbsolute.mutX(applyAbsolute.x() - applyOrigin.x());
+                    applyAbsolute.mutY(applyAbsolute.y() - applyOrigin.y());
+                    applyAbsolute.mutZ(applyAbsolute.z() - applyOrigin.z());
 
                     Direction newDirection = Direction.findClosest(
                             applyAbsolute,
@@ -401,7 +401,7 @@ public class BlockTransformExtent extends ResettableExtent {
                     );
 
                     if (newDirection != null) {
-                        Map<String, Tag> values = new HashMap<>(tag.getValue());
+                        Map<String, Tag<?, ?>> values = new HashMap<>(tag.getValue());
                         values.put("Rot", new ByteTag((byte) MCDirections.toRotation(newDirection)));
                         tag = new CompoundTag(values);
                     }
@@ -441,7 +441,7 @@ public class BlockTransformExtent extends ResettableExtent {
                         if (Settings.settings().ENABLED_COMPONENTS.DEBUG) {
                             LOGGER.warn(String.format(
                                     "Index outside direction array length found for block:{%s} property:{%s}",
-                                    state.getBlockType().getId(),
+                                    state.getBlockType().id(),
                                     property.getName()
                             ));
                         }

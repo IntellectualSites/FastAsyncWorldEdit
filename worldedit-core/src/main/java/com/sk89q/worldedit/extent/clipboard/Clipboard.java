@@ -31,6 +31,7 @@ import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.EditSessionBuilder;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.entity.Entity;
+import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardWriter;
@@ -40,6 +41,7 @@ import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.internal.util.ClipboardTransformBaker;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.transform.Transform;
 import com.sk89q.worldedit.regions.Region;
@@ -98,7 +100,7 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable, Fl
      *  - {@link DiskOptimizedClipboard}
      *  - {@link CPUOptimizedClipboard}
      *  - {@link MemoryOptimizedClipboard}
-     *  
+     *
      * @deprecated Internal use only. Use {@link BlockArrayClipboard#BlockArrayClipboard(Region, UUID)}
      */
     @Deprecated
@@ -144,15 +146,29 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable, Fl
     void setOrigin(BlockVector3 origin);
 
     /**
-     * Returns true if the clipboard has biome data. This can be checked since {@link Extent#getBiome(BlockVector2)}
+     * Returns true if the clipboard has biome data. This can be checked since {@link Extent#getBiome(BlockVector3)}
      * strongly suggests returning {@link com.sk89q.worldedit.world.biome.BiomeTypes#OCEAN} instead of {@code null}
-     * if biomes aren't present. However, it might not be desired to set areas to ocean if the clipboard is defaulting
-     * to ocean, instead of having biomes explicitly set.
+     * if biomes aren't present.
      *
      * @return true if the clipboard has biome data set
      */
     default boolean hasBiomes() {
         return false;
+    }
+
+    /**
+     * Returns a clipboard with a given transform baked in.
+     *
+     * <p>
+     * Note: This method may return the same clipboard object, if a copy is needed then you should check the returned value for identity equality and copy if needed.
+     * </p>
+     *
+     * @param transform The transform
+     * @return The new clipboard
+     * @throws WorldEditException if the copy encounters an error
+     */
+    default Clipboard transform(Transform transform) throws WorldEditException {
+        return ClipboardTransformBaker.bakeTransform(this, transform);
     }
 
     //FAWE start
@@ -163,15 +179,15 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable, Fl
     void removeEntity(Entity entity);
 
     default int getWidth() {
-        return getDimensions().getBlockX();
+        return getDimensions().x();
     }
 
     default int getHeight() {
-        return getDimensions().getBlockY();
+        return getDimensions().y();
     }
 
     default int getLength() {
-        return getDimensions().getBlockZ();
+        return getDimensions().z();
     }
 
     default int getArea() {
@@ -380,17 +396,17 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable, Fl
         final BlockVector3 origin = this.getOrigin();
 
         // To must be relative to the clipboard origin ( player location - clipboard origin ) (as the locations supplied are relative to the world origin)
-        final int relx = to.getBlockX() - origin.getBlockX();
-        final int rely = to.getBlockY() - origin.getBlockY();
-        final int relz = to.getBlockZ() - origin.getBlockZ();
+        final int relx = to.x() - origin.x();
+        final int rely = to.y() - origin.y();
+        final int relz = to.z() - origin.z();
 
         pasteBiomes &= Clipboard.this.hasBiomes();
 
         for (BlockVector3 pos : this) {
             BaseBlock block = pos.getFullBlock(this);
-            int xx = pos.getX() + relx;
-            int yy = pos.getY() + rely;
-            int zz = pos.getZ() + relz;
+            int xx = pos.x() + relx;
+            int yy = pos.y() + rely;
+            int zz = pos.z() + relz;
             if (pasteBiomes) {
                 extent.setBiome(xx, yy, zz, pos.getBiome(this));
             }
@@ -400,20 +416,20 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable, Fl
             extent.setBlock(xx, yy, zz, block);
         }
         // Entity offset is the paste location subtract the clipboard origin (entity's location is already relative to the world origin)
-        final int entityOffsetX = to.getBlockX() - origin.getBlockX();
-        final int entityOffsetY = to.getBlockY() - origin.getBlockY();
-        final int entityOffsetZ = to.getBlockZ() - origin.getBlockZ();
+        final int entityOffsetX = to.x() - origin.x();
+        final int entityOffsetY = to.y() - origin.y();
+        final int entityOffsetZ = to.z() - origin.z();
         // entities
         if (pasteEntities) {
             for (Entity entity : this.getEntities()) {
                 // skip players on pasting schematic
-                if (entity.getState() != null && entity.getState().getType().getId()
+                if (entity.getState() != null && entity.getState().getType().id()
                         .equals("minecraft:player")) {
                     continue;
                 }
                 Location pos = entity.getLocation();
-                Location newPos = new Location(pos.getExtent(), pos.getX() + entityOffsetX,
-                        pos.getY() + entityOffsetY, pos.getZ() + entityOffsetZ, pos.getYaw(),
+                Location newPos = new Location(pos.getExtent(), pos.x() + entityOffsetX,
+                        pos.y() + entityOffsetY, pos.z() + entityOffsetZ, pos.getYaw(),
                         pos.getPitch()
                 );
                 extent.createEntity(newPos, entity.getState());

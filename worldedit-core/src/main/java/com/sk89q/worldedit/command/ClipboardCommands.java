@@ -47,6 +47,7 @@ import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.command.util.Logging;
 import com.sk89q.worldedit.command.util.annotation.Confirm;
 import com.sk89q.worldedit.command.util.annotation.Preload;
+import com.sk89q.worldedit.command.util.annotation.SynchronousSettingExpected;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
@@ -150,8 +151,8 @@ public class ClipboardCommands {
         BlockVector3 max = region.getMaximumPoint();
 
         long volume =
-                ((long) max.getX() - (long) min.getX() + 1) * ((long) max.getY() - (long) min.getY() + 1) * ((long) max.getZ() - (long) min
-                        .getZ() + 1);
+                ((long) max.x() - (long) min.x() + 1) * ((long) max.y() - (long) min.y() + 1) * ((long) max.z() - (long) min
+                        .z() + 1);
         FaweLimit limit = actor.getLimit();
         if (volume >= limit.MAX_CHECKS) {
             throw FaweCache.MAX_CHECKS;
@@ -184,8 +185,8 @@ public class ClipboardCommands {
     ) throws WorldEditException {
         BlockVector3 min = region.getMinimumPoint();
         BlockVector3 max = region.getMaximumPoint();
-        long volume = (((long) max.getX() - (long) min.getX() + 1) * ((long) max.getY() - (long) min.getY() + 1) * ((long) max.getZ() - (long) min
-                .getZ() + 1));
+        long volume = (((long) max.x() - (long) min.x() + 1) * ((long) max.y() - (long) min.y() + 1) * ((long) max.z() - (long) min
+                .z() + 1));
         FaweLimit limit = actor.getLimit();
         if (volume >= limit.MAX_CHECKS) {
             throw FaweCache.MAX_CHECKS;
@@ -257,8 +258,8 @@ public class ClipboardCommands {
         BlockVector3 min = region.getMinimumPoint();
         BlockVector3 max = region.getMaximumPoint();
 
-        long volume = (((long) max.getX() - (long) min.getX() + 1) * ((long) max.getY() - (long) min.getY() + 1) * ((long) max.getZ() - (long) min
-                .getZ() + 1));
+        long volume = (((long) max.x() - (long) min.x() + 1) * ((long) max.y() - (long) min.y() + 1) * ((long) max.z() - (long) min
+                .z() + 1));
         FaweLimit limit = actor.getLimit();
         if (volume >= limit.MAX_CHECKS) {
             throw FaweCache.MAX_CHECKS;
@@ -340,7 +341,7 @@ public class ClipboardCommands {
             aliases = {"/download"},
             desc = "Downloads your clipboard through the configured web interface"
     )
-    @Deprecated
+    @Deprecated(forRemoval = true, since = "2.11.0")
     @CommandPermissions({"worldedit.clipboard.download"})
     public void download(
             final Actor actor,
@@ -402,10 +403,7 @@ public class ClipboardCommands {
             final Clipboard target;
             // If we have a transform, bake it into the copy
             if (!transform.isIdentity()) {
-                final FlattenedClipboardTransform result = FlattenedClipboardTransform.transform(clipboard, transform);
-                target = new BlockArrayClipboard(result.getTransformedRegion(), actor.getUniqueId());
-                target.setOrigin(clipboard.getOrigin());
-                Operations.completeLegacy(result.copyTo(target));
+                target = clipboard.transform(transform);
             } else {
                 target = clipboard;
             }
@@ -441,6 +439,7 @@ public class ClipboardCommands {
             desc = "Place the clipboard's contents without applying transformations (e.g. rotate)"
     )
     @CommandPermissions("worldedit.clipboard.place")
+    @SynchronousSettingExpected
     @Logging(PLACEMENT)
     public void place(
             Actor actor, World world, LocalSession session, final EditSession editSession,
@@ -505,6 +504,7 @@ public class ClipboardCommands {
             desc = "Paste the clipboard's contents"
     )
     @CommandPermissions("worldedit.clipboard.paste")
+    @SynchronousSettingExpected
     @Logging(PLACEMENT)
     public void paste(
             Actor actor, World world, LocalSession session, EditSession editSession,
