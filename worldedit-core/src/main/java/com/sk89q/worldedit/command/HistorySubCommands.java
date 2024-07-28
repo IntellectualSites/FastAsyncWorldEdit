@@ -251,7 +251,7 @@ public class HistorySubCommands {
         long seconds = (System.currentTimeMillis() - edit.getBDFile().lastModified()) / 1000;
         String timeStr = MainUtil.secToTime(seconds);
 
-        int size = edit.size();
+        long size = edit.longSize();
         boolean biomes = edit.getBioFile().exists();
         boolean createdEnts = edit.getEnttFile().exists();
         boolean removedEnts = edit.getEntfFile().exists();
@@ -335,7 +335,7 @@ public class HistorySubCommands {
                             long seconds = (System.currentTimeMillis() - rollback.getBDFile().lastModified()) / 1000;
                             String timeStr = MainUtil.secToTime(seconds);
 
-                            int size = edit.size();
+                            long size = edit.longSize();
 
                             TranslatableComponent elem = Caption.of(
                                     "fawe.worldedit.history.find.element",
