@@ -170,10 +170,13 @@ public class CharFilterBlock extends ChunkFilterBlock {
 
     @Override
     public synchronized final void filter(Filter filter) {
+        initSet();
         for (y = 0, index = 0; y < 16; y++) {
             for (z = 0; z < 16; z++) {
                 for (x = 0; x < 16; x++, index++) {
-                    filter.applyBlock(this);
+                    if (setArr[index] != BlockTypesCache.ReservedIDs.__RESERVED__) {
+                        filter.applyBlock(this);
+                    }
                 }
             }
         }

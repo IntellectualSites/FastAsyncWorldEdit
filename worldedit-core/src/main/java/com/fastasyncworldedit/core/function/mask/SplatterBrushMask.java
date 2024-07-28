@@ -40,7 +40,7 @@ public class SplatterBrushMask extends AbstractExtentMask {
         double dist = vector.distanceSq(position);
         synchronized (placed) {
             if (dist < size2 && !placed.contains(vector) && ThreadLocalRandom.current().nextInt(5) < 2 && surface.test(vector)) {
-                placed.add(vector);
+                placed.add(vector.toImmutable());
                 return true;
             }
         }
