@@ -401,7 +401,11 @@ public class SchematicCommands {
                 if (format == null) {
                     format = ClipboardFormats.findByFile(file);
                     if (format == null) {
-                        actor.print(Caption.of("worldedit.schematic.unknown-format", TextComponent.of(formatName)));
+                        if (noExplicitFormat) {
+                            actor.print(Caption.of("fawe.worldedit.schematic.schematic.load-failure", TextComponent.of(file.getName())));
+                        } else {
+                            actor.print(Caption.of("worldedit.schematic.unknown-format", TextComponent.of(formatName)));
+                        }
                         return;
                     }
                 }
