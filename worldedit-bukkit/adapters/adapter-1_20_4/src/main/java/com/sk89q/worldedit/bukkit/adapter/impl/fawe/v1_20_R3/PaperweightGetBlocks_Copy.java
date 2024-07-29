@@ -15,6 +15,7 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
+import io.papermc.lib.PaperLib;
 import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
@@ -179,8 +180,18 @@ public class PaperweightGetBlocks_Copy implements IChunkGet {
             biomes[layer] = new Holder[64];
         }
         if (biomeData instanceof PalettedContainer<Holder<Biome>> palettedContainer) {
-            for (int i = 0; i < 64; i++) {
-                biomes[layer][i] = palettedContainer.get(i);
+            if (PaperLib.isPaper()) {
+                for (int i = 0; i < 64; i++) {
+                    biomes[layer][i] = palettedContainer.get(i); // Only public on paper
+                }
+            } else {
+                try {
+                    for (int i = 0; i < 64; i++) {
+                        biomes[layer][i] = (Holder<Biome>) PaperweightPlatformAdapter.PALETTED_CONTAINER_GET.invoke(i);
+                    }
+                } catch (Throwable e) {
+                    throw new RuntimeException(e);
+                }
             }
         } else {
             LOGGER.error(
