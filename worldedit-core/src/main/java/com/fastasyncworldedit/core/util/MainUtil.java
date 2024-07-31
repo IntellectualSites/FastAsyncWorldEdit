@@ -712,6 +712,12 @@ public class MainUtil {
                 return file;
             }
         }
+        if (filename.matches(".*\\.[\\w].*")) {
+            File file = MainUtil.resolveRelative(new File(dir, filename));
+            if (file.exists()) {
+                return file;
+            }
+        }
         for (ClipboardFormat f : ClipboardFormats.getAll()) {
             File file = MainUtil.resolveRelative(new File(dir, filename + "." + f.getPrimaryFileExtension()));
             if (file.exists()) {
