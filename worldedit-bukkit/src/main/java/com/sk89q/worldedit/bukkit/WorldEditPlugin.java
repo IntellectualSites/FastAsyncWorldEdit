@@ -21,6 +21,7 @@ package com.sk89q.worldedit.bukkit;
 
 import com.fastasyncworldedit.bukkit.BukkitPermissionAttachmentManager;
 import com.fastasyncworldedit.bukkit.FaweBukkit;
+import com.fastasyncworldedit.core.util.TaskManager;
 import com.fastasyncworldedit.core.util.UpdateNotification;
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.util.WEManager;
@@ -91,6 +92,7 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.sk89q.worldedit.internal.anvil.ChunkDeleter.DELCHUNKS_FILE_NAME;
@@ -565,14 +567,15 @@ public class WorldEditPlugin extends JavaPlugin {
         //FAWE start - Use cache over returning a direct BukkitPlayer
         BukkitPlayer wePlayer = getCachedPlayer(player);
         if (wePlayer == null) {
-            synchronized (player) {
-                wePlayer = getCachedPlayer(player);
-                if (wePlayer == null) {
-                    wePlayer = new BukkitPlayer(this, player);
-                    player.setMetadata("WE", new FixedMetadataValue(this, wePlayer));
-                    return wePlayer;
+            Supplier<BukkitPlayer> task = () -> {
+                BukkitPlayer bukkitPlayer = getCachedPlayer(player);
+                if (bukkitPlayer == null) {
+                    bukkitPlayer = new BukkitPlayer(this, player);
+                    player.setMetadata("WE", new FixedMetadataValue(this, bukkitPlayer));
                 }
-            }
+                return bukkitPlayer;
+            };
+            TaskManager.taskManager().sync(task);
         }
         return wePlayer;
         //FAWE end
@@ -588,11 +591,12 @@ public class WorldEditPlugin extends JavaPlugin {
     }
 
     BukkitPlayer reCachePlayer(Player player) {
-        synchronized (player) {
+        Supplier<BukkitPlayer> task = () -> {
             BukkitPlayer wePlayer = new BukkitPlayer(this, player);
             player.setMetadata("WE", new FixedMetadataValue(this, wePlayer));
             return wePlayer;
-        }
+        };
+        return TaskManager.taskManager().sync(task);
     }
     //FAWE end
 
