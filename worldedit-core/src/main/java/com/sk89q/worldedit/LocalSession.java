@@ -930,7 +930,7 @@ public class LocalSession implements TextureHolder {
                     }
                 } catch (EmptyClipboardException ignored) {
                 }
-                DiskOptimizedClipboard doc = Fawe.instance().getClipboardExecutor().submit(
+                DiskOptimizedClipboard doc = Fawe.instance().submitUUIDKeyQueuedTask(
                         uuid,
                         () -> DiskOptimizedClipboard.loadFromFile(file)
                 ).get();
@@ -954,7 +954,7 @@ public class LocalSession implements TextureHolder {
                     } else {
                         continue;
                     }
-                    Fawe.instance().getClipboardExecutor().submit(uuid, () -> {
+                    Fawe.instance().submitUUIDKeyQueuedTask(uuid, () -> {
                         doc.close(); // Ensure closed before deletion
                         doc.getFile().delete();
                     });

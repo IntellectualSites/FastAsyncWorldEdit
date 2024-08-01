@@ -19,10 +19,14 @@
 
 package com.sk89q.worldedit.extension.platform;
 
+import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.configuration.Settings;
+import com.fastasyncworldedit.core.internal.exception.FaweClipboardVersionMismatchException;
 import com.fastasyncworldedit.core.internal.exception.FaweException;
 import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.fastasyncworldedit.core.regions.FaweMaskManager;
+import com.fastasyncworldedit.core.util.MainUtil;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.fastasyncworldedit.core.util.WEManager;
 import com.fastasyncworldedit.core.util.task.AsyncNotifyKeyedQueue;
@@ -34,6 +38,7 @@ import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.internal.cui.CUIEvent;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.ConvexPolyhedralRegion;
@@ -62,12 +67,15 @@ import com.sk89q.worldedit.world.gamemode.GameMode;
 import com.sk89q.worldedit.world.gamemode.GameModes;
 import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.item.ItemTypes;
+import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
 import java.io.File;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.StampedLock;
 
 /**
  * An abstract implementation of both a {@link Actor} and a {@link Player}
@@ -76,8 +84,11 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
 
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
+
     //FAWE start
     private final Map<String, Object> meta;
+    private final StampedLock clipboardLoading = new StampedLock();
 
     // Queue for async tasks
     private final AtomicInteger runningCount = new AtomicInteger();
@@ -93,7 +104,7 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
                     if (fe != null) {
                         printError(fe.getComponent());
                     } else {
-                        throwable.printStackTrace();
+                        LOGGER.error("Error in asyncNotifyQueue", throwable);
                     }
                 }
             }, this::getUniqueId);
@@ -520,21 +531,70 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
 
     @Override
     public void setSelection(Region region) {
-        RegionSelector selector;
-        if (region instanceof ConvexPolyhedralRegion) {
-            selector = new ConvexPolyhedralRegionSelector((ConvexPolyhedralRegion) region);
-        } else if (region instanceof CylinderRegion) {
-            selector = new CylinderRegionSelector((CylinderRegion) region);
-        } else if (region instanceof Polygonal2DRegion) {
-            selector = new Polygonal2DRegionSelector((Polygonal2DRegion) region);
-        } else {
-            selector = new CuboidRegionSelector(null, region.getMinimumPoint(),
-                    region.getMaximumPoint()
-            );
-        }
+        RegionSelector selector = switch (region) {
+            case ConvexPolyhedralRegion blockVector3s -> new ConvexPolyhedralRegionSelector(blockVector3s);
+            case CylinderRegion blockVector3s -> new CylinderRegionSelector(blockVector3s);
+            case Polygonal2DRegion blockVector3s -> new Polygonal2DRegionSelector(blockVector3s);
+            default -> new CuboidRegionSelector(null, region.getMinimumPoint(), region.getMaximumPoint());
+        };
         selector.setWorld(region.getWorld());
 
         getSession().setRegionSelector(getWorld(), selector);
+    }
+
+    @Override
+    public void loadClipboardFromDisk() {
+        if (clipboardLoading.isWriteLocked()) {
+            if (!Fawe.isMainThread()) {
+                long stamp = clipboardLoading.writeLock();
+                clipboardLoading.unlockWrite(stamp);
+            }
+            return;
+        }
+
+        final long stamp = clipboardLoading.writeLock();
+        File file = MainUtil.getFile(
+                Fawe.platform().getDirectory(),
+                Settings.settings().PATHS.CLIPBOARD + File.separator + getUniqueId() + ".bd"
+        );
+        Future<?> fut = Fawe.instance().submitUUIDKeyQueuedTask(getUniqueId(), () -> {
+            try {
+                try {
+                    getSession().loadClipboardFromDisk(file);
+                } catch (FaweClipboardVersionMismatchException e) {
+                    print(e.getComponent());
+                } catch (RuntimeException e) {
+                    print(Caption.of("fawe.error.clipboard.invalid"));
+                    LOGGER.error("Error loading clipboard form disk", e);
+                    print(Caption.of("fawe.error.stacktrace"));
+                    print(Caption.of("fawe.error.clipboard.load.failure"));
+                    print(Caption.of("fawe.error.clipboard.invalid.info", file.getName(), file.length()));
+                    print(Caption.of("fawe.error.stacktrace"));
+                } catch (Exception e) {
+                    print(Caption.of("fawe.error.clipboard.invalid"));
+                    LOGGER.error("Error loading clipboard form disk", e);
+                    print(Caption.of("fawe.error.stacktrace"));
+                    print(Caption.of("fawe.error.no-failure"));
+                    print(Caption.of("fawe.error.clipboard.invalid.info", file.getName(), file.length()));
+                    print(Caption.of("fawe.error.stacktrace"));
+                }
+            } finally {
+                clipboardLoading.unlockWrite(stamp);
+            }
+        });
+        if (Fawe.isMainThread()) {
+            return;
+        }
+        try {
+            fut.get();
+        } catch (Exception e) {
+            print(Caption.of("fawe.error.clipboard.invalid"));
+            LOGGER.error("Error loading clipboard form disk", e);
+            print(Caption.of("fawe.error.stacktrace"));
+            print(Caption.of("fawe.error.no-failure"));
+            print(Caption.of("fawe.error.clipboard.invalid.info", file.getName(), file.length()));
+            print(Caption.of("fawe.error.stacktrace"));
+        }
     }
     //FAWE end
 
@@ -694,10 +754,9 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
 
     @Override
     public boolean equals(Object other) {
-        if (!(other instanceof Player)) {
+        if (!(other instanceof Player other2)) {
             return false;
         }
-        Player other2 = (Player) other;
         return other2.getName().equals(getName());
     }
 

@@ -21,6 +21,7 @@ import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import net.jpountz.lz4.LZ4Factory;
 import org.apache.logging.log4j.Logger;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.management.InstanceAlreadyExistsException;
 import javax.management.NotificationEmitter;
@@ -37,7 +38,12 @@ import java.lang.management.MemoryUsage;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -81,6 +87,7 @@ import java.util.concurrent.TimeUnit;
 public class Fawe {
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
+    private static final ThreadLocal<Boolean> IS_UUID_KEYED_EXECUTOR_THREAD = ThreadLocal.withInitial(() -> false);
 
     private static Fawe instance;
 
@@ -92,7 +99,7 @@ public class Fawe {
      * The platform specific implementation.
      */
     private final IFawe implementation;
-    private final KeyQueuedExecutorService<UUID> clipboardExecutor;
+    private final KeyQueuedExecutorService<UUID> uuidKeyQueuedExecutorService;
     private FaweVersion version;
     private TextureUtil textures;
     private QueueHandler queueHandler;
@@ -140,14 +147,27 @@ public class Fawe {
         }, 0);
 
         TaskManager.taskManager().repeat(timer, 1);
-
-        clipboardExecutor = new KeyQueuedExecutorService<>(new ThreadPoolExecutor(
+        uuidKeyQueuedExecutorService = new KeyQueuedExecutorService<>(new ThreadPoolExecutor(
                 1,
                 Settings.settings().QUEUE.PARALLEL_THREADS,
                 0L,
                 TimeUnit.MILLISECONDS,
                 new LinkedBlockingQueue<>(),
-                new ThreadFactoryBuilder().setNameFormat("FAWE Clipboard - %d").build()
+                new ThreadFactoryBuilder().setNameFormat("FAWE UUID-key-queued - %d").setThreadFactory(new ThreadFactory() {
+                    private final ThreadFactory defaultFactory = Executors.defaultThreadFactory();
+
+                    @Override
+                    public Thread newThread(@Nonnull Runnable r) {
+                        return defaultFactory.newThread(() -> {
+                            IS_UUID_KEYED_EXECUTOR_THREAD.set(true);
+                            try {
+                                r.run();
+                            } finally {
+                                IS_UUID_KEYED_EXECUTOR_THREAD.set(false); // Clear the mark after execution
+                            }
+                        });
+                    }
+                }).build()
         ));
     }
 
@@ -463,9 +483,58 @@ public class Fawe {
      *
      * @return Executor used for clipboard IO if clipboard on disk is enabled or null
      * @since 2.6.2
+     * @deprecated Use any of {@link Fawe#submitUUIDKeyQueuedTask(UUID, Runnable)},
+     * {@link Fawe#submitUUIDKeyQueuedTask(UUID, Runnable, Object), {@link Fawe#submitUUIDKeyQueuedTask(UUID, Callable)}
+     * to ensure if a thread is already a UUID-queued thread, the task is immediately run
      */
+    @Deprecated(forRemoval = true, since = "TODO")
     public KeyQueuedExecutorService<UUID> getClipboardExecutor() {
-        return this.clipboardExecutor;
+        return this.uuidKeyQueuedExecutorService;
+    }
+
+    /**
+     * Submit a task to the UUID key-queued executor
+     *
+     * @return Future representing the tank
+     * @since TODO
+     */
+    public Future<?> submitUUIDKeyQueuedTask(UUID uuid, Runnable runnable) {
+        if (IS_UUID_KEYED_EXECUTOR_THREAD.get()) {
+            runnable.run();
+            return CompletableFuture.completedFuture(null);
+        }
+        return this.uuidKeyQueuedExecutorService.submit(uuid, runnable);
+    }
+
+    /**
+     * Submit a task to the UUID key-queued executor
+     *
+     * @return Future representing the tank
+     * @since TODO
+     */
+    public <T> Future<T> submitUUIDKeyQueuedTask(UUID uuid, Runnable runnable, T result) {
+        if (IS_UUID_KEYED_EXECUTOR_THREAD.get()) {
+            runnable.run();
+            return CompletableFuture.completedFuture(result);
+        }
+        return this.uuidKeyQueuedExecutorService.submit(uuid, runnable, result);
+    }
+
+    /**
+     * Submit a task to the UUID key-queued executor
+     *
+     * @return Future representing the tank
+     * @since TODO
+     */
+    public <T> Future<T> submitUUIDKeyQueuedTask(UUID uuid, Callable<T> callable) {
+        if (IS_UUID_KEYED_EXECUTOR_THREAD.get()) {
+            try {
+                CompletableFuture.completedFuture(callable.call());
+            } catch (Throwable t) {
+                CompletableFuture.failedFuture(t);
+            }
+        }
+        return this.uuidKeyQueuedExecutorService.submit(uuid, callable);
     }
 
 }
