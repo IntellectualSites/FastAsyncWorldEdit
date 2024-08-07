@@ -12,7 +12,7 @@ import java.lang.reflect.Method;
 import java.util.Optional;
 
 /**
- * Logs called commands to a logger.
+ * Handles commands indicated as requiring confirmation.
  */
 public class ConfirmHandler implements CommandCallListener {
 

@@ -29,7 +29,7 @@ public class InverseSingleBlockStateMask extends ABlockMask {
 
     @Override
     public boolean test(BlockVector3 vector) {
-        int test = getExtent().getBlock(vector).getOrdinal();
+        int test = vector.getBlock(getExtent()).getOrdinal();
         if (isAir && test == 0) {
             return false;
         }
