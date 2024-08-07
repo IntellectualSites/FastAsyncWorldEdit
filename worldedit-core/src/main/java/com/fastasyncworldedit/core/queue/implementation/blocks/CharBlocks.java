@@ -31,7 +31,9 @@ public abstract class CharBlocks implements IBlocks {
             char[] arr = blocks.blocks[layer];
             if (arr == null) {
                 // Chunk probably trimmed mid-operations, but do nothing about it to avoid other issues
-                return EMPTY.get(blocks, layer, false);
+                synchronized (blocks.sectionLocks[layer]) {
+                    return getSkipFull(blocks, layer, aggressive);
+                }
             }
             return arr;
         }
@@ -54,22 +56,7 @@ public abstract class CharBlocks implements IBlocks {
                 if (blocks.sections[layer] == FULL) {
                     return FULL.get(blocks, layer);
                 }
-                char[] arr = blocks.blocks[layer];
-                if (arr == null) {
-                    arr = blocks.blocks[layer] = blocks.update(layer, null, aggressive);
-                    if (arr == null) {
-                        throw new IllegalStateException("Array cannot be null: " + blocks.getClass());
-                    }
-                } else {
-                    blocks.blocks[layer] = blocks.update(layer, arr, aggressive);
-                    if (blocks.blocks[layer] == null) {
-                        throw new IllegalStateException("Array cannot be null (update): " + blocks.getClass());
-                    }
-                }
-                if (blocks.blocks[layer] != null) {
-                    blocks.sections[layer] = FULL;
-                }
-                return arr;
+                return getSkipFull(blocks, layer, aggressive);
             }
         }
 
@@ -260,6 +247,25 @@ public abstract class CharBlocks implements IBlocks {
         public final synchronized void set(CharBlocks blocks, int layer, int index, char value) {
             layer -= blocks.minSectionPosition;
             get(blocks, layer)[index] = value;
+        }
+
+        static char[] getSkipFull(CharBlocks blocks, int layer, boolean aggressive) {
+            char[] arr = blocks.blocks[layer];
+            if (arr == null) {
+                arr = blocks.blocks[layer] = blocks.update(layer, null, aggressive);
+                if (arr == null) {
+                    throw new IllegalStateException("Array cannot be null: " + blocks.getClass());
+                }
+            } else {
+                blocks.blocks[layer] = blocks.update(layer, arr, aggressive);
+                if (blocks.blocks[layer] == null) {
+                    throw new IllegalStateException("Array cannot be null (update): " + blocks.getClass());
+                }
+            }
+            if (blocks.blocks[layer] != null) {
+                blocks.sections[layer] = FULL;
+            }
+            return arr;
         }
 
     }
