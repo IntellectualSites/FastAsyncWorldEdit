@@ -1,6 +1,5 @@
 package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_21_R1.regen;
 
-import ca.spottedleaf.moonrise.patches.chunk_system.scheduling.ChunkHolderManager;
 import com.fastasyncworldedit.bukkit.adapter.Regenerator;
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.queue.IChunkCache;
@@ -26,6 +25,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.server.level.ChunkHolder;
+import net.minecraft.server.level.ChunkLevel;
 import net.minecraft.server.level.ChunkMap;
 import net.minecraft.server.level.ChunkTaskPriorityQueueSorter.Message;
 import net.minecraft.server.level.GenerationChunkHolder;
@@ -102,6 +102,7 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
     private static final Field generatorStructureStateField;
     private static final Field ringPositionsField;
     private static final Field hasGeneratedPositionsField;
+    private static final Field worldGenContextField;
 
     //list of chunk stati in correct order without FULL
     private static final Map<ChunkStatus, Concurrency> chunkStati = new LinkedHashMap<>();
@@ -170,6 +171,9 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
                     Refraction.pickName("hasGeneratedPositions", "h")
             );
             hasGeneratedPositionsField.setAccessible(true);
+
+            worldGenContextField = ChunkMap.class.getDeclaredField(Refraction.pickName("worldGenContextField", "P"));
+            worldGenContextField.setAccessible(true);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -380,19 +384,12 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
             }
         }
 
-
         chunkSourceField.set(freshWorld, freshChunkProvider);
         //let's start then
         structureTemplateManager = server.getStructureManager();
         threadedLevelLightEngine = new NoOpLightEngine(freshChunkProvider);
 
-        this.worldGenContext = new WorldGenContext(
-                freshWorld,
-                chunkGenerator,
-                structureTemplateManager,
-                threadedLevelLightEngine,
-                originalChunkProvider.chunkMap.worldGenContext.mainThreadMailBox()
-        );
+        this.worldGenContext = (WorldGenContext) worldGenContextField.get(freshChunkProvider.chunkMap);
         return true;
     }
 
