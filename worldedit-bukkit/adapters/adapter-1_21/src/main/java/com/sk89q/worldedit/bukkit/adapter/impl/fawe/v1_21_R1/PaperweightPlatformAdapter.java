@@ -2,7 +2,6 @@ package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_21_R1;
 
 import ca.spottedleaf.moonrise.patches.chunk_system.level.entity.ChunkEntitySlices;
 import ca.spottedleaf.moonrise.patches.chunk_system.scheduling.ChunkHolderManager;
-import com.destroystokyo.paper.util.maplist.EntityList;
 import com.fastasyncworldedit.bukkit.adapter.CachedBukkitAdapter;
 import com.fastasyncworldedit.bukkit.adapter.DelegateSemaphore;
 import com.fastasyncworldedit.bukkit.adapter.NMSAdapter;
@@ -119,6 +118,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
 
     static final boolean POST_CHUNK_REWRITE;
     private static Method PAPER_CHUNK_GEN_ALL_ENTITIES;
+    private static Method PAPER_PRE_CHUNK_UPDATE_ENTITY_LIST_GET_RAW_DATA;
     private static Field LEVEL_CHUNK_ENTITIES;
     private static Field SERVER_LEVEL_ENTITY_MANAGER;
 
@@ -202,7 +202,9 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                 // Paper - Pre-Chunk-Update
                 LEVEL_CHUNK_ENTITIES = LevelChunk.class.getDeclaredField("entities");
                 LEVEL_CHUNK_ENTITIES.setAccessible(true);
-            } catch (NoSuchFieldException ignored) {
+                Class<?> entityListClass = Class.forName("com.destroystokyo.paper.util.maplist.EntityList");
+                PAPER_PRE_CHUNK_UPDATE_ENTITY_LIST_GET_RAW_DATA = entityListClass.getDeclaredMethod("getRawData");
+            } catch (NoSuchFieldException | ClassNotFoundException ignored) {
             }
             try {
                 // Non-Paper
@@ -668,9 +670,9 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                 }
             }
             try {
-                EntityList entityList = (EntityList) LEVEL_CHUNK_ENTITIES.get(chunk);
-                return List.of(entityList.getRawData());
-            } catch (IllegalAccessException e) {
+                Object entityList = LEVEL_CHUNK_ENTITIES.get(chunk);
+                return List.of((Entity[]) PAPER_PRE_CHUNK_UPDATE_ENTITY_LIST_GET_RAW_DATA.invoke(entityList));
+            } catch (IllegalAccessException | InvocationTargetException e) {
                 collector.add(new RuntimeException("Failed to lookup entities [POST_CHUNK_REWRITE=false]", e));
                 // fall through
             }
