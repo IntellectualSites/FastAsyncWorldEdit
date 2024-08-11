@@ -438,7 +438,7 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable, Fl
                 if (entity.getType().equals(EntityTypes.LEASH_KNOT)) {
                     var state = entity.getState();
                     var nbtData = new HashMap<>(state.getNbtData().getValue());
-                    var posAsMap = new HashMap<String, Tag>();
+                    var posAsMap = new HashMap<String, Tag<?, ?>>();
                     posAsMap.put("X", new IntTag(pos.getBlockX()));
                     posAsMap.put("Y", new IntTag(pos.getBlockY()));
                     posAsMap.put("Z", new IntTag(pos.getBlockZ()));
