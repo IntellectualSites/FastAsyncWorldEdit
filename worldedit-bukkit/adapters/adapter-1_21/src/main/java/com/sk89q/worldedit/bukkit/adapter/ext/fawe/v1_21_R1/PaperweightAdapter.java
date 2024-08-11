@@ -854,7 +854,7 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
     }
 
     @SuppressWarnings("unchecked")
-    private List<CompletableFuture<ChunkAccess>> submitChunkLoadTasks(Region region, ServerLevel serverWorld) {
+    public List<CompletableFuture<ChunkAccess>> submitChunkLoadTasks(Region region, ServerLevel serverWorld) {
         ServerChunkCache chunkManager = serverWorld.getChunkSource();
         List<CompletableFuture<ChunkAccess>> chunkLoadings = new ArrayList<>();
         // Pre-gen all the chunks

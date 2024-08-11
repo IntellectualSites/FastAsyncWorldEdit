@@ -7,9 +7,11 @@ import com.fastasyncworldedit.core.queue.IChunkCache;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.google.common.collect.ImmutableList;
+import com.google.common.util.concurrent.Futures;
 import com.mojang.serialization.Lifecycle;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.adapter.Refraction;
+import com.sk89q.worldedit.bukkit.adapter.ext.fawe.v1_21_R1.PaperweightAdapter;
 import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_21_R1.PaperweightGetBlocks;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
@@ -34,6 +36,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ThreadedLevelLightEngine;
 import net.minecraft.server.level.progress.ChunkProgressListener;
 import net.minecraft.util.StaticCache2D;
+import net.minecraft.util.thread.BlockableEventLoop;
 import net.minecraft.util.thread.ProcessorHandle;
 import net.minecraft.util.thread.ProcessorMailbox;
 import net.minecraft.world.level.ChunkPos;
@@ -66,6 +69,7 @@ import net.minecraft.world.level.storage.PrimaryLevelData;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
+import org.bukkit.World;
 import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.generator.CustomChunkGenerator;
@@ -175,6 +179,8 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
         }
     }
 
+    private final PaperweightAdapter adapter;
+
     //runtime
     private ServerLevel originalServerWorld;
     private ServerChunkCache originalChunkProvider;
@@ -190,11 +196,9 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
 
     private boolean generateFlatBedrock = false;
 
-    public PaperweightRegen(org.bukkit.World originalBukkitWorld, Region region, Extent target, RegenOptions options) {
+    public PaperweightRegen(World originalBukkitWorld, Region region, Extent target, RegenOptions options, PaperweightAdapter adapter) {
         super(originalBukkitWorld, region, target, options);
-        if (PaperLib.isPaper()) {
-            throw new UnsupportedOperationException("Regeneration currently not support on Paper due to the new generation system");
-        }
+        this.adapter = adapter;
     }
 
     @Override
@@ -298,7 +302,7 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
         }).get();
         freshWorld.noSave = true;
         removeWorldFromWorldsMap();
-        newWorldData.checkName(originalServerWorld.serverLevelData.getLevelName()); //rename to original world name
+        // newWorldData.checkName(originalServerWorld.serverLevelData.getLevelName()); //rename to original world name
         if (paperConfigField != null) {
             paperConfigField.set(freshWorld, originalServerWorld.paperConfig());
         }
@@ -337,31 +341,8 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
         }
 //        chunkGenerator.conf = freshWorld.spigotConfig; - Does not exist anymore, may need to be re-addressed
 
-        freshChunkProvider = new ServerChunkCache(
-                freshWorld,
-                session,
-                server.getFixerUpper(),
-                server.getStructureManager(),
-                server.executor,
-                chunkGenerator,
-                freshWorld.spigotConfig.viewDistance,
-                freshWorld.spigotConfig.simulationDistance,
-                server.forceSynchronousWrites(),
-                new RegenNoOpWorldLoadListener(),
-                (chunkCoordIntPair, state) -> {
-                },
-                () -> server.overworld().getDataStorage()
-        ) {
-            // redirect to LevelChunks created in #createChunks
-            @Override
-            public ChunkAccess getChunk(int x, int z, @NotNull ChunkStatus chunkstatus, boolean create) {
-                ChunkAccess chunkAccess = getChunkAt(x, z);
-                if (chunkAccess == null && create) {
-                    chunkAccess = createChunk(getProtoChunkAt(x, z));
-                }
-                return chunkAccess;
-            }
-        };
+        // redirect to LevelChunks created in #createChunks
+        freshChunkProvider = freshWorld.getChunkSource();
 
         if (seed == originalOpts.seed() && !options.hasBiomeType()) {
             // Optimisation for needless ring position calculation when the seed and biome is the same.
@@ -394,6 +375,39 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
                 originalChunkProvider.chunkMap.worldGenContext.mainThreadMailBox()
         );
         return true;
+    }
+
+    @Override
+    protected void generate() throws Exception {
+        // trigger async chunk loads on the main thread
+        List<CompletableFuture<ChunkAccess>> chunkLoadings = TaskManager.taskManager()
+                .sync(() -> adapter.submitChunkLoadTasks(region, freshWorld));
+        if (Fawe.isMainThread()) {
+            BlockableEventLoop<Runnable> executor;
+            try {
+                executor = freshWorld.getChunkSource().mainThreadProcessor;
+                // TODO spigot support?
+                // executor = (BlockableEventLoop<Runnable>) chunkProviderExecutorField.get(freshWorld.getChunkSource());
+            } catch (Exception e) { // TODO Exception -> IllegalAccessException?
+                throw new IllegalStateException("Couldn't get executor for chunk loading.", e);
+            }
+            executor.managedBlock(() -> {
+                // bail out early if a future fails
+                if (chunkLoadings.stream().anyMatch(ftr ->
+                        ftr.isDone() && Futures.getUnchecked(ftr) == null
+                )) {
+                    return false;
+                }
+                return chunkLoadings.stream().allMatch(CompletableFuture::isDone);
+            });
+        } else {
+            // we are not on the main thread, just wait until all chunks are generated
+            for (final CompletableFuture<ChunkAccess> loading : chunkLoadings.reversed()) {
+                loading.join();
+            }
+        }
+
+        createSource();
     }
 
     @Override

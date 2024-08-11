@@ -45,6 +45,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -74,8 +75,7 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
     private final Long2ObjectOpenHashMap<Chunk> chunks = new Long2ObjectOpenHashMap<>();
     protected boolean generateConcurrent = true;
     protected long seed;
-    private ExecutorService executor;
-    private SingleThreadQueueExtent source;
+    protected SingleThreadQueueExtent source;
 
     /**
      * Initializes an abstract regeneration handler.
@@ -123,10 +123,7 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
         }
 
         try {
-            if (!generate()) {
-                cleanup0();
-                return false;
-            }
+            generate();
         } catch (Exception e) {
             cleanup0();
             throw e;
@@ -165,17 +162,26 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
         return chunks.get(MathMan.pairInt(x, z));
     }
 
-    private boolean generate() throws Exception {
+    protected void generate() throws Exception {
         ThreadFactory factory = new ThreadFactoryBuilder()
                 .setNameFormat("FAWE Regenerator - %d")
                 .build();
+        ExecutorService executor;
         if (generateConcurrent) {
             //Using concurrent chunk generation
             executor = Executors.newFixedThreadPool(Settings.settings().QUEUE.PARALLEL_THREADS, factory);
         } else { // else using sequential chunk generation, concurrent not supported
             executor = Executors.newSingleThreadExecutor(factory);
         }
+        try {
+            generateWithExecutor(executor);
+        } finally {
+            executor.shutdownNow();
+        }
+        createSource();
+    }
 
+    private void generateWithExecutor(ExecutorService executor) throws ExecutionException, InterruptedException {
         //TODO: can we get that required radius down without affecting chunk generation (e.g. strucures, features, ...)?
         //for now it is working well and fast, if we are bored in the future we could do the research (a lot of it) to reduce the border radius
 
@@ -200,6 +206,7 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
         // a memory-efficient, lightweight "list" that calculates index -> ChunkAccess
         // as needed when accessed
         class LazyChunkList extends AbstractList<IChunkAccess> {
+
             private final int size;
             private final int minX;
             private final int minZ;
@@ -211,6 +218,7 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
                 this.minX = centerX - radius;
                 this.minZ = centerZ - radius;
             }
+
             @Override
             public IChunkAccess get(final int index) {
                 Objects.checkIndex(index, size);
@@ -229,8 +237,10 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
         @Category("FAWE")
         @Name("fawe.regen")
         class RegenerationEvent extends Event {
+
             private String chunkStatus;
             private int chunksToProcess;
+
         }
 
         //run generation tasks excluding FULL chunk status
@@ -251,27 +261,30 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
                         scheduled.add(() -> {
                             for (long xz : row) {
                                 chunkStatus.processChunkSave(xz, new LazyChunkList(radius, MathMan.unpairIntX(xz),
-                                        MathMan.unpairIntY(xz)));
+                                        MathMan.unpairIntY(xz)
+                                ));
                             }
                         });
                     }
-                    runAndWait(scheduled);
+                    runAndWait(scheduled, executor);
                 }
             } else if (this.generateConcurrent && entry.getValue() == Concurrency.FULL) {
                 // every chunk can be processed individually
                 List<Runnable> scheduled = new ArrayList<>(coords.length);
                 for (long xz : coords) {
                     scheduled.add(() -> chunkStatus.processChunkSave(xz, new LazyChunkList(radius, MathMan.unpairIntX(xz),
-                            MathMan.unpairIntY(xz))));
+                            MathMan.unpairIntY(xz)
+                    )));
                 }
-                runAndWait(scheduled);
+                runAndWait(scheduled, executor);
             } else { // Concurrency.NONE or generateConcurrent == false
                 // run sequential but submit to different thread
                 // running regen on the main thread otherwise triggers async-only events on the main thread
                 executor.submit(() -> {
                     for (long xz : coords) {
                         chunkStatus.processChunkSave(xz, new LazyChunkList(radius, MathMan.unpairIntX(xz),
-                                MathMan.unpairIntY(xz)));
+                                MathMan.unpairIntY(xz)
+                        ));
                     }
                 }).get(); // wait until finished this step
             }
@@ -309,16 +322,18 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
                 populate(c, random, pop);
             });
         }
+    }
+
+    protected final void createSource() {
 
         source = new SingleThreadQueueExtent(
                 BukkitWorld.HAS_MIN_Y ? originalBukkitWorld.getMinHeight() : 0,
                 BukkitWorld.HAS_MIN_Y ? originalBukkitWorld.getMaxHeight() : 256
         );
         source.init(target, initSourceQueueCache(), null);
-        return true;
     }
 
-    private void runAndWait(final List<Runnable> tasks) {
+    private void runAndWait(final List<Runnable> tasks, ExecutorService executor) {
         try {
             List<Future<?>> futures = new ArrayList<>();
             tasks.forEach(task -> futures.add(executor.submit(task)));
@@ -382,9 +397,6 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
 
     //functions to be implemented by sub class
     private void cleanup0() {
-        if (executor != null) {
-            executor.shutdownNow();
-        }
         cleanup();
     }
 
