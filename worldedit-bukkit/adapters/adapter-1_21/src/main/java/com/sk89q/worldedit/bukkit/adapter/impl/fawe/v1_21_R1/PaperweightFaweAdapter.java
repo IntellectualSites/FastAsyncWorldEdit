@@ -624,15 +624,14 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
     }
 
     private boolean wasAccessibleSinceLastSave(ChunkHolder holder) {
-        if (!PaperLib.isPaper() || !PaperweightPlatformAdapter.POST_CHUNK_REWRITE) {
-            try {
-                return (boolean) CHUNK_HOLDER_WAS_ACCESSIBLE_SINCE_LAST_SAVE.invoke(holder);
-            } catch (IllegalAccessException | InvocationTargetException ignored) {
-                // fall-through
-            }
+        if (PaperLib.isPaper()) { // Papers new chunk system has no related replacement - therefor we assume true.
+            return true;
         }
-        // Papers new chunk system has no related replacement - therefor we assume true.
-        return true;
+        try {
+            return (boolean) CHUNK_HOLDER_WAS_ACCESSIBLE_SINCE_LAST_SAVE.invoke(holder);
+        } catch (IllegalAccessException | InvocationTargetException ignored) {
+            return false;
+        }
     }
 
 }
