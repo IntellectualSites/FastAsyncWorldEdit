@@ -648,7 +648,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                         .moonrise$getEntityLookup()
                         .getChunk(chunk.locX, chunk.locZ));
             } catch (IllegalAccessException | InvocationTargetException e) {
-                throw new RuntimeException("Failed to lookup entities [POST_CHUNK_REWRITE=true]", e);
+                throw new RuntimeException("Failed to lookup entities [PAPER=true]", e);
             }
         }
         try {
