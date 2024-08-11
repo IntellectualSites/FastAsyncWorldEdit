@@ -2,7 +2,6 @@ package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_21_R1;
 
 import ca.spottedleaf.moonrise.patches.chunk_system.level.entity.ChunkEntitySlices;
 import ca.spottedleaf.moonrise.patches.chunk_system.scheduling.ChunkHolderManager;
-import com.destroystokyo.paper.util.maplist.EntityList;
 import com.fastasyncworldedit.bukkit.adapter.CachedBukkitAdapter;
 import com.fastasyncworldedit.bukkit.adapter.DelegateSemaphore;
 import com.fastasyncworldedit.bukkit.adapter.NMSAdapter;
@@ -117,9 +116,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
 
-    static final boolean POST_CHUNK_REWRITE;
     private static Method PAPER_CHUNK_GEN_ALL_ENTITIES;
-    private static Field LEVEL_CHUNK_ENTITIES;
     private static Field SERVER_LEVEL_ENTITY_MANAGER;
 
     static {
@@ -189,28 +186,15 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             fieldRemove = BlockEntity.class.getDeclaredField(Refraction.pickName("remove", "p"));
             fieldRemove.setAccessible(true);
 
-            boolean chunkRewrite;
             try {
                 Level.class.getDeclaredMethod("moonrise$getEntityLookup");
-                chunkRewrite = true;
                 PAPER_CHUNK_GEN_ALL_ENTITIES = ChunkEntitySlices.class.getDeclaredMethod("getAllEntities");
                 PAPER_CHUNK_GEN_ALL_ENTITIES.setAccessible(true);
             } catch (NoSuchMethodException ignored) {
-                chunkRewrite = false;
-            }
-            try {
-                // Paper - Pre-Chunk-Update
-                LEVEL_CHUNK_ENTITIES = LevelChunk.class.getDeclaredField("entities");
-                LEVEL_CHUNK_ENTITIES.setAccessible(true);
-            } catch (NoSuchFieldException ignored) {
-            }
-            try {
                 // Non-Paper
                 SERVER_LEVEL_ENTITY_MANAGER = ServerLevel.class.getDeclaredField(Refraction.pickName("entityManager", "N"));
                 SERVER_LEVEL_ENTITY_MANAGER.setAccessible(true);
-            } catch (NoSuchFieldException ignored) {
             }
-            POST_CHUNK_REWRITE = chunkRewrite;
         } catch (RuntimeException | Error e) {
             throw e;
         } catch (Exception e) {
@@ -657,32 +641,22 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
     }
 
     static List<Entity> getEntities(LevelChunk chunk) {
-        ExceptionCollector<RuntimeException> collector = new ExceptionCollector<>();
         if (PaperLib.isPaper()) {
-            if (POST_CHUNK_REWRITE) {
-                try {
-                    //noinspection unchecked
-                    return (List<Entity>) PAPER_CHUNK_GEN_ALL_ENTITIES.invoke(chunk.level.moonrise$getEntityLookup().getChunk(chunk.locX, chunk.locZ));
-                } catch (IllegalAccessException | InvocationTargetException e) {
-                    throw new RuntimeException("Failed to lookup entities [POST_CHUNK_REWRITE=true]", e);
-                }
-            }
             try {
-                EntityList entityList = (EntityList) LEVEL_CHUNK_ENTITIES.get(chunk);
-                return List.of(entityList.getRawData());
-            } catch (IllegalAccessException e) {
-                collector.add(new RuntimeException("Failed to lookup entities [POST_CHUNK_REWRITE=false]", e));
-                // fall through
+                //noinspection unchecked
+                return (List<Entity>) PAPER_CHUNK_GEN_ALL_ENTITIES.invoke(chunk.level
+                        .moonrise$getEntityLookup()
+                        .getChunk(chunk.locX, chunk.locZ));
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                throw new RuntimeException("Failed to lookup entities [PAPER=true]", e);
             }
         }
         try {
             //noinspection unchecked
             return ((PersistentEntitySectionManager<Entity>) (SERVER_LEVEL_ENTITY_MANAGER.get(chunk.level))).getEntities(chunk.getPos());
         } catch (IllegalAccessException e) {
-            collector.add(new RuntimeException("Failed to lookup entities [PAPER=false]", e));
+            throw new RuntimeException("Failed to lookup entities [PAPER=false]", e);
         }
-        collector.throwIfPresent();
-        return List.of();
     }
 
     record FakeIdMapBlock(int size) implements IdMap<net.minecraft.world.level.block.state.BlockState> {
