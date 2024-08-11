@@ -27,7 +27,7 @@ public class SchemGen implements Resource {
     /**
      * @deprecated Use {@link SchemGen#SchemGen(Mask, Extent, List, boolean, Region)}
      */
-    @Deprecated(forRemoval = true, since = "TODO")
+    @Deprecated(forRemoval = true, since = "2.11.1")
     public SchemGen(Mask mask, Extent extent, List<ClipboardHolder> clipboards, boolean randomRotate) {
         this.mask = mask;
         this.extent = extent;
@@ -39,7 +39,7 @@ public class SchemGen implements Resource {
     /**
      * New instance. Places a schematic on terrain at a given x,z when appropriate
      *
-     * @since TODO
+     * @since 2.11.1
      */
     public SchemGen(Mask mask, Extent extent, List<ClipboardHolder> clipboards, boolean randomRotate, Region region) {
         this.mask = mask;

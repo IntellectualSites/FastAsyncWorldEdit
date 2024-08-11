@@ -119,7 +119,7 @@ public class FaweAPI {
      * @deprecated Opens streams that are not then closed. Use {@link ClipboardFormats#findByFile(File)} and its relevant
      *         methods to allow closing created streams/closing the reader (which will close the stream(s))
      */
-    @Deprecated(forRemoval = true, since = "TODO")
+    @Deprecated(forRemoval = true, since = "2.11.1")
     public static Clipboard load(File file) throws IOException {
         return ClipboardFormats.findByFile(file).load(file);
     }

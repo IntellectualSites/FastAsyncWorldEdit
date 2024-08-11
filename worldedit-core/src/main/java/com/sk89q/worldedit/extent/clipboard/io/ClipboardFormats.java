@@ -177,7 +177,7 @@ public class ClipboardFormats {
      * @deprecated DO NOT USE. Sponge formats 2 and 3 both use .schem by default.
      */
     @Nullable
-    @Deprecated(forRemoval = true, since = "TODO")
+    @Deprecated(forRemoval = true, since = "2.11.1")
     public static ClipboardFormat findByExtension(String extension) {
         checkNotNull(extension);
 
