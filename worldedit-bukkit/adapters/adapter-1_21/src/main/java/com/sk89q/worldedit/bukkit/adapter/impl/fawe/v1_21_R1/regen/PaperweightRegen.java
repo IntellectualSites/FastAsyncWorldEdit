@@ -11,7 +11,6 @@ import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.adapter.Refraction;
 import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.io.file.SafeFiles;
 import com.sk89q.worldedit.world.RegenOptions;
@@ -19,8 +18,6 @@ import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.dedicated.DedicatedServer;
-import net.minecraft.server.level.ChunkMap;
-import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.progress.ChunkProgressListener;
 import net.minecraft.util.ProgressListener;
@@ -28,28 +25,15 @@ import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelSettings;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.biome.BiomeSource;
-import net.minecraft.world.level.biome.FixedBiomeSource;
-import net.minecraft.world.level.chunk.ChunkAccess;
-import net.minecraft.world.level.chunk.ChunkGenerator;
-import net.minecraft.world.level.chunk.ChunkGeneratorStructureState;
-import net.minecraft.world.level.chunk.LevelChunk;
-import net.minecraft.world.level.chunk.ProtoChunk;
-import net.minecraft.world.level.chunk.status.ChunkStatus;
 import net.minecraft.world.level.dimension.LevelStem;
-import net.minecraft.world.level.levelgen.FlatLevelSource;
 import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
-import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
 import net.minecraft.world.level.levelgen.WorldOptions;
-import net.minecraft.world.level.levelgen.flat.FlatLevelGeneratorSettings;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.PrimaryLevelData;
-import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.craftbukkit.CraftWorld;
-import org.bukkit.craftbukkit.generator.CustomChunkGenerator;
 import org.bukkit.generator.BiomeProvider;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -63,7 +47,7 @@ import java.util.function.Supplier;
 
 import static net.minecraft.core.registries.Registries.BIOME;
 
-public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, LevelChunk, ChunkStatus> {
+public class PaperweightRegen extends Regenerator {
 
     private static final Field serverWorldsField;
     private static final Field paperConfigField;
@@ -109,7 +93,7 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
     }
 
     @Override
-    protected void tickLevel(final BooleanSupplier shouldKeepTicking) {
+    protected void runTasks(final BooleanSupplier shouldKeepTicking) {
         while (shouldKeepTicking.getAsBoolean()) {
             if (!this.freshWorld.getChunkSource().pollTask()) {
                 return;
@@ -237,6 +221,7 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
         try {
             Fawe.instance().getQueueHandler().sync(() -> {
                 try {
+                    freshWorld.getChunkSource().getDataStorage().cache.clear();
                     freshWorld.getChunkSource().close(false);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
@@ -256,16 +241,6 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
             SafeFiles.tryHardToDeleteDir(tempDir);
         } catch (Exception ignored) {
         }
-    }
-
-    @Override
-    protected ProtoChunk createProtoChunk(int x, int z) {
-        throw new UnsupportedOperationException("should not be called");
-    }
-
-    @Override
-    protected LevelChunk createChunk(ProtoChunk protoChunk) {
-        throw new UnsupportedOperationException("should not be called");
     }
 
     @Override
