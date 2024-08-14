@@ -4,6 +4,7 @@ import com.fastasyncworldedit.core.queue.IChunkCache;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.implementation.SingleThreadQueueExtent;
 import com.fastasyncworldedit.core.util.MathMan;
+import com.fastasyncworldedit.core.util.TaskManager;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
@@ -27,6 +28,8 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.function.BooleanSupplier;
 import java.util.function.Function;
 
 /**
@@ -101,6 +104,8 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
         return true;
     }
 
+    protected abstract void tickLevel(BooleanSupplier shouldKeepTicking);
+
     /**
      * Returns the {@code ProtoChunk} at the given chunk coordinates.
      *
@@ -134,6 +139,11 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
 
     private void copyToWorld() {
         createSource();
+        final long timeoutPerTick = TimeUnit.MILLISECONDS.toNanos(10);
+        int taskId = TaskManager.taskManager().repeat(() -> {
+            final long startTime = System.nanoTime();
+            tickLevel(() -> System.nanoTime() - startTime < timeoutPerTick);
+        }, 1);
         //Setting Blocks
         boolean genbiomes = options.shouldRegenBiomes();
         boolean hasBiome = options.hasBiomeType();
@@ -146,6 +156,7 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
         } else if (genbiomes) {
             target.setBlocks(region, new WithBiomePlacementPattern(vec -> source.getBiome(vec)));
         }
+        TaskManager.taskManager().cancel(taskId);
     }
 
     private class PlacementPattern implements Pattern {

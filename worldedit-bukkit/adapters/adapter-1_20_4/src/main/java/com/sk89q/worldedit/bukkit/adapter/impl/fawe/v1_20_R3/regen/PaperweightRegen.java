@@ -184,6 +184,11 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
     }
 
     @Override
+    protected void tickLevel(final BooleanSupplier shouldKeepTicking) {
+        this.freshWorld.tick(shouldKeepTicking);
+    }
+
+    @Override
     protected boolean prepare() {
         this.originalServerWorld = ((CraftWorld) originalBukkitWorld).getHandle();
         originalChunkProvider = originalServerWorld.getChunkSource();

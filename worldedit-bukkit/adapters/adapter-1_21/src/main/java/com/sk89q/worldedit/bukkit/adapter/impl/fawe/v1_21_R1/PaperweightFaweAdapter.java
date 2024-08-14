@@ -558,7 +558,7 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
 
     @Override
     public boolean regenerate(org.bukkit.World bukkitWorld, Region region, Extent target, RegenOptions options) throws Exception {
-        return new PaperweightRegen(bukkitWorld, region, target, options, this.parent).regenerate();
+        return new PaperweightRegen(bukkitWorld, region, target, options).regenerate();
     }
 
     @Override

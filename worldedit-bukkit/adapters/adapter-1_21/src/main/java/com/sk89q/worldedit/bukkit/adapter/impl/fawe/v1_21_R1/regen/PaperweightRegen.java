@@ -10,7 +10,6 @@ import com.mojang.serialization.Lifecycle;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.adapter.Refraction;
-import com.sk89q.worldedit.bukkit.adapter.ext.fawe.v1_21_R1.PaperweightAdapter;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.regions.Region;
@@ -24,6 +23,7 @@ import net.minecraft.server.level.ChunkMap;
 import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.progress.ChunkProgressListener;
+import net.minecraft.util.ProgressListener;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelSettings;
@@ -52,29 +52,22 @@ import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.generator.CustomChunkGenerator;
 import org.bukkit.generator.BiomeProvider;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.OptionalLong;
+import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
 import static net.minecraft.core.registries.Registries.BIOME;
 
 public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, LevelChunk, ChunkStatus> {
 
-    private static final Logger LOGGER = LogManagerCompat.getLogger();
-
     private static final Field serverWorldsField;
     private static final Field paperConfigField;
-    private static final Field flatBedrockField;
-    private static final Field generatorSettingFlatField;
     private static final Field generatorSettingBaseSupplierField;
-    private static final Field delegateField;
-    private static final Field chunkSourceField;
-    private static final Field generatorStructureStateField;
-    private static final Field ringPositionsField;
-    private static final Field hasGeneratedPositionsField;
 
 
     static {
@@ -83,91 +76,55 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
             serverWorldsField.setAccessible(true);
 
             Field tmpPaperConfigField;
-            Field tmpFlatBedrockField;
             try { //only present on paper
                 tmpPaperConfigField = Level.class.getDeclaredField("paperConfig");
                 tmpPaperConfigField.setAccessible(true);
-
-                tmpFlatBedrockField = tmpPaperConfigField.getType().getDeclaredField("generateFlatBedrock");
-                tmpFlatBedrockField.setAccessible(true);
             } catch (Exception e) {
                 tmpPaperConfigField = null;
-                tmpFlatBedrockField = null;
             }
             paperConfigField = tmpPaperConfigField;
-            flatBedrockField = tmpFlatBedrockField;
 
             generatorSettingBaseSupplierField = NoiseBasedChunkGenerator.class.getDeclaredField(Refraction.pickName(
                     "settings", "e"));
             generatorSettingBaseSupplierField.setAccessible(true);
-
-            generatorSettingFlatField = FlatLevelSource.class.getDeclaredField(Refraction.pickName("settings", "d"));
-            generatorSettingFlatField.setAccessible(true);
-
-            delegateField = CustomChunkGenerator.class.getDeclaredField("delegate");
-            delegateField.setAccessible(true);
-
-            chunkSourceField = ServerLevel.class.getDeclaredField(Refraction.pickName("chunkSource", "I"));
-            chunkSourceField.setAccessible(true);
-
-            generatorStructureStateField = ChunkMap.class.getDeclaredField(Refraction.pickName("chunkGeneratorState", "w"));
-            generatorStructureStateField.setAccessible(true);
-
-            ringPositionsField = ChunkGeneratorStructureState.class.getDeclaredField(Refraction.pickName("ringPositions", "g"));
-            ringPositionsField.setAccessible(true);
-
-            hasGeneratedPositionsField = ChunkGeneratorStructureState.class.getDeclaredField(
-                    Refraction.pickName("hasGeneratedPositions", "h")
-            );
-            hasGeneratedPositionsField.setAccessible(true);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    private final PaperweightAdapter adapter;
-
     //runtime
     private ServerLevel originalServerWorld;
-    private ServerChunkCache originalChunkProvider;
     private ServerLevel freshWorld;
     private LevelStorageSource.LevelStorageAccess session;
-    private ChunkGenerator chunkGenerator;
 
     private Path tempDir;
-
-    private boolean generateFlatBedrock = false;
 
     public PaperweightRegen(
             World originalBukkitWorld,
             Region region,
             Extent target,
-            RegenOptions options,
-            PaperweightAdapter adapter
+            RegenOptions options
     ) {
         super(originalBukkitWorld, region, target, options);
-        this.adapter = adapter;
+    }
+
+    @Override
+    protected void tickLevel(final BooleanSupplier shouldKeepTicking) {
+        while (shouldKeepTicking.getAsBoolean()) {
+            if (!this.freshWorld.getChunkSource().pollTask()) {
+                return;
+            }
+        }
     }
 
     @Override
     protected boolean prepare() {
         this.originalServerWorld = ((CraftWorld) originalBukkitWorld).getHandle();
-        originalChunkProvider = originalServerWorld.getChunkSource();
-
-        //flat bedrock? (only on paper)
-        if (paperConfigField != null) {
-            try {
-                generateFlatBedrock = flatBedrockField.getBoolean(paperConfigField.get(originalServerWorld));
-            } catch (Exception ignored) {
-            }
-        }
-
         seed = options.getSeed().orElse(originalServerWorld.getSeed());
         return true;
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     protected boolean initNewWorld() throws Exception {
         //world folder
         tempDir = java.nio.file.Files.createTempDirectory("FastAsyncWorldEditWorldGen");
@@ -238,51 +195,33 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
                 if (options.hasBiomeType()) {
                     return singleBiome;
                 }
-                return PaperweightRegen.this.chunkGenerator.getBiomeSource().getNoiseBiome(
-                        biomeX, biomeY, biomeZ, getChunkSource().randomState().sampler()
-                );
+                return super.getUncachedNoiseBiome(biomeX, biomeY, biomeZ);
             }
 
+            @Override
+            public void save(
+                    @Nullable final ProgressListener progressListener,
+                    final boolean flush,
+                    final boolean savingDisabled
+            ) {
+                // noop, spigot
+            }
+
+            @Override
+            public void save(
+                    @Nullable final ProgressListener progressListener,
+                    final boolean flush,
+                    final boolean savingDisabled,
+                    final boolean close
+            ) {
+                // noop, paper
+            }
         }).get();
         freshWorld.noSave = true;
         removeWorldFromWorldsMap();
         newWorldData.checkName(originalServerWorld.serverLevelData.getLevelName()); //rename to original world name
         if (paperConfigField != null) {
             paperConfigField.set(freshWorld, originalServerWorld.paperConfig());
-        }
-
-        ChunkGenerator originalGenerator = originalChunkProvider.getGenerator();
-        if (originalGenerator instanceof FlatLevelSource flatLevelSource) {
-            FlatLevelGeneratorSettings generatorSettingFlat = flatLevelSource.settings();
-            chunkGenerator = new FlatLevelSource(generatorSettingFlat);
-        } else if (originalGenerator instanceof NoiseBasedChunkGenerator noiseBasedChunkGenerator) {
-            Holder<NoiseGeneratorSettings> generatorSettingBaseSupplier = (Holder<NoiseGeneratorSettings>)
-                    generatorSettingBaseSupplierField.get(noiseBasedChunkGenerator);
-            BiomeSource biomeSource;
-            if (options.hasBiomeType()) {
-                biomeSource = new FixedBiomeSource(
-                        DedicatedServer.getServer().registryAccess()
-                                .registryOrThrow(BIOME).asHolderIdMap().byIdOrThrow(
-                                        WorldEditPlugin.getInstance().getBukkitImplAdapter().getInternalBiomeId(options.getBiomeType())
-                                )
-                );
-            } else {
-                biomeSource = originalGenerator.getBiomeSource();
-            }
-            chunkGenerator = new NoiseBasedChunkGenerator(
-                    biomeSource,
-                    generatorSettingBaseSupplier
-            );
-        } else if (originalGenerator instanceof CustomChunkGenerator customChunkGenerator) {
-            chunkGenerator = customChunkGenerator.getDelegate();
-        } else {
-            LOGGER.error("Unsupported generator type {}", originalGenerator.getClass().getName());
-            return false;
-        }
-        if (generator != null) {
-            chunkGenerator = new CustomChunkGenerator(freshWorld, chunkGenerator, generator);
-            //noinspection deprecation
-            generateConcurrent = generator.isParallelCapable();
         }
         return true;
     }
