@@ -4,8 +4,6 @@ import com.fastasyncworldedit.bukkit.adapter.Regenerator;
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.queue.IChunkCache;
 import com.fastasyncworldedit.core.queue.IChunkGet;
-import com.fastasyncworldedit.core.util.ReflectionUtils;
-import com.fastasyncworldedit.core.util.TaskManager;
 import com.google.common.collect.ImmutableList;
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Lifecycle;
@@ -60,12 +58,10 @@ import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.PrimaryLevelData;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
-import org.bukkit.Chunk;
 import org.bukkit.craftbukkit.v1_20_R2.CraftServer;
 import org.bukkit.craftbukkit.v1_20_R2.CraftWorld;
 import org.bukkit.craftbukkit.v1_20_R2.generator.CustomChunkGenerator;
 import org.bukkit.generator.BiomeProvider;
-import org.bukkit.generator.BlockPopulator;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.Field;
@@ -75,7 +71,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.OptionalLong;
-import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
@@ -424,26 +419,6 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
                 protoChunk,
                 null // we don't want to add entities
         );
-    }
-
-    @Override
-    protected ChunkStatusWrap getFullChunkStatus() {
-        return new ChunkStatusWrap(ChunkStatus.FULL);
-    }
-
-    @Override
-    protected List<BlockPopulator> getBlockPopulators() {
-        return originalServerWorld.getWorld().getPopulators();
-    }
-
-    @Override
-    protected void populate(LevelChunk levelChunk, Random random, BlockPopulator blockPopulator) {
-        // BlockPopulator#populate has to be called synchronously for TileEntity access
-        TaskManager.taskManager().task(() -> {
-            final CraftWorld world = freshWorld.getWorld();
-            final Chunk chunk = world.getChunkAt(levelChunk.locX, levelChunk.locZ);
-            blockPopulator.populate(world, random, chunk);
-        });
     }
 
     @Override

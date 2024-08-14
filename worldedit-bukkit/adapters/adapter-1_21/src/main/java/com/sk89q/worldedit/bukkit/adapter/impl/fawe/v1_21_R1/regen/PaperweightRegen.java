@@ -1,47 +1,31 @@
 package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_21_R1.regen;
 
-import ca.spottedleaf.moonrise.patches.chunk_system.scheduling.ChunkHolderManager;
 import com.fastasyncworldedit.bukkit.adapter.Regenerator;
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.queue.IChunkCache;
 import com.fastasyncworldedit.core.queue.IChunkGet;
-import com.fastasyncworldedit.core.util.TaskManager;
+import com.fastasyncworldedit.core.queue.implementation.chunk.ChunkCache;
 import com.google.common.collect.ImmutableList;
-import com.google.common.util.concurrent.Futures;
 import com.mojang.serialization.Lifecycle;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.adapter.Refraction;
 import com.sk89q.worldedit.bukkit.adapter.ext.fawe.v1_21_R1.PaperweightAdapter;
-import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_21_R1.PaperweightGetBlocks;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.io.file.SafeFiles;
 import com.sk89q.worldedit.world.RegenOptions;
-import io.papermc.lib.PaperLib;
-import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import net.minecraft.core.Holder;
-import net.minecraft.core.Registry;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.dedicated.DedicatedServer;
-import net.minecraft.server.level.ChunkHolder;
 import net.minecraft.server.level.ChunkMap;
-import net.minecraft.server.level.ChunkTaskPriorityQueueSorter.Message;
-import net.minecraft.server.level.GenerationChunkHolder;
 import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ThreadedLevelLightEngine;
 import net.minecraft.server.level.progress.ChunkProgressListener;
-import net.minecraft.util.StaticCache2D;
-import net.minecraft.util.thread.BlockableEventLoop;
-import net.minecraft.util.thread.ProcessorHandle;
-import net.minecraft.util.thread.ProcessorMailbox;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelHeightAccessor;
 import net.minecraft.world.level.LevelSettings;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeSource;
@@ -51,48 +35,33 @@ import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.chunk.ChunkGeneratorStructureState;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.ProtoChunk;
-import net.minecraft.world.level.chunk.UpgradeData;
-import net.minecraft.world.level.chunk.status.ChunkPyramid;
 import net.minecraft.world.level.chunk.status.ChunkStatus;
-import net.minecraft.world.level.chunk.status.WorldGenContext;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.FlatLevelSource;
 import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
 import net.minecraft.world.level.levelgen.WorldOptions;
-import net.minecraft.world.level.levelgen.blending.BlendingData;
 import net.minecraft.world.level.levelgen.flat.FlatLevelGeneratorSettings;
-import net.minecraft.world.level.levelgen.structure.placement.ConcentricRingsStructurePlacement;
-import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplateManager;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.PrimaryLevelData;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
-import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.generator.CustomChunkGenerator;
 import org.bukkit.generator.BiomeProvider;
-import org.bukkit.generator.BlockPopulator;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nullable;
 import java.lang.reflect.Field;
 import java.nio.file.Path;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.OptionalLong;
-import java.util.Random;
-import java.util.concurrent.CompletableFuture;
-import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
 import static net.minecraft.core.registries.Registries.BIOME;
 
-public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, LevelChunk, PaperweightRegen.ChunkStatusWrap> {
+public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, LevelChunk, ChunkStatus> {
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
 
@@ -107,31 +76,8 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
     private static final Field ringPositionsField;
     private static final Field hasGeneratedPositionsField;
 
-    //list of chunk stati in correct order without FULL
-    private static final Map<ChunkStatus, Concurrency> chunkStati = new LinkedHashMap<>();
 
     static {
-        chunkStati.put(ChunkStatus.EMPTY, Concurrency.FULL);   // empty: radius -1, does nothing
-        chunkStati.put(ChunkStatus.STRUCTURE_STARTS, Concurrency.NONE);   // structure starts: uses unsynchronized maps
-        chunkStati.put(
-                ChunkStatus.STRUCTURE_REFERENCES,
-                Concurrency.NONE
-        );   // structure refs: radius 8, but only writes to current chunk
-        chunkStati.put(ChunkStatus.BIOMES, Concurrency.NONE);   // biomes: radius 0
-        chunkStati.put(ChunkStatus.NOISE, Concurrency.RADIUS); // noise: radius 8
-        chunkStati.put(ChunkStatus.SURFACE, Concurrency.NONE);   // surface: radius 0, requires NONE
-        chunkStati.put(ChunkStatus.CARVERS, Concurrency.NONE);   // carvers: radius 0, but RADIUS and FULL change results
-        chunkStati.put(ChunkStatus.FEATURES, Concurrency.NONE);   // features: uses unsynchronized maps
-        chunkStati.put(
-                ChunkStatus.INITIALIZE_LIGHT,
-                Concurrency.FULL
-        ); // initialize_light: radius 0
-        chunkStati.put(
-                ChunkStatus.LIGHT,
-                Concurrency.FULL
-        );   // light: radius 1, but no writes to other chunks, only current chunk
-        chunkStati.put(ChunkStatus.SPAWN, Concurrency.NONE);   // spawn: radius 0
-
         try {
             serverWorldsField = CraftServer.class.getDeclaredField("worlds");
             serverWorldsField.setAccessible(true);
@@ -185,18 +131,20 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
     private ServerLevel originalServerWorld;
     private ServerChunkCache originalChunkProvider;
     private ServerLevel freshWorld;
-    private ServerChunkCache freshChunkProvider;
     private LevelStorageSource.LevelStorageAccess session;
-    private StructureTemplateManager structureTemplateManager;
-    private ThreadedLevelLightEngine threadedLevelLightEngine;
     private ChunkGenerator chunkGenerator;
-    private WorldGenContext worldGenContext;
 
     private Path tempDir;
 
     private boolean generateFlatBedrock = false;
 
-    public PaperweightRegen(World originalBukkitWorld, Region region, Extent target, RegenOptions options, PaperweightAdapter adapter) {
+    public PaperweightRegen(
+            World originalBukkitWorld,
+            Region region,
+            Extent target,
+            RegenOptions options,
+            PaperweightAdapter adapter
+    ) {
         super(originalBukkitWorld, region, target, options);
         this.adapter = adapter;
     }
@@ -215,8 +163,6 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
         }
 
         seed = options.getSeed().orElse(originalServerWorld.getSeed());
-        chunkStati.forEach((s, c) -> super.chunkStatuses.put(new ChunkStatusWrap(s), c));
-
         return true;
     }
 
@@ -267,8 +213,10 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
                 session,
                 newWorldData,
                 originalServerWorld.dimension(),
-                DedicatedServer.getServer().registryAccess().registry(Registries.LEVEL_STEM).orElseThrow()
-                        .getOrThrow(levelStemResourceKey),
+                new LevelStem(
+                        originalServerWorld.dimensionTypeRegistration(),
+                        originalServerWorld.getChunkSource().getGenerator()
+                ),
                 new RegenNoOpWorldLoadListener(),
                 originalServerWorld.isDebug(),
                 seed,
@@ -286,10 +234,6 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
                     ) : null;
 
             @Override
-            public void tick(@NotNull BooleanSupplier shouldKeepTicking) { //no ticking
-            }
-
-            @Override
             public @NotNull Holder<Biome> getUncachedNoiseBiome(int biomeX, int biomeY, int biomeZ) {
                 if (options.hasBiomeType()) {
                     return singleBiome;
@@ -302,7 +246,7 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
         }).get();
         freshWorld.noSave = true;
         removeWorldFromWorldsMap();
-        // newWorldData.checkName(originalServerWorld.serverLevelData.getLevelName()); //rename to original world name
+        newWorldData.checkName(originalServerWorld.serverLevelData.getLevelName()); //rename to original world name
         if (paperConfigField != null) {
             paperConfigField.set(freshWorld, originalServerWorld.paperConfig());
         }
@@ -337,77 +281,10 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
         }
         if (generator != null) {
             chunkGenerator = new CustomChunkGenerator(freshWorld, chunkGenerator, generator);
+            //noinspection deprecation
             generateConcurrent = generator.isParallelCapable();
         }
-//        chunkGenerator.conf = freshWorld.spigotConfig; - Does not exist anymore, may need to be re-addressed
-
-        // redirect to LevelChunks created in #createChunks
-        freshChunkProvider = freshWorld.getChunkSource();
-
-        if (seed == originalOpts.seed() && !options.hasBiomeType()) {
-            // Optimisation for needless ring position calculation when the seed and biome is the same.
-            ChunkGeneratorStructureState state = (ChunkGeneratorStructureState) generatorStructureStateField.get(
-                    originalChunkProvider.chunkMap);
-            boolean hasGeneratedPositions = hasGeneratedPositionsField.getBoolean(state);
-            if (hasGeneratedPositions) {
-                Map<ConcentricRingsStructurePlacement, CompletableFuture<List<ChunkPos>>> origPositions =
-                        (Map<ConcentricRingsStructurePlacement, CompletableFuture<List<ChunkPos>>>) ringPositionsField.get(state);
-                Map<ConcentricRingsStructurePlacement, CompletableFuture<List<ChunkPos>>> copy = new Object2ObjectArrayMap<>(
-                        origPositions);
-                ChunkGeneratorStructureState newState = (ChunkGeneratorStructureState) generatorStructureStateField.get(
-                        freshChunkProvider.chunkMap);
-                ringPositionsField.set(newState, copy);
-                hasGeneratedPositionsField.setBoolean(newState, true);
-            }
-        }
-
-
-        chunkSourceField.set(freshWorld, freshChunkProvider);
-        //let's start then
-        structureTemplateManager = server.getStructureManager();
-        threadedLevelLightEngine = new NoOpLightEngine(freshChunkProvider);
-
-        this.worldGenContext = new WorldGenContext(
-                freshWorld,
-                chunkGenerator,
-                structureTemplateManager,
-                threadedLevelLightEngine,
-                originalChunkProvider.chunkMap.worldGenContext.mainThreadMailBox()
-        );
         return true;
-    }
-
-    @Override
-    protected void generate() throws Exception {
-        // trigger async chunk loads on the main thread
-        List<CompletableFuture<ChunkAccess>> chunkLoadings = TaskManager.taskManager()
-                .sync(() -> adapter.submitChunkLoadTasks(region, freshWorld));
-        if (Fawe.isMainThread()) {
-            BlockableEventLoop<Runnable> executor;
-            try {
-                executor = freshWorld.getChunkSource().mainThreadProcessor;
-                // TODO spigot support?
-                // executor = (BlockableEventLoop<Runnable>) chunkProviderExecutorField.get(freshWorld.getChunkSource());
-            } catch (Exception e) { // TODO Exception -> IllegalAccessException?
-                throw new IllegalStateException("Couldn't get executor for chunk loading.", e);
-            }
-            executor.managedBlock(() -> {
-                // bail out early if a future fails
-                if (chunkLoadings.stream().anyMatch(ftr ->
-                        ftr.isDone() && Futures.getUnchecked(ftr) == null
-                )) {
-                    return false;
-                }
-                return chunkLoadings.stream().allMatch(CompletableFuture::isDone);
-            });
-        } else {
-            // we are not on the main thread, just wait until all chunks are generated
-            for (final CompletableFuture<ChunkAccess> loading : chunkLoadings.reversed()) {
-                loading.join();
-            }
-        }
-
-        createSource();
     }
 
     @Override
@@ -421,7 +298,7 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
         try {
             Fawe.instance().getQueueHandler().sync(() -> {
                 try {
-                    freshChunkProvider.close(false);
+                    freshWorld.getChunkSource().close(false);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
@@ -444,48 +321,17 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
 
     @Override
     protected ProtoChunk createProtoChunk(int x, int z) {
-        return new FastProtoChunk(new ChunkPos(x, z), UpgradeData.EMPTY, freshWorld,
-                this.freshWorld.registryAccess().registryOrThrow(BIOME), null
-        );
+        throw new UnsupportedOperationException("should not be called");
     }
 
     @Override
     protected LevelChunk createChunk(ProtoChunk protoChunk) {
-        return new LevelChunk(
-                freshWorld,
-                protoChunk,
-                null // we don't want to add entities
-        );
-    }
-
-    @Override
-    protected ChunkStatusWrap getFullChunkStatus() {
-        return new ChunkStatusWrap(ChunkStatus.FULL);
-    }
-
-    @Override
-    protected List<BlockPopulator> getBlockPopulators() {
-        return originalServerWorld.getWorld().getPopulators();
-    }
-
-    @Override
-    protected void populate(LevelChunk levelChunk, Random random, BlockPopulator blockPopulator) {
-        // BlockPopulator#populate has to be called synchronously for TileEntity access
-        TaskManager.taskManager().task(() -> {
-            final CraftWorld world = freshWorld.getWorld();
-            final Chunk chunk = world.getChunkAt(levelChunk.locX, levelChunk.locZ);
-            blockPopulator.populate(world, random, chunk);
-        });
+        throw new UnsupportedOperationException("should not be called");
     }
 
     @Override
     protected IChunkCache<IChunkGet> initSourceQueueCache() {
-        return (chunkX, chunkZ) -> new PaperweightGetBlocks(freshWorld, chunkX, chunkZ) {
-            @Override
-            public LevelChunk ensureLoaded(ServerLevel nmsWorld, int x, int z) {
-                return getChunkAt(x, z);
-            }
-        };
+        return new ChunkCache<>(BukkitAdapter.adapt(freshWorld.getWorld()));
     }
 
     //util
@@ -535,101 +381,6 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
 
         // TODO Paper only(?) @Override
         public void setChunkRadius(int radius) {
-        }
-
-    }
-
-    private class FastProtoChunk extends ProtoChunk {
-
-        public FastProtoChunk(
-                final ChunkPos pos,
-                final UpgradeData upgradeData,
-                final LevelHeightAccessor world,
-                final Registry<Biome> biomeRegistry,
-                @Nullable final BlendingData blendingData
-        ) {
-            super(pos, upgradeData, world, biomeRegistry, blendingData);
-        }
-
-        // avoid warning on paper
-
-        @SuppressWarnings("unused") // compatibility with spigot
-        public boolean generateFlatBedrock() {
-            return generateFlatBedrock;
-        }
-
-        // no one will ever see the entities!
-        @Override
-        public @NotNull List<CompoundTag> getEntities() {
-            return Collections.emptyList();
-        }
-
-    }
-
-    protected class ChunkStatusWrap extends ChunkStatusWrapper<ChunkAccess> {
-
-        private final ChunkStatus chunkStatus;
-
-        public ChunkStatusWrap(ChunkStatus chunkStatus) {
-            this.chunkStatus = chunkStatus;
-        }
-
-        @Override
-        public int requiredNeighborChunkRadius() {
-            return ChunkPyramid.GENERATION_PYRAMID.getStepTo(ChunkStatus.FULL).getAccumulatedRadiusOf(chunkStatus);
-        }
-
-        @Override
-        public String name() {
-            return chunkStatus.toString();
-        }
-
-        @Override
-        public CompletableFuture<?> processChunk(List<ChunkAccess> accessibleChunks) {
-            ChunkAccess chunkAccess = accessibleChunks.get(accessibleChunks.size() / 2);
-            int chunkX = chunkAccess.getPos().x;
-            int chunkZ = chunkAccess.getPos().z;
-            getProtoChunkAt(chunkX, chunkZ);
-            StaticCache2D<GenerationChunkHolder> neighbours = StaticCache2D
-                    .create(
-                            chunkX,
-                            chunkZ,
-                            requiredNeighborChunkRadius(),
-                            (final int nx, final int nz) -> new ChunkHolder(new ChunkPos(nx, nz),
-                                    ChunkHolderManager.MAX_TICKET_LEVEL,
-                                    freshWorld,
-                                    threadedLevelLightEngine,
-                                    null,
-                                    freshChunkProvider.chunkMap
-                            )
-                    );
-            return ChunkPyramid.GENERATION_PYRAMID.getStepTo(chunkStatus).apply(
-                    worldGenContext,
-                    neighbours,
-                    chunkAccess
-            );
-        }
-
-    }
-
-    /**
-     * A light engine that does nothing. As light is calculated after pasting anyway, we can avoid
-     * work this way.
-     */
-    static class NoOpLightEngine extends ThreadedLevelLightEngine {
-
-        private static final ProcessorMailbox<Runnable> MAILBOX = ProcessorMailbox.create(task -> {
-        }, "fawe-no-op");
-        private static final ProcessorHandle<Message<Runnable>> HANDLE = ProcessorHandle.of("fawe-no-op", m -> {
-        });
-
-        public NoOpLightEngine(final ServerChunkCache chunkProvider) {
-            super(chunkProvider, chunkProvider.chunkMap, false, MAILBOX, HANDLE);
-        }
-
-        @Override
-        public @NotNull CompletableFuture<ChunkAccess> lightChunk(final @NotNull ChunkAccess chunk, final boolean excludeBlocks) {
-            return CompletableFuture.completedFuture(chunk);
         }
 
     }
