@@ -1,6 +1,7 @@
 package com.fastasyncworldedit.core.extent.filter.block;
 
 import com.fastasyncworldedit.core.FaweCache;
+import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.fastasyncworldedit.core.queue.Filter;
 import com.fastasyncworldedit.core.queue.FilterBlockMask;
 import com.fastasyncworldedit.core.queue.IBlocks;
@@ -13,6 +14,7 @@ import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.util.concurrency.LazyReference;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -20,6 +22,7 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
+import org.enginehub.linbus.tree.LinCompoundTag;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -259,8 +262,9 @@ public class CharFilterBlock extends ChunkFilterBlock {
         final BlockState state = getBlock();
         final BlockMaterial material = state.getMaterial();
         if (material.hasContainer()) {
-            final CompoundTag tag = get.getTile(x, y + yy, z);
-            return state.toBaseBlock(tag);
+            final FaweCompoundTag tag = get.tile(x, y + yy, z);
+            assert tag != null : "has container but is null";
+            return state.toBaseBlock(tag.linTag());
         }
         return state.toBaseBlock();
     }
@@ -268,16 +272,28 @@ public class CharFilterBlock extends ChunkFilterBlock {
     @Override
     public void setFullBlock(BaseBlock block) {
         delegate.set(this, block.getOrdinalChar());
-        final CompoundTag nbt = block.getNbtData();
+        final LazyReference<LinCompoundTag> nbt = block.getNbtReference();
         if (nbt != null) { // TODO optimize check via ImmutableBaseBlock
-            set.setTile(x, yy + y, z, nbt);
+            set.tile(x, yy + y, z, FaweCompoundTag.of(nbt));
         }
     }
 
     @Override
-    public final CompoundTag getNbtData() {
-        return get.getTile(x, y + yy, z);
+    public @Nullable LinCompoundTag getNbt() {
+        final FaweCompoundTag tile = get.tile(x, y + yy, z);
+        if (tile == null) {
+            return null;
+        }
+        return tile.linTag();
     }
+
+    @Override
+    public void setNbt(@Nullable final LinCompoundTag nbtData) {
+        if (nbtData != null) {
+            set.tile(x, y + yy, z, FaweCompoundTag.of(nbtData));
+        }
+    }
+
     /*
     NORTH(Vector3.at(0, 0, -1), Flag.CARDINAL, 3, 1),
     EAST(Vector3.at(1, 0, 0), Flag.CARDINAL, 0, 2),
@@ -286,9 +302,9 @@ public class CharFilterBlock extends ChunkFilterBlock {
      */
 
     @Override
-    public void setNbtData(CompoundTag tag) {
-        if (tag != null) {
-            set.setTile(x, y + yy, z, tag);
+    public void setNbtReference(@Nullable final LazyReference<LinCompoundTag> nbtData) {
+        if (nbtData != null) {
+            set.tile(x, y + yy, z, FaweCompoundTag.of(nbtData));
         }
     }
 

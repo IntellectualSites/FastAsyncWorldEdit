@@ -5,6 +5,7 @@ import com.fastasyncworldedit.core.extent.clipboard.SimpleClipboard;
 import com.fastasyncworldedit.core.internal.io.ResettableFileInputStream;
 import com.fastasyncworldedit.core.internal.io.VarIntStreamIterator;
 import com.fastasyncworldedit.core.math.MutableBlockVector3;
+import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.fastasyncworldedit.core.util.IOUtil;
 import com.fastasyncworldedit.core.util.MathMan;
 import com.sk89q.jnbt.CompoundTag;
@@ -626,12 +627,11 @@ public class FastSchematicReaderV3 implements ClipboardReader {
     }
 
     private EntityTransformer provideTileEntityTransformer(Clipboard clipboard) {
-        //noinspection deprecation
-        return (x, y, z, id, tag) -> clipboard.setTile(
+        return (x, y, z, id, tag) -> clipboard.tile(
                 MathMan.roundInt(x + clipboard.getMinimumPoint().x()),
                 MathMan.roundInt(y + clipboard.getMinimumPoint().y()),
                 MathMan.roundInt(z + clipboard.getMinimumPoint().z()),
-                new CompoundTag(tag)
+                FaweCompoundTag.of(tag)
         );
     }
 

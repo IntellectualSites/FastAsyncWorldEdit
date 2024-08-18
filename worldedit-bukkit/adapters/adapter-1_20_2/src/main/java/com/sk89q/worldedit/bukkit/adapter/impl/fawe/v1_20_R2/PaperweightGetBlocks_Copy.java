@@ -1,14 +1,13 @@
 package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_20_R2;
 
 import com.fastasyncworldedit.core.extent.processor.heightmap.HeightMapType;
+import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.fastasyncworldedit.core.queue.IBlocks;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.IChunkSet;
-import com.google.common.base.Suppliers;
-import com.sk89q.jnbt.CompoundTag;
+import com.fastasyncworldedit.core.util.NbtUtils;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
-import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_20_R2.nbt.PaperweightLazyCompoundTag;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
@@ -16,6 +15,7 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import net.minecraft.core.Holder;
+import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.biome.Biome;
@@ -24,9 +24,11 @@ import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.PalettedContainer;
 import net.minecraft.world.level.chunk.PalettedContainerRO;
 import org.apache.logging.log4j.Logger;
+import org.enginehub.linbus.tree.LinCompoundTag;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -38,8 +40,8 @@ public class PaperweightGetBlocks_Copy implements IChunkGet {
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
 
-    private final Map<BlockVector3, CompoundTag> tiles = new HashMap<>();
-    private final Set<CompoundTag> entities = new HashSet<>();
+    private final Map<BlockVector3, FaweCompoundTag> tiles = new HashMap<>();
+    private final Set<FaweCompoundTag> entities = new HashSet<>();
     private final char[][] blocks;
     private final int minHeight;
     private final int maxHeight;
@@ -56,44 +58,35 @@ public class PaperweightGetBlocks_Copy implements IChunkGet {
     }
 
     protected void storeTile(BlockEntity blockEntity) {
+        @SuppressWarnings("unchecked")
+        BukkitImplAdapter<Tag> adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
         tiles.put(
                 BlockVector3.at(
                         blockEntity.getBlockPos().getX(),
                         blockEntity.getBlockPos().getY(),
                         blockEntity.getBlockPos().getZ()
                 ),
-                new PaperweightLazyCompoundTag(Suppliers.memoize(blockEntity::saveWithId))
+                FaweCompoundTag.of((LinCompoundTag) adapter.toNativeLin(blockEntity.saveWithId()))
         );
     }
 
-    @Override
-    public Map<BlockVector3, CompoundTag> getTiles() {
-        return tiles;
-    }
-
-    @Override
-    @Nullable
-    public CompoundTag getTile(int x, int y, int z) {
-        return tiles.get(BlockVector3.at(x, y, z));
-    }
-
-    @SuppressWarnings({"unchecked", "rawtypes"})
     protected void storeEntity(Entity entity) {
-        BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
+        @SuppressWarnings("unchecked")
+        BukkitImplAdapter<Tag> adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
         net.minecraft.nbt.CompoundTag compoundTag = new net.minecraft.nbt.CompoundTag();
         entity.save(compoundTag);
-        entities.add((CompoundTag) adapter.toNative(compoundTag));
+        entities.add(FaweCompoundTag.of((LinCompoundTag) adapter.toNativeLin(compoundTag)));
     }
 
     @Override
-    public Set<CompoundTag> getEntities() {
+    public Collection<FaweCompoundTag> entities() {
         return this.entities;
     }
 
     @Override
-    public CompoundTag getEntity(UUID uuid) {
-        for (CompoundTag tag : entities) {
-            if (uuid.equals(tag.getUUID())) {
+    public @Nullable FaweCompoundTag entity(final UUID uuid) {
+        for (FaweCompoundTag tag : entities) {
+            if (uuid.equals(NbtUtils.uuid(tag))) {
                 return tag;
             }
         }
@@ -194,7 +187,7 @@ public class PaperweightGetBlocks_Copy implements IChunkGet {
     @Override
     public BaseBlock getFullBlock(int x, int y, int z) {
         BlockState state = BlockTypesCache.states[get(x, y, z)];
-        return state.toBaseBlock(this, x, y, z);
+        return state.toBaseBlock((IBlocks) this, x, y, z);
     }
 
     @Override
@@ -222,6 +215,16 @@ public class PaperweightGetBlocks_Copy implements IChunkGet {
     @Override
     public BlockState getBlock(int x, int y, int z) {
         return BlockTypesCache.states[get(x, y, z)];
+    }
+
+    @Override
+    public Map<BlockVector3, FaweCompoundTag> tiles() {
+        return tiles;
+    }
+
+    @Override
+    public @Nullable FaweCompoundTag tile(final int x, final int y, final int z) {
+        return tiles.get(BlockVector3.at(x, y, z));
     }
 
     @Override

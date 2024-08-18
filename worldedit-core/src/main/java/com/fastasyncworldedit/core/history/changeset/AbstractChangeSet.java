@@ -4,11 +4,12 @@ import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.extent.HistoryExtent;
 import com.fastasyncworldedit.core.extent.processor.ProcessorScope;
+import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.fastasyncworldedit.core.queue.IBatchProcessor;
 import com.fastasyncworldedit.core.queue.IChunk;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.IChunkSet;
-import com.fastasyncworldedit.core.util.MainUtil;
+import com.fastasyncworldedit.core.util.NbtUtils;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.google.common.util.concurrent.Futures;
 import com.sk89q.jnbt.CompoundTag;
@@ -32,9 +33,12 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import org.apache.logging.log4j.Logger;
+import org.enginehub.linbus.tree.LinCompoundTag;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
@@ -123,37 +127,38 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
         int bx = chunk.getX() << 4;
         int bz = chunk.getZ() << 4;
 
-        Map<BlockVector3, CompoundTag> tilesFrom = get.getTiles();
-        Map<BlockVector3, CompoundTag> tilesTo = set.getTiles();
+        Map<BlockVector3, FaweCompoundTag> tilesFrom = get.tiles();
+        Map<BlockVector3, FaweCompoundTag> tilesTo = set.tiles();
         if (!tilesFrom.isEmpty()) {
-            for (Map.Entry<BlockVector3, CompoundTag> entry : tilesFrom.entrySet()) {
+            for (Map.Entry<BlockVector3, FaweCompoundTag> entry : tilesFrom.entrySet()) {
                 BlockVector3 pos = entry.getKey();
                 BlockState fromBlock = get.getBlock(pos.x() & 15, pos.y(), pos.z() & 15);
                 BlockState toBlock = set.getBlock(pos.x() & 15, pos.y(), pos.z() & 15);
                 if (fromBlock != toBlock || tilesTo.containsKey(pos)) {
-                    addTileRemove(MainUtil.setPosition(entry.getValue(), entry.getKey().x(), entry.getKey().y(),
-                            entry.getKey().z()));
+                    addTileRemove(NbtUtils.withPosition(entry.getValue(), entry.getKey().x(), entry.getKey().y(),
+                            entry.getKey().z()
+                    ));
                 }
             }
         }
         if (!tilesTo.isEmpty()) {
-            for (Map.Entry<BlockVector3, CompoundTag> entry : tilesTo.entrySet()) {
+            for (Map.Entry<BlockVector3, FaweCompoundTag> entry : tilesTo.entrySet()) {
                 BlockVector3 pos = entry.getKey();
-                addTileCreate(MainUtil.setPosition(entry.getValue(), pos.x() + bx, pos.y(), pos.z() + bz));
+                addTileCreate(NbtUtils.withPosition(entry.getValue(), pos.x() + bx, pos.y(), pos.z() + bz));
             }
         }
         Set<UUID> entRemoves = set.getEntityRemoves();
         if (!entRemoves.isEmpty()) {
             for (UUID uuid : entRemoves) {
-                CompoundTag found = get.getEntity(uuid);
+                FaweCompoundTag found = get.entity(uuid);
                 if (found != null) {
                     addEntityRemove(found);
                 }
             }
         }
-        Set<CompoundTag> ents = set.getEntities();
+        Collection<FaweCompoundTag> ents = set.entities();
         if (!ents.isEmpty()) {
-            for (CompoundTag tag : ents) {
+            for (FaweCompoundTag tag : ents) {
                 addEntityCreate(tag);
             }
         }
@@ -204,9 +209,9 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
                 BiomeType[] biomeSection = biomes[layer - set.getMinSectionPosition()];
                 int index = 0;
                 int yy = layer << 4;
-                for (int y = 0; y < 16; y+= 4) {
-                    for (int z = 0; z < 16; z+= 4) {
-                        for (int x = 0; x < 16; x+= 4, index++) {
+                for (int y = 0; y < 16; y += 4) {
+                    for (int z = 0; z < 16; z += 4) {
+                        for (int x = 0; x < 16; x += 4, index++) {
                             BiomeType newBiome = biomeSection[index];
                             if (newBiome != null) {
                                 BiomeType oldBiome = get.getBiomeType(x, yy + y, z);
@@ -237,13 +242,62 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
         return ProcessorScope.READING_SET_BLOCKS;
     }
 
-    public abstract void addTileCreate(CompoundTag tag);
+    @Deprecated(forRemoval = true, since = "TODO")
+    public void addTileCreate(CompoundTag tag) {
+        addTileCreate(adapt(tag));
+    }
 
-    public abstract void addTileRemove(CompoundTag tag);
+    @SuppressWarnings({"deprecation"})
+    private static @NotNull FaweCompoundTag adapt(CompoundTag tag) {
+        return FaweCompoundTag.of(tag.toLinTag());
+    }
 
-    public abstract void addEntityRemove(CompoundTag tag);
+    /**
+     * Creates a tile/block entity create change to this change set.
+     *
+     * @param tag the tile/block entity to add.
+     * @since TODO
+     */
+    public abstract void addTileCreate(FaweCompoundTag tag);
 
-    public abstract void addEntityCreate(CompoundTag tag);
+    @Deprecated(forRemoval = true, since = "TODO")
+    public void addTileRemove(CompoundTag tag) {
+        addTileRemove(adapt(tag));
+    }
+
+    /**
+     * Creates a tile/block entity remove change to this change set.
+     *
+     * @param tag the tile/block entity to remove.
+     * @since TODO
+     */
+    public abstract void addTileRemove(FaweCompoundTag tag);
+
+    @Deprecated(forRemoval = true, since = "TODO")
+    public void addEntityRemove(CompoundTag tag) {
+        addEntityRemove(adapt(tag));
+    }
+
+    /**
+     * Creates an entity remove change to this change set.
+     *
+     * @param tag the entity to remove.
+     * @since TODO
+     */
+    public abstract void addEntityRemove(FaweCompoundTag tag);
+
+    @Deprecated(forRemoval = true, since = "TODO")
+    public void addEntityCreate(CompoundTag tag) {
+        addEntityCreate(adapt(tag));
+    }
+
+    /**
+     * Creates an entity create change to this change set.
+     *
+     * @param tag the entity to add.
+     * @since TODO
+     */
+    public abstract void addEntityCreate(FaweCompoundTag tag);
 
     public abstract void addBiomeChange(int x, int y, int z, BiomeType from, BiomeType to);
 
@@ -280,13 +334,15 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
     }
 
     public void add(EntityCreate change) {
-        CompoundTag tag = change.state.getNbtData();
-        addEntityCreate(MainUtil.setEntityInfo(tag, change.getEntity()));
+        LinCompoundTag tag = change.state.getNbt();
+        assert tag != null;
+        addEntityCreate(FaweCompoundTag.of(NbtUtils.withEntityInfo(tag, change.getEntity())));
     }
 
     public void add(EntityRemove change) {
-        CompoundTag tag = change.state.getNbtData();
-        addEntityRemove(MainUtil.setEntityInfo(tag, change.getEntity()));
+        LinCompoundTag tag = change.state.getNbt();
+        assert tag != null;
+        addEntityRemove(FaweCompoundTag.of(NbtUtils.withEntityInfo(tag, change.getEntity())));
     }
 
     @Override
@@ -304,9 +360,9 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
 
     public void add(BlockChange change) {
         try {
-            BlockVector3 loc = change.getPosition();
+            BlockVector3 loc = change.position();
             BaseBlock from = change.previous();
-            BaseBlock to = change.getCurrent();
+            BaseBlock to = change.current();
             add(loc, from, to);
         } catch (Exception e) {
             LOGGER.catching(e);
@@ -326,31 +382,28 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
 
     public void add(int x, int y, int z, BaseBlock from, BaseBlock to) {
         try {
-            if (from.hasNbtData()) {
-                CompoundTag nbt = from.getNbtData();
-                assert nbt != null;
-                addTileRemove(MainUtil.setPosition(nbt, x, y, z));
+            LinCompoundTag nbt = from.getNbt();
+            if (nbt != null) {
+                addTileRemove(FaweCompoundTag.of(NbtUtils.withPosition(nbt, x, y, z)));
             }
-            if (to.hasNbtData()) {
-                CompoundTag nbt = to.getNbtData();
-                assert nbt != null;
-                addTileCreate(MainUtil.setPosition(nbt, x, y, z));
+            nbt = to.getNbt();
+            if (nbt != null) {
+                addTileCreate(FaweCompoundTag.of(NbtUtils.withPosition(nbt, x, y, z)));
             }
             int combinedFrom = from.getOrdinal();
             int combinedTo = to.getOrdinal();
             add(x, y, z, combinedFrom, combinedTo);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.catching(e);
         }
     }
 
     public void add(int x, int y, int z, int combinedFrom, BaseBlock to) {
         try {
-            if (to.hasNbtData()) {
-                CompoundTag nbt = to.getNbtData();
-                assert nbt != null;
-                addTileCreate(MainUtil.setPosition(nbt, x, y, z));
+            LinCompoundTag nbt = to.getNbt();
+            if (nbt != null) {
+                addTileCreate(FaweCompoundTag.of(NbtUtils.withPosition(nbt, x, y, z)));
             }
             int combinedTo = to.getInternalId();
             add(x, y, z, combinedFrom, combinedTo);

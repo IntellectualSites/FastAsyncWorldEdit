@@ -1,7 +1,9 @@
 package com.fastasyncworldedit.core.queue;
 
 import com.fastasyncworldedit.core.extent.processor.heightmap.HeightMapType;
+import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.OutputExtent;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -36,7 +38,12 @@ public interface IChunkSet extends IBlocks, OutputExtent {
     boolean isEmpty();
 
     @Override
-    boolean setTile(int x, int y, int z, CompoundTag tile);
+    @Deprecated(forRemoval = true, since = "TODO")
+    default boolean setTile(int x, int y, int z, CompoundTag tile) throws WorldEditException {
+        return tile(x, y, z, FaweCompoundTag.of(tile.toLinTag()));
+    }
+
+    boolean tile(int x, int y, int z, FaweCompoundTag tag);
 
     @Override
     void setBlockLight(int x, int y, int z, int value);
@@ -53,7 +60,12 @@ public interface IChunkSet extends IBlocks, OutputExtent {
 
     void setFullBright(int layer);
 
-    void setEntity(CompoundTag tag);
+    @Deprecated(forRemoval = true, since = "TODO")
+    default void setEntity(CompoundTag tag) {
+        entity(FaweCompoundTag.of(tag::toLinTag));
+    }
+
+    void entity(FaweCompoundTag tag);
 
     void removeEntity(UUID uuid);
 

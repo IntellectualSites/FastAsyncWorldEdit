@@ -852,6 +852,7 @@ public abstract class BlockVector3 {
         return orDefault.getBiome(this);
     }
 
+    @Deprecated(forRemoval = true, since = "TODO")
     public CompoundTag getNbtData(Extent orDefault) {
         return orDefault.getFullBlock(x(), y(), z()).getNbtData();
     }

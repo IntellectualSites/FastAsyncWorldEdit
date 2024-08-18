@@ -1,5 +1,6 @@
 package com.fastasyncworldedit.core.extent.filter.block;
 
+import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
@@ -103,6 +104,11 @@ public class ArrayFilterBlock extends AbstractExtentFilterBlock {
     public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block)
             throws WorldEditException {
         return getExtent().setBlock(x, y, z, block);
+    }
+
+    @Override
+    public boolean tile(final int x, final int y, final int z, final FaweCompoundTag tile) throws WorldEditException {
+        return false; // class is unused + deprecated, do not care about impl
     }
 
     @Override

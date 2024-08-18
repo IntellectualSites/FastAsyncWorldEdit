@@ -19,8 +19,8 @@
 
 package com.sk89q.worldedit.extent;
 
+import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.fastasyncworldedit.core.queue.IBatchProcessor;
-import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
@@ -108,7 +108,7 @@ public class NullExtent implements Extent {
     }
 
     @Override
-    public boolean setTile(int x, int y, int z, CompoundTag tile) throws WorldEditException {
+    public boolean tile(int x, int y, int z, FaweCompoundTag tile) throws WorldEditException {
         return false;
     }
 

@@ -3,6 +3,7 @@ package com.fastasyncworldedit.core.queue.implementation.chunk;
 import com.fastasyncworldedit.core.extent.filter.block.ChunkFilterBlock;
 import com.fastasyncworldedit.core.extent.processor.EmptyBatchProcessor;
 import com.fastasyncworldedit.core.extent.processor.heightmap.HeightMapType;
+import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.fastasyncworldedit.core.queue.Filter;
 import com.fastasyncworldedit.core.queue.IChunk;
 import com.fastasyncworldedit.core.queue.IChunkGet;
@@ -11,7 +12,6 @@ import com.fastasyncworldedit.core.queue.IQueueChunk;
 import com.fastasyncworldedit.core.queue.IQueueExtent;
 import com.fastasyncworldedit.core.queue.implementation.ParallelQueueExtent;
 import com.fastasyncworldedit.core.util.MemUtil;
-import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
@@ -22,6 +22,7 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -76,18 +77,8 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     }
 
     @Override
-    public boolean setTile(int x, int y, int z, CompoundTag tag) {
-        return delegate.set(this).setTile(x, y, z, tag);
-    }
-
-    @Override
-    public CompoundTag getTile(int x, int y, int z) {
-        return delegate.set(this).getTile(x, y, z);
-    }
-
-    @Override
-    public void setEntity(CompoundTag tag) {
-        delegate.set(this).setEntity(tag);
+    public void entity(final FaweCompoundTag tag) {
+        delegate.set(this).entity(tag);
     }
 
     @Override
@@ -161,11 +152,6 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
 
     public boolean isInit() {
         return isInit;
-    }
-
-    @Override
-    public CompoundTag getEntity(UUID uuid) {
-        return delegate.get(this).getEntity(uuid);
     }
 
     @Override
@@ -880,16 +866,6 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     };
 
     @Override
-    public Map<BlockVector3, CompoundTag> getTiles() {
-        return delegate.get(this).getTiles();
-    }
-
-    @Override
-    public Set<CompoundTag> getEntities() {
-        return delegate.get(this).getEntities();
-    }
-
-    @Override
     public boolean hasSection(int layer) {
         return chunkExisting != null && chunkExisting.hasSection(layer);
     }
@@ -944,6 +920,11 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     @Override
     public boolean isEmpty() {
         return chunkSet == null || chunkSet.isEmpty();
+    }
+
+    @Override
+    public boolean tile(final int x, final int y, final int z, final FaweCompoundTag tag) {
+        return false;
     }
 
     /**
@@ -1094,6 +1075,21 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     }
 
     @Override
+    public Map<BlockVector3, FaweCompoundTag> tiles() {
+        return delegate.get(this).tiles();
+    }
+
+    @Override
+    public @Nullable FaweCompoundTag tile(final int x, final int y, final int z) {
+        return delegate.get(this).tile(x, y, z);
+    }
+
+    @Override
+    public Collection<FaweCompoundTag> entities() {
+        return delegate.get(this).entities();
+    }
+
+    @Override
     public BaseBlock getFullBlock(int x, int y, int z) {
         return delegate.getFullBlock(this, x, y, z);
     }
@@ -1156,6 +1152,11 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     @Override
     public int[] getHeightMap(HeightMapType type) {
         return delegate.getHeightMap(this, type);
+    }
+
+    @Override
+    public @Nullable FaweCompoundTag entity(final UUID uuid) {
+        return delegate.get(this).entity(uuid);
     }
 
     public interface IBlockDelegate {

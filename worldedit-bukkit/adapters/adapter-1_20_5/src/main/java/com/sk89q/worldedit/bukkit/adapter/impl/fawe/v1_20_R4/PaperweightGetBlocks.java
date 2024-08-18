@@ -7,20 +7,16 @@ import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.extent.processor.heightmap.HeightMapType;
 import com.fastasyncworldedit.core.math.BitArrayUnstretched;
+import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.IChunkSet;
 import com.fastasyncworldedit.core.queue.implementation.QueueHandler;
 import com.fastasyncworldedit.core.queue.implementation.blocks.CharGetBlocks;
 import com.fastasyncworldedit.core.util.MathMan;
+import com.fastasyncworldedit.core.util.NbtUtils;
 import com.fastasyncworldedit.core.util.collection.AdaptedMap;
-import com.google.common.base.Suppliers;
-import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.jnbt.ListTag;
-import com.sk89q.jnbt.StringTag;
-import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
-import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_20_R4.nbt.PaperweightLazyCompoundTag;
 import com.sk89q.worldedit.internal.Constants;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -34,6 +30,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.IdMap;
 import net.minecraft.core.Registry;
 import net.minecraft.core.SectionPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.IntTag;
 import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.server.level.ServerLevel;
@@ -62,11 +59,19 @@ import org.bukkit.World;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.block.CraftBlock;
 import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.enginehub.linbus.tree.LinCompoundTag;
+import org.enginehub.linbus.tree.LinDoubleTag;
+import org.enginehub.linbus.tree.LinFloatTag;
+import org.enginehub.linbus.tree.LinListTag;
+import org.enginehub.linbus.tree.LinStringTag;
+import org.enginehub.linbus.tree.LinTagType;
 
 import javax.annotation.Nonnull;
-import java.util.AbstractSet;
+import javax.annotation.Nullable;
+import java.util.AbstractCollection;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -83,7 +88,6 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static net.minecraft.core.registries.Registries.BIOME;
 
@@ -92,9 +96,9 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
     private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     private static final Function<BlockPos, BlockVector3> posNms2We = v -> BlockVector3.at(v.getX(), v.getY(), v.getZ());
-    private static final Function<BlockEntity, CompoundTag> nmsTile2We = tileEntity -> new PaperweightLazyCompoundTag(
-            Suppliers.memoize(() -> tileEntity.saveWithId(DedicatedServer.getServer().registryAccess()))
-    );
+    public static final Function<BlockEntity, FaweCompoundTag> NMS_TO_TILE = ((PaperweightFaweAdapter) WorldEditPlugin
+            .getInstance()
+            .getBukkitImplAdapter()).blockEntityToCompoundTag();
     private final PaperweightFaweAdapter adapter = ((PaperweightFaweAdapter) WorldEditPlugin
             .getInstance()
             .getBukkitImplAdapter());
@@ -258,23 +262,24 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
     }
 
     @Override
-    public CompoundTag getTile(int x, int y, int z) {
+    public FaweCompoundTag tile(final int x, final int y, final int z) {
         BlockEntity blockEntity = getChunk().getBlockEntity(new BlockPos((x & 15) + (
                 chunkX << 4), y, (z & 15) + (
                 chunkZ << 4)));
         if (blockEntity == null) {
             return null;
         }
-        return new PaperweightLazyCompoundTag(Suppliers.memoize(() -> blockEntity.saveWithId(DedicatedServer.getServer().registryAccess())));
+        return NMS_TO_TILE.apply(blockEntity);
+
     }
 
     @Override
-    public Map<BlockVector3, CompoundTag> getTiles() {
+    public Map<BlockVector3, FaweCompoundTag> tiles() {
         Map<BlockPos, BlockEntity> nmsTiles = getChunk().getBlockEntities();
         if (nmsTiles.isEmpty()) {
             return Collections.emptyMap();
         }
-        return AdaptedMap.immutable(nmsTiles, posNms2We, nmsTile2We);
+        return AdaptedMap.immutable(nmsTiles, posNms2We, NMS_TO_TILE);
     }
 
     @Override
@@ -337,7 +342,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
     }
 
     @Override
-    public CompoundTag getEntity(UUID uuid) {
+    public @Nullable FaweCompoundTag entity(final UUID uuid) {
         ensureLoaded(serverLevel, chunkX, chunkZ);
         List<Entity> entities = PaperweightPlatformAdapter.getEntities(getChunk());
         Entity entity = null;
@@ -349,10 +354,10 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
         }
         if (entity != null) {
             org.bukkit.entity.Entity bukkitEnt = entity.getBukkitEntity();
-            return BukkitAdapter.adapt(bukkitEnt).getState().getNbtData();
+            return FaweCompoundTag.of(BukkitAdapter.adapt(bukkitEnt).getState().getNbt());
         }
-        for (CompoundTag tag : getEntities()) {
-            if (uuid.equals(tag.getUUID())) {
+        for (FaweCompoundTag tag : entities()) {
+            if (uuid.equals(NbtUtils.uuid(tag))) {
                 return tag;
             }
         }
@@ -360,14 +365,14 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
     }
 
     @Override
-    public Set<CompoundTag> getEntities() {
+    public Collection<FaweCompoundTag> entities() {
         ensureLoaded(serverLevel, chunkX, chunkZ);
         List<Entity> entities = PaperweightPlatformAdapter.getEntities(getChunk());
         if (entities.isEmpty()) {
-            return Collections.emptySet();
+            return Collections.emptyList();
         }
         int size = entities.size();
-        return new AbstractSet<>() {
+        return new AbstractCollection<>() {
             @Override
             public int size() {
                 return size;
@@ -380,10 +385,10 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
 
             @Override
             public boolean contains(Object get) {
-                if (!(get instanceof CompoundTag getTag)) {
+                if (!(get instanceof FaweCompoundTag getTag)) {
                     return false;
                 }
-                UUID getUUID = getTag.getUUID();
+                UUID getUUID = NbtUtils.uuid(getTag);
                 for (Entity entity : entities) {
                     UUID uuid = entity.getUUID();
                     if (uuid.equals(getUUID)) {
@@ -395,12 +400,12 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
 
             @Nonnull
             @Override
-            public Iterator<CompoundTag> iterator() {
-                Iterable<CompoundTag> result = entities.stream().map(input -> {
+            public Iterator<FaweCompoundTag> iterator() {
+                Iterable<FaweCompoundTag> result = entities.stream().map(input -> {
                     net.minecraft.nbt.CompoundTag tag = new net.minecraft.nbt.CompoundTag();
                     input.save(tag);
-                    return (CompoundTag) adapter.toNative(tag);
-                }).collect(Collectors.toList());
+                    return FaweCompoundTag.of((LinCompoundTag) adapter.toNativeLin(tag));
+                })::iterator;
                 return result.iterator();
             }
         };
@@ -728,43 +733,42 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                     };
                 }
 
-                Set<CompoundTag> entities = set.getEntities();
+                Collection<FaweCompoundTag> entities = set.entities();
                 if (entities != null && !entities.isEmpty()) {
                     if (syncTasks == null) {
                         syncTasks = new Runnable[2];
                     }
 
                     syncTasks[1] = () -> {
-                        Iterator<CompoundTag> iterator = entities.iterator();
+                        Iterator<FaweCompoundTag> iterator = entities.iterator();
                         while (iterator.hasNext()) {
-                            final CompoundTag nativeTag = iterator.next();
-                            final Map<String, Tag<?, ?>> entityTagMap = nativeTag.getValue();
-                            final StringTag idTag = (StringTag) entityTagMap.get("Id");
-                            final ListTag posTag = (ListTag) entityTagMap.get("Pos");
-                            final ListTag rotTag = (ListTag) entityTagMap.get("Rotation");
+                            final FaweCompoundTag nativeTag = iterator.next();
+                            final LinCompoundTag linTag = nativeTag.linTag();
+                            final LinStringTag idTag = linTag.findTag("Id", LinTagType.stringTag());
+                            final LinListTag<LinDoubleTag> posTag = linTag.findListTag("Pos", LinTagType.doubleTag());
+                            final LinListTag<LinFloatTag> rotTag = linTag.findListTag("Rotation", LinTagType.floatTag());
                             if (idTag == null || posTag == null || rotTag == null) {
                                 LOGGER.error("Unknown entity tag: {}", nativeTag);
                                 continue;
                             }
-                            final double x = posTag.getDouble(0);
-                            final double y = posTag.getDouble(1);
-                            final double z = posTag.getDouble(2);
-                            final float yaw = rotTag.getFloat(0);
-                            final float pitch = rotTag.getFloat(1);
-                            final String id = idTag.getValue();
+                            final double x = posTag.get(0).valueAsDouble();
+                            final double y = posTag.get(1).valueAsDouble();
+                            final double z = posTag.get(2).valueAsDouble();
+                            final float yaw = rotTag.get(0).valueAsFloat();
+                            final float pitch = rotTag.get(1).valueAsFloat();
+                            final String id = idTag.value();
 
                             EntityType<?> type = EntityType.byString(id).orElse(null);
                             if (type != null) {
                                 Entity entity = type.create(nmsWorld);
                                 if (entity != null) {
-                                    final net.minecraft.nbt.CompoundTag tag = (net.minecraft.nbt.CompoundTag) adapter.fromNative(
-                                            nativeTag);
+                                    final net.minecraft.nbt.CompoundTag tag = (net.minecraft.nbt.CompoundTag) adapter.fromNativeLin(linTag);
                                     for (final String name : Constants.NO_COPY_ENTITY_NBT_FIELDS) {
                                         tag.remove(name);
                                     }
                                     entity.load(tag);
                                     entity.absMoveTo(x, y, z, yaw, pitch);
-                                    entity.setUUID(nativeTag.getUUID());
+                                    entity.setUUID(NbtUtils.uuid(nativeTag));
                                     if (!nmsWorld.addFreshEntity(entity, CreatureSpawnEvent.SpawnReason.CUSTOM)) {
                                         LOGGER.warn(
                                                 "Error creating entity of type `{}` in world `{}` at location `{},{},{}`",
@@ -784,15 +788,15 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                 }
 
                 // set tiles
-                Map<BlockVector3, CompoundTag> tiles = set.getTiles();
+                Map<BlockVector3, FaweCompoundTag> tiles = set.tiles();
                 if (tiles != null && !tiles.isEmpty()) {
                     if (syncTasks == null) {
                         syncTasks = new Runnable[1];
                     }
 
                     syncTasks[0] = () -> {
-                        for (final Map.Entry<BlockVector3, CompoundTag> entry : tiles.entrySet()) {
-                            final CompoundTag nativeTag = entry.getValue();
+                        for (final Map.Entry<BlockVector3, FaweCompoundTag> entry : tiles.entrySet()) {
+                            final FaweCompoundTag nativeTag = entry.getValue();
                             final BlockVector3 blockHash = entry.getKey();
                             final int x = blockHash.x() + bx;
                             final int y = blockHash.y();
@@ -806,8 +810,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                                     tileEntity = nmsWorld.getBlockEntity(pos);
                                 }
                                 if (tileEntity != null) {
-                                    final net.minecraft.nbt.CompoundTag tag = (net.minecraft.nbt.CompoundTag) adapter.fromNative(
-                                            nativeTag);
+                                    final net.minecraft.nbt.CompoundTag tag = (CompoundTag) adapter.fromNativeLin(nativeTag.linTag());
                                     tag.put("x", IntTag.valueOf(x));
                                     tag.put("y", IntTag.valueOf(y));
                                     tag.put("z", IntTag.valueOf(z));

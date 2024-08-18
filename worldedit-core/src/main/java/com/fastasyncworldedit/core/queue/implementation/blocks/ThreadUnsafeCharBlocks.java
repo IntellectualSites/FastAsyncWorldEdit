@@ -4,9 +4,9 @@ import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.extent.processor.heightmap.HeightMapType;
 import com.fastasyncworldedit.core.math.BlockVector3ChunkMap;
+import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.fastasyncworldedit.core.queue.IBlocks;
 import com.fastasyncworldedit.core.queue.IChunkSet;
-import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
@@ -17,6 +17,7 @@ import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -44,8 +45,8 @@ public class ThreadUnsafeCharBlocks implements IChunkSet, IBlocks {
     private BiomeType[][] biomes;
     private char[][] light;
     private char[][] skyLight;
-    private BlockVector3ChunkMap<CompoundTag> tiles;
-    private HashSet<CompoundTag> entities;
+    private BlockVector3ChunkMap<FaweCompoundTag> tiles;
+    private HashSet<FaweCompoundTag> entities;
     private HashSet<UUID> entityRemoves;
     private Map<HeightMapType, int[]> heightMaps;
     private boolean fastMode;
@@ -64,8 +65,8 @@ public class ThreadUnsafeCharBlocks implements IChunkSet, IBlocks {
             int sectionCount,
             char[][] light,
             char[][] skyLight,
-            BlockVector3ChunkMap<CompoundTag> tiles,
-            HashSet<CompoundTag> entities,
+            BlockVector3ChunkMap<FaweCompoundTag> tiles,
+            HashSet<FaweCompoundTag> entities,
             HashSet<UUID> entityRemoves,
             Map<HeightMapType, int[]> heightMaps,
             char defaultOrdinal,
@@ -116,18 +117,18 @@ public class ThreadUnsafeCharBlocks implements IChunkSet, IBlocks {
     }
 
     @Override
-    public Map<BlockVector3, CompoundTag> getTiles() {
+    public Map<BlockVector3, FaweCompoundTag> tiles() {
         return tiles == null ? Collections.emptyMap() : tiles;
     }
 
     @Override
-    public CompoundTag getTile(int x, int y, int z) {
+    public @Nullable FaweCompoundTag tile(final int x, final int y, final int z) {
         return tiles == null ? null : tiles.get(x, y, z);
     }
 
     @Override
-    public Set<CompoundTag> getEntities() {
-        return entities == null ? Collections.emptySet() : entities;
+    public Collection<FaweCompoundTag> entities() {
+        return entities == null ? Collections.emptyList() : entities;
     }
 
     @Override
@@ -268,12 +269,12 @@ public class ThreadUnsafeCharBlocks implements IChunkSet, IBlocks {
     }
 
     @Override
-    public boolean setTile(int x, int y, int z, CompoundTag tile) {
+    public boolean tile(final int x, final int y, final int z, final FaweCompoundTag tag) {
         updateSectionIndexRange(y >> 4);
         if (tiles == null) {
             tiles = new BlockVector3ChunkMap<>();
         }
-        tiles.put(x, y, z, tile);
+        tiles.put(x, y, z, tag);
         return true;
     }
 
@@ -358,7 +359,7 @@ public class ThreadUnsafeCharBlocks implements IChunkSet, IBlocks {
     }
 
     @Override
-    public void setEntity(CompoundTag tag) {
+    public void entity(final FaweCompoundTag tag) {
         if (entities == null) {
             entities = new HashSet<>();
         }

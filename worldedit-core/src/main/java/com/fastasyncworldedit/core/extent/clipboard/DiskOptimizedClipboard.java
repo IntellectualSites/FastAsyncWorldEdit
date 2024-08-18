@@ -6,15 +6,17 @@ import com.fastasyncworldedit.core.internal.exception.FaweClipboardVersionMismat
 import com.fastasyncworldedit.core.internal.io.ByteBufferInputStream;
 import com.fastasyncworldedit.core.jnbt.streamer.IntValueReader;
 import com.fastasyncworldedit.core.math.IntTriple;
+import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.fastasyncworldedit.core.util.MainUtil;
+import com.fastasyncworldedit.core.util.NbtUtils;
 import com.fastasyncworldedit.core.util.ReflectionUtils;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.DoubleTag;
-import com.sk89q.jnbt.IntTag;
 import com.sk89q.jnbt.ListTag;
 import com.sk89q.jnbt.NBTInputStream;
 import com.sk89q.jnbt.NBTOutputStream;
 import com.sk89q.jnbt.Tag;
+import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
@@ -65,6 +67,7 @@ public class DiskOptimizedClipboard extends LinearClipboard {
     private static final Map<String, LockHolder> LOCK_HOLDER_CACHE = new ConcurrentHashMap<>();
 
     private final HashMap<IntTriple, CompoundTag> nbtMap;
+    private final HashMap<IntTriple, FaweCompoundTag> nbtMap2;
     private final File file;
     private final int headerSize;
 
@@ -124,6 +127,7 @@ public class DiskOptimizedClipboard extends LinearClipboard {
             canHaveBiomes = false;
         }
         nbtMap = new HashMap<>();
+        nbtMap2 = new HashMap<>();
         try {
             this.file = file;
             try {
@@ -180,6 +184,7 @@ public class DiskOptimizedClipboard extends LinearClipboard {
         super(readSize(file, versionOverride), BlockVector3.ZERO);
         headerSize = getHeaderSizeOverrideFromVersion(versionOverride);
         nbtMap = new HashMap<>();
+        nbtMap2 = new HashMap<>();
         try {
             this.file = file;
             this.braf = new RandomAccessFile(file, "rw");
@@ -709,12 +714,8 @@ public class DiskOptimizedClipboard extends LinearClipboard {
     }
 
     @Override
-    public boolean setTile(int x, int y, int z, CompoundTag tag) {
-        final Map<String, Tag<?, ?>> values = new HashMap<>(tag.getValue());
-        values.put("x", new IntTag(x));
-        values.put("y", new IntTag(y));
-        values.put("z", new IntTag(z));
-        nbtMap.put(new IntTriple(x, y, z), new CompoundTag(values));
+    public boolean tile(final int x, final int y, final int z, final FaweCompoundTag tile) throws WorldEditException {
+        nbtMap2.put(new IntTriple(x, y, z), NbtUtils.withPosition(tile, x, y, z));
         return true;
     }
 

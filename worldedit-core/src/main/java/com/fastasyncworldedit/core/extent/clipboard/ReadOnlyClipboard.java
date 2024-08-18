@@ -1,7 +1,7 @@
 package com.fastasyncworldedit.core.extent.clipboard;
 
 import com.fastasyncworldedit.core.Fawe;
-import com.sk89q.jnbt.CompoundTag;
+import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
@@ -106,7 +106,7 @@ public abstract class ReadOnlyClipboard extends SimpleClipboard {
     }
 
     @Override
-    public boolean setTile(int x, int y, int z, CompoundTag tag) {
+    public boolean tile(int x, int y, int z, FaweCompoundTag tag) {
         throw new UnsupportedOperationException("Clipboard is immutable");
     }
 

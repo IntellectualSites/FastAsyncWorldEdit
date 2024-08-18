@@ -1,5 +1,6 @@
 package com.fastasyncworldedit.core.extent.filter.block;
 
+import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.TileEntityBlock;
@@ -36,17 +37,6 @@ public abstract class FilterBlock extends BlockVector3 implements Extent, TileEn
     public abstract BiomeType getBiome();
 
     @Override
-    public abstract CompoundTag getNbtData();
-
-    @Override
-    public abstract void setNbtData(@Nullable CompoundTag nbtData);
-
-    @Override
-    public boolean hasNbtData() {
-        return getNbtData() != null;
-    }
-
-    @Override
     public BlockVector3 getMinimumPoint() {
         return getExtent().getMinimumPoint();
     }
@@ -61,10 +51,9 @@ public abstract class FilterBlock extends BlockVector3 implements Extent, TileEn
         return getExtent().getBlock(x, y, z);
     }
 
-
     @Override
-    public boolean setTile(int x, int y, int z, CompoundTag tile) throws WorldEditException {
-        return getExtent().setTile(x, y, z, tile);
+    public boolean tile(final int x, final int y, final int z, final FaweCompoundTag tile) throws WorldEditException {
+        return getExtent().tile(x, y, z, tile);
     }
 
     @Override

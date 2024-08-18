@@ -3,6 +3,8 @@ package com.fastasyncworldedit.core.queue;
 import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.internal.io.FastByteArrayOutputStream;
 import com.fastasyncworldedit.core.internal.io.FaweOutputStream;
+import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
+import com.fastasyncworldedit.core.util.collection.AdaptedMap;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.platform.Capability;
@@ -11,11 +13,14 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import com.sk89q.worldedit.world.registry.BlockRegistry;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
@@ -54,11 +59,38 @@ public interface IBlocks extends Trimable {
 
     BlockState getBlock(int x, int y, int z);
 
-    Map<BlockVector3, CompoundTag> getTiles();
+    @Deprecated(forRemoval = true, since = "TODO")
+    default Map<BlockVector3, CompoundTag> getTiles() {
+        return AdaptedMap.immutable(tiles(), pos -> pos, IBlocks::toCompoundTag);
+    }
 
-    CompoundTag getTile(int x, int y, int z);
+    Map<BlockVector3, FaweCompoundTag> tiles();
 
-    Set<CompoundTag> getEntities();
+    @Deprecated(forRemoval = true, since = "TODO")
+    default CompoundTag getTile(int x, int y, int z) {
+        final FaweCompoundTag tile = tile(x, y, z);
+        if (tile == null) {
+            return null;
+        }
+        return toCompoundTag(tile);
+    }
+
+    @SuppressWarnings({"deprecation"})
+    private static @NotNull CompoundTag toCompoundTag(FaweCompoundTag tile) {
+        return new CompoundTag(tile.linTag());
+    }
+
+    @Nullable
+    FaweCompoundTag tile(int x, int y, int z);
+
+    @Deprecated(forRemoval = true, since = "TODO")
+    default Set<CompoundTag> getEntities() {
+        return entities().stream()
+                .map(IBlocks::toCompoundTag)
+                .collect(Collectors.toSet());
+    }
+
+    Collection<FaweCompoundTag> entities();
 
     BiomeType getBiomeType(int x, int y, int z);
 
