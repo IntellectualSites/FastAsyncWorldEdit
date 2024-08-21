@@ -2,10 +2,17 @@ package com.fastasyncworldedit.core.extent.filter;
 
 import com.fastasyncworldedit.core.extent.filter.block.DelegateFilter;
 import com.fastasyncworldedit.core.extent.filter.block.FilterBlock;
+import com.fastasyncworldedit.core.internal.simd.SimdSupport;
+import com.fastasyncworldedit.core.internal.simd.VectorizedFilter;
+import com.fastasyncworldedit.core.internal.simd.VectorizedMask;
 import com.fastasyncworldedit.core.queue.Filter;
 import com.sk89q.worldedit.function.mask.AbstractExtentMask;
 import com.sk89q.worldedit.function.mask.Mask;
+import jdk.incubator.vector.ShortVector;
+import jdk.incubator.vector.VectorMask;
+import jdk.incubator.vector.VectorOperators;
 
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -15,8 +22,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class MaskFilter<T extends Filter> extends DelegateFilter<T> {
 
-    private final Mask mask;
-    private final AtomicInteger changes;
+    final Mask mask;
+    final AtomicInteger changes;
 
     public MaskFilter(T other, Mask root) {
         this(other, root, new AtomicInteger());
@@ -58,6 +65,47 @@ public class MaskFilter<T extends Filter> extends DelegateFilter<T> {
     @Override
     public Filter fork() {
         return new MaskFilter<>(getParent().fork(), mask.copy(), changes);
+    }
+
+    public static class VectorizedMaskFilter<T extends VectorizedFilter> extends MaskFilter<T> implements VectorizedFilter {
+
+        private final VectorizedMask vectorizedMask;
+
+        public VectorizedMaskFilter(final T other, final Mask root) {
+            super(other, root);
+            this.vectorizedMask = Objects.requireNonNull(SimdSupport.vectorizedTargetMask(root), "invalid vectorizable mask");
+        }
+
+        public VectorizedMaskFilter(final T other, final Mask root, AtomicInteger changes) {
+            super(other, root, changes);
+            this.vectorizedMask = Objects.requireNonNull(SimdSupport.vectorizedTargetMask(root), "invalid vectorizable mask");
+        }
+
+        @Override
+        public ShortVector applyVector(final ShortVector get, final ShortVector set) {
+            final T parent = getParent();
+            VectorMask<Short> masked = vectorizedMask.compareVector(set, get);
+            ShortVector res = parent.applyVector(get, set);
+            res = set.blend(res, masked);
+            VectorMask<Short> changed = res.compare(VectorOperators.NE, set);
+            changes.getAndAdd(changed.trueCount());
+            return res;
+        }
+
+        @Override
+        public MaskFilter<?> newInstance(final Filter other) {
+            if (other instanceof VectorizedFilter o) {
+                return new VectorizedMaskFilter<>(o, mask);
+            }
+            return super.newInstance(other);
+        }
+
+        @SuppressWarnings("unchecked")
+        @Override
+        public Filter fork() {
+            return new VectorizedMaskFilter<>((T) getParent().fork(), mask.copy(), changes);
+        }
+
     }
 
 }

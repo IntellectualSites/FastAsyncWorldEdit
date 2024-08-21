@@ -2,6 +2,9 @@ package com.fastasyncworldedit.core.queue;
 
 import com.fastasyncworldedit.core.extent.filter.block.ChunkFilterBlock;
 import com.fastasyncworldedit.core.extent.processor.IBatchProcessorHolder;
+import com.fastasyncworldedit.core.internal.simd.SimdSupport;
+import com.fastasyncworldedit.core.internal.simd.VectorizedCharFilterBlock;
+import com.fastasyncworldedit.core.internal.simd.VectorizedFilter;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.math.BlockVector2;
@@ -146,7 +149,11 @@ public interface IQueueExtent<T extends IChunk> extends Flushable, Trimable, ICh
         if (newChunk != null) {
             chunk = newChunk;
             if (block == null) {
-                block = this.createFilterBlock();
+                if (SimdSupport.useVectorApi() && filter instanceof VectorizedFilter) {
+                    block = new VectorizedCharFilterBlock(this);
+                } else {
+                    block = this.createFilterBlock();
+                }
             }
             block.initChunk(chunkX, chunkZ);
             chunk.filterBlocks(filter, block, region, full);

@@ -28,6 +28,7 @@ fun Project.applyCommonJavaConfiguration(sourcesJar: Boolean, banSlf4j: Boolean 
                 options.isDeprecation = true
                 options.encoding = "UTF-8"
                 options.compilerArgs.add("-parameters")
+                options.compilerArgs.add("--add-modules=jdk.incubator.vector")
             }
 
     configurations.all {

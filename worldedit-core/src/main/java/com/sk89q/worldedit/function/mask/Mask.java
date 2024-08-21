@@ -22,7 +22,11 @@ package com.sk89q.worldedit.function.mask;
 import com.fastasyncworldedit.core.extent.filter.MaskFilter;
 import com.fastasyncworldedit.core.extent.filter.block.FilterBlock;
 import com.fastasyncworldedit.core.function.mask.InverseMask;
+import com.fastasyncworldedit.core.internal.simd.SimdSupport;
+import com.fastasyncworldedit.core.internal.simd.VectorizedFilter;
+import com.fastasyncworldedit.core.internal.simd.VectorizedMask;
 import com.fastasyncworldedit.core.queue.Filter;
+import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
 
 import javax.annotation.Nullable;
@@ -64,7 +68,21 @@ public interface Mask {
         return null;
     }
 
+    @SuppressWarnings({"unchecked", "rawtypes"})
     default <T extends Filter> MaskFilter<T> toFilter(T filter) {
+        final VectorizedMask mask = SimdSupport.vectorizedTargetMask(this);
+        if (mask != null) {
+            VectorizedFilter vectorizedFilter = null;
+            if (filter instanceof VectorizedFilter vf) {
+                vectorizedFilter = vf;
+            } else if (filter instanceof Pattern p) {
+                vectorizedFilter = SimdSupport.vectorizedPattern(p);
+            }
+            if (vectorizedFilter != null) {
+                // also pass original?
+                return new MaskFilter.VectorizedMaskFilter(vectorizedFilter, this);
+            }
+        }
         return new MaskFilter<>(filter, this);
     }
 
