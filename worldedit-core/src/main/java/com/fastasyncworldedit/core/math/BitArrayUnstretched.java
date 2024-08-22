@@ -1,5 +1,6 @@
 package com.fastasyncworldedit.core.math;
 
+import com.fastasyncworldedit.core.queue.implementation.blocks.DataArray;
 import com.fastasyncworldedit.core.util.MathMan;
 
 public final class BitArrayUnstretched {
@@ -108,7 +109,7 @@ public final class BitArrayUnstretched {
         return buffer;
     }
 
-    public char[] toRaw(char[] buffer) {
+    public DataArray toRaw(DataArray buffer) {
         final long[] data = this.data;
         final int bitsPerEntry = this.bitsPerEntry;
         final int maxSeqLocIndex = this.maxSeqLocIndex;
@@ -118,9 +119,9 @@ public final class BitArrayUnstretched {
         for (int i = 0; i < longLen; i++) {
             long l = data[i];
             char lastVal;
-            for (; localStart <= maxSeqLocIndex && arrI < buffer.length; localStart += bitsPerEntry) {
+            for (; localStart <= maxSeqLocIndex && arrI < DataArray.CHUNK_SECTION_SIZE; localStart += bitsPerEntry) {
                 lastVal = (char) (l >>> localStart & this.mask);
-                buffer[arrI++] = lastVal;
+                buffer.setAt(arrI++, lastVal);
             }
             localStart = 0;
         }

@@ -4,6 +4,7 @@ import com.fastasyncworldedit.core.extent.processor.heightmap.HeightMapType;
 import com.fastasyncworldedit.core.queue.IBlocks;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.IChunkSet;
+import com.fastasyncworldedit.core.queue.implementation.blocks.DataArray;
 import com.google.common.base.Suppliers;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
@@ -41,7 +42,7 @@ public class PaperweightGetBlocks_Copy implements IChunkGet {
 
     private final Map<BlockVector3, CompoundTag> tiles = new HashMap<>();
     private final Set<CompoundTag> entities = new HashSet<>();
-    private final char[][] blocks;
+    private final DataArray[] blocks;
     private final int minHeight;
     private final int maxHeight;
     final ServerLevel serverLevel;
@@ -53,7 +54,7 @@ public class PaperweightGetBlocks_Copy implements IChunkGet {
         this.serverLevel = levelChunk.level;
         this.minHeight = serverLevel.getMinBuildHeight();
         this.maxHeight = serverLevel.getMaxBuildHeight() - 1; // Minecraft max limit is exclusive.
-        this.blocks = new char[getSectionCount()][];
+        this.blocks = new DataArray[getSectionCount()];
     }
 
     protected void storeTile(BlockEntity blockEntity) {
@@ -168,7 +169,7 @@ public class PaperweightGetBlocks_Copy implements IChunkGet {
         return serverLevel.getSectionsCount();
     }
 
-    protected void storeSection(int layer, char[] data) {
+    protected void storeSection(int layer, DataArray data) {
         blocks[layer] = data;
     }
 
@@ -205,17 +206,16 @@ public class PaperweightGetBlocks_Copy implements IChunkGet {
     }
 
     @Override
-    public char[] load(int layer) {
+    public DataArray load(int layer) {
         layer -= getMinSectionPosition();
         if (blocks[layer] == null) {
-            blocks[layer] = new char[4096];
-            Arrays.fill(blocks[layer], (char) BlockTypesCache.ReservedIDs.AIR);
+            blocks[layer] = DataArray.createFilled(BlockTypesCache.ReservedIDs.AIR);
         }
         return blocks[layer];
     }
 
     @Override
-    public char[] loadIfPresent(int layer) {
+    public DataArray loadIfPresent(int layer) {
         layer -= getMinSectionPosition();
         return blocks[layer];
     }
@@ -248,7 +248,7 @@ public class PaperweightGetBlocks_Copy implements IChunkGet {
     public char get(int x, int y, int z) {
         final int layer = (y >> 4) - getMinSectionPosition();
         final int index = (y & 15) << 8 | z << 4 | x;
-        return blocks[layer][index];
+        return (char) blocks[layer].getAt(index);
     }
 
 

@@ -6,14 +6,12 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 
-import java.util.Arrays;
-
-public abstract class CharGetBlocks extends CharBlocks implements IChunkGet {
+public abstract class DataArrayGetBlocks extends DataArrayBlocks implements IChunkGet {
 
     /**
      * New instance given the min/max section indices
      */
-    public CharGetBlocks(final int minSectionPosition, final int maxSectionPosition) {
+    public DataArrayGetBlocks(final int minSectionPosition, final int maxSectionPosition) {
         super(minSectionPosition, maxSectionPosition);
     }
 
@@ -33,11 +31,11 @@ public abstract class CharGetBlocks extends CharBlocks implements IChunkGet {
     }
 
     @Override
-    public char[] update(int layer, char[] data, boolean aggressive) {
+    public DataArray update(int layer, DataArray data, boolean aggressive) {
         if (data == null) {
-            data = new char[4096];
+            data = DataArray.createEmpty();
         }
-        Arrays.fill(data, (char) BlockTypesCache.ReservedIDs.AIR);
+        data.setAll(BlockTypesCache.ReservedIDs.AIR);
         return data;
     }
 
@@ -59,5 +57,4 @@ public abstract class CharGetBlocks extends CharBlocks implements IChunkGet {
         super.reset();
         return null;
     }
-
 }

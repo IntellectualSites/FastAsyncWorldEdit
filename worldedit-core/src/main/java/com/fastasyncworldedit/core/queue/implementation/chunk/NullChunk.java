@@ -5,6 +5,7 @@ import com.fastasyncworldedit.core.extent.processor.heightmap.HeightMapType;
 import com.fastasyncworldedit.core.queue.Filter;
 import com.fastasyncworldedit.core.queue.IChunkSet;
 import com.fastasyncworldedit.core.queue.IQueueChunk;
+import com.fastasyncworldedit.core.queue.implementation.blocks.DataArray;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
@@ -130,7 +131,8 @@ public final class NullChunk implements IQueueChunk {
         return false;
     }
 
-    public void setBlocks(int layer, @Nonnull char[] data) {
+    @Override
+    public void setBlocks(int layer, @Nonnull DataArray data) {
     }
 
     @Nullable
@@ -168,13 +170,13 @@ public final class NullChunk implements IQueueChunk {
     }
 
     @Nullable
-    public char[] load(int layer) {
+    public DataArray load(int layer) {
         return null;
     }
 
     @Nullable
     @Override
-    public char[] loadIfPresent(final int layer) {
+    public DataArray loadIfPresent(final int layer) {
         return null;
     }
 

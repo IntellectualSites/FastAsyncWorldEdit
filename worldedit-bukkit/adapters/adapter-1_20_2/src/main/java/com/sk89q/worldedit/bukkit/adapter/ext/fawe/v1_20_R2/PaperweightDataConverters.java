@@ -49,7 +49,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.enginehub.linbus.tree.LinCompoundTag;
 
-import javax.annotation.Nullable;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -63,6 +62,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 
 /**
  * Handles converting all Pre 1.13.2 data using the Legacy DataFix System (ported to 1.13.2)

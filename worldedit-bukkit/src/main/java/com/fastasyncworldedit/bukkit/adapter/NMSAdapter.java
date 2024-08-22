@@ -2,6 +2,7 @@ package com.fastasyncworldedit.bukkit.adapter;
 
 import com.fastasyncworldedit.core.FAWEPlatformAdapterImpl;
 import com.fastasyncworldedit.core.queue.IChunkGet;
+import com.fastasyncworldedit.core.queue.implementation.blocks.DataArray;
 import com.fastasyncworldedit.core.util.MathMan;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import org.apache.logging.log4j.LogManager;
@@ -17,14 +18,14 @@ public class NMSAdapter implements FAWEPlatformAdapterImpl {
             int[] blockToPalette,
             int[] paletteToBlock,
             int[] blocksCopy,
-            char[] set,
+            DataArray set,
             CachedBukkitAdapter adapter,
             short[] nonEmptyBlockCount
     ) {
         short nonAir = 4096;
         int num_palette = 0;
         for (int i = 0; i < 4096; i++) {
-            char ordinal = set[i];
+            char ordinal = (char) set.getAt(i);
             switch (ordinal) {
                 case BlockTypesCache.ReservedIDs.__RESERVED__ -> {
                     ordinal = BlockTypesCache.ReservedIDs.AIR;
@@ -49,7 +50,7 @@ public class NMSAdapter implements FAWEPlatformAdapterImpl {
             System.arraycopy(adapter.getOrdinalToIbdID(), 0, blockToPalette, 0, adapter.getOrdinalToIbdID().length);
         }
         for (int i = 0; i < 4096; i++) {
-            char ordinal = set[i];
+            char ordinal = (char) set.getAt(i);
             if (ordinal == BlockTypesCache.ReservedIDs.__RESERVED__) {
                 ordinal = BlockTypesCache.ReservedIDs.AIR;
             }
@@ -68,16 +69,16 @@ public class NMSAdapter implements FAWEPlatformAdapterImpl {
             int[] blockToPalette,
             int[] paletteToBlock,
             int[] blocksCopy,
-            Function<Integer, char[]> get,
-            char[] set,
+            Function<Integer, DataArray> get,
+            DataArray set,
             CachedBukkitAdapter adapter,
             short[] nonEmptyBlockCount
     ) {
         short nonAir = 4096;
         int num_palette = 0;
-        char[] getArr = null;
+        DataArray getArr = null;
         for (int i = 0; i < 4096; i++) {
-            char ordinal = set[i];
+            char ordinal = (char) set.getAt(i);
             switch (ordinal) {
                 case BlockTypesCache.ReservedIDs.__RESERVED__ -> {
                     if (getArr == null) {
@@ -85,7 +86,7 @@ public class NMSAdapter implements FAWEPlatformAdapterImpl {
                     }
                     // write to set array as this should be a copied array, and will be important when the changes are written
                     // to the GET chunk cached by FAWE. Future dords, actually read this comment please.
-                    set[i] = switch (ordinal = getArr[i]) {
+                    set.setAt(i, switch (ordinal = (char) getArr.getAt(i)) {
                         case BlockTypesCache.ReservedIDs.__RESERVED__ -> {
                             nonAir--;
                             yield (ordinal = BlockTypesCache.ReservedIDs.AIR);
@@ -96,7 +97,7 @@ public class NMSAdapter implements FAWEPlatformAdapterImpl {
                             yield ordinal;
                         }
                         default -> ordinal;
-                    };
+                    });
                 }
                 case BlockTypesCache.ReservedIDs.AIR, BlockTypesCache.ReservedIDs.CAVE_AIR, BlockTypesCache.ReservedIDs.VOID_AIR -> nonAir--;
             }
@@ -117,7 +118,7 @@ public class NMSAdapter implements FAWEPlatformAdapterImpl {
             System.arraycopy(adapter.getOrdinalToIbdID(), 0, blockToPalette, 0, adapter.getOrdinalToIbdID().length);
         }
         for (int i = 0; i < 4096; i++) {
-            char ordinal = set[i];
+            char ordinal = (char) set.getAt(i);
             if (ordinal == BlockTypesCache.ReservedIDs.__RESERVED__) {
                 LOGGER.error("Empty (__RESERVED__) ordinal given where not expected, default to air.");
                 ordinal = BlockTypesCache.ReservedIDs.AIR;
