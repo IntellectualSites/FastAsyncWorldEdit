@@ -18,7 +18,7 @@ public class RadiusMaskParser extends RichParser<Mask> {
     }
 
     @Override
-    protected Stream<String> getSuggestions(String argumentInput, int index) {
+    protected Stream<String> getSuggestions(String argumentInput, int index, ParserContext context) {
         if (index == 0 || index == 1) {
             return SuggestionHelper.suggestPositiveIntegers(argumentInput);
         }

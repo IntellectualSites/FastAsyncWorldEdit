@@ -54,7 +54,7 @@ public class BiomePatternParser extends RichParser<Pattern> {
     }
 
     @Override
-    protected Stream<String> getSuggestions(String argumentInput, int index) {
+    protected Stream<String> getSuggestions(String argumentInput, int index, ParserContext context) {
         if (index == 0) {
             return BiomeType.REGISTRY.getSuggestions(argumentInput);
         }

@@ -24,12 +24,12 @@ public class RichOffsetMaskParser extends RichParser<Mask> {
     }
 
     @Override
-    protected Stream<String> getSuggestions(String argumentInput, int index) {
+    protected Stream<String> getSuggestions(String argumentInput, int index, ParserContext context) {
         if (index < 3) {
             return SuggestionHelper.suggestPositiveIntegers(argumentInput);
         }
         if (index == 3) {
-            return worldEdit.getMaskFactory().getSuggestions(argumentInput).stream();
+            return worldEdit.getMaskFactory().getSuggestions(argumentInput, context).stream();
         }
         return Stream.empty();
     }
