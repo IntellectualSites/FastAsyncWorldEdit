@@ -20,7 +20,7 @@ fun Project.applyPlatformAndCoreConfiguration() {
     apply(plugin = "eclipse")
     apply(plugin = "idea")
     apply(plugin = "maven-publish")
-    apply(plugin = "com.github.johnrengelman.shadow")
+    apply(plugin = "com.gradleup.shadow")
     apply(plugin = "signing")
 
     applyCommonJavaConfiguration(
