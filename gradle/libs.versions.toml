@@ -18,7 +18,7 @@ towny = "0.100.3.12"
 plotsquared = "7.3.9"
 
 # Third party
-bstats = "3.0.2"
+bstats = "3.0.3"
 sparsebitset = "1.3"
 parallelgzip = "1.0.5"
 adventure = "4.17.0"
