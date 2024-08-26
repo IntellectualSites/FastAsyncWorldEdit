@@ -19,7 +19,9 @@
 
 package com.sk89q.worldedit.function.operation;
 
+import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.history.changeset.AbstractChangeSet;
+import com.fastasyncworldedit.core.history.changeset.ChangeExchangeCoordinator;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.history.UndoContext;
@@ -56,6 +58,7 @@ public class ChangeSetExecutor implements Operation {
     //FAWE end
 
     private final Iterator<Change> iterator;
+    private final ChangeExchangeCoordinator changeExchangeCoordinator;
     private final Type type;
     private final UndoContext context;
 
@@ -74,18 +77,42 @@ public class ChangeSetExecutor implements Operation {
 
         this.type = type;
         this.context = context;
-        if (changeSet instanceof AbstractChangeSet) {
-            iterator = ((AbstractChangeSet) changeSet).getIterator(blockBag, inventory, type == Type.REDO);
+        if (changeSet instanceof AbstractChangeSet abstractChangeSet) {
+            if (Settings.settings().EXPERIMENTAL.UNDO_BATCH_SIZE > 0) {
+                this.changeExchangeCoordinator = abstractChangeSet.getCoordinatedChanges(blockBag, inventory, type == Type.REDO);
+                this.iterator = null;
+            } else {
+                this.iterator = abstractChangeSet.getIterator(blockBag, inventory, type == Type.REDO);
+                this.changeExchangeCoordinator = null;
+            }
         } else if (type == Type.UNDO) {
             iterator = changeSet.backwardIterator();
+            this.changeExchangeCoordinator = null;
         } else {
             iterator = changeSet.forwardIterator();
+            this.changeExchangeCoordinator = null;
         }
     }
     //FAWE end
 
     @Override
     public Operation resume(RunContext run) throws WorldEditException {
+        // FAWE start - ChangeExchangeCoordinator
+        if (this.changeExchangeCoordinator != null) {
+            try (this.changeExchangeCoordinator) {
+                Change[] changes = new Change[Settings.settings().EXPERIMENTAL.UNDO_BATCH_SIZE];
+                while ((changes = this.changeExchangeCoordinator.take(changes)) != null) {
+                    for (final Change change : changes) {
+                        if (change == null) {
+                            return null; // end
+                        }
+                        type.perform(change, context);
+                    }
+                }
+                return null;
+            }
+        }
+        // FAWE end
         while (iterator.hasNext()) {
             Change change = iterator.next();
             //FAWE start - types > individual history step

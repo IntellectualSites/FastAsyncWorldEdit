@@ -55,6 +55,17 @@ public class NullChangeSet extends AbstractChangeSet {
     }
 
     @Override
+    public ChangeExchangeCoordinator getCoordinatedChanges(final BlockBag blockBag, final int mode, final boolean dir) {
+        return new ChangeExchangeCoordinator(((exchanger, changes) -> {
+            try {
+                exchanger.exchange(null);
+            } catch (InterruptedException ignored) {
+                Thread.currentThread().interrupt();
+            }
+        }));
+    }
+
+    @Override
     public final Iterator<Change> getIterator(boolean undo) {
         return Collections.emptyIterator();
     }
