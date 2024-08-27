@@ -3,6 +3,7 @@ package com.fastasyncworldedit.core.command.tool.brush;
 import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.command.tool.ResettableTool;
 import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.extent.clipboard.EmptyClipboard;
 import com.fastasyncworldedit.core.extent.clipboard.ResizableClipboardBuilder;
 import com.fastasyncworldedit.core.function.NullRegionFunction;
 import com.fastasyncworldedit.core.function.mask.AbstractDelegateMask;
@@ -87,11 +88,11 @@ public class CopyPastaBrush implements Brush, ResettableTool {
             visitor.visit(position);
             Operations.completeBlindly(visitor);
             // Build the clipboard
-            Clipboard newClipboard = builder.build();
+            long blocks = builder.longSize();
+            Clipboard newClipboard = blocks > 0 ? builder.build() : EmptyClipboard.getInstance();
             newClipboard.setOrigin(position);
             ClipboardHolder holder = new ClipboardHolder(newClipboard);
             session.setClipboard(holder);
-            long blocks = builder.longSize();
             player.print(Caption.of("fawe.worldedit.copy.command.copy", blocks));
         } else {
             AffineTransform transform = null;
