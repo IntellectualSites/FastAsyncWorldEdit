@@ -62,7 +62,7 @@ public interface IBatchProcessor {
      * @return false if chunk is empty of blocks
      */
     default boolean trimY(IChunkSet set, int minY, int maxY, final boolean keepInsideRange) {
-        int minLayer = (minY - 1) >> 4;
+        int minLayer = minY >> 4;
         int maxLayer = (maxY + 1) >> 4;
         if (keepInsideRange) {
             for (int layer = set.getMinSectionPosition(); layer <= minLayer; layer++) {
