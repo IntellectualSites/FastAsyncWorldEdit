@@ -86,7 +86,15 @@ public interface IBatchProcessor {
                     if (layer == maxLayer) {
                         char[] arr = set.loadIfPresent(layer);
                         if (arr != null) {
-                            int index = ((maxY + 1) & 15) << 8;
+                            /*
+                              If maxY is the last coordinate in a chunk section (`2^n-1`), it bleeds into
+                              the next higher section and represents the 0th block on the y-axis on that section. This results
+                              in the index being 0 (so the whole section is wiped) - even though only the last slice should be
+                              overwritten.
+                              If maxY is any other coordinate (0 - 14) `((maxY + 1) & 15) << 8` is evaluated, resulting in
+                              getting the index for the next (upper) slice of this section (as this one should be overwritten)
+                             */
+                            int index = (maxY + 1) % 16 == 0 ? arr.length : ((maxY + 1) & 15) << 8;
                             for (int i = index; i < arr.length; i++) {
                                 arr[i] = BlockTypesCache.ReservedIDs.__RESERVED__;
                             }
