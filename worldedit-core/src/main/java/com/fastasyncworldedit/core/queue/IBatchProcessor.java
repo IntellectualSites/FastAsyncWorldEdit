@@ -63,7 +63,7 @@ public interface IBatchProcessor {
      */
     default boolean trimY(IChunkSet set, int minY, int maxY, final boolean keepInsideRange) {
         int minLayer = minY >> 4;
-        int maxLayer = (maxY + 1) >> 4;
+        int maxLayer = maxY >> 4;
         if (keepInsideRange) {
             for (int layer = set.getMinSectionPosition(); layer <= minLayer; layer++) {
                 if (set.hasSection(layer)) {

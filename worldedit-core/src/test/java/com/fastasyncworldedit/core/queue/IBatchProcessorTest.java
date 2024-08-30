@@ -41,7 +41,7 @@ class IBatchProcessorTest {
                 int layer = invocationOnMock.getArgument(0);
                 char[] blocks = invocationOnMock.getArgument(1);
                 // when totally out of range (layer mismatch) no blocks should be set
-                if ((layer < minYSection || layer > maxYSection)) {
+                if (layer < minYSection || layer > maxYSection) {
                     if (blocks != null) {
                         fail("Expected null-array for out of range access at layer %d where minYLayer=%d and maxYLayer=%d"
                                 .formatted(layer, minYSection, maxYSection)
@@ -56,7 +56,11 @@ class IBatchProcessorTest {
                 if (layer == minYSection) {
                     char[] expected = Arrays.copyOf(CHUNK_DATA, CHUNK_DATA.length);
                     Arrays.fill(expected, 0, (minY & 15) << 8, (char) BlockTypesCache.ReservedIDs.__RESERVED__);
-                    assertArrayEquals(expected, blocks, "expected in-range blocks to be AIR - out-of-range __RESERVED__");
+                    assertArrayEquals(
+                            expected, blocks,
+                            "expected in-range blocks at layer=%d to be AIR - out-of-range __RESERVED__"
+                                    .formatted(layer)
+                    );
                     return null;
                 }
 
@@ -64,7 +68,11 @@ class IBatchProcessorTest {
                 if (layer == maxYSection) {
                     char[] expected = Arrays.copyOf(CHUNK_DATA, CHUNK_DATA.length);
                     Arrays.fill(expected, (maxY & 15) << 8, expected.length, (char) BlockTypesCache.ReservedIDs.__RESERVED__);
-                    assertArrayEquals(expected, blocks, "expected in-range blocks to be AIR - out-of-range __RESERVED__");
+                    assertArrayEquals(
+                            expected, blocks,
+                            "expected in-range blocks at layer=%d to be AIR - out-of-range __RESERVED__"
+                                    .formatted(layer)
+                    );
                     return null;
                 }
                 assertArrayEquals(blocks, CHUNK_DATA, "full chunk should contain full data");
@@ -80,7 +88,7 @@ class IBatchProcessorTest {
                     Arguments.of(-64, 0),
                     Arguments.of(0, 128),
                     Arguments.of(4, 144),
-                    Arguments.of(12, 256),
+                    Arguments.of(12, 255),
                     Arguments.of(24, 103)
             );
         }
