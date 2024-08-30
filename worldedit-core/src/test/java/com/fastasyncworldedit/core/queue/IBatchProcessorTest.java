@@ -4,10 +4,14 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
+import org.junit.jupiter.api.parallel.Isolated;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import javax.annotation.concurrent.NotThreadSafe;
 import java.util.Arrays;
 import java.util.stream.Stream;
 
@@ -17,6 +21,7 @@ import static org.mockito.Mockito.*;
 class IBatchProcessorTest {
 
     @Nested
+    @Isolated
     class trimY {
 
         private static final char[] CHUNK_DATA = new char[16 * 16 * 16];
@@ -67,7 +72,7 @@ class IBatchProcessorTest {
                 // kinda the same for the highest layer - just the other way around
                 if (layer == maxYSection) {
                     char[] expected = Arrays.copyOf(CHUNK_DATA, CHUNK_DATA.length);
-                    Arrays.fill(expected, (maxY & 15) << 8, expected.length, (char) BlockTypesCache.ReservedIDs.__RESERVED__);
+                    Arrays.fill(expected, ((maxY + 1) & 15) << 8, expected.length, (char) BlockTypesCache.ReservedIDs.__RESERVED__);
                     assertArrayEquals(
                             expected, blocks,
                             "expected in-range blocks at layer=%d to be AIR - out-of-range __RESERVED__"
@@ -87,6 +92,7 @@ class IBatchProcessorTest {
                     Arguments.of(64, 72),
                     Arguments.of(-64, 0),
                     Arguments.of(0, 128),
+                    Arguments.of(16, 132),
                     Arguments.of(4, 144),
                     Arguments.of(12, 255),
                     Arguments.of(24, 103)
