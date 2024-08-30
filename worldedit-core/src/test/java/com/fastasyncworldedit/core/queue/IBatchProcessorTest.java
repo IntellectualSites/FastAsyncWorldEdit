@@ -4,14 +4,11 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.parallel.Execution;
-import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.junit.jupiter.api.parallel.Isolated;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import javax.annotation.concurrent.NotThreadSafe;
 import java.util.Arrays;
 import java.util.stream.Stream;
 
