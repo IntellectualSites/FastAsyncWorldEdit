@@ -26,8 +26,8 @@ import net.minecraft.world.level.chunk.PalettedContainer;
 import net.minecraft.world.level.chunk.PalettedContainerRO;
 import org.apache.logging.log4j.Logger;
 import org.enginehub.linbus.tree.LinCompoundTag;
-import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -87,7 +87,7 @@ public class PaperweightGetBlocks_Copy implements IChunkGet {
     }
 
     @Override
-    public @org.jetbrains.annotations.Nullable FaweCompoundTag entity(final UUID uuid) {
+    public @Nullable FaweCompoundTag entity(final UUID uuid) {
         for (FaweCompoundTag tag : entities) {
             if (uuid.equals(NbtUtils.uuid(tag))) {
                 return tag;

@@ -21,7 +21,8 @@ package com.sk89q.worldedit.world.registry;
 
 import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.sk89q.jnbt.CompoundTag;
-import org.jetbrains.annotations.Nullable;
+
+import javax.annotation.Nullable;
 
 class SimpleBlockMaterial implements BlockMaterial {
 

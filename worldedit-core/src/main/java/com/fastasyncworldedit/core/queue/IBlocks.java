@@ -13,8 +13,8 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import com.sk89q.worldedit.world.registry.BlockRegistry;
-import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.Collection;
@@ -76,7 +76,7 @@ public interface IBlocks extends Trimable {
     }
 
     @SuppressWarnings({"deprecation"})
-    private static @NotNull CompoundTag toCompoundTag(FaweCompoundTag tile) {
+    private static @Nonnull CompoundTag toCompoundTag(FaweCompoundTag tile) {
         return new CompoundTag(tile.linTag());
     }
 

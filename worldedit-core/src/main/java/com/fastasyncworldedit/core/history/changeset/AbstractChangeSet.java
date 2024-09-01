@@ -35,8 +35,8 @@ import com.sk89q.worldedit.world.block.BlockTypesCache;
 import org.apache.logging.log4j.Logger;
 import org.enginehub.linbus.tree.LinCompoundTag;
 import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
@@ -248,7 +248,7 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
     }
 
     @SuppressWarnings({"deprecation"})
-    private static @NotNull FaweCompoundTag adapt(CompoundTag tag) {
+    private static @Nonnull FaweCompoundTag adapt(CompoundTag tag) {
         return FaweCompoundTag.of(tag.toLinTag());
     }
 

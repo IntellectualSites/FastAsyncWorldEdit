@@ -11,7 +11,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.material.PushReaction;
 import org.bukkit.craftbukkit.block.data.CraftBlockData;
-import org.jetbrains.annotations.Nullable;
+
+import javax.annotation.Nullable;
 
 public class PaperweightBlockMaterial implements BlockMaterial {
 
