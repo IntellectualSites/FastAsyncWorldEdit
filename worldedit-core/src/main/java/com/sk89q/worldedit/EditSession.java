@@ -3611,7 +3611,8 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     }
 
     private void recurseHollow(Region region, BlockVector3 origin, Set<BlockVector3> outside, Mask mask) {
-        final LocalBlockVectorSet queue = new LocalBlockVectorSet();
+        // FAWE start - use BlockVector3Set instead of LinkedList
+        final BlockVector3Set queue = BlockVector3Set.getAppropriateVectorSet(region);
         queue.add(origin);
 
         while (!queue.isEmpty()) {
@@ -3634,6 +3635,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
                 }
             }
         }
+        // FAWE end
     }
 
     public int makeBiomeShape(
