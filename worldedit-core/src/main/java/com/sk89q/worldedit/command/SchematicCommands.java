@@ -76,12 +76,9 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URI;
 import java.net.URL;
-import java.nio.channels.Channels;
-import java.nio.channels.FileChannel;
-import java.nio.channels.ReadableByteChannel;
-import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -94,8 +91,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.Callable;
-import java.util.function.Consumer;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 
@@ -328,7 +325,6 @@ public class SchematicCommands {
         LocalConfiguration config = worldEdit.getConfiguration();
 
         //FAWE start
-        final Closer closer = Closer.create();
         ClipboardFormat format;
         InputStream in;
         // if format is set explicitly, do not look up by extension!
@@ -336,7 +332,7 @@ public class SchematicCommands {
         if (noExplicitFormat) {
             formatName = "fast";
         }
-        try {
+        try(final Closer closer = Closer.create()) {
             URI uri;
             if (formatName.startsWith("url:")) {
                 String t = filename;
@@ -364,10 +360,9 @@ public class SchematicCommands {
                 // delete temporary file when we're done
                 closer.register((Closeable) () -> Files.deleteIfExists(temp));
                 // write schematic into temporary file
-                try (final ReadableByteChannel byteChannel = Channels.newChannel(url.openStream());
-                     final FileOutputStream out = new FileOutputStream(tempFile);
-                     final FileChannel outChannel = out.getChannel()) {
-                    outChannel.transferFrom(byteChannel, 0, Long.MAX_VALUE);
+                try (final InputStream urlIn = new BufferedInputStream(url.openStream());
+                    final OutputStream tempOut = new BufferedOutputStream(new FileOutputStream(tempFile))) {
+                    urlIn.transferTo(tempOut);
                 }
                 // No format is specified -> try or fail
                 if (noExplicitFormat && (format = ClipboardFormats.findByFile(tempFile)) == null) {
@@ -460,12 +455,6 @@ public class SchematicCommands {
         } catch (Exception e) {
             actor.print(Caption.of("fawe.worldedit.schematic.schematic.load-failure", TextComponent.of(e.getMessage())));
             LOGGER.error("Error loading a schematic", e);
-        } finally {
-            try {
-                closer.close();
-            } catch (IOException e) {
-                LOGGER.error("Failed to close schematic resources", e);
-            }
         }
         //FAWE end
     }
