@@ -126,9 +126,10 @@ public class PaperweightBlockMaterial implements BlockMaterial {
         return blockState.isRandomlyTicking();
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public boolean isMovementBlocker() {
-        return craftMaterial.isSolid();
+        return blockState.blocksMotion();
     }
 
     @Override
