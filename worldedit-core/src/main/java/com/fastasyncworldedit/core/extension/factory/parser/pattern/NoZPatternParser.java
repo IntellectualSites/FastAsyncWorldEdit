@@ -24,9 +24,9 @@ public class NoZPatternParser extends RichParser<Pattern> {
     }
 
     @Override
-    public Stream<String> getSuggestions(String argumentInput, int index) {
+    public Stream<String> getSuggestions(String argumentInput, int index, ParserContext context) {
         if (index == 0) {
-            return this.worldEdit.getPatternFactory().getSuggestions(argumentInput).stream();
+            return this.worldEdit.getPatternFactory().getSuggestions(argumentInput, context).stream();
         }
         return Stream.empty();
     }

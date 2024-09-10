@@ -25,10 +25,10 @@ public class MaskedPatternParser extends RichParser<Pattern> {
     }
 
     @Override
-    protected Stream<String> getSuggestions(String argumentInput, int index) {
+    protected Stream<String> getSuggestions(String argumentInput, int index, ParserContext context) {
         return switch (index) {
-            case 0 -> this.worldEdit.getMaskFactory().getSuggestions(argumentInput).stream();
-            case 1, 2 -> this.worldEdit.getPatternFactory().getSuggestions(argumentInput).stream();
+            case 0 -> this.worldEdit.getMaskFactory().getSuggestions(argumentInput, context).stream();
+            case 1, 2 -> this.worldEdit.getPatternFactory().getSuggestions(argumentInput, context).stream();
             default -> Stream.empty();
         };
     }

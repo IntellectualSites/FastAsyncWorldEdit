@@ -28,9 +28,9 @@ public class LinearPatternParser extends RichParser<Pattern> {
     }
 
     @Override
-    protected Stream<String> getSuggestions(String argumentInput, int index) {
+    protected Stream<String> getSuggestions(String argumentInput, int index, ParserContext context) {
         return switch (index) {
-            case 0 -> this.worldEdit.getPatternFactory().getSuggestions(argumentInput).stream();
+            case 0 -> this.worldEdit.getPatternFactory().getSuggestions(argumentInput, context).stream();
             case 1, 2, 3 -> SuggestionHelper.suggestPositiveIntegers(argumentInput);
             default -> Stream.empty();
         };
