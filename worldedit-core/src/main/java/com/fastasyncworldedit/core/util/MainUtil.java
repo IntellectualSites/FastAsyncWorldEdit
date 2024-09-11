@@ -701,7 +701,7 @@ public class MainUtil {
 
     public static File resolve(File dir, String filename, @Nullable ClipboardFormat format, boolean allowDir) {
         if (format != null) {
-            if (!filename.matches(".*\\.[\\w].*")) {
+            if (!filename.matches(".*\\.\\w.*")) {
                 filename = filename + "." + format.getPrimaryFileExtension();
             }
             return MainUtil.resolveRelative(new File(dir, filename));
@@ -712,7 +712,7 @@ public class MainUtil {
                 return file;
             }
         }
-        if (filename.matches(".*\\.[\\w].*")) {
+        if (filename.matches(".*\\.\\w.*")) {
             File file = MainUtil.resolveRelative(new File(dir, filename));
             if (file.exists()) {
                 return file;
