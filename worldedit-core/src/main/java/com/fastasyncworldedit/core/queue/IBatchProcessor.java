@@ -62,40 +62,41 @@ public interface IBatchProcessor {
      * @return false if chunk is empty of blocks
      */
     default boolean trimY(IChunkSet set, int minY, int maxY, final boolean keepInsideRange) {
-        int minLayer = (minY - 1) >> 4;
-        int maxLayer = (maxY + 1) >> 4;
+        int minLayer = minY >> 4;
+        int maxLayer = maxY >> 4;
         if (keepInsideRange) {
-            for (int layer = set.getMinSectionPosition(); layer <= minLayer; layer++) {
-                if (set.hasSection(layer)) {
-                    if (layer == minLayer) {
-                        char[] arr = set.loadIfPresent(layer);
-                        if (arr != null) {
-                            int index = (minY & 15) << 8;
-                            for (int i = 0; i < index; i++) {
-                                arr[i] = BlockTypesCache.ReservedIDs.__RESERVED__;
-                            }
-                            set.setBlocks(layer, arr);
-                        }
-                    } else {
-                        set.setBlocks(layer, null);
+            for (int layer = set.getMinSectionPosition(); layer <= set.getMaxSectionPosition(); layer++) {
+                if (!set.hasSection(layer)) {
+                    continue;
+                }
+                // wipe all data from chunk layers above or below the max / min layer
+                if (layer < minLayer || layer > maxLayer) {
+                    set.setBlocks(layer, null);
+                    continue;
+                }
+                // if chunk layer / section is fully enclosed by minY to maxY, keep as is
+                if (layer > minLayer && layer < maxLayer) {
+                    continue;
+                }
+                char[] blocks = set.loadIfPresent(layer);
+                if (blocks == null) {
+                    continue;
+                }
+                // When on the minimum layer (as defined by minY), remove blocks up to minY (exclusive)
+                if (layer == minLayer) {
+                    int index = (minY & 15) << 8;
+                    for (int i = 0; i < index; i++) {
+                        blocks[i] = BlockTypesCache.ReservedIDs.__RESERVED__;
                     }
                 }
-            }
-            for (int layer = maxLayer; layer <= set.getMaxSectionPosition(); layer++) {
-                if (set.hasSection(layer)) {
-                    if (layer == maxLayer) {
-                        char[] arr = set.loadIfPresent(layer);
-                        if (arr != null) {
-                            int index = ((maxY + 1) & 15) << 8;
-                            for (int i = index; i < arr.length; i++) {
-                                arr[i] = BlockTypesCache.ReservedIDs.__RESERVED__;
-                            }
-                            set.setBlocks(layer, arr);
-                        }
-                    } else {
-                        set.setBlocks(layer, null);
+                // When on the maximum layer (as defined by maxY), remove blocks above maxY (exclusive)
+                if (layer == maxLayer) {
+                    int index = ((maxY & 15) + 1) << 8;
+                    for (int i = index; i < blocks.length; i++) {
+                        blocks[i] = BlockTypesCache.ReservedIDs.__RESERVED__;
                     }
                 }
+                set.setBlocks(layer, blocks);
             }
             try {
                 int layer = (minY - 15) >> 4;
