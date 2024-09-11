@@ -22,6 +22,7 @@ public class VectorizedCharFilterBlock extends CharFilterBlock {
         char[] setArr = this.setArr;
         assert setArr != null;
         char[] getArr = this.getArr;
+        // assume setArr.length == getArr.length == 4096
         for (int i = 0; i < 4096; i += species.length()) {
             ShortVector set = ShortVector.fromCharArray(species, setArr, i);
             ShortVector get = ShortVector.fromCharArray(species, getArr, i);

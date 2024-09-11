@@ -22,6 +22,7 @@ public interface VectorizedMask {
 
     default void processSection(int layer, char[] set, char[] get) {
         final VectorSpecies<Short> species = ShortVector.SPECIES_PREFERRED;
+        // assume that set.length % species.elementSize() == 0
         for (int i = 0; i < set.length; i += species.length()) {
             ShortVector vectorSet = ShortVector.fromCharArray(species, set, i);
             ShortVector vectorGet = ShortVector.fromCharArray(species, get, i);
