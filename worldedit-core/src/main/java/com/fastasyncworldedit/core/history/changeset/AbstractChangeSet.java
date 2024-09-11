@@ -32,6 +32,7 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.io.IOException;
 import java.util.Iterator;
@@ -249,6 +250,13 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
     public Iterator<Change> getIterator(BlockBag blockBag, int mode, boolean redo) {
         return getIterator(redo);
     }
+
+    /**
+     * {@return a coordinator to exchange sets of changes between a producer and a consumer}
+     * @since TODO
+     */
+    @ApiStatus.Internal
+    public abstract ChangeExchangeCoordinator getCoordinatedChanges(BlockBag blockBag, int mode, boolean dir);
 
     public abstract Iterator<Change> getIterator(boolean redo);
 

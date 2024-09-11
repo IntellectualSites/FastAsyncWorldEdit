@@ -623,6 +623,13 @@ public class Settings extends Config {
     public static class EXPERIMENTAL {
 
         @Comment({
+                "Undo operation batch size",
+                " - The size defines the number of changes read at once.",
+                " - Larger numbers might reduce overhead but increase latency for edits with only few changes.",
+                " - 0 means undo operations are not batched."})
+        public int UNDO_BATCH_SIZE = 128;
+
+        @Comment({
                 "[UNSAFE] Directly modify the region files. (OBSOLETE - USE ANVIL COMMANDS)",
                 " - IMPROPER USE CAN CAUSE WORLD CORRUPTION!",
         })

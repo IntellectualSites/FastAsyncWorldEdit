@@ -77,6 +77,11 @@ public class AbstractDelegateChangeSet extends AbstractChangeSet {
     }
 
     @Override
+    public ChangeExchangeCoordinator getCoordinatedChanges(final BlockBag blockBag, final int mode, final boolean dir) {
+        return parent.getCoordinatedChanges(blockBag, mode, dir);
+    }
+
+    @Override
     public Iterator<Change> getIterator(boolean redo) {
         return parent.getIterator(redo);
     }
