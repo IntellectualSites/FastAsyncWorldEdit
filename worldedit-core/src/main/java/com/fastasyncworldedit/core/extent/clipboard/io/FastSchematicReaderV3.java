@@ -89,7 +89,7 @@ public class FastSchematicReaderV3 implements ClipboardReader {
 
     private VersionedDataFixer dataFixer;
     private BlockVector3 offset;
-    private BlockVector3 origin;
+    private BlockVector3 origin = BlockVector3.ZERO;
     private BlockState[] blockPalette;
     private BiomeType[] biomePalette;
     private int dataVersion = -1;
@@ -144,21 +144,18 @@ public class FastSchematicReaderV3 implements ClipboardReader {
                             (LinCompoundTag) this.nbtInputStream.readTagPayload(NBTConstants.TYPE_COMPOUND, 2).toLinTag();
 
                     LinCompoundTag worldEditTag = metadataCompoundTag.findTag("WorldEdit", LinTagType.compoundTag());
-                    if (worldEditTag == null) {
-                        throw new IOException("`Metadata > WorldEdit` tag is invalid or missing.");
-                    }
+                    if (worldEditTag != null) { // allowed to be optional
+                        LinIntArrayTag originTag = worldEditTag.findTag("Origin", LinTagType.intArrayTag());
+                        if (originTag != null) { // allowed to be optional
+                            int[] parts = originTag.value();
 
-                    LinIntArrayTag originTag = worldEditTag.findTag("Origin", LinTagType.intArrayTag());
-                    if (originTag == null) {
-                        throw new IOException("`Metadata > WorldEdit > Origin` tag is invalid or missing.");
-                    }
+                            if (parts.length != 3) {
+                                throw new IOException("`Metadata > WorldEdit > Origin` int array length is invalid.");
+                            }
 
-                    int[] parts = originTag.value();
-                    if (parts.length != 3) {
-                        throw new IOException("`Metadata > WorldEdit > Origin` int array length is invalid.");
+                            this.origin = BlockVector3.at(parts[0], parts[1], parts[2]);
+                        }
                     }
-
-                    this.origin = BlockVector3.at(parts[0], parts[1], parts[2]);
                 }
                 case "Offset" -> {
                     this.dataInputStream.skipNBytes(4); // Array Length field (4 byte int)
