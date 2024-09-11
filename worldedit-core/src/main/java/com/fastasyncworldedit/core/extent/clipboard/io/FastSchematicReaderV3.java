@@ -40,6 +40,8 @@ import org.apache.logging.log4j.Logger;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.enginehub.linbus.tree.LinCompoundTag;
+import org.enginehub.linbus.tree.LinIntArrayTag;
+import org.enginehub.linbus.tree.LinTagType;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.io.BufferedInputStream;
@@ -87,6 +89,7 @@ public class FastSchematicReaderV3 implements ClipboardReader {
 
     private VersionedDataFixer dataFixer;
     private BlockVector3 offset;
+    private BlockVector3 origin;
     private BlockState[] blockPalette;
     private BiomeType[] biomePalette;
     private int dataVersion = -1;
@@ -136,6 +139,27 @@ public class FastSchematicReaderV3 implements ClipboardReader {
                     this.dataVersion = this.dataInputStream.readInt();
                     this.dataFixer = ReaderUtil.getVersionedDataFixer(this.dataVersion, platform, platform.getDataVersion());
                 }
+                case "Metadata" -> {
+                    LinCompoundTag metadataCompoundTag =
+                            (LinCompoundTag) this.nbtInputStream.readTagPayload(NBTConstants.TYPE_COMPOUND, 2).toLinTag();
+
+                    LinCompoundTag worldEditTag = metadataCompoundTag.findTag("WorldEdit", LinTagType.compoundTag());
+                    if (worldEditTag == null) {
+                        throw new IOException("`Metadata > WorldEdit` tag is invalid or missing.");
+                    }
+
+                    LinIntArrayTag originTag = worldEditTag.findTag("Origin", LinTagType.intArrayTag());
+                    if (originTag == null) {
+                        throw new IOException("`Metadata > WorldEdit > Origin` tag is invalid or missing.");
+                    }
+
+                    int[] parts = originTag.value();
+                    if (parts.length != 3) {
+                        throw new IOException("`Metadata > WorldEdit > Origin` int array length is invalid.");
+                    }
+
+                    this.origin = BlockVector3.at(parts[0], parts[1], parts[2]);
+                }
                 case "Offset" -> {
                     this.dataInputStream.skipNBytes(4); // Array Length field (4 byte int)
                     this.offset = BlockVector3.at(
@@ -172,7 +196,7 @@ public class FastSchematicReaderV3 implements ClipboardReader {
 
         clipboard.setOrigin(this.offset.multiply(-1));
         if (clipboard instanceof SimpleClipboard simpleClipboard && !this.offset.equals(BlockVector3.ZERO)) {
-            clipboard = new BlockArrayClipboard(simpleClipboard, this.offset);
+            clipboard = new BlockArrayClipboard(simpleClipboard, this.offset.add(this.origin));
         }
         return clipboard;
     }
