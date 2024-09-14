@@ -430,15 +430,17 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                         TextComponent.of("Could not get chunk at " + chunkX + "," + chunkZ + " whilst low memory: " + e.getMessage()));
             }
         }
+        final int finalCopyKey = copyKey;
         // Run immediately if possible
         if (chunk != null) {
-            return internalCall(set, finalizer, chunk, nmsWorld);
+            return internalCall(set, finalizer, finalCopyKey, chunk, nmsWorld);
         }
         // Submit via the STQE as that will help handle excessive queuing by waiting for the submission count to fall below the
         // target size
         nmsChunkFuture.thenApply(nmsChunk -> owner.submitTaskUnchecked(() -> (T) internalCall(
                 set,
                 finalizer,
+                finalCopyKey,
                 nmsChunk,
                 nmsWorld
         )));
@@ -448,7 +450,13 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
         return (T) (Future) CompletableFuture.completedFuture(null);
     }
 
-    private <T extends Future<T>> T internalCall(IChunkSet set, Runnable finalizer, LevelChunk nmsChunk, ServerLevel nmsWorld) {
+    private <T extends Future<T>> T internalCall(
+            IChunkSet set,
+            Runnable finalizer,
+            int copyKey,
+            LevelChunk nmsChunk,
+            ServerLevel nmsWorld
+    ) {
         try {
             PaperweightGetBlocks_Copy copy = createCopy ? new PaperweightGetBlocks_Copy(nmsChunk) : null;
             if (createCopy) {
