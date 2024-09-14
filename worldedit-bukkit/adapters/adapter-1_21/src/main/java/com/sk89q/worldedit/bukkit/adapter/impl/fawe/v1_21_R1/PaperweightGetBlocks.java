@@ -18,6 +18,7 @@ import com.fastasyncworldedit.core.queue.IQueueExtent;
 import com.fastasyncworldedit.core.queue.implementation.QueueHandler;
 import com.fastasyncworldedit.core.queue.implementation.blocks.CharGetBlocks;
 import com.fastasyncworldedit.core.util.MathMan;
+import com.fastasyncworldedit.core.util.MemUtil;
 import com.fastasyncworldedit.core.util.NbtUtils;
 import com.fastasyncworldedit.core.util.collection.AdaptedMap;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
@@ -411,7 +412,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
     }
 
     @Override
-    @SuppressWarnings("rawtypes")
+    @SuppressWarnings({"rawtypes", "unchecked"})
     public synchronized <T extends Future<T>> T call(IQueueExtent<? extends IChunk> owner, IChunkSet set, Runnable finalizer) {
         if (!callLock.isHeldByCurrentThread()) {
             throw new IllegalStateException("Attempted to call chunk GET but chunk was not call-locked.");
@@ -420,6 +421,15 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
         final ServerLevel nmsWorld = serverLevel;
         CompletableFuture<LevelChunk> nmsChunkFuture = ensureLoaded(nmsWorld, chunkX, chunkZ);
         LevelChunk chunk = nmsChunkFuture.getNow(null);
+        if (chunk == null && MemUtil.shouldBeginSlow()) {
+            try {
+                chunk = nmsChunkFuture.get(); // "Artificially" slow FAWE down if memory low as performing the
+            } catch (InterruptedException | ExecutionException e) {
+                LOGGER.error("Could not get chunk at {},{} whilst low memory", chunkX, chunkZ, e);
+                throw new FaweException(
+                        TextComponent.of("Could not get chunk at " + chunkX + "," + chunkZ + " whilst low memory: " + e.getMessage()));
+            }
+        }
         // Run immediately if possible
         if (chunk != null) {
             return internalCall(set, finalizer, chunk, nmsWorld);
