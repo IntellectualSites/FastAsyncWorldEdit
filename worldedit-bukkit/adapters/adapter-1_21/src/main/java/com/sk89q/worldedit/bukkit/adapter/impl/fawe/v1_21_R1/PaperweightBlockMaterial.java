@@ -1,11 +1,8 @@
 package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_21_R1;
 
-import com.google.common.base.Suppliers;
-import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_21_R1.nbt.PaperweightLazyCompoundTag;
+import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 import net.minecraft.core.BlockPos;
-import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.world.level.EmptyBlockGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
@@ -15,6 +12,8 @@ import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.material.PushReaction;
 import org.bukkit.craftbukkit.block.data.CraftBlockData;
 
+import javax.annotation.Nullable;
+
 public class PaperweightBlockMaterial implements BlockMaterial {
 
     private final Block block;
@@ -22,7 +21,7 @@ public class PaperweightBlockMaterial implements BlockMaterial {
     private final CraftBlockData craftBlockData;
     private final org.bukkit.Material craftMaterial;
     private final int opacity;
-    private final CompoundTag tile;
+    private final FaweCompoundTag tile;
 
     public PaperweightBlockMaterial(Block block) {
         this(block, block.defaultBlockState());
@@ -38,9 +37,9 @@ public class PaperweightBlockMaterial implements BlockMaterial {
                 BlockPos.ZERO,
                 blockState
         );
-        tile = tileEntity == null ? null : new PaperweightLazyCompoundTag(
-                Suppliers.memoize(() -> tileEntity.saveWithId(DedicatedServer.getServer().registryAccess()))
-        );
+        tile = tileEntity == null
+                ? null
+                : PaperweightGetBlocks.NMS_TO_TILE.apply(tileEntity);
     }
 
     public Block getBlock() {
@@ -164,7 +163,7 @@ public class PaperweightBlockMaterial implements BlockMaterial {
     }
 
     @Override
-    public CompoundTag getDefaultTile() {
+    public @Nullable FaweCompoundTag defaultTile() {
         return tile;
     }
 

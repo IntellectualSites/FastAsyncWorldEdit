@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.world.block;
 
+import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.fastasyncworldedit.core.registry.state.PropertyKey;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEditException;
@@ -262,15 +263,15 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
 
     @Override
     public void applyTileEntity(OutputExtent output, int x, int y, int z) {
-        CompoundTag nbt = getNbtData();
+        LinCompoundTag nbt = getNbt();
         if (nbt != null) {
-            output.setTile(x, y, z, nbt);
+            output.tile(x, y, z, FaweCompoundTag.of(nbt));
         }
     }
 
     @Override
     public BaseBlock withPropertyId(int propertyId) {
-        return getBlockType().withPropertyId(propertyId).toBaseBlock(getNbtData());
+        return getBlockType().withPropertyId(propertyId).toBaseBlock(getNbtReference());
     }
 
     @Override
@@ -285,7 +286,7 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
 
     @Override
     public <V> BaseBlock with(PropertyKey property, V value) {
-        return toImmutableState().with(property, value).toBaseBlock(getNbtData());
+        return toImmutableState().with(property, value).toBaseBlock(getNbtReference());
     }
 
     @Override

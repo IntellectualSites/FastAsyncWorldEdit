@@ -19,7 +19,10 @@
 
 package com.sk89q.worldedit.world.registry;
 
+import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.sk89q.jnbt.CompoundTag;
+
+import javax.annotation.Nullable;
 
 class SimpleBlockMaterial implements BlockMaterial {
 
@@ -251,8 +254,12 @@ class SimpleBlockMaterial implements BlockMaterial {
     }
 
     @Override
-    public CompoundTag getDefaultTile() {
-        return tile;
+    public @Nullable FaweCompoundTag defaultTile() {
+        // this implementation is very lazy, but SimpleBlockMaterial isn't really used anyway
+        if (tile != null) {
+            return FaweCompoundTag.of(tile.toLinTag());
+        }
+        return null;
     }
     //FAWE end
 

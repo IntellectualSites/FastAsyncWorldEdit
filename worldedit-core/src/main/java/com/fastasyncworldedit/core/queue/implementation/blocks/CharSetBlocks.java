@@ -4,16 +4,18 @@ import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.extent.processor.heightmap.HeightMapType;
 import com.fastasyncworldedit.core.math.BlockVector3ChunkMap;
+import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.fastasyncworldedit.core.queue.IChunkSet;
 import com.fastasyncworldedit.core.queue.Pool;
-import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 
+import javax.annotation.Nullable;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashSet;
@@ -36,8 +38,8 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
     public BiomeType[][] biomes;
     public char[][] light;
     public char[][] skyLight;
-    public BlockVector3ChunkMap<CompoundTag> tiles;
-    public HashSet<CompoundTag> entities;
+    public BlockVector3ChunkMap<FaweCompoundTag> tiles;
+    public HashSet<FaweCompoundTag> entities;
     public HashSet<UUID> entityRemoves;
     public EnumMap<HeightMapType, int[]> heightMaps;
     private boolean fastMode = false;
@@ -71,17 +73,17 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
     }
 
     @Override
-    public Map<BlockVector3, CompoundTag> getTiles() {
+    public Map<BlockVector3, FaweCompoundTag> tiles() {
         return tiles == null ? Collections.emptyMap() : tiles;
     }
 
     @Override
-    public CompoundTag getTile(int x, int y, int z) {
+    public @Nullable FaweCompoundTag tile(final int x, final int y, final int z) {
         return tiles == null ? null : tiles.get(x, y, z);
     }
 
     @Override
-    public Set<CompoundTag> getEntities() {
+    public Collection<FaweCompoundTag> entities() {
         return entities == null ? Collections.emptySet() : entities;
     }
 
@@ -132,12 +134,12 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
     }
 
     @Override
-    public boolean setTile(int x, int y, int z, CompoundTag tile) {
+    public boolean tile(final int x, final int y, final int z, final FaweCompoundTag tag) {
         if (tiles == null) {
             tiles = new BlockVector3ChunkMap<>();
         }
         updateSectionIndexRange(y >> 4);
-        tiles.put(x, y, z, tile);
+        tiles.put(x, y, z, tag);
         return true;
     }
 
@@ -259,7 +261,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
     }
 
     @Override
-    public void setEntity(CompoundTag tag) {
+    public void entity(final FaweCompoundTag tag) {
         if (entities == null) {
             entities = new HashSet<>();
         }

@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.world.registry;
 
+import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.sk89q.jnbt.CompoundTag;
 
 import javax.annotation.Nullable;
@@ -185,7 +186,19 @@ public interface BlockMaterial {
      * @return default tile entity data
      */
     @Nullable
-    CompoundTag getDefaultTile();
+    default CompoundTag getDefaultTile() {
+        final FaweCompoundTag faweCompoundTag = defaultTile();
+        if (faweCompoundTag == null) {
+            return null;
+        }
+        return new CompoundTag(faweCompoundTag.linTag());
+    }
+
+    /**
+     * {@return the default tile associated with this material, if any}
+     * @since TODO
+     */
+    @Nullable FaweCompoundTag defaultTile();
 
     /**
      * Get the map color.

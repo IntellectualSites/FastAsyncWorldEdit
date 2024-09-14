@@ -5,6 +5,7 @@ import com.fastasyncworldedit.bukkit.adapter.NMSRelighterFactory;
 import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.entity.LazyBaseEntity;
 import com.fastasyncworldedit.core.extent.processor.lighting.RelighterFactory;
+import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.fastasyncworldedit.core.queue.IBatchProcessor;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.implementation.packet.ChunkPacket;
@@ -97,6 +98,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.OptionalInt;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -127,6 +129,12 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
 
     public PaperweightFaweAdapter() throws NoSuchFieldException, NoSuchMethodException {
         this.parent = new com.sk89q.worldedit.bukkit.adapter.ext.fawe.v1_20_R3.PaperweightAdapter();
+    }
+
+    public Function<BlockEntity, FaweCompoundTag> blockEntityToCompoundTag() {
+        return blockEntity -> FaweCompoundTag.of(
+                () -> (LinCompoundTag) toNativeLin(blockEntity.saveWithId())
+        );
     }
 
     @Nullable

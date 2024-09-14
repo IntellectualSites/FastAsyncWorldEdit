@@ -10,6 +10,7 @@ import com.fastasyncworldedit.core.history.change.MutableTileChange;
 import com.fastasyncworldedit.core.internal.exception.FaweSmallEditUnsupportedException;
 import com.fastasyncworldedit.core.internal.io.FaweInputStream;
 import com.fastasyncworldedit.core.internal.io.FaweOutputStream;
+import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.fastasyncworldedit.core.util.MainUtil;
 import com.fastasyncworldedit.core.util.MathMan;
 import com.sk89q.jnbt.CompoundTag;
@@ -21,9 +22,12 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import org.enginehub.linbus.stream.LinBinaryIO;
+import org.enginehub.linbus.tree.LinRootEntry;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.DataOutput;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -398,56 +402,44 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
     }
 
     @Override
-    public void addTileCreate(CompoundTag tag) {
-        if (tag == null) {
-            return;
-        }
+    public void addTileCreate(final FaweCompoundTag tag) {
         blockSize++;
         try {
-            NBTOutputStream nbtos = getTileCreateOS();
-            nbtos.writeTag(tag);
+            DataOutput nbtos = getTileCreateOS();
+            LinBinaryIO.write(nbtos, new LinRootEntry("tile-create", tag.linTag()));
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     @Override
-    public void addTileRemove(CompoundTag tag) {
-        if (tag == null) {
-            return;
-        }
+    public void addTileRemove(final FaweCompoundTag tag) {
         blockSize++;
         try {
-            NBTOutputStream nbtos = getTileRemoveOS();
-            nbtos.writeTag(tag);
+            DataOutput nbtos = getTileRemoveOS();
+            LinBinaryIO.write(nbtos, new LinRootEntry("tile-remove", tag.linTag()));
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     @Override
-    public void addEntityRemove(CompoundTag tag) {
-        if (tag == null) {
-            return;
-        }
+    public void addEntityRemove(final FaweCompoundTag tag) {
         blockSize++;
         try {
-            NBTOutputStream nbtos = getEntityRemoveOS();
-            nbtos.writeTag(tag);
+            DataOutput nbtos = getEntityRemoveOS();
+            LinBinaryIO.write(nbtos, new LinRootEntry("entity-remove", tag.linTag()));
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     @Override
-    public void addEntityCreate(CompoundTag tag) {
-        if (tag == null) {
-            return;
-        }
+    public void addEntityCreate(final FaweCompoundTag tag) {
         blockSize++;
         try {
-            NBTOutputStream nbtos = getEntityCreateOS();
-            nbtos.writeTag(tag);
+            DataOutput nbtos = getEntityCreateOS();
+            LinBinaryIO.write(nbtos, new LinRootEntry("entity-create", tag.linTag()));
         } catch (IOException e) {
             e.printStackTrace();
         }

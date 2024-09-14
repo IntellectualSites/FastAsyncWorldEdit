@@ -1,5 +1,7 @@
 package com.fastasyncworldedit.core.world.block;
 
+import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
+import com.fastasyncworldedit.core.queue.IBlocks;
 import com.fastasyncworldedit.core.queue.ITileInput;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -11,9 +13,21 @@ public enum CompoundInput {
         public BaseBlock get(BlockState state, ITileInput input, int x, int y, int z) {
             return state.toBaseBlock(input.getTile(x, y, z));
         }
+
+        @Override
+        public BaseBlock get(final BlockState state, final IBlocks blocks, final int x, final int y, final int z) {
+            final FaweCompoundTag tile = blocks.tile(x, y, z);
+            assert tile != null : "container without tile entity";
+            return state.toBaseBlock(tile.linTag());
+        }
     };
 
+    @Deprecated(forRemoval = true, since = "TODO")
     public BaseBlock get(BlockState state, ITileInput input, int x, int y, int z) {
+        return state.toBaseBlock();
+    }
+
+    public BaseBlock get(BlockState state, IBlocks blocks, int x, int y, int z) {
         return state.toBaseBlock();
     }
 }

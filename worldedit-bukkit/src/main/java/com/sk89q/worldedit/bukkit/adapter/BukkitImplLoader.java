@@ -165,9 +165,11 @@ public class BukkitImplLoader {
      * @throws AdapterLoadException thrown if no adapter could be found
      */
     public BukkitImplAdapter loadAdapter() throws AdapterLoadException {
+        // FAWE - do not initialize classes on lookup
+        final ClassLoader classLoader = this.getClass().getClassLoader();
         for (String className : adapterCandidates) {
             try {
-                Class<?> cls = Class.forName(className);
+                Class<?> cls = Class.forName(className, false, classLoader);
                 if (cls.isSynthetic()) {
                     continue;
                 }

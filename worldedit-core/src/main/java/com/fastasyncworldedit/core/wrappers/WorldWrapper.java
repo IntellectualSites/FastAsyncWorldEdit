@@ -1,5 +1,6 @@
 package com.fastasyncworldedit.core.wrappers;
 
+import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.implementation.packet.ChunkPacket;
 import com.fastasyncworldedit.core.util.ExtentTraverser;
@@ -187,8 +188,8 @@ public class WorldWrapper extends AbstractWorld {
     }
 
     @Override
-    public boolean setTile(int x, int y, int z, CompoundTag tile) throws WorldEditException {
-        return parent.setTile(x, y, z, tile);
+    public boolean tile(int x, int y, int z, FaweCompoundTag tile) throws WorldEditException {
+        return parent.tile(x, y, z, tile);
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.fastasyncworldedit.core.queue;
 
 import com.fastasyncworldedit.core.extent.processor.heightmap.HeightMapType;
+import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.extent.InputExtent;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -46,7 +47,26 @@ public interface IChunkGet extends IBlocks, Trimable, InputExtent, ITileInput {
 
     <T extends Future<T>> T call(IChunkSet set, Runnable finalize);
 
-    CompoundTag getEntity(UUID uuid);
+    @Deprecated(forRemoval = true, since = "TODO")
+    default CompoundTag getEntity(UUID uuid) {
+        final FaweCompoundTag entity = entity(uuid);
+        if (entity == null) {
+            return null;
+        }
+        return new CompoundTag(entity.linTag());
+    }
+
+    /**
+     * {@return the compound tag describing the entity with the given UUID, if any}
+     * @param uuid the uuid of the entity
+     */
+    @Nullable FaweCompoundTag entity(UUID uuid);
+
+    @Override
+    @Deprecated(forRemoval = true, since = "TODO")
+    default CompoundTag getTile(int x, int y, int z) {
+        return IBlocks.super.getTile(x, y, z);
+    }
 
     boolean isCreateCopy();
 
