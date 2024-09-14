@@ -123,6 +123,8 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
     private static Field LEVEL_CHUNK_ENTITIES;
     private static Field SERVER_LEVEL_ENTITY_MANAGER;
 
+    static final MethodHandle PALETTED_CONTAINER_GET;
+
     static {
         final MethodHandles.Lookup lookup = MethodHandles.lookup();
         try {
@@ -212,6 +214,13 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             } catch (NoSuchFieldException ignored) {
             }
             POST_CHUNK_REWRITE = chunkRewrite;
+
+            Method palettedContaienrGet = PalettedContainer.class.getDeclaredMethod(
+                    Refraction.pickName("get", "a"),
+                    int.class
+            );
+            palettedContaienrGet.setAccessible(true);
+            PALETTED_CONTAINER_GET = lookup.unreflect(palettedContaienrGet);
         } catch (RuntimeException | Error e) {
             throw e;
         } catch (Exception e) {
