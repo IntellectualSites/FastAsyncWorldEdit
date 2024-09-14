@@ -50,6 +50,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -645,7 +646,7 @@ public enum FaweCache implements Trimable {
      */
     public ThreadPoolExecutor newBlockingExecutor(String name, Logger logger) {
         int nThreads = Settings.settings().QUEUE.PARALLEL_THREADS;
-        ArrayBlockingQueue<Runnable> queue = new ArrayBlockingQueue<>(nThreads, true);
+        LinkedBlockingQueue<Runnable> queue = new LinkedBlockingQueue<>();
         return new ThreadPoolExecutor(nThreads, nThreads,
                 0L, TimeUnit.MILLISECONDS, queue,
                 new ThreadFactoryBuilder().setNameFormat(name).build(),

@@ -7,11 +7,14 @@ import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.extent.processor.heightmap.HeightMapType;
+import com.fastasyncworldedit.core.internal.exception.FaweException;
 import com.fastasyncworldedit.core.math.BitArrayUnstretched;
 import com.fastasyncworldedit.core.math.IntPair;
 import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
+import com.fastasyncworldedit.core.queue.IChunk;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.IChunkSet;
+import com.fastasyncworldedit.core.queue.IQueueExtent;
 import com.fastasyncworldedit.core.queue.implementation.QueueHandler;
 import com.fastasyncworldedit.core.queue.implementation.blocks.CharGetBlocks;
 import com.fastasyncworldedit.core.util.MathMan;
@@ -24,6 +27,7 @@ import com.sk89q.worldedit.internal.Constants;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.util.SideEffect;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
@@ -86,7 +90,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -198,7 +204,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
             try {
                 fillLightNibble(light, LightLayer.BLOCK, minSectionPosition, maxSectionPosition);
             } catch (Throwable e) {
-                e.printStackTrace();
+                LOGGER.error("Error setting lighting to get", e);
             }
         }
     }
@@ -210,7 +216,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
             try {
                 fillLightNibble(light, LightLayer.SKY, minSectionPosition, maxSectionPosition);
             } catch (Throwable e) {
-                e.printStackTrace();
+                LOGGER.error("Error setting sky lighting to get", e);
             }
         }
     }
@@ -400,26 +406,42 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
         entity.discard();
     }
 
-    public LevelChunk ensureLoaded(ServerLevel nmsWorld, int chunkX, int chunkZ) {
+    public CompletableFuture<LevelChunk> ensureLoaded(ServerLevel nmsWorld, int chunkX, int chunkZ) {
         return PaperweightPlatformAdapter.ensureLoaded(nmsWorld, chunkX, chunkZ);
     }
 
     @Override
     @SuppressWarnings("rawtypes")
-    public synchronized <T extends Future<T>> T call(IChunkSet set, Runnable finalizer) {
+    public synchronized <T extends Future<T>> T call(IQueueExtent<? extends IChunk> owner, IChunkSet set, Runnable finalizer) {
         if (!callLock.isHeldByCurrentThread()) {
             throw new IllegalStateException("Attempted to call chunk GET but chunk was not call-locked.");
         }
         forceLoadSections = false;
-        LevelChunk nmsChunk = ensureLoaded(serverLevel, chunkX, chunkZ);
-        PaperweightGetBlocks_Copy copy = createCopy ? new PaperweightGetBlocks_Copy(nmsChunk) : null;
-        if (createCopy) {
-            if (copies.containsKey(copyKey)) {
-                throw new IllegalStateException("Copy key already used.");
-            }
-            copies.put(copyKey, copy);
+        final ServerLevel nmsWorld = serverLevel;
+        CompletableFuture<LevelChunk> nmsChunkFuture = ensureLoaded(nmsWorld, chunkX, chunkZ);
+        LevelChunk chunk = nmsChunkFuture.getNow(null);
+        // Run immediately if possible
+        if (chunk != null) {
+            return internalCall(set, finalizer, chunk, nmsWorld);
         }
+        nmsChunkFuture.thenApply(nmsChunk -> owner.submitTaskUnchecked(() -> (T) internalCall(
+                set,
+                finalizer,
+                nmsChunk,
+                nmsWorld
+        )));
+        return (T) (Future) CompletableFuture.completedFuture(null);
+    }
+
+    private <T extends Future<T>> T internalCall(IChunkSet set, Runnable finalizer, LevelChunk nmsChunk, ServerLevel nmsWorld) {
         try {
+            PaperweightGetBlocks_Copy copy = createCopy ? new PaperweightGetBlocks_Copy(nmsChunk) : null;
+            if (createCopy) {
+                if (copies.containsKey(copyKey)) {
+                    throw new IllegalStateException("Copy key already used.");
+                }
+                copies.put(copyKey, copy);
+            }
             // Remove existing tiles. Create a copy so that we can remove blocks
             Map<BlockPos, BlockEntity> chunkTiles = new HashMap<>(nmsChunk.getBlockEntities());
             List<BlockEntity> beacons = null;
@@ -491,7 +513,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                                             biomeData
                                     );
                                     if (PaperweightPlatformAdapter.setSectionAtomic(
-                                            serverLevel.getWorld().getName(),
+                                            nmsWorld.getWorld().getName(),
                                             chunkPos,
                                             levelChunkSections,
                                             null,
@@ -567,7 +589,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                                     biomeData
                             );
                             if (PaperweightPlatformAdapter.setSectionAtomic(
-                                    serverLevel.getWorld().getName(),
+                                    nmsWorld.getWorld().getName(),
                                     chunkPos,
                                     levelChunkSections,
                                     null,
@@ -631,7 +653,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                                     biomeData != null ? biomeData : (PalettedContainer<Holder<Biome>>) existingSection.getBiomes()
                             );
                             if (!PaperweightPlatformAdapter.setSectionAtomic(
-                                    serverLevel.getWorld().getName(),
+                                    nmsWorld.getWorld().getName(),
                                     chunkPos,
                                     levelChunkSections,
                                     existingSection,
@@ -706,7 +728,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                         }
                         if (Settings.settings().EXPERIMENTAL.REMOVE_ENTITY_FROM_WORLD_ON_CHUNK_FAIL) {
                             for (UUID uuid : entityRemoves) {
-                                Entity entity = serverLevel.getEntities().get(uuid);
+                                Entity entity = nmsWorld.getEntities().get(uuid);
                                 if (entity != null) {
                                     removeEntity(entity);
                                 }
@@ -745,7 +767,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
 
                             EntityType<?> type = EntityType.byString(id).orElse(null);
                             if (type != null) {
-                                Entity entity = type.create(serverLevel);
+                                Entity entity = type.create(nmsWorld);
                                 if (entity != null) {
                                     final CompoundTag tag = (CompoundTag) adapter.fromNativeLin(linTag);
                                     for (final String name : Constants.NO_COPY_ENTITY_NBT_FIELDS) {
@@ -754,11 +776,11 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                                     entity.load(tag);
                                     entity.absMoveTo(x, y, z, yaw, pitch);
                                     entity.setUUID(NbtUtils.uuid(nativeTag));
-                                    if (!serverLevel.addFreshEntity(entity, CreatureSpawnEvent.SpawnReason.CUSTOM)) {
+                                    if (!nmsWorld.addFreshEntity(entity, CreatureSpawnEvent.SpawnReason.CUSTOM)) {
                                         LOGGER.warn(
                                                 "Error creating entity of type `{}` in world `{}` at location `{},{},{}`",
                                                 id,
-                                                serverLevel.getWorld().getName(),
+                                                nmsWorld.getWorld().getName(),
                                                 x,
                                                 y,
                                                 z
@@ -788,11 +810,11 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                             final int z = blockHash.z() + bz;
                             final BlockPos pos = new BlockPos(x, y, z);
 
-                            synchronized (serverLevel) {
-                                BlockEntity tileEntity = serverLevel.getBlockEntity(pos);
+                            synchronized (nmsWorld) {
+                                BlockEntity tileEntity = nmsWorld.getBlockEntity(pos);
                                 if (tileEntity == null || tileEntity.isRemoved()) {
-                                    serverLevel.removeBlockEntity(pos);
-                                    tileEntity = serverLevel.getBlockEntity(pos);
+                                    nmsWorld.removeBlockEntity(pos);
+                                    tileEntity = nmsWorld.getBlockEntity(pos);
                                 }
                                 if (tileEntity != null) {
                                     final CompoundTag tag = (CompoundTag) adapter.fromNativeLin(nativeTag.linTag());
@@ -849,7 +871,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                                 return queueHandler.async(callback, null);
                             }
                         } catch (Throwable e) {
-                            e.printStackTrace();
+                            LOGGER.error("Error performing final chunk calling at {},{}", chunkX, chunkZ, e);
                             throw e;
                         }
                     };
@@ -867,7 +889,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
             }
             return null;
         } catch (Throwable e) {
-            e.printStackTrace();
+            LOGGER.error("Error calling chunk at {},{}", chunkX, chunkZ, e);
             return null;
         } finally {
             forceLoadSections = true;
@@ -993,7 +1015,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                 }
                 return data;
             } catch (IllegalAccessException | InterruptedException e) {
-                e.printStackTrace();
+                LOGGER.error("Could not read block data from palette", e);
                 throw new RuntimeException(e);
             } finally {
                 lock.release();
@@ -1035,7 +1057,16 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
             synchronized (this) {
                 levelChunk = this.levelChunk;
                 if (levelChunk == null) {
-                    this.levelChunk = levelChunk = ensureLoaded(this.serverLevel, chunkX, chunkZ);
+                    try {
+                        this.levelChunk = levelChunk = ensureLoaded(this.serverLevel, chunkX, chunkZ).get();
+                    } catch (InterruptedException | ExecutionException e) {
+                        LOGGER.error("Could not get chunk at {},{}", chunkX, chunkZ, e);
+                        throw new FaweException(
+                                TextComponent.of("Could not get chunk at " + chunkX + "," + chunkZ + ": " + e.getMessage()),
+                                FaweException.Type.OTHER,
+                                false
+                        );
+                    }
                 }
             }
         }
