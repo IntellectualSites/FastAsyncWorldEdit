@@ -60,7 +60,7 @@ public class TreePlanter implements BlockTool {
             @Nullable Direction face
     ) {
 
-        try (EditSession editSession = session.createEditSession(player, null, true)) {
+        try (EditSession editSession = session.createEditSession(player, null)) {
             try {
                 boolean successful = false;
 

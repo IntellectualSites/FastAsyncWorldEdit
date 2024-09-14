@@ -463,7 +463,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      */
     @Deprecated
     public long getBlockChangeLimit() {
-        return originalLimit.MAX_CHANGES;
+        return originalLimit.MAX_CHANGES.get();
     }
 
     /**
@@ -472,7 +472,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * @param limit the limit (&gt;= 0) or -1 for no limit
      */
     public void setBlockChangeLimit(long limit) {
-        this.limit.MAX_CHANGES = limit;
+        this.limit.MAX_CHANGES.set(limit);
     }
 
     /**
@@ -1284,8 +1284,8 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         Operations.completeBlindly(commit());
         // Check fails
         FaweLimit used = getLimitUsed();
-        if (used.MAX_FAILS > 0) {
-            if (used.MAX_CHANGES > 0 || used.MAX_ENTITIES > 0) {
+        if (used.MAX_FAILS.get() > 0) {
+            if (used.MAX_CHANGES.get() > 0 || used.MAX_ENTITIES.get() > 0) {
                 actor.print(Caption.of("fawe.error.worldedit.some.fails", used.MAX_FAILS));
             } else if (new ExtentTraverser<>(getExtent()).findAndGet(FaweRegionExtent.class) != null) {
                 actor.print(Caption.of("fawe.cancel.reason.outside.region"));

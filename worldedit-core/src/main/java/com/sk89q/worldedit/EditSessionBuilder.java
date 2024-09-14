@@ -104,7 +104,6 @@ public final class EditSessionBuilder {
     private Extent extent;
     private boolean compiled;
     private boolean wrapped;
-    private boolean expectSynchronousSetting = false;
 
     private @Nullable
     World world;
@@ -416,15 +415,6 @@ public final class EditSessionBuilder {
         return setDirty();
     }
 
-    public EditSessionBuilder expectSynchronousSetting(boolean expectSynchronousSetting) {
-        this.expectSynchronousSetting = expectSynchronousSetting;
-        return setDirty();
-    }
-
-    public boolean isExpectingSynchronousSetting() {
-        return this.expectSynchronousSetting;
-    }
-
     /**
      * Compile the builder to the settings given. Prepares history, limits, lighting, etc.
      */
@@ -645,9 +635,9 @@ public final class EditSessionBuilder {
                 };
             }
             if (limit != null && !limit.isUnlimited()) {
-                this.extent = new LimitExtent(this.extent, limit, onErrorMessage, placeChunks && combineStages, expectSynchronousSetting);
+                this.extent = new LimitExtent(this.extent, limit, onErrorMessage, placeChunks && combineStages);
                 // Only process if we're not necessarily going to catch tiles via Extent#setBlock, e.g. because using PQE methods
-                if (placeChunks && combineStages && !expectSynchronousSetting) {
+                if (placeChunks && combineStages) {
                     queue.addProcessor((LimitExtent) this.extent);
                 }
             }

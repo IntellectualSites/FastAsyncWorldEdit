@@ -67,7 +67,7 @@ public class ProvideBindings extends Bindings {
         EditSessionHolder holder = context.injectedValue(Key.of(EditSessionHolder.class)).orElse(null);
         EditSession editSession = holder != null ? holder.session() : null;
         if (editSession == null) {
-            editSession = localSession.createEditSession(actor, command, synchronousSetting);
+            editSession = localSession.createEditSession(actor, command);
             editSession.enableStandardMode();
         } else {
             LimitExtent limitExtent = new ExtentTraverser<>(editSession).findAndGet(LimitExtent.class);

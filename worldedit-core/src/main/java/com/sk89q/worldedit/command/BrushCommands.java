@@ -1414,7 +1414,7 @@ public class BrushCommands {
 
         //FAWE start
         FaweLimit limit = Settings.settings().getLimit(player);
-        iterations = Math.min(limit.MAX_ITERATIONS, iterations);
+        iterations = Math.min(limit.MAX_ITERATIONS.get(), iterations);
         //FAWE end
 
         set(context, new SmoothBrush(iterations, mask), "worldedit.brush.smooth").setSize(radius);
@@ -1452,7 +1452,7 @@ public class BrushCommands {
 
         //FAWE start
         FaweLimit limit = Settings.settings().getLimit(player);
-        iterations = Math.min(limit.MAX_ITERATIONS, iterations);
+        iterations = Math.min(limit.MAX_ITERATIONS.get(), iterations);
         //FAWE end
 
         set(context, new SnowSmoothBrush(iterations, snowBlockCount, mask), "worldedit.brush.snowsmooth").setSize(radius);

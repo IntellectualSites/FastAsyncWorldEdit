@@ -62,7 +62,7 @@ public class SinglePickaxe implements BlockTool {
             return false;
         }
 
-        try (EditSession editSession = session.createEditSession(player, null, true)) {
+        try (EditSession editSession = session.createEditSession(player, null)) {
             try {
                 editSession.getSurvivalExtent().setToolUse(config.superPickaxeDrop);
                 editSession.setBlock(blockPoint, BlockTypes.AIR.getDefaultState());
