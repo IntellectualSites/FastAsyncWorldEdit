@@ -135,6 +135,7 @@ public class Fawe {
             } catch (Throwable ignored) {
             }
         }, 0);
+        TaskManager.taskManager().repeatAsync(() -> MemUtil.checkAndSetApproachingLimit(), 1);
 
         TaskManager.taskManager().repeat(timer, 1);
         uuidKeyQueuedExecutorService = new KeyQueuedExecutorService<>(new ThreadPoolExecutor(
@@ -413,11 +414,16 @@ public class Fawe {
             final NotificationEmitter ne = (NotificationEmitter) memBean;
 
             ne.addNotificationListener((notification, handback) -> {
+                LOGGER.info("Notification");
                 final long heapSize = Runtime.getRuntime().totalMemory();
                 final long heapMaxSize = Runtime.getRuntime().maxMemory();
                 if (heapSize < heapMaxSize) {
                     return;
                 }
+                LOGGER.info("NNNNNNNNNNNNNNNNNNNNNNNNNNNN");
+                LOGGER.info("NNNNNNNNNNNNNNNNNNNNNNNNNNNN");
+                LOGGER.info("NNNNNNNNNNNNNNNNNNNNNNNNNNNN");
+                LOGGER.info("JJJJJJJJJJJJJJJJJJJJJJJJJJJJ");
                 MemUtil.memoryLimitedTask();
             }, null, null);
 
