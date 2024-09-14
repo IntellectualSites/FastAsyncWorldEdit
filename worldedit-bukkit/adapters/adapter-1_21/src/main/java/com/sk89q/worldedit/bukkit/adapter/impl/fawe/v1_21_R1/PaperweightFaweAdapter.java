@@ -19,6 +19,7 @@ import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_21_R1.nbt.PaperweightLazyCompoundTag;
+import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_21_R1.regen.PaperweightRegen;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.internal.block.BlockStateIdAccess;
@@ -565,7 +566,7 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
 
     @Override
     public boolean regenerate(org.bukkit.World bukkitWorld, Region region, Extent target, RegenOptions options) throws Exception {
-        throw new UnsupportedOperationException("Regen support for 1.21 not yet implemented.");
+        return new PaperweightRegen(bukkitWorld, region, target, options).regenerate();
     }
 
     @Override
