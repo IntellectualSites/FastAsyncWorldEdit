@@ -424,12 +424,17 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
         if (chunk != null) {
             return internalCall(set, finalizer, chunk, nmsWorld);
         }
+        // Submit via the STQE as that will help handle excessive queuing by waiting for the submission count to fall below the
+        // target size
         nmsChunkFuture.thenApply(nmsChunk -> owner.submitTaskUnchecked(() -> (T) internalCall(
                 set,
                 finalizer,
                 nmsChunk,
                 nmsWorld
         )));
+        // If we have re-submitted, return a completed future to prevent potential deadlocks where a future reliant on the
+        // above submission is halting the BlockingExecutor, and preventing the above task from actually running. The futures
+        // submitted above will still be added to the STQE submissions.
         return (T) (Future) CompletableFuture.completedFuture(null);
     }
 
