@@ -72,7 +72,7 @@ public interface OutputExtent {
     /**
      * @deprecated use {@link #tile(int, int, int, FaweCompoundTag)} instead
      */
-    @Deprecated(forRemoval = true, since = "TODO")
+    @Deprecated(forRemoval = true, since = "2.11.2")
     default boolean setTile(int x, int y, int z, CompoundTag tile) throws WorldEditException {
         return tile(x, y, z, FaweCompoundTag.of(tile.toLinTag()));
     }
@@ -84,7 +84,7 @@ public interface OutputExtent {
      * @param z the z position
      * @param tile the tile/block entity to set
      * @return {@code true} if the tile/block entity was placed
-     * @since TODO
+     * @since 2.11.2
      */
     boolean tile(int x, int y, int z, FaweCompoundTag tile) throws WorldEditException;
 

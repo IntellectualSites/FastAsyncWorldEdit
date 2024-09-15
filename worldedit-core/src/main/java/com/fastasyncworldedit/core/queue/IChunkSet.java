@@ -38,7 +38,7 @@ public interface IChunkSet extends IBlocks, OutputExtent {
     boolean isEmpty();
 
     @Override
-    @Deprecated(forRemoval = true, since = "TODO")
+    @Deprecated(forRemoval = true, since = "2.11.2")
     default boolean setTile(int x, int y, int z, CompoundTag tile) throws WorldEditException {
         return tile(x, y, z, FaweCompoundTag.of(tile.toLinTag()));
     }
@@ -60,7 +60,7 @@ public interface IChunkSet extends IBlocks, OutputExtent {
 
     void setFullBright(int layer);
 
-    @Deprecated(forRemoval = true, since = "TODO")
+    @Deprecated(forRemoval = true, since = "2.11.2")
     default void setEntity(CompoundTag tag) {
         entity(FaweCompoundTag.of(tag::toLinTag));
     }

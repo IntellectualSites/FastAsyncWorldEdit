@@ -196,7 +196,7 @@ public interface BlockMaterial {
 
     /**
      * {@return the default tile associated with this material, if any}
-     * @since TODO
+     * @since 2.11.2
      */
     @Nullable FaweCompoundTag defaultTile();
 

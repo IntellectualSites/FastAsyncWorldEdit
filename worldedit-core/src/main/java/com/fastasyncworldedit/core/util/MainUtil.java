@@ -428,7 +428,7 @@ public class MainUtil {
      * @deprecated use {@link NbtUtils#withPosition} instead
      */
     @Nonnull
-    @Deprecated(forRemoval = true, since = "TODO")
+    @Deprecated(forRemoval = true, since = "2.11.2")
     public static CompoundTag setPosition(@Nonnull CompoundTag tag, int x, int y, int z) {
         Map<String, Tag<?, ?>> value = new HashMap<>(tag.getValue());
         value.put("x", new IntTag(x));
@@ -446,7 +446,7 @@ public class MainUtil {
      * @deprecated use {@link NbtUtils#withEntityInfo(LinCompoundTag, Entity)} instead
      */
     @Nonnull
-    @Deprecated(forRemoval = true, since = "TODO")
+    @Deprecated(forRemoval = true, since = "2.11.2")
     public static CompoundTag setEntityInfo(@Nonnull CompoundTag tag, @Nonnull Entity entity) {
         Map<String, Tag<?, ?>> map = new HashMap<>(tag.getValue());
         map.put("Id", new StringTag(entity.getState().getType().id()));

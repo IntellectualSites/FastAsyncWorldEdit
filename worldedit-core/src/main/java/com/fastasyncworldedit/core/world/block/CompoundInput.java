@@ -21,7 +21,7 @@ public enum CompoundInput {
         }
     };
 
-    @Deprecated(forRemoval = true, since = "TODO")
+    @Deprecated(forRemoval = true, since = "2.11.2")
     public BaseBlock get(BlockState state, ITileInput input, int x, int y, int z) {
         return state.toBaseBlock();
     }

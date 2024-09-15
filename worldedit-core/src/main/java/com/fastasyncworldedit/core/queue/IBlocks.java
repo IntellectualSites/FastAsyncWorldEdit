@@ -59,14 +59,14 @@ public interface IBlocks extends Trimable {
 
     BlockState getBlock(int x, int y, int z);
 
-    @Deprecated(forRemoval = true, since = "TODO")
+    @Deprecated(forRemoval = true, since = "2.11.2")
     default Map<BlockVector3, CompoundTag> getTiles() {
         return AdaptedMap.immutable(tiles(), pos -> pos, IBlocks::toCompoundTag);
     }
 
     Map<BlockVector3, FaweCompoundTag> tiles();
 
-    @Deprecated(forRemoval = true, since = "TODO")
+    @Deprecated(forRemoval = true, since = "2.11.2")
     default CompoundTag getTile(int x, int y, int z) {
         final FaweCompoundTag tile = tile(x, y, z);
         if (tile == null) {
@@ -83,7 +83,7 @@ public interface IBlocks extends Trimable {
     @Nullable
     FaweCompoundTag tile(int x, int y, int z);
 
-    @Deprecated(forRemoval = true, since = "TODO")
+    @Deprecated(forRemoval = true, since = "2.11.2")
     default Set<CompoundTag> getEntities() {
         return entities().stream()
                 .map(IBlocks::toCompoundTag)

@@ -174,7 +174,7 @@ public final class NBTUtils {
      * @since 2.4.0
      * @deprecated use {@link com.fastasyncworldedit.core.util.NbtUtils#addUUIDToMap(Map, UUID)} instead
      */
-    @Deprecated(forRemoval = true, since = "TODO")
+    @Deprecated(forRemoval = true, since = "2.11.2")
     public static void addUUIDToMap(Map<String, Tag<?, ?>> map, UUID uuid) {
         int[] uuidArray = new int[4];
         uuidArray[0] = (int) (uuid.getMostSignificantBits() >> 32);

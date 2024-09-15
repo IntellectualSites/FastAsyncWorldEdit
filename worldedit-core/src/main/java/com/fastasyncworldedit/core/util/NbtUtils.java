@@ -96,7 +96,7 @@ public final class NbtUtils {
      *
      * @param compoundTag the compound tag to extract uuid information from
      * @return the extracted UUID
-     * @since TODO
+     * @since 2.11.2
      */
     public static UUID uuid(FaweCompoundTag compoundTag) {
         final LinCompoundTag linTag = compoundTag.linTag();
@@ -139,7 +139,7 @@ public final class NbtUtils {
      * @param y   New Y coordinate
      * @param z   New Z coordinate
      * @return New tag
-     * @since TODO
+     * @since 2.11.2
      */
     public static @Nonnull LinCompoundTag withPosition(@Nonnull LinCompoundTag tag, int x, int y, int z) {
         return tag.toBuilder()
@@ -157,7 +157,7 @@ public final class NbtUtils {
      * @param y   New Y coordinate
      * @param z   New Z coordinate
      * @return New tag
-     * @since TODO
+     * @since 2.11.2
      */
     public static @Nonnull FaweCompoundTag withPosition(@Nonnull FaweCompoundTag tag, int x, int y, int z) {
         return FaweCompoundTag.of(withPosition(tag.linTag(), x, y, z));
@@ -168,7 +168,7 @@ public final class NbtUtils {
      *
      * @param tag    the tag to copy
      * @param entity the entity to use the Id and the Pos from
-     * @since TODO
+     * @since 2.11.2
      */
     public static @Nonnull LinCompoundTag withEntityInfo(@Nonnull LinCompoundTag tag, @Nonnull Entity entity) {
         final LinCompoundTag.Builder builder = tag.toBuilder()
@@ -191,7 +191,7 @@ public final class NbtUtils {
      *
      * @param map  the map to insert to
      * @param uuid the uuid to insert
-     * @since TODO
+     * @since 2.11.2
      */
     public static void addUUIDToMap(Map<String, LinTag<?>> map, UUID uuid) {
         int[] uuidArray = new int[4];

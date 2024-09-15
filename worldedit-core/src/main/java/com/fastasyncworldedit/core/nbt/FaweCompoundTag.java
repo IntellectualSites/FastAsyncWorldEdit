@@ -7,7 +7,7 @@ import org.enginehub.linbus.tree.LinCompoundTag;
 
 /**
  * A wrapper around compound tags, potentially lazily transformed.
- * @since TODO
+ * @since 2.11.2
  */
 public sealed interface FaweCompoundTag permits EagerFaweCompoundTag, LazyFaweCompoundTag {
 

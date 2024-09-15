@@ -209,7 +209,7 @@ public class BlockArrayClipboard implements Clipboard {
     }
 
 
-    @Deprecated(forRemoval = true, since = "TODO")
+    @Deprecated(forRemoval = true, since = "2.11.2")
     public boolean setTile(BlockVector3 position, CompoundTag tag) {
         return tile(position.x(), position.y(), position.z(), FaweCompoundTag.of(tag.toLinTag()));
     }

@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * @since TODO
+ * @since 2.11.2
  */
 @ApiStatus.Internal
 public interface ChangePopulator<C extends Change> {

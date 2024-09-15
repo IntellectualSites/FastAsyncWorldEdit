@@ -47,7 +47,7 @@ public interface IChunkGet extends IBlocks, Trimable, InputExtent, ITileInput {
 
     <T extends Future<T>> T call(IChunkSet set, Runnable finalize);
 
-    @Deprecated(forRemoval = true, since = "TODO")
+    @Deprecated(forRemoval = true, since = "2.11.2")
     default CompoundTag getEntity(UUID uuid) {
         final FaweCompoundTag entity = entity(uuid);
         if (entity == null) {
@@ -63,7 +63,7 @@ public interface IChunkGet extends IBlocks, Trimable, InputExtent, ITileInput {
     @Nullable FaweCompoundTag entity(UUID uuid);
 
     @Override
-    @Deprecated(forRemoval = true, since = "TODO")
+    @Deprecated(forRemoval = true, since = "2.11.2")
     default CompoundTag getTile(int x, int y, int z) {
         return IBlocks.super.getTile(x, y, z);
     }

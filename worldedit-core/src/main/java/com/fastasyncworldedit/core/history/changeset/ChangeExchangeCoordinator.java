@@ -7,7 +7,7 @@ import java.util.concurrent.Exchanger;
 import java.util.function.BiConsumer;
 
 /**
- * @since TODO
+ * @since 2.11.2
  */
 @ApiStatus.Internal
 public class ChangeExchangeCoordinator implements AutoCloseable {

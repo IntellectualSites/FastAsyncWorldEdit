@@ -242,7 +242,7 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
         return ProcessorScope.READING_SET_BLOCKS;
     }
 
-    @Deprecated(forRemoval = true, since = "TODO")
+    @Deprecated(forRemoval = true, since = "2.11.2")
     public void addTileCreate(CompoundTag tag) {
         addTileCreate(adapt(tag));
     }
@@ -256,11 +256,11 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
      * Creates a tile/block entity create change to this change set.
      *
      * @param tag the tile/block entity to add.
-     * @since TODO
+     * @since 2.11.2
      */
     public abstract void addTileCreate(FaweCompoundTag tag);
 
-    @Deprecated(forRemoval = true, since = "TODO")
+    @Deprecated(forRemoval = true, since = "2.11.2")
     public void addTileRemove(CompoundTag tag) {
         addTileRemove(adapt(tag));
     }
@@ -269,11 +269,11 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
      * Creates a tile/block entity remove change to this change set.
      *
      * @param tag the tile/block entity to remove.
-     * @since TODO
+     * @since 2.11.2
      */
     public abstract void addTileRemove(FaweCompoundTag tag);
 
-    @Deprecated(forRemoval = true, since = "TODO")
+    @Deprecated(forRemoval = true, since = "2.11.2")
     public void addEntityRemove(CompoundTag tag) {
         addEntityRemove(adapt(tag));
     }
@@ -282,11 +282,11 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
      * Creates an entity remove change to this change set.
      *
      * @param tag the entity to remove.
-     * @since TODO
+     * @since 2.11.2
      */
     public abstract void addEntityRemove(FaweCompoundTag tag);
 
-    @Deprecated(forRemoval = true, since = "TODO")
+    @Deprecated(forRemoval = true, since = "2.11.2")
     public void addEntityCreate(CompoundTag tag) {
         addEntityCreate(adapt(tag));
     }
@@ -295,7 +295,7 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
      * Creates an entity create change to this change set.
      *
      * @param tag the entity to add.
-     * @since TODO
+     * @since 2.11.2
      */
     public abstract void addEntityCreate(FaweCompoundTag tag);
 
@@ -307,7 +307,7 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
 
     /**
      * {@return a coordinator to exchange sets of changes between a producer and a consumer}
-     * @since TODO
+     * @since 2.11.2
      */
     @ApiStatus.Internal
     public abstract ChangeExchangeCoordinator getCoordinatedChanges(BlockBag blockBag, int mode, boolean dir);
