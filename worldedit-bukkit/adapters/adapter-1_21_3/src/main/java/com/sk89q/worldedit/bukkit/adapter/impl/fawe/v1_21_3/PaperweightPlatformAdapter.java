@@ -260,7 +260,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                 }
             }
         } catch (Throwable e) {
-            e.printStackTrace();
+            LOGGER.error("Error apply DelegateSemaphore", e);
             throw new RuntimeException(e);
         }
     }
@@ -672,7 +672,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             }
             methodremoveTickingBlockEntity.invoke(levelChunk, beacon.getBlockPos());
         } catch (Throwable throwable) {
-            throwable.printStackTrace();
+            LOGGER.error("Error removing beacon", throwable);
         }
     }
 
