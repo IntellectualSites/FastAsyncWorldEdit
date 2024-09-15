@@ -263,8 +263,7 @@ public class CharFilterBlock extends ChunkFilterBlock {
         final BlockMaterial material = state.getMaterial();
         if (material.hasContainer()) {
             final FaweCompoundTag tag = get.tile(x, y + yy, z);
-            assert tag != null : "has container but is null";
-            return state.toBaseBlock(tag.linTag());
+            return state.toBaseBlock(tag == null ? null : tag.linTag());
         }
         return state.toBaseBlock();
     }
