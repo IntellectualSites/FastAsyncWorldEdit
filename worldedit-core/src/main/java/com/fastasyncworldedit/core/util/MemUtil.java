@@ -1,6 +1,8 @@
 package com.fastasyncworldedit.core.util;
 
 import com.fastasyncworldedit.core.configuration.Settings;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
+import org.apache.logging.log4j.Logger;
 
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -8,6 +10,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class MemUtil {
 
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
     private static final AtomicBoolean memory = new AtomicBoolean(false);
     private static final AtomicBoolean slower = new AtomicBoolean(false);
 
@@ -60,7 +63,8 @@ public class MemUtil {
         final long heapFreeSize = Runtime.getRuntime().freeMemory();
         final long heapMaxSize = Runtime.getRuntime().maxMemory();
         final int size = (int) ((heapFreeSize * 100) / heapMaxSize);
-        slower.set(size > 80);
+        boolean limited = size >= Settings.settings().SLOWER_MEMORY_PERCENT;
+        slower.set(limited);
     }
 
     private static final Queue<Runnable> memoryLimitedTasks = new ConcurrentLinkedQueue<>();
