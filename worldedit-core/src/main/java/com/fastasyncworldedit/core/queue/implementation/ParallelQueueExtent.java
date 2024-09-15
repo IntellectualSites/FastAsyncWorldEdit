@@ -14,6 +14,8 @@ import com.fastasyncworldedit.core.extent.processor.BatchProcessorHolder;
 import com.fastasyncworldedit.core.extent.processor.MultiBatchProcessor;
 import com.fastasyncworldedit.core.function.mask.BlockMaskBuilder;
 import com.fastasyncworldedit.core.internal.exception.FaweException;
+import com.fastasyncworldedit.core.internal.simd.SimdSupport;
+import com.fastasyncworldedit.core.internal.simd.VectorizedFilter;
 import com.fastasyncworldedit.core.queue.Filter;
 import com.fastasyncworldedit.core.queue.IQueueChunk;
 import com.fastasyncworldedit.core.queue.IQueueExtent;
@@ -223,7 +225,9 @@ public class ParallelQueueExtent extends PassthroughExtent {
 
     @Override
     public int setBlocks(Region region, Pattern pattern) throws MaxChangedBlocksException {
-        return this.changes = apply(region, new LinkedFilter<>(pattern, new CountFilter()), true).getChild().getTotal();
+        VectorizedFilter vectorizedPattern = SimdSupport.vectorizedPattern(pattern);
+        var filter = LinkedFilter.of(vectorizedPattern == null ? pattern : vectorizedPattern, new CountFilter());
+        return this.changes = apply(region, filter, true).getChild().getTotal();
     }
 
     @Override

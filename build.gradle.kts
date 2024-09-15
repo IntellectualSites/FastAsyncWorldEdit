@@ -91,7 +91,7 @@ tasks {
             minecraftVersion(it)
             pluginJars(*project(":worldedit-bukkit").getTasksByName("shadowJar", false).map { (it as Jar).archiveFile }
                     .toTypedArray())
-            jvmArgs("-DPaper.IgnoreJavaVersion=true", "-Dcom.mojang.eula.agree=true")
+            jvmArgs("-DPaper.IgnoreJavaVersion=true", "-Dcom.mojang.eula.agree=true", "--add-modules=jdk.incubator.vector")
             group = "run paper"
             runDirectory.set(file("run-$it"))
         }

@@ -675,6 +675,11 @@ public class Settings extends Config {
         })
         public boolean ALLOW_TICK_FLUIDS = false;
 
+        @Comment({
+                "Whether FAWE should use the incubator Vector API to accelerate some operations"
+        })
+        public boolean USE_VECTOR_API = false;
+
     }
 
     @Comment({"Web/HTTP connection related settings"})

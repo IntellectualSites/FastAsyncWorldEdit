@@ -23,12 +23,14 @@ import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 import org.enginehub.linbus.tree.LinCompoundTag;
+import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import static com.sk89q.worldedit.world.block.BlockTypesCache.states;
 
+@ApiStatus.NonExtendable
 public class CharFilterBlock extends ChunkFilterBlock {
 
     private static final SetDelegate FULL = (block, value) -> block.setArr[block.index] = value;
@@ -38,10 +40,10 @@ public class CharFilterBlock extends ChunkFilterBlock {
     private int minLayer;
     private CharGetBlocks get;
     private IChunkSet set;
-    private char[] getArr;
+    protected char[] getArr;
     @Nullable
-    private char[] setArr;
-    private SetDelegate delegate;
+    protected char[] setArr;
+    protected SetDelegate delegate;
     // local
     private int layer;
     private int index;
@@ -172,7 +174,7 @@ public class CharFilterBlock extends ChunkFilterBlock {
     }
 
     @Override
-    public synchronized final void filter(Filter filter) {
+    public synchronized void filter(Filter filter) {
         for (y = 0, index = 0; y < 16; y++) {
             for (z = 0; z < 16; z++) {
                 for (x = 0; x < 16; x++, index++) {
@@ -395,7 +397,7 @@ public class CharFilterBlock extends ChunkFilterBlock {
     }
 
     //Set delegate
-    private SetDelegate initSet() {
+    protected final SetDelegate initSet() {
         setArr = set.load(layer);
         return delegate = FULL;
     }
@@ -427,7 +429,8 @@ public class CharFilterBlock extends ChunkFilterBlock {
         return getExtent().setBiome(x, y, z, biome);
     }
 
-    private interface SetDelegate {
+    @ApiStatus.Internal
+    protected interface SetDelegate {
 
         void set(@Nonnull CharFilterBlock block, char value);
 

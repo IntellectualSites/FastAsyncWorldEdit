@@ -28,6 +28,7 @@ fun Project.applyCommonJavaConfiguration(sourcesJar: Boolean, banSlf4j: Boolean 
                 options.isDeprecation = true
                 options.encoding = "UTF-8"
                 options.compilerArgs.add("-parameters")
+                options.compilerArgs.add("--add-modules=jdk.incubator.vector")
             }
 
     configurations.all {
@@ -51,12 +52,14 @@ fun Project.applyCommonJavaConfiguration(sourcesJar: Boolean, banSlf4j: Boolean 
     tasks.withType<Javadoc>().configureEach {
         (options as StandardJavadocDocletOptions).apply {
             addStringOption("Xdoclint:none", "-quiet")
+            addStringOption("-add-modules", "jdk.incubator.vector")
             tags(
                     "apiNote:a:API Note:",
                     "implSpec:a:Implementation Requirements:",
                     "implNote:a:Implementation Note:"
             )
             options.encoding = "UTF-8"
+
             links(
                     "https://jd.advntr.dev/api/latest/",
                     "https://logging.apache.org/log4j/2.x/javadoc/log4j-api/",
