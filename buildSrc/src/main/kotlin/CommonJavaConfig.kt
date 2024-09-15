@@ -61,7 +61,7 @@ fun Project.applyCommonJavaConfiguration(sourcesJar: Boolean, banSlf4j: Boolean 
                     "https://jd.advntr.dev/api/latest/",
                     "https://logging.apache.org/log4j/2.x/javadoc/log4j-api/",
                     "https://www.antlr.org/api/Java/",
-                    "https://jd.papermc.io/paper/1.21/",
+                    "https://jd.papermc.io/paper/1.21.1/",
                     "https://intellectualsites.github.io/fastasyncworldedit-javadocs/worldedit-core/"
             )
             docTitle = "${rootProject.name}-${project.description}" +  " " + "${rootProject.version}"
