@@ -427,7 +427,7 @@ public class AbstractDelegateExtent implements Extent {
 
     @Override
     public boolean tile(int x, int y, int z, FaweCompoundTag tile) throws WorldEditException {
-        return setBlock(x, y, z, getBlock(x, y, z).toBaseBlock(tile.linTag()));
+        return setBlock(x, y, z, getBlock(x, y, z).toBaseBlock(tile == null ? null : tile.linTag()));
     }
     //FAWE end
 

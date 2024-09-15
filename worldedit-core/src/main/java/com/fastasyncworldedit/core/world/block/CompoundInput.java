@@ -17,8 +17,7 @@ public enum CompoundInput {
         @Override
         public BaseBlock get(final BlockState state, final IBlocks blocks, final int x, final int y, final int z) {
             final FaweCompoundTag tile = blocks.tile(x, y, z);
-            assert tile != null : "container without tile entity";
-            return state.toBaseBlock(tile.linTag());
+            return state.toBaseBlock(tile == null ? null : tile.linTag());
         }
     };
 
