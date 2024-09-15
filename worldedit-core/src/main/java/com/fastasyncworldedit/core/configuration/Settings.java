@@ -57,6 +57,12 @@ public class Settings extends Config {
             " - Disable with 100 or -1."
     })
     public int MAX_MEMORY_PERCENT = 95;
+    @Comment({
+            "When percent memory usage reaches this threshold some aspects of editing will be slowed down:",
+            " - FAWE-Asynchronous chunk loading when writing changes (see queue.async-chunk-load-write)"
+    })
+    public int SLOWER_MEMORY_PERCENT = 80;
+
     @Create
     public ENABLED_COMPONENTS ENABLED_COMPONENTS;
     @Create
@@ -598,6 +604,13 @@ public class Settings extends Config {
                 " - Enable to improve performance at the expense of memory",
         })
         public boolean POOL = true;
+
+        @Comment({
+                "If chunk loading for writing edits to the world should be performed asynchronously to to FAWE",
+                " - Enable to improve performance at the expense of memory",
+                " - If experience out of memory crashed, disable this or reduce slower-memory-percent"
+        })
+        public boolean ASYNC_CHUNK_LOAD_WRITE = true;
 
         public static class PROGRESS {
 

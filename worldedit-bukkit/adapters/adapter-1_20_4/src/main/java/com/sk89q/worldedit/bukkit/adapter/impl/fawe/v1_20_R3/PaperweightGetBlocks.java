@@ -420,7 +420,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
         final ServerLevel nmsWorld = serverLevel;
         CompletableFuture<LevelChunk> nmsChunkFuture = ensureLoaded(nmsWorld, chunkX, chunkZ);
         LevelChunk chunk = nmsChunkFuture.getNow(null);
-        if (chunk == null && MemUtil.shouldBeginSlow()) {
+        if ((chunk == null && MemUtil.shouldBeginSlow()) || Settings.settings().QUEUE.ASYNC_CHUNK_LOAD_WRITE) {
             try {
                 chunk = nmsChunkFuture.get(); // "Artificially" slow FAWE down if memory low as performing the
             } catch (InterruptedException | ExecutionException e) {
