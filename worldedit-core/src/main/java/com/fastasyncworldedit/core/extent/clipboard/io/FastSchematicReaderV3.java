@@ -141,7 +141,7 @@ public class FastSchematicReaderV3 implements ClipboardReader {
                 }
                 case "Metadata" -> {
                     LinCompoundTag metadataCompoundTag =
-                            (LinCompoundTag) this.nbtInputStream.readTagPayload(NBTConstants.TYPE_COMPOUND, 2).toLinTag();
+                            (LinCompoundTag) this.nbtInputStream.readTagPayload(NBTConstants.TYPE_COMPOUND, 0).toLinTag();
 
                     LinCompoundTag worldEditTag = metadataCompoundTag.findTag("WorldEdit", LinTagType.compoundTag());
                     if (worldEditTag != null) { // allowed to be optional
