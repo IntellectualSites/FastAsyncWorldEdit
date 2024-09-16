@@ -4,6 +4,8 @@ import com.sk89q.worldedit.history.change.Change;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.concurrent.Exchanger;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.function.BiConsumer;
 
 /**
@@ -32,8 +34,9 @@ public class ChangeExchangeCoordinator implements AutoCloseable {
                     .start(() -> this.runnerTask.accept(this.exchanger, new Change[length]));
         }
         try {
-            return exchanger.exchange(consumed);
-        } catch (InterruptedException e) {
+            // Allow a reasonable timeout in case of weirdness
+            return exchanger.exchange(consumed, 30, TimeUnit.SECONDS);
+        } catch (InterruptedException | TimeoutException e) {
             this.runner.interrupt();
             Thread.currentThread().interrupt();
             return null;
