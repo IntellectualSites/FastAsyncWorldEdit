@@ -169,8 +169,7 @@ public class NMSAdapter implements FAWEPlatformAdapterImpl {
         if (layer < 0 || layer >= sections.length) {
             return false;
         }
-        long[] stamp = new long[1];
-        ChunkLock[] chunkLock = new ChunkLock[1];
+        StampLockHolder holder = new StampLockHolder();
         ConcurrentHashMap<IntPair, ChunkLock> chunks = SENDING_CHUNKS.computeIfAbsent(
                 worldName,
                 world -> new ConcurrentHashMap<>()
@@ -181,23 +180,23 @@ public class NMSAdapter implements FAWEPlatformAdapterImpl {
             } else if (lock.writeWaiting) {
                 throw new IllegalStateException("Attempting to write chunk section when write is already ongoing?!");
             }
-            stamp[0] = lock.lock.tryWriteLock();
-            chunkLock[0] = lock;
+            holder.stamp = lock.lock.tryWriteLock();
+            holder.chunkLock = lock;
             lock.writeWaiting = true;
             return lock;
         });
         try {
-            if (stamp[0] == 0) {
-                stamp[0] = chunkLock[0].lock.writeLock();
+            if (holder.stamp == 0) {
+                holder.stamp = holder.chunkLock.lock.writeLock();
             }
             return ReflectionUtils.compareAndSet(sections, expected, value, layer);
         } finally {
             chunks = SENDING_CHUNKS.get(worldName);
             chunks.computeIfPresent(pair, (k, lock) -> {
-                if (lock != chunkLock[0]) {
+                if (lock != holder.chunkLock) {
                     throw new IllegalStateException("SENDING_CHUNKS stored lock does not equal lock attempted to be unlocked?!");
                 }
-                lock.lock.unlockWrite(stamp[0]);
+                lock.lock.unlockWrite(holder.stamp);
                 lock.writeWaiting = false;
                 // Keep the lock, etc. in the map as we're going to be accessing again later when sending
                 return lock;
@@ -247,12 +246,17 @@ public class NMSAdapter implements FAWEPlatformAdapterImpl {
         ConcurrentHashMap<IntPair, ChunkLock> chunks = SENDING_CHUNKS.get(worldName);
         chunks.computeIfPresent(pair, (k, lock) -> {
             if (lock.lock != stampedLock) {
-                throw new IllegalStateException("SENDING_CHUNKS stored lock is not ");
+                throw new IllegalStateException("SENDING_CHUNKS stored lock does not equal lock attempted to be unlocked?!");
             }
             lock.lock.unlockRead(stamp);
             // Do not continue to store the lock if we may not need it (i.e. chunk has been sent, may not be sent again)
             return null;
         });
+    }
+
+    static final class StampLockHolder {
+        long stamp;
+        ChunkLock chunkLock = null;
     }
 
     private static final class ChunkLock {
