@@ -22,12 +22,9 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockTypes;
-import org.enginehub.linbus.stream.LinBinaryIO;
-import org.enginehub.linbus.tree.LinRootEntry;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.DataOutput;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -405,8 +402,8 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
     public void addTileCreate(final FaweCompoundTag tag) {
         blockSize++;
         try {
-            DataOutput nbtos = getTileCreateOS();
-            LinBinaryIO.write(nbtos, new LinRootEntry("tile-create", tag.linTag()));
+            NBTOutputStream nbtos = getTileCreateOS();
+            nbtos.writeTag(new CompoundTag(tag.linTag()));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -416,8 +413,8 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
     public void addTileRemove(final FaweCompoundTag tag) {
         blockSize++;
         try {
-            DataOutput nbtos = getTileRemoveOS();
-            LinBinaryIO.write(nbtos, new LinRootEntry("tile-remove", tag.linTag()));
+            NBTOutputStream nbtos = getTileRemoveOS();
+            nbtos.writeTag(new CompoundTag(tag.linTag()));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -427,8 +424,8 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
     public void addEntityRemove(final FaweCompoundTag tag) {
         blockSize++;
         try {
-            DataOutput nbtos = getEntityRemoveOS();
-            LinBinaryIO.write(nbtos, new LinRootEntry("entity-remove", tag.linTag()));
+            NBTOutputStream nbtos = getEntityRemoveOS();
+            nbtos.writeTag(new CompoundTag(tag.linTag()));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -438,8 +435,8 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
     public void addEntityCreate(final FaweCompoundTag tag) {
         blockSize++;
         try {
-            DataOutput nbtos = getEntityCreateOS();
-            LinBinaryIO.write(nbtos, new LinRootEntry("entity-create", tag.linTag()));
+            NBTOutputStream nbtos = getEntityCreateOS();
+            nbtos.writeTag(new CompoundTag(tag.linTag()));
         } catch (IOException e) {
             e.printStackTrace();
         }
