@@ -308,16 +308,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * @return Limit remaining
      */
     public FaweLimit getLimitUsed() {
-        FaweLimit newLimit = new FaweLimit();
-        newLimit.MAX_ACTIONS = originalLimit.MAX_ACTIONS - limit.MAX_ACTIONS;
-        newLimit.MAX_CHANGES = originalLimit.MAX_CHANGES - limit.MAX_CHANGES;
-        newLimit.MAX_FAILS = originalLimit.MAX_FAILS - limit.MAX_FAILS;
-        newLimit.MAX_CHECKS = originalLimit.MAX_CHECKS - limit.MAX_CHECKS;
-        newLimit.MAX_ITERATIONS = originalLimit.MAX_ITERATIONS - limit.MAX_ITERATIONS;
-        newLimit.MAX_BLOCKSTATES = originalLimit.MAX_BLOCKSTATES - limit.MAX_BLOCKSTATES;
-        newLimit.MAX_ENTITIES = originalLimit.MAX_ENTITIES - limit.MAX_ENTITIES;
-        newLimit.MAX_HISTORY = limit.MAX_HISTORY;
-        return newLimit;
+        return originalLimit.getLimitUsed(limit);
     }
 
     /**
@@ -472,7 +463,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      */
     @Deprecated
     public long getBlockChangeLimit() {
-        return originalLimit.MAX_CHANGES;
+        return originalLimit.MAX_CHANGES.get();
     }
 
     /**
@@ -481,7 +472,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * @param limit the limit (&gt;= 0) or -1 for no limit
      */
     public void setBlockChangeLimit(long limit) {
-        this.limit.MAX_CHANGES = limit;
+        this.limit.MAX_CHANGES.set(limit);
     }
 
     /**
@@ -1293,8 +1284,8 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         Operations.completeBlindly(commit());
         // Check fails
         FaweLimit used = getLimitUsed();
-        if (used.MAX_FAILS > 0) {
-            if (used.MAX_CHANGES > 0 || used.MAX_ENTITIES > 0) {
+        if (used.MAX_FAILS.get() > 0) {
+            if (used.MAX_CHANGES.get() > 0 || used.MAX_ENTITIES.get() > 0) {
                 actor.print(Caption.of("fawe.error.worldedit.some.fails", used.MAX_FAILS));
             } else if (new ExtentTraverser<>(getExtent()).findAndGet(FaweRegionExtent.class) != null) {
                 actor.print(Caption.of("fawe.cancel.reason.outside.region"));

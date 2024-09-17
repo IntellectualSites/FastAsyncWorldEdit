@@ -992,15 +992,15 @@ public class BrushCommands {
                     Expression radius,
             @Arg(desc = "Command to run")
                     List<String> input,
-            @Switch(name = 'p', desc = "Show any printed output")
-                    boolean print
+            @Switch(name = 'h', desc = "Hide any printed output")
+                    boolean hide
     ) throws WorldEditException {
         worldEdit.checkMaxBrushRadius(
                 radius,
                 context.injectedValue(Key.of(Player.class)).orElseThrow(() -> new IllegalStateException("No player"))
         );
         String cmd = StringMan.join(input, " ");
-        set(context, new CommandBrush(cmd, print), "worldedit.brush.command").setSize(radius);
+        set(context, new CommandBrush(cmd, !hide), "worldedit.brush.command").setSize(radius);
     }
 
     @Command(
@@ -1414,7 +1414,7 @@ public class BrushCommands {
 
         //FAWE start
         FaweLimit limit = Settings.settings().getLimit(player);
-        iterations = Math.min(limit.MAX_ITERATIONS, iterations);
+        iterations = Math.min(limit.MAX_ITERATIONS.get(), iterations);
         //FAWE end
 
         set(context, new SmoothBrush(iterations, mask), "worldedit.brush.smooth").setSize(radius);
@@ -1452,7 +1452,7 @@ public class BrushCommands {
 
         //FAWE start
         FaweLimit limit = Settings.settings().getLimit(player);
-        iterations = Math.min(limit.MAX_ITERATIONS, iterations);
+        iterations = Math.min(limit.MAX_ITERATIONS.get(), iterations);
         //FAWE end
 
         set(context, new SnowSmoothBrush(iterations, snowBlockCount, mask), "worldedit.brush.snowsmooth").setSize(radius);

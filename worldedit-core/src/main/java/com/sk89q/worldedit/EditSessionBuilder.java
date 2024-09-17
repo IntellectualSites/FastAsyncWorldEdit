@@ -635,7 +635,11 @@ public final class EditSessionBuilder {
                 };
             }
             if (limit != null && !limit.isUnlimited()) {
-                this.extent = new LimitExtent(this.extent, limit, onErrorMessage);
+                this.extent = new LimitExtent(this.extent, limit, onErrorMessage, placeChunks && combineStages);
+                // Only process if we're not necessarily going to catch tiles via Extent#setBlock, e.g. because using PQE methods
+                if (placeChunks && combineStages) {
+                    queue.addProcessor((LimitExtent) this.extent);
+                }
             }
             this.extent = wrapExtent(this.extent, eventBus, event, EditSession.Stage.BEFORE_HISTORY);
         }

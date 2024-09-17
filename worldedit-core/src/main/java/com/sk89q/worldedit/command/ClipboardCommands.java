@@ -47,6 +47,7 @@ import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.command.util.Logging;
 import com.sk89q.worldedit.command.util.annotation.Confirm;
 import com.sk89q.worldedit.command.util.annotation.Preload;
+import com.sk89q.worldedit.command.util.annotation.SynchronousSettingExpected;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
@@ -153,7 +154,7 @@ public class ClipboardCommands {
                 ((long) max.x() - (long) min.x() + 1) * ((long) max.y() - (long) min.y() + 1) * ((long) max.z() - (long) min
                         .z() + 1);
         FaweLimit limit = actor.getLimit();
-        if (volume >= limit.MAX_CHECKS) {
+        if (volume >= limit.MAX_CHECKS.get()) {
             throw FaweCache.MAX_CHECKS;
         }
         session.setClipboard(null);
@@ -187,7 +188,7 @@ public class ClipboardCommands {
         long volume = (((long) max.x() - (long) min.x() + 1) * ((long) max.y() - (long) min.y() + 1) * ((long) max.z() - (long) min
                 .z() + 1));
         FaweLimit limit = actor.getLimit();
-        if (volume >= limit.MAX_CHECKS) {
+        if (volume >= limit.MAX_CHECKS.get()) {
             throw FaweCache.MAX_CHECKS;
         }
         session.setClipboard(null);
@@ -260,10 +261,10 @@ public class ClipboardCommands {
         long volume = (((long) max.x() - (long) min.x() + 1) * ((long) max.y() - (long) min.y() + 1) * ((long) max.z() - (long) min
                 .z() + 1));
         FaweLimit limit = actor.getLimit();
-        if (volume >= limit.MAX_CHECKS) {
+        if (volume >= limit.MAX_CHECKS.get()) {
             throw FaweCache.MAX_CHECKS;
         }
-        if (volume >= limit.MAX_CHANGES) {
+        if (volume >= limit.MAX_CHANGES.get()) {
             throw FaweCache.MAX_CHANGES;
         }
         session.setClipboard(null);
@@ -438,6 +439,7 @@ public class ClipboardCommands {
             desc = "Place the clipboard's contents without applying transformations (e.g. rotate)"
     )
     @CommandPermissions("worldedit.clipboard.place")
+    @SynchronousSettingExpected
     @Logging(PLACEMENT)
     public void place(
             Actor actor, World world, LocalSession session, final EditSession editSession,
@@ -502,6 +504,7 @@ public class ClipboardCommands {
             desc = "Paste the clipboard's contents"
     )
     @CommandPermissions("worldedit.clipboard.paste")
+    @SynchronousSettingExpected
     @Logging(PLACEMENT)
     public void paste(
             Actor actor, World world, LocalSession session, EditSession editSession,
