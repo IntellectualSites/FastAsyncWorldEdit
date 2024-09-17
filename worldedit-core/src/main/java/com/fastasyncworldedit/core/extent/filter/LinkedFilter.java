@@ -41,19 +41,9 @@ public sealed class LinkedFilter<L extends Filter, R extends Filter> implements 
     }
 
     @Override
-    public boolean appliesChunk(int chunkX, int chunkZ) {
-        return getLeft().appliesChunk(chunkX, chunkZ) && getRight().appliesChunk(chunkX, chunkZ);
-    }
-
-    @Override
     public <T extends IChunk> T applyChunk(T chunk, @Nullable Region region) {
         chunk = getLeft().applyChunk(chunk, region);
         return getRight().applyChunk(chunk, region);
-    }
-
-    @Override
-    public boolean appliesLayer(IChunk chunk, int layer) {
-        return getLeft().appliesLayer(chunk, layer) && getRight().appliesLayer(chunk, layer);
     }
 
     @Override

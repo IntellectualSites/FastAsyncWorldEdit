@@ -140,9 +140,9 @@ public interface IQueueExtent<T extends IChunk> extends Flushable, Trimable, ICh
             int chunkZ,
             boolean full
     ) {
-        if (!filter.appliesChunk(chunkX, chunkZ)) {
-            return block;
-        }
+//        if (!filter.appliesChunk(chunkX, chunkZ)) {
+//            return block;
+//        }
         T chunk = this.getOrCreateChunk(chunkX, chunkZ);
 
         T newChunk = filter.applyChunk(chunk, region);
