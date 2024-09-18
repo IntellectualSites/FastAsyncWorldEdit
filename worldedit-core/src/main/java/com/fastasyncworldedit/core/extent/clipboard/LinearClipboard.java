@@ -57,6 +57,10 @@ public abstract class LinearClipboard extends SimpleClipboard {
      */
     public abstract void streamBiomes(IntValueReader task);
 
+    /**
+     * @deprecated will be removed as it is unused and uses outdated types
+     */
+    @Deprecated(forRemoval = true, since = "TODO")
     public abstract Collection<CompoundTag> getTileEntities();
 
     @Override
