@@ -269,7 +269,8 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
         int minSection = Math.max(get.getMinSectionPosition(), getMinimumY() >> 4);
         int maxSection = Math.min(get.getMaxSectionPosition(), getMaximumY() >> 4);
         for (int layer = minSection; layer <= maxSection; layer++) {
-            if ((!full && !get.hasSection(layer)) || !filter.appliesLayer(chunk, layer)) {
+            //if ((!full && !get.hasSection(layer)) || !filter.appliesLayer(chunk, layer)) {
+            if (!full && !get.hasSection(layer)) {
                 return;
             }
             block = block.initLayer(get, set, layer);
@@ -319,7 +320,8 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
             int layer,
             boolean full
     ) {
-        if ((!full && !get.hasSection(layer)) || !filter.appliesLayer(chunk, layer)) {
+        //if ((!full && !get.hasSection(layer)) || !filter.appliesLayer(chunk, layer)) {
+        if (!full && !get.hasSection(layer)) {
             return;
         }
         block = block.initLayer(get, set, layer);
@@ -341,7 +343,8 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
             int maxZ,
             boolean full
     ) {
-        if ((!full && !get.hasSection(layer)) || !filter.appliesLayer(chunk, layer)) {
+        //if ((!full && !get.hasSection(layer)) || !filter.appliesLayer(chunk, layer)) {
+        if (!full && !get.hasSection(layer)) {
             return;
         }
         block = block.initLayer(get, set, layer);
@@ -359,7 +362,8 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
             int yEnd,
             boolean full
     ) {
-        if ((!full && !get.hasSection(layer)) || !filter.appliesLayer(chunk, layer)) {
+        //if ((!full && !get.hasSection(layer)) || !filter.appliesLayer(chunk, layer)) {
+        if (!full && !get.hasSection(layer)) {
             return;
         }
         block = block.initLayer(get, set, layer);

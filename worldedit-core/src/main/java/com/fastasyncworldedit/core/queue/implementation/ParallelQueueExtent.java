@@ -30,7 +30,6 @@ import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Countable;
 import com.sk89q.worldedit.world.World;
@@ -227,7 +226,7 @@ public class ParallelQueueExtent extends PassthroughExtent {
     public int setBlocks(Region region, Pattern pattern) throws MaxChangedBlocksException {
         VectorizedFilter vectorizedPattern = SimdSupport.vectorizedPattern(pattern);
         var filter = LinkedFilter.of(vectorizedPattern == null ? pattern : vectorizedPattern, new CountFilter());
-        return this.changes = apply(region, filter, true).getChild().getTotal();
+        return this.changes = apply(region, filter, true).getRight().getTotal();
     }
 
     @Override

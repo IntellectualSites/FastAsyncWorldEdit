@@ -10,18 +10,8 @@ public interface IDelegateFilter extends Filter {
     Filter getParent();
 
     @Override
-    default boolean appliesChunk(int chunkX, int chunkZ) {
-        return getParent().appliesChunk(chunkX, chunkZ);
-    }
-
-    @Override
     default <V extends IChunk> V applyChunk(V chunk, @Nullable Region region) {
         return getParent().applyChunk(chunk, region);
-    }
-
-    @Override
-    default boolean appliesLayer(IChunk chunk, int layer) {
-        return getParent().appliesLayer(chunk, layer);
     }
 
     @Override

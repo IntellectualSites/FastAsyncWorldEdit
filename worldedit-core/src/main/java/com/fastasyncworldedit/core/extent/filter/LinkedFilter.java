@@ -1,69 +1,92 @@
 package com.fastasyncworldedit.core.extent.filter;
 
-import com.fastasyncworldedit.core.extent.filter.block.DelegateFilter;
 import com.fastasyncworldedit.core.extent.filter.block.FilterBlock;
 import com.fastasyncworldedit.core.internal.simd.VectorizedFilter;
 import com.fastasyncworldedit.core.queue.Filter;
+import com.fastasyncworldedit.core.queue.IChunk;
+import com.sk89q.worldedit.regions.Region;
 import jdk.incubator.vector.ShortVector;
+import org.jetbrains.annotations.Nullable;
 
 /**
- * Filter which links two Filters together for single-filter-input operations.
+ * Filter which links two Filters together for single-filter-input operations. Left filter is operated first.
  *
- * @param <T> Parent which extends Filter
- * @param <S> Child which extends Filter
+ * @param <L> Left filter
+ * @param <R> Right filter
  */
-public sealed class LinkedFilter<T extends Filter, S extends Filter> extends DelegateFilter<T> {
+public sealed class LinkedFilter<L extends Filter, R extends Filter> implements Filter {
 
-    private final S child;
+    private final L left;
+    private final R right;
+
+    public LinkedFilter(L left, R right) {
+        this.left = left;
+        this.right = right;
+    }
 
     @SuppressWarnings({"unchecked", "rawtypes"}) // we defeated the type system
-    public static <T extends Filter, S extends Filter> LinkedFilter<? extends T, ? extends S> of(T parent, S child) {
-        if (parent instanceof VectorizedFilter p && child instanceof VectorizedFilter c) {
-            return new VectorizedLinkedFilter(p, c);
+    public static <L extends Filter, R extends Filter> LinkedFilter<? extends L, ? extends R> of(L left, R right) {
+        if (left instanceof VectorizedFilter l && right instanceof VectorizedFilter r) {
+            return new VectorizedLinkedFilter(l, r);
         }
-        return new LinkedFilter<>(parent, child);
+        return new LinkedFilter<>(left, right);
     }
 
-    public LinkedFilter(T parent, S child) {
-        super(parent);
-        this.child = child;
+    public L getLeft() {
+        return this.left;
     }
 
-    public S getChild() {
-        return this.child;
+    public R getRight() {
+        return this.right;
+    }
+
+    @Override
+    public <T extends IChunk> T applyChunk(T chunk, @Nullable Region region) {
+        chunk = getLeft().applyChunk(chunk, region);
+        return getRight().applyChunk(chunk, region);
     }
 
     @Override
     public void applyBlock(FilterBlock block) {
-        this.getParent().applyBlock(block);
-        this.getChild().applyBlock(block);
+        getLeft().applyBlock(block);
+        getRight().applyBlock(block);
     }
 
     @Override
-    public LinkedFilter<? extends LinkedFilter<T, S>, ? extends Filter> newInstance(Filter other) {
-        return new LinkedFilter<>(this, other);
+    public void finishChunk(IChunk chunk) {
+        getLeft().finishChunk(chunk);
+        getRight().finishChunk(chunk);
     }
 
-    private final static class VectorizedLinkedFilter<T extends VectorizedFilter, S extends VectorizedFilter>
-            extends LinkedFilter<T, S> implements VectorizedFilter {
+    @Override
+    public Filter fork() {
+        return new LinkedFilter<>(getLeft().fork(), getRight().fork());
+    }
 
-        public VectorizedLinkedFilter(final T parent, final S child) {
-            super(parent, child);
+    @Override
+    public void join() {
+        getLeft().join();
+        getRight().join();
+    }
+
+    private final static class VectorizedLinkedFilter<L extends VectorizedFilter, R extends VectorizedFilter>
+            extends LinkedFilter<L, R> implements VectorizedFilter {
+
+        public VectorizedLinkedFilter(final L left, final R right) {
+            super(left, right);
         }
 
         @Override
         public ShortVector applyVector(final ShortVector get, final ShortVector set) {
-            ShortVector res = getParent().applyVector(get, set);
-            return getChild().applyVector(get, res);
+            ShortVector res = getLeft().applyVector(get, set);
+            return getRight().applyVector(get, res);
         }
 
         @Override
-        public LinkedFilter<? extends LinkedFilter<T, S>, Filter> newInstance(Filter other) {
-            if (other instanceof VectorizedFilter o) {
-                return new VectorizedLinkedFilter(this, o);
-            }
-            return new LinkedFilter<>(this, other);
+        public Filter fork() {
+            return new VectorizedLinkedFilter<>((L) getLeft().fork(), (R) getRight().fork());
         }
+
     }
 
 }
