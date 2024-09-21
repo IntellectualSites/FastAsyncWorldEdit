@@ -1,5 +1,6 @@
 package com.fastasyncworldedit.bukkit.adapter;
 
+import com.fastasyncworldedit.bukkit.FaweBukkitWorld;
 import com.fastasyncworldedit.core.FAWEPlatformAdapterImpl;
 import com.fastasyncworldedit.core.math.IntPair;
 import com.fastasyncworldedit.core.queue.IChunkGet;
@@ -144,8 +145,6 @@ public class NMSAdapter implements FAWEPlatformAdapterImpl {
         ((BukkitGetBlocks) chunk).send();
     }
 
-    private static final ConcurrentHashMap<String, ConcurrentHashMap<IntPair, ChunkLock>> SENDING_CHUNKS = new ConcurrentHashMap<>();
-
     /**
      * Atomically set the given chunk section to the chunk section array stored in the chunk, given the expected existing chunk
      * section instance at the given layer position.
@@ -170,13 +169,10 @@ public class NMSAdapter implements FAWEPlatformAdapterImpl {
             return false;
         }
         StampLockHolder holder = new StampLockHolder();
-        ConcurrentHashMap<IntPair, ChunkLock> chunks = SENDING_CHUNKS.computeIfAbsent(
-                worldName,
-                world -> new ConcurrentHashMap<>()
-        );
+        ConcurrentHashMap<IntPair, ChunkSendLock> chunks = FaweBukkitWorld.getWorldSendingChunksMap(worldName);
         chunks.compute(pair, (k, lock) -> {
             if (lock == null) {
-                lock = new ChunkLock();
+                lock = new ChunkSendLock();
             } else if (lock.writeWaiting) {
                 throw new IllegalStateException("Attempting to write chunk section when write is already ongoing?!");
             }
@@ -191,7 +187,7 @@ public class NMSAdapter implements FAWEPlatformAdapterImpl {
             }
             return ReflectionUtils.compareAndSet(sections, expected, value, layer);
         } finally {
-            chunks = SENDING_CHUNKS.get(worldName);
+            chunks = FaweBukkitWorld.getWorldSendingChunksMap(worldName);
             chunks.computeIfPresent(pair, (k, lock) -> {
                 if (lock != holder.chunkLock) {
                     throw new IllegalStateException("SENDING_CHUNKS stored lock does not equal lock attempted to be unlocked?!");
@@ -218,21 +214,18 @@ public class NMSAdapter implements FAWEPlatformAdapterImpl {
      *
      * @since TODO
      */
-    protected static void beginChunkPacketSend(String worldName, IntPair pair, long[] stamp, StampedLock[] stampedLock) {
-        ConcurrentHashMap<IntPair, ChunkLock> chunks = SENDING_CHUNKS.computeIfAbsent(
-                worldName,
-                world -> new ConcurrentHashMap<>()
-        );
+    protected static void beginChunkPacketSend(String worldName, IntPair pair, StampLockHolder stampedLock) {
+        ConcurrentHashMap<IntPair, ChunkSendLock> chunks = FaweBukkitWorld.getWorldSendingChunksMap(worldName);
         chunks.compute(pair, (k, lock) -> {
             if (lock == null) {
-                lock = new ChunkLock();
+                lock = new ChunkSendLock();
             }
             // Allow twice-read-locking, so if the packets have been created but not sent, we can queue another read
             if (lock.writeWaiting || lock.lock.getReadLockCount() > 1 || lock.lock.isWriteLocked()) {
                 return lock;
             }
-            stamp[0] = lock.lock.readLock();
-            stampedLock[0] = lock.lock;
+            stampedLock.stamp = lock.lock.readLock();
+            stampedLock.chunkLock = lock;
             return lock;
         });
     }
@@ -242,27 +235,27 @@ public class NMSAdapter implements FAWEPlatformAdapterImpl {
      *
      * @since TODO
      */
-    protected static void endChunkPacketSend(String worldName, IntPair pair, long stamp, StampedLock stampedLock) {
-        ConcurrentHashMap<IntPair, ChunkLock> chunks = SENDING_CHUNKS.get(worldName);
+    protected static void endChunkPacketSend(String worldName, IntPair pair, StampLockHolder lockHolder) {
+        ConcurrentHashMap<IntPair, ChunkSendLock> chunks = FaweBukkitWorld.getWorldSendingChunksMap(worldName);
         chunks.computeIfPresent(pair, (k, lock) -> {
-            if (lock.lock != stampedLock) {
+            if (lock.lock != lockHolder.chunkLock.lock) {
                 throw new IllegalStateException("SENDING_CHUNKS stored lock does not equal lock attempted to be unlocked?!");
             }
-            lock.lock.unlockRead(stamp);
+            lock.lock.unlockRead(lockHolder.stamp);
             // Do not continue to store the lock if we may not need it (i.e. chunk has been sent, may not be sent again)
             return null;
         });
     }
 
-    static final class StampLockHolder {
-        long stamp;
-        ChunkLock chunkLock = null;
+    public static final class StampLockHolder {
+        public long stamp;
+        public ChunkSendLock chunkLock = null;
     }
 
-    private static final class ChunkLock {
+    public static final class ChunkSendLock {
 
-        private final StampedLock lock = new StampedLock();
-        private boolean writeWaiting = false;
+        public final StampedLock lock = new StampedLock();
+        public boolean writeWaiting = false;
 
     }
 

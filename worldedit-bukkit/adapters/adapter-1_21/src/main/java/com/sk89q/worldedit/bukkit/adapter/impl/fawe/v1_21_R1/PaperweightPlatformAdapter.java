@@ -32,7 +32,6 @@ import net.minecraft.server.level.ChunkMap;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.BitStorage;
-import net.minecraft.util.ExceptionCollector;
 import net.minecraft.util.SimpleBitStorage;
 import net.minecraft.util.ThreadingDetector;
 import net.minecraft.util.Unit;
@@ -82,7 +81,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.concurrent.locks.StampedLock;
 import java.util.function.Function;
 
 import static java.lang.invoke.MethodType.methodType;
@@ -355,10 +353,9 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         if (levelChunk == null) {
             return;
         }
-        long[] stamp = new long[1];
-        StampedLock[] stampedLock = new StampedLock[1];
-        NMSAdapter.beginChunkPacketSend(nmsWorld.getWorld().getName(), pair, stamp, stampedLock);
-        if (stampedLock[0] == null) {
+        StampLockHolder lockHolder = new StampLockHolder();
+        NMSAdapter.beginChunkPacketSend(nmsWorld.getWorld().getName(), pair, lockHolder);
+        if (lockHolder.chunkLock == null) {
             return;
         }
         MinecraftServer.getServer().execute(() -> {
@@ -383,7 +380,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                 }
                 nearbyPlayers(nmsWorld, coordIntPair).forEach(p -> p.connection.send(packet));
             } finally {
-                NMSAdapter.endChunkPacketSend(nmsWorld.getWorld().getName(), pair, stamp[0], stampedLock[0]);
+                NMSAdapter.endChunkPacketSend(nmsWorld.getWorld().getName(), pair, lockHolder);
             }
         });
     }
