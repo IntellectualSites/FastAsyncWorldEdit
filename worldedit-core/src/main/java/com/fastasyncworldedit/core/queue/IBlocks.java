@@ -61,7 +61,7 @@ public interface IBlocks extends Trimable {
 
     @Deprecated(forRemoval = true, since = "2.11.2")
     default Map<BlockVector3, CompoundTag> getTiles() {
-        return AdaptedMap.immutable(tiles(), pos -> pos, IBlocks::toCompoundTag);
+        return AdaptedMap.values(tiles(), ct -> FaweCompoundTag.of(ct.toLinTag()), IBlocks::toCompoundTag);
     }
 
     Map<BlockVector3, FaweCompoundTag> tiles();

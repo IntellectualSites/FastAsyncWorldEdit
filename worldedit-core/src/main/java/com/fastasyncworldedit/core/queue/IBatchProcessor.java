@@ -3,15 +3,16 @@ package com.fastasyncworldedit.core.queue;
 import com.fastasyncworldedit.core.extent.processor.EmptyBatchProcessor;
 import com.fastasyncworldedit.core.extent.processor.MultiBatchProcessor;
 import com.fastasyncworldedit.core.extent.processor.ProcessorScope;
-import com.sk89q.jnbt.CompoundTag;
+import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
+import com.fastasyncworldedit.core.util.NbtUtils;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 
 import javax.annotation.Nullable;
+import java.util.Collection;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.function.Function;
@@ -156,11 +157,11 @@ public interface IBatchProcessor {
      */
     @Deprecated(forRemoval = true, since = "2.8.4")
     default boolean trimNBT(IChunkSet set, Function<BlockVector3, Boolean> contains) {
-        Set<CompoundTag> ents = set.getEntities();
+        Collection<FaweCompoundTag> ents = set.entities();
         if (!ents.isEmpty()) {
-            ents.removeIf(ent -> !contains.apply(ent.getEntityPosition().toBlockPoint()));
+            ents.removeIf(ent -> !contains.apply(NbtUtils.entityPosition(ent).toBlockPoint()));
         }
-        Map<BlockVector3, CompoundTag> tiles = set.getTiles();
+        Map<BlockVector3, FaweCompoundTag> tiles = set.tiles();
         if (!tiles.isEmpty()) {
             tiles.entrySet().removeIf(blockVector3CompoundTagEntry -> !contains
                     .apply(blockVector3CompoundTagEntry.getKey()));
@@ -177,11 +178,11 @@ public interface IBatchProcessor {
     default boolean trimNBT(
             IChunkSet set, Function<BlockVector3, Boolean> containsEntity, Function<BlockVector3, Boolean> containsTile
     ) {
-        Set<CompoundTag> ents = set.getEntities();
+        Collection<FaweCompoundTag> ents = set.entities();
         if (!ents.isEmpty()) {
-            ents.removeIf(ent -> !containsEntity.apply(ent.getEntityPosition().toBlockPoint()));
+            ents.removeIf(ent -> !containsEntity.apply(NbtUtils.entityPosition(ent).toBlockPoint()));
         }
-        Map<BlockVector3, CompoundTag> tiles = set.getTiles();
+        Map<BlockVector3, FaweCompoundTag> tiles = set.tiles();
         if (!tiles.isEmpty()) {
             tiles.entrySet().removeIf(blockVector3CompoundTagEntry -> !containsTile.apply(blockVector3CompoundTagEntry.getKey()));
         }

@@ -512,8 +512,8 @@ public class LimitExtent extends AbstractDelegateExtent implements IBatchProcess
         if (!processing) {
             return set;
         }
-        int tiles = set.getTiles().size();
-        int ents = set.getEntities().size() + set.getEntityRemoves().size();
+        int tiles = set.tiles().size();
+        int ents = set.entities().size() + set.getEntityRemoves().size();
         limit.THROW_MAX_CHANGES(tiles + ents);
         limit.THROW_MAX_BLOCKSTATES(tiles);
         limit.THROW_MAX_ENTITIES(ents);
