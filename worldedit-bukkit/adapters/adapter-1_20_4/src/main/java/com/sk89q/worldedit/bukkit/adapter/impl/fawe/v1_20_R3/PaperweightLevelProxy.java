@@ -12,6 +12,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
+import org.enginehub.linbus.tree.LinCompoundTag;
 import sun.misc.Unsafe;
 
 import javax.annotation.Nonnull;
@@ -50,7 +51,7 @@ public class PaperweightLevelProxy extends ServerLevel {
         if (blockPos.getY() == Integer.MAX_VALUE) {
             return null;
         }
-        com.sk89q.jnbt.CompoundTag tag = processor.getTileAt(blockPos.getX(), blockPos.getY(), blockPos.getZ());
+        LinCompoundTag tag = processor.getTileAt(blockPos.getX(), blockPos.getY(), blockPos.getZ());
         if (tag == null) {
             return null;
         }
@@ -59,7 +60,7 @@ public class PaperweightLevelProxy extends ServerLevel {
             return null;
         }
         BlockEntity tileEntity = entityBlock.newBlockEntity(blockPos, state);
-        tileEntity.load((CompoundTag) adapter.fromNative(tag));
+        tileEntity.load((CompoundTag) adapter.fromNativeLin(tag));
         return tileEntity;
     }
 

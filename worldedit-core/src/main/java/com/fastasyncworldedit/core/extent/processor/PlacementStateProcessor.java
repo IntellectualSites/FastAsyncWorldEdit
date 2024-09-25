@@ -7,12 +7,12 @@ import com.fastasyncworldedit.core.function.mask.AdjacentAny2DMask;
 import com.fastasyncworldedit.core.math.BlockVector3ChunkMap;
 import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.fastasyncworldedit.core.math.MutableVector3;
+import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.fastasyncworldedit.core.queue.IBatchProcessor;
 import com.fastasyncworldedit.core.queue.IChunk;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.IChunkSet;
 import com.fastasyncworldedit.core.registry.state.PropertyKey;
-import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
@@ -213,7 +213,7 @@ public abstract class PlacementStateProcessor extends AbstractDelegateExtent imp
     }
 
     private IChunkSet process() {
-        Map<BlockVector3, CompoundTag> setTiles = processChunkSet.getTiles();
+        Map<BlockVector3, FaweCompoundTag> setTiles = processChunkSet.tiles();
         for (int layer = processChunkGet.getMinSectionPosition(); layer <= processChunkGet.getMaxSectionPosition(); layer++) {
             int layerY = layer << 4;
             char[] set = processChunkSet.loadIfPresent(layer);
@@ -230,7 +230,7 @@ public abstract class PlacementStateProcessor extends AbstractDelegateExtent imp
     }
 
     private void checkAndPerformUpdate(
-            Map<BlockVector3, CompoundTag> setTiles,
+            Map<BlockVector3, FaweCompoundTag> setTiles,
             char[] set,
             int index,
             int blockY,
@@ -254,7 +254,7 @@ public abstract class PlacementStateProcessor extends AbstractDelegateExtent imp
                             blockX,
                             blockY,
                             blockZ,
-                            setTiles.isEmpty() ? null : ((BlockVector3ChunkMap<CompoundTag>) setTiles).remove(x, blockY, z)
+                            setTiles.isEmpty() ? null : ((BlockVector3ChunkMap<FaweCompoundTag>) setTiles).remove(x, blockY, z)
                     ), ordinal);
                     set[index] = BlockTypesCache.ReservedIDs.__RESERVED__;
                     continue;
@@ -300,7 +300,7 @@ public abstract class PlacementStateProcessor extends AbstractDelegateExtent imp
                 continue;
             }
             if (secondPass.tile != null) {
-                extent.setTile(secondPass.x, secondPass.y, secondPass.z, secondPass.tile);
+                extent.tile(secondPass.x, secondPass.y, secondPass.z, secondPass.tile);
             }
             extent.setBlock(secondPass.x, secondPass.y, secondPass.z, BlockTypesCache.states[newOrdinal]);
         }
@@ -337,7 +337,7 @@ public abstract class PlacementStateProcessor extends AbstractDelegateExtent imp
             return processChunkGet.getBlock(x & 15, y, z & 15);
         }
         BlockState state = BlockTypesCache.states[ordinal];
-        // "Hack" for stairs as internal server methods will only accept "single" chests for joining
+        // "Hack" for chests as internal server methods will only accept "single" chests for joining
         if (state.getBlockType().equals(BlockTypes.CHEST) || state.getBlockType().equals(BlockTypes.TRAPPED_CHEST)) {
             String shape =  state.getState(PropertyKey.TYPE).toString();
             if (shape.equals("right")) {
@@ -361,34 +361,34 @@ public abstract class PlacementStateProcessor extends AbstractDelegateExtent imp
         return BlockTypesCache.states[ordinal];
     }
 
-    public CompoundTag getTileAt(int x, int y, int z) {
+    public LinCompoundTag getTileAt(int x, int y, int z) {
         SecondPass secondPass = new SecondPass(x, y, z, null);
         Character ord = postCompleteSecondPasses.get(secondPass);
         if (ord != null && ord != 0) {
             // This should be rare enough...
             for (SecondPass pass : postCompleteSecondPasses.keySet()) {
                 if (pass.hashCode() == secondPass.hashCode()) {
-                    return pass.tile != null ? pass.tile : BlockTypesCache.states[ord].getNbtData();
+                    return pass.tile != null ? pass.tile.linTag() : BlockTypesCache.states[ord].getNbt();
                 }
             }
-            return BlockTypesCache.states[ord].getNbtData();
+            return BlockTypesCache.states[ord].getNbt();
         }
         if (processChunkSet == null || (x & CHUNK_BLOCK_POS_MASK) != processChunkX || (z & CHUNK_BLOCK_POS_MASK) != processChunkZ) {
-            return extent.getFullBlock(x, y, z).getNbtData();
+            return extent.getFullBlock(x, y, z).getNbt();
         }
-        CompoundTag tile = processChunkSet.getTile(x & 15, y, z & 15);
+        FaweCompoundTag tile = processChunkSet.tile(x & 15, y, z & 15);
         if (tile != null) {
-            return tile;
+            return tile.linTag();
         }
         char[] set = processChunkSet.loadIfPresent(y >> 4);
         if (set == null) {
-            return processChunkGet.getFullBlock(x & 15, y, z & 15).getNbtData();
+            return processChunkGet.getFullBlock(x & 15, y, z & 15).getNbt();
         }
         char ordinal = set[(y & 15) << 8 | (z & 15) << 4 | (x & 15)];
         if (ordinal == BlockTypesCache.ReservedIDs.__RESERVED__) {
-            return processChunkGet.getFullBlock(x & 15, y, z & 15).getNbtData();
+            return processChunkGet.getFullBlock(x & 15, y, z & 15).getNbt();
         }
-        return BlockTypesCache.states[ordinal].getNbtData();
+        return BlockTypesCache.states[ordinal].getNbt();
     }
 
     private char getBlockOrdinal(int blockX, int blockY, int blockZ, BlockState state) {
@@ -487,9 +487,9 @@ public abstract class PlacementStateProcessor extends AbstractDelegateExtent imp
         if (block.getOrdinalChar() != newOrdinal) {
             BlockState newState = BlockTypesCache.states[newOrdinal];
             orDefault.setBlock(set.x(), set.y(), set.z(), newState);
-            CompoundTag nbt = block.getNbtData();
+            LinCompoundTag nbt = block.getNbt();
             if (nbt != null && newState.getBlockType() == block.getBlockType()) {
-                orDefault.setTile(set.x(), set.y(), set.z(), nbt);
+                orDefault.tile(set.x(), set.y(), set.z(), FaweCompoundTag.of(nbt));
             }
             return true;
         }
@@ -521,7 +521,7 @@ public abstract class PlacementStateProcessor extends AbstractDelegateExtent imp
         return null;
     }
 
-    protected record SecondPass(int x, int y, int z, CompoundTag tile) {
+    protected record SecondPass(int x, int y, int z, FaweCompoundTag tile) {
 
         private SecondPass(BlockVector3 pos) {
             this(pos.x(), pos.y(), pos.z(), null);
