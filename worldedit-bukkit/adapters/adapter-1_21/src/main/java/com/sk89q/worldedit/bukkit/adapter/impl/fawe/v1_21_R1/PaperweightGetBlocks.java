@@ -7,6 +7,7 @@ import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.extent.processor.heightmap.HeightMapType;
 import com.fastasyncworldedit.core.math.BitArrayUnstretched;
+import com.fastasyncworldedit.core.math.IntPair;
 import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.IChunkSet;
@@ -107,6 +108,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
     private final ServerLevel serverLevel;
     private final int chunkX;
     private final int chunkZ;
+    private final IntPair chunkPos;
     private final int minHeight;
     private final int maxHeight;
     private final int minSectionPosition;
@@ -141,6 +143,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
         this.blockLight = new DataLayer[getSectionCount()];
         this.biomeRegistry = serverLevel.registryAccess().registryOrThrow(BIOME);
         this.biomeHolderIdMap = biomeRegistry.asHolderIdMap();
+        this.chunkPos = new IntPair(chunkX, chunkZ);
     }
 
     public int getChunkX() {
@@ -427,7 +430,8 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
             throw new IllegalStateException("Attempted to call chunk GET but chunk was not call-locked.");
         }
         forceLoadSections = false;
-        PaperweightGetBlocks_Copy copy = createCopy ? new PaperweightGetBlocks_Copy(levelChunk) : null;
+        LevelChunk nmsChunk = ensureLoaded(serverLevel, chunkX, chunkZ);
+        PaperweightGetBlocks_Copy copy = createCopy ? new PaperweightGetBlocks_Copy(nmsChunk) : null;
         if (createCopy) {
             if (copies.containsKey(copyKey)) {
                 throw new IllegalStateException("Copy key already used.");
@@ -435,9 +439,6 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
             copies.put(copyKey, copy);
         }
         try {
-            ServerLevel nmsWorld = serverLevel;
-            LevelChunk nmsChunk = ensureLoaded(nmsWorld, chunkX, chunkZ);
-
             // Remove existing tiles. Create a copy so that we can remove blocks
             Map<BlockPos, BlockEntity> chunkTiles = new HashMap<>(nmsChunk.getBlockEntities());
             List<BlockEntity> beacons = null;
@@ -509,6 +510,8 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                                             biomeData
                                     );
                                     if (PaperweightPlatformAdapter.setSectionAtomic(
+                                            serverLevel.getWorld().getName(),
+                                            chunkPos,
                                             levelChunkSections,
                                             null,
                                             newSection,
@@ -583,6 +586,8 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                                     biomeData
                             );
                             if (PaperweightPlatformAdapter.setSectionAtomic(
+                                    serverLevel.getWorld().getName(),
+                                    chunkPos,
                                     levelChunkSections,
                                     null,
                                     newSection,
@@ -644,7 +649,11 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                                     biomeRegistry,
                                     biomeData != null ? biomeData : (PalettedContainer<Holder<Biome>>) existingSection.getBiomes()
                             );
-                            if (!PaperweightPlatformAdapter.setSectionAtomic(levelChunkSections, existingSection,
+                            if (!PaperweightPlatformAdapter.setSectionAtomic(
+                                    serverLevel.getWorld().getName(),
+                                    chunkPos,
+                                    levelChunkSections,
+                                    existingSection,
                                     newSection,
                                     getSectionIndex
                             )) {
@@ -716,7 +725,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                         }
                         if (Settings.settings().EXPERIMENTAL.REMOVE_ENTITY_FROM_WORLD_ON_CHUNK_FAIL) {
                             for (UUID uuid : entityRemoves) {
-                                Entity entity = nmsWorld.getEntities().get(uuid);
+                                Entity entity = serverLevel.getEntities().get(uuid);
                                 if (entity != null) {
                                     removeEntity(entity);
                                 }
@@ -755,7 +764,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
 
                             EntityType<?> type = EntityType.byString(id).orElse(null);
                             if (type != null) {
-                                Entity entity = type.create(nmsWorld);
+                                Entity entity = type.create(serverLevel);
                                 if (entity != null) {
                                     final CompoundTag tag = (CompoundTag) adapter.fromNativeLin(linTag);
                                     for (final String name : Constants.NO_COPY_ENTITY_NBT_FIELDS) {
@@ -764,11 +773,11 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                                     entity.load(tag);
                                     entity.absMoveTo(x, y, z, yaw, pitch);
                                     entity.setUUID(NbtUtils.uuid(nativeTag));
-                                    if (!nmsWorld.addFreshEntity(entity, CreatureSpawnEvent.SpawnReason.CUSTOM)) {
+                                    if (!serverLevel.addFreshEntity(entity, CreatureSpawnEvent.SpawnReason.CUSTOM)) {
                                         LOGGER.warn(
                                                 "Error creating entity of type `{}` in world `{}` at location `{},{},{}`",
                                                 id,
-                                                nmsWorld.getWorld().getName(),
+                                                serverLevel.getWorld().getName(),
                                                 x,
                                                 y,
                                                 z
@@ -798,11 +807,11 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                             final int z = blockHash.z() + bz;
                             final BlockPos pos = new BlockPos(x, y, z);
 
-                            synchronized (nmsWorld) {
-                                BlockEntity tileEntity = nmsWorld.getBlockEntity(pos);
+                            synchronized (serverLevel) {
+                                BlockEntity tileEntity = serverLevel.getBlockEntity(pos);
                                 if (tileEntity == null || tileEntity.isRemoved()) {
-                                    nmsWorld.removeBlockEntity(pos);
-                                    tileEntity = nmsWorld.getBlockEntity(pos);
+                                    serverLevel.removeBlockEntity(pos);
+                                    tileEntity = serverLevel.getBlockEntity(pos);
                                 }
                                 if (tileEntity != null) {
                                     final CompoundTag tag = (CompoundTag) adapter.fromNativeLin(nativeTag.linTag());
@@ -821,7 +830,6 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                     callback = null;
                 } else {
                     int finalMask = bitMask != 0 ? bitMask : lightUpdate ? set.getBitMask() : 0;
-                    boolean finalLightUpdate = lightUpdate;
                     callback = () -> {
                         // Set Modified
                         nmsChunk.setLightCorrect(true); // Set Modified
@@ -927,7 +935,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
     @Override
     public void send() {
         synchronized (sendLock) {
-            PaperweightPlatformAdapter.sendChunk(this, serverLevel, chunkX, chunkZ);
+            PaperweightPlatformAdapter.sendChunk(new IntPair(chunkX, chunkZ), serverLevel, chunkX, chunkZ);
         }
     }
 

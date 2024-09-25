@@ -118,9 +118,9 @@ public class BukkitWorld extends AbstractWorld {
         HAS_MIN_Y = temp;
     }
 
-    private WeakReference<World> worldRef;
+    protected WeakReference<World> worldRef;
     //FAWE start
-    private final String worldNameRef;
+    protected final String worldNameRef;
     //FAWE end
     private final WorldNativeAccess<?, ?, ?> worldNativeAccess;
 

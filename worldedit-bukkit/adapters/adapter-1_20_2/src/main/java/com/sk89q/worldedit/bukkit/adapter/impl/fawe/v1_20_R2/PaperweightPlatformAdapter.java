@@ -7,8 +7,8 @@ import com.fastasyncworldedit.bukkit.adapter.NMSAdapter;
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.math.BitArrayUnstretched;
+import com.fastasyncworldedit.core.math.IntPair;
 import com.fastasyncworldedit.core.util.MathMan;
-import com.fastasyncworldedit.core.util.ReflectionUtils;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.mojang.datafixers.util.Either;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
@@ -243,15 +243,14 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
     }
 
     static boolean setSectionAtomic(
+            String worldName,
+            IntPair pair,
             LevelChunkSection[] sections,
             LevelChunkSection expected,
             LevelChunkSection value,
             int layer
     ) {
-        if (layer >= 0 && layer < sections.length) {
-            return ReflectionUtils.compareAndSet(sections, expected, value, layer);
-        }
-        return false;
+        return NMSAdapter.setSectionAtomic(worldName, pair, sections, expected, value, layer);
     }
 
     // There is no point in having a functional semaphore for paper servers.
@@ -349,7 +348,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
     }
 
     @SuppressWarnings("deprecation")
-    public static void sendChunk(Object chunk, ServerLevel nmsWorld, int chunkX, int chunkZ) {
+    public static void sendChunk(IntPair pair, ServerLevel nmsWorld, int chunkX, int chunkZ) {
         ChunkHolder chunkHolder = getPlayerChunk(nmsWorld, chunkX, chunkZ);
         if (chunkHolder == null) {
             return;
@@ -370,26 +369,35 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         if (levelChunk == null) {
             return;
         }
+        StampLockHolder lockHolder = new StampLockHolder();
+        NMSAdapter.beginChunkPacketSend(nmsWorld.getWorld().getName(), pair, lockHolder);
+        if (lockHolder.chunkLock == null) {
+            return;
+        }
         MinecraftServer.getServer().execute(() -> {
-            ClientboundLevelChunkWithLightPacket packet;
-            if (PaperLib.isPaper()) {
-                packet = new ClientboundLevelChunkWithLightPacket(
-                        levelChunk,
-                        nmsWorld.getChunkSource().getLightEngine(),
-                        null,
-                        null,
-                        false // last false is to not bother with x-ray
-                );
-            } else {
-                // deprecated on paper - deprecation suppressed
-                packet = new ClientboundLevelChunkWithLightPacket(
-                        levelChunk,
-                        nmsWorld.getChunkSource().getLightEngine(),
-                        null,
-                        null
-                );
+            try {
+                ClientboundLevelChunkWithLightPacket packet;
+                if (PaperLib.isPaper()) {
+                    packet = new ClientboundLevelChunkWithLightPacket(
+                            levelChunk,
+                            nmsWorld.getChunkSource().getLightEngine(),
+                            null,
+                            null,
+                            false // last false is to not bother with x-ray
+                    );
+                } else {
+                    // deprecated on paper - deprecation suppressed
+                    packet = new ClientboundLevelChunkWithLightPacket(
+                            levelChunk,
+                            nmsWorld.getChunkSource().getLightEngine(),
+                            null,
+                            null
+                    );
+                }
+                nearbyPlayers(nmsWorld, coordIntPair).forEach(p -> p.connection.send(packet));
+            } finally {
+                NMSAdapter.endChunkPacketSend(nmsWorld.getWorld().getName(), pair, lockHolder);
             }
-            nearbyPlayers(nmsWorld, coordIntPair).forEach(p -> p.connection.send(packet));
         });
     }
 
