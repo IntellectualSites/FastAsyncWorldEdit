@@ -8,6 +8,7 @@ import com.fastasyncworldedit.core.util.image.ImageViewer;
 import com.sk89q.worldedit.entity.Player;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.UUID;
 
@@ -48,5 +49,9 @@ public interface IFawe {
     }
 
     FAWEPlatformAdapterImpl getPlatformAdapter();
+
+    Path getWorldsFolder();
+
+    boolean isWorldLoaded(String world);
 
 }

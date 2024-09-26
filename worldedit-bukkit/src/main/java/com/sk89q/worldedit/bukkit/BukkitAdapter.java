@@ -495,4 +495,20 @@ public enum BukkitAdapter {
         return getAdapter().adapt(item);
         //FAWE end
     }
+
+    //FAWE start
+    /**
+     * Get a char array of minecraft internal IDs against FAWE char IDs
+     */
+    public static char[] getIbdToStateOrdinal() {
+        return getAdapter().getIbdToStateOrdinal();
+    }
+
+    /**
+     * Get an int array of FAWE char IDs against minecraft internal IDs
+     */
+    public static int[] getOrdinalToIbdID() {
+        return getAdapter().getOrdinalToIbdID();
+    }
+    //FAWE end
 }

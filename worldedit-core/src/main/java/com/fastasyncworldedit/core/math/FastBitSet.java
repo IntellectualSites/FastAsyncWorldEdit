@@ -1,11 +1,12 @@
 package com.fastasyncworldedit.core.math;
 
+import java.math.BigInteger;
 import java.util.Arrays;
 
 public class FastBitSet {
 
-    private final int size;
-    private final long[] bits;
+    private int size;
+    private long[] bits;
 
     public FastBitSet(int size) {
         this.size = size;
@@ -91,6 +92,27 @@ public class FastBitSet {
         for (int i = b; i < e; ++i) {
             a[i] = l;
         }
+    }
+
+    public void expandTo(int newSize, boolean value) {
+        int newLength = (newSize + 64) >> 6;
+        if (newLength <= this.bits.length) {
+            if (this.size < newSize) {
+                this.size = newSize;
+            }
+            return;
+        }
+        long[] tmp = new long[newLength];
+        if (value) {
+            Arrays.fill(tmp, -1L);
+        }
+        System.arraycopy(bits, 0, tmp, 0, bits.length);
+        this.bits = tmp;
+        this.size = newSize;
+    }
+
+    public void setAll() {
+        setAll(bits);
     }
 
     public boolean get(final int i) {
@@ -195,6 +217,18 @@ public class FastBitSet {
             return value;
         }
 
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < this.bits.length; i++) {
+            String bits = new StringBuilder(String.format("%064d", new BigInteger(Long.toBinaryString(this.bits[i]))))
+                    .reverse()
+                    .toString();
+            builder.append(i * 64).append(":").append(bits).append(" ");
+        }
+        return builder.toString();
     }
 
 }

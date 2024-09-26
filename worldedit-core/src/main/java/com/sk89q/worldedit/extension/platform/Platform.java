@@ -276,5 +276,21 @@ public interface Platform extends Keyed {
     default IBatchProcessor getPlatformPostProcessor(boolean fastMode) {
         return null;
     }
+
+    /**
+     * Get a char array of minecraft internal IDs against FAWE char IDs
+     */
+    @Nullable
+    default char[] getIbdToStateOrdinal() {
+        return null;
+    }
+
+    /**
+     * Get an int array of FAWE char IDs against minecraft internal IDs
+     */
+    @Nullable
+    default int[] getOrdinalToIbdID() {
+        return null;
+    }
     //FAWE end
 }

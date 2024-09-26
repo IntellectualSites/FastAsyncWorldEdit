@@ -630,6 +630,16 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
     }
 
     @Override
+    public char[] getIbdToStateOrdinal() {
+        return new char[0];
+    }
+
+    @Override
+    public int[] getOrdinalToIbdID() {
+        return new int[0];
+    }
+
+    @Override
     public BaseItemStack adapt(org.bukkit.inventory.ItemStack itemStack) {
         final ItemStack nmsStack = CraftItemStack.asNMSCopy(itemStack);
         final BaseItemStack weStack = new BaseItemStack(BukkitAdapter.asItemType(itemStack.getType()), itemStack.getAmount());

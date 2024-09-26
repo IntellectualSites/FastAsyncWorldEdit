@@ -23,12 +23,12 @@ public class SimpleBukkitAdapter extends CachedBukkitAdapter {
     }
 
     @Override
-    protected char[] getIbdToStateOrdinal() {
+    public char[] getIbdToStateOrdinal() {
         return new char[Character.MAX_VALUE + 1];
     }
 
     @Override
-    protected int[] getOrdinalToIbdID() {
+    public int[] getOrdinalToIbdID() {
         return new int[Character.MAX_VALUE + 1];
     }
 

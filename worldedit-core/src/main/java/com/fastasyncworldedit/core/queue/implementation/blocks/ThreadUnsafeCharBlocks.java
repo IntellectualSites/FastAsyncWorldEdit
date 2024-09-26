@@ -440,7 +440,7 @@ public class ThreadUnsafeCharBlocks implements IChunkSet, IBlocks {
     @Override
     public boolean hasBiomes(int layer) {
         layer -= minSectionPosition;
-        return layer >= 0 && layer < biomes.length && biomes[layer] != null && biomes[layer].length > 0;
+        return layer >= 0 && biomes != null && layer < biomes.length && biomes[layer] != null && biomes[layer].length > 0;
     }
 
     @Override

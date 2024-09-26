@@ -8,6 +8,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.world.storage.InvalidFormatException;
 
 import javax.annotation.Nullable;
 import java.util.UUID;
