@@ -2,14 +2,12 @@ package com.fastasyncworldedit.core.extent;
 
 import com.fastasyncworldedit.core.extent.processor.ProcessorScope;
 import com.fastasyncworldedit.core.math.BlockVector3ChunkMap;
+import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.fastasyncworldedit.core.queue.IBatchProcessor;
 import com.fastasyncworldedit.core.queue.IChunk;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.IChunkSet;
 import com.fastasyncworldedit.core.util.ExtentTraverser;
-import com.google.common.collect.ImmutableMap;
-import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
@@ -20,16 +18,17 @@ import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.NbtValued;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
+import org.enginehub.linbus.tree.LinCompoundTag;
+import org.enginehub.linbus.tree.LinTag;
 
 import javax.annotation.Nullable;
-import java.util.HashMap;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 public class StripNBTExtent extends AbstractDelegateExtent implements IBatchProcessor {
@@ -75,77 +74,80 @@ public class StripNBTExtent extends AbstractDelegateExtent implements IBatchProc
         if (!(block instanceof BaseBlock localBlock)) {
             return block;
         }
-        if (!localBlock.hasNbtData()) {
+        final LinCompoundTag nbt = localBlock.getNbt();
+        if (nbt == null) {
             return block;
         }
-        CompoundTag nbt = localBlock.getNbtData();
-        Map<String, Tag<?, ?>> value = new HashMap<>(nbt.getValue());
+        LinCompoundTag.Builder nbtBuilder = nbt.toBuilder();
         for (String key : strip) {
-            value.remove(key);
+            nbtBuilder.remove(key);
         }
-        return (B) localBlock.toBaseBlock(new CompoundTag(value));
+        return (B) localBlock.toBaseBlock(nbtBuilder.build());
     }
 
     public <T extends NbtValued> T stripEntityNBT(T entity) {
-        if (!entity.hasNbtData()) {
+        LinCompoundTag nbt = entity.getNbt();
+        if (nbt == null) {
             return entity;
         }
-        CompoundTag nbt = entity.getNbtData();
-        Map<String, Tag<?, ?>> value = new HashMap<>(nbt.getValue());
+        LinCompoundTag.Builder nbtBuilder = nbt.toBuilder();
         for (String key : strip) {
-            value.remove(key);
+            nbtBuilder.remove(key);
         }
-        entity.setNbtData(new CompoundTag(value));
+        entity.setNbt(nbtBuilder.build());
         return entity;
     }
 
     @Override
     public IChunkSet processSet(final IChunk chunk, final IChunkGet get, final IChunkSet set) {
-        Map<BlockVector3, CompoundTag> tiles = set.getTiles();
-        Set<CompoundTag> entities = set.getEntities();
+        Map<BlockVector3, FaweCompoundTag> tiles = set.tiles();
+        Collection<FaweCompoundTag> entities = set.entities();
         if (tiles.isEmpty() && entities.isEmpty()) {
             return set;
         }
         boolean isBv3ChunkMap = tiles instanceof BlockVector3ChunkMap;
-        for (final Map.Entry<BlockVector3, CompoundTag> entry : tiles.entrySet()) {
-            ImmutableMap.Builder<String, Tag<?, ?>> map = ImmutableMap.builder();
-            final AtomicBoolean isStripped = new AtomicBoolean(false);
-            entry.getValue().getValue().forEach((k, v) -> {
-                if (strip.contains(k.toLowerCase())) {
-                    isStripped.set(true);
-                } else {
-                    map.put(k, v);
-                }
-            });
-            if (isStripped.get()) {
+        for (final var entry : tiles.entrySet()) {
+            FaweCompoundTag original = entry.getValue();
+            FaweCompoundTag result = stripNbt(original);
+            if (original != result) {
                 if (isBv3ChunkMap) {
                     // Replace existing value with stripped value
-                    tiles.put(entry.getKey(), new CompoundTag(map.build()));
+                    tiles.put(entry.getKey(), result);
                 } else {
-                    entry.setValue(new CompoundTag(map.build()));
+                    entry.setValue(result);
                 }
             }
         }
-        Set<CompoundTag> stripped = new HashSet<>();
-        Iterator<CompoundTag> iterator = entities.iterator();
+        Set<FaweCompoundTag> stripped = new HashSet<>();
+        Iterator<FaweCompoundTag> iterator = entities.iterator();
         while (iterator.hasNext()) {
-            CompoundTag entity = iterator.next();
-            ImmutableMap.Builder<String, Tag<?, ?>> map = ImmutableMap.builder();
-            final AtomicBoolean isStripped = new AtomicBoolean(false);
-            entity.getValue().forEach((k, v) -> {
-                if (strip.contains(k.toUpperCase(Locale.ROOT))) {
-                    isStripped.set(true);
-                } else {
-                    map.put(k, v);
-                }
-            });
-            if (isStripped.get()) {
+            FaweCompoundTag original = iterator.next();
+            FaweCompoundTag result = stripNbt(original);
+            if (original != result) {
                 iterator.remove();
-                stripped.add(new CompoundTag(map.build()));
+                stripped.add(result);
             }
         }
-        set.getEntities().addAll(stripped);
+        // this relies on entities.addAll(...) not throwing an exception if empty+unmodifiable (=> stripped is empty too)
+        entities.addAll(stripped);
         return set;
+    }
+
+    private FaweCompoundTag stripNbt(
+            FaweCompoundTag compoundTag
+    ) {
+        LinCompoundTag.Builder builder = LinCompoundTag.builder();
+        boolean stripped = false;
+        for (var entry : compoundTag.linTag().value().entrySet()) {
+            String k = entry.getKey();
+            LinTag<?> v = entry.getValue();
+            if (strip.contains(k.toLowerCase(Locale.ROOT))) {
+                stripped = true;
+            } else {
+                builder.put(k, v);
+            }
+        }
+        return stripped ? FaweCompoundTag.of(builder.build()) : compoundTag;
     }
 
     @Nullable

@@ -2,6 +2,7 @@ package com.fastasyncworldedit.core.util;
 
 import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.sk89q.worldedit.entity.Entity;
+import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.storage.InvalidFormatException;
 import org.enginehub.linbus.tree.LinByteTag;
@@ -209,6 +210,20 @@ public final class NbtUtils {
 
         map.put("PersistentIDMSB", LinLongTag.of(uuid.getMostSignificantBits()));
         map.put("PersistentIDLSB", LinLongTag.of(uuid.getLeastSignificantBits()));
+    }
+
+    /**
+     * {@return the position data of the given tag}
+     *
+     * @param compoundTag the tag to extract position information from
+     * @since TODO
+     */
+    public static Vector3 entityPosition(FaweCompoundTag compoundTag) {
+        LinListTag<LinDoubleTag> pos = compoundTag.linTag().getListTag("Pos", LinTagType.doubleTag());
+        double x = pos.get(0).valueAsDouble();
+        double y = pos.get(1).valueAsDouble();
+        double z = pos.get(2).valueAsDouble();
+        return Vector3.at(x, y, z);
     }
 
 }
