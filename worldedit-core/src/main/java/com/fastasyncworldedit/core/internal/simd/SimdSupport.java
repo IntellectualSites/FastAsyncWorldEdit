@@ -2,14 +2,17 @@ package com.fastasyncworldedit.core.internal.simd;
 
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.extent.filter.block.DelegateFilter;
+import com.fastasyncworldedit.core.function.mask.InverseMask;
 import com.fastasyncworldedit.core.function.mask.SingleBlockStateMask;
 import com.fastasyncworldedit.core.queue.Filter;
+import com.sk89q.worldedit.function.mask.ExistingBlockMask;
 import com.sk89q.worldedit.function.mask.InverseSingleBlockStateMask;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BlockTypesCache;
 import jdk.incubator.vector.ShortVector;
 import jdk.incubator.vector.VectorOperators;
 
@@ -44,8 +47,21 @@ public class SimdSupport {
         return switch (mask) {
             case SingleBlockStateMask single -> vectorizedTargetMask(single.getBlockState().getOrdinalChar());
             case InverseSingleBlockStateMask inverse -> vectorizedTargetMaskInverse(inverse.getBlockState().getOrdinalChar());
+            case ExistingBlockMask ignored -> vectorizedTargetMaskNonAir();
+            case InverseMask inverse -> {
+                final VectorizedMask base = vectorizedTargetMask(inverse.inverse());
+                if (base == null) {
+                    yield null;
+                }
+                yield (set, get) -> base.compareVector(set, get).not();
+            }
             default -> null;
         };
+    }
+
+    private static VectorizedMask vectorizedTargetMaskNonAir() {
+        // everything > VOID_AIR is not air
+        return (set, get) -> get.compare(VectorOperators.UNSIGNED_GT, BlockTypesCache.ReservedIDs.VOID_AIR);
     }
 
     private static VectorizedMask vectorizedTargetMask(char ordinal) {
