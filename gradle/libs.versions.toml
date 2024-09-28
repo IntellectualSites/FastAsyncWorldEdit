@@ -9,7 +9,7 @@ snakeyaml = "2.0"
 
 # Plugins
 dummypermscompat = "1.10"
-worldguard-bukkit = "7.0.10"
+worldguard-bukkit = "7.0.12"
 mapmanager = "1.8.0-SNAPSHOT"
 griefprevention = "17.0.0"
 griefdefender = "2.1.0-SNAPSHOT"
