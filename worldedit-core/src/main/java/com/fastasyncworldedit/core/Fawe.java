@@ -14,14 +14,13 @@ import com.fastasyncworldedit.core.util.TaskManager;
 import com.fastasyncworldedit.core.util.TextureUtil;
 import com.fastasyncworldedit.core.util.WEManager;
 import com.fastasyncworldedit.core.util.task.KeyQueuedExecutorService;
+import com.fastasyncworldedit.core.util.task.UUIDKeyQueuedThreadFactory;
 import com.github.luben.zstd.Zstd;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import net.jpountz.lz4.LZ4Factory;
 import org.apache.logging.log4j.Logger;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.management.InstanceAlreadyExistsException;
 import javax.management.NotificationEmitter;
@@ -40,10 +39,8 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -87,7 +84,6 @@ import java.util.concurrent.TimeUnit;
 public class Fawe {
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
-    private static final ThreadLocal<Boolean> IS_UUID_KEYED_EXECUTOR_THREAD = ThreadLocal.withInitial(() -> false);
 
     private static Fawe instance;
 
@@ -153,21 +149,7 @@ public class Fawe {
                 0L,
                 TimeUnit.MILLISECONDS,
                 new LinkedBlockingQueue<>(),
-                new ThreadFactoryBuilder().setNameFormat("FAWE UUID-key-queued - %d").setThreadFactory(new ThreadFactory() {
-                    private final ThreadFactory defaultFactory = Executors.defaultThreadFactory();
-
-                    @Override
-                    public Thread newThread(@Nonnull Runnable r) {
-                        return defaultFactory.newThread(() -> {
-                            IS_UUID_KEYED_EXECUTOR_THREAD.set(true);
-                            try {
-                                r.run();
-                            } finally {
-                                IS_UUID_KEYED_EXECUTOR_THREAD.set(false); // Clear the mark after execution
-                            }
-                        });
-                    }
-                }).build()
+                new UUIDKeyQueuedThreadFactory()
         ));
     }
 
@@ -499,7 +481,7 @@ public class Fawe {
      * @since TODO
      */
     public Future<?> submitUUIDKeyQueuedTask(UUID uuid, Runnable runnable) {
-        if (IS_UUID_KEYED_EXECUTOR_THREAD.get()) {
+        if (Thread.currentThread() instanceof UUIDKeyQueuedThreadFactory.UUIDKeyQueuedThread) {
             runnable.run();
             return CompletableFuture.completedFuture(null);
         }
@@ -513,7 +495,7 @@ public class Fawe {
      * @since TODO
      */
     public <T> Future<T> submitUUIDKeyQueuedTask(UUID uuid, Runnable runnable, T result) {
-        if (IS_UUID_KEYED_EXECUTOR_THREAD.get()) {
+        if (Thread.currentThread() instanceof UUIDKeyQueuedThreadFactory.UUIDKeyQueuedThread) {
             runnable.run();
             return CompletableFuture.completedFuture(result);
         }
@@ -527,7 +509,7 @@ public class Fawe {
      * @since TODO
      */
     public <T> Future<T> submitUUIDKeyQueuedTask(UUID uuid, Callable<T> callable) {
-        if (IS_UUID_KEYED_EXECUTOR_THREAD.get()) {
+        if (Thread.currentThread() instanceof UUIDKeyQueuedThreadFactory.UUIDKeyQueuedThread) {
             try {
                 CompletableFuture.completedFuture(callable.call());
             } catch (Throwable t) {
