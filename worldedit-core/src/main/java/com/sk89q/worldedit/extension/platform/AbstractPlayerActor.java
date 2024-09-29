@@ -74,8 +74,8 @@ import java.io.File;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.StampedLock;
 
 /**
  * An abstract implementation of both a {@link Actor} and a {@link Player}
@@ -88,7 +88,7 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
 
     //FAWE start
     private final Map<String, Object> meta;
-    private final StampedLock clipboardLoading = new StampedLock();
+    private final Semaphore clipboardLoading = new Semaphore(1);
 
     // Queue for async tasks
     private final AtomicInteger runningCount = new AtomicInteger();
@@ -544,21 +544,24 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
 
     @Override
     public void loadClipboardFromDisk() {
-        if (clipboardLoading.isWriteLocked()) {
+        if (!clipboardLoading.tryAcquire()) {
             if (!Fawe.isMainThread()) {
-                long stamp = clipboardLoading.writeLock();
-                clipboardLoading.unlockWrite(stamp);
+                try {
+                    clipboardLoading.acquire();
+                    clipboardLoading.release();
+                } catch (InterruptedException e) {
+                    LOGGER.error("Error waiting for clipboard-on-disk loading for player {}", getName(), e);
+                }
             }
             return;
         }
 
-        final long stamp = clipboardLoading.writeLock();
         File file = MainUtil.getFile(
                 Fawe.platform().getDirectory(),
                 Settings.settings().PATHS.CLIPBOARD + File.separator + getUniqueId() + ".bd"
         );
-        Future<?> fut = Fawe.instance().submitUUIDKeyQueuedTask(getUniqueId(), () -> {
-            try {
+        try {
+            Future<?> fut = Fawe.instance().submitUUIDKeyQueuedTask(getUniqueId(), () -> {
                 try {
                     getSession().loadClipboardFromDisk(file);
                 } catch (FaweClipboardVersionMismatchException e) {
@@ -577,15 +580,13 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
                     print(Caption.of("fawe.error.no-failure"));
                     print(Caption.of("fawe.error.clipboard.invalid.info", file.getName(), file.length()));
                     print(Caption.of("fawe.error.stacktrace"));
+                } finally {
+                    clipboardLoading.release();
                 }
-            } finally {
-                clipboardLoading.unlockWrite(stamp);
+            });
+            if (Fawe.isMainThread()) {
+                return;
             }
-        });
-        if (Fawe.isMainThread()) {
-            return;
-        }
-        try {
             fut.get();
         } catch (Exception e) {
             print(Caption.of("fawe.error.clipboard.invalid"));
