@@ -23,7 +23,7 @@ public class AdjacentAnyMask extends AbstractMask implements ResettableMask {
     }
 
     AdjacentAnyMask(CachedMask mask, int minY, int maxY) {
-        this.mask = CachedMask.cache(mask);
+        this.mask = mask;
         mutable = new MutableBlockVector3();
         this.minY = minY;
         this.maxY = maxY;
