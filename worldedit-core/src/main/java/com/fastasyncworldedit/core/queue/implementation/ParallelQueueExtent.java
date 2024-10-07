@@ -149,6 +149,8 @@ public class ParallelQueueExtent extends PassthroughExtent {
                     final SingleThreadQueueExtent queue = (SingleThreadQueueExtent) getNewQueue();
                     queue.setFastMode(fastmode);
                     queue.setFaweExceptionArray(faweExceptionReasonsUsed);
+                    int div = ((size + 1) * 3) >> 1; // Allow each thread to use 1.5x TARGET_SIZE / PARALLEL_THREADS
+                    queue.setTargetSize(Settings.settings().QUEUE.TARGET_SIZE / div);
                     enter(queue);
                     synchronized (queue) {
                         try {

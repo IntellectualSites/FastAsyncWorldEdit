@@ -987,7 +987,8 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         if (chunkSet != null && !chunkSet.isEmpty()) {
             chunkSet.setBitMask(bitMask);
             IChunkSet copy = chunkSet.createCopy();
-            return this.call(copy, () -> {
+
+            return this.call(extent, copy, () -> {
                 // Do nothing
             });
         }
@@ -997,8 +998,9 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     /**
      * This method should never be called from outside ChunkHolder
      */
+
     @Override
-    public synchronized T call(IChunkSet set, Runnable finalize) {
+    public <U extends Future<U>> U call(IQueueExtent<? extends IChunk> owner, IChunkSet set, Runnable finalize) {
         if (set != null) {
             IChunkGet get = getOrCreateGet();
             try {
@@ -1016,7 +1018,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
                 } else {
                     finalizer = finalize;
                 }
-                return get.call(set, finalizer);
+                return get.call(extent, set, finalizer);
             } finally {
                 get.unlockCall();
                 untrackExtent();
