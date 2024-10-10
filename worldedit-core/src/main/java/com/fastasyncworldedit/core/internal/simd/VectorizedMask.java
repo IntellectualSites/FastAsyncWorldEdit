@@ -3,6 +3,7 @@ package com.fastasyncworldedit.core.internal.simd;
 import com.fastasyncworldedit.core.queue.IChunk;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.IChunkSet;
+import com.sk89q.worldedit.world.block.BlockTypesCache;
 import jdk.incubator.vector.ShortVector;
 import jdk.incubator.vector.VectorMask;
 import jdk.incubator.vector.VectorSpecies;
@@ -31,10 +32,22 @@ public interface VectorizedMask {
         }
     }
 
+    /**
+     * {@return the set vector with all lanes that do not match this mask set to 0}
+     *
+     * @param set the set vector
+     * @param get the get vector
+     */
     default ShortVector processVector(ShortVector set, ShortVector get) {
-        return set.blend(0, compareVector(set, get).not());
+        return set.blend(BlockTypesCache.ReservedIDs.__RESERVED__, compareVector(set, get).not());
     }
 
+    /**
+     * {@return a mask with all lanes set that match this mask}
+     *
+     * @param set the set vector
+     * @param get the get vector
+     */
     VectorMask<Short> compareVector(ShortVector set, ShortVector get);
 
 }
