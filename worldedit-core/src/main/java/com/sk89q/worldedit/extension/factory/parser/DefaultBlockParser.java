@@ -465,6 +465,7 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
                 if (state == null) {
                     throw new NoMatchException(Caption.of("fawe.error.invalid-block-type", TextComponent.of(input)));
                 }
+                nbt = state.getNbtData();
             }
             //FAWE end
 
