@@ -228,6 +228,7 @@ public final class ItemTypes {
     public static final ItemType BLACK_BANNER = init();
     @Nullable
     public static final ItemType BLACK_BED = init();
+    @Nullable public static final ItemType BLACK_BUNDLE = init();
     @Nullable
     public static final ItemType BLACK_CANDLE = init();
     @Nullable
@@ -272,6 +273,7 @@ public final class ItemTypes {
     public static final ItemType BLUE_BANNER = init();
     @Nullable
     public static final ItemType BLUE_BED = init();
+    @Nullable public static final ItemType BLUE_BUNDLE = init();
     @Nullable
     public static final ItemType BLUE_CANDLE = init();
     @Nullable
@@ -314,6 +316,7 @@ public final class ItemTypes {
     public static final ItemType BOOK = init();
     @Nullable
     public static final ItemType BOOKSHELF = init();
+    @Nullable public static final ItemType BORDURE_INDENTED_BANNER_PATTERN = init();
     @Nullable
     public static final ItemType BOW = init();
     @Nullable
@@ -348,6 +351,7 @@ public final class ItemTypes {
     public static final ItemType BROWN_BANNER = init();
     @Nullable
     public static final ItemType BROWN_BED = init();
+    @Nullable public static final ItemType BROWN_BUNDLE = init();
     @Nullable
     public static final ItemType BROWN_CARPET = init();
     @Nullable
@@ -611,6 +615,8 @@ public final class ItemTypes {
     public static final ItemType CRAFTER = init();
     @Nullable
     public static final ItemType CRAFTING_TABLE = init();
+    @Nullable public static final ItemType CREAKING_HEART = init();
+    @Nullable public static final ItemType CREAKING_SPAWN_EGG = init();
     @Nullable
     public static final ItemType CREEPER_BANNER_PATTERN = init();
     @Nullable
@@ -671,6 +677,7 @@ public final class ItemTypes {
     public static final ItemType CYAN_BANNER = init();
     @Nullable
     public static final ItemType CYAN_BED = init();
+    @Nullable public static final ItemType CYAN_BUNDLE = init();
     @Nullable
     public static final ItemType CYAN_CANDLE = init();
     @Nullable
@@ -962,6 +969,7 @@ public final class ItemTypes {
     public static final ItemType FERMENTED_SPIDER_EYE = init();
     @Nullable
     public static final ItemType FERN = init();
+    @Nullable public static final ItemType FIELD_MASONED_BANNER_PATTERN = init();
     @Nullable
     public static final ItemType FILLED_MAP = init();
     @Nullable
@@ -1097,6 +1105,7 @@ public final class ItemTypes {
     public static final ItemType GRAY_BANNER = init();
     @Nullable
     public static final ItemType GRAY_BED = init();
+    @Nullable public static final ItemType GRAY_BUNDLE = init();
     @Nullable
     public static final ItemType GRAY_CANDLE = init();
     @Nullable
@@ -1123,6 +1132,7 @@ public final class ItemTypes {
     public static final ItemType GREEN_BANNER = init();
     @Nullable
     public static final ItemType GREEN_BED = init();
+    @Nullable public static final ItemType GREEN_BUNDLE = init();
     @Nullable
     public static final ItemType GREEN_CANDLE = init();
     @Nullable
@@ -1337,6 +1347,7 @@ public final class ItemTypes {
     public static final ItemType LIGHT_BLUE_BANNER = init();
     @Nullable
     public static final ItemType LIGHT_BLUE_BED = init();
+    @Nullable public static final ItemType LIGHT_BLUE_BUNDLE = init();
     @Nullable
     public static final ItemType LIGHT_BLUE_CANDLE = init();
     @Nullable
@@ -1363,6 +1374,7 @@ public final class ItemTypes {
     public static final ItemType LIGHT_GRAY_BANNER = init();
     @Nullable
     public static final ItemType LIGHT_GRAY_BED = init();
+    @Nullable public static final ItemType LIGHT_GRAY_BUNDLE = init();
     @Nullable
     public static final ItemType LIGHT_GRAY_CANDLE = init();
     @Nullable
@@ -1399,6 +1411,7 @@ public final class ItemTypes {
     public static final ItemType LIME_BANNER = init();
     @Nullable
     public static final ItemType LIME_BED = init();
+    @Nullable public static final ItemType LIME_BUNDLE = init();
     @Nullable
     public static final ItemType LIME_CANDLE = init();
     @Nullable
@@ -1435,6 +1448,7 @@ public final class ItemTypes {
     public static final ItemType MAGENTA_BANNER = init();
     @Nullable
     public static final ItemType MAGENTA_BED = init();
+    @Nullable public static final ItemType MAGENTA_BUNDLE = init();
     @Nullable
     public static final ItemType MAGENTA_CANDLE = init();
     @Nullable
@@ -1711,6 +1725,7 @@ public final class ItemTypes {
     public static final ItemType ORANGE_BANNER = init();
     @Nullable
     public static final ItemType ORANGE_BED = init();
+    @Nullable public static final ItemType ORANGE_BUNDLE = init();
     @Nullable
     public static final ItemType ORANGE_CANDLE = init();
     @Nullable
@@ -1761,6 +1776,26 @@ public final class ItemTypes {
     public static final ItemType PACKED_MUD = init();
     @Nullable
     public static final ItemType PAINTING = init();
+    @Nullable public static final ItemType PALE_HANGING_MOSS = init();
+    @Nullable public static final ItemType PALE_MOSS_BLOCK = init();
+    @Nullable public static final ItemType PALE_MOSS_CARPET = init();
+    @Nullable public static final ItemType PALE_OAK_BOAT = init();
+    @Nullable public static final ItemType PALE_OAK_BUTTON = init();
+    @Nullable public static final ItemType PALE_OAK_CHEST_BOAT = init();
+    @Nullable public static final ItemType PALE_OAK_DOOR = init();
+    @Nullable public static final ItemType PALE_OAK_FENCE = init();
+    @Nullable public static final ItemType PALE_OAK_FENCE_GATE = init();
+    @Nullable public static final ItemType PALE_OAK_HANGING_SIGN = init();
+    @Nullable public static final ItemType PALE_OAK_LEAVES = init();
+    @Nullable public static final ItemType PALE_OAK_LOG = init();
+    @Nullable public static final ItemType PALE_OAK_PLANKS = init();
+    @Nullable public static final ItemType PALE_OAK_PRESSURE_PLATE = init();
+    @Nullable public static final ItemType PALE_OAK_SAPLING = init();
+    @Nullable public static final ItemType PALE_OAK_SIGN = init();
+    @Nullable public static final ItemType PALE_OAK_SLAB = init();
+    @Nullable public static final ItemType PALE_OAK_STAIRS = init();
+    @Nullable public static final ItemType PALE_OAK_TRAPDOOR = init();
+    @Nullable public static final ItemType PALE_OAK_WOOD = init();
     @Nullable
     public static final ItemType PANDA_SPAWN_EGG = init();
     @Nullable
@@ -1793,6 +1828,7 @@ public final class ItemTypes {
     public static final ItemType PINK_BANNER = init();
     @Nullable
     public static final ItemType PINK_BED = init();
+    @Nullable public static final ItemType PINK_BUNDLE = init();
     @Nullable
     public static final ItemType PINK_CANDLE = init();
     @Nullable
@@ -1943,6 +1979,7 @@ public final class ItemTypes {
     public static final ItemType PURPLE_BANNER = init();
     @Nullable
     public static final ItemType PURPLE_BED = init();
+    @Nullable public static final ItemType PURPLE_BUNDLE = init();
     @Nullable
     public static final ItemType PURPLE_CANDLE = init();
     @Nullable
@@ -2019,6 +2056,7 @@ public final class ItemTypes {
     public static final ItemType RED_BANNER = init();
     @Nullable
     public static final ItemType RED_BED = init();
+    @Nullable public static final ItemType RED_BUNDLE = init();
     @Nullable
     public static final ItemType RED_CANDLE = init();
     @Nullable
@@ -2382,6 +2420,8 @@ public final class ItemTypes {
     public static final ItemType STRIPPED_OAK_LOG = init();
     @Nullable
     public static final ItemType STRIPPED_OAK_WOOD = init();
+    @Nullable public static final ItemType STRIPPED_PALE_OAK_LOG = init();
+    @Nullable public static final ItemType STRIPPED_PALE_OAK_WOOD = init();
     @Nullable
     public static final ItemType STRIPPED_SPRUCE_LOG = init();
     @Nullable
@@ -2648,6 +2688,7 @@ public final class ItemTypes {
     public static final ItemType WHITE_BANNER = init();
     @Nullable
     public static final ItemType WHITE_BED = init();
+    @Nullable public static final ItemType WHITE_BUNDLE = init();
     @Nullable
     public static final ItemType WHITE_CANDLE = init();
     @Nullable
@@ -2708,6 +2749,7 @@ public final class ItemTypes {
     public static final ItemType YELLOW_BANNER = init();
     @Nullable
     public static final ItemType YELLOW_BED = init();
+    @Nullable public static final ItemType YELLOW_BUNDLE = init();
     @Nullable
     public static final ItemType YELLOW_CANDLE = init();
     @Nullable
