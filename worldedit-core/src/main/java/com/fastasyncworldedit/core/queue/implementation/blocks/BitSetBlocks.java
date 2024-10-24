@@ -6,6 +6,7 @@ import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.fastasyncworldedit.core.queue.IChunkSet;
 import com.fastasyncworldedit.core.util.collection.MemBlockSet;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.util.SideEffectSet;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
@@ -210,6 +211,16 @@ public class BitSetBlocks implements IChunkSet {
     @Override
     public boolean hasBiomes(final int layer) {
         return false;
+    }
+
+    @Override
+    public void setSideEffectSet(SideEffectSet sideEffectSet) {
+
+    }
+
+    @Override
+    public SideEffectSet getSideEffectSet() {
+        return SideEffectSet.none();
     }
 
     @Override
