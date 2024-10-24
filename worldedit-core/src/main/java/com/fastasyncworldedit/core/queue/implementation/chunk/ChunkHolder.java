@@ -924,7 +924,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
 
     @Override
     public boolean tile(final int x, final int y, final int z, final FaweCompoundTag tag) {
-        return false;
+        return delegate.set(this).tile(x, y, z, tag);
     }
 
     /**
