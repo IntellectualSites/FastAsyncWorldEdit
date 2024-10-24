@@ -325,7 +325,7 @@ public class ClipboardCommands {
             } else {
                 throw e;
             }
-            Fawe.instance().getClipboardExecutor().submit(actor.getUniqueId(), () -> {
+            Fawe.instance().submitUUIDKeyQueuedTask(actor.getUniqueId(), () -> {
                 clipboard.close();
                 doc.getFile().delete();
             });
