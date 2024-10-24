@@ -82,11 +82,10 @@ public class MaskFilter<T extends Filter> extends DelegateFilter<T> {
         }
 
         @Override
-        public ShortVector applyVector(final ShortVector get, final ShortVector set) {
+        public ShortVector applyVector(final ShortVector get, final ShortVector set, VectorMask<Short> mask) {
             final T parent = getParent();
             VectorMask<Short> masked = vectorizedMask.compareVector(set, get);
-            ShortVector res = parent.applyVector(get, set);
-            res = set.blend(res, masked);
+            ShortVector res = parent.applyVector(get, set, mask.and(masked));
             VectorMask<Short> changed = res.compare(VectorOperators.NE, set);
             changes.getAndAdd(changed.trueCount());
             return res;
