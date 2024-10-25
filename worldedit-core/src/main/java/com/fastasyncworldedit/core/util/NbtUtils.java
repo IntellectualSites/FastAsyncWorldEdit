@@ -216,7 +216,7 @@ public final class NbtUtils {
      * {@return the position data of the given tag}
      *
      * @param compoundTag the tag to extract position information from
-     * @since TODO
+     * @since 2.12.0
      */
     public static Vector3 entityPosition(FaweCompoundTag compoundTag) {
         LinListTag<LinDoubleTag> pos = compoundTag.linTag().getListTag("Pos", LinTagType.doubleTag());

@@ -299,7 +299,7 @@ public class FaweLimit {
     /**
      * Get an {@link FaweLimit} representing the amount of a limit used from a given "original" limit
      *
-     * @since TODO
+     * @since 2.12.0
      */
     public FaweLimit getLimitUsed(FaweLimit originalLimit) {
         FaweLimit newLimit = new FaweLimit();

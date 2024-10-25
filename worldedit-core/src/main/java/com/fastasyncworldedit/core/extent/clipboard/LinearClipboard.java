@@ -60,7 +60,7 @@ public abstract class LinearClipboard extends SimpleClipboard {
     /**
      * @deprecated will be removed as it is unused and uses outdated types
      */
-    @Deprecated(forRemoval = true, since = "TODO")
+    @Deprecated(forRemoval = true, since = "2.12.0")
     public abstract Collection<CompoundTag> getTileEntities();
 
     @Override

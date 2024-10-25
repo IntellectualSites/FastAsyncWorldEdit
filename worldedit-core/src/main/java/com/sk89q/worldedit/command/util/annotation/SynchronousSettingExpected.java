@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
 /**
  * Indicates it is expected that blocks will only be set synchronously, i.e. from one thread (at a time)
  *
- * @since TODO
+ * @since 2.12.0
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({

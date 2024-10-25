@@ -155,7 +155,7 @@ public class NMSAdapter implements FAWEPlatformAdapterImpl {
      * Utilises ConcurrentHashMap#compute for easy synchronisation for all of the above. Only tryWriteLock is used in blocks
      * synchronised using ConcurrentHashMap methods.
      *
-     * @since TODO
+     * @since 2.12.0
      */
     protected static <LevelChunkSection> boolean setSectionAtomic(
             String worldName,
@@ -212,7 +212,7 @@ public class NMSAdapter implements FAWEPlatformAdapterImpl {
      * <p>
      * Utilises ConcurrentHashMap#compute for easy synchronisation
      *
-     * @since TODO
+     * @since 2.12.0
      */
     protected static void beginChunkPacketSend(String worldName, IntPair pair, StampLockHolder stampedLock) {
         ConcurrentHashMap<IntPair, ChunkSendLock> chunks = FaweBukkitWorld.getWorldSendingChunksMap(worldName);
@@ -233,7 +233,7 @@ public class NMSAdapter implements FAWEPlatformAdapterImpl {
     /**
      * Releases the read lock acquired when sending a chunk packet for a chunk
      *
-     * @since TODO
+     * @since 2.12.0
      */
     protected static void endChunkPacketSend(String worldName, IntPair pair, StampLockHolder lockHolder) {
         ConcurrentHashMap<IntPair, ChunkSendLock> chunks = FaweBukkitWorld.getWorldSendingChunksMap(worldName);
