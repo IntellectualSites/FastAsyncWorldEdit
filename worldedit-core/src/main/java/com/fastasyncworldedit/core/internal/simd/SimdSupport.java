@@ -14,6 +14,7 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import jdk.incubator.vector.ShortVector;
+import jdk.incubator.vector.VectorMask;
 import jdk.incubator.vector.VectorOperators;
 
 import javax.annotation.Nullable;
@@ -101,8 +102,9 @@ public class SimdSupport {
         }
 
         @Override
-        public ShortVector applyVector(final ShortVector get, final ShortVector set) {
-            return ShortVector.broadcast(ShortVector.SPECIES_PREFERRED, ordinal);
+        public ShortVector applyVector(final ShortVector get, final ShortVector set, VectorMask<Short> mask) {
+            // only change the lanes the mask dictates us to change, keep the rest
+            return set.blend(ShortVector.broadcast(ShortVector.SPECIES_PREFERRED, ordinal), mask);
         }
 
         @Override
