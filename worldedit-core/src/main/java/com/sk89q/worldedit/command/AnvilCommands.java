@@ -1,12 +1,24 @@
-package com.fastasyncworldedit.core.command;
+package com.sk89q.worldedit.command;
 
+import com.fastasyncworldedit.core.Fawe;
+import com.fastasyncworldedit.core.anvil.MCAChunk;
+import com.fastasyncworldedit.core.anvil.MCAWorld;
+import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.queue.IQueueChunk;
+import com.fastasyncworldedit.core.queue.IQueueExtent;
+import com.fastasyncworldedit.core.regions.WorldRegionsRegion;
+import com.fastasyncworldedit.core.util.MaskTraverser;
 import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.EditSessionBuilder;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.entity.Player;
+import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.function.mask.AbstractExtentMask;
+import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.internal.annotation.Selection;
 import com.sk89q.worldedit.regions.Region;
@@ -20,13 +32,6 @@ import java.io.IOException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-/**
- * @deprecated Anvil classes were used on versions prior to 1.13 to trim chunks.
- *         The way how it's been done was unsafe and led to issues back the years, hence it
- *         hasn't been implemented in any modern version. Therefore the current
- *         implementation is deprecated for removal without replacement.
- */
-@Deprecated
 @CommandContainer(superTypes = CommandPermissionsConditionGenerator.Registration.class)
 public class AnvilCommands {
 
@@ -116,57 +121,22 @@ public class AnvilCommands {
     //    }
 
     @Command(
-            name = "replaceall",
-            aliases = {"rea", "repall"},
-            desc = "Replace all blocks in the selection with another"
-    )
+            name = "replaceall", aliases = {"rea", "repall"}, desc = "Replace all blocks in the selection with another")
     @CommandPermissions("worldedit.anvil.replaceall")
     public void replaceAll(
-            Player player, String folder,
-            @Arg(name = "from", desc = "String", def = "")
-                    String fromPattern,
-            String toPatternStr,
-            @Switch(name = 'd', desc = "Disable wildcard data matching")
-                    boolean useData
+            Actor actor,
+            @Arg(name = "world", desc = "Unloaded world") MCAWorld world,
+            @Arg(name = "from", desc = "Mask") Mask from,
+            @Arg(name = "to", desc = "Pattern") Pattern to
     ) throws WorldEditException {
-        //        final FaweBlockMatcher matchFrom;  TODO NOT IMPLEMENTED
-        //        if (from == null) {
-        //            matchFrom = FaweBlockMatcher.NOT_AIR;
-        //        } else {
-        //            if (from.contains(":")) {
-        //                useData = true; //override d flag, if they specified data they want it
-        //            }
-        //            matchFrom = FaweBlockMatcher.fromBlocks(worldEdit.getBlocks(player, from, true), useData);
-        //        }
-        //        final FaweBlockMatcher matchTo = FaweBlockMatcher.setBlocks(worldEdit.getBlocks(player, to, true));
-        //        ReplaceSimpleFilter filter = new ReplaceSimpleFilter(matchFrom, matchTo);
-        //        ReplaceSimpleFilter result = runWithWorld(player, folder, filter, true);
-        //        if (result != null) player.print(Caption.of("fawe.worldedit.visitor.visitor.block", (result.getTotal())));
+        IQueueExtent<IQueueChunk> queueExtent = Fawe.instance().getQueueHandler().getMCAQueue(world);
+        new MaskTraverser(from).setNewExtent(queueExtent);
+        queueExtent.replaceBlocks(new WorldRegionsRegion(world), from, to);
+        queueExtent.flush();
+        actor.print(Caption.of("fawe.worldedit.anvil.replaceall.complete"));
     }
 
-    @Command(
-            name = "remapall",
-            descFooter = "Remap the world between MCPE/PC values",
-            desc = "Remap the world between MCPE/PC values"
-    )
-    @CommandPermissions("worldedit.anvil.remapall")
-    public void remapall(Player player, String folder) throws WorldEditException {
-        //        ClipboardRemapper.RemapPlatform from; TODO NOT IMPLEMENTED
-        //        ClipboardRemapper.RemapPlatform to;
-        //        from = ClipboardRemapper.RemapPlatform.PE;
-        //        to = ClipboardRemapper.RemapPlatform.PC;
-        //        RemapFilter filter = new RemapFilter(from, to);
-        //        RemapFilter result = runWithWorld(player, folder, filter, true);
-        //        if (result != null) {
-        //            player.print(Caption.of("fawe.worldedit.visitor.visitor.block", (result.getTotal())));
-        //        }
-    }
-
-
-    @Command(
-            name = "deleteallunvisited",
-            aliases = {"delunvisited"},
-            desc = "Delete all chunks which haven't been occupied",
+    @Command(name = "deleteallunvisited", aliases = {"delunvisited"}, desc = "Delete all chunks which haven't been occupied",
             descFooter = "occupied for `age-ticks` (20t = 1s) and \n"
                     + "Have not been accessed since `file-duration` (ms) after creation and\n"
                     + "Have not been used in the past `chunk-inactivity` (ms)"

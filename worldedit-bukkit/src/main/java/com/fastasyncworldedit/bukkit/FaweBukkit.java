@@ -45,6 +45,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -310,6 +311,16 @@ public class FaweBukkit implements IFawe, Listener {
     @Override
     public FAWEPlatformAdapterImpl getPlatformAdapter() {
         return platformAdapter;
+    }
+
+    @Override
+    public Path getWorldsFolder() {
+        return Bukkit.getWorldContainer().toPath();
+    }
+
+    @Override
+    public boolean isWorldLoaded(String world) {
+        return Bukkit.getWorld(world) != null;
     }
 
     private void setupPlotSquared() {

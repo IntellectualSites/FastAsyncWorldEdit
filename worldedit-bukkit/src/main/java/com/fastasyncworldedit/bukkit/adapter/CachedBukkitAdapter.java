@@ -100,8 +100,4 @@ public abstract class CachedBukkitAdapter implements IBukkitAdapter {
         }
     }
 
-    protected abstract char[] getIbdToStateOrdinal();
-
-    protected abstract int[] getOrdinalToIbdID();
-
 }

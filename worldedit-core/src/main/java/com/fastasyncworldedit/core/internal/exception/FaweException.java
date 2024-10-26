@@ -26,6 +26,26 @@ public class FaweException extends RuntimeException {
     /**
      * New instance. Defaults to {@link FaweException.Type#OTHER}.
      */
+    public FaweException(Component reason, Type type, boolean ignorable, Exception e) {
+        super(e);
+        this.message = reason;
+        this.type = type;
+        this.ignorable = ignorable;
+    }
+
+    /**
+     * New instance. Defaults to {@link FaweException.Type#OTHER}.
+     */
+    public FaweException(String reason, Type type, boolean ignorable, Exception e) {
+        super(e);
+        this.message = TextComponent.of(reason);
+        this.type = type;
+        this.ignorable = ignorable;
+    }
+
+    /**
+     * New instance. Defaults to {@link FaweException.Type#OTHER}.
+     */
     public FaweException(Component reason) {
         this(reason, Type.OTHER);
     }
@@ -114,6 +134,7 @@ public class FaweException extends RuntimeException {
         ACTOR_REQUIRED,
         CLIPBOARD,
         HISTORY,
+        ANVIL_IO,
         OTHER
     }
 

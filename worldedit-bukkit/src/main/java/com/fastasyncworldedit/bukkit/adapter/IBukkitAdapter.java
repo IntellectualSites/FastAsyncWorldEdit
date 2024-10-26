@@ -396,4 +396,14 @@ public interface IBukkitAdapter {
         return TaskManager.taskManager().sync(world::getEntities);
     }
 
+    /**
+     * Get a char array of minecraft internal IDs against FAWE char IDs
+     */
+    char[] getIbdToStateOrdinal();
+
+    /**
+     * Get an int array of FAWE char IDs against minecraft internal IDs
+     */
+    int[] getOrdinalToIbdID();
+
 }
