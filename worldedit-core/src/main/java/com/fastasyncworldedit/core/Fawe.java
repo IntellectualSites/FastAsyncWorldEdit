@@ -511,9 +511,9 @@ public class Fawe {
     public <T> Future<T> submitUUIDKeyQueuedTask(UUID uuid, Callable<T> callable) {
         if (Thread.currentThread() instanceof UUIDKeyQueuedThreadFactory.UUIDKeyQueuedThread) {
             try {
-                CompletableFuture.completedFuture(callable.call());
+                return CompletableFuture.completedFuture(callable.call());
             } catch (Throwable t) {
-                CompletableFuture.failedFuture(t);
+                return CompletableFuture.failedFuture(t);
             }
         }
         return this.uuidKeyQueuedExecutorService.submit(uuid, callable);
