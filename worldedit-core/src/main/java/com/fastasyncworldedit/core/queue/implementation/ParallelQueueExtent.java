@@ -224,8 +224,8 @@ public final class ParallelQueueExtent extends PassthroughExtent {
 
     @Override
     public int setBlocks(Region region, Pattern pattern) throws MaxChangedBlocksException {
-        VectorizedFilter vectorizedPattern = SimdSupport.vectorizedPattern(pattern);
-        var filter = LinkedFilter.of(vectorizedPattern == null ? pattern : vectorizedPattern, new CountFilter());
+        VectorizedFilter<?> vectorizedPattern = SimdSupport.vectorizedPattern(pattern);
+        var filter = LinkedFilter.of(vectorizedPattern == null ? pattern : vectorizedPattern, new CountFilter<>());
         return this.changes = apply(region, filter, true).getRight().getTotal();
     }
 

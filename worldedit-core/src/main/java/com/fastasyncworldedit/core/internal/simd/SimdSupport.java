@@ -5,6 +5,7 @@ import com.fastasyncworldedit.core.extent.filter.block.DelegateFilter;
 import com.fastasyncworldedit.core.function.mask.InverseMask;
 import com.fastasyncworldedit.core.function.mask.SingleBlockStateMask;
 import com.fastasyncworldedit.core.queue.Filter;
+import com.fastasyncworldedit.core.queue.implementation.blocks.DataArray;
 import com.sk89q.worldedit.function.mask.ExistingBlockMask;
 import com.sk89q.worldedit.function.mask.InverseSingleBlockStateMask;
 import com.sk89q.worldedit.function.mask.Mask;
@@ -13,9 +14,10 @@ import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
-import jdk.incubator.vector.ShortVector;
+import jdk.incubator.vector.Vector;
 import jdk.incubator.vector.VectorMask;
 import jdk.incubator.vector.VectorOperators;
+import jdk.incubator.vector.VectorSpecies;
 
 import javax.annotation.Nullable;
 
@@ -41,7 +43,7 @@ public class SimdSupport {
         return VECTOR_API_PRESENT && Settings.settings().EXPERIMENTAL.USE_VECTOR_API;
     }
 
-    public static @Nullable VectorizedMask vectorizedTargetMask(Mask mask) {
+    public static <T> @Nullable VectorizedMask<T> vectorizedTargetMask(Mask mask) {
         if (!useVectorApi()) {
             return null;
         }
@@ -50,7 +52,7 @@ public class SimdSupport {
             case InverseSingleBlockStateMask inverse -> vectorizedTargetMaskInverse(inverse.getBlockState().getOrdinalChar());
             case ExistingBlockMask ignored -> vectorizedTargetMaskNonAir();
             case InverseMask inverse -> {
-                final VectorizedMask base = vectorizedTargetMask(inverse.inverse());
+                final VectorizedMask<T> base = vectorizedTargetMask(inverse.inverse());
                 if (base == null) {
                     yield null;
                 }
@@ -60,16 +62,16 @@ public class SimdSupport {
         };
     }
 
-    private static VectorizedMask vectorizedTargetMaskNonAir() {
+    private static <T> VectorizedMask<T> vectorizedTargetMaskNonAir() {
         // everything > VOID_AIR is not air
         return (set, get) -> get.compare(VectorOperators.UNSIGNED_GT, BlockTypesCache.ReservedIDs.VOID_AIR);
     }
 
-    private static VectorizedMask vectorizedTargetMask(char ordinal) {
+    private static <T> VectorizedMask<T> vectorizedTargetMask(char ordinal) {
         return (set, get) -> get.compare(VectorOperators.EQ, (short) ordinal);
     }
 
-    private static VectorizedMask vectorizedTargetMaskInverse(char ordinal) {
+    private static <T> VectorizedMask<T> vectorizedTargetMaskInverse(char ordinal) {
         return (set, get) -> get.compare(VectorOperators.NE, (short) ordinal);
     }
 
@@ -92,7 +94,7 @@ public class SimdSupport {
         };
     }
 
-    private static final class VectorizedPattern<T extends Filter> extends DelegateFilter<T> implements VectorizedFilter {
+    private static final class VectorizedPattern<T extends Filter, V> extends DelegateFilter<T> implements VectorizedFilter<V> {
 
         private final char ordinal;
 
@@ -102,9 +104,10 @@ public class SimdSupport {
         }
 
         @Override
-        public ShortVector applyVector(final ShortVector get, final ShortVector set, VectorMask<Short> mask) {
+        public Vector<V> applyVector(final Vector<V> get, final Vector<V> set, VectorMask<V> mask) {
             // only change the lanes the mask dictates us to change, keep the rest
-            return set.blend(ShortVector.broadcast(ShortVector.SPECIES_PREFERRED, ordinal), mask);
+            VectorSpecies<V> species = DataArray.preferredSpecies();
+            return set.blend(species.broadcast(ordinal), mask);
         }
 
         @Override

@@ -3,33 +3,26 @@ package com.fastasyncworldedit.core.internal.simd;
 import com.fastasyncworldedit.core.queue.IChunk;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.IChunkSet;
+import com.fastasyncworldedit.core.queue.implementation.blocks.DataArray;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
-import jdk.incubator.vector.ShortVector;
+import jdk.incubator.vector.Vector;
 import jdk.incubator.vector.VectorMask;
-import jdk.incubator.vector.VectorSpecies;
 
-public interface VectorizedMask {
+public interface VectorizedMask<T> {
 
     default void processChunks(IChunk chunk, IChunkGet get, IChunkSet set) {
         for (int layer = get.getMinSectionPosition(); layer <= get.getMaxSectionPosition(); layer++) {
-            final char[] sectionSet = set.loadIfPresent(layer);
+            final DataArray sectionSet = set.loadIfPresent(layer);
             if (sectionSet == null) {
                 continue;
             }
-            final char[] sectionGet = get.load(layer);
+            final DataArray sectionGet = get.load(layer);
             processSection(layer, sectionSet, sectionGet);
         }
     }
 
-    default void processSection(int layer, char[] set, char[] get) {
-        final VectorSpecies<Short> species = ShortVector.SPECIES_PREFERRED;
-        // assume that set.length % species.elementSize() == 0
-        for (int i = 0; i < set.length; i += species.length()) {
-            ShortVector vectorSet = ShortVector.fromCharArray(species, set, i);
-            ShortVector vectorGet = ShortVector.fromCharArray(species, get, i);
-            vectorSet = processVector(vectorSet, vectorGet);
-            vectorSet.intoCharArray(set, i);
-        }
+    default void processSection(int layer, DataArray set, DataArray get) {
+        set.processSet(get, this::processVector);
     }
 
     /**
@@ -38,7 +31,7 @@ public interface VectorizedMask {
      * @param set the set vector
      * @param get the get vector
      */
-    default ShortVector processVector(ShortVector set, ShortVector get) {
+    default Vector<T> processVector(Vector<T> set, Vector<T> get) {
         return set.blend(BlockTypesCache.ReservedIDs.__RESERVED__, compareVector(set, get).not());
     }
 
@@ -48,6 +41,6 @@ public interface VectorizedMask {
      * @param set the set vector
      * @param get the get vector
      */
-    VectorMask<Short> compareVector(ShortVector set, ShortVector get);
+    VectorMask<T> compareVector(Vector<T> set, Vector<T> get);
 
 }

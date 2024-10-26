@@ -9,6 +9,7 @@ import com.fastasyncworldedit.core.queue.IBatchProcessor;
 import com.fastasyncworldedit.core.queue.IChunk;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.IChunkSet;
+import com.fastasyncworldedit.core.queue.implementation.blocks.DataArray;
 import com.fastasyncworldedit.core.util.NbtUtils;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.google.common.util.concurrent.Futures;
@@ -166,17 +167,18 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
             if (!set.hasSection(layer)) {
                 continue;
             }
+
             // add each block and tile
-            char[] blocksGet;
-            char[] tmp = get.load(layer);
-            if (tmp == null) {
-                blocksGet = FaweCache.INSTANCE.EMPTY_CHAR_4096;
+            DataArray blocksGet;
+            DataArray tmpGet = get.load(layer);
+            if (tmpGet == null) {
+                blocksGet = FaweCache.INSTANCE.EMPTY_DATA;
             } else {
-                System.arraycopy(tmp, 0, (blocksGet = new char[4096]), 0, 4096);
+                blocksGet = DataArray.createCopy(tmpGet);
             }
-            char[] blocksSet;
             // loadIfPresent shouldn't be null if set.hasSection(layer) is true
-            System.arraycopy(Objects.requireNonNull(set.loadIfPresent(layer)), 0, (blocksSet = new char[4096]), 0, 4096);
+            DataArray tmpSet = Objects.requireNonNull(set.loadIfPresent(layer));
+            DataArray blocksSet = DataArray.createCopy(tmpSet);
 
             // Account for negative layers
             int by = layer << 4;
@@ -185,10 +187,10 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
                 for (int z = 0; z < 16; z++) {
                     int zz = z + bz;
                     for (int x = 0; x < 16; x++, index++) {
-                        final int combinedTo = blocksSet[index];
+                        final int combinedTo = blocksSet.getAt(index);
                         if (combinedTo != BlockTypesCache.ReservedIDs.__RESERVED__) {
                             int xx = bx + x;
-                            int from = blocksGet[index];
+                            int from = blocksGet.getAt(index);
                             if (from == BlockTypesCache.ReservedIDs.__RESERVED__) {
                                 from = BlockTypesCache.ReservedIDs.AIR;
                             }

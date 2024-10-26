@@ -70,10 +70,10 @@ public interface Mask {
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     default <T extends Filter> MaskFilter<T> toFilter(T filter) {
-        final VectorizedMask mask = SimdSupport.vectorizedTargetMask(this);
+        final VectorizedMask<?> mask = SimdSupport.vectorizedTargetMask(this);
         if (mask != null) {
-            VectorizedFilter vectorizedFilter = null;
-            if (filter instanceof VectorizedFilter vf) {
+            VectorizedFilter<?> vectorizedFilter = null;
+            if (filter instanceof VectorizedFilter<?> vf) {
                 vectorizedFilter = vf;
             } else if (filter instanceof Pattern p) {
                 vectorizedFilter = SimdSupport.vectorizedPattern(p);
