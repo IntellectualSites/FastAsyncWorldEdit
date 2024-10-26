@@ -53,6 +53,7 @@ public abstract class PlacementStateProcessor extends AbstractDelegateExtent imp
     private static BlockTypeMask DEFAULT_MASK = null;
     private static BlockTypeMask IN_FIRST_PASS = null;
     private static BlockTypeMask REQUIRES_SECOND_PASS = null;
+    private static BlockTypeMask IN_FIRST_PASS_WITHOUT_SECOND = null;
     private static AdjacentAny2DMask ADJACENT_STAIR_MASK = null;
 
     protected final Extent extent;
@@ -125,6 +126,9 @@ public abstract class PlacementStateProcessor extends AbstractDelegateExtent imp
                 BlockTypes.TRAPPED_CHEST
         );
         IN_FIRST_PASS.add(BlockCategories.STAIRS.getAll());
+
+        IN_FIRST_PASS_WITHOUT_SECOND = new BlockTypeMask(nullExtent);
+        IN_FIRST_PASS_WITHOUT_SECOND.add(BlockCategories.STAIRS.getAll());
 
         REQUIRES_SECOND_PASS = new BlockTypeMask(nullExtent);
         REQUIRES_SECOND_PASS.add(
@@ -242,7 +246,11 @@ public abstract class PlacementStateProcessor extends AbstractDelegateExtent imp
                 int blockX = processChunkX + x;
                 char ordinal = set[index];
                 BlockState state = BlockTypesCache.states[ordinal];
-                if (firstPass && !IN_FIRST_PASS.test(state)) {
+                if (firstPass) {
+                    if (!IN_FIRST_PASS.test(state)) {
+                        continue;
+                    }
+                } else if (IN_FIRST_PASS_WITHOUT_SECOND.test(state)) {
                     continue;
                 }
                 if (!mask.test(state)) {
@@ -358,7 +366,7 @@ public abstract class PlacementStateProcessor extends AbstractDelegateExtent imp
                 }
             }
         }
-        return BlockTypesCache.states[ordinal];
+        return state;
     }
 
     public LinCompoundTag getTileAt(int x, int y, int z) {
@@ -425,7 +433,7 @@ public abstract class PlacementStateProcessor extends AbstractDelegateExtent imp
             }
             if (hadNesw) {
                 if (dirs.contains(Direction.UP)) {
-                    clickPos.mutY(blockY + 0.5);
+                    clickPos.mutY(blockY + 0.6);
                 }
             } else if (dirs.contains(Direction.UP)) {
                 clickedFaceDirection = Direction.DOWN;
