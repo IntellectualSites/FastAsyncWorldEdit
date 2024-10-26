@@ -1,10 +1,13 @@
 package com.fastasyncworldedit.core.util.task;
 
+import org.jetbrains.annotations.ApiStatus;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
+@ApiStatus.Internal
 public class UUIDKeyQueuedThreadFactory implements ThreadFactory {
 
     private final ThreadGroup group;
@@ -16,7 +19,7 @@ public class UUIDKeyQueuedThreadFactory implements ThreadFactory {
         namePrefix = "FAWE UUID-key-queued - ";
     }
 
-    public Thread newThread(Runnable r) {
+    public Thread newThread(@Nonnull Runnable r) {
         Thread t = new UUIDKeyQueuedThread(group, r, namePrefix + threadNumber.getAndIncrement(), 0);
         if (t.isDaemon()) {
             t.setDaemon(false);
