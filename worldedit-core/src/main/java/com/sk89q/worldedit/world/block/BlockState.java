@@ -351,7 +351,7 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
         BlockState newState = this;
         for (Property<?> prop : ot.getProperties()) {
             PropertyKey key = prop.getKey();
-            if (blockType.hasProperty(key)) {
+            if (blockType.hasPropertyOfType(key, prop.getClass())) {
                 newState = newState.with(key, other.getState(key));
             }
         }
