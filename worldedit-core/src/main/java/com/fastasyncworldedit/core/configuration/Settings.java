@@ -606,11 +606,22 @@ public class Settings extends Config {
         public boolean POOL = true;
 
         @Comment({
-                "If chunk loading for writing edits to the world should be performed asynchronously to to FAWE",
+                "If chunk loading for writing edits to the world should be performed asynchronously to FAWE",
                 " - Enable to improve performance at the expense of memory",
                 " - If experience out of memory crashed, disable this or reduce slower-memory-percent"
         })
         public boolean ASYNC_CHUNK_LOAD_WRITE = true;
+
+        @Comment({
+                "Percentage of queue.target-size to use per thread in multi-threaded operations",
+                " - Minimum of 100 / queue.parallel-threads (queue.target-size split across threads)",
+                " - Maximum of 100 (queue.target-size per thread)",
+                " - Higher performance at the expense of memory",
+                " - I.e. target-size=400, parallel-threads=8 and threads-target-size=25 means target-size of 100 per thread",
+                " - Defaults to 100 * 2 / parallel-threads"
+        })
+        @ComputedFrom(node = "queue.parallel-threads", computer = ConfigOptComputation.THREAD_TARGET_SIZE_COMPUTATION.class)
+        public int THREAD_TARGET_SIZE_PERCENT = 100 * 2 / Runtime.getRuntime().availableProcessors();
 
         public static class PROGRESS {
 
