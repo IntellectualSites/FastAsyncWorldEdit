@@ -422,7 +422,9 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
         LevelChunk chunk = nmsChunkFuture.getNow(null);
         if ((chunk == null && MemUtil.shouldBeginSlow()) || Settings.settings().QUEUE.ASYNC_CHUNK_LOAD_WRITE) {
             try {
-                chunk = nmsChunkFuture.get(); // "Artificially" slow FAWE down if memory low as performing the
+                // "Artificially" slow FAWE down if memory low as performing the operation async can cause large amounts of
+                // memory usage
+                chunk = nmsChunkFuture.get();
             } catch (InterruptedException | ExecutionException e) {
                 LOGGER.error("Could not get chunk at {},{} whilst low memory", chunkX, chunkZ, e);
                 throw new FaweException(
