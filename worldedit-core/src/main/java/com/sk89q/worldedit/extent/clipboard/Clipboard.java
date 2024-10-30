@@ -213,7 +213,7 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable, Fl
         return getMinimumPoint().distance(getMaximumPoint());
     }
 
-    default double getDiagonalSq() {
+    default int getDiagonalSq() {
         return getMinimumPoint().distanceSq(getMaximumPoint());
     }
 
