@@ -190,6 +190,25 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable, Fl
         return getDimensions().z();
     }
 
+    default BlockVector3 getCenter() {
+        return new BlockVector3() {
+            @Override
+            public int x() {
+                return getWidth() / 2;
+            }
+
+            @Override
+            public int y() {
+                return getHeight() / 2;
+            }
+
+            @Override
+            public int z() {
+                return getLength() / 2;
+            }
+        };
+    }
+
     default int getArea() {
         return getWidth() * getLength();
     }
