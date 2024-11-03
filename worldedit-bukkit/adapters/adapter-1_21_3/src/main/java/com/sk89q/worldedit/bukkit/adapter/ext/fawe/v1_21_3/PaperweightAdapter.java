@@ -33,6 +33,7 @@ import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
+import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_21_3.PaperweightFaweAdapter;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.extension.platform.Watchdog;
 import com.sk89q.worldedit.extent.Extent;
@@ -42,10 +43,6 @@ import com.sk89q.worldedit.internal.wna.WorldNativeAccess;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldedit.registry.state.BooleanProperty;
-import com.sk89q.worldedit.registry.state.DirectionalProperty;
-import com.sk89q.worldedit.registry.state.EnumProperty;
-import com.sk89q.worldedit.registry.state.IntegerProperty;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.SideEffect;
@@ -85,8 +82,6 @@ import net.minecraft.server.level.ChunkResult;
 import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.progress.ChunkProgressListener;
-import net.minecraft.util.RandomSource;
-import net.minecraft.util.StringRepresentable;
 import net.minecraft.util.thread.BlockableEventLoop;
 import net.minecraft.world.Clearable;
 import net.minecraft.world.InteractionHand;
@@ -144,7 +139,6 @@ import org.enginehub.linbus.tree.LinShortTag;
 import org.enginehub.linbus.tree.LinStringTag;
 import org.enginehub.linbus.tree.LinTag;
 import org.enginehub.linbus.tree.LinTagType;
-import org.jetbrains.annotations.NotNull;
 import org.spigotmc.SpigotConfig;
 import org.spigotmc.WatchdogThread;
 
@@ -159,7 +153,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.OptionalInt;
@@ -561,32 +554,7 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
     }
 
     private static final LoadingCache<net.minecraft.world.level.block.state.properties.Property<?>, Property<?>> PROPERTY_CACHE =
-            CacheBuilder
-            .newBuilder()
-            .build(new CacheLoader<>() {
-                @Override
-                public @NotNull Property<?> load(net.minecraft.world.level.block.state.properties.@NotNull Property<?> state) {
-                    return switch (state) {
-                        case net.minecraft.world.level.block.state.properties.BooleanProperty booleanProperty ->
-                                new BooleanProperty(booleanProperty.getName(), booleanProperty.getPossibleValues());
-                        case net.minecraft.world.level.block.state.properties.IntegerProperty integerProperty ->
-                            new IntegerProperty(integerProperty.getName(), integerProperty.getPossibleValues());
-                        case net.minecraft.world.level.block.state.properties.EnumProperty<?> enumProperty -> {
-                            if (enumProperty.getValueClass() == net.minecraft.core.Direction.class) {
-                                yield new DirectionalProperty(enumProperty.getName(), enumProperty.getPossibleValues().stream()
-                                        .map(StringRepresentable::getSerializedName)
-                                        .map(s -> s.toUpperCase(Locale.ROOT))
-                                        .map(Direction::valueOf)
-                                        .toList()
-                                );
-                            }
-                            yield new EnumProperty(enumProperty.getName(), enumProperty.getPossibleValues().stream()
-                                    .map(StringRepresentable::getSerializedName).collect(Collectors.toCollection(ArrayList::new)));
-                        }
-                        default -> throw new IllegalArgumentException("WorldEdit needs an update to support " + state.getClass().getSimpleName());
-                    };
-                }
-            });
+            CacheBuilder.newBuilder().build(CacheLoader.from(PaperweightFaweAdapter::adaptProperty));
 
     @SuppressWarnings({ "rawtypes" })
     @Override

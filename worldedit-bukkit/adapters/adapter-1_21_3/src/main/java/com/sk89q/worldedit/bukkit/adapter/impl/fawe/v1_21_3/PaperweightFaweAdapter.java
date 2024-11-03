@@ -19,7 +19,6 @@ import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.bukkit.adapter.ext.fawe.v1_21_3.PaperweightAdapter;
-import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_21_3.nbt.PaperweightLazyCompoundTag;
 import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_21_3.regen.PaperweightRegen;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.extent.Extent;
@@ -90,8 +89,8 @@ import org.bukkit.entity.Player;
 import org.enginehub.linbus.tree.LinCompoundTag;
 import org.enginehub.linbus.tree.LinStringTag;
 import org.enginehub.linbus.tree.LinTag;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nullable;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -147,10 +146,30 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
         );
     }
 
-    @Nullable
-    private static String getEntityId(Entity entity) {
-        ResourceLocation resourceLocation = net.minecraft.world.entity.EntityType.getKey(entity.getType());
-        return resourceLocation == null ? null : resourceLocation.toString();
+    public static Property<?> adaptProperty(net.minecraft.world.level.block.state.properties.Property<?> property) {
+        return switch (property) {
+            case net.minecraft.world.level.block.state.properties.BooleanProperty booleanProperty ->
+                    new BooleanProperty(booleanProperty.getName(), ImmutableList.copyOf(booleanProperty.getPossibleValues()));
+            case net.minecraft.world.level.block.state.properties.IntegerProperty integerProperty ->
+                    new IntegerProperty(integerProperty.getName(), ImmutableList.copyOf(integerProperty.getPossibleValues()));
+            case net.minecraft.world.level.block.state.properties.EnumProperty<?> enumProperty -> {
+                if (enumProperty.getValueClass() == net.minecraft.core.Direction.class) {
+                    yield new DirectionalProperty(enumProperty.getName(), enumProperty.getPossibleValues().stream()
+                            .map(StringRepresentable::getSerializedName)
+                            .map(s -> s.toUpperCase(Locale.ROOT))
+                            .map(Direction::valueOf)
+                            .toList()
+                    );
+                }
+                yield new EnumProperty(enumProperty.getName(), enumProperty.getPossibleValues().stream()
+                        .map(StringRepresentable::getSerializedName).collect(Collectors.toCollection(ArrayList::new)));
+            }
+            default -> throw new IllegalArgumentException("FastAsyncWorldEdit needs an update to support " + property.getClass().getSimpleName());
+        };
+    }
+
+    private static @NotNull String getEntityId(Entity entity) {
+        return net.minecraft.world.entity.EntityType.getKey(entity.getType()).toString();
     }
 
     private static void readEntityIntoTag(Entity entity, net.minecraft.nbt.CompoundTag compoundTag) {
@@ -183,40 +202,7 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
                 if (!(obj instanceof net.minecraft.world.level.block.state.properties.Property<?> state)) {
                     continue;
                 }
-                Property<?> property;
-                if (state instanceof net.minecraft.world.level.block.state.properties.BooleanProperty) {
-                    property = new BooleanProperty(
-                            state.getName(),
-                            (List<Boolean>) ImmutableList.copyOf(state.getPossibleValues())
-                    );
-                } else if (state instanceof net.minecraft.world.level.block.state.properties.EnumProperty<?> enumProperty) {
-                    if (enumProperty.getValueClass() == net.minecraft.core.Direction.class) {
-                        property = new DirectionalProperty(enumProperty.getName(), enumProperty.getPossibleValues().stream()
-                                .map(StringRepresentable::getSerializedName)
-                                .map(s -> s.toUpperCase(Locale.ROOT))
-                                .map(Direction::valueOf)
-                                .toList()
-                        );
-                    } else {
-                        property = new EnumProperty(
-                                state.getName(),
-                                state
-                                        .getPossibleValues()
-                                        .stream()
-                                        .map(e -> ((StringRepresentable) e).getSerializedName())
-                                        .collect(Collectors.toCollection(ArrayList::new))
-                        );
-                    }
-                } else if (state instanceof net.minecraft.world.level.block.state.properties.IntegerProperty) {
-                    property = new IntegerProperty(
-                            state.getName(),
-                            (List<Integer>) ImmutableList.copyOf(state.getPossibleValues())
-                    );
-                } else {
-                    throw new IllegalArgumentException("FastAsyncWorldEdit needs an update to support " + state
-                            .getClass()
-                            .getSimpleName());
-                }
+                Property<?> property = adaptProperty(state);
                 properties.compute(property.getName().toLowerCase(Locale.ROOT), (k, v) -> {
                     if (v == null) {
                         v = new ArrayList<>(Collections.singletonList(property));
@@ -227,7 +213,7 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
                 });
             }
         } catch (IllegalAccessException e) {
-            e.printStackTrace();
+            LOGGER.error("failed to initialize block states", e);
         } finally {
             allBlockProperties = ImmutableMap.copyOf(properties);
         }
@@ -320,22 +306,18 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
         Entity mcEntity = craftEntity.getHandle();
 
         String id = getEntityId(mcEntity);
+        EntityType type = com.sk89q.worldedit.world.entity.EntityTypes.get(id);
+        Supplier<LinCompoundTag> saveTag = () -> {
+            final net.minecraft.nbt.CompoundTag minecraftTag = new net.minecraft.nbt.CompoundTag();
+            readEntityIntoTag(mcEntity, minecraftTag);
+            //add Id for AbstractChangeSet to work
+            final LinCompoundTag tag = (LinCompoundTag) toNativeLin(minecraftTag);
+            final Map<String, LinTag<?>> tags = NbtUtils.getLinCompoundTagValues(tag);
+            tags.put("Id", LinStringTag.of(id));
+            return LinCompoundTag.of(tags);
+        };
+        return new LazyBaseEntity(type, saveTag);
 
-        if (id != null) {
-            EntityType type = com.sk89q.worldedit.world.entity.EntityTypes.get(id);
-            Supplier<LinCompoundTag> saveTag = () -> {
-                final net.minecraft.nbt.CompoundTag minecraftTag = new net.minecraft.nbt.CompoundTag();
-                readEntityIntoTag(mcEntity, minecraftTag);
-                //add Id for AbstractChangeSet to work
-                final LinCompoundTag tag = (LinCompoundTag) toNativeLin(minecraftTag);
-                final Map<String, LinTag<?>> tags = NbtUtils.getLinCompoundTagValues(tag);
-                tags.put("Id", LinStringTag.of(id));
-                return LinCompoundTag.of(tags);
-            };
-            return new LazyBaseEntity(type, saveTag);
-        } else {
-            return null;
-        }
     }
 
     @Override
@@ -506,7 +488,7 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
                 )),
                 baseItemStack.getAmount()
         );
-        final CompoundTag nbt = (net.minecraft.nbt.CompoundTag) fromNative(baseItemStack.getNbtData());
+        final CompoundTag nbt = (net.minecraft.nbt.CompoundTag) fromNativeLin(baseItemStack.getNbt());
         if (nbt != null) {
             final DataComponentPatch patch = COMPONENTS_CODEC
                     .parse(registryAccess.createSerializationContext(NbtOps.INSTANCE), nbt)
@@ -561,9 +543,6 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
 
     @Override
     public net.minecraft.nbt.Tag fromNative(Tag foreign) {
-        if (foreign instanceof PaperweightLazyCompoundTag) {
-            return ((PaperweightLazyCompoundTag) foreign).get();
-        }
         return parent.fromNative(foreign);
     }
 
