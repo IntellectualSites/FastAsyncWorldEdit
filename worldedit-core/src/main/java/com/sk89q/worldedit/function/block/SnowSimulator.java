@@ -121,12 +121,12 @@ public class SnowSimulator implements LayerFunction {
             return false;
         } else if (!block.getBlockType().getMaterial().isFullCube()) {
             BlockType type = block.getBlockType();
-            if (type.hasPropertyOfType(slab.getKey(), slab.getClass()) && block.getState(slab).equalsIgnoreCase("bottom")) {
+            if (type.hasProperty(slab) && block.getState(slab).equalsIgnoreCase("bottom")) {
                 return false;
-            } else if ((type.hasPropertyOfType(trapdoorOpen.getKey(), trapdoorOpen.getClass()) && block.getState(trapdoorOpen)) ||
-                    (type.hasPropertyOfType(trapdoor.getKey(), trapdoor.getClass()) && block.getState(trapdoor).equalsIgnoreCase("bottom"))) {
+            } else if ((type.hasProperty(trapdoorOpen) && block.getState(trapdoorOpen)) ||
+                    (type.hasProperty(trapdoor) && block.getState(trapdoor).equalsIgnoreCase("bottom"))) {
                 return false;
-            } else if (type.hasPropertyOfType(stair.getKey(), stair.getClass()) && block.getState(stair).equalsIgnoreCase("bottom")) {
+            } else if (type.hasProperty(stair) && block.getState(stair).equalsIgnoreCase("bottom")) {
                 return false;
             } else {
                 return false;
@@ -143,14 +143,14 @@ public class SnowSimulator implements LayerFunction {
             // We've hit the highest layer (If it doesn't contain current + 2 it means it's 1 away from full)
             if (!snowLayersProperty.getValues().contains(currentHeight + 2)) {
                 if (this.extent.setBlock(abovePosition, snowBlock)) {
-                    if (block.getBlockType().hasPropertyOfType(snowy.getKey(), snowy.getClass())) {
+                    if (block.getBlockType().hasProperty(snowy)) {
                         this.extent.setBlock(position, block.with(snowy, true));
                     }
                     this.affected++;
                 }
             } else {
                 if (this.extent.setBlock(abovePosition, above.with(snowLayersProperty, currentHeight + 1))) {
-                    if (block.getBlockType().hasPropertyOfType(snowy.getKey(), snowy.getClass())) {
+                    if (block.getBlockType().hasProperty(snowy)) {
                         this.extent.setBlock(position, block.with(snowy, true));
                     }
                     this.affected++;
@@ -159,7 +159,7 @@ public class SnowSimulator implements LayerFunction {
             return false;
         }
         if (this.extent.setBlock(abovePosition, snow)) {
-            if (block.getBlockType().hasPropertyOfType(snowy.getKey(), snowy.getClass())) {
+            if (block.getBlockType().hasProperty(snowy)) {
                 this.extent.setBlock(position, block.with(snowy, true));
             }
             this.affected++;

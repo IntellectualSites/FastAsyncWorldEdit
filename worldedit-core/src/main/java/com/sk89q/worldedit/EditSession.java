@@ -2788,7 +2788,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
                         if (setBlock(mutable, air)) {
                             if (y > getMinY()) {
                                 BlockState block = getBlock(mutable2);
-                                if (block.getBlockType().hasPropertyOfType(snowy.getKey(), snowy.getClass())) {
+                                if (block.getBlockType().hasProperty(snowy)) {
                                     if (setBlock(mutable2, block.with(snowy, false))) {
                                         affected++;
                                     }

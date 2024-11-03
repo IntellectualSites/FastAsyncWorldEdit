@@ -248,19 +248,17 @@ public class BlockType implements Keyed, Pattern {
     }
 
     /**
-     * {@return whether this block type has a property with given key of the given type}
+     * {@return whether this block type has a given property}
      *
-     * @param key          the key identifying the property
-     * @param propertyType the expected type of the property
+     * @param property     the expected property
      * @since TODO
      */
-    @SuppressWarnings("rawtypes")
-    public boolean hasPropertyOfType(PropertyKey key, Class<? extends Property> propertyType) {
-        int ordinal = key.getId();
-        Property<?> property;
+    public boolean hasProperty(Property<?> property) {
+        int ordinal = property.getKey().getId();
+        Property<?> selfProperty;
         return this.settings.propertiesMapArr.length > ordinal
-                && (property = this.settings.propertiesMapArr[ordinal]) != null
-                && property.getClass() == propertyType;
+                && (selfProperty = this.settings.propertiesMapArr[ordinal]) != null
+                && selfProperty == property;
     }
 
     public <V> Property<V> getProperty(PropertyKey key) {
