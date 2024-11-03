@@ -27,10 +27,10 @@ import com.sk89q.worldedit.registry.state.BooleanProperty;
 import com.sk89q.worldedit.registry.state.EnumProperty;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
 import java.util.Locale;
-import java.util.Map;
 
 public class SnowSimulator implements LayerFunction {
 
@@ -120,20 +120,19 @@ public class SnowSimulator implements LayerFunction {
                 abovePosition) > 10) {
             return false;
         } else if (!block.getBlockType().getMaterial().isFullCube()) {
-            Map<Property<?>, Object> states = block.getStates();
-            if (states.containsKey(slab) && block.getState(slab).equalsIgnoreCase("bottom")) {
+            BlockType type = block.getBlockType();
+            if (type.hasPropertyOfType(slab.getKey(), slab.getClass()) && block.getState(slab).equalsIgnoreCase("bottom")) {
                 return false;
-            } else if (states.containsKey(trapdoorOpen) && states.containsKey(trapdoor) && (block.getState(trapdoorOpen)
-                    || block.getState(trapdoor).equalsIgnoreCase("bottom"))) {
+            } else if ((type.hasPropertyOfType(trapdoorOpen.getKey(), trapdoorOpen.getClass()) && block.getState(trapdoorOpen)) ||
+                    (type.hasPropertyOfType(trapdoor.getKey(), trapdoor.getClass()) && block.getState(trapdoor).equalsIgnoreCase("bottom"))) {
                 return false;
-            } else if (states.containsKey(stair) && block.getState(stair).equalsIgnoreCase("bottom")) {
+            } else if (type.hasPropertyOfType(stair.getKey(), stair.getClass()) && block.getState(stair).equalsIgnoreCase("bottom")) {
                 return false;
             } else {
                 return false;
             }
             //FAWE end
-        } else if (!block.getBlockType().id().toLowerCase(Locale.ROOT).contains("ice") && block
-                .getBlockType()
+        } else if (!block.getBlockType().id().toLowerCase(Locale.ROOT).contains("ice") && block.getBlockType()
                 .getMaterial()
                 .isTranslucent()) {
             return false;
@@ -144,14 +143,14 @@ public class SnowSimulator implements LayerFunction {
             // We've hit the highest layer (If it doesn't contain current + 2 it means it's 1 away from full)
             if (!snowLayersProperty.getValues().contains(currentHeight + 2)) {
                 if (this.extent.setBlock(abovePosition, snowBlock)) {
-                    if (block.getStates().containsKey(snowy)) {
+                    if (block.getBlockType().hasPropertyOfType(snowy.getKey(), snowy.getClass())) {
                         this.extent.setBlock(position, block.with(snowy, true));
                     }
                     this.affected++;
                 }
             } else {
                 if (this.extent.setBlock(abovePosition, above.with(snowLayersProperty, currentHeight + 1))) {
-                    if (block.getStates().containsKey(snowy)) {
+                    if (block.getBlockType().hasPropertyOfType(snowy.getKey(), snowy.getClass())) {
                         this.extent.setBlock(position, block.with(snowy, true));
                     }
                     this.affected++;
@@ -160,7 +159,7 @@ public class SnowSimulator implements LayerFunction {
             return false;
         }
         if (this.extent.setBlock(abovePosition, snow)) {
-            if (block.getStates().containsKey(snowy)) {
+            if (block.getBlockType().hasPropertyOfType(snowy.getKey(), snowy.getClass())) {
                 this.extent.setBlock(position, block.with(snowy, true));
             }
             this.affected++;

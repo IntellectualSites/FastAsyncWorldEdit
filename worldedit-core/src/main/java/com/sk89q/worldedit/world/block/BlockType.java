@@ -254,7 +254,8 @@ public class BlockType implements Keyed, Pattern {
      * @param propertyType the expected type of the property
      * @since TODO
      */
-    public boolean hasPropertyOfType(PropertyKey key, Class<?> propertyType) {
+    @SuppressWarnings("rawtypes")
+    public boolean hasPropertyOfType(PropertyKey key, Class<? extends Property> propertyType) {
         int ordinal = key.getId();
         Property<?> property;
         return this.settings.propertiesMapArr.length > ordinal
