@@ -137,4 +137,9 @@ public class PropertyKey implements Comparable<PropertyKey> {
         return Integer.compare(this.id, o.id);
     }
 
+    @Override
+    public String toString() {
+        return "PropertyKey[" + getName() + "]";
+    }
+
 }
