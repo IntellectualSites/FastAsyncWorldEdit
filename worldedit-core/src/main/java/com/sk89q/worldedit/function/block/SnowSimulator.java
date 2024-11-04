@@ -26,6 +26,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.BooleanProperty;
 import com.sk89q.worldedit.registry.state.EnumProperty;
 import com.sk89q.worldedit.registry.state.Property;
+import com.sk89q.worldedit.world.block.BlockCategories;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
@@ -132,9 +133,7 @@ public class SnowSimulator implements LayerFunction {
                 return false;
             }
             //FAWE end
-        } else if (!block.getBlockType().id().toLowerCase(Locale.ROOT).contains("ice") && block.getBlockType()
-                .getMaterial()
-                .isTranslucent()) {
+        } else if (!BlockCategories.SNOW_LAYER_CAN_SURVIVE_ON.contains(block.getBlockType())) {
             return false;
         }
 
