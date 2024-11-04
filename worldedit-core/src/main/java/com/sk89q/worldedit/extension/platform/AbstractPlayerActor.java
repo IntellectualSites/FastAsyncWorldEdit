@@ -568,14 +568,14 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
                     print(e.getComponent());
                 } catch (RuntimeException e) {
                     print(Caption.of("fawe.error.clipboard.invalid"));
-                    LOGGER.error("Error loading clipboard form disk", e);
+                    LOGGER.error("Error loading clipboard from disk", e);
                     print(Caption.of("fawe.error.stacktrace"));
                     print(Caption.of("fawe.error.clipboard.load.failure"));
                     print(Caption.of("fawe.error.clipboard.invalid.info", file.getName(), file.length()));
                     print(Caption.of("fawe.error.stacktrace"));
                 } catch (Exception e) {
                     print(Caption.of("fawe.error.clipboard.invalid"));
-                    LOGGER.error("Error loading clipboard form disk", e);
+                    LOGGER.error("Error loading clipboard from disk", e);
                     print(Caption.of("fawe.error.stacktrace"));
                     print(Caption.of("fawe.error.no-failure"));
                     print(Caption.of("fawe.error.clipboard.invalid.info", file.getName(), file.length()));
@@ -589,12 +589,8 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
             }
             fut.get();
         } catch (Exception e) {
-            print(Caption.of("fawe.error.clipboard.invalid"));
-            LOGGER.error("Error loading clipboard form disk", e);
-            print(Caption.of("fawe.error.stacktrace"));
-            print(Caption.of("fawe.error.no-failure"));
-            print(Caption.of("fawe.error.clipboard.invalid.info", file.getName(), file.length()));
-            print(Caption.of("fawe.error.stacktrace"));
+            LOGGER.error("Error loading clipboard from disk", e);
+            print(Caption.of("fawe.error.clipboard.load.failure"));
         }
     }
     //FAWE end
