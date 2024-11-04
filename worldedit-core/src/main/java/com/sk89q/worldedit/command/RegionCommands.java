@@ -594,7 +594,7 @@ public class RegionCommands {
                 session.getRegionSelector(world).learnChanges();
                 session.getRegionSelector(world).explainRegionAdjust(actor, session);
             } catch (RegionOperationException e) {
-                actor.printError(TextComponent.of(e.getMessage()));
+                actor.printError(e.getRichMessage());
             }
         }
 
@@ -640,7 +640,7 @@ public class RegionCommands {
                     int count,
             @Arg(desc = "How far to move the contents each stack", def = Offset.FORWARD)
             @Offset
-                    BlockVector3 direction,
+                    BlockVector3 offset,
             @Switch(name = 's', desc = "Shift the selection to the last stacked copy")
                     boolean moveSelection,
             @Switch(name = 'a', desc = "Ignore air blocks")
@@ -649,6 +649,8 @@ public class RegionCommands {
                     boolean copyEntities,
             @Switch(name = 'b', desc = "Also copy biomes")
                     boolean copyBiomes,
+            @Switch(name = 'r', desc = "Use block units")
+                    boolean blockUnits,
             @ArgFlag(name = 'm', desc = "Set the include mask, non-matching blocks become air")
                     Mask mask
     ) throws WorldEditException {
@@ -668,19 +670,24 @@ public class RegionCommands {
             combinedMask = mask;
         }
 
-        int affected = editSession.stackCuboidRegion(region, direction, count, copyEntities, copyBiomes, combinedMask);
+        int affected;
+        if (blockUnits) {
+            affected = editSession.stackRegionBlockUnits(region, offset, count, copyEntities, copyBiomes, combinedMask);
+        } else {
+            affected = editSession.stackCuboidRegion(region, offset, count, copyEntities, copyBiomes, combinedMask);
+        }
 
         if (moveSelection) {
             try {
                 final BlockVector3 size = region.getMaximumPoint().subtract(region.getMinimumPoint()).add(1, 1, 1);
-
-                final BlockVector3 shiftVector = direction.multiply(size).multiply(count);
+                final BlockVector3 shiftSize = blockUnits ? offset : offset.multiply(size);
+                final BlockVector3 shiftVector = shiftSize.multiply(count);
                 region.shift(shiftVector);
 
                 session.getRegionSelector(world).learnChanges();
                 session.getRegionSelector(world).explainRegionAdjust(actor, session);
             } catch (RegionOperationException e) {
-                actor.printError(TextComponent.of(e.getMessage()));
+                actor.printError(e.getRichMessage());
             }
         }
 
