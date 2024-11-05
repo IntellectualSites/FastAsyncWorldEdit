@@ -35,9 +35,8 @@ import org.bukkit.World;
 import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.generator.BiomeProvider;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.Nonnull;
 import java.lang.reflect.Field;
 import java.nio.file.Path;
 import java.util.Map;
@@ -175,7 +174,7 @@ public class PaperweightRegen extends Regenerator {
                     ) : null;
 
             @Override
-            public @NotNull Holder<Biome> getUncachedNoiseBiome(int biomeX, int biomeY, int biomeZ) {
+            public @Nonnull Holder<Biome> getUncachedNoiseBiome(int biomeX, int biomeY, int biomeZ) {
                 if (options.hasBiomeType()) {
                     return singleBiome;
                 }
@@ -184,7 +183,7 @@ public class PaperweightRegen extends Regenerator {
 
             @Override
             public void save(
-                    @Nullable final ProgressListener progressListener,
+                    final ProgressListener progressListener,
                     final boolean flush,
                     final boolean savingDisabled
             ) {
@@ -193,7 +192,7 @@ public class PaperweightRegen extends Regenerator {
 
             @Override
             public void save(
-                    @Nullable final ProgressListener progressListener,
+                    final ProgressListener progressListener,
                     final boolean flush,
                     final boolean savingDisabled,
                     final boolean close
@@ -273,12 +272,12 @@ public class PaperweightRegen extends Regenerator {
         }
 
         @Override
-        public void updateSpawnPos(@NotNull ChunkPos spawnPos) {
+        public void updateSpawnPos(@Nonnull ChunkPos spawnPos) {
         }
 
         @Override
         public void onStatusChange(
-                final @NotNull ChunkPos pos,
+                final @Nonnull ChunkPos pos,
                 @org.jetbrains.annotations.Nullable final net.minecraft.world.level.chunk.status.ChunkStatus status
         ) {
 

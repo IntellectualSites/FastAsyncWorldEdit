@@ -89,7 +89,6 @@ import org.bukkit.entity.Player;
 import org.enginehub.linbus.tree.LinCompoundTag;
 import org.enginehub.linbus.tree.LinStringTag;
 import org.enginehub.linbus.tree.LinTag;
-import org.jetbrains.annotations.NotNull;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
@@ -160,7 +159,7 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
         };
     }
 
-    private static @NotNull String getEntityId(Entity entity) {
+    private static String getEntityId(Entity entity) {
         return net.minecraft.world.entity.EntityType.getKey(entity.getType()).toString();
     }
 
