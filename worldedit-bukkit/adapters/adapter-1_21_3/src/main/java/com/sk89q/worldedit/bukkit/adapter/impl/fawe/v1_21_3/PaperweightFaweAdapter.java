@@ -126,18 +126,10 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
         }
     }
 
-    private final PaperweightAdapter parent;
-    // ------------------------------------------------------------------------
-    // Code that may break between versions of Minecraft
-    // ------------------------------------------------------------------------
     private final PaperweightMapChunkUtil mapUtil = new PaperweightMapChunkUtil();
-    private char[] ibdToStateOrdinal = null;
-    private int[] ordinalToIbdID = null;
-    private boolean initialised = false;
-    private Map<String, List<Property<?>>> allBlockProperties = null;
 
     public PaperweightFaweAdapter() throws NoSuchFieldException, NoSuchMethodException {
-        this.parent = new PaperweightAdapter();
+        super(new PaperweightAdapter());
     }
 
     public Function<BlockEntity, FaweCompoundTag> blockEntityToCompoundTag() {
