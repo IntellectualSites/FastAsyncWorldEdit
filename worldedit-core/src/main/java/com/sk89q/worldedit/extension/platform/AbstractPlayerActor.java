@@ -104,7 +104,7 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
                     if (fe != null) {
                         printError(fe.getComponent());
                     } else {
-                        LOGGER.error("Error in asyncNotifyQueue", throwable);
+                        LOGGER.error("Error occurred executing player action", throwable);
                     }
                 }
             }, this::getUniqueId);

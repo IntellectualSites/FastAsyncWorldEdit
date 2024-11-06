@@ -312,6 +312,11 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
             return newState != this.getInternalId() ? type.withStateId(newState) : this;
         } catch (ClassCastException e) {
             throw new IllegalArgumentException("Property not found: " + property);
+        } catch (Exception e) {
+            throw new UnsupportedOperationException(
+                    "Error resolving property " + property.getName() + " for block type " + getBlockType().id() + "(nullable) value " + value,
+                    e
+            );
         }
     }
 
@@ -322,6 +327,11 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
             return (V) ap.getValue(this.getInternalId());
         } catch (ClassCastException e) {
             throw new IllegalArgumentException("Property not found: " + property);
+        } catch (Exception e) {
+            throw new UnsupportedOperationException(
+                    "Error resolving property " + property.getName() + " for blocktype " + getBlockType().id(),
+                    e
+            );
         }
     }
 
@@ -337,6 +347,11 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
             return newState != this.getInternalId() ? type.withStateId(newState) : this;
         } catch (ClassCastException e) {
             throw new IllegalArgumentException("Property not found: " + property);
+        } catch (Exception e) {
+            throw new UnsupportedOperationException(
+                    "Error resolving property " + property.getName() + " for block type " + getBlockType().id() + "(nullable) value " + value,
+                    e
+            );
         }
     }
 
@@ -351,7 +366,7 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
         BlockState newState = this;
         for (Property<?> prop : ot.getProperties()) {
             PropertyKey key = prop.getKey();
-            if (blockType.hasProperty(key)) {
+            if (blockType.hasPropertyOfType(key, prop.getClass())) {
                 newState = newState.with(key, other.getState(key));
             }
         }

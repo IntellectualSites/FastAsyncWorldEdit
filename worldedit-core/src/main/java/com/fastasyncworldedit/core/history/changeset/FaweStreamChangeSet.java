@@ -817,6 +817,7 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
             @Override
             protected void write(final MutableTileChange change, final CompoundTag tag) {
                 change.tag = tag;
+                change.create = create;
             }
 
             @Override
@@ -845,6 +846,7 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
             @Override
             protected void write(final MutableEntityChange change, final CompoundTag tag) {
                 change.tag = tag;
+                change.create = create;
             }
 
             @Override

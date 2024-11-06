@@ -4,7 +4,9 @@ import com.fastasyncworldedit.core.util.TaskManager;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
+import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.util.TreeGenerator;
 import org.bukkit.Material;
 import org.bukkit.TreeType;
@@ -12,6 +14,7 @@ import org.bukkit.World;
 import org.bukkit.block.BlockState;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * A base class for version-specific implementations of the BukkitImplAdapter
@@ -20,6 +23,16 @@ import java.util.List;
  * @param <SERVER_LEVEL> the version-specific ServerLevel type
  */
 public abstract class FaweAdapter<TAG, SERVER_LEVEL> extends CachedBukkitAdapter implements IDelegateBukkitImplAdapter<TAG> {
+
+    protected final BukkitImplAdapter<TAG> parent;
+    protected char[] ibdToStateOrdinal = null;
+    protected int[] ordinalToIbdID = null;
+    protected boolean initialised = false;
+    protected Map<String, List<Property<?>>> allBlockProperties = null;
+
+    protected FaweAdapter(final BukkitImplAdapter<TAG> parent) {
+        this.parent = parent;
+    }
 
     @Override
     public boolean generateTree(
