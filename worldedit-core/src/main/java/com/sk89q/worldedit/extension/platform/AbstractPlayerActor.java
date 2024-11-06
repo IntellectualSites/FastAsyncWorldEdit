@@ -34,6 +34,7 @@ import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.internal.cui.CUIEvent;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.ConvexPolyhedralRegion;
@@ -62,6 +63,7 @@ import com.sk89q.worldedit.world.gamemode.GameMode;
 import com.sk89q.worldedit.world.gamemode.GameModes;
 import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.item.ItemTypes;
+import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
 import java.io.File;
@@ -75,6 +77,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  * players that make use of WorldEdit.
  */
 public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
+
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     //FAWE start
     private final Map<String, Object> meta;
@@ -93,7 +97,7 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
                     if (fe != null) {
                         printError(fe.getComponent());
                     } else {
-                        throwable.printStackTrace();
+                        LOGGER.error("Error occurred executing player action", throwable);
                     }
                 }
             }, this::getUniqueId);
