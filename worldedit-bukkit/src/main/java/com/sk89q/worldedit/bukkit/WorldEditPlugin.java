@@ -564,17 +564,17 @@ public class WorldEditPlugin extends JavaPlugin {
     public BukkitPlayer wrapPlayer(Player player) {
         //FAWE start - Use cache over returning a direct BukkitPlayer
         BukkitPlayer wePlayer = getCachedPlayer(player);
-        if (wePlayer == null) {
-            synchronized (player) {
-                wePlayer = getCachedPlayer(player);
-                if (wePlayer == null) {
-                    wePlayer = new BukkitPlayer(this, player);
-                    player.setMetadata("WE", new FixedMetadataValue(this, wePlayer));
-                    return wePlayer;
-                }
-            }
+        if (wePlayer != null) {
+            return wePlayer;
         }
-        return wePlayer;
+        synchronized (player) {
+            BukkitPlayer bukkitPlayer = getCachedPlayer(player);
+            if (bukkitPlayer == null) {
+                bukkitPlayer = new BukkitPlayer(this, player);
+                player.setMetadata("WE", new FixedMetadataValue(this, bukkitPlayer));
+            }
+            return bukkitPlayer;
+        }
         //FAWE end
     }
 

@@ -19,10 +19,14 @@
 
 package com.sk89q.worldedit.extension.platform;
 
+import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.configuration.Settings;
+import com.fastasyncworldedit.core.internal.exception.FaweClipboardVersionMismatchException;
 import com.fastasyncworldedit.core.internal.exception.FaweException;
 import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.fastasyncworldedit.core.regions.FaweMaskManager;
+import com.fastasyncworldedit.core.util.MainUtil;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.fastasyncworldedit.core.util.WEManager;
 import com.fastasyncworldedit.core.util.task.AsyncNotifyKeyedQueue;
@@ -69,6 +73,8 @@ import javax.annotation.Nullable;
 import java.io.File;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Future;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -82,6 +88,7 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
 
     //FAWE start
     private final Map<String, Object> meta;
+    private final Semaphore clipboardLoading = new Semaphore(1);
 
     // Queue for async tasks
     private final AtomicInteger runningCount = new AtomicInteger();
@@ -524,21 +531,67 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
 
     @Override
     public void setSelection(Region region) {
-        RegionSelector selector;
-        if (region instanceof ConvexPolyhedralRegion) {
-            selector = new ConvexPolyhedralRegionSelector((ConvexPolyhedralRegion) region);
-        } else if (region instanceof CylinderRegion) {
-            selector = new CylinderRegionSelector((CylinderRegion) region);
-        } else if (region instanceof Polygonal2DRegion) {
-            selector = new Polygonal2DRegionSelector((Polygonal2DRegion) region);
-        } else {
-            selector = new CuboidRegionSelector(null, region.getMinimumPoint(),
-                    region.getMaximumPoint()
-            );
-        }
+        RegionSelector selector = switch (region) {
+            case ConvexPolyhedralRegion blockVector3s -> new ConvexPolyhedralRegionSelector(blockVector3s);
+            case CylinderRegion blockVector3s -> new CylinderRegionSelector(blockVector3s);
+            case Polygonal2DRegion blockVector3s -> new Polygonal2DRegionSelector(blockVector3s);
+            default -> new CuboidRegionSelector(null, region.getMinimumPoint(), region.getMaximumPoint());
+        };
         selector.setWorld(region.getWorld());
 
         getSession().setRegionSelector(getWorld(), selector);
+    }
+
+    @Override
+    public void loadClipboardFromDisk() {
+        if (!clipboardLoading.tryAcquire()) {
+            if (!Fawe.isMainThread()) {
+                try {
+                    clipboardLoading.acquire();
+                    clipboardLoading.release();
+                } catch (InterruptedException e) {
+                    LOGGER.error("Error waiting for clipboard-on-disk loading for player {}", getName(), e);
+                }
+            }
+            return;
+        }
+
+        File file = MainUtil.getFile(
+                Fawe.platform().getDirectory(),
+                Settings.settings().PATHS.CLIPBOARD + File.separator + getUniqueId() + ".bd"
+        );
+        try {
+            Future<?> fut = Fawe.instance().submitUUIDKeyQueuedTask(getUniqueId(), () -> {
+                try {
+                    getSession().loadClipboardFromDisk(file);
+                } catch (FaweClipboardVersionMismatchException e) {
+                    print(e.getComponent());
+                } catch (RuntimeException e) {
+                    print(Caption.of("fawe.error.clipboard.invalid"));
+                    LOGGER.error("Error loading clipboard from disk", e);
+                    print(Caption.of("fawe.error.stacktrace"));
+                    print(Caption.of("fawe.error.clipboard.load.failure"));
+                    print(Caption.of("fawe.error.clipboard.invalid.info", file.getName(), file.length()));
+                    print(Caption.of("fawe.error.stacktrace"));
+                } catch (Exception e) {
+                    print(Caption.of("fawe.error.clipboard.invalid"));
+                    LOGGER.error("Error loading clipboard from disk", e);
+                    print(Caption.of("fawe.error.stacktrace"));
+                    print(Caption.of("fawe.error.no-failure"));
+                    print(Caption.of("fawe.error.clipboard.invalid.info", file.getName(), file.length()));
+                    print(Caption.of("fawe.error.stacktrace"));
+                } finally {
+                    clipboardLoading.release();
+                }
+            });
+            if (Fawe.isMainThread()) {
+                return;
+            }
+            fut.get();
+        } catch (Exception e) {
+            LOGGER.error("Error loading clipboard from disk", e);
+            print(Caption.of("fawe.error.clipboard.load.failure"));
+        }
     }
     //FAWE end
 
@@ -698,10 +751,9 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
 
     @Override
     public boolean equals(Object other) {
-        if (!(other instanceof Player)) {
+        if (!(other instanceof Player other2)) {
             return false;
         }
-        Player other2 = (Player) other;
         return other2.getName().equals(getName());
     }
 

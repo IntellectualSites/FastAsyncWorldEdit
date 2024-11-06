@@ -423,7 +423,7 @@ public interface Player extends Entity, Actor {
         if (Settings.settings().CLIPBOARD.USE_DISK && Settings.settings().CLIPBOARD.DELETE_ON_LOGOUT) {
             session.deleteClipboardOnDisk();
         } else if (Settings.settings().CLIPBOARD.USE_DISK) {
-            Fawe.instance().getClipboardExecutor().submit(getUniqueId(), () -> session.setClipboard(null));
+            Fawe.instance().submitUUIDKeyQueuedTask(getUniqueId(), () -> session.setClipboard(null));
         } else if (Settings.settings().CLIPBOARD.DELETE_ON_LOGOUT) {
             session.setClipboard(null);
         }
@@ -436,32 +436,8 @@ public interface Player extends Entity, Actor {
     void sendTitle(Component title, Component sub);
 
     /**
-     * Loads any history items from disk: - Should already be called if history on disk is enabled.
+     * Loads clipboard file from disk if it exists
      */
-    default void loadClipboardFromDisk() {
-        File file = MainUtil.getFile(
-                Fawe.platform().getDirectory(),
-                Settings.settings().PATHS.CLIPBOARD + File.separator + getUniqueId() + ".bd"
-        );
-        try {
-            getSession().loadClipboardFromDisk(file);
-        } catch (FaweClipboardVersionMismatchException e) {
-            print(e.getComponent());
-        } catch (RuntimeException e) {
-            print(Caption.of("fawe.error.clipboard.invalid"));
-            e.printStackTrace();
-            print(Caption.of("fawe.error.stacktrace"));
-            print(Caption.of("fawe.error.clipboard.load.failure"));
-            print(Caption.of("fawe.error.clipboard.invalid.info", file.getName(), file.length()));
-            print(Caption.of("fawe.error.stacktrace"));
-        } catch (Exception e) {
-            print(Caption.of("fawe.error.clipboard.invalid"));
-            e.printStackTrace();
-            print(Caption.of("fawe.error.stacktrace"));
-            print(Caption.of("fawe.error.no-failure"));
-            print(Caption.of("fawe.error.clipboard.invalid.info", file.getName(), file.length()));
-            print(Caption.of("fawe.error.stacktrace"));
-        }
-    }
+    void loadClipboardFromDisk();
     //FAWE end
 }

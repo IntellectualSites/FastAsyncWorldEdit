@@ -132,7 +132,7 @@
   "fawe.error.parse.no-clipboard-source": "No clipboards found at given source: {0}",
   "fawe.error.clipboard.invalid": "====== INVALID CLIPBOARD ======",
   "fawe.error.clipboard.invalid.info": "File: {0} (len: {1})",
-  "fawe.error.clipboard.load.failure": "Could not load clipboard. Possible that the clipboard is still being written to from another server?!",
+  "fawe.error.clipboard.load.failure": "Unexpected failure loading clipboard from disk!",
   "fawe.error.clipboard.on.disk.version.mismatch": "Clipboard version mismatch: expected {0} but got {1}. It is recommended you delete the clipboard folder and restart the server.\nYour clipboard folder is located at {2}.",
   "fawe.error.limit.disallowed-block": "Your limit disallows use of block '{0}'",
   "fawe.error.limit.disallowed-property": "Your limit disallows use of property '{0}'",
