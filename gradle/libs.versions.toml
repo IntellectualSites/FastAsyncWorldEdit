@@ -51,7 +51,7 @@ mockito = "5.14.2"
 
 # Gradle plugins
 pluginyml = "0.6.0"
-minotaur = "2.8.7"
+mod-publish-plugin = "0.7.4"
 
 [libraries]
 # Minecraft expectations
@@ -127,4 +127,4 @@ log4jCore = { group = "org.apache.logging.log4j", name = "log4j-core", version.r
 
 [plugins]
 pluginyml = { id = "net.minecrell.plugin-yml.bukkit", version.ref = "pluginyml" }
-minotaur = { id = "com.modrinth.minotaur", version.ref = "minotaur" }
+mod-publish-plugin = { id = "me.modmuss50.mod-publish-plugin", version.ref = "mod-publish-plugin" }
