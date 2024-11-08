@@ -158,13 +158,22 @@ tasks.register<ShadowJar>("reobfShadowJar") {
     from(sourceSets.main.map { it.output })
     manifest.inheritFrom(tasks.jar.get().manifest)
     exclude("META-INF/INDEX.LIST", "META-INF/*.SF", "META-INF/*.DSA", "META-INF/*.RSA", "module-info.class")
+
+    manifest {
+        attributes(
+            "FAWE-Plugin-Jar-Type" to "spigot"
+        )
+    }
 }
 
 tasks.named<ShadowJar>("shadowJar") {
     archiveFileName.set("${rootProject.name}-Paper-${project.version}.${archiveExtension.getOrElse("jar")}")
     configurations.add(adapters)
     manifest {
-        attributes("paperweight-mappings-namespace" to "mojang")
+        attributes(
+            "paperweight-mappings-namespace" to "mojang",
+            "FAWE-Plugin-Jar-Type" to "mojang"
+        )
     }
 }
 
