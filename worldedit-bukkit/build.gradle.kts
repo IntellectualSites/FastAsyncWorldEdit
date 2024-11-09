@@ -179,7 +179,7 @@ tasks.named<ShadowJar>("shadowJar") {
 
 tasks.withType<ShadowJar>().configureEach {
     dependencies {
-        // In tandem with not bundling log4j, we shouldn"t relocate base package here.
+        // In tandem with not bundling log4j, we shouldn't relocate base package here.
         // relocate("org.apache.logging", "com.sk89q.worldedit.log4j")
         relocate("org.antlr.v4", "com.sk89q.worldedit.antlr4")
 
