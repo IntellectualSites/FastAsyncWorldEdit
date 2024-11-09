@@ -148,7 +148,7 @@ public class WorldEditPlugin extends JavaPlugin {
                         "Download the correct FAWE jar from Modrinth: https://modrinth.com/plugin/fastasyncworldedit/"
                     );
                 }
-            } else if (PaperLib.getMinecraftPatchVersion() > 20 || (PaperLib.getMinecraftVersion() == 20 && PaperLib.getMinecraftPatchVersion() >= 5)) {
+            } else if (PaperLib.getMinecraftVersion() > 20 || (PaperLib.getMinecraftVersion() == 20 && PaperLib.getMinecraftPatchVersion() >= 5)) {
                 if (type.equals("spigot")) {
                     LOGGER.warn(
                         "You are using the Spigot-mapped FAWE jar on a modern Paper version.\n" +
