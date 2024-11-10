@@ -144,31 +144,37 @@ public class WorldEditPlugin extends JavaPlugin {
             if (PaperLib.getMinecraftVersion() < 20 || (PaperLib.getMinecraftVersion() == 20 && PaperLib.getMinecraftPatchVersion() < 5)) {
                 if (type.equals("mojang") && !Refraction.isMojangMapped()) {
                     throw new IllegalStateException(
-                        "\n**********************************************\n" +
-                        "** You are using the wrong FAWE jar for your Minecraft version.\n" +
-                        "** Download the correct FAWE jar from Modrinth: https://modrinth.com/plugin/fastasyncworldedit/\n" +
-                        "**********************************************"
+                        """
+                        
+                        **********************************************
+                        ** You are using the wrong FAWE jar for your Minecraft version.
+                        ** Download the correct FAWE jar from Modrinth: https://modrinth.com/plugin/fastasyncworldedit/
+                        **********************************************"""
                     );
                 }
             } else if (PaperLib.getMinecraftVersion() > 20 || (PaperLib.getMinecraftVersion() == 20 && PaperLib.getMinecraftPatchVersion() >= 5)) {
                 if (type.equals("spigot")) {
                     LOGGER.warn(
-                        "\n**********************************************\n" +
-                        "** You are using the Spigot-mapped FAWE jar on a modern Paper version.\n" +
-                        "** This will result in slower first-run times and wasted disk space from plugin remapping.\n" +
-                        "** Download the Paper FAWE jar from Modrinth to avoid this: https://modrinth.com/plugin/fastasyncworldedit/\n" +
-                        "**********************************************"
+                        """
+                        
+                        **********************************************
+                        ** You are using the Spigot-mapped FAWE jar on a modern Paper version.
+                        ** This will result in slower first-run times and wasted disk space from plugin remapping.
+                        ** Download the Paper FAWE jar from Modrinth to avoid this: https://modrinth.com/plugin/fastasyncworldedit/
+                        **********************************************"""
                     );
                 }
             }
         } else {
             if (type.equals("mojang")) {
                 throw new IllegalStateException(
-                    "\n**********************************************\n" +
-                    "** You are attempting to run the Paper FAWE jar on a Spigot server.\n" +
-                    "** Either switch to Paper (https://papermc.io), or download the correct FAWE jar for your platform\n" +
-                    "** from Modrinth: https://modrinth.com/plugin/fastasyncworldedit/\n" +
-                    "**********************************************"
+                    """
+                    
+                    **********************************************
+                    ** You are attempting to run the Paper FAWE jar on a Spigot server.
+                    ** Either switch to Paper (https://papermc.io), or download the correct FAWE jar for your platform
+                    ** from Modrinth: https://modrinth.com/plugin/fastasyncworldedit/
+                    **********************************************"""
                 );
             }
         }
