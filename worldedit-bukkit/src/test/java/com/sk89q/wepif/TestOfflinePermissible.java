@@ -376,9 +376,4 @@ public class TestOfflinePermissible implements OfflinePlayer, Permissible {
         return null;
     }
 
-    // @Override
-    public @NotNull PersistentDataContainerView getPersistentDataContainer() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
 }
