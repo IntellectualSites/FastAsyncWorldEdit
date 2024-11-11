@@ -62,8 +62,9 @@ import org.bstats.bukkit.Metrics;
 import org.bstats.charts.SimplePie;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.Registry;
+import org.bukkit.NamespacedKey;
 import org.bukkit.Tag;
+import org.bukkit.block.Biome;
 import org.bukkit.command.BlockCommandSender;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -88,6 +89,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -248,23 +250,21 @@ public class WorldEditPlugin extends JavaPlugin {
         // datapacks aren't loaded until just before the world is, and bukkit has no event for this
         // so the earliest we can do this is in WorldInit
         setupTags();
+        setupBiomes(false); // FAWE - load biomes later. Initialize biomes twice to allow for the registry to be present for
         // plugins requiring WE biomes during startup, as well as allowing custom biomes loaded later on to be present in WE.
         WorldEdit.getInstance().getEventBus().post(new PlatformReadyEvent(platform));
     }
 
     @SuppressWarnings({"deprecation", "unchecked"})
     private void initializeRegistries() {
-        // Biome
-        Registry.BIOME.forEach(biome -> {
-            if (!biome.name().equals("CUSTOM")) {
-                String key = biome.getKey().toString();
-                BiomeType.REGISTRY.register(key, new BiomeType(key));
-            }
-        });
+        // FAWE start - move Biomes to their own method. Initialize biomes twice to allow for the registry to be present for
+        // plugins requiring WE biomes during startup, as well as allowing custom biomes loaded later on to be present in WE.
+        setupBiomes(true);
+        // FAWE end
         /*
 
         // Block & Item
-        Registry.MATERIAL.forEach(material -> {
+        for (Material material : Material.values()) {
             if (material.isBlock() && !material.isLegacy()) {
                 BlockType.REGISTRY.register(material.getKey().toString(), new BlockType(material.getKey().toString(), blockState -> {
                     // TODO Use something way less hacky than this.
@@ -291,14 +291,17 @@ public class WorldEditPlugin extends JavaPlugin {
             if (material.isItem() && !material.isLegacy()) {
                 ItemType.REGISTRY.register(material.getKey().toString(), new ItemType(material.getKey().toString()));
             }
-        });
-        */
-        // Entity
-        Registry.ENTITY_TYPE.forEach(entityType -> {
-            String key = entityType.getKey().toString();
-            EntityType.REGISTRY.register(key, new EntityType(key));
-        });
+        }
+*/
 
+        // Entity
+        for (org.bukkit.entity.EntityType entityType : org.bukkit.entity.EntityType.values()) {
+            String mcid = entityType.getName();
+            if (mcid != null) {
+                String lowerCaseMcId = mcid.toLowerCase(Locale.ROOT);
+                EntityType.REGISTRY.register("minecraft:" + lowerCaseMcId, new EntityType("minecraft:" + lowerCaseMcId));
+            }
+        }
         // ... :|
         GameModes.get("");
         WeatherTypes.get("");
@@ -318,6 +321,38 @@ public class WorldEditPlugin extends JavaPlugin {
                     "The version of Spigot/Paper you are using doesn't support Tags. The usage of tags with WorldEdit will not work until you update.");
         }
     }
+
+    // FAWE start
+    private void setupBiomes(boolean expectFail) {
+        if (this.adapter.value().isPresent()) {
+            // Biomes are stored globally in the server. Registries are not kept per-world in Minecraft.
+            // The WorldServer get-registries method simply delegates to the MinecraftServer method.
+            for (final NamespacedKey biome : ((BukkitImplAdapter<?>) adapter.value().get()).getRegisteredBiomes()) {
+                BiomeType biomeType;
+                if ((biomeType = BiomeType.REGISTRY.get(biome.toString())) == null) { // only register once
+                    biomeType = new BiomeType(biome.toString());
+                    BiomeType.REGISTRY.register(biome.toString(), biomeType);
+                }
+                biomeType.setLegacyId(adapter.value().get().getInternalBiomeId(biomeType));
+            }
+        } else {
+            if (!expectFail) {
+                LOGGER.warn("Failed to load biomes via adapter (not present). Will load via bukkit");
+            }
+            for (Biome biome : Biome.values()) {
+                // Custom is bad
+                if (biome.name().equals("CUSTOM")) {
+                    continue;
+                }
+                String lowerCaseBiome = biome.getKey().toString().toLowerCase(Locale.ROOT);
+                // only register once
+                if (BiomeType.REGISTRY.get(lowerCaseBiome) == null) {
+                    BiomeType.REGISTRY.register(lowerCaseBiome, new BiomeType(lowerCaseBiome));
+                }
+            }
+        }
+    }
+    // FAWE end
 
     private void loadAdapter() {
         WorldEdit worldEdit = WorldEdit.getInstance();
