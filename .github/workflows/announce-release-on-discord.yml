@@ -24,5 +24,5 @@ jobs:
             ""
             "The download is available at:"
             "- Spigot: <https://www.spigotmc.org/resources/13932/>"
-            "- Modrinth: <https://modrinth.com/plugin/fastasyncworldedit/version/${{ github.event.release.tag_name }}>"
+            "- Modrinth: <https://modrinth.com/plugin/fastasyncworldedit>"
             "- CurseForge: <https://www.curseforge.com/minecraft/bukkit-plugins/fawe>"

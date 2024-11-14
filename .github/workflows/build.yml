@@ -70,9 +70,9 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: FastAsyncWorldEdit-Bukkit-SNAPSHOT
-          path: worldedit-bukkit/build/libs/FastAsyncWorldEdit-Bukkit-*.jar
+          path: worldedit-bukkit/build/libs/FastAsyncWorldEdit-*.jar
       - name: Publish to Modrinth
         if: ${{ runner.os == 'Linux' && env.STATUS == 'release' && github.event_name == 'push' && github.ref == 'refs/heads/main'}}
-        run: ./gradlew modrinth
+        run: ./gradlew publishMods
         env:
           MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}

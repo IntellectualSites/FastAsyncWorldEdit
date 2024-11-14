@@ -64,7 +64,7 @@ public class WorldEditManifest {
     }
 
     @Nullable
-    private static Attributes readAttributes() {
+    public static Attributes readAttributes() {
         Class<WorldEditManifest> clazz = WorldEditManifest.class;
         String className = clazz.getSimpleName() + ".class";
         String classPath = clazz.getResource(className).toString();

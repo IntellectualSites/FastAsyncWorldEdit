@@ -32,9 +32,11 @@ import com.sk89q.wepif.PermissionsResolverManager;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.WorldEditManifest;
 import com.sk89q.worldedit.bukkit.adapter.AdapterLoadException;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplLoader;
+import com.sk89q.worldedit.bukkit.adapter.Refraction;
 import com.sk89q.worldedit.event.platform.CommandEvent;
 import com.sk89q.worldedit.event.platform.CommandSuggestionEvent;
 import com.sk89q.worldedit.event.platform.PlatformReadyEvent;
@@ -90,7 +92,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.jar.Attributes;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.sk89q.worldedit.internal.anvil.ChunkDeleter.DELCHUNKS_FILE_NAME;
@@ -128,6 +132,50 @@ public class WorldEditPlugin extends JavaPlugin {
                         "You installed WorldEdit alongside FastAsyncWorldEdit. That is unneeded and will cause unforeseen issues, " +
                                 "because FastAsyncWorldEdit already provides WorldEdit. " +
                                 "Stop your server and delete the 'worldedit-bukkit' jar from your plugins folder.");
+            }
+        }
+        //FAWE end
+        //FAWE start
+        final Attributes attributes = WorldEditManifest.readAttributes();
+        Objects.requireNonNull(attributes, "Could not retrieve manifest attributes");
+        final String type = attributes.getValue("FAWE-Plugin-Jar-Type");
+        Objects.requireNonNull(type, "Could not determine plugin jar type");
+        if (PaperLib.isPaper()) {
+            if (PaperLib.getMinecraftVersion() < 20 || (PaperLib.getMinecraftVersion() == 20 && PaperLib.getMinecraftPatchVersion() < 5)) {
+                if (type.equals("mojang") && !Refraction.isMojangMapped()) {
+                    throw new IllegalStateException(
+                        """
+                        
+                        **********************************************
+                        ** You are using the wrong FAWE jar for your Minecraft version.
+                        ** Download the correct FAWE jar from Modrinth: https://modrinth.com/plugin/fastasyncworldedit/
+                        **********************************************"""
+                    );
+                }
+            } else if (PaperLib.getMinecraftVersion() > 20 || (PaperLib.getMinecraftVersion() == 20 && PaperLib.getMinecraftPatchVersion() >= 5)) {
+                if (type.equals("spigot")) {
+                    LOGGER.warn(
+                        """
+                        
+                        **********************************************
+                        ** You are using the Spigot-mapped FAWE jar on a modern Paper version.
+                        ** This will result in slower first-run times and wasted disk space from plugin remapping.
+                        ** Download the Paper FAWE jar from Modrinth to avoid this: https://modrinth.com/plugin/fastasyncworldedit/
+                        **********************************************"""
+                    );
+                }
+            }
+        } else {
+            if (type.equals("mojang")) {
+                throw new IllegalStateException(
+                    """
+                    
+                    **********************************************
+                    ** You are attempting to run the Paper FAWE jar on a Spigot server.
+                    ** Either switch to Paper (https://papermc.io), or download the correct FAWE jar for your platform
+                    ** from Modrinth: https://modrinth.com/plugin/fastasyncworldedit/
+                    **********************************************"""
+                );
             }
         }
         //FAWE end

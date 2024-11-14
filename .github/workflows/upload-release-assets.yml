@@ -21,6 +21,6 @@ jobs:
       - name: Upload Release Assets
         uses: AButler/upload-release-assets@v3.0
         with:
-          files: 'worldedit-bukkit/build/libs/FastAsyncWorldEdit-Bukkit-*.jar'
+          files: 'worldedit-bukkit/build/libs/FastAsyncWorldEdit-*.jar'
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           release-tag: ${{ github.event.release.tag_name }}
