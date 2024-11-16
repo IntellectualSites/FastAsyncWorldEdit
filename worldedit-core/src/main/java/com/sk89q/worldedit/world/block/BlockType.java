@@ -255,10 +255,7 @@ public class BlockType implements Keyed, Pattern {
      */
     public boolean hasProperty(Property<?> property) {
         int ordinal = property.getKey().getId();
-        Property<?> selfProperty;
-        return this.settings.propertiesMapArr.length > ordinal
-                && (selfProperty = this.settings.propertiesMapArr[ordinal]) != null
-                && selfProperty == property;
+        return this.settings.propertiesMapArr.length > ordinal && property.equals(this.settings.propertiesMapArr[ordinal]);
     }
 
     public <V> Property<V> getProperty(PropertyKey key) {
