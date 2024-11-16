@@ -56,7 +56,6 @@ import net.minecraft.world.level.chunk.SingleValuePalette;
 import net.minecraft.world.level.chunk.status.ChunkStatus;
 import net.minecraft.world.level.entity.PersistentEntitySectionManager;
 import org.apache.logging.log4j.Logger;
-import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.CraftChunk;
 
 import javax.annotation.Nonnull;
@@ -79,8 +78,6 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Semaphore;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import java.util.function.IntFunction;
 
 import static java.lang.invoke.MethodType.methodType;

@@ -18,6 +18,7 @@ import com.fastasyncworldedit.core.queue.IQueueExtent;
 import com.fastasyncworldedit.core.queue.implementation.QueueHandler;
 import com.fastasyncworldedit.core.queue.implementation.blocks.CharGetBlocks;
 import com.fastasyncworldedit.core.util.MathMan;
+import com.fastasyncworldedit.core.util.MemUtil;
 import com.fastasyncworldedit.core.util.NbtUtils;
 import com.fastasyncworldedit.core.util.collection.AdaptedMap;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
@@ -410,7 +411,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
     }
 
     @Override
-    @SuppressWarnings("rawtypes")
+    @SuppressWarnings({"rawtypes", "unchecked"})
     public synchronized <T extends Future<T>> T call(IQueueExtent<? extends IChunk> owner, IChunkSet set, Runnable finalizer) {
         if (!callLock.isHeldByCurrentThread()) {
             throw new IllegalStateException("Attempted to call chunk GET but chunk was not call-locked.");
@@ -419,11 +420,24 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
         final ServerLevel nmsWorld = serverLevel;
         CompletableFuture<LevelChunk> nmsChunkFuture = ensureLoaded(nmsWorld, chunkX, chunkZ);
         LevelChunk chunk = nmsChunkFuture.getNow(null);
+        if ((chunk == null && MemUtil.shouldBeginSlow()) || Settings.settings().QUEUE.ASYNC_CHUNK_LOAD_WRITE) {
+            try {
+                // "Artificially" slow FAWE down if memory low as performing the operation async can cause large amounts of
+                // memory usage
+                chunk = nmsChunkFuture.get();
+            } catch (InterruptedException | ExecutionException e) {
+                LOGGER.error("Could not get chunk at {},{} whilst low memory", chunkX, chunkZ, e);
+                throw new FaweException(
+                        TextComponent.of("Could not get chunk at " + chunkX + "," + chunkZ + " whilst low memory: " + e.getMessage()));
+            }
+        }
         final int finalCopyKey = copyKey;
         // Run immediately if possible
         if (chunk != null) {
             return tryWrappedInternalCall(set, finalizer, finalCopyKey, chunk, nmsWorld);
         }
+        // Submit via the STQE as that will help handle excessive queuing by waiting for the submission count to fall below the
+        // target size
         nmsChunkFuture.thenApply(nmsChunk -> owner.submitTaskUnchecked(() -> (T) tryWrappedInternalCall(
                 set,
                 finalizer,
@@ -431,6 +445,9 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                 nmsChunk,
                 nmsWorld
         )));
+        // If we have re-submitted, return a completed future to prevent potential deadlocks where a future reliant on the
+        // above submission is halting the BlockingExecutor, and preventing the above task from actually running. The futures
+        // submitted above will still be added to the STQE submissions.
         return (T) (Future) CompletableFuture.completedFuture(null);
     }
 
