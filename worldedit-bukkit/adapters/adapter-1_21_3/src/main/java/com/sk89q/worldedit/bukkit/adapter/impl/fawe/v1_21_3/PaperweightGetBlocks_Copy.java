@@ -47,6 +47,8 @@ public class PaperweightGetBlocks_Copy implements IChunkGet {
     private final char[][] blocks;
     private final int minHeight;
     private final int maxHeight;
+    private final int chunkX;
+    private final int chunkZ;
     final ServerLevel serverLevel;
     final LevelChunk levelChunk;
     private Holder<Biome>[][] biomes = null;
@@ -57,6 +59,8 @@ public class PaperweightGetBlocks_Copy implements IChunkGet {
         this.minHeight = serverLevel.getMinY();
         this.maxHeight = serverLevel.getMaxY() - 1; // Minecraft max limit is exclusive.
         this.blocks = new char[getSectionCount()][];
+        this.chunkX = levelChunk.locX;
+        this.chunkZ = levelChunk.locZ;
     }
 
     protected void storeTile(BlockEntity blockEntity) {
@@ -85,6 +89,11 @@ public class PaperweightGetBlocks_Copy implements IChunkGet {
     @Override
     public Collection<FaweCompoundTag> entities() {
         return this.entities;
+    }
+
+    @Override
+    public Set<com.sk89q.worldedit.entity.Entity> getFullEntities() {
+        throw new UnsupportedOperationException("Cannot get full entities from GET copy.");
     }
 
     @Override
@@ -137,6 +146,16 @@ public class PaperweightGetBlocks_Copy implements IChunkGet {
     @Override
     public int getMinSectionPosition() {
         return minHeight >> 4;
+    }
+
+    @Override
+    public int getX() {
+        return chunkX;
+    }
+
+    @Override
+    public int getZ() {
+        return chunkZ;
     }
 
     @Override
