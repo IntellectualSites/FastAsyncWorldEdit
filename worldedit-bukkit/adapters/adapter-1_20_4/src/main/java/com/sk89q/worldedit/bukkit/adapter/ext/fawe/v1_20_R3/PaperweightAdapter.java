@@ -28,7 +28,6 @@ import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.Futures;
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Lifecycle;
-import com.sk89q.jnbt.NBTConstants;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseItem;
@@ -524,22 +523,6 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
             return createdEntity.getBukkitEntity();
         } else {
             return null;
-        }
-    }
-
-    // This removes all unwanted tags from the main entity and all its passengers
-    private void removeUnwantedEntityTagsRecursively(net.minecraft.nbt.CompoundTag tag) {
-        for (String name : Constants.NO_COPY_ENTITY_NBT_FIELDS) {
-            tag.remove(name);
-        }
-
-        // Adapted from net.minecraft.world.entity.EntityType#loadEntityRecursive
-        if (tag.contains("Passengers", NBTConstants.TYPE_LIST)) {
-            net.minecraft.nbt.ListTag nbttaglist = tag.getList("Passengers", NBTConstants.TYPE_COMPOUND);
-
-            for (int i = 0; i < nbttaglist.size(); ++i) {
-                removeUnwantedEntityTagsRecursively(nbttaglist.getCompound(i));
-            }
         }
     }
 

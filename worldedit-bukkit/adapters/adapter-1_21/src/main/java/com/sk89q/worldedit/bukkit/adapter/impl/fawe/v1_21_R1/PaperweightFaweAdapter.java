@@ -64,6 +64,7 @@ import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.dedicated.DedicatedServer;
@@ -518,11 +519,10 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
     public org.bukkit.inventory.ItemStack adapt(BaseItemStack baseItemStack) {
         final RegistryAccess.Frozen registryAccess = DedicatedServer.getServer().registryAccess();
         ItemStack stack = new ItemStack(
-                DedicatedServer.getServer().registryAccess().registryOrThrow(Registries.ITEM)
-                        .get(ResourceLocation.tryParse(baseItemStack.getType().id())),
+                registryAccess.registryOrThrow(Registries.ITEM).get(ResourceLocation.tryParse(baseItemStack.getType().id())),
                 baseItemStack.getAmount()
         );
-        final net.minecraft.nbt.CompoundTag nbt = (net.minecraft.nbt.CompoundTag) fromNative(baseItemStack.getNbtData());
+        final net.minecraft.nbt.CompoundTag nbt = (net.minecraft.nbt.CompoundTag) fromNativeLin(baseItemStack.getNbt());
         if (nbt != null) {
             final DataComponentPatch patch = COMPONENTS_CODEC
                     .parse(registryAccess.createSerializationContext(NbtOps.INSTANCE), nbt)
@@ -557,7 +557,6 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
 
     @Override
     public boolean generateFeature(ConfiguredFeatureType feature, World world, EditSession editSession, BlockVector3 pt) {
-        //FAWE start
         ServerLevel serverLevel = ((CraftWorld) world).getHandle();
         ChunkGenerator generator = serverLevel.getMinecraftWorld().getChunkSource().getGenerator();
 
@@ -593,7 +592,6 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
         });
 
         return placeFeatureIntoSession(editSession, populator, placed);
-        //FAWE end
     }
 
     @Override
@@ -611,7 +609,6 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
 
         ChunkPos chunkPos = new ChunkPos(new BlockPos(pt.x(), pt.y(), pt.z()));
 
-        //FAWE start
         FaweBlockStateListPopulator populator = new FaweBlockStateListPopulator(serverLevel);
         Map<BlockPos, CraftBlockState> placed = TaskManager.taskManager().sync(() -> {
             serverLevel.captureTreeGeneration = true;
@@ -671,7 +668,6 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
         });
 
         return placeFeatureIntoSession(editSession, populator, placed);
-        //FAWE end
     }
 
     private boolean placeFeatureIntoSession(

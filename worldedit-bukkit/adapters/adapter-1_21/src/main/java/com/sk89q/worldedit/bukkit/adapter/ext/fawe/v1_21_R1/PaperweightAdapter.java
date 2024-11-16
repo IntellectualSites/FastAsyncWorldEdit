@@ -34,7 +34,6 @@ import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
-import com.sk89q.worldedit.bukkit.adapter.Refraction;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.extension.platform.Watchdog;
 import com.sk89q.worldedit.extent.Extent;
@@ -513,26 +512,21 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
         Entity createdEntity = createEntityFromId(state.getType().id(), craftWorld.getHandle());
 
         if (createdEntity != null) {
-            worldServer.addFreshEntityWithPassengers(createdEntity, SpawnReason.CUSTOM);
+            LinCompoundTag nativeTag = state.getNbt();
+            if (nativeTag != null) {
+                net.minecraft.nbt.CompoundTag tag = (net.minecraft.nbt.CompoundTag) fromNativeLin(nativeTag);
+                for (String name : Constants.NO_COPY_ENTITY_NBT_FIELDS) {
+                    tag.remove(name);
+                }
+                readTagIntoEntity(tag, createdEntity);
+            }
+
+            createdEntity.absMoveTo(location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
+
+            worldServer.addFreshEntity(createdEntity, SpawnReason.CUSTOM);
             return createdEntity.getBukkitEntity();
         } else {
             return null;
-        }
-    }
-
-    // This removes all unwanted tags from the main entity and all its passengers
-    private void removeUnwantedEntityTagsRecursively(net.minecraft.nbt.CompoundTag tag) {
-        for (String name : Constants.NO_COPY_ENTITY_NBT_FIELDS) {
-            tag.remove(name);
-        }
-
-        // Adapted from net.minecraft.world.entity.EntityType#loadEntityRecursive
-        if (tag.contains("Passengers", LinTagId.LIST.id())) {
-            net.minecraft.nbt.ListTag nbttaglist = tag.getList("Passengers", LinTagId.COMPOUND.id());
-
-            for (int i = 0; i < nbttaglist.size(); ++i) {
-                removeUnwantedEntityTagsRecursively(nbttaglist.getCompound(i));
-            }
         }
     }
 
@@ -1161,9 +1155,7 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
 
         MojangWatchdog(DedicatedServer server) throws NoSuchFieldException {
             this.server = server;
-            Field tickField = MinecraftServer.class.getDeclaredField(
-                    Refraction.pickName("nextTickTime", "ag")
-            );
+            Field tickField = MinecraftServer.class.getDeclaredField(StaticRefraction.NEXT_TICK_TIME);
             if (tickField.getType() != long.class) {
                 throw new IllegalStateException("nextTickTime is not a long field, mapping is likely incorrect");
             }
