@@ -1,4 +1,4 @@
-package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_21_R1;
+package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_21_3;
 
 import com.fastasyncworldedit.core.util.ReflectionUtils;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
@@ -104,12 +104,33 @@ public class PaperweightLevelProxy extends ServerLevel {
     }
 
     @Override
-    public int getMinBuildHeight() {
-        return serverLevel.getMinBuildHeight();
+    public int getMinY() {
+        return serverLevel.getMinY();
+    }
+
+    @Override
+    public int getMaxY() {
+        return serverLevel.getMaxY();
+    }
+
+    @Override
+    public boolean isInsideBuildHeight(int blockY) {
+        return serverLevel.isInsideBuildHeight(blockY);
+    }
+
+    @Override
+    public boolean isOutsideBuildHeight(BlockPos pos) {
+        return serverLevel.isOutsideBuildHeight(pos);
+    }
+
+    @Override
+    public boolean isOutsideBuildHeight(int blockY) {
+        return serverLevel.isOutsideBuildHeight(blockY);
     }
 
     @Override
     public WorldBorder getWorldBorder() {
         return serverLevel.getWorldBorder();
     }
+
 }

@@ -10,6 +10,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.border.WorldBorder;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import org.enginehub.linbus.tree.LinCompoundTag;
@@ -105,6 +106,11 @@ public class PaperweightLevelProxy extends ServerLevel {
     @Override
     public int getMinBuildHeight() {
         return serverLevel.getMinBuildHeight();
+    }
+
+    @Override
+    public WorldBorder getWorldBorder() {
+        return serverLevel.getWorldBorder();
     }
 
 }
