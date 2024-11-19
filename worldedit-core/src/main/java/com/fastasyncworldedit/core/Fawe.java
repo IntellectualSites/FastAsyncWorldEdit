@@ -469,7 +469,7 @@ public class Fawe {
      * {@link Fawe#submitUUIDKeyQueuedTask(UUID, Runnable, Object), {@link Fawe#submitUUIDKeyQueuedTask(UUID, Callable)}
      * to ensure if a thread is already a UUID-queued thread, the task is immediately run
      */
-    @Deprecated(forRemoval = true, since = "TODO")
+    @Deprecated(forRemoval = true, since = "2.12.1")
     public KeyQueuedExecutorService<UUID> getClipboardExecutor() {
         return this.uuidKeyQueuedExecutorService;
     }
@@ -478,7 +478,7 @@ public class Fawe {
      * Submit a task to the UUID key-queued executor
      *
      * @return Future representing the tank
-     * @since TODO
+     * @since 2.12.1
      */
     public Future<?> submitUUIDKeyQueuedTask(UUID uuid, Runnable runnable) {
         if (Thread.currentThread() instanceof UUIDKeyQueuedThreadFactory.UUIDKeyQueuedThread) {
@@ -492,7 +492,7 @@ public class Fawe {
      * Submit a task to the UUID key-queued executor
      *
      * @return Future representing the tank
-     * @since TODO
+     * @since 2.12.1
      */
     public <T> Future<T> submitUUIDKeyQueuedTask(UUID uuid, Runnable runnable, T result) {
         if (Thread.currentThread() instanceof UUIDKeyQueuedThreadFactory.UUIDKeyQueuedThread) {
@@ -506,7 +506,7 @@ public class Fawe {
      * Submit a task to the UUID key-queued executor
      *
      * @return Future representing the tank
-     * @since TODO
+     * @since 2.12.1
      */
     public <T> Future<T> submitUUIDKeyQueuedTask(UUID uuid, Callable<T> callable) {
         if (Thread.currentThread() instanceof UUIDKeyQueuedThreadFactory.UUIDKeyQueuedThread) {

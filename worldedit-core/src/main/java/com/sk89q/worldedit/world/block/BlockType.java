@@ -251,7 +251,7 @@ public class BlockType implements Keyed, Pattern {
      * {@return whether this block type has a given property}
      *
      * @param property     the expected property
-     * @since TODO
+     * @since 2.12.1
      */
     public boolean hasProperty(Property<?> property) {
         int ordinal = property.getKey().getId();
