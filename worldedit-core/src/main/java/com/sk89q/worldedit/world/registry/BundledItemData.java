@@ -55,7 +55,6 @@ public final class BundledItemData {
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
     private static BundledItemData INSTANCE;
-    private final ResourceLoader resourceLoader;
 
     private final Map<String, ItemEntry> idMap = new HashMap<>();
 
@@ -63,12 +62,6 @@ public final class BundledItemData {
      * Create a new instance.
      */
     private BundledItemData() {
-        this.resourceLoader = WorldEdit
-                .getInstance()
-                .getPlatformManager()
-                .queryCapability(Capability.CONFIGURATION)
-                .getResourceLoader();
-
         try {
             loadFromResource();
         } catch (Throwable e) {
@@ -85,28 +78,10 @@ public final class BundledItemData {
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(Vector3.class, new VectorAdapter());
         Gson gson = gsonBuilder.create();
-        URL url = null;
-        final int dataVersion = WorldEdit
-                .getInstance()
-                .getPlatformManager()
-                .queryCapability(Capability.WORLD_EDITING)
-                .getDataVersion();
-        if (dataVersion >= Constants.DATA_VERSION_MC_1_17) {
-            url = resourceLoader.getResource(BundledBlockData.class, "items.117.json");
-        } else if (dataVersion >= Constants.DATA_VERSION_MC_1_16) {
-            url = resourceLoader.getResource(BundledBlockData.class, "items.116.json");
-        } else if (dataVersion >= Constants.DATA_VERSION_MC_1_15) {
-            url = resourceLoader.getResource(BundledBlockData.class, "items.115.json");
-        }
-        if (url == null) {
-            url = resourceLoader.getResource(BundledBlockData.class, "items.json");
-        }
-        if (url == null) {
-            throw new IOException("Could not find items.json");
-        }
+        URL url = BundledRegistries.loadRegistry("items");
+        LOGGER.debug("Using {} for bundled item data.", url);
         String data = Resources.toString(url, Charset.defaultCharset());
-        List<ItemEntry> entries = gson.fromJson(data, new TypeToken<List<ItemEntry>>() {
-        }.getType());
+        List<ItemEntry> entries = gson.fromJson(data, new TypeToken<List<ItemEntry>>() {}.getType());
 
         for (ItemEntry entry : entries) {
             idMap.put(entry.id, entry);
