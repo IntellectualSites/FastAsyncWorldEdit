@@ -38,7 +38,7 @@ import com.fastasyncworldedit.core.function.generator.GenBase;
 import com.fastasyncworldedit.core.function.generator.OreGen;
 import com.fastasyncworldedit.core.function.generator.SchemGen;
 import com.fastasyncworldedit.core.function.mask.BlockMaskBuilder;
-import com.fastasyncworldedit.core.function.mask.MaskUnion;
+import com.sk89q.worldedit.function.mask.MaskUnion;
 import com.fastasyncworldedit.core.function.mask.ResettableMask;
 import com.fastasyncworldedit.core.function.mask.SingleBlockTypeMask;
 import com.fastasyncworldedit.core.function.mask.WallMakeMask;

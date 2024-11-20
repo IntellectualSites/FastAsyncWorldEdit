@@ -203,6 +203,7 @@ tasks.withType<ShadowJar>().configureEach {
         relocate("it.unimi.dsi.fastutil", "com.sk89q.worldedit.bukkit.fastutil") {
             include(dependency("it.unimi.dsi:fastutil"))
         }
+        relocate("net.royawesome.jlibnoise", "com.sk89q.worldedit.jlibnoise")
         relocate("org.incendo.serverlib", "com.fastasyncworldedit.serverlib") {
             include(dependency("dev.notmyfault.serverlib:ServerLib:2.3.6"))
         }
