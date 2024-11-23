@@ -24,6 +24,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.IdMap;
 import net.minecraft.core.Registry;
+import net.minecraft.network.protocol.game.ClientboundForgetLevelChunkPacket;
 import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ChunkHolder;
@@ -335,7 +336,6 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         if (chunkHolder == null) {
             return;
         }
-        ChunkPos coordIntPair = new ChunkPos(chunkX, chunkZ);
         LevelChunk levelChunk;
         if (PaperLib.isPaper()) {
             // getChunkAtIfLoadedImmediately is paper only
@@ -353,6 +353,10 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         }
         MinecraftServer.getServer().execute(() -> {
             try {
+                ChunkPos pos = levelChunk.getPos();
+                // NOTE: the ClientboundForgetLevelChunkPacket packet is required on 1.21.3
+                // as the client won't update empty -> non-empty sections properly otherwise
+                ClientboundForgetLevelChunkPacket forget = new ClientboundForgetLevelChunkPacket(pos);
                 ClientboundLevelChunkWithLightPacket packet;
                 if (PaperLib.isPaper()) {
                     packet = new ClientboundLevelChunkWithLightPacket(
@@ -371,7 +375,10 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                             null
                     );
                 }
-                nearbyPlayers(nmsWorld, coordIntPair).forEach(p -> p.connection.send(packet));
+                nearbyPlayers(nmsWorld, pos).forEach(p -> {
+                    p.connection.send(forget);
+                    p.connection.send(packet);
+                });
             } finally {
                 NMSAdapter.endChunkPacketSend(nmsWorld.getWorld().getName(), pair, lockHolder);
             }
