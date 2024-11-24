@@ -4,7 +4,7 @@ import com.fastasyncworldedit.core.command.SuggestInputParseException;
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.extension.factory.parser.FaweParser;
 import com.fastasyncworldedit.core.function.mask.BlockMaskBuilder;
-import com.fastasyncworldedit.core.function.mask.MaskUnion;
+import com.sk89q.worldedit.function.mask.MaskUnion;
 import com.fastasyncworldedit.core.util.StringMan;
 import com.sk89q.minecraft.util.commands.CommandLocals;
 import com.sk89q.worldedit.WorldEdit;

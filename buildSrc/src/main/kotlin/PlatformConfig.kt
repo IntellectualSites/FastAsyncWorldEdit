@@ -134,6 +134,7 @@ fun Project.applyPlatformAndCoreConfiguration() {
 
 fun Project.applyShadowConfiguration() {
     tasks.withType<ShadowJar>().configureEach {
+        relocate("com.sk89q.jchronic", "com.sk89q.worldedit.jchronic")
         dependencies {
             include(project(":worldedit-libs:core"))
             include(project(":worldedit-libs:${project.name.replace("worldedit-", "")}"))

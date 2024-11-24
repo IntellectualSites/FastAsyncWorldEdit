@@ -1,9 +1,5 @@
-package com.fastasyncworldedit.core.function.mask;
+package com.sk89q.worldedit.function.mask;
 
-import com.sk89q.worldedit.function.mask.Mask;
-import com.sk89q.worldedit.function.mask.Mask2D;
-import com.sk89q.worldedit.function.mask.MaskIntersection;
-import com.sk89q.worldedit.function.mask.Masks;
 import com.sk89q.worldedit.math.BlockVector3;
 
 import javax.annotation.Nullable;
