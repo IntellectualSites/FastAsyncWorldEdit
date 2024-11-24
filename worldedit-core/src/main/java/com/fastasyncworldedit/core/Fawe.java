@@ -466,7 +466,7 @@ public class Fawe {
      * @return Executor used for clipboard IO if clipboard on disk is enabled or null
      * @since 2.6.2
      * @deprecated Use any of {@link Fawe#submitUUIDKeyQueuedTask(UUID, Runnable)},
-     * {@link Fawe#submitUUIDKeyQueuedTask(UUID, Runnable, Object), {@link Fawe#submitUUIDKeyQueuedTask(UUID, Callable)}
+     * {@link Fawe#submitUUIDKeyQueuedTask(UUID, Runnable, Object)}, {@link Fawe#submitUUIDKeyQueuedTask(UUID, Callable)}
      * to ensure if a thread is already a UUID-queued thread, the task is immediately run
      */
     @Deprecated(forRemoval = true, since = "2.12.1")
