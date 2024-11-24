@@ -45,41 +45,35 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
- * [ WorldEdit action]
- * |
- * \|/
+ * [ WorldEdit action ]
+ * <br>
  * [ EditSession ] - The change is processed (area restrictions, change limit, block type)
- * |
- * \|/
- * [Block change] - A block change from some location
- * |
- * \|/
+ * <br>
+ * [ Block change ] - A block change from some location
+ * <br>
  * [ Set Queue ] - The SetQueue manages the implementation specific queue
- * |
- * \|/
+ * <br>
  * [ Fawe Queue] - A queue of chunks - check if the queue has the chunk for a change
- * |
- * \|/
+ * <br>
  * [ Fawe Chunk Implementation ] - Otherwise create a new FaweChunk object which is a wrapper around the Chunk object
- * |
- * \|/
+ * <br>
  * [ Execution ] - When done, the queue then sets the blocks for the chunk, performs lighting updates and sends the chunk packet to the clients
  * <p>
  * Why it's faster:
- * - The chunk is modified directly rather than through the API
- * \ Removes some overhead, and means some processing can be done async
- * - Lighting updates are performed on the chunk level rather than for every block
- * \ e.g., A blob of stone: only the visible blocks need to have the lighting calculated
- * - Block changes are sent with a chunk packet
- * \ A chunk packet is generally quicker to create and smaller for large world edits
- * - No physics updates
- * \ Physics updates are slow, and are usually performed on each block
- * - Block data shortcuts
- * \ Some known blocks don't need to have the data set or accessed (e.g., air is never going to have data)
- * - Remove redundant extents
- * \ Up to 11 layers of extents can be removed
- * - History bypassing
- * \ FastMode bypasses history and means blocks in the world don't need to be checked and recorded
+ * <br> The chunk is modified directly rather than through the API
+ * - Removes some overhead, and means some processing can be done async
+ * <br> Lighting updates are performed on the chunk level rather than for every block
+ * - e.g., A blob of stone: only the visible blocks need to have the lighting calculated
+ * <br> Block changes are sent with a chunk packet
+ * - A chunk packet is generally quicker to create and smaller for large world edits
+ * <br> No physics updates
+ * - Physics updates are slow, and are usually performed on each block
+ * <br> Block data shortcuts
+ * - Some known blocks don't need to have the data set or accessed (e.g., air is never going to have data)
+ * <br> Remove redundant extents
+ * - Up to 11 layers of extents can be removed
+ * <br> History bypassing
+ * - FastMode bypasses history and means blocks in the world don't need to be checked and recorded
  */
 public class Fawe {
 
