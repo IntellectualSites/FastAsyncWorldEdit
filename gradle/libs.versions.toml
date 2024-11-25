@@ -51,7 +51,7 @@ mockito = "5.14.2"
 
 # Gradle plugins
 pluginyml = "0.6.0"
-mod-publish-plugin = "0.8.0"
+mod-publish-plugin = "0.8.1"
 
 [libraries]
 # Minecraft expectations
