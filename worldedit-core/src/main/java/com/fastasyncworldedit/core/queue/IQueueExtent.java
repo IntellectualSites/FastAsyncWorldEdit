@@ -10,6 +10,7 @@ import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.util.SideEffectSet;
 
 import javax.annotation.Nullable;
 import java.io.Flushable;
@@ -80,6 +81,20 @@ public interface IQueueExtent<T extends IChunk> extends Flushable, Trimable, ICh
     void setFastMode(boolean fastMode);
 
     boolean isFastMode();
+
+    /**
+     * Set the side effects to be used with this extent
+     *
+     * @since TODO
+     */
+    void setSideEffectSet(SideEffectSet sideEffectSet);
+
+    /**
+     * Get the side effects to be used with this extent
+     *
+     * @since TODO
+     */
+    SideEffectSet getSideEffectSet();
 
     /**
      * Create a new root IChunk object. Full chunks will be reused, so a more optimized chunk can be

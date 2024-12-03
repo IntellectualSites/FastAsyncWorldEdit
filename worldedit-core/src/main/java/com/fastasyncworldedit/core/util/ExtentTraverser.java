@@ -1,7 +1,11 @@
 package com.fastasyncworldedit.core.util;
 
+import com.fastasyncworldedit.core.queue.implementation.ParallelQueueExtent;
+import com.fastasyncworldedit.core.queue.implementation.SingleThreadQueueExtent;
+import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.world.World;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -19,6 +23,26 @@ public class ExtentTraverser<T extends Extent> {
     public ExtentTraverser(@Nonnull T root, ExtentTraverser<T> parent) {
         this.root = root;
         this.parent = parent;
+    }
+
+    /**
+     * Get the world backing the given extent, if present, else null.
+     *
+     * @since TODO
+     */
+    @Nullable
+    public static World getWorldFromExtent(Extent extent) {
+        if (extent.isWorld()) {
+            return (World) extent;
+        } else if (extent instanceof EditSession session) {
+            return session.getWorld();
+        } else if (extent instanceof SingleThreadQueueExtent stqe) {
+            return stqe.getWorld();
+        } else if (extent instanceof ParallelQueueExtent pqe) {
+            return ((SingleThreadQueueExtent) pqe.getExtent()).getWorld();
+        } else {
+            return new ExtentTraverser<>(extent).findAndGet(World.class);
+        }
     }
 
     public boolean exists() {

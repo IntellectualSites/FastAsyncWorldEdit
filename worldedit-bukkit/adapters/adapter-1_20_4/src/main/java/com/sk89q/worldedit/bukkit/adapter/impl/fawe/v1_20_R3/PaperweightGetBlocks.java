@@ -21,6 +21,7 @@ import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.internal.Constants;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.util.SideEffect;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
@@ -840,7 +841,9 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                         nmsChunk.mustNotSave = false;
                         nmsChunk.setUnsaved(true);
                         // send to player
-                        if (Settings.settings().LIGHTING.MODE == 0 || !Settings.settings().LIGHTING.DELAY_PACKET_SENDING || finalMask == 0 && biomes != null) {
+                        if (!set
+                                .getSideEffectSet()
+                                .shouldApply(SideEffect.LIGHTING) || !Settings.settings().LIGHTING.DELAY_PACKET_SENDING || finalMask == 0 && biomes != null) {
                             this.send();
                         }
                         if (finalizer != null) {
