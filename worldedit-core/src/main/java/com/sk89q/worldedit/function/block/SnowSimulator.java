@@ -31,36 +31,36 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
-import java.util.Locale;
+import java.util.Comparator;
 
+//FAWE start - rewrite simulator
 public class SnowSimulator implements LayerFunction {
 
-    //FAWE start
-    public static final BooleanProperty snowy = (BooleanProperty) (Property<?>) BlockTypes.GRASS_BLOCK.getProperty("snowy");
-    private static final EnumProperty slab = (EnumProperty) (Property<?>) BlockTypes.SANDSTONE_SLAB.getProperty("type");
-    private static final EnumProperty stair = (EnumProperty) (Property<?>) BlockTypes.SANDSTONE_STAIRS.getProperty("half");
-    private static final EnumProperty trapdoor = (EnumProperty) (Property<?>) BlockTypes.ACACIA_TRAPDOOR.getProperty("half");
-    private static final BooleanProperty trapdoorOpen = (BooleanProperty) (Property<?>) BlockTypes.ACACIA_TRAPDOOR.getProperty(
+    public static final BooleanProperty SNOWY = (BooleanProperty) (Property<?>) BlockTypes.GRASS_BLOCK.getProperty("snowy");
+    private static final EnumProperty PROPERTY_SLAB = (EnumProperty) (Property<?>) BlockTypes.OAK_SLAB.getProperty("type");
+    private static final EnumProperty PROPERTY_STAIR = (EnumProperty) (Property<?>) BlockTypes.OAK_STAIRS.getProperty("half");
+    private static final EnumProperty TRAPDOOR = (EnumProperty) (Property<?>) BlockTypes.OAK_TRAPDOOR.getProperty("half");
+    private static final BooleanProperty TRAPDOOR_OPEN = (BooleanProperty) (Property<?>) BlockTypes.OAK_TRAPDOOR.getProperty(
             "open");
-    //FAWE end
 
-    private final BlockState ice = BlockTypes.ICE.getDefaultState();
-    private final BlockState snow = BlockTypes.SNOW.getDefaultState();
-    private final BlockState snowBlock = BlockTypes.SNOW_BLOCK.getDefaultState();
+    private static final BlockState ICE = BlockTypes.ICE.getDefaultState();
+    private static final BlockState SNOW = BlockTypes.SNOW.getDefaultState();
+    private static final BlockState SNOW_BLOCK = BlockTypes.SNOW_BLOCK.getDefaultState();
 
-    private final Property<Integer> snowLayersProperty = BlockTypes.SNOW.getProperty("layers");
-    private final Property<Integer> waterLevelProperty = BlockTypes.WATER.getProperty("level");
+    private static final Property<Integer> PROPERTY_SNOW_LAYERS = BlockTypes.SNOW.getProperty("layers");
+    private static final Property<Integer> PROPERTY_WATER_LEVEL = BlockTypes.WATER.getProperty("level");
+
+    private static final String PROPERTY_VALUE_TOP = "top";
+    private static final String PROPERTY_VALUE_BOTTOM = "bottom";
+    private static final int MAX_SNOW_LAYER = PROPERTY_SNOW_LAYERS.getValues().stream().max(Comparator.naturalOrder()).orElse(8);
 
     private final Extent extent;
     private final boolean stack;
-
     private int affected;
 
     public SnowSimulator(Extent extent, boolean stack) {
-
         this.extent = extent;
         this.stack = stack;
-
         this.affected = 0;
     }
 
@@ -70,20 +70,21 @@ public class SnowSimulator implements LayerFunction {
 
     @Override
     public boolean isGround(BlockVector3 position) {
-        BlockState block = this.extent.getBlock(position);
+        final BlockState block = this.extent.getBlock(position);
+        final BlockType blockType = block.getBlockType();
 
-        // We're returning the first block we can place *on top of*
-        if (block.getBlockType().getMaterial().isAir() || (stack && block.getBlockType() == BlockTypes.SNOW)) {
+        // We're returning the first block we can (potentially) place *on top of*
+        if (blockType.getMaterial().isAir() || (stack && blockType == BlockTypes.SNOW)) {
             return false;
         }
 
         // Unless it's water
-        if (block.getBlockType() == BlockTypes.WATER) {
+        if (blockType == BlockTypes.WATER) {
             return true;
         }
 
         // Stop searching when we hit a movement blocker
-        return block.getBlockType().getMaterial().isMovementBlocker();
+        return blockType.getMaterial().isMovementBlocker();
     }
 
     @Override
@@ -93,17 +94,16 @@ public class SnowSimulator implements LayerFunction {
             return false;
         }
 
-        BlockState block = this.extent.getBlock(position);
+        final BlockState block = this.extent.getBlock(position);
+        final BlockType blockType = block.getBlockType();
 
-        if (block.getBlockType() == BlockTypes.WATER) {
-            if (block.getState(waterLevelProperty) == 0) {
-                if (this.extent.setBlock(position, ice)) {
-                    affected++;
-                }
+        // If affected block is water, replace with ice
+        if (blockType == BlockTypes.WATER) {
+            if (shouldFreeze(position, block) && this.extent.setBlock(position.x(), position.y(), position.z(), ICE)) {
+                affected++;
             }
             return false;
         }
-
 
         // Can't put snow this far up
         if (position.y() == this.extent.getMaximumPoint().y()) {
@@ -113,57 +113,91 @@ public class SnowSimulator implements LayerFunction {
         BlockVector3 abovePosition = position.add(0, 1, 0);
         BlockState above = this.extent.getBlock(abovePosition);
 
-        // Can only replace air (or snow in stack mode)
-        if (!above.getBlockType().getMaterial().isAir() && (!stack || above.getBlockType() != BlockTypes.SNOW)) {
-            return false;
-            //FAWE start
-        } else if (!block.getBlockType().id().toLowerCase(Locale.ROOT).contains("ice") && this.extent.getEmittedLight(
-                abovePosition) > 10) {
-            return false;
-        } else if (!block.getBlockType().getMaterial().isFullCube()) {
-            BlockType type = block.getBlockType();
-            if (type.hasProperty(slab) && block.getState(slab).equalsIgnoreCase("bottom")) {
-                return false;
-            } else if ((type.hasProperty(trapdoorOpen) && block.getState(trapdoorOpen)) ||
-                    (type.hasProperty(trapdoor) && block.getState(trapdoor).equalsIgnoreCase("bottom"))) {
-                return false;
-            } else if (type.hasProperty(stair) && block.getState(stair).equalsIgnoreCase("bottom")) {
-                return false;
-            } else {
-                return false;
-            }
-            //FAWE end
-        } else if (!BlockCategories.SNOW_LAYER_CAN_SURVIVE_ON.contains(block.getBlockType())) {
+        if (!shouldSnow(block, above)) {
             return false;
         }
 
+        // in stack mode, we want to increase existing snow layers
         if (stack && above.getBlockType() == BlockTypes.SNOW) {
-            int currentHeight = above.getState(snowLayersProperty);
-            // We've hit the highest layer (If it doesn't contain current + 2 it means it's 1 away from full)
-            if (!snowLayersProperty.getValues().contains(currentHeight + 2)) {
-                if (this.extent.setBlock(abovePosition, snowBlock)) {
-                    if (block.getBlockType().hasProperty(snowy)) {
-                        this.extent.setBlock(position, block.with(snowy, true));
-                    }
-                    this.affected++;
-                }
-            } else {
-                if (this.extent.setBlock(abovePosition, above.with(snowLayersProperty, currentHeight + 1))) {
-                    if (block.getBlockType().hasProperty(snowy)) {
-                        this.extent.setBlock(position, block.with(snowy, true));
-                    }
-                    this.affected++;
-                }
+            int layers = above.getState(PROPERTY_SNOW_LAYERS);
+            // if we would place the last possible layer (in current versions layer 8) we just replace with a snow block and
+            // set the block beneath snowy (if property is applicable, example would be grass with snow texture on top)
+            if (layers == MAX_SNOW_LAYER - 1 && !this.extent.setBlock(abovePosition, SNOW_BLOCK)) {
+                return false;
             }
+            // we've not reached the top snow layer yet, so just add another layer
+            if (!this.extent.setBlock(abovePosition, above.with(PROPERTY_SNOW_LAYERS, layers + 1))) {
+                return false;
+            }
+        } else {
+            if (!this.extent.setBlock(abovePosition, SNOW)) {
+                return false;
+            }
+        }
+        // set block beneath snow (layers) snowy, if applicable
+        if (block.getBlockType().hasProperty(SNOWY)) {
+            this.extent.setBlock(position, block.with(SNOWY, true));
+        }
+        this.affected++;
+        return false;
+    }
+
+    /**
+     * Check if snow should be placed at {@code above}
+     *
+     * @param blockState The block under the snow layer
+     * @param above      The block which will hold the snow layer
+     * @return if snow should be placed
+     */
+    private boolean shouldSnow(BlockState blockState, BlockState above) {
+        // simplified net.minecraft.world.level.biome.Biome#shouldSnow
+        // if the block, where the snow should be actually placed at, is not air or snow (if in stack mode), we can't place
+        // anything
+        if (!(above.isAir() || (above.getBlockType() == BlockTypes.SNOW && stack))) {
             return false;
         }
-        if (this.extent.setBlock(abovePosition, snow)) {
-            if (block.getBlockType().hasProperty(snowy)) {
-                this.extent.setBlock(position, block.with(snowy, true));
-            }
-            this.affected++;
+        // net.minecraft.world.level.block.SnowLayerBlock#canSurvive
+        if (BlockCategories.SNOW_LAYER_CANNOT_SURVIVE_ON.contains(blockState)) {
+            return false;
+        }
+        if (BlockCategories.SNOW_LAYER_CAN_SURVIVE_ON.contains(blockState)) {
+            return true;
+        }
+        BlockType type = blockState.getBlockType();
+
+        // net.minecraft.world.level.block.Block.isFaceFull (block has 1x1x1 bounding box)
+        if (type.getMaterial().isFullCube()) {
+            return true;
+        }
+        // if block beneath potential snow layer has snow layers, we can place snow if all possible layers are present.
+        if (type == BlockTypes.SNOW && blockState.getState(PROPERTY_SNOW_LAYERS) == MAX_SNOW_LAYER) {
+            return true;
+        }
+        // return potential non-full blocks, which could hold snow layers due to block states
+        // if block is a slab, needs to be on the upper part of the block
+        if (type.hasProperty(PROPERTY_SLAB)) {
+            return PROPERTY_VALUE_TOP.equals(blockState.getState(PROPERTY_SLAB));
+        }
+        // if block is a trapdoor, the trapdoor must NOT be open
+        if (type.hasProperty(TRAPDOOR_OPEN) && blockState.getState(TRAPDOOR_OPEN)) {
+            return false;
+        }
+        // if block is a closed trapdoor, the trapdoor must be aligned at the top part of the block
+        if (type.hasProperty(TRAPDOOR)) {
+            return PROPERTY_VALUE_TOP.equals(blockState.getState(TRAPDOOR));
+        }
+        // if block is a stair, it must be "bottom" (upside-down)
+        if (type.hasProperty(PROPERTY_STAIR)) {
+            return PROPERTY_VALUE_BOTTOM.equals(blockState.getState(PROPERTY_STAIR));
         }
         return false;
+    }
+
+    // net.minecraft.world.level.biome.Biome#shouldFreeze
+    private boolean shouldFreeze(BlockVector3 position, BlockState blockState) {
+        return blockState.getBlockType() == BlockTypes.WATER &&
+                blockState.getState(PROPERTY_WATER_LEVEL) == 0 &&
+                this.extent.getEmittedLight(position) < 10;
     }
 
 }
