@@ -39,9 +39,8 @@ public class SnowSimulator implements LayerFunction {
     public static final BooleanProperty SNOWY = (BooleanProperty) (Property<?>) BlockTypes.GRASS_BLOCK.getProperty("snowy");
     private static final EnumProperty PROPERTY_SLAB = (EnumProperty) (Property<?>) BlockTypes.OAK_SLAB.getProperty("type");
     private static final EnumProperty PROPERTY_STAIR = (EnumProperty) (Property<?>) BlockTypes.OAK_STAIRS.getProperty("half");
-    private static final EnumProperty TRAPDOOR = (EnumProperty) (Property<?>) BlockTypes.OAK_TRAPDOOR.getProperty("half");
-    private static final BooleanProperty TRAPDOOR_OPEN = (BooleanProperty) (Property<?>) BlockTypes.OAK_TRAPDOOR.getProperty(
-            "open");
+    private static final EnumProperty PROPERTY_TRAPDOOR = (EnumProperty) (Property<?>) BlockTypes.OAK_TRAPDOOR.getProperty("half");
+    private static final BooleanProperty PROPERTY_TRAPDOOR_OPEN = (BooleanProperty) (Property<?>) BlockTypes.OAK_TRAPDOOR.getProperty("open");
 
     private static final BlockState ICE = BlockTypes.ICE.getDefaultState();
     private static final BlockState SNOW = BlockTypes.SNOW.getDefaultState();
@@ -179,12 +178,12 @@ public class SnowSimulator implements LayerFunction {
             return PROPERTY_VALUE_TOP.equals(blockState.getState(PROPERTY_SLAB));
         }
         // if block is a trapdoor, the trapdoor must NOT be open
-        if (type.hasProperty(TRAPDOOR_OPEN) && blockState.getState(TRAPDOOR_OPEN)) {
+        if (type.hasProperty(PROPERTY_TRAPDOOR_OPEN) && blockState.getState(PROPERTY_TRAPDOOR_OPEN)) {
             return false;
         }
         // if block is a closed trapdoor, the trapdoor must be aligned at the top part of the block
-        if (type.hasProperty(TRAPDOOR)) {
-            return PROPERTY_VALUE_TOP.equals(blockState.getState(TRAPDOOR));
+        if (type.hasProperty(PROPERTY_TRAPDOOR)) {
+            return PROPERTY_VALUE_TOP.equals(blockState.getState(PROPERTY_TRAPDOOR));
         }
         // if block is a stair, it must be "bottom" (upside-down)
         if (type.hasProperty(PROPERTY_STAIR)) {
