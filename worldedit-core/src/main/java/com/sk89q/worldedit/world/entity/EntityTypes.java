@@ -77,6 +77,10 @@ public final class EntityTypes {
     @Nullable
     public static final EntityType COW = get("minecraft:cow");
     @Nullable
+    public static final EntityType CREAKING = get("minecraft:creaking");
+    @Deprecated @Nullable
+    public static final EntityType CREAKING_TRANSIENT = get("minecraft:creaking_transient");
+    @Nullable
     public static final EntityType CREEPER = get("minecraft:creeper");
     @Nullable
     public static final EntityType DOLPHIN = get("minecraft:dolphin");
