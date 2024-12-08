@@ -403,7 +403,7 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
         if (tx >= min.x() && bx <= max.x() && tz >= min.z() && bz <= max.z()) {
             // contains some
             boolean processExtra = false;
-            for (int layer = getMinimumY() >> 4; layer <= getMaximumY() >> 4; layer++) {
+            for (int layer = Math.max(getMinimumY(), chunk.getMinY()) >> 4; layer <= Math.min(getMaximumY(), chunk.getMaxY()) >> 4; layer++) {
                 if (!set.hasSection(layer)) {
                     continue;
                 }
@@ -457,7 +457,7 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
         if (tx >= min.x() && bx <= max.x() && tz >= min.z() && bz <= max.z()) {
             // contains some
             boolean processExtra = false;
-            for (int layer = getMinimumY() >> 4; layer <= getMaximumY() >> 4; layer++) {
+            for (int layer = Math.max(getMinimumY(), chunk.getMinY()) >> 4; layer <= Math.min(getMaximumY(), chunk.getMaxY()) >> 4; layer++) {
                 int by = layer << 4;
                 int ty = by + 15;
                 if (containsEntireCuboid(bx, tx, by, ty, bz, tz)) {
