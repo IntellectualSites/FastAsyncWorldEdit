@@ -9,6 +9,7 @@ import com.fastasyncworldedit.core.queue.IChunkSet;
 import com.fastasyncworldedit.core.queue.Pool;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.util.SideEffectSet;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
@@ -44,6 +45,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
     public EnumMap<HeightMapType, int[]> heightMaps;
     private boolean fastMode = false;
     private int bitMask = -1;
+    private SideEffectSet sideEffectSet = SideEffectSet.defaults();
 
     private CharSetBlocks() {
         // Expand as we go
@@ -374,8 +376,19 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
                 heightMaps != null ? new EnumMap<>(heightMaps) : null,
                 defaultOrdinal(),
                 fastMode,
-                bitMask
+                bitMask,
+                sideEffectSet
         );
+    }
+
+    @Override
+    public void setSideEffectSet(SideEffectSet sideEffectSet) {
+        this.sideEffectSet = sideEffectSet;
+    }
+
+    @Override
+    public SideEffectSet getSideEffectSet() {
+        return sideEffectSet;
     }
 
     static char[][] createLightCopy(char[][] lightArr, int sectionCount) {
