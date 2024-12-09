@@ -239,7 +239,7 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
 
     @Override
     public ProcessorScope getScope() {
-        return ProcessorScope.READING_SET_BLOCKS;
+        return ProcessorScope.READING_BLOCKS;
     }
 
     @Deprecated(forRemoval = true, since = "2.11.2")

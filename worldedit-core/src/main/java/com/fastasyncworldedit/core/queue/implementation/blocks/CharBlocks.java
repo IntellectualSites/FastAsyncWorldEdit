@@ -71,6 +71,8 @@ public abstract class CharBlocks implements IBlocks {
     protected int minSectionPosition;
     protected int maxSectionPosition;
     protected int sectionCount;
+    private int chunkX;
+    private int chunkZ;
 
     /**
      * New instance given initial min/max section indices. Can be negative.
@@ -86,6 +88,11 @@ public abstract class CharBlocks implements IBlocks {
             sections[i] = EMPTY;
             sectionLocks[i] = new Object();
         }
+    }
+
+    public void init(int chunkX, int chunkZ) {
+        this.chunkX = chunkX;
+        this.chunkZ = chunkZ;
     }
 
     @Override
@@ -192,6 +199,16 @@ public abstract class CharBlocks implements IBlocks {
             return defaultOrdinal();
         }
         return get(layer, index);
+    }
+
+    @Override
+    public int getX() {
+        return chunkX;
+    }
+
+    @Override
+    public int getZ() {
+        return chunkZ;
     }
 
     /**
