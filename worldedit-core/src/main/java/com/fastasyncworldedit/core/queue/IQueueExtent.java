@@ -10,10 +10,12 @@ import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
+import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nullable;
 import java.io.Flushable;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
 /**
@@ -61,7 +63,7 @@ public interface IQueueExtent<T extends IChunk> extends Flushable, Trimable, ICh
     IChunkSet getCachedSet(int chunkX, int chunkZ);
 
     /**
-     * Submit the chunk so that it's changes are applied to the world
+     * Submit the chunk so that its changes are applied to the world
      *
      * @return Future
      */
@@ -80,6 +82,12 @@ public interface IQueueExtent<T extends IChunk> extends Flushable, Trimable, ICh
     void setFastMode(boolean fastMode);
 
     boolean isFastMode();
+
+    /**
+     * Submit a task to the extent to be queued as if it were a chunk
+     */
+    @ApiStatus.Internal
+    <V extends Future<V>> V submitTaskUnchecked(Callable<V> callable);
 
     /**
      * Create a new root IChunk object. Full chunks will be reused, so a more optimized chunk can be
