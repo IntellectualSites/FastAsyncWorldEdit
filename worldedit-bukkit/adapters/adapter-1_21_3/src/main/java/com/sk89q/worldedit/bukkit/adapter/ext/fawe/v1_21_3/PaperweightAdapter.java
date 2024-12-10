@@ -849,12 +849,12 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
     }
 
     private static final Set<SideEffect> SUPPORTED_SIDE_EFFECTS = Sets.immutableEnumSet(
-        SideEffect.NEIGHBORS,
+        //FAWE start - FAWE-supported side effects
+        SideEffect.HISTORY,
+        SideEffect.HEIGHTMAPS,
         SideEffect.LIGHTING,
-        SideEffect.VALIDATION,
-        SideEffect.ENTITY_AI,
-        SideEffect.EVENTS,
-        SideEffect.UPDATE
+        SideEffect.NEIGHBORS
+        //FAWE end
     );
 
     @Override

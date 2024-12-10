@@ -19,23 +19,30 @@
 
 package com.sk89q.worldedit.util;
 
+import com.fastasyncworldedit.core.configuration.Settings;
+
 import java.util.Locale;
 
 public enum SideEffect {
-    LIGHTING(State.ON, true),
-    NEIGHBORS(State.ON, true),
-    UPDATE(State.ON, true),
+    //FAWE start - adjust defaults, add history and heightmaps
+    HISTORY(State.ON, true),
+    HEIGHTMAPS(State.ON, true),
+    LIGHTING(Settings.settings().LIGHTING.MODE == 0 ? State.OFF : State.ON, true),
+    NEIGHBORS(State.OFF, true),
+    UPDATE(State.OFF, true),
+    //FAWE end
     VALIDATION(State.OFF, true),
     ENTITY_AI(State.OFF, true),
     EVENTS(State.OFF, true),
     /**
      * Internal use only.
      */
-    POI_UPDATE(State.ON, false),
+    POI_UPDATE(State.OFF, false),
     /**
      * Internal use only.
      */
-    NETWORK(State.ON, false);
+    NETWORK(State.OFF, false);
+    //FAWE end
 
     private final String displayName;
     private final String description;

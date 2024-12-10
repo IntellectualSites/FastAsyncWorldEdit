@@ -29,6 +29,7 @@ import com.fastasyncworldedit.core.util.MaskTraverser;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
+import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
@@ -38,6 +39,7 @@ import com.sk89q.worldedit.command.util.annotation.Preload;
 import com.sk89q.worldedit.command.util.annotation.SynchronousSettingExpected;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.function.GroundFunction;
 import com.sk89q.worldedit.function.generator.FloraGenerator;
 import com.sk89q.worldedit.function.mask.ExistingBlockMask;
@@ -914,5 +916,34 @@ public class RegionCommands {
         actor.print(Caption.of("worldedit.flora.created", TextComponent.of(affected)));
         return affected;
     }
+
+    //FAWE start - block "fixing"
+    @Command(
+            name = "/fixblocks",
+            aliases = {"/updateblocks", "/fixconnect"},
+            desc = "\"Fixes\" all blocks in the region to the correct shape/connections based on surrounding blocks"
+    )
+    @CommandPermissions("worldedit.region.fixblocks")
+    @Logging(REGION)
+    @Confirm(Confirm.Processor.REGION)
+    @Preload(Preload.PreloadCheck.PRELOAD)
+    public int fixblocks(
+            Actor actor, EditSession editSession, @Selection Region region
+    ) {
+        int affected = editSession.setBlocks(
+                region,
+                WorldEdit
+                        .getInstance()
+                        .getPlatformManager()
+                        .queryCapability(Capability.WORLD_EDITING)
+                        .getPlatformPlacementProcessor(editSession, null, region)
+        );
+        if (affected != 0) {
+            actor.print(Caption.of("worldedit.set.done", TextComponent.of(affected)));
+
+        }
+        return affected;
+    }
+    //FAWE end
 
 }
