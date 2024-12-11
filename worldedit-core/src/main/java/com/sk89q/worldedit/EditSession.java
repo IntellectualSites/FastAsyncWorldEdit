@@ -170,7 +170,7 @@ import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.sk89q.worldedit.function.block.SnowSimulator.snowy;
+import static com.sk89q.worldedit.function.block.SnowSimulator.SNOWY;
 import static com.sk89q.worldedit.regions.Regions.asFlatRegion;
 import static com.sk89q.worldedit.regions.Regions.maximumBlockY;
 import static com.sk89q.worldedit.regions.Regions.minimumBlockY;
@@ -2788,8 +2788,8 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
                         if (setBlock(mutable, air)) {
                             if (y > getMinY()) {
                                 BlockState block = getBlock(mutable2);
-                                if (block.getBlockType().hasProperty(snowy)) {
-                                    if (setBlock(mutable2, block.with(snowy, false))) {
+                                if (block.getBlockType().hasProperty(SNOWY)) {
+                                    if (setBlock(mutable2, block.with(SNOWY, false))) {
                                         affected++;
                                     }
                                 }
