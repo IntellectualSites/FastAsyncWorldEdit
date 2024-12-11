@@ -403,9 +403,9 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
         if (tx >= min.x() && bx <= max.x() && tz >= min.z() && bz <= max.z()) {
             // contains some
             boolean processExtra = false;
-            final int max1 = Math.max(getMinimumY(), chunk.getMinY());
-            final int min1 = Math.min(getMaximumY(), chunk.getMaxY());
-            for (int layer = max1 >> 4; layer <= min1 >> 4; layer++) {
+            final int minLayer = Math.max(getMinimumY(), chunk.getMinY());
+            final int maxLayer = Math.min(getMaximumY(), chunk.getMaxY());
+            for (int layer = minLayer >> 4; layer <= maxLayer >> 4; layer++) {
                 if (!set.hasSection(layer)) {
                     continue;
                 }
@@ -459,9 +459,9 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
         if (tx >= min.x() && bx <= max.x() && tz >= min.z() && bz <= max.z()) {
             // contains some
             boolean processExtra = false;
-            final int max1 = Math.max(getMinimumY(), chunk.getMinY());
-            final int min1 = Math.min(getMaximumY(), chunk.getMaxY());
-            for (int layer = max1 >> 4; layer <= min1 >> 4; layer++) {
+            final int minLayer = Math.max(getMinimumY(), chunk.getMinY());
+            final int maxLayer = Math.min(getMaximumY(), chunk.getMaxY());
+            for (int layer = minLayer >> 4; layer <= maxLayer >> 4; layer++) {
                 int by = layer << 4;
                 int ty = by + 15;
                 if (containsEntireCuboid(bx, tx, by, ty, bz, tz)) {
