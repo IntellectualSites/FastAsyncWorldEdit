@@ -61,7 +61,7 @@ public class PaperweightBlockMaterial implements BlockMaterial {
 
     @Override
     public boolean isFullCube() {
-        return craftMaterial.isOccluding();
+        return Block.isShapeFullBlock(blockState.getShape(EmptyBlockGetter.INSTANCE, BlockPos.ZERO));
     }
 
     @Override
