@@ -150,10 +150,12 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             fieldBiomes = tmpFieldBiomes;
             fieldBiomes.setAccessible(true);
 
-            Method getVisibleChunkIfPresent = ChunkMap.class.getDeclaredMethod(Refraction.pickName(
-                    "getVisibleChunkIfPresent",
-                    "b"
-            ), long.class);
+            Method getVisibleChunkIfPresent = ChunkMap.class.getDeclaredMethod(
+                    Refraction.pickName(
+                            "getVisibleChunkIfPresent",
+                            "b"
+                    ), long.class
+            );
             getVisibleChunkIfPresent.setAccessible(true);
             methodGetVisibleChunk = lookup.unreflect(getVisibleChunkIfPresent);
 
@@ -354,14 +356,11 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         MinecraftServer.getServer().execute(() -> {
             try {
                 ChunkPos pos = levelChunk.getPos();
-                // NOTE: the ClientboundForgetLevelChunkPacket packet is required on 1.21.3
-                // as the client won't update empty -> non-empty sections properly otherwise
-                ClientboundForgetLevelChunkPacket forget = new ClientboundForgetLevelChunkPacket(pos);
                 ClientboundLevelChunkWithLightPacket packet;
                 if (PaperLib.isPaper()) {
                     packet = new ClientboundLevelChunkWithLightPacket(
                             levelChunk,
-                            nmsWorld.getChunkSource().getLightEngine(),
+                            nmsWorld.getLightEngine(),
                             null,
                             null,
                             false // last false is to not bother with x-ray
@@ -370,15 +369,12 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                     // deprecated on paper - deprecation suppressed
                     packet = new ClientboundLevelChunkWithLightPacket(
                             levelChunk,
-                            nmsWorld.getChunkSource().getLightEngine(),
+                            nmsWorld.getLightEngine(),
                             null,
                             null
                     );
                 }
-                nearbyPlayers(nmsWorld, pos).forEach(p -> {
-                    p.connection.send(forget);
-                    p.connection.send(packet);
-                });
+                nearbyPlayers(nmsWorld, pos).forEach(p -> p.connection.send(packet));
             } finally {
                 NMSAdapter.endChunkPacketSend(nmsWorld.getWorld().getName(), pair, lockHolder);
             }
