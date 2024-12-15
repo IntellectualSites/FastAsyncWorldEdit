@@ -20,11 +20,14 @@ import com.fastasyncworldedit.core.queue.Filter;
 import com.fastasyncworldedit.core.queue.IQueueChunk;
 import com.fastasyncworldedit.core.queue.IQueueExtent;
 import com.sk89q.worldedit.MaxChangedBlocksException;
+import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.mask.BlockMask;
 import com.sk89q.worldedit.function.mask.ExistingBlockMask;
 import com.sk89q.worldedit.function.mask.Mask;
+import com.sk89q.worldedit.function.operation.Operation;
+import com.sk89q.worldedit.function.operation.RunContext;
 import com.sk89q.worldedit.function.pattern.BlockPattern;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
@@ -32,6 +35,7 @@ import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Countable;
+import com.sk89q.worldedit.util.SideEffectSet;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -39,6 +43,7 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import org.apache.logging.log4j.Logger;
 
+import javax.annotation.Nullable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -58,11 +63,12 @@ public class ParallelQueueExtent extends PassthroughExtent {
     // not very important)
     private final boolean[] faweExceptionReasonsUsed = new boolean[FaweException.Type.values().length];
     private final boolean fastmode;
+    private final SideEffectSet sideEffectSet;
     private int changes;
     private int lastException = Integer.MIN_VALUE;
     private int exceptionCount = 0;
 
-    public ParallelQueueExtent(QueueHandler handler, World world, boolean fastmode) {
+    public ParallelQueueExtent(QueueHandler handler, World world, boolean fastmode, @Nullable SideEffectSet sideEffectSet) {
         super(handler.getQueue(world, new BatchProcessorHolder(), new BatchProcessorHolder()));
         this.world = world;
         this.handler = handler;
@@ -75,6 +81,7 @@ public class ParallelQueueExtent extends PassthroughExtent {
             ((MultiBatchProcessor) this.postProcessor.getProcessor()).setFaweExceptionArray(faweExceptionReasonsUsed);
         }
         this.fastmode = fastmode;
+        this.sideEffectSet = sideEffectSet == null ? SideEffectSet.defaults() : sideEffectSet;
     }
 
     /**
@@ -121,7 +128,12 @@ public class ParallelQueueExtent extends PassthroughExtent {
 
     @SuppressWarnings("rawtypes")
     private IQueueExtent<IQueueChunk> getNewQueue() {
-        return handler.getQueue(world, this.processor, this.postProcessor);
+        SingleThreadQueueExtent queue = (SingleThreadQueueExtent) handler.getQueue(world, this.processor, this.postProcessor);
+        queue.setFastMode(fastmode);
+        queue.setSideEffectSet(sideEffectSet);
+        queue.setFaweExceptionArray(faweExceptionReasonsUsed);
+        enter(queue);
+        return queue;
     }
 
     @Override
@@ -140,6 +152,8 @@ public class ParallelQueueExtent extends PassthroughExtent {
                 BlockVector2 pos = chunksIter.next();
                 block = getExtent().apply(block, filter, region, pos.x(), pos.z(), full);
             }
+            getExtent().flush();
+            filter.finish();
         } else {
             final ForkJoinTask[] tasks = IntStream.range(0, size).mapToObj(i -> handler.submit(() -> {
                 try {
@@ -147,13 +161,9 @@ public class ParallelQueueExtent extends PassthroughExtent {
                     final Region newRegion = region.clone();
                     // Create a chunk that we will reuse/reset for each operation
                     final SingleThreadQueueExtent queue = (SingleThreadQueueExtent) getNewQueue();
-                    queue.setFastMode(fastmode);
-                    queue.setFaweExceptionArray(faweExceptionReasonsUsed);
-                    enter(queue);
                     synchronized (queue) {
                         try {
                             ChunkFilterBlock block = null;
-
                             while (true) {
                                 // Get the next chunk posWeakChunk
                                 final int chunkX;
@@ -169,6 +179,7 @@ public class ParallelQueueExtent extends PassthroughExtent {
                                 block = queue.apply(block, newFilter, newRegion, chunkX, chunkZ, full);
                             }
                             queue.flush();
+                            filter.finish();
                         } catch (Throwable t) {
                             if (t instanceof FaweException) {
                                 Fawe.handleFaweException(faweExceptionReasonsUsed, (FaweException) t, LOGGER);
@@ -203,6 +214,24 @@ public class ParallelQueueExtent extends PassthroughExtent {
             filter.join();
         }
         return filter;
+    }
+
+    @Override
+    protected Operation commitBefore() {
+        return new Operation() {
+            @Override
+            public Operation resume(final RunContext run) throws WorldEditException {
+                extent.commit();
+                processor.flush();
+                ((IQueueExtent<IQueueChunk<?>>) extent).flush();
+                return null;
+            }
+
+            @Override
+            public void cancel() {
+
+            }
+        };
     }
 
     @Override

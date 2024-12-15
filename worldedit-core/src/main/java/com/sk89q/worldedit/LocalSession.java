@@ -154,6 +154,7 @@ public class LocalSession implements TextureHolder {
     private transient TextureUtil texture;
     private transient ResettableExtent transform = null;
     private transient World currentWorld;
+    private transient boolean fastMode = false;
     //FAWE end
     private transient ClipboardHolder clipboard;
     private transient final Object clipboardLock = new Object();
@@ -1725,11 +1726,12 @@ public class LocalSession implements TextureHolder {
      * @return an edit session
      */
     public EditSession createEditSession(Actor actor) {
-        //FAWE start
+        //FAWE start - save command used
         return createEditSession(actor, null);
     }
 
     public EditSession createEditSession(Actor actor, String command) {
+        //FAWE end
         checkNotNull(actor);
 
         World world = null;
@@ -1740,17 +1742,18 @@ public class LocalSession implements TextureHolder {
         }
 
         // Create an edit session
-        EditSession editSession;
         EditSessionBuilder builder = WorldEdit.getInstance().newEditSessionBuilder().world(world);
         if (actor.isPlayer() && actor instanceof Player) {
             BlockBag blockBag = getBlockBag((Player) actor);
             builder.actor(actor);
             builder.blockBag(blockBag);
         }
+        //FAWE start
         builder.command(command);
-        builder.fastMode(!this.sideEffectSet.doesApplyAny());
+        builder.fastMode(this.fastMode);
+        builder.setSideEffectSet(this.sideEffectSet);
 
-        editSession = builder.build();
+        EditSession editSession = builder.build();
 
         if (mask != null) {
             editSession.setMask(mask);
@@ -1762,7 +1765,7 @@ public class LocalSession implements TextureHolder {
             editSession.addTransform(transform);
         }
         editSession.setTickingWatchdog(tickingWatchdog);
-
+        //FAWE end
         return editSession;
     }
     //FAWE end
@@ -1801,7 +1804,9 @@ public class LocalSession implements TextureHolder {
      */
     @Deprecated
     public boolean hasFastMode() {
-        return !this.sideEffectSet.doesApplyAny();
+        //FAWE start - use fastmode boolean not side effects
+        return this.fastMode;
+        //FAWE end
     }
 
     /**
@@ -1811,7 +1816,9 @@ public class LocalSession implements TextureHolder {
      */
     @Deprecated
     public void setFastMode(boolean fastMode) {
-        this.sideEffectSet = fastMode ? SideEffectSet.none() : SideEffectSet.defaults();
+        //FAWE start - use fastmode boolean not side effects
+        this.fastMode = fastMode;
+        //FAWE end
     }
 
     /**

@@ -7,6 +7,7 @@ import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.OutputExtent;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.util.SideEffectSet;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
@@ -138,5 +139,20 @@ public interface IChunkSet extends IBlocks, OutputExtent {
     default IChunkSet createCopy() {
         return this;
     }
+
+    /**
+     * Set the side effects to be used when settings these blocks
+     *
+     * @since TODO
+     */
+    void setSideEffectSet(@Nonnull SideEffectSet sideEffectSet);
+
+    /**
+     * Get the side effects to be used when settings these blocks
+     *
+     * @since TODO
+     */
+    @Nonnull
+    SideEffectSet getSideEffectSet();
 
 }

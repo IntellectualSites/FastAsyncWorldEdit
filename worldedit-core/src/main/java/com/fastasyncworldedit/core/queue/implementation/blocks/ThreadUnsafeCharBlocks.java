@@ -9,6 +9,7 @@ import com.fastasyncworldedit.core.queue.IBlocks;
 import com.fastasyncworldedit.core.queue.IChunkSet;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.util.SideEffectSet;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
@@ -51,6 +52,7 @@ public class ThreadUnsafeCharBlocks implements IChunkSet, IBlocks {
     private Map<HeightMapType, int[]> heightMaps;
     private boolean fastMode;
     private int bitMask;
+    private SideEffectSet sideEffectSet;
 
     /**
      * New instance given the data stored in a {@link CharSetBlocks} instance.
@@ -71,7 +73,8 @@ public class ThreadUnsafeCharBlocks implements IChunkSet, IBlocks {
             Map<HeightMapType, int[]> heightMaps,
             char defaultOrdinal,
             boolean fastMode,
-            int bitMask
+            int bitMask,
+            SideEffectSet sideEffectSet
     ) {
         this.blocks = blocks;
         this.minSectionPosition = minSectionPosition;
@@ -87,6 +90,7 @@ public class ThreadUnsafeCharBlocks implements IChunkSet, IBlocks {
         this.defaultOrdinal = defaultOrdinal;
         this.fastMode = fastMode;
         this.bitMask = bitMask;
+        this.sideEffectSet = sideEffectSet;
     }
 
     @Override
@@ -480,8 +484,19 @@ public class ThreadUnsafeCharBlocks implements IChunkSet, IBlocks {
                 heightMaps != null ? new HashMap<>(heightMaps) : null,
                 defaultOrdinal,
                 fastMode,
-                bitMask
+                bitMask,
+                sideEffectSet
         );
+    }
+
+    @Override
+    public void setSideEffectSet(SideEffectSet sideEffectSet) {
+        this.sideEffectSet = sideEffectSet;
+    }
+
+    @Override
+    public SideEffectSet getSideEffectSet() {
+        return sideEffectSet;
     }
 
     @Override
