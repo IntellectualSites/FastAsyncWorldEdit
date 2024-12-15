@@ -4,6 +4,7 @@ import com.fastasyncworldedit.bukkit.adapter.FaweAdapter;
 import com.fastasyncworldedit.bukkit.adapter.NMSRelighterFactory;
 import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.entity.LazyBaseEntity;
+import com.fastasyncworldedit.core.extent.processor.PlacementStateProcessor;
 import com.fastasyncworldedit.core.extent.processor.lighting.RelighterFactory;
 import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.fastasyncworldedit.core.queue.IBatchProcessor;
@@ -13,6 +14,7 @@ import com.fastasyncworldedit.core.util.NbtUtils;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Sets;
 import com.mojang.serialization.Codec;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.blocks.BaseItemStack;
@@ -22,6 +24,7 @@ import com.sk89q.worldedit.bukkit.adapter.ext.fawe.v1_21_4.PaperweightAdapter;
 import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_21_4.regen.PaperweightRegen;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.function.mask.BlockTypeMask;
 import com.sk89q.worldedit.internal.block.BlockStateIdAccess;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.internal.wna.WorldNativeAccess;
@@ -279,9 +282,16 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
         return state.toBaseBlock();
     }
 
+    private static final Set<SideEffect> SUPPORTED_SIDE_EFFECTS = Sets.immutableEnumSet(
+            SideEffect.HISTORY,
+            SideEffect.HEIGHTMAPS,
+            SideEffect.LIGHTING,
+            SideEffect.NEIGHBORS
+    );
+
     @Override
     public Set<SideEffect> getSupportedSideEffects() {
-        return SideEffectSet.defaults().getSideEffectsToApply();
+        return SUPPORTED_SIDE_EFFECTS;
     }
 
     @Override
@@ -423,6 +433,10 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
     public <B extends BlockStateHolder<B>> BlockData adapt(B state) {
         PaperweightBlockMaterial material = (PaperweightBlockMaterial) state.getMaterial();
         return material.getCraftBlockData();
+    }
+
+    public net.minecraft.world.level.block.state.BlockState adapt(BlockState blockState) {
+        return Block.stateById(getOrdinalToIbdID()[blockState.getOrdinal()]);
     }
 
     @Override
@@ -603,6 +617,11 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
     @Override
     public IBatchProcessor getTickingPostProcessor() {
         return new PaperweightPostProcessor();
+    }
+
+    @Override
+    public PlacementStateProcessor getPlatformPlacementProcessor(Extent extent, BlockTypeMask mask, Region region) {
+        return new PaperweightPlacementStateProcessor(extent, mask, region);
     }
 
     private boolean wasAccessibleSinceLastSave(ChunkHolder holder) {
