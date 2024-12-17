@@ -1,151 +1,173 @@
 package com.fastasyncworldedit.core.extent.clipboard.io.schematic;
 
-import com.fastasyncworldedit.core.FaweCache;
-import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.jnbt.IntTag;
-import com.sk89q.jnbt.ListTag;
-import com.sk89q.jnbt.NBTInputStream;
-import com.sk89q.jnbt.NBTOutputStream;
-import com.sk89q.jnbt.NamedTag;
-import com.sk89q.jnbt.StringTag;
-import com.sk89q.jnbt.Tag;
+import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
+import com.sk89q.worldedit.extension.platform.Capability;
+import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardWriter;
+import com.sk89q.worldedit.extent.clipboard.io.sponge.ReaderUtil;
+import com.sk89q.worldedit.extent.clipboard.io.sponge.VersionedDataFixer;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.util.concurrency.LazyReference;
+import com.sk89q.worldedit.world.DataFixer;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.entity.EntityTypes;
 import com.sk89q.worldedit.world.storage.NBTConversions;
+import it.unimi.dsi.fastutil.chars.Char2IntArrayMap;
+import it.unimi.dsi.fastutil.chars.Char2IntMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import org.apache.logging.log4j.Logger;
+import org.enginehub.linbus.stream.LinBinaryIO;
+import org.enginehub.linbus.tree.LinCompoundTag;
+import org.enginehub.linbus.tree.LinDoubleTag;
+import org.enginehub.linbus.tree.LinFloatTag;
+import org.enginehub.linbus.tree.LinIntTag;
+import org.enginehub.linbus.tree.LinListTag;
+import org.enginehub.linbus.tree.LinRootEntry;
+import org.enginehub.linbus.tree.LinTag;
+import org.enginehub.linbus.tree.LinTagType;
 
 import javax.annotation.Nonnull;
+import java.io.Closeable;
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
 public class MinecraftStructure implements ClipboardReader, ClipboardWriter {
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
+    private static final Platform PLATFORM = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING);
 
     private static final int WARN_SIZE = 32;
 
-    private NBTInputStream inputStream;
-    private NBTOutputStream out;
+    private DataInput in;
+    private DataOutput out;
 
-    public MinecraftStructure(@Nonnull NBTInputStream inputStream) {
-        this.inputStream = inputStream;
+    public MinecraftStructure(@Nonnull DataInput in) {
+        this.in = in;
     }
 
-    public MinecraftStructure(NBTOutputStream out) {
+    public MinecraftStructure(@Nonnull DataOutput out) {
+        this.out = out;
+    }
+
+    @SuppressWarnings("removal")
+    @Deprecated(since = "TODO")
+    public MinecraftStructure(@Nonnull com.sk89q.jnbt.NBTInputStream inputStream) {
+        this.in = inputStream.dataInputStream();
+    }
+
+    @SuppressWarnings("removal")
+    @Deprecated(since = "TODO")
+    public MinecraftStructure(@Nonnull com.sk89q.jnbt.NBTOutputStream out) {
         this.out = out;
     }
 
     @Override
-    public Clipboard read() throws IOException {
-        return read(UUID.randomUUID());
-    }
-
-    @Override
     public Clipboard read(UUID clipboardId) throws IOException {
-        NamedTag rootTag = inputStream.readNamedTag();
+        final LinRootEntry rootEntry = LinRootEntry.readFrom(LinBinaryIO.read(this.in));
 
         // MC structures are all unnamed, but this doesn't seem to be necessary? might remove this later
-        if (!rootTag.getName().isEmpty()) {
+        if (!rootEntry.name().isEmpty()) {
             throw new IOException("Root tag has name - are you sure this is a structure?");
         }
+        final LinCompoundTag parent = rootEntry.value();
+        final VersionedDataFixer dataFixer = ReaderUtil.getVersionedDataFixer(
+                parent.getTag("DataVersion", LinTagType.intTag()).valueAsInt(),
+                PLATFORM, PLATFORM.getDataVersion()
+        );
 
-        Map<String, Tag<?, ?>> tags = ((CompoundTag) rootTag.getTag()).getValue();
-
-        ListTag size = (ListTag) tags.get("size");
-        int width = size.getInt(0);
-        int height = size.getInt(1);
-        int length = size.getInt(2);
-
-        // Init clipboard
-        BlockVector3 origin = BlockVector3.at(0, 0, 0);
-        CuboidRegion region = new CuboidRegion(origin, origin.add(width, height, length).subtract(BlockVector3.ONE));
-        Clipboard clipboard = new BlockArrayClipboard(region, clipboardId);
-        // Blocks
-        ListTag blocks = (ListTag) tags.get("blocks");
-        if (blocks != null) {
-            // Palette
-            List<CompoundTag> palette = (List<CompoundTag>) tags.get("palette").getValue();
-            BlockState[] combinedArray = new BlockState[palette.size()];
-            for (int i = 0; i < palette.size(); i++) {
-                CompoundTag compound = palette.get(i);
-                Map<String, Tag<?, ?>> map = compound.getValue();
-                String name = ((StringTag) map.get("Name")).getValue();
-                BlockType type = BlockTypes.get(name);
-                BlockState state = type.getDefaultState();
-                CompoundTag properties = (CompoundTag) map.get("Properties");
-                if (properties != null) {
-                    for (Map.Entry<String, Tag<?, ?>> entry : properties.getValue().entrySet()) {
-                        String key = entry.getKey();
-                        String value = ((StringTag) entry.getValue()).getValue();
-                        Property<Object> property = type.getProperty(key);
-                        state = state.with(property, property.getValueFor(value));
-                    }
-                }
-                combinedArray[i] = state;
-            }
-            // Populate blocks
-            List<CompoundTag> blocksList = (List<CompoundTag>) tags.get("blocks").getValue();
-            try {
-                for (CompoundTag compound : blocksList) {
-                    Map<String, Tag<?, ?>> blockMap = compound.getValue();
-                    IntTag stateTag = (IntTag) blockMap.get("state");
-                    ListTag posTag = (ListTag) blockMap.get("pos");
-                    BlockState state = combinedArray[stateTag.getValue()];
-                    int x = posTag.getInt(0);
-                    int y = posTag.getInt(1);
-                    int z = posTag.getInt(2);
-
-                    if (state.getBlockType().getMaterial().hasContainer()) {
-                        CompoundTag nbt = (CompoundTag) blockMap.get("nbt");
-                        if (nbt != null) {
-                            BaseBlock block = state.toBaseBlock(nbt);
-                            clipboard.setBlock(x, y, z, block);
-                            continue;
-                        }
-                    }
-                    clipboard.setBlock(x, y, z, state);
-
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        final List<LinIntTag> size = parent.getListTag("size", LinTagType.intTag()).value();
+        if (size.size() != 3) {
+            throw new IOException("Expected 'size' to contain 3 integers, but got " + size.size());
         }
-        // Entities
-        ListTag entities = (ListTag) tags.get("entities");
-        if (entities != null) {
-            List<CompoundTag> entityList = (List<CompoundTag>) (List<?>) entities.getValue();
-            for (CompoundTag entityEntry : entityList) {
-                Map<String, Tag<?, ?>> entityEntryMap = entityEntry.getValue();
-                ListTag posTag = (ListTag) entityEntryMap.get("pos");
-                CompoundTag nbtTag = (CompoundTag) entityEntryMap.get("nbt");
-                String id = nbtTag.getString("Id");
-                Location location = NBTConversions.toLocation(clipboard, posTag, nbtTag.getListTag("Rotation"));
-                if (!id.isEmpty()) {
-                    BaseEntity state = new BaseEntity(EntityTypes.get(id), nbtTag);
-                    clipboard.createEntity(location, state);
+        final CuboidRegion region = new CuboidRegion(BlockVector3.ZERO, BlockVector3.at(
+                size.get(0).valueAsInt(), size.get(1).valueAsInt(), size.get(2).value()
+        ).subtract(BlockVector3.ONE));
+        final Clipboard clipboard = new BlockArrayClipboard(region, clipboardId);
+
+        // Palette
+        final List<LinCompoundTag> paletteEntry = parent.getListTag("palette", LinTagType.compoundTag()).value();
+        final BlockState[] palette = new BlockState[paletteEntry.size()];
+        for (int i = 0; i < palette.length; i++) {
+            final LinCompoundTag entry = paletteEntry.get(i);
+            final BlockType blockType = BlockTypes.get(dataFixer.fixUp(DataFixer.FixTypes.BLOCK_STATE, entry.getTag("Name", LinTagType.stringTag()).value()));
+            if (blockType == null) {
+                throw new IOException("Unknown block type: " + entry.getTag("Name", LinTagType.stringTag()).value());
+            }
+            BlockState block = blockType.getDefaultState();
+            LinCompoundTag properties = entry.findTag("Properties", LinTagType.compoundTag());
+            if (properties != null) {
+                for (final Map.Entry<String, LinTag<?>> propertyPair : properties.value().entrySet()) {
+                    final Property<Object> property = blockType.getProperty(propertyPair.getKey());
+                    if (property == null) {
+                        continue;
+                    }
+                    final String value = LinTagType.stringTag().cast(propertyPair.getValue()).value();
+                    block = block.with(property, property.getValueFor(value));
+
                 }
             }
+            palette[i] = block;
+        }
+
+        // Blocks
+        final List<LinCompoundTag> blocks = parent.getListTag("blocks", LinTagType.compoundTag()).value();
+        for (final LinCompoundTag block : blocks) {
+            int state = block.getTag("state", LinTagType.intTag()).valueAsInt();
+            if (state >= palette.length) {
+                throw new IOException("state index exceeds palette length");
+            }
+            List<LinIntTag> pos = block.getTag("pos", LinTagType.listTag()).asTypeChecked(LinTagType.intTag()).value();
+            if (size.size() != 3) {
+                throw new IOException("Expected 'pos' to contain 3 integers, but got " + size.size());
+            }
+            LinCompoundTag nbt = block.findTag("nbt", LinTagType.compoundTag());
+            if (nbt == null) {
+                clipboard.setBlock(pos.get(0).valueAsInt(), pos.get(1).valueAsInt(), pos.get(2).valueAsInt(), palette[state]);
+                continue;
+            }
+            clipboard.setBlock(
+                    pos.get(0).valueAsInt(), pos.get(1).valueAsInt(), pos.get(2).valueAsInt(),
+                    palette[state].toBaseBlock(nbt)
+            );
+        }
+
+        // Entities
+        LinListTag<@org.jetbrains.annotations.NotNull LinCompoundTag> entities = parent.findListTag("entities", LinTagType.compoundTag());
+        if (entities == null) {
+            return clipboard;
+        }
+        for (final LinCompoundTag entity : entities.value()) {
+            final LinCompoundTag nbt = entity.getTag("nbt", LinTagType.compoundTag());
+            clipboard.createEntity(
+                    NBTConversions.toLocation(clipboard,
+                            entity.getListTag("pos", LinTagType.doubleTag()),
+                            nbt.getListTag("Rotation", LinTagType.floatTag())
+                    ),
+                    new BaseEntity(
+                            EntityTypes.get(nbt.getTag("id", LinTagType.stringTag()).value()),
+                            LazyReference.computed(dataFixer.fixUp(DataFixer.FixTypes.ENTITY, nbt))
+                    )
+            );
         }
         return clipboard;
     }
@@ -153,121 +175,117 @@ public class MinecraftStructure implements ClipboardReader, ClipboardWriter {
     @Override
     public void write(Clipboard clipboard) throws IOException {
         clipboard.flush();
-        write(clipboard, "FAWE");
-    }
-
-    public void write(Clipboard clipboard, String owner) throws IOException {
         Region region = clipboard.getRegion();
         int width = region.getWidth();
         int height = region.getHeight();
         int length = region.getLength();
+        BlockVector3 min = region.getMinimumPoint();
         if (width > WARN_SIZE || height > WARN_SIZE || length > WARN_SIZE) {
             LOGGER.info("A structure longer than 32 is unsupported by minecraft (but probably still works)");
         }
-        Map<String, Object> structure = FaweCache.INSTANCE.asMap("version", 1, "author", owner);
-        // ignored: version / owner
-        Int2ObjectArrayMap<Integer> indexes = new Int2ObjectArrayMap<>();
-        // Size
-        structure.put("size", Arrays.asList(width, height, length));
-        // Palette
-        ArrayList<HashMap<String, Object>> palette = new ArrayList<>();
-        for (BlockVector3 point : region) {
-            BlockState block = clipboard.getBlock(point);
-            char ordinal = block.getOrdinalChar();
-            BlockType type = block.getBlockType();
+        LinCompoundTag.Builder root = LinCompoundTag.builder();
+        root.putInt("DataVersion", PLATFORM.getDataVersion());
+        root.put("size", LinListTag.of(LinTagType.intTag(), List.of(
+            LinIntTag.of(width), LinIntTag.of(height), LinIntTag.of(length)
+        )));
 
-            if (type == BlockTypes.STRUCTURE_VOID || indexes.containsKey(ordinal)) {
+        // Block Palette
+        Char2IntMap ordinals = new Char2IntArrayMap();
+        LinListTag.Builder<@org.jetbrains.annotations.NotNull LinCompoundTag> palette = LinListTag.builder(LinTagType.compoundTag());
+        Int2ObjectMap<BlockState> paletteIndexes = new Int2ObjectArrayMap<>();
+        for (final BlockVector3 pos : clipboard) {
+            final BlockState block = clipboard.getBlock(pos);
+            if (block.getBlockType() == BlockTypes.STRUCTURE_VOID || ordinals.containsKey(block.getOrdinalChar())) {
                 continue;
             }
+            ordinals.put(block.getOrdinalChar(), paletteIndexes.size());
+            paletteIndexes.put(block.getOrdinalChar(), block);
+            final LinCompoundTag.Builder entry = LinCompoundTag.builder()
+                    .putString("Name", block.getBlockType().id());
+            if (block.getInternalId() != block.getBlockType().getInternalId()) {
+                final LinCompoundTag.Builder properties = LinCompoundTag.builder();
+                block.getStates().forEach((property, value) -> properties.putString(
+                        property.getName(),
+                        value.toString().toLowerCase(Locale.ROOT)
+                ));
+                entry.put("Properties", properties.build());
+            }
+            palette.add(entry.build());
+        }
 
-            indexes.put(ordinal, palette.size());
-            HashMap<String, Object> paletteEntry = new HashMap<>();
-            paletteEntry.put("Name", type.id());
-            if (block.getInternalId() != type.getInternalId()) {
-                Map<String, Object> properties = null;
-                for (Map.Entry<Property<?>, Object> entry : block.getStates().entrySet()) {
-                    if (properties == null) {
-                        properties = new HashMap<>();
-                    }
-                    properties.put(entry.getKey().getName(), entry.getValue().toString());
-                }
-                if (properties != null) {
-                    paletteEntry.put("Properties", properties);
-                }
-            }
-            palette.add(paletteEntry);
-        }
-        if (!palette.isEmpty()) {
-            structure.put("palette", palette);
-        }
         // Blocks
-        ArrayList<Map<String, Object>> blocks = new ArrayList<>();
-        BlockVector3 min = region.getMinimumPoint();
-        for (BlockVector3 point : region) {
-            BaseBlock block = clipboard.getFullBlock(point);
-            if (block.getBlockType() != BlockTypes.STRUCTURE_VOID) {
-                char ordinal = block.getOrdinalChar();
-                int index = indexes.get(ordinal);
-                List<Integer> pos = Arrays.asList(
-                        point.x() - min.x(),
-                        point.y() - min.y(),
-                        point.z() - min.z()
-                );
-                if (!block.hasNbtData()) {
-                    blocks.add(FaweCache.INSTANCE.asMap("state", index, "pos", pos));
-                } else {
-                    Map<String, Tag<?, ?>> tag = new HashMap<>(block.getNbtData().getValue());
-                    tag.remove("x");
-                    tag.remove("y");
-                    tag.remove("z");
-                    CompoundTag cTag = new CompoundTag(tag);
-                    blocks.add(
-                            FaweCache.INSTANCE.asMap("state", index, "pos", pos, "nbt", cTag));
+        LinListTag.Builder<@org.jetbrains.annotations.NotNull LinCompoundTag> blocks = LinListTag.builder(LinTagType.compoundTag());
+        for (final BlockVector3 pos : clipboard) {
+            final BlockState block = clipboard.getBlock(pos);
+            LinCompoundTag.Builder entry = LinCompoundTag.builder()
+                    .putInt("state", ordinals.get(block.getOrdinalChar()))
+                    .put("pos", LinListTag.of(LinTagType.intTag(), List.of(
+                            LinIntTag.of(pos.x() - min.x()),
+                            LinIntTag.of(pos.y() - min.y()),
+                            LinIntTag.of(pos.z() - min.z())
+                    )));
+            final BaseBlock baseBlock = clipboard.getFullBlock(pos);
+            if (baseBlock != null) {
+                final LinCompoundTag nbt = baseBlock.getNbt();
+                if (nbt != null) {
+                    entry.put("nbt", nbt.toBuilder().remove("x").remove("y").remove("z").build());
                 }
             }
+            blocks.add(entry.build());
         }
-        if (!blocks.isEmpty()) {
-            structure.put("blocks", blocks);
-        }
+
         // Entities
-        ArrayList<Map<String, Object>> entities = new ArrayList<>();
-        for (Entity entity : clipboard.getEntities()) {
-            Location loc = entity.getLocation();
-            List<Double> pos = Arrays.asList(
-                    loc.x() - min.x(),
-                    loc.y() - min.y(),
-                    loc.z() - min.z()
-            );
-            List<Integer> blockPos = Arrays.asList(
-                    loc.getBlockX() - min.x(),
-                    loc.getBlockY() - min.y(),
-                    loc.getBlockZ() - min.z()
-            );
-            BaseEntity state = entity.getState();
-            if (state != null) {
-                CompoundTag nbt = state.getNbtData();
-                Map<String, Tag<?, ?>> nbtMap = new HashMap<>(nbt.getValue());
-                // Replace rotation data
-                nbtMap.put("Rotation", writeRotation(entity.getLocation()));
-                nbtMap.put("id", new StringTag(state.getType().id()));
-                Map<String, Object> entityMap = FaweCache.INSTANCE.asMap("pos", pos, "blockPos", blockPos, "nbt", new CompoundTag(nbtMap));
-                entities.add(entityMap);
+        LinListTag.Builder<@org.jetbrains.annotations.NotNull LinCompoundTag> entities = LinListTag.builder(LinTagType.compoundTag());
+        for (final Entity entity : clipboard.getEntities()) {
+            final Location location = entity.getLocation();
+            final Vector3 exactPosition = location.subtract(min.x(), min.y(), min.z());
+            final BlockVector3 blockPosition = entity.getBlockLocation().toBlockPoint().subtract(min);
+            final BaseEntity baseEntity = entity.getState();
+            LinCompoundTag.Builder nbt = null;
+            if (baseEntity != null) {
+                final LinCompoundTag contained = baseEntity.getNbt();
+                if (contained != null) {
+                    nbt = contained.toBuilder();
+                }
             }
+            if (nbt == null) {
+                nbt = LinCompoundTag.builder();
+            }
+            entities.add(LinCompoundTag.builder()
+                    .put("pos", LinListTag.of(LinTagType.doubleTag(), List.of(
+                            LinDoubleTag.of(exactPosition.x()),
+                            LinDoubleTag.of(exactPosition.y()),
+                            LinDoubleTag.of(exactPosition.z())
+                    )))
+                    .put("blockPos", LinListTag.of(LinTagType.intTag(), List.of(
+                            LinIntTag.of(blockPosition.x()),
+                            LinIntTag.of(blockPosition.y()),
+                            LinIntTag.of(blockPosition.z())
+                    )))
+                    .put("nbt", nbt
+                            .putString("id", entity.getType().id())
+                            .put("Rotation", LinListTag.of(LinTagType.floatTag(), List.of(
+                                    LinFloatTag.of(location.getYaw()),
+                                    LinFloatTag.of(location.getPitch())
+                            )))
+                            .build()
+                    )
+                    .build());
         }
-        if (!entities.isEmpty()) {
-            structure.put("entities", entities);
-        }
-        out.writeNamedTag("", FaweCache.INSTANCE.asTag(structure));
+        root.put("palette", palette.build())
+                .put("blocks", blocks.build())
+                .put("entities", entities.build());
+        LinBinaryIO.write(this.out, new LinRootEntry("", root.build()));
         close();
     }
 
     @Override
     public void close() throws IOException {
-        if (inputStream != null) {
-            inputStream.close();
+        if (in != null && in instanceof Closeable closeable) {
+            closeable.close();
         }
-        if (out != null) {
-            out.close();
+        if (out != null && out instanceof Closeable closeable) {
+            closeable.close();
         }
     }
 
