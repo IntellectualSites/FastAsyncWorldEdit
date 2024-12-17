@@ -818,7 +818,7 @@ public interface Extent extends InputExtent, OutputExtent {
         checkNotNull(pattern);
 
         BlockReplace replace = new BlockReplace(this, pattern);
-        RegionMaskingFilter filter = new RegionMaskingFilter(this, mask, replace);
+        RegionMaskingFilter filter = new RegionMaskingFilter(mask, replace);
         //FAWE start > add extent to RegionVisitor to allow chunk preloading
         RegionVisitor visitor = new RegionVisitor(region, filter, this);
         //FAWE end
