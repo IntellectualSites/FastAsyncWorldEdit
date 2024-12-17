@@ -427,6 +427,8 @@ public final class BlockTypes {
     @Nullable
     public static final BlockType CHISELED_RED_SANDSTONE = init();
     @Nullable
+    public static final BlockType CHISELED_RESIN_BRICKS = init();
+    @Nullable
     public static final BlockType CHISELED_SANDSTONE = init();
     @Nullable
     public static final BlockType CHISELED_STONE_BRICKS = init();
@@ -440,6 +442,8 @@ public final class BlockTypes {
     public static final BlockType CHORUS_PLANT = init();
     @Nullable
     public static final BlockType CLAY = init();
+    @Nullable
+    public static final BlockType CLOSED_EYEBLOSSOM = init();
     @Nullable
     public static final BlockType COAL_BLOCK = init();
     @Nullable
@@ -1294,6 +1298,8 @@ public final class BlockTypes {
     @Nullable
     public static final BlockType OCHRE_FROGLIGHT = init();
     @Nullable
+    public static final BlockType OPEN_EYEBLOSSOM = init();
+    @Nullable
     public static final BlockType ORANGE_BANNER = init();
     @Nullable
     public static final BlockType ORANGE_BED = init();
@@ -1489,6 +1495,8 @@ public final class BlockTypes {
     @Nullable
     public static final BlockType POTTED_CHERRY_SAPLING = init();
     @Nullable
+    public static final BlockType POTTED_CLOSED_EYEBLOSSOM = init();
+    @Nullable
     public static final BlockType POTTED_CORNFLOWER = init();
     @Nullable
     public static final BlockType POTTED_CRIMSON_FUNGUS = init();
@@ -1515,6 +1523,8 @@ public final class BlockTypes {
     public static final BlockType POTTED_MANGROVE_PROPAGULE = init();
     @Nullable
     public static final BlockType POTTED_OAK_SAPLING = init();
+    @Nullable
+    public static final BlockType POTTED_OPEN_EYEBLOSSOM = init();
     @Nullable
     public static final BlockType POTTED_ORANGE_TULIP = init();
     @Nullable
@@ -1687,6 +1697,18 @@ public final class BlockTypes {
     public static final BlockType REPEATER = init();
     @Nullable
     public static final BlockType REPEATING_COMMAND_BLOCK = init();
+    @Nullable
+    public static final BlockType RESIN_BLOCK = init();
+    @Nullable
+    public static final BlockType RESIN_BRICK_SLAB = init();
+    @Nullable
+    public static final BlockType RESIN_BRICK_STAIRS = init();
+    @Nullable
+    public static final BlockType RESIN_BRICK_WALL = init();
+    @Nullable
+    public static final BlockType RESIN_BRICKS = init();
+    @Nullable
+    public static final BlockType RESIN_CLUMP = init();
     @Nullable
     public static final BlockType RESPAWN_ANCHOR = init();
     @Nullable

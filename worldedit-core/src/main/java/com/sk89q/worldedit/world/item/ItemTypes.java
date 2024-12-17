@@ -492,6 +492,8 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType CHISELED_RED_SANDSTONE = init();
     @Nullable
+    public static final ItemType CHISELED_RESIN_BRICKS = init();
+    @Nullable
     public static final ItemType CHISELED_SANDSTONE = init();
     @Nullable
     public static final ItemType CHISELED_STONE_BRICKS = init();
@@ -511,6 +513,8 @@ public final class ItemTypes {
     public static final ItemType CLAY_BALL = init();
     @Nullable
     public static final ItemType CLOCK = init();
+    @Nullable
+    public static final ItemType CLOSED_EYEBLOSSOM = init();
     @Nullable
     public static final ItemType COAL = init();
     @Nullable
@@ -1696,6 +1700,8 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType OMINOUS_TRIAL_KEY = init();
     @Nullable
+    public static final ItemType OPEN_EYEBLOSSOM = init();
+    @Nullable
     public static final ItemType ORANGE_BANNER = init();
     @Nullable
     public static final ItemType ORANGE_BED = init();
@@ -2069,6 +2075,20 @@ public final class ItemTypes {
     public static final ItemType REPEATER = init();
     @Nullable
     public static final ItemType REPEATING_COMMAND_BLOCK = init();
+    @Nullable
+    public static final ItemType RESIN_BLOCK = init();
+    @Nullable
+    public static final ItemType RESIN_BRICK = init();
+    @Nullable
+    public static final ItemType RESIN_BRICK_SLAB = init();
+    @Nullable
+    public static final ItemType RESIN_BRICK_STAIRS = init();
+    @Nullable
+    public static final ItemType RESIN_BRICK_WALL = init();
+    @Nullable
+    public static final ItemType RESIN_BRICKS = init();
+    @Nullable
+    public static final ItemType RESIN_CLUMP = init();
     @Nullable
     public static final ItemType RESPAWN_ANCHOR = init();
     @Nullable
