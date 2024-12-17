@@ -380,7 +380,7 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
 
     /**
      * The structure block format:
-     * http://minecraft.gamepedia.com/Structure_block_file_format
+     * <a href="https://minecraft.wiki/w/Structure_file">Structure file - Minecraft Wiki</a>
      */
     MINECRAFT_STRUCTURE("structure") {
         @Override
@@ -391,16 +391,14 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
         @Override
         public ClipboardReader getReader(InputStream inputStream) throws IOException {
             inputStream = new BufferedInputStream(inputStream);
-            NBTInputStream nbtStream = new NBTInputStream(new BufferedInputStream(new GZIPInputStream(inputStream)));
-            return new MinecraftStructure(nbtStream);
+            return new MinecraftStructure(new DataInputStream(new GZIPInputStream(inputStream)));
         }
 
         @Override
         public ClipboardWriter getWriter(OutputStream outputStream) throws IOException {
             outputStream = new BufferedOutputStream(outputStream);
             OutputStream gzip = new ParallelGZIPOutputStream(outputStream);
-            NBTOutputStream nbtStream = new NBTOutputStream(new BufferedOutputStream(gzip));
-            return new MinecraftStructure(nbtStream);
+            return new MinecraftStructure(new DataOutputStream(new BufferedOutputStream(gzip)));
         }
 
         @Override
