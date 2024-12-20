@@ -19,18 +19,17 @@ public class VectorizedCharFilterBlock extends CharFilterBlock {
             throw new IllegalStateException("Unexpected VectorizedCharFilterBlock " + filter);
         }
         final VectorSpecies<Short> species = ShortVector.SPECIES_PREFERRED;
-        // TODO can we avoid eager initSet?
-        initSet(); // set array is null before
-        char[] setArr = this.setArr;
-        assert setArr != null;
-        char[] getArr = this.getArr;
+        VectorFacade setFassade = new VectorFacade(this.set);
+        setFassade.setLayer(this.layer);
+        VectorFacade getFassade = new VectorFacade(this.get);
+        getFassade.setLayer(this.layer);
+        getFassade.setData(this.getArr);
         // assume setArr.length == getArr.length == 4096
         VectorMask<Short> affectAll = species.maskAll(true);
         for (int i = 0; i < 4096; i += species.length()) {
-            ShortVector set = ShortVector.fromCharArray(species, setArr, i);
-            ShortVector get = ShortVector.fromCharArray(species, getArr, i);
-            ShortVector res = vecFilter.applyVector(get, set, affectAll);
-            res.intoCharArray(setArr, i);
+            setFassade.setIndex(i);
+            getFassade.setIndex(i);
+            vecFilter.applyVector(getFassade, setFassade, affectAll);
         }
     }
 }
