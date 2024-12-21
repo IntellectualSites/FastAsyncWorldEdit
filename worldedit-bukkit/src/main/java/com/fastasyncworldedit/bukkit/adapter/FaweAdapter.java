@@ -25,7 +25,7 @@ import java.util.Map;
 public abstract class FaweAdapter<TAG, SERVER_LEVEL> extends CachedBukkitAdapter implements IDelegateBukkitImplAdapter<TAG> {
 
     protected final BukkitImplAdapter<TAG> parent;
-    protected char[] ibdToStateOrdinal = null;
+    protected int[] ibdToOrdinal = null;
     protected int[] ordinalToIbdID = null;
     protected boolean initialised = false;
     protected Map<String, List<Property<?>>> allBlockProperties = null;
