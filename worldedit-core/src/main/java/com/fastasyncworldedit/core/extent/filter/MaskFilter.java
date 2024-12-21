@@ -2,6 +2,7 @@ package com.fastasyncworldedit.core.extent.filter;
 
 import com.fastasyncworldedit.core.extent.filter.block.DelegateFilter;
 import com.fastasyncworldedit.core.extent.filter.block.FilterBlock;
+import com.fastasyncworldedit.core.internal.simd.VectorFacade;
 import com.fastasyncworldedit.core.internal.simd.SimdSupport;
 import com.fastasyncworldedit.core.internal.simd.VectorizedFilter;
 import com.fastasyncworldedit.core.internal.simd.VectorizedMask;
@@ -11,6 +12,7 @@ import com.sk89q.worldedit.function.mask.Mask;
 import jdk.incubator.vector.ShortVector;
 import jdk.incubator.vector.VectorMask;
 import jdk.incubator.vector.VectorOperators;
+import jdk.incubator.vector.VectorSpecies;
 
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -82,13 +84,15 @@ public class MaskFilter<T extends Filter> extends DelegateFilter<T> {
         }
 
         @Override
-        public ShortVector applyVector(final ShortVector get, final ShortVector set, VectorMask<Short> mask) {
+        public void applyVector(final VectorFacade get, final VectorFacade set, final VectorMask<Short> mask) {
             final T parent = getParent();
-            VectorMask<Short> masked = vectorizedMask.compareVector(set, get);
-            ShortVector res = parent.applyVector(get, set, mask.and(masked));
-            VectorMask<Short> changed = res.compare(VectorOperators.NE, set);
-            changes.getAndAdd(changed.trueCount());
-            return res;
+            final VectorSpecies<Short> species = mask.vectorSpecies();
+            VectorMask<Short> masked = this.vectorizedMask.compareVector(set, get, species);
+            ShortVector before = set.getOrZero(masked.vectorSpecies());
+            parent.applyVector(get, set, mask.and(masked));
+            ShortVector after = set.getOrZero(masked.vectorSpecies());
+            VectorMask<Short> changed = after.compare(VectorOperators.NE, before);
+            this.changes.getAndAdd(changed.trueCount());
         }
 
         @Override

@@ -1,11 +1,11 @@
 package com.fastasyncworldedit.core.extent.filter;
 
 import com.fastasyncworldedit.core.extent.filter.block.FilterBlock;
+import com.fastasyncworldedit.core.internal.simd.VectorFacade;
 import com.fastasyncworldedit.core.internal.simd.VectorizedFilter;
 import com.fastasyncworldedit.core.queue.Filter;
 import com.fastasyncworldedit.core.queue.IChunk;
 import com.sk89q.worldedit.regions.Region;
-import jdk.incubator.vector.ShortVector;
 import jdk.incubator.vector.VectorMask;
 import org.jetbrains.annotations.Nullable;
 
@@ -78,9 +78,9 @@ public sealed class LinkedFilter<L extends Filter, R extends Filter> implements 
         }
 
         @Override
-        public ShortVector applyVector(final ShortVector get, final ShortVector set, VectorMask<Short> mask) {
-            ShortVector res = getLeft().applyVector(get, set, mask);
-            return getRight().applyVector(get, res, mask);
+        public void applyVector(final VectorFacade get, final VectorFacade set, final VectorMask<Short> mask) {
+            getLeft().applyVector(get, set, mask);
+            getRight().applyVector(get, set, mask);
         }
 
         @Override
