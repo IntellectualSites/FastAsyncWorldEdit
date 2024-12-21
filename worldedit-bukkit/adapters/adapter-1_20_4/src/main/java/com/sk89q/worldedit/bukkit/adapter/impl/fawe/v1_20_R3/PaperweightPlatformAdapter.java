@@ -82,7 +82,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.function.Function;
+import java.util.function.IntFunction;
 
 import static java.lang.invoke.MethodType.methodType;
 import static net.minecraft.core.registries.Registries.BIOME;
@@ -420,7 +420,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
 
     public static LevelChunkSection newChunkSection(
             final int layer,
-            final Function<Integer, char[]> get,
+            final IntFunction<char[]> get,
             char[] set,
             CachedBukkitAdapter adapter,
             Registry<Biome> biomeRegistry,
@@ -436,9 +436,9 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         try {
             int num_palette;
             if (get == null) {
-                num_palette = createPalette(blockToPalette, paletteToBlock, blocksCopy, set, adapter, null);
+                num_palette = createPalette(blockToPalette, paletteToBlock, blocksCopy, set, adapter);
             } else {
-                num_palette = createPalette(layer, blockToPalette, paletteToBlock, blocksCopy, get, set, adapter, null);
+                num_palette = createPalette(layer, blockToPalette, paletteToBlock, blocksCopy, get, set, adapter);
             }
 
             int bitsPerEntry = MathMan.log2nlz(num_palette - 1);
