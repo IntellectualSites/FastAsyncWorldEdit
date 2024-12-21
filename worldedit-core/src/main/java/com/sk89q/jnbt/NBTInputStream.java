@@ -22,6 +22,7 @@ package com.sk89q.jnbt;
 import com.fastasyncworldedit.core.jnbt.streamer.StreamDelegate;
 import com.fastasyncworldedit.core.jnbt.streamer.ValueReader;
 import org.enginehub.linbus.stream.LinBinaryIO;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.io.Closeable;
 import java.io.DataInputStream;
@@ -693,6 +694,13 @@ public final class NBTInputStream implements Closeable {
                 throw new IllegalArgumentException("CANNOT REMOVE");
             }
         };
+    }
+    //FAWE end
+
+    //FAWE start - make underlying stream accessible (for soft migration reasons)
+    @ApiStatus.Internal
+    public DataInputStream dataInputStream() {
+        return this.is;
     }
     //FAWE end
 
