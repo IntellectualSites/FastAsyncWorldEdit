@@ -1,5 +1,6 @@
 package com.fastasyncworldedit.bukkit.adapter;
 
+import com.fastasyncworldedit.core.queue.IChunk;
 import com.fastasyncworldedit.core.queue.IChunkCache;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.implementation.SingleThreadQueueExtent;
@@ -16,12 +17,14 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import org.bukkit.generator.BiomeProvider;
 import org.bukkit.generator.WorldInfo;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.function.BiFunction;
 import java.util.function.BooleanSupplier;
-import java.util.function.Function;
 
 /**
  * Represents an abstract regeneration handler.
@@ -109,18 +112,45 @@ public abstract class Regenerator {
         boolean genbiomes = options.shouldRegenBiomes();
         boolean hasBiome = options.hasBiomeType();
         BiomeType biome = options.getBiomeType();
+        Pattern pattern;
         if (!genbiomes && !hasBiome) {
-            target.setBlocks(region, new PlacementPattern());
+            pattern = new PlacementPattern();
+        } else if (hasBiome) {
+            pattern = new WithBiomePlacementPattern((ignored1, ignored2) -> biome);
+        } else {
+            pattern = new WithBiomePlacementPattern((vec, chunk) -> {
+                if (chunk != null) {
+                    return chunk.getBiomeType(vec.x() & 15, vec.y(), vec.z() & 15);
+                }
+                return source.getBiome(vec);
+            });
         }
-        if (hasBiome) {
-            target.setBlocks(region, new WithBiomePlacementPattern(ignored -> biome));
-        } else if (genbiomes) {
-            target.setBlocks(region, new WithBiomePlacementPattern(vec -> source.getBiome(vec)));
-        }
+        target.setBlocks(region, pattern);
         TaskManager.taskManager().cancel(taskId);
     }
 
-    private class PlacementPattern implements Pattern {
+    private abstract class ChunkwisePattern implements Pattern {
+        // the chunk we're currently operating on, if any.
+        // allows faster access to chunk data than source.getFullBlock(...)
+        protected @Nullable IChunk chunk;
+
+        @Override
+        public @NotNull <T extends IChunk> T applyChunk(final T chunk, @Nullable final Region region) {
+            this.chunk = source.getOrCreateChunk(chunk.getX(), chunk.getZ());
+            return chunk;
+        }
+
+        @Override
+        public void finishChunk(final IChunk chunk) {
+            this.chunk = null;
+        }
+
+        @Override
+        public abstract Pattern fork();
+
+    }
+
+    private class PlacementPattern extends ChunkwisePattern {
 
         @Override
         public BaseBlock applyBlock(final BlockVector3 position) {
@@ -129,16 +159,26 @@ public abstract class Regenerator {
 
         @Override
         public boolean apply(final Extent extent, final BlockVector3 get, final BlockVector3 set) throws WorldEditException {
-            return extent.setBlock(set.x(), set.y(), set.z(), source.getFullBlock(get.x(), get.y(), get.z()));
+            BaseBlock fullBlock;
+            if (chunk != null) {
+                fullBlock = chunk.getFullBlock(get.x() & 15, get.y(), get.z() & 15);
+            } else {
+                fullBlock = source.getFullBlock(get.x(), get.y(), get.z());
+            }
+            return set.setFullBlock(extent, fullBlock);
         }
 
+        @Override
+        public Pattern fork() {
+            return new PlacementPattern();
+        }
     }
 
-    private class WithBiomePlacementPattern implements Pattern {
+    private class WithBiomePlacementPattern extends ChunkwisePattern {
 
-        private final Function<BlockVector3, BiomeType> biomeGetter;
+        private final BiFunction<BlockVector3, @Nullable IChunk, BiomeType> biomeGetter;
 
-        private WithBiomePlacementPattern(final Function<BlockVector3, BiomeType> biomeGetter) {
+        private WithBiomePlacementPattern(final BiFunction<BlockVector3, @Nullable IChunk, BiomeType> biomeGetter) {
             this.biomeGetter = biomeGetter;
         }
 
@@ -149,10 +189,20 @@ public abstract class Regenerator {
 
         @Override
         public boolean apply(final Extent extent, final BlockVector3 get, final BlockVector3 set) throws WorldEditException {
-            return extent.setBlock(set.x(), set.y(), set.z(), source.getFullBlock(get.x(), get.y(), get.z()))
-                    && extent.setBiome(set.x(), set.y(), set.z(), biomeGetter.apply(get));
+            final BaseBlock fullBlock;
+            if (chunk != null) {
+                fullBlock = chunk.getFullBlock(get.x() & 15, get.y(), get.z() & 15);
+            } else {
+                fullBlock = source.getFullBlock(get.x(), get.y(), get.z());
+            }
+            return extent.setBlock(set.x(), set.y(), set.z(), fullBlock)
+                    && extent.setBiome(set.x(), set.y(), set.z(), biomeGetter.apply(get, chunk));
         }
 
+        @Override
+        public Pattern fork() {
+            return new WithBiomePlacementPattern(this.biomeGetter);
+        }
     }
 
     //functions to be implemented by sub class
