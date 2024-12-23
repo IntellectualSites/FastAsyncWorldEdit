@@ -1,186 +1,126 @@
 package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_20_R2;
 
+import com.fastasyncworldedit.bukkit.adapter.BukkitBlockMaterial;
 import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
-import com.sk89q.util.ReflectionUtil;
-import com.sk89q.worldedit.bukkit.adapter.Refraction;
-import com.sk89q.worldedit.world.registry.BlockMaterial;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.EmptyBlockGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
-import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.material.PushReaction;
 import org.bukkit.craftbukkit.v1_20_R2.block.data.CraftBlockData;
 
-import javax.annotation.Nullable;
+public class PaperweightBlockMaterial extends BukkitBlockMaterial<Block, BlockState> {
 
-public class PaperweightBlockMaterial implements BlockMaterial {
-
-    private final Block block;
-    private final BlockState blockState;
-    private final boolean isTranslucent;
-    private final CraftBlockData craftBlockData;
-    private final org.bukkit.Material craftMaterial;
     private final int opacity;
-    private final FaweCompoundTag tile;
 
     public PaperweightBlockMaterial(Block block) {
         this(block, block.defaultBlockState());
     }
 
     public PaperweightBlockMaterial(Block block, BlockState blockState) {
-        this.block = block;
-        this.blockState = blockState;
-        this.craftBlockData = CraftBlockData.fromData(blockState);
-        this.craftMaterial = craftBlockData.getMaterial();
-        BlockBehaviour.Properties blockInfo = ReflectionUtil.getField(BlockBehaviour.class, block,
-                Refraction.pickName("properties", "aN"));
-        this.isTranslucent = !(boolean) ReflectionUtil.getField(BlockBehaviour.Properties.class, blockInfo,
-                Refraction.pickName("canOcclude", "m")
-        );
-        opacity = blockState.getLightBlock(EmptyBlockGetter.INSTANCE, BlockPos.ZERO);
-        BlockEntity tileEntity = !(block instanceof EntityBlock) ? null : ((EntityBlock) block).newBlockEntity(
-                BlockPos.ZERO,
-                blockState
-        );
-        tile = tileEntity == null
-                ? null
-                : PaperweightGetBlocks.NMS_TO_TILE.apply(tileEntity);
+        super(block, blockState, CraftBlockData.fromData(blockState));
+        this.opacity = blockState.getLightBlock(EmptyBlockGetter.INSTANCE, BlockPos.ZERO);
     }
 
-    public Block getBlock() {
-        return block;
-    }
-
-    public BlockState getState() {
-        return blockState;
-    }
-
-    public CraftBlockData getCraftBlockData() {
-        return craftBlockData;
+    @Override
+    protected FaweCompoundTag tileForBlock(final Block block) {
+        BlockEntity tileEntity = !(block instanceof EntityBlock eb) ? null : eb.newBlockEntity(BlockPos.ZERO, this.blockState);
+        return tileEntity == null ? null : PaperweightGetBlocks.NMS_TO_TILE.apply(tileEntity);
     }
 
     @Override
     public boolean isAir() {
-        return blockState.isAir();
+        return this.blockState.isAir();
     }
 
     @Override
     public boolean isFullCube() {
-        return Block.isShapeFullBlock(blockState.getShape(EmptyBlockGetter.INSTANCE, BlockPos.ZERO));
+        return Block.isShapeFullBlock(this.blockState.getShape(EmptyBlockGetter.INSTANCE, BlockPos.ZERO));
     }
 
     @Override
     public boolean isOpaque() {
-        return blockState.isOpaque();
+        return this.blockState.canOcclude();
     }
 
     @Override
     public boolean isPowerSource() {
-        return blockState.isSignalSource();
+        return this.blockState.isSignalSource();
     }
 
     @Override
     public boolean isLiquid() {
-        // TODO: Better check ?
-        return block instanceof LiquidBlock;
+        return !this.blockState.getFluidState().is(Fluids.EMPTY);
     }
 
     @Override
     public boolean isSolid() {
-        // TODO: Replace
-        return blockState.isSolid();
+        return this.blockState.isSolidRender(EmptyBlockGetter.INSTANCE, BlockPos.ZERO);
     }
 
     @Override
     public float getHardness() {
-        return craftBlockData.getState().destroySpeed;
+        return this.blockState.destroySpeed;
     }
 
     @Override
     public float getResistance() {
-        return block.getExplosionResistance();
+        return this.block.getExplosionResistance();
     }
 
     @Override
     public float getSlipperiness() {
-        return block.getFriction();
+        return this.block.getFriction();
     }
 
     @Override
     public int getLightValue() {
-        return blockState.getLightEmission();
+        return this.blockState.getLightEmission();
     }
 
     @Override
     public int getLightOpacity() {
-        return opacity;
+        return this.opacity;
     }
 
     @Override
     public boolean isFragileWhenPushed() {
-        return blockState.getPistonPushReaction() == PushReaction.DESTROY;
+        return this.blockState.getPistonPushReaction() == PushReaction.DESTROY;
     }
 
     @Override
     public boolean isUnpushable() {
-        return blockState.getPistonPushReaction() == PushReaction.BLOCK;
+        return this.blockState.getPistonPushReaction() == PushReaction.BLOCK;
     }
 
     @Override
     public boolean isTicksRandomly() {
-        return block.isRandomlyTicking(blockState);
+        return this.blockState.isRandomlyTicking();
     }
 
     @SuppressWarnings("deprecation")
     @Override
     public boolean isMovementBlocker() {
-        return blockState.blocksMotion();
-    }
-
-    @Override
-    public boolean isBurnable() {
-        return craftMaterial.isBurnable();
-    }
-
-    @Override
-    public boolean isToolRequired() {
-        // Removed in 1.16.1, this is not present in higher versions
-        return false;
+        return this.blockState.blocksMotion();
     }
 
     @Override
     public boolean isReplacedDuringPlacement() {
-        return blockState.canBeReplaced();
+        return this.blockState.canBeReplaced();
     }
 
     @Override
     public boolean isTranslucent() {
-        return isTranslucent;
-    }
-
-    @Override
-    public boolean hasContainer() {
-        return block instanceof EntityBlock;
-    }
-
-    @Override
-    public boolean isTile() {
-        return block instanceof EntityBlock;
-    }
-
-    @Override
-    public @Nullable FaweCompoundTag defaultTile() {
-        return tile;
+        return !this.blockState.canOcclude();
     }
 
     @Override
     public int getMapColor() {
         // rgb field
-        return block.defaultMapColor().col;
+        return this.block.defaultMapColor().col;
     }
 
 }
