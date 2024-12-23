@@ -48,13 +48,13 @@ import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.internal.registry.InputParser;
+import com.sk89q.worldedit.internal.util.DeprecationUtil;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockCategories;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
@@ -538,13 +538,7 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
             //FAWE end
         }
 
-        if (nbt != null) {
-            BaseBlock result = blockStates.size() > 0 ? state.toBaseBlock(nbt) : new BlanketBaseBlock(state, nbt);
-            return validate(context, result);
-        }
-
-        if (blockType == BlockTypes.SIGN || blockType == BlockTypes.WALL_SIGN
-                || BlockCategories.SIGNS.contains(blockType)) {
+        if (DeprecationUtil.isSign(blockType)) {
             // Allow special sign text syntax
             String[] text = new String[4];
             text[0] = blockAndExtraData.length > 1 ? blockAndExtraData[1] : "";
@@ -552,10 +546,11 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
             text[2] = blockAndExtraData.length > 3 ? blockAndExtraData[3] : "";
             text[3] = blockAndExtraData.length > 4 ? blockAndExtraData[4] : "";
             return validate(context, new SignBlock(state, text));
-        } else if (blockType == BlockTypes.SPAWNER) {
+        } else if (blockType == BlockTypes.SPAWNER && (blockAndExtraData.length > 1 || nbt != null)) {
             // Allow setting mob spawn type
+            String mobName;
             if (blockAndExtraData.length > 1) {
-                String mobName = blockAndExtraData[1];
+                mobName = blockAndExtraData[1];
                 EntityType ent = EntityTypes.get(mobName.toLowerCase(Locale.ROOT));
                 if (ent == null) {
                     throw new NoMatchException(Caption.of("worldedit.error.unknown-entity", TextComponent.of(mobName)));
@@ -564,14 +559,13 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
                 if (!worldEdit.getPlatformManager().queryCapability(Capability.USER_COMMANDS).isValidMobType(mobName)) {
                     throw new NoMatchException(Caption.of("worldedit.error.unknown-mob", TextComponent.of(mobName)));
                 }
-                return validate(context, new MobSpawnerBlock(state, mobName));
             } else {
-                //noinspection ConstantConditions
-                return validate(context, new MobSpawnerBlock(state, EntityTypes.PIG.id()));
+                mobName = EntityTypes.PIG.id();
             }
-        } else if (blockType == BlockTypes.PLAYER_HEAD || blockType == BlockTypes.PLAYER_WALL_HEAD) {
+            return validate(context, new MobSpawnerBlock(state, mobName));
+        } else if ((blockType == BlockTypes.PLAYER_HEAD || blockType == BlockTypes.PLAYER_WALL_HEAD) && (blockAndExtraData.length > 1 || nbt != null)) {
             // allow setting type/player/rotation
-            if (blockAndExtraData.length <= 1) {
+            if (blockAndExtraData.length == 1) {
                 return validate(context, new SkullBlock(state));
             }
 
@@ -580,12 +574,14 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
             return validate(context, new SkullBlock(state, type.replace(" ", "_"))); // valid MC usernames
         } else {
             //FAWE start
-            nbt = state.getNbtData();
+            if (nbt == null) {
+                nbt = state.getNbtData();
+            }
             BaseBlock result;
             if (nbt != null) {
-                result = blockStates.size() > 0 ? state.toBaseBlock(nbt) : new BlanketBaseBlock(state, nbt);
+                result = !blockStates.isEmpty() ? state.toBaseBlock(nbt) : new BlanketBaseBlock(state, nbt);
             } else {
-                result = blockStates.size() > 0 ? new BaseBlock(state) : state.toBaseBlock();
+                result = !blockStates.isEmpty() ? new BaseBlock(state) : state.toBaseBlock();
             }
             return validate(context, result);
             //FAWE end
