@@ -347,7 +347,7 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
     @Override
     public OptionalInt getInternalBlockStateId(BlockState state) {
         PaperweightBlockMaterial material = (PaperweightBlockMaterial) state.getMaterial();
-        net.minecraft.world.level.block.state.BlockState mcState = material.getCraftBlockData().getState();
+        net.minecraft.world.level.block.state.BlockState mcState = material.getState();
         return OptionalInt.of(Block.BLOCK_STATE_REGISTRY.getId(mcState));
     }
 
@@ -440,7 +440,7 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
     @Override
     public <B extends BlockStateHolder<B>> BlockData adapt(B state) {
         PaperweightBlockMaterial material = (PaperweightBlockMaterial) state.getMaterial();
-        return material.getCraftBlockData();
+        return material.getBlockData();
     }
 
     public net.minecraft.world.level.block.state.BlockState adapt(BlockState blockState) {
