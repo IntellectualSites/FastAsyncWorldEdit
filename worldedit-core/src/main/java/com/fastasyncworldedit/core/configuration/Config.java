@@ -19,7 +19,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
-import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -34,7 +33,7 @@ public class Config {
 
     private final Map<String, Object> removedKeyVals = new HashMap<>();
     @Nullable
-    private Map<String, Map.Entry<String, Object>> copyTo = new HashMap<>();
+    private Map<String, FromNode> copyTo = new HashMap<>();
     private boolean performCopyTo = false;
     private List<String> existingMigrateNodes = null;
 
@@ -85,11 +84,11 @@ public class Config {
                     if (copyTo != null) {
                         copyTo.remove(key); // Remove if the config field is already written
                         final Object finalValue = value;
-                        copyTo.replaceAll((copyToNode, entry) -> {
-                            if (!key.equals(entry.getKey())) {
-                                return entry;
+                        copyTo.replaceAll((copyToNode, fromNode) -> {
+                            if (!key.equals(fromNode.node())) {
+                                return fromNode;
                             }
-                            return new AbstractMap.SimpleEntry<>(key, finalValue);
+                            return new FromNode(key, fromNode.computation, finalValue);
                         });
                     }
                     Migrate migrate = field.getAnnotation(Migrate.class);
@@ -234,6 +233,16 @@ public class Config {
 
     }
 
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({ElementType.FIELD})
+    @interface ComputedFrom {
+
+        String node();
+
+        Class<? extends ConfigOptComputation<?>> computer();
+
+    }
+
     @Ignore // This is not part of the config
     public static class ConfigBlock<T> {
 
@@ -319,12 +328,25 @@ public class Config {
                 if (copyTo != null && (copiedFrom = field.getAnnotation(CopiedFrom.class)) != null) {
                     String node = toNodeName(field.getName());
                     node = parentNode == null ? node : parentNode + "." + node;
-                    Map.Entry<String, Object> entry = copyTo.remove(node);
+                    FromNode entry = copyTo.remove(node);
                     Object copiedVal;
                     if (entry == null) {
-                        copyTo.put(node, new AbstractMap.SimpleEntry<>(copiedFrom.value(), null));
-                    } else if ((copiedVal = entry.getValue()) != null) {
+                        copyTo.put(node, new FromNode(copiedFrom.value(), null, null));
+                    } else if ((copiedVal = entry.val()) != null) {
                         field.set(instance, copiedVal);
+                    }
+                }
+                ComputedFrom computedFrom;
+                if (copyTo != null && (computedFrom = field.getAnnotation(ComputedFrom.class)) != null) {
+                    String node = toNodeName(field.getName());
+                    node = parentNode == null ? node : parentNode + "." + node;
+                    FromNode entry = copyTo.remove(node);
+                    Object copiedVal;
+                    if (entry == null) {
+                        copyTo.put(node, new FromNode(computedFrom.node(), computedFrom.computer(), null));
+                    } else if ((copiedVal = entry.val()) != null) {
+                        ConfigOptComputation<?> computer = computedFrom.computer().getDeclaredConstructor().newInstance();
+                        field.set(instance, computer.apply(copiedVal));
                     }
                 }
                 Create create = field.getAnnotation(Create.class);
@@ -511,6 +533,10 @@ public class Config {
             modifiersField.setAccessible(true);
             modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
         }
+    }
+
+    private record FromNode(String node, Class<? extends ConfigOptComputation<?>> computation, Object val) {
+
     }
 
 }
