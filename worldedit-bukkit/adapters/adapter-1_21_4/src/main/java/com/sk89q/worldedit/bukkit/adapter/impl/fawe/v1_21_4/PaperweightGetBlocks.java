@@ -1150,6 +1150,13 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
     }
 
     @Override
+    public boolean hasNonEmptySection(int layer) {
+        layer -= getMinSectionPosition();
+        LevelChunkSection section = getSections(false)[layer];
+        return section != null && !section.hasOnlyAir();
+    }
+
+    @Override
     @SuppressWarnings("unchecked")
     public synchronized boolean trim(boolean aggressive) {
         skyLight = new DataLayer[getSectionCount()];

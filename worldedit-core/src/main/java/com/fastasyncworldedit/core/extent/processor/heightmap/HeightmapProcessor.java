@@ -18,11 +18,10 @@ public class HeightmapProcessor implements IBatchProcessor {
     private static final HeightMapType[] TYPES = HeightMapType.values();
     private static final int BLOCKS_PER_Y_SHIFT = 8; // log2(256)
     private static final int BLOCKS_PER_Y = 256; // 16 x 16
-    private static final boolean[] COMPLETE = new boolean[BLOCKS_PER_Y];
     private static final char[] AIR_LAYER = new char[4096];
+    private static final int NEEDED_UPDATES = TYPES.length * BLOCKS_PER_Y;
 
     static {
-        Arrays.fill(COMPLETE, true);
         Arrays.fill(AIR_LAYER, (char) BlockTypesCache.ReservedIDs.AIR);
     }
 
@@ -49,13 +48,12 @@ public class HeightmapProcessor implements IBatchProcessor {
     public IChunkSet processSet(IChunk chunk, IChunkGet get, IChunkSet set) {
         // each heightmap gets one 16*16 array
         int[][] heightmaps = new int[TYPES.length][BLOCKS_PER_Y];
-        boolean[][] updated = new boolean[TYPES.length][BLOCKS_PER_Y];
-        int skip = 0;
-        int allSkipped = (1 << TYPES.length) - 1; // lowest types.length bits are set
-        layer:
+        byte[] updated = new byte[BLOCKS_PER_Y];
+        int updateCount = 0; // count updates, this way we know when we're finished
+        layerIter:
         for (int layer = maxY >> 4; layer >= minY >> 4; layer--) {
-            boolean hasSectionSet = set.hasSection(layer);
-            boolean hasSectionGet = get.hasSection(layer);
+            boolean hasSectionSet = set.hasNonEmptySection(layer);
+            boolean hasSectionGet = get.hasNonEmptySection(layer);
             if (!(hasSectionSet || hasSectionGet)) {
                 continue;
             }
@@ -78,7 +76,7 @@ public class HeightmapProcessor implements IBatchProcessor {
                     if (ordinal == BlockTypesCache.ReservedIDs.__RESERVED__) {
                         if (!hasSectionGet) {
                             if (!hasSectionSet) {
-                                continue layer;
+                                continue layerIter;
                             }
                             continue;
                         } else if (getSection == null) {
@@ -88,7 +86,7 @@ public class HeightmapProcessor implements IBatchProcessor {
                                     || Arrays.equals(getSection, AIR_LAYER)) {
                                 hasSectionGet = false;
                                 if (!hasSectionSet) {
-                                    continue layer;
+                                    continue layerIter;
                                 }
                                 continue;
                             }
@@ -103,30 +101,26 @@ public class HeightmapProcessor implements IBatchProcessor {
                     if (block == null) {
                         continue;
                     }
+                    byte updateStateAtJ = updated[j];
                     for (int i = 0; i < TYPES.length; i++) {
-                        if ((skip & (1 << i)) != 0) {
-                            continue; // skip finished height map
+                        int bitFlag = 1 << i;
+                        if ((updateStateAtJ & bitFlag) != 0) {
+                            continue; // skip finished height map at this column
                         }
                         HeightMapType type = TYPES[i];
                         // ignore if that position was already set
-                        if (!updated[i][j] && type.includes(block)) {
+                        if (type.includes(block)) {
                             // mc requires + 1, heightmaps are normalized internally, thus we need to "zero" them.
                             heightmaps[i][j] = ((layer - get.getMinSectionPosition()) << 4) + y + 1;
-                            updated[i][j] = true; // mark as updated
+                            updated[j] |= (byte) bitFlag; // mark as updated
+                            if (++updateCount == NEEDED_UPDATES) {
+                                break layerIter; // all heightmaps in all columns updated
+                            }
+
                         }
                     }
                 }
             }
-            for (int i = 0; i < updated.length; i++) {
-                if ((skip & (1 << i)) == 0 // if already true, skip array equality check
-                        && Arrays.equals(updated[i], COMPLETE)) {
-                    skip |= 1 << i;
-                }
-            }
-            if (skip != allSkipped) {
-                continue;
-            }
-            break; // all maps are processed
         }
         for (int i = 0; i < TYPES.length; i++) {
             set.setHeightMap(TYPES[i], heightmaps[i]);
