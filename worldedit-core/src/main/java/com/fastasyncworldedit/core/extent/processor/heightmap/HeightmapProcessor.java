@@ -50,7 +50,7 @@ public class HeightmapProcessor implements IBatchProcessor {
         int[][] heightmaps = new int[TYPES.length][BLOCKS_PER_Y];
         byte[] updated = new byte[BLOCKS_PER_Y];
         int updateCount = 0; // count updates, this way we know when we're finished
-        layer:
+        layerIter:
         for (int layer = maxY >> 4; layer >= minY >> 4; layer--) {
             boolean hasSectionSet = set.hasNonEmptySection(layer);
             boolean hasSectionGet = get.hasNonEmptySection(layer);
@@ -76,7 +76,7 @@ public class HeightmapProcessor implements IBatchProcessor {
                     if (ordinal == BlockTypesCache.ReservedIDs.__RESERVED__) {
                         if (!hasSectionGet) {
                             if (!hasSectionSet) {
-                                continue layer;
+                                continue layerIter;
                             }
                             continue;
                         } else if (getSection == null) {
@@ -86,7 +86,7 @@ public class HeightmapProcessor implements IBatchProcessor {
                                     || Arrays.equals(getSection, AIR_LAYER)) {
                                 hasSectionGet = false;
                                 if (!hasSectionSet) {
-                                    continue layer;
+                                    continue layerIter;
                                 }
                                 continue;
                             }
@@ -114,7 +114,7 @@ public class HeightmapProcessor implements IBatchProcessor {
                             heightmaps[i][j] = ((layer - get.getMinSectionPosition()) << 4) + y + 1;
                             updated[j] |= (byte) bitFlag; // mark as updated
                             if (++updateCount == NEEDED_UPDATES) {
-                                break layer; // all heightmaps in all columns updated
+                                break layerIter; // all heightmaps in all columns updated
                             }
 
                         }
