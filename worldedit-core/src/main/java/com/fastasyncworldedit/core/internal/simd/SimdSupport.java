@@ -54,7 +54,7 @@ public class SimdSupport {
                 if (base == null) {
                     yield null;
                 }
-                yield (set, get) -> base.compareVector(set, get).not();
+                yield (set, get, species) -> base.compareVector(set, get, species).not();
             }
             default -> null;
         };
@@ -62,15 +62,15 @@ public class SimdSupport {
 
     private static VectorizedMask vectorizedTargetMaskNonAir() {
         // everything > VOID_AIR is not air
-        return (set, get) -> get.compare(VectorOperators.UNSIGNED_GT, BlockTypesCache.ReservedIDs.VOID_AIR);
+        return (set, get, species) -> get.get(species).compare(VectorOperators.UNSIGNED_GT, BlockTypesCache.ReservedIDs.VOID_AIR);
     }
 
     private static VectorizedMask vectorizedTargetMask(char ordinal) {
-        return (set, get) -> get.compare(VectorOperators.EQ, (short) ordinal);
+        return (set, get, species) -> get.get(species).compare(VectorOperators.EQ, (short) ordinal);
     }
 
     private static VectorizedMask vectorizedTargetMaskInverse(char ordinal) {
-        return (set, get) -> get.compare(VectorOperators.NE, (short) ordinal);
+        return (set, get, species) -> get.get(species).compare(VectorOperators.NE, (short) ordinal);
     }
 
     public static @Nullable VectorizedFilter vectorizedPattern(Pattern pattern) {
@@ -102,14 +102,16 @@ public class SimdSupport {
         }
 
         @Override
-        public ShortVector applyVector(final ShortVector get, final ShortVector set, VectorMask<Short> mask) {
-            // only change the lanes the mask dictates us to change, keep the rest
-            return set.blend(ShortVector.broadcast(ShortVector.SPECIES_PREFERRED, ordinal), mask);
+        public Filter newInstance(final Filter other) {
+            return new VectorizedPattern<>(other, ordinal);
         }
 
         @Override
-        public Filter newInstance(final Filter other) {
-            return new VectorizedPattern<>(other, ordinal);
+        public void applyVector(final VectorFacade get, final VectorFacade set, final VectorMask<Short> mask) {
+            ShortVector s = set.getOrZero(mask.vectorSpecies());
+            // only change the lanes the mask dictates us to change, keep the rest
+            s = s.blend(ShortVector.broadcast(ShortVector.SPECIES_PREFERRED, ordinal), mask);
+            set.setOrIgnore(s);
         }
 
     }

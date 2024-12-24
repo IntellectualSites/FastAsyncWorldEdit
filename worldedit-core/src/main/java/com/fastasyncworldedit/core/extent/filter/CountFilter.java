@@ -1,8 +1,8 @@
 package com.fastasyncworldedit.core.extent.filter;
 
 import com.fastasyncworldedit.core.extent.filter.block.FilterBlock;
+import com.fastasyncworldedit.core.internal.simd.VectorFacade;
 import com.fastasyncworldedit.core.internal.simd.VectorizedFilter;
-import jdk.incubator.vector.ShortVector;
 import jdk.incubator.vector.VectorMask;
 
 public class CountFilter extends ForkedFilter<CountFilter> implements VectorizedFilter {
@@ -37,9 +37,8 @@ public class CountFilter extends ForkedFilter<CountFilter> implements Vectorized
     }
 
     @Override
-    public ShortVector applyVector(final ShortVector get, final ShortVector set, VectorMask<Short> mask) {
+    public void applyVector(final VectorFacade get, final VectorFacade set, final VectorMask<Short> mask) {
         total += mask.trueCount();
-        return set;
     }
 
 }

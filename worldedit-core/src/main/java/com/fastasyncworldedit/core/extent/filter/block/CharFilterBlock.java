@@ -37,14 +37,14 @@ public class CharFilterBlock extends ChunkFilterBlock {
 
     private int maxLayer;
     private int minLayer;
-    private CharGetBlocks get;
-    private IChunkSet set;
+    protected CharGetBlocks get;
+    protected IChunkSet set;
     protected char[] getArr;
     @Nullable
     protected char[] setArr;
     protected SetDelegate delegate;
     // local
-    private int layer;
+    protected int layer;
     private int index;
     private int x;
     private int y;
