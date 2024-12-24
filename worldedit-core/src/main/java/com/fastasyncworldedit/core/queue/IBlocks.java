@@ -38,6 +38,17 @@ public interface IBlocks extends Trimable {
     boolean hasSection(int layer);
 
     /**
+     * {@return whether the chunk has a section that has any non-air/reserved blocks}
+     * This method might be conservative and return {@code true} even if the section is empty.
+     *
+     * @param layer the section's layer
+     * @since TODO
+     */
+    default boolean hasNonEmptySection(int layer) {
+        return hasSection(layer);
+    }
+
+    /**
      * Obtain the specified chunk section stored as an array of ordinals. Uses normal minecraft chunk-section position indices
      * (length 4096). Operations synchronises on the section and will load the section into memory if not present. For chunk
      * GET operations, this will load the data from the world. For chunk SET, this will create a new empty array.
