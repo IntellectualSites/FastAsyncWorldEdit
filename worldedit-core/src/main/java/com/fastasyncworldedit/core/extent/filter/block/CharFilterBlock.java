@@ -410,6 +410,11 @@ public class CharFilterBlock extends ChunkFilterBlock {
     }
 
     @Override
+    public BiomeType getBiome(final BlockVector3 position) {
+        return this.getBiomeType(position.x(), position.y(), position.z());
+    }
+
+    @Override
     public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block)
             throws WorldEditException {
         return getExtent().setBlock(x, y, z, block);

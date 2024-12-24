@@ -954,7 +954,8 @@ public class TextureUtil implements TextureHolder {
                             }
                         }
                         if (entry == null) {
-                            LOGGER.error("Cannot find {} in {}", modelsDir, file);
+                            final String[] dirs = Arrays.stream(modelsDir).map(s -> String.format(s, nameSpace, name)).toArray(String[]::new);
+                            LOGGER.error("Cannot find {} in {}", dirs, file);
                             continue;
                         }
 
