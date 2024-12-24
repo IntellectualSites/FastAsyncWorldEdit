@@ -172,6 +172,15 @@ public class MinecraftStructure implements ClipboardReader, ClipboardWriter {
         return clipboard;
     }
 
+
+    /**
+     * @deprecated owner is not used anymore, use {@link #write(Clipboard)}
+     */
+    @Deprecated(since = "TODO")
+    public void write(Clipboard clipboard, @SuppressWarnings("unused") String owner) throws IOException {
+        this.write(clipboard);
+    }
+
     @Override
     public void write(Clipboard clipboard) throws IOException {
         clipboard.flush();
