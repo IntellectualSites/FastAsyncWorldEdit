@@ -37,8 +37,12 @@ import java.util.stream.Collectors;
 
 /**
  * Represents a sign block.
+ *
+ * @deprecated WorldEdit does not handle interpreting NBT,
+ *     deprecated for removal without replacement
  */
-public class SignBlock extends BaseBlock {
+@Deprecated
+public class SignBlock extends LegacyBaseBlockWrapper {
 
     private String[] text;
 
@@ -93,6 +97,7 @@ public class SignBlock extends BaseBlock {
     }
 
     @Override
+    @Deprecated
     public boolean hasNbtData() {
         return true;
     }
@@ -103,6 +108,7 @@ public class SignBlock extends BaseBlock {
     }
 
     @Override
+    @Deprecated
     public CompoundTag getNbtData() {
         Map<String, Tag<?, ?>> values = new HashMap<>();
         if (isLegacy()) {
@@ -111,7 +117,7 @@ public class SignBlock extends BaseBlock {
             values.put("Text3", new StringTag(text[2]));
             values.put("Text4", new StringTag(text[3]));
         } else {
-            ListTag messages = new ListTag(StringTag.class, Arrays.stream(text).map(StringTag::new).collect(Collectors.toList()));
+            ListTag<?, ?> messages = new ListTag<>(StringTag.class, Arrays.stream(text).map(StringTag::new).collect(Collectors.toList()));
             Map<String, Tag<?, ?>> frontTextTag = new HashMap<>();
             frontTextTag.put("messages", messages);
             values.put("front_text", new CompoundTag(frontTextTag));
@@ -120,6 +126,7 @@ public class SignBlock extends BaseBlock {
     }
 
     @Override
+    @Deprecated
     public void setNbtData(CompoundTag rootTag) {
         if (rootTag == null) {
             return;
@@ -158,7 +165,7 @@ public class SignBlock extends BaseBlock {
             }
         } else {
             CompoundTag frontTextTag = (CompoundTag) values.get("front_text");
-            ListTag messagesTag = frontTextTag.getListTag("messages");
+            ListTag<?, ?> messagesTag = frontTextTag.getListTag("messages");
             for (int i = 0; i < messagesTag.getValue().size(); i++) {
                 StringTag tag = (StringTag) messagesTag.getValue().get(i);
                 text[i] = tag.getValue();
