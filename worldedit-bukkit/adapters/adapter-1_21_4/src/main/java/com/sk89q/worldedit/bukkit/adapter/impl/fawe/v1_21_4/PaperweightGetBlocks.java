@@ -1,6 +1,6 @@
 package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_21_4;
 
-import com.fastasyncworldedit.bukkit.adapter.BukkitGetBlocks;
+import com.fastasyncworldedit.bukkit.adapter.AbstractBukkitGetBlocks;
 import com.fastasyncworldedit.bukkit.adapter.DelegateSemaphore;
 import com.fastasyncworldedit.bukkit.adapter.NativeEntityFunctionSet;
 import com.fastasyncworldedit.core.Fawe;
@@ -11,14 +11,9 @@ import com.fastasyncworldedit.core.internal.exception.FaweException;
 import com.fastasyncworldedit.core.math.BitArrayUnstretched;
 import com.fastasyncworldedit.core.math.IntPair;
 import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
-import com.fastasyncworldedit.core.queue.IChunk;
-import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.IChunkSet;
-import com.fastasyncworldedit.core.queue.IQueueExtent;
 import com.fastasyncworldedit.core.queue.implementation.QueueHandler;
-import com.fastasyncworldedit.core.queue.implementation.blocks.CharGetBlocks;
 import com.fastasyncworldedit.core.util.MathMan;
-import com.fastasyncworldedit.core.util.MemUtil;
 import com.fastasyncworldedit.core.util.NbtUtils;
 import com.fastasyncworldedit.core.util.collection.AdaptedMap;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
@@ -92,18 +87,16 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Function;
 
 import static net.minecraft.core.registries.Registries.BIOME;
 
-public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBlocks {
+public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, LevelChunk> {
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
 
@@ -115,86 +108,27 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
             .getInstance()
             .getBukkitImplAdapter());
     private final ReadWriteLock sectionLock = new ReentrantReadWriteLock();
-    private final ReentrantLock callLock = new ReentrantLock();
-    private final ServerLevel serverLevel;
-    private final int chunkX;
-    private final int chunkZ;
-    private final IntPair chunkPos;
-    private final int minHeight;
-    private final int maxHeight;
-    private final int minSectionPosition;
-    private final int maxSectionPosition;
     private final Registry<Biome> biomeRegistry;
     private final IdMap<Holder<Biome>> biomeHolderIdMap;
-    private final ConcurrentHashMap<Integer, PaperweightGetBlocks_Copy> copies = new ConcurrentHashMap<>();
     private final Object sendLock = new Object();
     private LevelChunkSection[] sections;
     private LevelChunk levelChunk;
     private DataLayer[] blockLight;
     private DataLayer[] skyLight;
-    private boolean createCopy = false;
-    private boolean forceLoadSections = true;
     private boolean lightUpdate = false;
-    private int copyKey = 0;
 
     public PaperweightGetBlocks(World world, int chunkX, int chunkZ) {
         this(((CraftWorld) world).getHandle(), chunkX, chunkZ);
     }
 
     public PaperweightGetBlocks(ServerLevel serverLevel, int chunkX, int chunkZ) {
-        super(serverLevel.getMinY() >> 4, (serverLevel.getMaxY() - 1) >> 4);
-        this.serverLevel = serverLevel;
-        this.chunkX = chunkX;
-        this.chunkZ = chunkZ;
-        this.minHeight = serverLevel.getMinY();
-        this.maxHeight = serverLevel.getMaxY() - 1; // Minecraft max limit is exclusive.
+        super(serverLevel, chunkX, chunkZ, serverLevel.getMinY(), serverLevel.getMaxY() - 1);
         this.minSectionPosition = minHeight >> 4;
         this.maxSectionPosition = maxHeight >> 4;
         this.skyLight = new DataLayer[getSectionCount()];
         this.blockLight = new DataLayer[getSectionCount()];
         this.biomeRegistry = serverLevel.registryAccess().lookupOrThrow(BIOME);
         this.biomeHolderIdMap = biomeRegistry.asHolderIdMap();
-        this.chunkPos = new IntPair(chunkX, chunkZ);
-    }
-
-    @Override
-    public int getX() {
-        return chunkX;
-    }
-
-    @Override
-    public int getZ() {
-        return chunkZ;
-    }
-
-    @Override
-    public boolean isCreateCopy() {
-        return createCopy;
-    }
-
-    @Override
-    public int setCreateCopy(boolean createCopy) {
-        if (!callLock.isHeldByCurrentThread()) {
-            throw new IllegalStateException("Attempting to set if chunk GET should create copy, but it is not call-locked.");
-        }
-        this.createCopy = createCopy;
-        // Increment regardless of whether copy will be created or not to return null from getCopy()
-        return ++this.copyKey;
-    }
-
-    @Override
-    public IChunkGet getCopy(final int key) {
-        return copies.remove(key);
-    }
-
-    @Override
-    public void lockCall() {
-        this.callLock.lock();
-    }
-
-    @Override
-    public void unlockCall() {
-        this.callLock.unlock();
     }
 
     @Override
@@ -229,16 +163,6 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
         Heightmap.Types nativeType = Heightmap.Types.valueOf(type.name());
         Heightmap heightMap = getChunk().heightmaps.get(nativeType);
         heightMap.setRawData(getChunk(), nativeType, bitArray.getData());
-    }
-
-    @Override
-    public int getMaxY() {
-        return maxHeight;
-    }
-
-    @Override
-    public int getMinY() {
-        return minHeight;
     }
 
     @Override
@@ -359,7 +283,6 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
 
     @Override
     public @Nullable FaweCompoundTag entity(final UUID uuid) {
-        ensureLoaded(serverLevel, chunkX, chunkZ);
         List<Entity> entities = PaperweightPlatformAdapter.getEntities(getChunk());
         Entity entity = null;
         for (Entity e : entities) {
@@ -382,7 +305,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
 
     @Override
     public Collection<FaweCompoundTag> entities() {
-        List<Entity> entities = PaperweightPlatformAdapter.getEntities(ensureLoaded(serverLevel, chunkX, chunkZ));
+        List<Entity> entities = PaperweightPlatformAdapter.getEntities(getChunk());
         if (entities.isEmpty()) {
             return Collections.emptyList();
         }
@@ -395,7 +318,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
 
     @Override
     public Set<com.sk89q.worldedit.entity.Entity> getFullEntities() {
-        List<Entity> entities = PaperweightPlatformAdapter.getEntities(ensureLoaded(serverLevel, chunkX, chunkZ));
+        List<Entity> entities = PaperweightPlatformAdapter.getEntities(getChunk());
         if (entities.isEmpty()) {
             return Collections.emptySet();
         }
@@ -406,69 +329,13 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
         entity.discard();
     }
 
-    public CompletableFuture<LevelChunk> ensureLoaded(ServerLevel nmsWorld, int chunkX, int chunkZ) {
+    @Override
+    public CompletableFuture<LevelChunk> ensureLoaded(ServerLevel nmsWorld) {
         return PaperweightPlatformAdapter.ensureLoaded(nmsWorld, chunkX, chunkZ);
     }
 
     @Override
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    public synchronized <T extends Future<T>> T call(IQueueExtent<? extends IChunk> owner, IChunkSet set, Runnable finalizer) {
-        if (!callLock.isHeldByCurrentThread()) {
-            throw new IllegalStateException("Attempted to call chunk GET but chunk was not call-locked.");
-        }
-        forceLoadSections = false;
-        final ServerLevel nmsWorld = serverLevel;
-        CompletableFuture<LevelChunk> nmsChunkFuture = ensureLoaded(nmsWorld, chunkX, chunkZ);
-        LevelChunk chunk = nmsChunkFuture.getNow(null);
-        if ((chunk == null && MemUtil.shouldBeginSlow()) || Settings.settings().QUEUE.ASYNC_CHUNK_LOAD_WRITE) {
-            try {
-                // "Artificially" slow FAWE down if memory low as performing the operation async can cause large amounts of
-                // memory usage
-                chunk = nmsChunkFuture.get();
-            } catch (InterruptedException | ExecutionException e) {
-                LOGGER.error("Could not get chunk at {},{} whilst low memory", chunkX, chunkZ, e);
-                throw new FaweException(
-                        TextComponent.of("Could not get chunk at " + chunkX + "," + chunkZ + " whilst low memory: " + e.getMessage()));
-            }
-        }
-        final int finalCopyKey = copyKey;
-        // Run immediately if possible
-        if (chunk != null) {
-            return tryWrappedInternalCall(set, finalizer, finalCopyKey, chunk, nmsWorld);
-        }
-        // Submit via the STQE as that will help handle excessive queuing by waiting for the submission count to fall below the
-        // target size
-        nmsChunkFuture.thenApply(nmsChunk -> owner.submitTaskUnchecked(() -> (T) tryWrappedInternalCall(
-                set,
-                finalizer,
-                finalCopyKey,
-                nmsChunk,
-                nmsWorld
-        )));
-        // If we have re-submitted, return a completed future to prevent potential deadlocks where a future reliant on the
-        // above submission is halting the BlockingExecutor, and preventing the above task from actually running. The futures
-        // submitted above will still be added to the STQE submissions.
-        return (T) (Future) CompletableFuture.completedFuture(null);
-    }
-
-    private <T extends Future<T>> T tryWrappedInternalCall(
-            IChunkSet set,
-            Runnable finalizer,
-            int copyKey,
-            LevelChunk nmsChunk,
-            ServerLevel nmsWorld
-    ) {
-        try {
-            return internalCall(set, finalizer, copyKey, nmsChunk, nmsWorld);
-        } catch (Throwable e) {
-            LOGGER.error("Error performing chunk call at chunk {},{}", chunkX, chunkZ, e);
-            return null;
-        } finally {
-            forceLoadSections = true;
-        }
-    }
-
-    private <T extends Future<T>> T internalCall(
+    protected <T extends Future<T>> T internalCall(
             IChunkSet set,
             Runnable finalizer,
             int copyKey,
@@ -1092,7 +959,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                 levelChunk = this.levelChunk;
                 if (levelChunk == null) {
                     try {
-                        this.levelChunk = levelChunk = ensureLoaded(this.serverLevel, chunkX, chunkZ).get();
+                        this.levelChunk = levelChunk = ensureLoaded(this.serverLevel).get();
                     } catch (InterruptedException | ExecutionException e) {
                         LOGGER.error("Could not get chunk at {},{}", chunkX, chunkZ, e);
                         throw new FaweException(
