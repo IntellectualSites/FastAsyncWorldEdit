@@ -1004,12 +1004,7 @@ public class SchematicCommands {
                     uri = ((URIClipboardHolder) holder).getURI(clipboard);
                 }
                 if (new ActorSaveClipboardEvent(actor, clipboard, uri, file.toURI()).call()) {
-                    if (writer instanceof MinecraftStructure) {
-                        ((MinecraftStructure) writer).write(target, actor.getName());
-                    } else {
-                        writer.write(target);
-                    }
-
+                    writer.write(target);
                     closer.close(); // release the new .schem file so that its size can be measured
                     double filesizeKb = Files.size(Paths.get(file.getAbsolutePath())) / 1000.0;
 
