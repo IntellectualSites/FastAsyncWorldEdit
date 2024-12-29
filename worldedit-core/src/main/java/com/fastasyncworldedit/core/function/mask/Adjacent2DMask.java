@@ -8,7 +8,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 /**
  * Mask that tests adjacency only in 2D/the same y-level
  *
- * @since TODO
+ * @since 2.12.3
  */
 public class Adjacent2DMask extends AbstractMask {
 
@@ -23,7 +23,7 @@ public class Adjacent2DMask extends AbstractMask {
      * @param mask Mask required to be adjacent
      * @param requiredMin Minimum number of positive adjacency matches required
      * @param requiredMax Maximum number of positive adjacency matches  required
-     * @since TODO
+     * @since 2.12.3
      */
     public Adjacent2DMask(Mask mask, int requiredMin, int requiredMax) {
         this.mask = mask;

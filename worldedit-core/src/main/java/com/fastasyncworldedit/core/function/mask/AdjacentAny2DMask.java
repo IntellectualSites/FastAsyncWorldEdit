@@ -10,7 +10,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 /**
  * Optimized version of {@link Adjacent2DMask} for testing for any single adjacency
  *
- * @since TODO
+ * @since 2.12.3
  */
 public class AdjacentAny2DMask extends AbstractMask {
 
@@ -21,7 +21,7 @@ public class AdjacentAny2DMask extends AbstractMask {
      * Optimized version of {@link Adjacent2DMask} for testing for any single adjacency. Caches results of the adjacent mask
      *
      * @param mask Mask required to be adjacent
-     * @since TODO
+     * @since 2.12.3
      */
     public AdjacentAny2DMask(Mask mask) {
         this(mask, true);
@@ -32,7 +32,7 @@ public class AdjacentAny2DMask extends AbstractMask {
      *
      * @param mask  Mask required to be adjacent
      * @param cache If the result of the adjacency mask should be cached
-     * @since TODO
+     * @since 2.12.3
      */
     public AdjacentAny2DMask(Mask mask, boolean cache) {
         this.mask = cache ? CachedMask.cache(mask) : mask;
@@ -61,7 +61,7 @@ public class AdjacentAny2DMask extends AbstractMask {
      *
      * @param extent   extent to test in
      * @param position position to test at
-     * @since TODO
+     * @since 2.12.3
      */
     public boolean test(Extent extent, BlockVector3 position) {
         if (!(mask instanceof AbstractExtentMask extentMask)) {

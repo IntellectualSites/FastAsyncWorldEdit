@@ -422,7 +422,7 @@ public final class EditSessionBuilder {
     /**
      * Set the side effects to be used with this edit
      *
-     * @since TODO
+     * @since 2.12.3
      */
     public EditSessionBuilder setSideEffectSet(@Nullable SideEffectSet sideEffectSet) {
         this.sideEffectSet = sideEffectSet;
@@ -756,7 +756,7 @@ public final class EditSessionBuilder {
     /**
      * Get the SideEffectSet that will be used
      *
-     * @since TODO
+     * @since 2.12.3
      */
     public SideEffectSet getSideEffectSet() {
         return sideEffectSet;

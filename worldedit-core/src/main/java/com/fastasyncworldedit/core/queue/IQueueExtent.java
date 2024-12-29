@@ -85,14 +85,14 @@ public interface IQueueExtent<T extends IChunk> extends Flushable, Trimable, ICh
     /**
      * Set the side effects to be used with this extent
      *
-     * @since TODO
+     * @since 2.12.3
      */
     void setSideEffectSet(SideEffectSet sideEffectSet);
 
     /**
      * Get the side effects to be used with this extent
      *
-     * @since TODO
+     * @since 2.12.3
      */
     SideEffectSet getSideEffectSet();
 

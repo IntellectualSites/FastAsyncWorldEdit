@@ -284,7 +284,7 @@ public interface Platform extends Keyed {
      * Returns an {@link PlacementStateProcessor} instance for processing placed blocks to "fix" them. Optional region to
      * prevent any changes outside of, as sometimes block neighbours will also be updated otherwise.
      *
-     * @since TODO
+     * @since 2.12.3
      */
     default PlacementStateProcessor getPlatformPlacementProcessor(Extent extent, BlockTypeMask mask, @Nullable Region region) {
         return null;

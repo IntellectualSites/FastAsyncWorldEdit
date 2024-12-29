@@ -64,7 +64,7 @@ public class SideEffectSet {
     /**
      * Create a new {@link SideEffectSet} with the given side effect set to "on"
      *
-     * @since TODO
+     * @since 2.12.3
      */
     public SideEffectSet with(SideEffect sideEffect) {
         return with(sideEffect, SideEffect.State.ON);
@@ -73,7 +73,7 @@ public class SideEffectSet {
     /**
      * Create a new {@link SideEffectSet} with the given side effect set to "off"
      *
-     * @since TODO
+     * @since 2.12.3
      */
     public SideEffectSet without(SideEffect sideEffect) {
         return with(sideEffect, SideEffect.State.OFF);
@@ -134,7 +134,7 @@ public class SideEffectSet {
      *  - Neighbours
      *  - Lighting (if set to mode 0 in config
      *
-     * @since TODO
+     * @since 2.12.3
      */
     public static SideEffectSet api() {
         return defaults().without(SideEffect.HISTORY);

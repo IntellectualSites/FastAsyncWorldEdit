@@ -70,13 +70,13 @@ public class MinecraftStructure implements ClipboardReader, ClipboardWriter {
     }
 
     @SuppressWarnings("removal")
-    @Deprecated(since = "TODO")
+    @Deprecated(since = "2.12.3")
     public MinecraftStructure(@Nonnull com.sk89q.jnbt.NBTInputStream inputStream) {
         this.in = inputStream.dataInputStream();
     }
 
     @SuppressWarnings("removal")
-    @Deprecated(since = "TODO")
+    @Deprecated(since = "2.12.3")
     public MinecraftStructure(@Nonnull com.sk89q.jnbt.NBTOutputStream out) {
         this.out = out;
     }
@@ -176,7 +176,7 @@ public class MinecraftStructure implements ClipboardReader, ClipboardWriter {
     /**
      * @deprecated owner is not used anymore, use {@link #write(Clipboard)}
      */
-    @Deprecated(since = "TODO")
+    @Deprecated(since = "2.12.3")
     public void write(Clipboard clipboard, @SuppressWarnings("unused") String owner) throws IOException {
         this.write(clipboard);
     }

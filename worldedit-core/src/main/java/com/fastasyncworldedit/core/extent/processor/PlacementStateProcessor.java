@@ -42,7 +42,7 @@ import java.util.stream.Collectors;
 /**
  * Processor/pattern that uses Minecraft internal methods to determine the shape of blocks, e.g. stairs and fences
  *
- * @since TODO
+ * @since 2.12.3
  */
 public abstract class PlacementStateProcessor extends AbstractDelegateExtent implements IBatchProcessor, Pattern {
 
@@ -76,7 +76,7 @@ public abstract class PlacementStateProcessor extends AbstractDelegateExtent imp
      *
      * @param extent Extent to use
      * @param mask   Mask of blocks to perform updates on
-     * @since TODO
+     * @since 2.12.3
      */
     public PlacementStateProcessor(Extent extent, BlockTypeMask mask, Region region) {
         super(extent);

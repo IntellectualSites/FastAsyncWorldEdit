@@ -143,14 +143,14 @@ public interface IChunkSet extends IBlocks, OutputExtent {
     /**
      * Set the side effects to be used when settings these blocks
      *
-     * @since TODO
+     * @since 2.12.3
      */
     void setSideEffectSet(@Nonnull SideEffectSet sideEffectSet);
 
     /**
      * Get the side effects to be used when settings these blocks
      *
-     * @since TODO
+     * @since 2.12.3
      */
     @Nonnull
     SideEffectSet getSideEffectSet();

@@ -59,7 +59,7 @@ public class BlockCategoryMask extends AbstractExtentMask {
     /**
      * Test a specific block against this category mask
      *
-     * @since TODO
+     * @since 2.12.3
      */
     public <B extends BlockStateHolder<B>> boolean test(B blockStateHolder) {
         return category.contains(blockStateHolder);

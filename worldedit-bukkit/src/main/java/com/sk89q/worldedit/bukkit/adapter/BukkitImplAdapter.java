@@ -407,7 +407,7 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
 
     /**
      * Returns an {@link PlacementStateProcessor} instance for processing placed blocks to "fix" them.
-     * @since TODO
+     * @since 2.12.3
      */
     default PlacementStateProcessor getPlatformPlacementProcessor(Extent extent, BlockTypeMask mask, Region region) {
         return null;

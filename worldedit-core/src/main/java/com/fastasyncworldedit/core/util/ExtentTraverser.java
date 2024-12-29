@@ -28,7 +28,7 @@ public class ExtentTraverser<T extends Extent> {
     /**
      * Get the world backing the given extent, if present, else null.
      *
-     * @since TODO
+     * @since 2.12.3
      */
     @Nullable
     public static World getWorldFromExtent(Extent extent) {

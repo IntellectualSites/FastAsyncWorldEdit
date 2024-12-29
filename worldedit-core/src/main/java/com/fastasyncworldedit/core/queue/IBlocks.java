@@ -42,7 +42,7 @@ public interface IBlocks extends Trimable {
      * This method might be conservative and return {@code true} even if the section is empty.
      *
      * @param layer the section's layer
-     * @since TODO
+     * @since 2.12.3
      */
     default boolean hasNonEmptySection(int layer) {
         return hasSection(layer);

@@ -361,7 +361,7 @@ public enum Direction {
     /**
      * Get the directions associated with the given block state, e.g. the connections a fence makes or the direction stairs face
      *
-     * @since TODO
+     * @since 2.12.3
      */
     public static EnumSet<Direction> getDirections(BlockState state) {
         EnumSet<Direction> directions = EnumSet.noneOf(Direction.class);

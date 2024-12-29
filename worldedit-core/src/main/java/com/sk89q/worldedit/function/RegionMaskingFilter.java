@@ -56,7 +56,7 @@ public class RegionMaskingFilter implements RegionFunction {
      * @param function the function
      */
     //FAWE start - Extent
-    @Deprecated(since = "TODO")
+    @Deprecated(since = "2.12.3")
     public RegionMaskingFilter(@SuppressWarnings("unused") Extent extent, Mask mask, RegionFunction function) {
         this(mask, function);
     }
