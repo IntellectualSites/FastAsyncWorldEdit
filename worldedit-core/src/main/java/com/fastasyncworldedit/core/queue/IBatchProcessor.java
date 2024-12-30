@@ -51,7 +51,18 @@ public interface IBatchProcessor {
     }
 
     /**
-     * Convert this processor into an Extent based processor instead of a queue batch based one.
+     * Process a chunk GET. Method typically only called when a chunk is loaded into memory (miss from
+     * {@link com.fastasyncworldedit.core.queue.implementation.SingleThreadQueueExtent cache}).
+     *
+     * @param get GET chunk loaded
+     * @return processed get chunk
+     */
+    default IChunkGet processGet(IChunkGet get) {
+        return get;
+    }
+
+    /**
+     * Convert this processor into an Extent based processor instead of a queue batch based on.
      */
     @Nullable
     Extent construct(Extent child);

@@ -94,7 +94,7 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
 
     @Override
     public IChunkGet getCachedGet(int chunkX, int chunkZ) {
-        return cacheGet.get(chunkX, chunkZ);
+        return processGet(cacheGet.get(chunkX, chunkZ));
     }
 
     @Override
@@ -187,7 +187,7 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
             };
         }
         if (set == null) {
-            set = (x, z) -> CharSetBlocks.newInstance();
+            set = (x, z) -> CharSetBlocks.newInstance(x, z);
         }
         this.cacheGet = get;
         this.cacheSet = set;
