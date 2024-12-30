@@ -1,5 +1,6 @@
 package com.fastasyncworldedit.bukkit.adapter;
 
+import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.internal.exception.FaweException;
 import com.fastasyncworldedit.core.math.IntPair;
@@ -7,12 +8,14 @@ import com.fastasyncworldedit.core.queue.IChunk;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.IChunkSet;
 import com.fastasyncworldedit.core.queue.IQueueExtent;
+import com.fastasyncworldedit.core.queue.implementation.QueueHandler;
 import com.fastasyncworldedit.core.queue.implementation.blocks.CharGetBlocks;
 import com.fastasyncworldedit.core.util.MemUtil;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import org.apache.logging.log4j.Logger;
 
+import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
@@ -36,7 +39,7 @@ public abstract class AbstractBukkitGetBlocks<ServerLevel, LevelChunk> extends C
     protected int copyKey = 0;
 
     protected AbstractBukkitGetBlocks(
-            ServerLevel serverLevel, int chunkX, int chunkZ, int minY,  int maxY
+            ServerLevel serverLevel, int chunkX, int chunkZ, int minY, int maxY
     ) {
         super(minY >> 4, maxY >> 4);
         this.serverLevel = serverLevel;
@@ -115,6 +118,44 @@ public abstract class AbstractBukkitGetBlocks<ServerLevel, LevelChunk> extends C
         } finally {
             forceLoadSections = true;
         }
+    }
+
+    protected <T extends Future<T>> T handleCallFinalizer(Runnable[] syncTasks, Runnable callback, Runnable finalizer) throws
+            Exception {
+        if (syncTasks != null) {
+            QueueHandler queueHandler = Fawe.instance().getQueueHandler();
+            Runnable[] finalSyncTasks = syncTasks;
+
+            // Chain the sync tasks and the callback
+            Callable<Future<?>> chain = () -> {
+                try {
+                    // Run the sync tasks
+                    for (Runnable task : finalSyncTasks) {
+                        if (task != null) {
+                            task.run();
+                        }
+                    }
+                    if (callback != null) {
+                        return queueHandler.async(callback, null);
+                    } else if (finalizer != null) {
+                        return queueHandler.async(finalizer, null);
+                    }
+                    return null;
+                } catch (Throwable e) {
+                    LOGGER.error("Error performing final chunk calling at {},{}", chunkX, chunkZ, e);
+                    throw e;
+                }
+            };
+            //noinspection unchecked - required at compile time
+            return (T) (Future) queueHandler.sync(chain);
+        } else {
+            if (callback != null) {
+                callback.run();
+            } else if (finalizer != null) {
+                finalizer.run();
+            }
+        }
+        return null;
     }
 
     @Override

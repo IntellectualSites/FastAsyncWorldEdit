@@ -152,6 +152,18 @@ public abstract class CharBlocks implements IBlocks {
         return data;
     }
 
+    protected char[] loadPrivately(int layer) {
+        layer -= getMinSectionPosition();
+        if (sections[layer] != null) {
+            synchronized (sectionLocks[layer]) {
+                if (sections[layer].isFull() && blocks[layer] != null) {
+                    return blocks[layer];
+                }
+            }
+        }
+        return update(layer, null, true);
+    }
+
     // Not synchronized as any subsequent methods called from this class will be, or the section shouldn't appear as loaded anyway.
     @Override
     public boolean hasSection(int layer) {

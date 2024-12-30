@@ -823,18 +823,6 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
         this.blocks[layer] = arr;
     }
 
-    private char[] loadPrivately(int layer) {
-        layer -= getMinSectionPosition();
-        if (super.sections[layer] != null) {
-            synchronized (super.sectionLocks[layer]) {
-                if (super.sections[layer].isFull() && super.blocks[layer] != null) {
-                    return super.blocks[layer];
-                }
-            }
-        }
-        return PaperweightGetBlocks.this.update(layer, null, true);
-    }
-
     @Override
     public void send() {
         synchronized (sendLock) {

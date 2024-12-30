@@ -3,7 +3,6 @@ package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_21_4;
 import com.fastasyncworldedit.bukkit.adapter.AbstractBukkitGetBlocks;
 import com.fastasyncworldedit.bukkit.adapter.DelegateSemaphore;
 import com.fastasyncworldedit.bukkit.adapter.NativeEntityFunctionSet;
-import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.extent.processor.heightmap.HeightMapType;
@@ -12,7 +11,6 @@ import com.fastasyncworldedit.core.math.BitArrayUnstretched;
 import com.fastasyncworldedit.core.math.IntPair;
 import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.fastasyncworldedit.core.queue.IChunkSet;
-import com.fastasyncworldedit.core.queue.implementation.QueueHandler;
 import com.fastasyncworldedit.core.util.MathMan;
 import com.fastasyncworldedit.core.util.NbtUtils;
 import com.fastasyncworldedit.core.util.collection.AdaptedMap;
@@ -85,7 +83,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -111,8 +108,8 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
     private final Registry<Biome> biomeRegistry;
     private final IdMap<Holder<Biome>> biomeHolderIdMap;
     private final Object sendLock = new Object();
-    private LevelChunkSection[] sections;
     private LevelChunk levelChunk;
+    private LevelChunkSection[] sections;
     private DataLayer[] blockLight;
     private DataLayer[] skyLight;
     private boolean lightUpdate = false;
@@ -123,8 +120,6 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
 
     public PaperweightGetBlocks(ServerLevel serverLevel, int chunkX, int chunkZ) {
         super(serverLevel, chunkX, chunkZ, serverLevel.getMinY(), serverLevel.getMaxY() - 1);
-        this.minSectionPosition = minHeight >> 4;
-        this.maxSectionPosition = maxHeight >> 4;
         this.skyLight = new DataLayer[getSectionCount()];
         this.blockLight = new DataLayer[getSectionCount()];
         this.biomeRegistry = serverLevel.registryAccess().lookupOrThrow(BIOME);
@@ -756,45 +751,8 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
                     }
                 };
             }
-            if (syncTasks != null) {
-                QueueHandler queueHandler = Fawe.instance().getQueueHandler();
-                Runnable[] finalSyncTasks = syncTasks;
-
-                // Chain the sync tasks and the callback
-                Callable<Future> chain = () -> {
-                    try {
-                        // Run the sync tasks
-                        for (Runnable task : finalSyncTasks) {
-                            if (task != null) {
-                                task.run();
-                            }
-                        }
-                        if (callback == null) {
-                            if (finalizer != null) {
-                                queueHandler.async(finalizer, null);
-                            }
-                            return null;
-                        } else {
-                            return queueHandler.async(callback, null);
-                        }
-                    } catch (Throwable e) {
-                        LOGGER.error("Error performing final chunk calling at {},{}", chunkX, chunkZ, e);
-                        throw e;
-                    }
-                };
-                //noinspection unchecked - required at compile time
-                return (T) (Future) queueHandler.sync(chain);
-            } else {
-                if (callback == null) {
-                    if (finalizer != null) {
-                        finalizer.run();
-                    }
-                } else {
-                    callback.run();
-                }
-            }
+            return handleCallFinalizer(syncTasks, callback, finalizer);
         }
-        return null;
     }
 
     private void updateGet(
@@ -824,18 +782,6 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
             sectionLock.writeLock().unlock();
         }
         this.blocks[layer] = arr;
-    }
-
-    private char[] loadPrivately(int layer) {
-        layer -= getMinSectionPosition();
-        if (super.sections[layer] != null) {
-            synchronized (super.sectionLocks[layer]) {
-                if (super.sections[layer].isFull() && super.blocks[layer] != null) {
-                    return super.blocks[layer];
-                }
-            }
-        }
-        return PaperweightGetBlocks.this.update(layer, null, true);
     }
 
     @Override
