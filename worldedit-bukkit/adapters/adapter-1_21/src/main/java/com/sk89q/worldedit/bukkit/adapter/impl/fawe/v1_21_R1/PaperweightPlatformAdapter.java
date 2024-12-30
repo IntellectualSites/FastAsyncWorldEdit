@@ -55,7 +55,6 @@ import net.minecraft.world.level.chunk.SingleValuePalette;
 import net.minecraft.world.level.chunk.status.ChunkStatus;
 import net.minecraft.world.level.entity.PersistentEntitySectionManager;
 import org.apache.logging.log4j.Logger;
-import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.CraftChunk;
 
 import javax.annotation.Nonnull;
@@ -76,9 +75,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Semaphore;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import java.util.function.IntFunction;
 
 import static java.lang.invoke.MethodType.methodType;
@@ -258,12 +256,48 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                 }
             }
         } catch (Throwable e) {
-            e.printStackTrace();
+            LOGGER.error("Error apply DelegateSemaphore", e);
             throw new RuntimeException(e);
         }
     }
 
-    public static LevelChunk ensureLoaded(ServerLevel serverLevel, int chunkX, int chunkZ) {
+    public static CompletableFuture<LevelChunk> ensureLoaded(ServerLevel serverLevel, int chunkX, int chunkZ) {
+        LevelChunk levelChunk = getChunkImmediatelyAsync(serverLevel, chunkX, chunkZ);
+        if (levelChunk != null) {
+            return CompletableFuture.completedFuture(levelChunk);
+        }
+        if (PaperLib.isPaper()) {
+            CompletableFuture<LevelChunk> future = serverLevel
+                    .getWorld()
+                    .getChunkAtAsync(chunkX, chunkZ, true, true)
+                    .thenApply(chunk -> {
+                        addTicket(serverLevel, chunkX, chunkZ);
+                        try {
+                            return (LevelChunk) CRAFT_CHUNK_GET_HANDLE.invoke(chunk);
+                        } catch (Throwable e) {
+                            LOGGER.error("Could not asynchronously load chunk at {},{}", chunkX, chunkZ, e);
+                            return null;
+                        }
+                    });
+            try {
+                if (!future.isCompletedExceptionally() || (future.isDone() && future.get() != null)) {
+                    return future;
+                }
+                Throwable t = future.exceptionNow();
+                LOGGER.error("Asynchronous chunk load at {},{} exceptionally completed immediately", chunkX, chunkZ, t);
+            } catch (InterruptedException | ExecutionException e) {
+                LOGGER.error(
+                        "Unexpected error when getting completed future at chunk {},{}. Returning to default.",
+                        chunkX,
+                        chunkZ,
+                        e
+                );
+            }
+        }
+        return CompletableFuture.supplyAsync(() -> TaskManager.taskManager().sync(() -> serverLevel.getChunk(chunkX, chunkZ)));
+    }
+
+    public static @Nullable LevelChunk getChunkImmediatelyAsync(ServerLevel serverLevel, int chunkX, int chunkZ) {
         if (!PaperLib.isPaper()) {
             LevelChunk nmsChunk = serverLevel.getChunkSource().getChunk(chunkX, chunkZ, false);
             if (nmsChunk != null) {
@@ -272,6 +306,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             if (Fawe.isMainThread()) {
                 return serverLevel.getChunk(chunkX, chunkZ);
             }
+            return null;
         } else {
             LevelChunk nmsChunk = serverLevel.getChunkSource().getChunkAtIfCachedImmediately(chunkX, chunkZ);
             if (nmsChunk != null) {
@@ -287,30 +322,8 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             if (Fawe.isMainThread()) {
                 return serverLevel.getChunk(chunkX, chunkZ);
             }
-            CompletableFuture<org.bukkit.Chunk> future = serverLevel.getWorld().getChunkAtAsync(chunkX, chunkZ, true, true);
-            try {
-                CraftChunk chunk;
-                try {
-                    chunk = (CraftChunk) future.get(10, TimeUnit.SECONDS);
-                } catch (TimeoutException e) {
-                    String world = serverLevel.getWorld().getName();
-                    // We've already taken 10 seconds we can afford to wait a little here.
-                    boolean loaded = TaskManager.taskManager().sync(() -> Bukkit.getWorld(world) != null);
-                    if (loaded) {
-                        LOGGER.warn("Chunk {},{} failed to load in 10 seconds in world {}. Retrying...", chunkX, chunkZ, world);
-                        // Retry chunk load
-                        chunk = (CraftChunk) serverLevel.getWorld().getChunkAtAsync(chunkX, chunkZ, true, true).get();
-                    } else {
-                        throw new UnsupportedOperationException("Cannot load chunk from unloaded world " + world + "!");
-                    }
-                }
-                addTicket(serverLevel, chunkX, chunkZ);
-                return (LevelChunk) CRAFT_CHUNK_GET_HANDLE.invoke(chunk);
-            } catch (Throwable e) {
-                e.printStackTrace();
-            }
+            return null;
         }
-        return TaskManager.taskManager().sync(() -> serverLevel.getChunk(chunkX, chunkZ));
     }
 
     private static void addTicket(ServerLevel serverLevel, int chunkX, int chunkZ) {
@@ -649,7 +662,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             }
             methodremoveTickingBlockEntity.invoke(levelChunk, beacon.getBlockPos());
         } catch (Throwable throwable) {
-            throwable.printStackTrace();
+            LOGGER.error("Error removing beacon", throwable);
         }
     }
 
