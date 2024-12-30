@@ -12,8 +12,10 @@ import java.util.AbstractCollection;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * The BlockVectorSet is a memory optimized Set for storing {@link BlockVector3}'s.
@@ -26,6 +28,26 @@ import java.util.Objects;
 public class BlockVectorSet extends AbstractCollection<BlockVector3> implements BlockVector3Set {
 
     private final Long2ObjectLinkedOpenHashMap<LocalBlockVectorSet> localSets = new Long2ObjectLinkedOpenHashMap<>(4);
+
+    public BlockVectorSet() {
+    }
+
+    public BlockVectorSet(LocalBlockVectorSet localSet) {
+        if (localSet != null && localSet.isInitialised()) {
+            int offsetX = localSet.offsetX();
+            int offsetY = localSet.offsetY();
+            int offsetZ = localSet.offsetZ();
+            if ((offsetX & 2048) != 0 && (offsetY & 512) != 0 && (offsetZ & 2048) != 0) { // Can plug and play
+                localSets.put(MathMan.tripleWorldCoord(offsetX >> 11, offsetY >> 9, offsetZ >> 11), localSet);
+            } else {
+                localSet.forEach((x, y, z, index) -> this.add(x, y, z));
+            }
+        }
+    }
+
+    private BlockVectorSet(Map<Long, LocalBlockVectorSet> sets) {
+        localSets.putAll(sets);
+    }
 
     @Override
     public int size() {
@@ -257,10 +279,17 @@ public class BlockVectorSet extends AbstractCollection<BlockVector3> implements 
         return result;
     }
 
-
     @Override
     public void clear() {
         localSets.clear();
+    }
+
+    @Override
+    public BlockVectorSet copy() {
+        return new BlockVectorSet(localSets
+                .long2ObjectEntrySet()
+                .stream()
+                .collect(Collectors.toMap(Long2ObjectMap.Entry::getLongKey, e -> (LocalBlockVectorSet) e.getValue().clone())));
     }
 
 }

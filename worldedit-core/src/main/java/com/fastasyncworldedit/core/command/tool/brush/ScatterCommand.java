@@ -3,6 +3,7 @@ package com.fastasyncworldedit.core.command.tool.brush;
 import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.math.LocalBlockVectorSet;
 import com.fastasyncworldedit.core.util.StringMan;
+import com.fastasyncworldedit.core.util.collection.BlockVector3Set;
 import com.fastasyncworldedit.core.wrappers.AsyncPlayer;
 import com.fastasyncworldedit.core.wrappers.LocationMaskedPlayerWrapper;
 import com.fastasyncworldedit.core.wrappers.SilentPlayerWrapper;
@@ -31,9 +32,21 @@ public class ScatterCommand extends ScatterBrush {
     }
 
     @Override
+    @Deprecated(forRemoval = true, since = "TODO")
     public void apply(
             EditSession editSession,
             LocalBlockVectorSet placed,
+            BlockVector3 position,
+            Pattern p,
+            double size
+    ) throws MaxChangedBlocksException {
+        apply(editSession, LocalBlockVectorSet.wrap(placed), position, p, size);
+    }
+
+    @Override
+    public void apply(
+            EditSession editSession,
+            BlockVector3Set placed,
             BlockVector3 position,
             Pattern pattern,
             double size
