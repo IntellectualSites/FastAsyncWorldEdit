@@ -18,6 +18,16 @@ public class DelegateTextureUtil extends TextureUtil {
     }
 
     @Override
+    public TextureUtil fork() {
+        try {
+            return new DelegateTextureUtil(parent.fork());
+        } catch (FileNotFoundException e) {
+            // This should never happen
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
     public BlockType getNearestBlock(int color) {
         return parent.getNearestBlock(color);
     }
