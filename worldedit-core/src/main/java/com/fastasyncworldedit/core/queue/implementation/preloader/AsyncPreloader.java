@@ -64,9 +64,6 @@ public class AsyncPreloader implements Preloader, Runnable {
         MutablePair<World, Set<BlockVector2>> existing = cancelAndGet(actor);
         try {
             Region region = session.getSelection(world);
-            if (region == null) {
-                return;
-            }
             if (existing == null) {
                 update.put(
                         actor.getUniqueId(),
