@@ -13,8 +13,8 @@ import com.sk89q.worldedit.world.block.BlockTypes;
 
 public class DesaturatePattern extends AbstractPattern {
 
-    private final TextureHolder holder;
-    private final Extent extent;
+    private final transient TextureUtil util;
+    private final transient Extent extent;
     private final double value;
 
     /**
@@ -26,19 +26,32 @@ public class DesaturatePattern extends AbstractPattern {
      */
     public DesaturatePattern(Extent extent, TextureHolder holder, double value) {
         this.extent = extent;
-        this.holder = holder;
+        this.util = holder.getTextureUtil();
+        this.value = Math.max(0, Math.min(1, value));
+    }
+
+    /**
+     * Create a new {@link Pattern} instance
+     *
+     * @param extent extent to set to
+     * @param value  decimal percent to desaturate by (0 -> 1)
+     * @param util   {@link TextureUtil} to use for textures
+     * @since TODO
+     */
+    private DesaturatePattern(Extent extent, double value, TextureUtil util) {
+        this.extent = extent;
+        this.util = util;
         this.value = Math.max(0, Math.min(1, value));
     }
 
     @Override
     public BaseBlock applyBlock(BlockVector3 position) {
         BlockType type = extent.getBlock(position).getBlockType();
-        TextureUtil util = holder.getTextureUtil();
         int color;
         if (type == BlockTypes.GRASS_BLOCK) {
-            color = holder.getTextureUtil().getColor(extent.getBiome(position));
+            color = util.getColor(extent.getBiome(position));
         } else {
-            color = holder.getTextureUtil().getColor(type);
+            color = util.getColor(type);
         }
         return util.getNearestBlock(color).getDefaultState().toBaseBlock();
     }
@@ -58,12 +71,11 @@ public class DesaturatePattern extends AbstractPattern {
     @Override
     public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
         BlockType type = get.getBlock(extent).getBlockType();
-        TextureUtil util = holder.getTextureUtil();
         int color;
         if (type == BlockTypes.GRASS_BLOCK) {
-            color = holder.getTextureUtil().getColor(extent.getBiome(get));
+            color = util.getColor(extent.getBiome(get));
         } else {
-            color = holder.getTextureUtil().getColor(type);
+            color = util.getColor(type);
         }
         int newColor = getColor(color);
         if (newColor == color) {
@@ -74,6 +86,11 @@ public class DesaturatePattern extends AbstractPattern {
             return false;
         }
         return set.setBlock(extent, newType.getDefaultState());
+    }
+
+    @Override
+    public Pattern fork() {
+        return new DesaturatePattern(extent, value, util);
     }
 
 }

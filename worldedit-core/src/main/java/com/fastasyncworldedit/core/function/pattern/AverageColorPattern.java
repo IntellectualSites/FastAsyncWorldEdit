@@ -15,7 +15,7 @@ import java.awt.Color;
 
 public class AverageColorPattern extends AbstractExtentPattern {
 
-    private final transient TextureHolder holder;
+    private final transient TextureUtil util;
     private final int color;
 
     /**
@@ -30,21 +30,34 @@ public class AverageColorPattern extends AbstractExtentPattern {
      */
     public AverageColorPattern(Extent extent, TextureHolder holder, int r, int g, int b, int a) {
         super(extent);
-        this.holder = holder;
+        this.util = holder.getTextureUtil();
         this.color = new Color(MathMan.clamp(r, 0, 255), MathMan.clamp(g, 0, 255), MathMan.clamp(b, 0, 255), MathMan.clamp(a, 0
                 , 255)).getRGB();
+    }
+
+    /**
+     * Create a new {@link Pattern} instance
+     *
+     * @param extent extent to set to
+     * @param util   {@link TextureUtil} to use to get textures
+     * @param color  color to saturate to
+     * @since TODO
+     */
+    private AverageColorPattern(Extent extent, TextureUtil util, int color) {
+        super(extent);
+        this.util = util;
+        this.color = color;
     }
 
     @Override
     public BaseBlock applyBlock(BlockVector3 position) {
         BaseBlock block = getExtent().getFullBlock(position);
-        TextureUtil util = holder.getTextureUtil();
         BlockType type = block.getBlockType();
         int currentColor;
         if (type == BlockTypes.GRASS_BLOCK) {
-            currentColor = holder.getTextureUtil().getColor(getExtent().getBiome(position));
+            currentColor = util.getColor(getExtent().getBiome(position));
         } else {
-            currentColor = holder.getTextureUtil().getColor(type);
+            currentColor = util.getColor(type);
         }
         int newColor = TextureUtil.averageColor(currentColor, color);
         return util.getNearestBlock(newColor).getDefaultState().toBaseBlock();
@@ -53,12 +66,11 @@ public class AverageColorPattern extends AbstractExtentPattern {
     @Override
     public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
         BlockType blockType = get.getBlock(extent).getBlockType();
-        TextureUtil util = holder.getTextureUtil();
         int currentColor;
         if (blockType == BlockTypes.GRASS_BLOCK) {
-            currentColor = holder.getTextureUtil().getColor(extent.getBiome(get));
+            currentColor = util.getColor(extent.getBiome(get));
         } else {
-            currentColor = holder.getTextureUtil().getColor(blockType);
+            currentColor = util.getColor(blockType);
         }
         if (currentColor == 0) {
             return false;
@@ -69,6 +81,11 @@ public class AverageColorPattern extends AbstractExtentPattern {
             return false;
         }
         return set.setBlock(extent, newBlock.getDefaultState());
+    }
+
+    @Override
+    public Pattern fork() {
+        return new AverageColorPattern(getExtent(), util, color);
     }
 
 }
