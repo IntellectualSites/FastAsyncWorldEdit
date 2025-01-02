@@ -13,6 +13,7 @@ import org.bukkit.TreeType;
 import org.bukkit.World;
 import org.bukkit.block.BlockState;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 

@@ -35,6 +35,7 @@ import org.enginehub.linbus.tree.LinCompoundTag;
 import org.enginehub.linbus.tree.LinTag;
 
 import javax.annotation.Nullable;
+import java.util.Collection;
 import java.util.Map;
 import java.util.OptionalInt;
 
@@ -133,6 +134,11 @@ public interface IDelegateBukkitImplAdapter<T> extends BukkitImplAdapter<T> {
     @Override
     default void sendBiomeUpdates(World world, Iterable<BlockVector2> chunks) {
         getParent().sendBiomeUpdates(world, chunks);
+    }
+
+    @Override
+    default Collection<String> getRegisteredDefaultBlockStates() {
+        return getParent().getRegisteredDefaultBlockStates();
     }
 
     @Override
