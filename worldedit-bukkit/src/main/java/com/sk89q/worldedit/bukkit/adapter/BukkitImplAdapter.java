@@ -54,6 +54,7 @@ import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 import org.bukkit.Keyed;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
@@ -66,7 +67,9 @@ import org.enginehub.linbus.tree.LinCompoundTag;
 import org.enginehub.linbus.tree.LinTag;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -330,6 +333,22 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
 
     default BlockMaterial getMaterial(BlockState blockState) {
         return null;
+    }
+
+    /**
+     * Returns an iterable of all blocks in their default state as string representations known to the server.
+     *
+     * @return an iterable containing the default state strings of all valid blocks
+     */
+    default Collection<String> getRegisteredDefaultBlockStates() {
+        ArrayList<String> blocks = new ArrayList<>();
+        for (Material m : Material.values()) {
+            if (!m.isLegacy() && m.isBlock()) {
+                BlockData blockData = m.createBlockData();
+                blocks.add(blockData.getAsString());
+            }
+        }
+        return blocks;
     }
 
     @Deprecated

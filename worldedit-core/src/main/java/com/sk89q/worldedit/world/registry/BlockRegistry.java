@@ -94,7 +94,7 @@ public interface BlockRegistry {
     /**
      * Register all blocks.
      */
-    default Collection<String> values() {
+    default Collection<String> getAllDefaultBlockStates() {
         return Collections.emptyList();
     }
 
