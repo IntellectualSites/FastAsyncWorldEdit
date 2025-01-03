@@ -7,7 +7,7 @@ import com.sk89q.worldedit.regions.Region;
 
 import java.util.Set;
 
-public interface BlockVector3Set extends Set<BlockVector3>, Cloneable {
+public interface BlockVector3Set extends Set<BlockVector3> {
 
     /**
      * Get the appropriate {@link BlockVector3Set} implementation for the given region. Either {@link LocalBlockVectorSet} or
@@ -89,7 +89,7 @@ public interface BlockVector3Set extends Set<BlockVector3>, Cloneable {
     /**
      * Copy this {@link BlockVector3Set} instance
      *
-     * @return cloned instance
+     * @return copied instance
      * @since TODO
      */
     BlockVector3Set copy();

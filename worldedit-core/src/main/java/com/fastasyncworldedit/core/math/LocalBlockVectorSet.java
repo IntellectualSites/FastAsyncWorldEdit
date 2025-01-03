@@ -85,7 +85,7 @@ public class LocalBlockVectorSet implements BlockVector3Set {
      * @since TODO
      */
     public static BlockVector3Set wrapped(int x, int z) {
-        return new BlockVector3SetHolder(new LocalBlockVectorSet());
+        return new BlockVector3SetHolder(new LocalBlockVectorSet(x, z));
     }
 
     /**
@@ -97,7 +97,7 @@ public class LocalBlockVectorSet implements BlockVector3Set {
      * @since TODO
      */
     public static BlockVector3Set wrapped(int x, int y, int z) {
-        return new BlockVector3SetHolder(new LocalBlockVectorSet());
+        return new BlockVector3SetHolder(new LocalBlockVectorSet(x, y, z));
     }
 
     private LocalBlockVectorSet(int x, int y, int z, SparseBitSet set) {
@@ -502,11 +502,11 @@ public class LocalBlockVectorSet implements BlockVector3Set {
 
     }
 
-    static class BlockVector3SetHolder implements BlockVector3Set {
+    private static class BlockVector3SetHolder implements BlockVector3Set {
 
         BlockVector3Set set;
 
-        public BlockVector3SetHolder(BlockVector3Set set) {
+        private BlockVector3SetHolder(BlockVector3Set set) {
             this.set = set;
         }
 

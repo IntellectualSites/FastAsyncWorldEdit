@@ -45,7 +45,7 @@ public class BlockVectorSet extends AbstractCollection<BlockVector3> implements 
         }
     }
 
-    private BlockVectorSet(Map<Long, LocalBlockVectorSet> sets) {
+    private BlockVectorSet(Map<Long, ? extends LocalBlockVectorSet> sets) {
         localSets.putAll(sets);
     }
 
@@ -289,7 +289,7 @@ public class BlockVectorSet extends AbstractCollection<BlockVector3> implements 
         return new BlockVectorSet(localSets
                 .long2ObjectEntrySet()
                 .stream()
-                .collect(Collectors.toMap(Long2ObjectMap.Entry::getLongKey, e -> (LocalBlockVectorSet) e.getValue().clone())));
+                .collect(Collectors.toMap(Long2ObjectMap.Entry::getLongKey, e -> e.getValue().copy())));
     }
 
 }
