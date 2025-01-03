@@ -27,12 +27,13 @@ public class CachedMask extends AbstractDelegateMask implements ResettableMask {
      * @param local If the area will be small
      * @since 2.4.0
      */
+    @Deprecated(forRemoval = true, since = "TODO")
     public CachedMask(Mask mask, boolean local) {
         super(mask);
         hasExtent = mask instanceof AbstractExtentMask;
         if (local) {
-            cache_checked = new LocalBlockVectorSet();
-            cache_results = new LocalBlockVectorSet();
+            cache_checked = LocalBlockVectorSet.wrapped();
+            cache_results = LocalBlockVectorSet.wrapped();
         } else {
             cache_checked = new BlockVectorSet();
             cache_results = new BlockVectorSet();

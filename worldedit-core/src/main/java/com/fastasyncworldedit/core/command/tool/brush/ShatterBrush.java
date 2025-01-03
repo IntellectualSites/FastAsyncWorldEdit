@@ -23,6 +23,7 @@ public class ShatterBrush extends ScatterBrush {
     }
 
     @Override
+    @Deprecated(forRemoval = true, since = "TODO")
     public void apply(
             final EditSession editSession,
             final BlockVector3Set placed,
@@ -51,7 +52,7 @@ public class ShatterBrush extends ScatterBrush {
             LocalBlockVectorSet set = new LocalBlockVectorSet();
             set.add(pos);
             frontiers[i] = set;
-            frontiersVisited[i] = set.clone();
+            frontiersVisited[i] = set.copy();
             i++;
         }
         // Mask
