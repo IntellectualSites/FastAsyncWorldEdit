@@ -2,6 +2,7 @@ package com.fastasyncworldedit.bukkit.adapter;
 
 import com.fastasyncworldedit.bukkit.FaweBukkitWorld;
 import com.fastasyncworldedit.core.FAWEPlatformAdapterImpl;
+import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.math.IntPair;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.util.MathMan;
@@ -124,6 +125,9 @@ public class NMSAdapter implements FAWEPlatformAdapterImpl {
         if (layer < 0 || layer >= sections.length) {
             return false;
         }
+        if (Fawe.isMainThread()) {
+            return ReflectionUtils.compareAndSet(sections, expected, value, layer);
+        }
         StampLockHolder holder = new StampLockHolder();
         ConcurrentHashMap<IntPair, ChunkSendLock> chunks = FaweBukkitWorld.getWorldSendingChunksMap(worldName);
         chunks.compute(pair, (k, lock) -> {
@@ -171,6 +175,9 @@ public class NMSAdapter implements FAWEPlatformAdapterImpl {
      * @since 2.12.0
      */
     protected static void beginChunkPacketSend(String worldName, IntPair pair, StampLockHolder stampedLock) {
+        if (Fawe.isMainThread()) {
+            return;
+        }
         ConcurrentHashMap<IntPair, ChunkSendLock> chunks = FaweBukkitWorld.getWorldSendingChunksMap(worldName);
         chunks.compute(pair, (k, lock) -> {
             if (lock == null) {
@@ -192,6 +199,9 @@ public class NMSAdapter implements FAWEPlatformAdapterImpl {
      * @since 2.12.0
      */
     protected static void endChunkPacketSend(String worldName, IntPair pair, StampLockHolder lockHolder) {
+        if (Fawe.isMainThread()) {
+            return;
+        }
         ConcurrentHashMap<IntPair, ChunkSendLock> chunks = FaweBukkitWorld.getWorldSendingChunksMap(worldName);
         chunks.computeIfPresent(pair, (k, lock) -> {
             if (lock.lock != lockHolder.chunkLock.lock) {
