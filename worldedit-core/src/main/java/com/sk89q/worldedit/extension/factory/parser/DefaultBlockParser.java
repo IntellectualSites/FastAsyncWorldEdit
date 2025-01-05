@@ -607,6 +607,9 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
             }
             CompoundTag nbt = holder.getNbtData();
             if (nbt != null) {
+                if (actor.hasPermission("worldedit.anyblock.nbt")) {
+                    return holder;
+                }
                 if (nbt.equals(holder.getBlockType().getDefaultState().getNbtData())) {
                     if (!actor.hasPermission("worldedit.anyblock.default-nbt")) {
                         throw new DisallowedUsageException(Caption.of(
@@ -614,7 +617,7 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
                                 TextComponent.of("worldedit.anyblock.default-nbt")
                         ));
                     }
-                } else if (!actor.hasPermission("worldedit.anyblock.nbt")) {
+                } else {
                     throw new DisallowedUsageException(Caption.of(
                             "fawe.error.nbt.forbidden",
                             TextComponent.of("worldedit.anyblock.nbt")
