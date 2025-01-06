@@ -175,9 +175,6 @@ public class NMSAdapter implements FAWEPlatformAdapterImpl {
      * @since 2.12.0
      */
     protected static void beginChunkPacketSend(String worldName, IntPair pair, StampLockHolder stampedLock) {
-        if (Fawe.isMainThread()) {
-            return;
-        }
         ConcurrentHashMap<IntPair, ChunkSendLock> chunks = FaweBukkitWorld.getWorldSendingChunksMap(worldName);
         chunks.compute(pair, (k, lock) -> {
             if (lock == null) {
@@ -199,9 +196,6 @@ public class NMSAdapter implements FAWEPlatformAdapterImpl {
      * @since 2.12.0
      */
     protected static void endChunkPacketSend(String worldName, IntPair pair, StampLockHolder lockHolder) {
-        if (Fawe.isMainThread()) {
-            return;
-        }
         ConcurrentHashMap<IntPair, ChunkSendLock> chunks = FaweBukkitWorld.getWorldSendingChunksMap(worldName);
         chunks.computeIfPresent(pair, (k, lock) -> {
             if (lock.lock != lockHolder.chunkLock.lock) {
