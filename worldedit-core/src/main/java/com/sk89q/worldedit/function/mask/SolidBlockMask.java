@@ -20,23 +20,38 @@
 package com.sk89q.worldedit.function.mask;
 
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.world.block.BlockTypesCache;
 
-import javax.annotation.Nullable;
+public class SolidBlockMask extends AbstractExtentMask {
+    // FAWE start - precompute solid blocks
+    private static final boolean[] SOLID = initialize();
 
-public class SolidBlockMask extends BlockMask {
+    private static boolean[] initialize() {
+        final boolean[] solid = new boolean[BlockTypesCache.states.length];
+        for (int i = 0; i < solid.length; i++) {
+            solid[i] = BlockTypesCache.states[i].getBlockType().getMaterial().isMovementBlocker();
+        }
+        return solid;
+    }
+    // FAWE end
 
     public SolidBlockMask(Extent extent) {
         super(extent);
-        add(state -> state.getMaterial().isMovementBlocker());
     }
 
-    @Nullable
+    // FAWE start
     @Override
-    public Mask2D toMask2D() {
-        return null;
+    public boolean test(final Extent extent, final BlockVector3 position) {
+        final int ordinal = position.getOrdinal(extent);
+        return SOLID[ordinal];
     }
 
-    //FAWE start
+    @Override
+    public boolean test(final BlockVector3 vector) {
+        return test(getExtent(), vector);
+    }
+
     @Override
     public Mask copy() {
         return new SolidBlockMask(getExtent());
