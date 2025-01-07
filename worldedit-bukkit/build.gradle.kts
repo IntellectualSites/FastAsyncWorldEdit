@@ -122,6 +122,7 @@ dependencies {
     api(libs.parallelgzip) { isTransitive = false }
     compileOnly(libs.adventureApi)
     compileOnlyApi(libs.checkerqual)
+    compileOnly(libs.zones)
 
     // Tests
     testImplementation(libs.mockito)

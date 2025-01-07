@@ -10,6 +10,7 @@ import com.fastasyncworldedit.bukkit.regions.GriefPreventionFeature;
 import com.fastasyncworldedit.bukkit.regions.ResidenceFeature;
 import com.fastasyncworldedit.bukkit.regions.TownyFeature;
 import com.fastasyncworldedit.bukkit.regions.WorldGuardFeature;
+import com.fastasyncworldedit.bukkit.regions.ZonesFeature;
 import com.fastasyncworldedit.bukkit.util.BukkitTaskManager;
 import com.fastasyncworldedit.bukkit.util.ItemUtil;
 import com.fastasyncworldedit.bukkit.util.MinecraftVersion;
@@ -245,6 +246,14 @@ public class FaweBukkit implements IFawe, Listener {
             try {
                 managers.add(new GriefDefenderFeature(griefdefenderPlugin));
                 LOGGER.info("Attempting to use plugin 'GriefDefender'");
+            } catch (Throwable ignored) {
+            }
+        }
+        final Plugin zonesPlugin = Bukkit.getServer().getPluginManager().getPlugin("Zones");
+        if (zonesPlugin != null && zonesPlugin.isEnabled()) {
+            try {
+                managers.add(new ZonesFeature(zonesPlugin));
+                LOGGER.info("Attempting to use plugin 'Zones'");
             } catch (Throwable ignored) {
             }
         }
