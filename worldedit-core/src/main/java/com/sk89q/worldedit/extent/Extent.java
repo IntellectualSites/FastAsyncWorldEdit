@@ -47,6 +47,7 @@ import com.sk89q.worldedit.function.block.BlockReplace;
 import com.sk89q.worldedit.function.mask.BlockMask;
 import com.sk89q.worldedit.function.mask.ExistingBlockMask;
 import com.sk89q.worldedit.function.mask.Mask;
+import com.sk89q.worldedit.function.mask.SolidBlockMask;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.pattern.BlockPattern;
@@ -456,17 +457,17 @@ public interface Extent extends InputExtent, OutputExtent {
         int clearanceBelow = y - minY;
         int clearance = Math.min(clearanceAbove, clearanceBelow);
         BlockState block = getBlock(x, y, z);
-        boolean state = !block.getBlockType().getMaterial().isMovementBlocker();
+        boolean state = !SolidBlockMask.isSolid(block);
         int offset = state ? 0 : 1;
         for (int d = 0; d <= clearance; d++) {
             int y1 = y + d;
             block = getBlock(x, y1, z);
-            if (block.getMaterial().isMovementBlocker() == state && block.getBlockType() != BlockTypes.__RESERVED__) {
+            if (matchesSolidState(block, state)) {
                 return y1 - offset;
             }
             int y2 = y - d;
             block = getBlock(x, y2, z);
-            if (block.getMaterial().isMovementBlocker() == state && block.getBlockType() != BlockTypes.__RESERVED__) {
+            if (matchesSolidState(block, state)) {
                 return y2 + offset;
             }
         }
@@ -474,14 +475,14 @@ public interface Extent extends InputExtent, OutputExtent {
             if (clearanceAbove < clearanceBelow) {
                 for (int layer = y - clearance - 1; layer >= minY; layer--) {
                     block = getBlock(x, layer, z);
-                    if (block.getMaterial().isMovementBlocker() == state && block.getBlockType() != BlockTypes.__RESERVED__) {
+                    if (matchesSolidState(block, state)) {
                         return layer + offset;
                     }
                 }
             } else {
                 for (int layer = y + clearance + 1; layer <= maxY; layer++) {
                     block = getBlock(x, layer, z);
-                    if (block.getMaterial().isMovementBlocker() == state && block.getBlockType() != BlockTypes.__RESERVED__) {
+                    if (matchesSolidState(block, state)) {
                         return layer - offset;
                     }
                 }
@@ -493,6 +494,10 @@ public interface Extent extends InputExtent, OutputExtent {
             return block.getBlockType().getMaterial().isAir() ? -1 : result;
         }
         return result;
+    }
+
+    private static boolean matchesSolidState(BlockState block, boolean state) {
+        return SolidBlockMask.isSolid(block) == state && block.getBlockType() != BlockTypes.__RESERVED__;
     }
 
     default void addCaves(Region region) throws WorldEditException {

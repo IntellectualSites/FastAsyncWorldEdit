@@ -21,6 +21,7 @@ package com.sk89q.worldedit.function.mask;
 
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 
 public class SolidBlockMask extends AbstractExtentMask {
@@ -51,6 +52,15 @@ public class SolidBlockMask extends AbstractExtentMask {
     public boolean test(final BlockVector3 vector) {
         return test(getExtent(), vector);
     }
+
+    /**
+     * {@return whether the given block state is considered solid by this mask}
+     * @since TODO
+     */
+    public static boolean isSolid(BlockState blockState) {
+        return SOLID[blockState.getOrdinal()];
+    }
+
 
     @Override
     public Mask copy() {
