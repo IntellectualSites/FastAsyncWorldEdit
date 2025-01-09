@@ -20,6 +20,7 @@ public abstract class CharBlocks implements IBlocks {
             char[] arr = blocks.blocks[layer];
             if (arr == null) {
                 // Chunk probably trimmed mid-operations, but do nothing about it to avoid other issues
+                blocks.sections[layer] = EMPTY;
                 return EMPTY.get(blocks, layer, false);
             }
             return arr;
