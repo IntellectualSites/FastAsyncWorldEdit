@@ -64,25 +64,15 @@ public class CachedMask extends AbstractDelegateMask implements ResettableMask {
         int x = vector.x();
         int y = vector.y();
         int z = vector.z();
-        try {
-            boolean check = cache_checked.add(x, y, z);
-            if (!check) {
-                return cache_results.contains(x, y, z);
-            }
-            boolean result = getMask().test(vector);
-            if (result) {
-                cache_results.add(x, y, z);
-            }
-            return result;
-        } catch (UnsupportedOperationException ignored) {
-            boolean result = getMask().test(vector);
-            resetCache();
-            cache_checked.add(x, y, z);
-            if (result) {
-                cache_results.add(x, y, z);
-            }
-            return result;
+        boolean check = cache_checked.add(x, y, z);
+        if (!check) {
+            return cache_results.contains(x, y, z);
         }
+        boolean result = getMask().test(vector);
+        if (result) {
+            cache_results.add(x, y, z);
+        }
+        return result;
     }
 
     public boolean test(@Nullable Extent extent, BlockVector3 vector) {
@@ -93,25 +83,15 @@ public class CachedMask extends AbstractDelegateMask implements ResettableMask {
         int y = vector.y();
         int z = vector.z();
         AbstractExtentMask mask = (AbstractExtentMask) getMask();
-        try {
-            boolean check = cache_checked.add(x, y, z);
-            if (!check) {
-                return cache_results.contains(x, y, z);
-            }
-            boolean result = mask.test(extent, vector);
-            if (result) {
-                cache_results.add(x, y, z);
-            }
-            return result;
-        } catch (UnsupportedOperationException ignored) {
-            boolean result = mask.test(extent, vector);
-            resetCache();
-            cache_checked.add(x, y, z);
-            if (result) {
-                cache_results.add(x, y, z);
-            }
-            return result;
+        boolean check = cache_checked.add(x, y, z);
+        if (!check) {
+            return cache_results.contains(x, y, z);
         }
+        boolean result = mask.test(extent, vector);
+        if (result) {
+            cache_results.add(x, y, z);
+        }
+        return result;
     }
 
     @Override

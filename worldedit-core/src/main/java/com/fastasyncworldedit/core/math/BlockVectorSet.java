@@ -37,7 +37,7 @@ public class BlockVectorSet extends AbstractCollection<BlockVector3> implements 
             int offsetX = localSet.offsetX();
             int offsetY = localSet.offsetY();
             int offsetZ = localSet.offsetZ();
-            if ((offsetX & 2048) != 0 && (offsetY & 512) != 0 && (offsetZ & 2048) != 0) { // Can plug and play
+            if ((offsetX & 2047) == 0 && (offsetY & 511) == 0 && (offsetZ & 2047) == 0) { // Can plug and play
                 localSets.put(MathMan.tripleWorldCoord(offsetX >> 11, offsetY >> 9, offsetZ >> 11), localSet);
             } else {
                 localSet.forEach((x, y, z, index) -> this.add(x, y, z));
