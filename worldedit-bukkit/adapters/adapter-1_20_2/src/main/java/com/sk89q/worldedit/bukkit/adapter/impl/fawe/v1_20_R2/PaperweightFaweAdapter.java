@@ -146,6 +146,13 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
         return parent;
     }
 
+    @Override
+    protected void ensureInit() {
+        if (!this.initialised) {
+            init();
+        }
+    }
+
     private synchronized boolean init() {
         if (ibdToOrdinal != null && ibdToOrdinal[1] != 0) {
             return false;
