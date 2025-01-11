@@ -150,7 +150,7 @@ public class BukkitBlockRegistry extends BundledBlockRegistry {
 
     //FAWE start
     @Override
-    public Collection<String> getAllDefaultBlockStates() {
+    public Collection<String> values() {
         BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
         return adapter.getRegisteredDefaultBlockStates();
     }
