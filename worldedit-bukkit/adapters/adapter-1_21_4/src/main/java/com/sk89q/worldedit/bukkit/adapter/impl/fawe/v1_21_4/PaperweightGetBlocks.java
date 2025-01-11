@@ -961,13 +961,8 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
             Arrays.fill(data, (char) BlockTypesCache.ReservedIDs.AIR);
             return data;
         }
-        if (data != null && data.length != 4096) {
-            data = new char[4096];
-            Arrays.fill(data, (char) BlockTypesCache.ReservedIDs.AIR);
-        }
-        if (data == null || data == FaweCache.INSTANCE.EMPTY_CHAR_4096) {
-            data = new char[4096];
-            Arrays.fill(data, (char) BlockTypesCache.ReservedIDs.AIR);
+        if (data == null || data == FaweCache.INSTANCE.EMPTY_CHAR_4096 || data.length != 4096) {
+            data = new char[4096]; // new array, will be populated below
         }
         Semaphore lock = PaperweightPlatformAdapter.applyLock(section);
         synchronized (lock) {
@@ -996,38 +991,24 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                     num_palette = palette.getSize();
                 } else {
                     // The section's palette is the global block palette.
-                    for (int i = 0; i < 4096; i++) {
-                        char paletteVal = data[i];
-                        char ordinal = adapter.ibdIDToOrdinal(paletteVal);
-                        data[i] = ordinal;
-                    }
+                    adapter.mapFromGlobalPalette(data);
                     return data;
                 }
 
                 char[] paletteToOrdinal = FaweCache.INSTANCE.PALETTE_TO_BLOCK_CHAR.get();
                 try {
-                    if (num_palette != 1) {
+                    if (num_palette == 1) {
+                        char ordinal = ordinal(palette.valueFor(0), adapter);
+                        Arrays.fill(data, ordinal);
+                    } else {
                         for (int i = 0; i < num_palette; i++) {
                             char ordinal = ordinal(palette.valueFor(i), adapter);
                             paletteToOrdinal[i] = ordinal;
                         }
-                        for (int i = 0; i < 4096; i++) {
-                            char paletteVal = data[i];
-                            char val = paletteToOrdinal[paletteVal];
-                            if (val == Character.MAX_VALUE) {
-                                val = ordinal(palette.valueFor(i), adapter);
-                                paletteToOrdinal[i] = val;
-                            }
-                            data[i] = val;
-                        }
-                    } else {
-                        char ordinal = ordinal(palette.valueFor(0), adapter);
-                        Arrays.fill(data, ordinal);
+                        adapter.mapWithPalette(data, paletteToOrdinal);
                     }
                 } finally {
-                    for (int i = 0; i < num_palette; i++) {
-                        paletteToOrdinal[i] = Character.MAX_VALUE;
-                    }
+                    Arrays.fill(paletteToOrdinal, 0, num_palette, Character.MAX_VALUE);
                 }
                 return data;
             } catch (IllegalAccessException | InterruptedException e) {

@@ -84,8 +84,8 @@ public class ProvideBindings extends Bindings {
                     }
                 }
             }
-            Request.request().setEditSession(editSession);
         }
+        Request.request().setEditSession(editSession);
         return editSession;
     }
 

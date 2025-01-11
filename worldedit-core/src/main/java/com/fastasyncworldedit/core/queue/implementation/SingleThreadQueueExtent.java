@@ -61,7 +61,6 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
     private Thread currentThread;
     // Last access pointers
     private volatile IQueueChunk lastChunk;
-    private volatile long lastPair = Long.MAX_VALUE;
     private boolean enabledQueue = true;
     private boolean fastmode = false;
     // Array for lazy avoidance of concurrent modification exceptions and needless overcomplication of code (synchronisation is
@@ -163,7 +162,6 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
         }
         this.enabledQueue = true;
         this.lastChunk = null;
-        this.lastPair = Long.MAX_VALUE;
         this.currentThread = null;
         this.initialized = false;
         this.setProcessor(EmptyBatchProcessor.getInstance());
@@ -217,7 +215,6 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
     @Override
     public <V extends Future<V>> V submit(IQueueChunk chunk) {
         if (lastChunk == chunk) {
-            lastPair = Long.MAX_VALUE;
             lastChunk = null;
         }
         final long index = MathMan.pairInt(chunk.getX(), chunk.getZ());
@@ -268,7 +265,6 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
         cacheSet.trim(aggressive);
         if (Thread.currentThread() == currentThread) {
             lastChunk = null;
-            lastPair = Long.MAX_VALUE;
             return chunks.isEmpty();
         }
         if (!submissions.isEmpty()) {
@@ -306,23 +302,21 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
 
     @Override
     public final IQueueChunk getOrCreateChunk(int x, int z) {
+        final IQueueChunk lastChunk = this.lastChunk;
+        if (lastChunk != null && lastChunk.getX() == x && lastChunk.getZ() == z) {
+            return lastChunk;
+        }
+        final long pair = MathMan.pairInt(x, z);
+        if (!processGet(x, z) || (Settings.settings().REGION_RESTRICTIONS_OPTIONS.RESTRICT_TO_SAFE_RANGE
+                && (x > 1875000 || z > 1875000 || x < -1875000 || z < -1875000))) {
+            // don't store as last chunk, not worth it
+            return NullChunk.getInstance();
+        }
         getChunkLock.lock();
         try {
-            final long pair = (long) x << 32 | z & 0xffffffffL;
-            if (pair == lastPair) {
-                return lastChunk;
-            }
-            if (!processGet(x, z) || (Settings.settings().REGION_RESTRICTIONS_OPTIONS.RESTRICT_TO_SAFE_RANGE
-                    // if any chunk coord is outside 30 million blocks
-                    && (x > 1875000 || z > 1875000 || x < -1875000 || z < -1875000))) {
-                lastPair = pair;
-                lastChunk = NullChunk.getInstance();
-                return NullChunk.getInstance();
-            }
             IQueueChunk chunk = chunks.get(pair);
             if (chunk != null) {
-                lastPair = pair;
-                lastChunk = chunk;
+                this.lastChunk = chunk;
                 return chunk;
             }
             final int size = chunks.size();
@@ -343,8 +337,7 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
             chunk = wrap(chunk);
 
             chunks.put(pair, chunk);
-            lastPair = pair;
-            lastChunk = chunk;
+            this.lastChunk = chunk;
 
             return chunk;
         } finally {
