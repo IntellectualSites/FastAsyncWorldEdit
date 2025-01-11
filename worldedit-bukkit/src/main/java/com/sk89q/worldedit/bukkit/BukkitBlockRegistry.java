@@ -152,7 +152,10 @@ public class BukkitBlockRegistry extends BundledBlockRegistry {
     @Override
     public Collection<String> values() {
         BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
-        return adapter.getRegisteredDefaultBlockStates();
+        if (adapter != null) {
+            return adapter.getRegisteredDefaultBlockStates();
+        }
+        return super.values();
     }
 
     @Override
