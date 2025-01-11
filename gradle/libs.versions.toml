@@ -15,7 +15,7 @@ griefprevention = "17.0.0"
 griefdefender = "2.1.0-SNAPSHOT"
 residence = "4.5._13.1"
 towny = "0.101.0.4"
-plotsquared = "7.4.0"
+plotsquared = "7.4.1"
 
 # Third party
 bstats = "3.1.0"
@@ -23,7 +23,7 @@ sparsebitset = "1.3"
 parallelgzip = "1.0.5"
 adventure = "4.18.0"
 adventure-bukkit = "4.3.4"
-checkerqual = "3.48.3"
+checkerqual = "3.48.4"
 truezip = "6.8.4"
 auto-value = "1.11.0"
 findbugs = "3.0.2"
@@ -47,7 +47,7 @@ text = "3.0.4"
 piston = "0.5.10"
 
 # Tests
-mockito = "5.14.2"
+mockito = "5.15.2"
 
 # Gradle plugins
 pluginyml = "0.6.0"

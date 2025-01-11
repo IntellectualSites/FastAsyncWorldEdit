@@ -9,10 +9,12 @@ import com.sk89q.worldedit.event.platform.CommandEvent;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.internal.annotation.Selection;
 import com.sk89q.worldedit.internal.command.CommandArgParser;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.internal.util.Substring;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import org.apache.logging.log4j.Logger;
 import org.enginehub.piston.exception.StopExecutionException;
 import org.enginehub.piston.inject.InjectAnnotation;
 import org.enginehub.piston.inject.InjectedValueAccess;
@@ -45,6 +47,21 @@ public @interface Confirm {
     Processor value() default Processor.ALWAYS;
 
     enum Processor {
+        NULLABLE_REGION {
+            @Override
+            public boolean passes(Actor actor, InjectedValueAccess context, double value) {
+                if (checkExisting(context)) {
+                    return true;
+                }
+                Region region = context
+                        .injectedValue(Key.of(Region.class, Selection.class))
+                        .orElse(null);
+                if (region == null) {
+                    return true;
+                }
+                return handleRegion(region, actor, context, value);
+            }
+        },
         REGION {
             @Override
             public boolean passes(Actor actor, InjectedValueAccess context, double value) {
@@ -54,18 +71,7 @@ public @interface Confirm {
                 Region region = context
                         .injectedValue(Key.of(Region.class, Selection.class))
                         .orElseThrow(IncompleteRegionException::new);
-                BlockVector3 pos1 = region.getMinimumPoint();
-                BlockVector3 pos2 = region.getMaximumPoint();
-                long area = (pos2.x() - pos1.x()) * (pos2.z() - pos1.z() + 1)
-                        * (long) value;
-                long max = 2 << 18;
-                if (max != -1 && area > max) {
-                    actor.print(Caption.of("fawe.cancel.reason.confirm.region",
-                            pos1, pos2, getArgs(context), region.getHeight() * area
-                    ));
-                    return confirm(actor, context);
-                }
-                return true;
+                return handleRegion(region, actor, context, value);
             }
         },
         RADIUS {
@@ -110,6 +116,8 @@ public @interface Confirm {
                 return confirm(actor, context);
             }
         };
+
+        private static final Logger LOGGER = LogManagerCompat.getLogger();
 
         public boolean passes(Actor actor, InjectedValueAccess context, double value) {
             return true;
@@ -171,7 +179,7 @@ public @interface Confirm {
                     Map<Key<?>, Optional<?>> memory = (Map<Key<?>, Optional<?>>) Reflect.memory.get(memoizingValueAccess);
                     memory.put(Key.of(InterruptableCondition.class), Optional.of(wait));
                 } catch (IllegalAccessException e) {
-                    e.printStackTrace();
+                    LOGGER.error("Error confirming command", e);
                 }
                 // Waits till 15 seconds then returns false unless awakened
                 if (condition.await(15, TimeUnit.SECONDS)) {
@@ -192,9 +200,26 @@ public @interface Confirm {
             //  in which case this is the least of our worries...
             return lock.isPresent();
         }
+
+        private static boolean handleRegion(Region region, Actor actor, InjectedValueAccess context, double value) {
+            BlockVector3 pos1 = region.getMinimumPoint();
+            BlockVector3 pos2 = region.getMaximumPoint();
+            long area = (pos2.x() - pos1.x()) * (pos2.z() - pos1.z() + 1)
+                    * (long) value;
+            long max = 2 << 18;
+            if (max != -1 && area > max) {
+                actor.print(Caption.of("fawe.cancel.reason.confirm.region",
+                        pos1, pos2, getArgs(context), region.getHeight() * area
+                ));
+                return confirm(actor, context);
+            }
+            return true;
+        }
     }
 
     class Reflect {
+
+        private static final Logger LOGGER = LogManagerCompat.getLogger();
 
         static final Field memory;
         static final Field injectedValues;
@@ -205,7 +230,7 @@ public @interface Confirm {
                 memoryField = MemoizingValueAccess.class.getDeclaredField("memory");
                 memoryField.setAccessible(true);
             } catch (NoSuchFieldException e) {
-                e.printStackTrace();
+                LOGGER.error("Could not find memory field", e);
                 memoryField = null;
             }
             memory = memoryField;
@@ -216,7 +241,7 @@ public @interface Confirm {
                 injectedValuesField = c.getDeclaredField("injectedValues");
                 injectedValuesField.setAccessible(true);
             } catch (NoSuchFieldException | ClassNotFoundException e) {
-                e.printStackTrace();
+                LOGGER.error("Could not find injectedValues field", e);
                 injectedValuesField = null;
             }
             injectedValues = injectedValuesField;

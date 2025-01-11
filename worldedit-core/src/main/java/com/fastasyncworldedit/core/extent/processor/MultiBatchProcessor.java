@@ -19,7 +19,7 @@ import org.apache.logging.log4j.Logger;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -77,11 +77,11 @@ public class MultiBatchProcessor implements IBatchProcessor {
 
     @Override
     public IChunkSet processSet(IChunk chunk, IChunkGet get, IChunkSet set) {
-        Map<Integer, List<IBatchProcessor>> ordered = new HashMap<>();
+        Map<ProcessorScope, List<IBatchProcessor>> ordered = new EnumMap<>(ProcessorScope.class);
         IChunkSet chunkSet = set;
         for (IBatchProcessor processor : processors) {
             if (processor.getScope() != ProcessorScope.ADDING_BLOCKS) {
-                ordered.computeIfAbsent(processor.getScope().intValue(), k -> new ArrayList<>())
+                ordered.computeIfAbsent(processor.getScope(), k -> new ArrayList<>())
                         .add(processor);
                 continue;
             }
