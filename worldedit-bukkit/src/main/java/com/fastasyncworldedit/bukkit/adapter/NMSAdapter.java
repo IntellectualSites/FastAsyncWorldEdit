@@ -96,10 +96,10 @@ public class NMSAdapter implements FAWEPlatformAdapterImpl {
 
     @Override
     public void sendChunk(IChunkGet chunk, int mask, boolean lighting) {
-        if (!(chunk instanceof BukkitGetBlocks)) {
+        if (!(chunk instanceof AbstractBukkitGetBlocks)) {
             throw new IllegalArgumentException("(IChunkGet) chunk not of type BukkitGetBlocks");
         }
-        ((BukkitGetBlocks) chunk).send();
+        ((AbstractBukkitGetBlocks) chunk).send();
     }
 
     /**
