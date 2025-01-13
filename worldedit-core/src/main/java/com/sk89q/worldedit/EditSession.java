@@ -3522,7 +3522,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     )
             throws MaxChangedBlocksException {
 
-        LocalBlockVectorSet vset = new LocalBlockVectorSet();
+        BlockVector3Set vset = LocalBlockVectorSet.wrapped();
         List<Node> nodes = new ArrayList<>(nodevectors.size());
 
         Interpolation interpol = new KochanekBartelsInterpolation();
@@ -3561,7 +3561,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         if (radius < 1) {
             return vset;
         }
-        LocalBlockVectorSet returnset = new LocalBlockVectorSet();
+        BlockVector3Set returnset = LocalBlockVectorSet.wrapped();
         int ceilrad = (int) Math.ceil(radius);
 
         for (BlockVector3 v : vset) {
@@ -3587,7 +3587,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         if (radius < 1) {
             return vset;
         }
-        final LocalBlockVectorSet returnset = new LocalBlockVectorSet();
+        final BlockVector3Set returnset = LocalBlockVectorSet.wrapped();
         final int ceilrad = (int) Math.ceil(radius);
         for (BlockVector3 v : vset) {
             final int tipx = v.x();
@@ -3605,8 +3605,8 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     }
 
     public Set<BlockVector3> getOutline(Set<BlockVector3> vset) {
-        final LocalBlockVectorSet returnset = new LocalBlockVectorSet();
-        final LocalBlockVectorSet newset = new LocalBlockVectorSet();
+        final BlockVector3Set returnset = LocalBlockVectorSet.wrapped();
+        final BlockVector3Set newset = LocalBlockVectorSet.wrapped();
         newset.addAll(vset);
         for (BlockVector3 v : newset) {
             final int x = v.x();
@@ -3624,8 +3624,8 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     //FAWE end
 
     public Set<BlockVector3> getHollowed(Set<BlockVector3> vset) {
-        final Set<BlockVector3> returnset = new LocalBlockVectorSet();
-        final LocalBlockVectorSet newset = new LocalBlockVectorSet();
+        final BlockVector3Set returnset = LocalBlockVectorSet.wrapped();
+        final BlockVector3Set newset = LocalBlockVectorSet.wrapped();
         newset.addAll(vset);
         for (BlockVector3 v : newset) {
             final int x = v.x();
