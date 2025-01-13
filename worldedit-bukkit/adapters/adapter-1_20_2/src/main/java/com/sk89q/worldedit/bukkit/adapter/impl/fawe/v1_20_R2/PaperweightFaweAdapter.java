@@ -51,6 +51,7 @@ import io.papermc.lib.PaperLib;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.WritableRegistry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
 import net.minecraft.resources.ResourceLocation;
@@ -92,6 +93,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -224,6 +226,15 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
         }
         initialised = true;
         return true;
+    }
+
+    @Override
+    public Collection<String> getRegisteredDefaultBlockStates() {
+        ArrayList<String> states = new ArrayList<>();
+        for (final Block block : BuiltInRegistries.BLOCK) {
+            states.add(CraftBlockData.createData(block.defaultBlockState()).getAsString());
+        }
+        return states;
     }
 
     @Override
