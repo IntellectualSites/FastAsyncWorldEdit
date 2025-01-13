@@ -295,7 +295,7 @@ public class ParallelQueueExtent extends PassthroughExtent {
      */
     @Override
     public Clipboard lazyCopy(Region region) {
-        Clipboard clipboard = new WorldCopyClipboard(() -> this, region);
+        Clipboard clipboard = WorldCopyClipboard.of(this, region);
         clipboard.setOrigin(region.getMinimumPoint());
         return clipboard;
     }

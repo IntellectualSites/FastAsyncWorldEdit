@@ -28,12 +28,28 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
 
     private static final Pool<CharSetBlocks> POOL = FaweCache.INSTANCE.registerPool(
             CharSetBlocks.class,
-            CharSetBlocks::new,
-            Settings.settings().QUEUE.POOL
+            CharSetBlocks::new, Settings.settings().QUEUE.POOL
     );
 
+    /**
+     * @deprecated Use {@link CharSetBlocks#newInstance(int, int)}
+     */
+    @Deprecated(forRemoval = true, since = "TODO")
     public static CharSetBlocks newInstance() {
         return POOL.poll();
+    }
+
+    /**
+     * Create a new {@link CharSetBlocks} instance
+     *
+     * @param x chunk x
+     * @param z chunk z
+     * @return New pooled CharSetBlocks instance.
+     */
+    public static CharSetBlocks newInstance(int x, int z) {
+        CharSetBlocks set = POOL.poll();
+        set.init(x, z);
+        return set;
     }
 
     public BiomeType[][] biomes;
@@ -377,7 +393,9 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
                 defaultOrdinal(),
                 fastMode,
                 bitMask,
-                sideEffectSet
+                sideEffectSet,
+                getX(),
+                getZ()
         );
     }
 
