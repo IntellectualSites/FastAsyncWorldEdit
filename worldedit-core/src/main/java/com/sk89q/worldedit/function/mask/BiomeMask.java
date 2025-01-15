@@ -36,7 +36,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class BiomeMask extends AbstractExtentMask {
 //FAWE end
 
+    //FAWE start - avoid HashSet usage
     private final boolean[] biomes;
+    //FAWE end
 
     /**
      * Create a new biome mask.
@@ -49,10 +51,12 @@ public class BiomeMask extends AbstractExtentMask {
         super(extent);
         //FAWE end
         checkNotNull(biomes);
+        //FAWE start - avoid HashSet usage
         this.biomes = new boolean[BiomeType.REGISTRY.size()];
         for (final BiomeType biome : biomes) {
             this.biomes[biome.getInternalId()] = true;
         }
+        //FAWE end
     }
 
     private BiomeMask(Extent extent, boolean[] biomes) {
@@ -77,9 +81,11 @@ public class BiomeMask extends AbstractExtentMask {
      */
     public void add(Collection<BiomeType> biomes) {
         checkNotNull(biomes);
+        //FAWE start - avoid HashSet usage
         for (final BiomeType biome : biomes) {
             this.biomes[biome.getInternalId()] = true;
         }
+        //FAWE end
     }
 
     /**
@@ -97,13 +103,17 @@ public class BiomeMask extends AbstractExtentMask {
      * @return a list of biomes
      */
     public Collection<BiomeType> getBiomes() {
+        //FAWE start - avoid HashSet usage
         return BiomeType.REGISTRY.values().stream().filter(type -> biomes[type.getInternalId()]).toList();
+        //FAWE end
     }
 
     @Override
     public boolean test(BlockVector3 vector) {
+        //FAWE start - avoid HashSet usage
         BiomeType biome = vector.getBiome(getExtent());
         return biomes[biome.getInternalId()];
+        //FAWE end
     }
 
     @Nullable
@@ -117,12 +127,12 @@ public class BiomeMask extends AbstractExtentMask {
     public Mask copy() {
         return new BiomeMask(getExtent(), this.biomes.clone());
     }
-    //FAWE end
 
     @Override
     public boolean test(Extent extent, BlockVector3 position) {
         BiomeType biome = getExtent().getBiome(position);
         return biomes[biome.getInternalId()];
     }
+    //FAWE end
 
 }
