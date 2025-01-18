@@ -133,10 +133,10 @@ public class AngleMask extends AbstractExtentMask implements ResettableMask {
         int y = base.y();
         // we expect the data for blocks above and below to be loaded already
         // in which case caching/reading from cache has more overhead
-        if (y != maxY && !fastMask.test(base.getStateRelativeY(extent, 1))) {
+        if (y != maxY && !SolidBlockMask.isSolid(base.getStateRelativeY(extent, 1))) {
             return true;
         }
-        if (y != minY && !fastMask.test(base.getStateRelativeY(extent, -1))) {
+        if (y != minY && !SolidBlockMask.isSolid(base.getStateRelativeY(extent, -1))) {
             return true;
         }
         // other positions might be in different chunks, go a slower, cached path there
