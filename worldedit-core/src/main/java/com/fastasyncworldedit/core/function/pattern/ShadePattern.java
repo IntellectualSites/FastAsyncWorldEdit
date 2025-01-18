@@ -15,8 +15,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 public class ShadePattern extends AbstractPattern {
 
-    private final TextureUtil util;
-    private final Extent extent;
+    private final transient TextureUtil util;
+    private final transient Extent extent;
     private final boolean darken;
 
     /**
@@ -30,6 +30,21 @@ public class ShadePattern extends AbstractPattern {
         checkNotNull(extent);
         this.extent = extent;
         this.util = holder.getTextureUtil();
+        this.darken = darken;
+    }
+
+    /**
+     * Create a new {@link Pattern} instance
+     *
+     * @param extent extent to set to
+     * @param darken if the shade should darken or lighten colours
+     * @param util   {@link TextureUtil} to use for textures
+     * @since TODO
+     */
+    private ShadePattern(Extent extent, boolean darken, TextureUtil util) {
+        checkNotNull(extent);
+        this.extent = extent;
+        this.util = util;
         this.darken = darken;
     }
 
@@ -60,6 +75,11 @@ public class ShadePattern extends AbstractPattern {
             return set.setBlock(extent, newType.getDefaultState());
         }
         return false;
+    }
+
+    @Override
+    public Pattern fork() {
+        return new ShadePattern(extent, darken, util.fork());
     }
 
 }
