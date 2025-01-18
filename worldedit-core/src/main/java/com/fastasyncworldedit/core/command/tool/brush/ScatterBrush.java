@@ -121,7 +121,7 @@ public class ScatterBrush implements Brush {
     @Deprecated(forRemoval = true, since = "2.9.2")
     public void apply(EditSession editSession, LocalBlockVectorSet placed, BlockVector3 pt, Pattern p, double size) throws
             MaxChangedBlocksException {
-        apply(editSession, (BlockVector3Set) placed, pt, p, size);
+        apply(editSession, LocalBlockVectorSet.wrap(placed), pt, p, size);
     }
 
     /**
