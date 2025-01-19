@@ -39,6 +39,8 @@ public class ThreadUnsafeCharBlocks implements IChunkSet, IBlocks {
     private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     private final char defaultOrdinal;
+    private final int chunkX;
+    private final int chunkZ;
     private char[][] blocks;
     private int minSectionPosition;
     private int maxSectionPosition;
@@ -74,7 +76,9 @@ public class ThreadUnsafeCharBlocks implements IChunkSet, IBlocks {
             char defaultOrdinal,
             boolean fastMode,
             int bitMask,
-            SideEffectSet sideEffectSet
+            SideEffectSet sideEffectSet,
+            int chunkX,
+            int chunkZ
     ) {
         this.blocks = blocks;
         this.minSectionPosition = minSectionPosition;
@@ -91,6 +95,8 @@ public class ThreadUnsafeCharBlocks implements IChunkSet, IBlocks {
         this.fastMode = fastMode;
         this.bitMask = bitMask;
         this.sideEffectSet = sideEffectSet;
+        this.chunkX = chunkX;
+        this.chunkZ = chunkZ;
     }
 
     @Override
@@ -180,6 +186,16 @@ public class ThreadUnsafeCharBlocks implements IChunkSet, IBlocks {
     @Override
     public int getMinSectionPosition() {
         return minSectionPosition;
+    }
+
+    @Override
+    public int getX() {
+        return chunkX;
+    }
+
+    @Override
+    public int getZ() {
+        return chunkZ;
     }
 
     public char get(int x, int y, int z) {
@@ -485,7 +501,9 @@ public class ThreadUnsafeCharBlocks implements IChunkSet, IBlocks {
                 defaultOrdinal,
                 fastMode,
                 bitMask,
-                sideEffectSet
+                sideEffectSet,
+                chunkX,
+                chunkZ
         );
     }
 

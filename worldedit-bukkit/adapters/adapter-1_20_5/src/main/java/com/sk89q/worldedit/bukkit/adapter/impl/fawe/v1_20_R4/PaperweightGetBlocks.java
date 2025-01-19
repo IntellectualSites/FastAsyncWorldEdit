@@ -2,6 +2,7 @@ package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_20_R4;
 
 import com.fastasyncworldedit.bukkit.adapter.BukkitGetBlocks;
 import com.fastasyncworldedit.bukkit.adapter.DelegateSemaphore;
+import com.fastasyncworldedit.bukkit.adapter.NativeEntityFunctionSet;
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.configuration.Settings;
@@ -17,6 +18,7 @@ import com.fastasyncworldedit.core.util.MathMan;
 import com.fastasyncworldedit.core.util.NbtUtils;
 import com.fastasyncworldedit.core.util.collection.AdaptedMap;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.bukkit.BukkitEntity;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.internal.Constants;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
@@ -71,6 +73,7 @@ import org.enginehub.linbus.tree.LinTagType;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.AbstractCollection;
+import java.util.AbstractSet;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -90,6 +93,7 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static net.minecraft.core.registries.Registries.BIOME;
 
@@ -147,11 +151,13 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
         this.chunkPos = new IntPair(chunkX, chunkZ);
     }
 
-    public int getChunkX() {
+    @Override
+    public int getX() {
         return chunkX;
     }
 
-    public int getChunkZ() {
+    @Override
+    public int getZ() {
         return chunkZ;
     }
 
@@ -370,49 +376,24 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
 
     @Override
     public Collection<FaweCompoundTag> entities() {
-        ensureLoaded(serverLevel, chunkX, chunkZ);
-        List<Entity> entities = PaperweightPlatformAdapter.getEntities(getChunk());
+        List<Entity> entities = PaperweightPlatformAdapter.getEntities(ensureLoaded(serverLevel, chunkX, chunkZ));
         if (entities.isEmpty()) {
             return Collections.emptyList();
         }
-        int size = entities.size();
-        return new AbstractCollection<>() {
-            @Override
-            public int size() {
-                return size;
-            }
+        return new NativeEntityFunctionSet<>(entities, Entity::getUUID, e -> {
+            net.minecraft.nbt.CompoundTag tag = new net.minecraft.nbt.CompoundTag();
+            e.save(tag);
+            return FaweCompoundTag.of(() -> (LinCompoundTag) adapter.toNativeLin(tag));
+        });
+    }
 
-            @Override
-            public boolean isEmpty() {
-                return false;
-            }
-
-            @Override
-            public boolean contains(Object get) {
-                if (!(get instanceof FaweCompoundTag getTag)) {
-                    return false;
-                }
-                UUID getUUID = NbtUtils.uuid(getTag);
-                for (Entity entity : entities) {
-                    UUID uuid = entity.getUUID();
-                    if (uuid.equals(getUUID)) {
-                        return true;
-                    }
-                }
-                return false;
-            }
-
-            @Nonnull
-            @Override
-            public Iterator<FaweCompoundTag> iterator() {
-                Iterable<FaweCompoundTag> result = entities.stream().map(input -> {
-                    net.minecraft.nbt.CompoundTag tag = new net.minecraft.nbt.CompoundTag();
-                    input.save(tag);
-                    return FaweCompoundTag.of((LinCompoundTag) adapter.toNativeLin(tag));
-                })::iterator;
-                return result.iterator();
-            }
-        };
+    @Override
+    public Set<com.sk89q.worldedit.entity.Entity> getFullEntities() {
+        List<Entity> entities = PaperweightPlatformAdapter.getEntities(ensureLoaded(serverLevel, chunkX, chunkZ));
+        if (entities.isEmpty()) {
+            return Collections.emptySet();
+        }
+        return new NativeEntityFunctionSet<>(entities, Entity::getUUID, e -> new BukkitEntity(e.getBukkitEntity()));
     }
 
     private void removeEntity(Entity entity) {
