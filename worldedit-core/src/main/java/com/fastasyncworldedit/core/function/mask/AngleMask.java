@@ -14,8 +14,7 @@ public class AngleMask extends AbstractExtentMask implements ResettableMask {
     protected static double ADJACENT_MOD = 0.5;
     protected static double DIAGONAL_MOD = 1 / Math.sqrt(8);
 
-    private final SolidBlockMask fastMask;
-    protected final CachedMask mask;
+    private final SolidBlockMask mask;
     protected final double max;
     protected final double min;
     protected final boolean overlay;
@@ -33,8 +32,7 @@ public class AngleMask extends AbstractExtentMask implements ResettableMask {
 
     public AngleMask(Extent extent, double min, double max, boolean overlay, int distance) {
         super(extent);
-        this.fastMask = new SolidBlockMask(extent);
-        this.mask = new CachedMask(this.fastMask);
+        this.mask = new SolidBlockMask(extent);
         this.min = min;
         this.max = max;
         this.checkFirst = max >= (Math.tan(90 * (Math.PI / 180)));
@@ -158,7 +156,7 @@ public class AngleMask extends AbstractExtentMask implements ResettableMask {
     @Override
     public boolean test(BlockVector3 vector) {
 
-        if (!fastMask.test(vector)) {
+        if (!mask.test(vector)) {
             return false;
         }
         int y = vector.y();
@@ -185,7 +183,7 @@ public class AngleMask extends AbstractExtentMask implements ResettableMask {
             }
         }
 
-        if (!fastMask.test(extent, vector)) {
+        if (!mask.test(extent, vector)) {
             return false;
         }
         if (overlay) {
