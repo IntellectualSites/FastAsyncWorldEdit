@@ -59,8 +59,8 @@ public class PaperweightGetBlocks_Copy implements IChunkGet {
         this.minHeight = serverLevel.getMinY();
         this.maxHeight = serverLevel.getMaxY() - 1; // Minecraft max limit is exclusive.
         this.blocks = new char[getSectionCount()][];
-        this.chunkX = levelChunk.locX;
-        this.chunkZ = levelChunk.locZ;
+        this.chunkX = levelChunk.getPos().x;
+        this.chunkZ = levelChunk.getPos().z;
     }
 
     protected void storeTile(BlockEntity blockEntity) {
