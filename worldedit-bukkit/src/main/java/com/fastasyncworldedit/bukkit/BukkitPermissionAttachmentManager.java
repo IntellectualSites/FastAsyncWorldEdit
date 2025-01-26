@@ -38,7 +38,7 @@ public class BukkitPermissionAttachmentManager {
         }
         PermissionAttachment attach = attachments.remove(p);
         if (attach != null) {
-            p.removeAttachment(attach);
+            attach.remove();
         }
     }
 
