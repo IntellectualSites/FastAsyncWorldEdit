@@ -11,6 +11,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 
 import javax.annotation.Nullable;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -139,9 +140,7 @@ public interface IBatchProcessor {
                 char[] arr = set.loadIfPresent(layer);
                 if (arr != null) {
                     int index = (minY & 15) << 8;
-                    for (int i = index; i < 4096; i++) {
-                        arr[i] = BlockTypesCache.ReservedIDs.__RESERVED__;
-                    }
+                    Arrays.fill(arr, index, 4096, (char) BlockTypesCache.ReservedIDs.__RESERVED__);
                 }
                 set.setBlocks(layer, arr);
             } else if (layer == maxLayer) {

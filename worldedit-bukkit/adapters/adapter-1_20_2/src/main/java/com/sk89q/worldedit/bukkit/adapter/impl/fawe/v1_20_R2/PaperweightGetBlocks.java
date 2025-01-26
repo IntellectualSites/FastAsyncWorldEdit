@@ -1,19 +1,16 @@
 package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_20_R2;
 
-import com.fastasyncworldedit.bukkit.adapter.BukkitGetBlocks;
+import com.fastasyncworldedit.bukkit.adapter.AbstractBukkitGetBlocks;
 import com.fastasyncworldedit.bukkit.adapter.DelegateSemaphore;
 import com.fastasyncworldedit.bukkit.adapter.NativeEntityFunctionSet;
-import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.extent.processor.heightmap.HeightMapType;
+import com.fastasyncworldedit.core.internal.exception.FaweException;
 import com.fastasyncworldedit.core.math.BitArrayUnstretched;
 import com.fastasyncworldedit.core.math.IntPair;
 import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
-import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.IChunkSet;
-import com.fastasyncworldedit.core.queue.implementation.QueueHandler;
-import com.fastasyncworldedit.core.queue.implementation.blocks.CharGetBlocks;
 import com.fastasyncworldedit.core.util.MathMan;
 import com.fastasyncworldedit.core.util.NbtUtils;
 import com.fastasyncworldedit.core.util.collection.AdaptedMap;
@@ -24,6 +21,7 @@ import com.sk89q.worldedit.internal.Constants;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.util.SideEffect;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
@@ -69,10 +67,7 @@ import org.enginehub.linbus.tree.LinListTag;
 import org.enginehub.linbus.tree.LinStringTag;
 import org.enginehub.linbus.tree.LinTagType;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.AbstractCollection;
-import java.util.AbstractSet;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -84,19 +79,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static net.minecraft.core.registries.Registries.BIOME;
 
-public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBlocks {
+public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, LevelChunk> {
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
 
@@ -108,86 +101,25 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
             .getInstance()
             .getBukkitImplAdapter());
     private final ReadWriteLock sectionLock = new ReentrantReadWriteLock();
-    private final ReentrantLock callLock = new ReentrantLock();
-    private final ServerLevel serverLevel;
-    private final int chunkX;
-    private final int chunkZ;
-    private final IntPair chunkPos;
-    private final int minHeight;
-    private final int maxHeight;
-    private final int minSectionPosition;
-    private final int maxSectionPosition;
     private final Registry<Biome> biomeRegistry;
     private final IdMap<Holder<Biome>> biomeHolderIdMap;
-    private final ConcurrentHashMap<Integer, PaperweightGetBlocks_Copy> copies = new ConcurrentHashMap<>();
     private final Object sendLock = new Object();
-    private LevelChunkSection[] sections;
     private LevelChunk levelChunk;
+    private LevelChunkSection[] sections;
     private DataLayer[] blockLight;
     private DataLayer[] skyLight;
-    private boolean createCopy = false;
-    private boolean forceLoadSections = true;
     private boolean lightUpdate = false;
-    private int copyKey = 0;
 
     public PaperweightGetBlocks(World world, int chunkX, int chunkZ) {
         this(((CraftWorld) world).getHandle(), chunkX, chunkZ);
     }
 
     public PaperweightGetBlocks(ServerLevel serverLevel, int chunkX, int chunkZ) {
-        super(serverLevel.getMinBuildHeight() >> 4, (serverLevel.getMaxBuildHeight() - 1) >> 4);
-        this.serverLevel = serverLevel;
-        this.chunkX = chunkX;
-        this.chunkZ = chunkZ;
-        this.minHeight = serverLevel.getMinBuildHeight();
-        this.maxHeight = serverLevel.getMaxBuildHeight() - 1; // Minecraft max limit is exclusive.
-        this.minSectionPosition = minHeight >> 4;
-        this.maxSectionPosition = maxHeight >> 4;
+        super(serverLevel, chunkX, chunkZ, serverLevel.getMinBuildHeight(), serverLevel.getMaxBuildHeight() - 1);
         this.skyLight = new DataLayer[getSectionCount()];
         this.blockLight = new DataLayer[getSectionCount()];
         this.biomeRegistry = serverLevel.registryAccess().registryOrThrow(BIOME);
         this.biomeHolderIdMap = biomeRegistry.asHolderIdMap();
-        this.chunkPos = new IntPair(chunkX, chunkZ);
-    }
-
-    @Override
-    public int getX() {
-        return chunkX;
-    }
-
-    @Override
-    public int getZ() {
-        return chunkZ;
-    }
-
-    @Override
-    public boolean isCreateCopy() {
-        return createCopy;
-    }
-
-    @Override
-    public int setCreateCopy(boolean createCopy) {
-        if (!callLock.isHeldByCurrentThread()) {
-            throw new IllegalStateException("Attempting to set if chunk GET should create copy, but it is not call-locked.");
-        }
-        this.createCopy = createCopy;
-        // Increment regardless of whether copy will be created or not to return null from getCopy()
-        return ++this.copyKey;
-    }
-
-    @Override
-    public IChunkGet getCopy(final int key) {
-        return copies.remove(key);
-    }
-
-    @Override
-    public void lockCall() {
-        this.callLock.lock();
-    }
-
-    @Override
-    public void unlockCall() {
-        this.callLock.unlock();
     }
 
     @Override
@@ -197,7 +129,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
             try {
                 fillLightNibble(light, LightLayer.BLOCK, minSectionPosition, maxSectionPosition);
             } catch (Throwable e) {
-                e.printStackTrace();
+                LOGGER.error("Error setting lighting to get", e);
             }
         }
     }
@@ -209,7 +141,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
             try {
                 fillLightNibble(light, LightLayer.SKY, minSectionPosition, maxSectionPosition);
             } catch (Throwable e) {
-                e.printStackTrace();
+                LOGGER.error("Error setting sky lighting to get", e);
             }
         }
     }
@@ -222,16 +154,6 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
         Heightmap.Types nativeType = Heightmap.Types.valueOf(type.name());
         Heightmap heightMap = getChunk().heightmaps.get(nativeType);
         heightMap.setRawData(getChunk(), nativeType, bitArray.getData());
-    }
-
-    @Override
-    public int getMaxY() {
-        return maxHeight;
-    }
-
-    @Override
-    public int getMinY() {
-        return minHeight;
     }
 
     @Override
@@ -352,7 +274,6 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
 
     @Override
     public @Nullable FaweCompoundTag entity(final UUID uuid) {
-        ensureLoaded(serverLevel, chunkX, chunkZ);
         List<Entity> entities = PaperweightPlatformAdapter.getEntities(getChunk());
         Entity entity = null;
         for (Entity e : entities) {
@@ -375,7 +296,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
 
     @Override
     public Collection<FaweCompoundTag> entities() {
-        List<Entity> entities = PaperweightPlatformAdapter.getEntities(ensureLoaded(serverLevel, chunkX, chunkZ));
+        List<Entity> entities = PaperweightPlatformAdapter.getEntities(getChunk());
         if (entities.isEmpty()) {
             return Collections.emptyList();
         }
@@ -388,7 +309,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
 
     @Override
     public Set<com.sk89q.worldedit.entity.Entity> getFullEntities() {
-        List<Entity> entities = PaperweightPlatformAdapter.getEntities(ensureLoaded(serverLevel, chunkX, chunkZ));
+        List<Entity> entities = PaperweightPlatformAdapter.getEntities(getChunk());
         if (entities.isEmpty()) {
             return Collections.emptySet();
         }
@@ -399,18 +320,19 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
         entity.discard();
     }
 
-    public LevelChunk ensureLoaded(ServerLevel nmsWorld, int chunkX, int chunkZ) {
+    @Override
+    public CompletableFuture<LevelChunk> ensureLoaded(ServerLevel nmsWorld) {
         return PaperweightPlatformAdapter.ensureLoaded(nmsWorld, chunkX, chunkZ);
     }
 
     @Override
-    @SuppressWarnings("rawtypes")
-    public synchronized <T extends Future<T>> T call(IChunkSet set, Runnable finalizer) {
-        if (!callLock.isHeldByCurrentThread()) {
-            throw new IllegalStateException("Attempted to call chunk GET but chunk was not call-locked.");
-        }
-        forceLoadSections = false;
-        LevelChunk nmsChunk = ensureLoaded(serverLevel, chunkX, chunkZ);
+    protected <T extends Future<T>> T internalCall(
+            IChunkSet set,
+            Runnable finalizer,
+            int copyKey,
+            LevelChunk nmsChunk,
+            ServerLevel nmsWorld
+    ) throws Exception {
         PaperweightGetBlocks_Copy copy = createCopy ? new PaperweightGetBlocks_Copy(nmsChunk) : null;
         if (createCopy) {
             if (copies.containsKey(copyKey)) {
@@ -418,464 +340,421 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
             }
             copies.put(copyKey, copy);
         }
-        try {
-            // Remove existing tiles. Create a copy so that we can remove blocks
-            Map<BlockPos, BlockEntity> chunkTiles = new HashMap<>(nmsChunk.getBlockEntities());
-            List<BlockEntity> beacons = null;
-            if (!chunkTiles.isEmpty()) {
-                for (Map.Entry<BlockPos, BlockEntity> entry : chunkTiles.entrySet()) {
-                    final BlockPos pos = entry.getKey();
-                    final int lx = pos.getX() & 15;
-                    final int ly = pos.getY();
-                    final int lz = pos.getZ() & 15;
-                    final int layer = ly >> 4;
-                    if (!set.hasSection(layer)) {
+        // Remove existing tiles. Create a copy so that we can remove blocks
+        Map<BlockPos, BlockEntity> chunkTiles = new HashMap<>(nmsChunk.getBlockEntities());
+        List<BlockEntity> beacons = null;
+        if (!chunkTiles.isEmpty()) {
+            for (Map.Entry<BlockPos, BlockEntity> entry : chunkTiles.entrySet()) {
+                final BlockPos pos = entry.getKey();
+                final int lx = pos.getX() & 15;
+                final int ly = pos.getY();
+                final int lz = pos.getZ() & 15;
+                final int layer = ly >> 4;
+                if (!set.hasSection(layer)) {
+                    continue;
+                }
+
+                int ordinal = set.getBlock(lx, ly, lz).getOrdinal();
+                if (ordinal != BlockTypesCache.ReservedIDs.__RESERVED__) {
+                    BlockEntity tile = entry.getValue();
+                    if (PaperLib.isPaper() && tile instanceof BeaconBlockEntity) {
+                        if (beacons == null) {
+                            beacons = new ArrayList<>();
+                        }
+                        beacons.add(tile);
+                        PaperweightPlatformAdapter.removeBeacon(tile, nmsChunk);
                         continue;
                     }
-
-                    int ordinal = set.getBlock(lx, ly, lz).getOrdinal();
-                    if (ordinal != BlockTypesCache.ReservedIDs.__RESERVED__) {
-                        BlockEntity tile = entry.getValue();
-                        if (PaperLib.isPaper() && tile instanceof BeaconBlockEntity) {
-                            if (beacons == null) {
-                                beacons = new ArrayList<>();
-                            }
-                            beacons.add(tile);
-                            PaperweightPlatformAdapter.removeBeacon(tile, nmsChunk);
-                            continue;
-                        }
-                        nmsChunk.removeBlockEntity(tile.getBlockPos());
-                        if (createCopy) {
-                            copy.storeTile(tile);
-                        }
+                    nmsChunk.removeBlockEntity(tile.getBlockPos());
+                    if (createCopy) {
+                        copy.storeTile(tile);
                     }
                 }
             }
-            final BiomeType[][] biomes = set.getBiomes();
+        }
+        final BiomeType[][] biomes = set.getBiomes();
 
-            int bitMask = 0;
-            synchronized (nmsChunk) {
-                LevelChunkSection[] levelChunkSections = nmsChunk.getSections();
+        int bitMask = 0;
+        synchronized (nmsChunk) {
+            LevelChunkSection[] levelChunkSections = nmsChunk.getSections();
 
-                for (int layerNo = getMinSectionPosition(); layerNo <= getMaxSectionPosition(); layerNo++) {
+            for (int layerNo = getMinSectionPosition(); layerNo <= getMaxSectionPosition(); layerNo++) {
 
-                    int getSectionIndex = layerNo - getMinSectionPosition();
-                    int setSectionIndex = layerNo - set.getMinSectionPosition();
+                int getSectionIndex = layerNo - getMinSectionPosition();
+                int setSectionIndex = layerNo - set.getMinSectionPosition();
 
-                    if (!set.hasSection(layerNo)) {
-                        // No blocks, but might be biomes present. Handle this lazily.
-                        if (biomes == null) {
-                            continue;
-                        }
-                        if (layerNo < set.getMinSectionPosition() || layerNo > set.getMaxSectionPosition()) {
-                            continue;
-                        }
-                        if (biomes[setSectionIndex] != null) {
-                            synchronized (super.sectionLocks[getSectionIndex]) {
-                                LevelChunkSection existingSection = levelChunkSections[getSectionIndex];
-                                if (createCopy && existingSection != null) {
-                                    copy.storeBiomes(getSectionIndex, existingSection.getBiomes());
-                                }
-
-                                if (existingSection == null) {
-                                    PalettedContainer<Holder<Biome>> biomeData = PaperweightPlatformAdapter.getBiomePalettedContainer(
-                                            biomes[setSectionIndex],
-                                            biomeHolderIdMap
-                                    );
-                                    LevelChunkSection newSection = PaperweightPlatformAdapter.newChunkSection(
-                                            layerNo,
-                                            new char[4096],
-                                            adapter,
-                                            biomeRegistry,
-                                            biomeData
-                                    );
-                                    if (PaperweightPlatformAdapter.setSectionAtomic(
-                                            serverLevel.getWorld().getName(),
-                                            chunkPos,
-                                            levelChunkSections,
-                                            null,
-                                            newSection,
-                                            getSectionIndex
-                                    )) {
-                                        updateGet(nmsChunk, levelChunkSections, newSection, new char[4096], getSectionIndex);
-                                        continue;
-                                    } else {
-                                        existingSection = levelChunkSections[getSectionIndex];
-                                        if (existingSection == null) {
-                                            LOGGER.error("Skipping invalid null section. chunk: {}, {} layer: {}", chunkX, chunkZ,
-                                                    getSectionIndex
-                                            );
-                                            continue;
-                                        }
-                                    }
-                                } else {
-                                    PalettedContainer<Holder<Biome>> paletteBiomes = setBiomesToPalettedContainer(
-                                            biomes,
-                                            setSectionIndex,
-                                            existingSection.getBiomes()
-                                    );
-                                    if (paletteBiomes != null) {
-                                        PaperweightPlatformAdapter.setBiomesToChunkSection(existingSection, paletteBiomes);
-                                    }
-                                }
-                            }
-                        }
+                if (!set.hasSection(layerNo)) {
+                    // No blocks, but might be biomes present. Handle this lazily.
+                    if (biomes == null) {
                         continue;
                     }
-
-                    bitMask |= 1 << getSectionIndex;
-
-                    // setArr is modified by PaperweightPlatformAdapter#newChunkSection. This is in order to write changes to
-                    // this chunk GET when #updateGet is called. Future dords, please listen this time.
-                    char[] tmp = set.load(layerNo);
-                    char[] setArr = new char[tmp.length];
-                    System.arraycopy(tmp, 0, setArr, 0, tmp.length);
-
-                    // synchronise on internal section to avoid circular locking with a continuing edit if the chunk was
-                    // submitted to keep loaded internal chunks to queue target size.
-                    synchronized (super.sectionLocks[getSectionIndex]) {
-
-                        LevelChunkSection newSection;
-                        LevelChunkSection existingSection = levelChunkSections[getSectionIndex];
-                        // Don't attempt to tick section whilst we're editing
-                        if (existingSection != null) {
-                            PaperweightPlatformAdapter.clearCounts(existingSection);
-                            if (PaperLib.isPaper()) {
-                                existingSection.tickingList.clear();
-                            }
-                        }
-
-                        if (createCopy) {
-                            char[] tmpLoad = loadPrivately(layerNo);
-                            char[] copyArr = new char[4096];
-                            System.arraycopy(tmpLoad, 0, copyArr, 0, 4096);
-                            copy.storeSection(getSectionIndex, copyArr);
-                            if (biomes != null && existingSection != null) {
+                    if (layerNo < set.getMinSectionPosition() || layerNo > set.getMaxSectionPosition()) {
+                        continue;
+                    }
+                    if (biomes[setSectionIndex] != null) {
+                        synchronized (super.sectionLocks[getSectionIndex]) {
+                            LevelChunkSection existingSection = levelChunkSections[getSectionIndex];
+                            if (createCopy && existingSection != null) {
                                 copy.storeBiomes(getSectionIndex, existingSection.getBiomes());
                             }
-                        }
 
-                        if (existingSection == null) {
-                            PalettedContainer<Holder<Biome>> biomeData = biomes == null ? new PalettedContainer<>(
-                                    biomeHolderIdMap,
-                                    biomeHolderIdMap.byIdOrThrow(adapter.getInternalBiomeId(BiomeTypes.PLAINS)),
-                                    PalettedContainer.Strategy.SECTION_BIOMES
-                            ) : PaperweightPlatformAdapter.getBiomePalettedContainer(biomes[setSectionIndex], biomeHolderIdMap);
-                            newSection = PaperweightPlatformAdapter.newChunkSection(
-                                    layerNo,
-                                    setArr,
-                                    adapter,
-                                    biomeRegistry,
-                                    biomeData
-                            );
-                            if (PaperweightPlatformAdapter.setSectionAtomic(
-                                    serverLevel.getWorld().getName(),
-                                    chunkPos,
-                                    levelChunkSections,
-                                    null,
-                                    newSection,
-                                    getSectionIndex
-                            )) {
-                                updateGet(nmsChunk, levelChunkSections, newSection, setArr, getSectionIndex);
-                                continue;
-                            } else {
-                                existingSection = levelChunkSections[getSectionIndex];
-                                if (existingSection == null) {
-                                    LOGGER.error("Skipping invalid null section. chunk: {}, {} layer: {}", chunkX, chunkZ,
-                                            getSectionIndex
-                                    );
+                            if (existingSection == null) {
+                                PalettedContainer<Holder<Biome>> biomeData = PaperweightPlatformAdapter.getBiomePalettedContainer(
+                                        biomes[setSectionIndex],
+                                        biomeHolderIdMap
+                                );
+                                LevelChunkSection newSection = PaperweightPlatformAdapter.newChunkSection(
+                                        layerNo,
+                                        new char[4096],
+                                        adapter,
+                                        biomeRegistry,
+                                        biomeData
+                                );
+                                if (PaperweightPlatformAdapter.setSectionAtomic(
+                                        nmsWorld.getWorld().getName(),
+                                        chunkPos,
+                                        levelChunkSections,
+                                        null,
+                                        newSection,
+                                        getSectionIndex
+                                )) {
+                                    updateGet(nmsChunk, levelChunkSections, newSection, new char[4096], getSectionIndex);
                                     continue;
+                                } else {
+                                    existingSection = levelChunkSections[getSectionIndex];
+                                    if (existingSection == null) {
+                                        LOGGER.error(
+                                                "Skipping invalid null section. chunk: {}, {} layer: {}",
+                                                chunkX,
+                                                chunkZ,
+                                                getSectionIndex
+                                        );
+                                        continue;
+                                    }
+                                }
+                            } else {
+                                PalettedContainer<Holder<Biome>> paletteBiomes = setBiomesToPalettedContainer(
+                                        biomes,
+                                        setSectionIndex,
+                                        existingSection.getBiomes()
+                                );
+                                if (paletteBiomes != null) {
+                                    PaperweightPlatformAdapter.setBiomesToChunkSection(existingSection, paletteBiomes);
                                 }
                             }
                         }
+                    }
+                    continue;
+                }
 
-                        //ensure that the server doesn't try to tick the chunksection while we're editing it. (Again)
+                bitMask |= 1 << getSectionIndex;
+
+                // setArr is modified by PaperweightPlatformAdapter#newChunkSection. This is in order to write changes to
+                // this chunk GET when #updateGet is called. Future dords, please listen this time.
+                char[] tmp = set.load(layerNo);
+                char[] setArr = new char[tmp.length];
+                System.arraycopy(tmp, 0, setArr, 0, tmp.length);
+
+                // synchronise on internal section to avoid circular locking with a continuing edit if the chunk was
+                // submitted to keep loaded internal chunks to queue target size.
+                synchronized (super.sectionLocks[getSectionIndex]) {
+
+                    LevelChunkSection newSection;
+                    LevelChunkSection existingSection = levelChunkSections[getSectionIndex];
+                    // Don't attempt to tick section whilst we're editing
+                    if (existingSection != null) {
                         PaperweightPlatformAdapter.clearCounts(existingSection);
                         if (PaperLib.isPaper()) {
                             existingSection.tickingList.clear();
                         }
-                        DelegateSemaphore lock = PaperweightPlatformAdapter.applyLock(existingSection);
+                    }
 
-                        // Synchronize to prevent further acquisitions
-                        synchronized (lock) {
-                            lock.acquire(); // Wait until we have the lock
-                            lock.release();
-                            try {
-                                sectionLock.writeLock().lock();
-                                if (this.getChunk() != nmsChunk) {
-                                    this.levelChunk = nmsChunk;
-                                    this.sections = null;
-                                    this.reset();
-                                } else if (existingSection != getSections(false)[getSectionIndex]) {
-                                    this.sections[getSectionIndex] = existingSection;
-                                    this.reset();
-                                } else if (!Arrays.equals(
-                                        update(getSectionIndex, new char[4096], true),
-                                        loadPrivately(layerNo)
-                                )) {
-                                    this.reset(layerNo);
-                            /*} else if (lock.isModified()) {
-                                this.reset(layerNo);*/
-                                }
-                            } finally {
-                                sectionLock.writeLock().unlock();
-                            }
+                    if (createCopy) {
+                        char[] tmpLoad = loadPrivately(layerNo);
+                        char[] copyArr = new char[4096];
+                        System.arraycopy(tmpLoad, 0, copyArr, 0, 4096);
+                        copy.storeSection(getSectionIndex, copyArr);
+                        if (biomes != null && existingSection != null) {
+                            copy.storeBiomes(getSectionIndex, existingSection.getBiomes());
+                        }
+                    }
 
-                            PalettedContainer<Holder<Biome>> biomeData = setBiomesToPalettedContainer(
-                                    biomes,
-                                    setSectionIndex,
-                                    existingSection.getBiomes()
-                            );
-
-                            newSection = PaperweightPlatformAdapter.newChunkSection(
-                                    layerNo,
-                                    this::loadPrivately,
-                                    setArr,
-                                    adapter,
-                                    biomeRegistry,
-                                    biomeData != null ? biomeData : (PalettedContainer<Holder<Biome>>) existingSection.getBiomes()
-                            );
-                            if (!PaperweightPlatformAdapter.setSectionAtomic(
-                                    serverLevel.getWorld().getName(),
-                                    chunkPos,
-                                    levelChunkSections,
-                                    existingSection,
-                                    newSection,
-                                    getSectionIndex
-                            )) {
-                                LOGGER.error("Skipping invalid null section. chunk: {}, {} layer: {}", chunkX, chunkZ,
+                    if (existingSection == null) {
+                        PalettedContainer<Holder<Biome>> biomeData = biomes == null ? new PalettedContainer<>(
+                                biomeHolderIdMap,
+                                biomeHolderIdMap.byIdOrThrow(adapter.getInternalBiomeId(BiomeTypes.PLAINS)),
+                                PalettedContainer.Strategy.SECTION_BIOMES
+                        ) : PaperweightPlatformAdapter.getBiomePalettedContainer(biomes[setSectionIndex], biomeHolderIdMap);
+                        newSection = PaperweightPlatformAdapter.newChunkSection(
+                                layerNo,
+                                setArr,
+                                adapter,
+                                biomeRegistry,
+                                biomeData
+                        );
+                        if (PaperweightPlatformAdapter.setSectionAtomic(
+                                nmsWorld.getWorld().getName(),
+                                chunkPos,
+                                levelChunkSections,
+                                null,
+                                newSection,
+                                getSectionIndex
+                        )) {
+                            updateGet(nmsChunk, levelChunkSections, newSection, setArr, getSectionIndex);
+                            continue;
+                        } else {
+                            existingSection = levelChunkSections[getSectionIndex];
+                            if (existingSection == null) {
+                                LOGGER.error(
+                                        "Skipping invalid null section. chunk: {}, {} layer: {}",
+                                        chunkX,
+                                        chunkZ,
                                         getSectionIndex
                                 );
-                            } else {
-                                updateGet(nmsChunk, levelChunkSections, newSection, setArr, getSectionIndex);
-                            }
-                        }
-                    }
-                }
-
-                Map<HeightMapType, int[]> heightMaps = set.getHeightMaps();
-                for (Map.Entry<HeightMapType, int[]> entry : heightMaps.entrySet()) {
-                    PaperweightGetBlocks.this.setHeightmapToGet(entry.getKey(), entry.getValue());
-                }
-                PaperweightGetBlocks.this.setLightingToGet(
-                        set.getLight(),
-                        set.getMinSectionPosition(),
-                        set.getMaxSectionPosition()
-                );
-                PaperweightGetBlocks.this.setSkyLightingToGet(
-                        set.getSkyLight(),
-                        set.getMinSectionPosition(),
-                        set.getMaxSectionPosition()
-                );
-
-                Runnable[] syncTasks = null;
-
-                int bx = chunkX << 4;
-                int bz = chunkZ << 4;
-
-                // Call beacon deactivate events here synchronously
-                // list will be null on spigot, so this is an implicit isPaper check
-                if (beacons != null && !beacons.isEmpty()) {
-                    final List<BlockEntity> finalBeacons = beacons;
-
-                    syncTasks = new Runnable[4];
-
-                    syncTasks[3] = () -> {
-                        for (BlockEntity beacon : finalBeacons) {
-                            BeaconBlockEntity.playSound(beacon.getLevel(), beacon.getBlockPos(), SoundEvents.BEACON_DEACTIVATE);
-                            new BeaconDeactivatedEvent(CraftBlock.at(beacon.getLevel(), beacon.getBlockPos())).callEvent();
-                        }
-                    };
-                }
-
-                Set<UUID> entityRemoves = set.getEntityRemoves();
-                if (entityRemoves != null && !entityRemoves.isEmpty()) {
-                    if (syncTasks == null) {
-                        syncTasks = new Runnable[3];
-                    }
-
-                    syncTasks[2] = () -> {
-                        Set<UUID> entitiesRemoved = new HashSet<>();
-                        final List<Entity> entities = PaperweightPlatformAdapter.getEntities(nmsChunk);
-
-                        for (Entity entity : entities) {
-                            UUID uuid = entity.getUUID();
-                            if (entityRemoves.contains(uuid)) {
-                                if (createCopy) {
-                                    copy.storeEntity(entity);
-                                }
-                                removeEntity(entity);
-                                entitiesRemoved.add(uuid);
-                                entityRemoves.remove(uuid);
-                            }
-                        }
-                        if (Settings.settings().EXPERIMENTAL.REMOVE_ENTITY_FROM_WORLD_ON_CHUNK_FAIL) {
-                            for (UUID uuid : entityRemoves) {
-                                Entity entity = serverLevel.getEntities().get(uuid);
-                                if (entity != null) {
-                                    removeEntity(entity);
-                                }
-                            }
-                        }
-                        // Only save entities that were actually removed to history
-                        set.getEntityRemoves().clear();
-                        set.getEntityRemoves().addAll(entitiesRemoved);
-                    };
-                }
-
-                Collection<FaweCompoundTag> entities = set.entities();
-                if (entities != null && !entities.isEmpty()) {
-                    if (syncTasks == null) {
-                        syncTasks = new Runnable[2];
-                    }
-
-                    syncTasks[1] = () -> {
-                        Iterator<FaweCompoundTag> iterator = entities.iterator();
-                        while (iterator.hasNext()) {
-                            final FaweCompoundTag nativeTag = iterator.next();
-                            final LinCompoundTag linTag = nativeTag.linTag();
-                            final LinStringTag idTag = linTag.findTag("Id", LinTagType.stringTag());
-                            final LinListTag<LinDoubleTag> posTag = linTag.findListTag("Pos", LinTagType.doubleTag());
-                            final LinListTag<LinFloatTag> rotTag = linTag.findListTag("Rotation", LinTagType.floatTag());
-                            if (idTag == null || posTag == null || rotTag == null) {
-                                LOGGER.error("Unknown entity tag: {}", nativeTag);
                                 continue;
                             }
-                            final double x = posTag.get(0).valueAsDouble();
-                            final double y = posTag.get(1).valueAsDouble();
-                            final double z = posTag.get(2).valueAsDouble();
-                            final float yaw = rotTag.get(0).valueAsFloat();
-                            final float pitch = rotTag.get(1).valueAsFloat();
-                            final String id = idTag.value();
-
-                            EntityType<?> type = EntityType.byString(id).orElse(null);
-                            if (type != null) {
-                                Entity entity = type.create(serverLevel);
-                                if (entity != null) {
-                                    final CompoundTag tag = (CompoundTag) adapter.fromNativeLin(linTag);
-                                    for (final String name : Constants.NO_COPY_ENTITY_NBT_FIELDS) {
-                                        tag.remove(name);
-                                    }
-                                    entity.load(tag);
-                                    entity.absMoveTo(x, y, z, yaw, pitch);
-                                    entity.setUUID(NbtUtils.uuid(nativeTag));
-                                    if (!serverLevel.addFreshEntity(entity, CreatureSpawnEvent.SpawnReason.CUSTOM)) {
-                                        LOGGER.warn(
-                                                "Error creating entity of type `{}` in world `{}` at location `{},{},{}`",
-                                                id,
-                                                serverLevel.getWorld().getName(),
-                                                x,
-                                                y,
-                                                z
-                                        );
-                                        // Unsuccessful create should not be saved to history
-                                        iterator.remove();
-                                    }
-                                }
-                            }
                         }
-                    };
-                }
-
-                // set tiles
-                Map<BlockVector3, FaweCompoundTag> tiles = set.tiles();
-                if (tiles != null && !tiles.isEmpty()) {
-                    if (syncTasks == null) {
-                        syncTasks = new Runnable[1];
                     }
 
-                    syncTasks[0] = () -> {
-                        for (final Map.Entry<BlockVector3, FaweCompoundTag> entry : tiles.entrySet()) {
-                            final FaweCompoundTag nativeTag = entry.getValue();
-                            final BlockVector3 blockHash = entry.getKey();
-                            final int x = blockHash.x() + bx;
-                            final int y = blockHash.y();
-                            final int z = blockHash.z() + bz;
-                            final BlockPos pos = new BlockPos(x, y, z);
-
-                            synchronized (serverLevel) {
-                                BlockEntity tileEntity = serverLevel.getBlockEntity(pos);
-                                if (tileEntity == null || tileEntity.isRemoved()) {
-                                    serverLevel.removeBlockEntity(pos);
-                                    tileEntity = serverLevel.getBlockEntity(pos);
-                                }
-                                if (tileEntity != null) {
-                                    final CompoundTag tag = (CompoundTag) adapter.fromNativeLin(nativeTag.linTag());
-                                    tag.put("x", IntTag.valueOf(x));
-                                    tag.put("y", IntTag.valueOf(y));
-                                    tag.put("z", IntTag.valueOf(z));
-                                    tileEntity.load(tag);
-                                }
-                            }
-                        }
-                    };
-                }
-
-                Runnable callback;
-                if (bitMask == 0 && biomes == null && !lightUpdate) {
-                    callback = null;
-                } else {
-                    int finalMask = bitMask != 0 ? bitMask : lightUpdate ? set.getBitMask() : 0;
-                    callback = () -> {
-                        // Set Modified
-                        nmsChunk.setLightCorrect(true); // Set Modified
-                        nmsChunk.mustNotSave = false;
-                        nmsChunk.setUnsaved(true);
-                        // send to player
-                        if (!set
-                                .getSideEffectSet()
-                                .shouldApply(SideEffect.LIGHTING) || !Settings.settings().LIGHTING.DELAY_PACKET_SENDING || finalMask == 0 && biomes != null) {
-                            this.send();
-                        }
-                        if (finalizer != null) {
-                            finalizer.run();
-                        }
-                    };
-                }
-                if (syncTasks != null) {
-                    QueueHandler queueHandler = Fawe.instance().getQueueHandler();
-                    Runnable[] finalSyncTasks = syncTasks;
-
-                    // Chain the sync tasks and the callback
-                    Callable<Future> chain = () -> {
+                    //ensure that the server doesn't try to tick the chunksection while we're editing it. (Again)
+                    PaperweightPlatformAdapter.clearCounts(existingSection);
+                    if (PaperLib.isPaper()) {
+                        existingSection.tickingList.clear();
+                    }
+                    DelegateSemaphore lock = PaperweightPlatformAdapter.applyLock(existingSection);
+                    // Synchronize to prevent further acquisitions
+                    synchronized (lock) {
+                        lock.acquire(); // Wait until we have the lock
+                        lock.release();
                         try {
-                            // Run the sync tasks
-                            for (Runnable task : finalSyncTasks) {
-                                if (task != null) {
-                                    task.run();
-                                }
+                            sectionLock.writeLock().lock();
+                            if (this.getChunk() != nmsChunk) {
+                                this.levelChunk = nmsChunk;
+                                this.sections = null;
+                                this.reset();
+                            } else if (existingSection != getSections(false)[getSectionIndex]) {
+                                this.sections[getSectionIndex] = existingSection;
+                                this.reset();
+                            } else if (!Arrays.equals(update(getSectionIndex, new char[4096], true), loadPrivately(layerNo))) {
+                                this.reset(layerNo);
+                        /*} else if (lock.isModified()) {
+                            this.reset(layerNo);*/
                             }
-                            if (callback == null) {
-                                if (finalizer != null) {
-                                    queueHandler.async(finalizer, null);
-                                }
-                                return null;
-                            } else {
-                                return queueHandler.async(callback, null);
-                            }
-                        } catch (Throwable e) {
-                            e.printStackTrace();
-                            throw e;
+                        } finally {
+                            sectionLock.writeLock().unlock();
                         }
-                    };
-                    //noinspection unchecked - required at compile time
-                    return (T) (Future) queueHandler.sync(chain);
-                } else {
-                    if (callback == null) {
-                        if (finalizer != null) {
-                            finalizer.run();
+
+                        PalettedContainer<Holder<Biome>> biomeData = setBiomesToPalettedContainer(
+                                biomes,
+                                setSectionIndex,
+                                existingSection.getBiomes()
+                        );
+
+                        newSection = PaperweightPlatformAdapter.newChunkSection(
+                                layerNo,
+                                this::loadPrivately,
+                                setArr,
+                                adapter,
+                                biomeRegistry,
+                                biomeData != null ? biomeData : (PalettedContainer<Holder<Biome>>) existingSection.getBiomes()
+                        );
+                        if (!PaperweightPlatformAdapter.setSectionAtomic(
+                                nmsWorld.getWorld().getName(),
+                                chunkPos,
+                                levelChunkSections,
+                                existingSection,
+                                newSection,
+                                getSectionIndex
+                        )) {
+                            LOGGER.error(
+                                    "Skipping invalid null section. chunk: {}, {} layer: {}",
+                                    chunkX,
+                                    chunkZ,
+                                    getSectionIndex
+                            );
+                        } else {
+                            updateGet(nmsChunk, levelChunkSections, newSection, setArr, getSectionIndex);
                         }
-                    } else {
-                        callback.run();
                     }
                 }
             }
-            return null;
-        } catch (Throwable e) {
-            e.printStackTrace();
-            return null;
-        } finally {
-            forceLoadSections = true;
+
+            Map<HeightMapType, int[]> heightMaps = set.getHeightMaps();
+            for (Map.Entry<HeightMapType, int[]> entry : heightMaps.entrySet()) {
+                PaperweightGetBlocks.this.setHeightmapToGet(entry.getKey(), entry.getValue());
+            }
+            PaperweightGetBlocks.this.setLightingToGet(set.getLight(), set.getMinSectionPosition(), set.getMaxSectionPosition());
+            PaperweightGetBlocks.this.setSkyLightingToGet(
+                    set.getSkyLight(),
+                    set.getMinSectionPosition(),
+                    set.getMaxSectionPosition()
+            );
+
+            Runnable[] syncTasks = null;
+
+            int bx = chunkX << 4;
+            int bz = chunkZ << 4;
+
+            // Call beacon deactivate events here synchronously
+            // list will be null on spigot, so this is an implicit isPaper check
+            if (beacons != null && !beacons.isEmpty()) {
+                final List<BlockEntity> finalBeacons = beacons;
+
+                syncTasks = new Runnable[4];
+
+                syncTasks[3] = () -> {
+                    for (BlockEntity beacon : finalBeacons) {
+                        BeaconBlockEntity.playSound(beacon.getLevel(), beacon.getBlockPos(), SoundEvents.BEACON_DEACTIVATE);
+                        new BeaconDeactivatedEvent(CraftBlock.at(beacon.getLevel(), beacon.getBlockPos())).callEvent();
+                    }
+                };
+            }
+
+            Set<UUID> entityRemoves = set.getEntityRemoves();
+            if (entityRemoves != null && !entityRemoves.isEmpty()) {
+                if (syncTasks == null) {
+                    syncTasks = new Runnable[3];
+                }
+
+                syncTasks[2] = () -> {
+                    Set<UUID> entitiesRemoved = new HashSet<>();
+                    final List<Entity> entities = PaperweightPlatformAdapter.getEntities(nmsChunk);
+
+                    for (Entity entity : entities) {
+                        UUID uuid = entity.getUUID();
+                        if (entityRemoves.contains(uuid)) {
+                            if (createCopy) {
+                                copy.storeEntity(entity);
+                            }
+                            removeEntity(entity);
+                            entitiesRemoved.add(uuid);
+                            entityRemoves.remove(uuid);
+                        }
+                    }
+                    if (Settings.settings().EXPERIMENTAL.REMOVE_ENTITY_FROM_WORLD_ON_CHUNK_FAIL) {
+                        for (UUID uuid : entityRemoves) {
+                            Entity entity = nmsWorld.getEntities().get(uuid);
+                            if (entity != null) {
+                                removeEntity(entity);
+                            }
+                        }
+                    }
+                    // Only save entities that were actually removed to history
+                    set.getEntityRemoves().clear();
+                    set.getEntityRemoves().addAll(entitiesRemoved);
+                };
+            }
+
+            Collection<FaweCompoundTag> entities = set.entities();
+            if (entities != null && !entities.isEmpty()) {
+                if (syncTasks == null) {
+                    syncTasks = new Runnable[2];
+                }
+
+                syncTasks[1] = () -> {
+                    Iterator<FaweCompoundTag> iterator = entities.iterator();
+                    while (iterator.hasNext()) {
+                        final FaweCompoundTag nativeTag = iterator.next();
+                        final LinCompoundTag linTag = nativeTag.linTag();
+                        final LinStringTag idTag = linTag.findTag("Id", LinTagType.stringTag());
+                        final LinListTag<LinDoubleTag> posTag = linTag.findListTag("Pos", LinTagType.doubleTag());
+                        final LinListTag<LinFloatTag> rotTag = linTag.findListTag("Rotation", LinTagType.floatTag());
+                        if (idTag == null || posTag == null || rotTag == null) {
+                            LOGGER.error("Unknown entity tag: {}", nativeTag);
+                            continue;
+                        }
+                        final double x = posTag.get(0).valueAsDouble();
+                        final double y = posTag.get(1).valueAsDouble();
+                        final double z = posTag.get(2).valueAsDouble();
+                        final float yaw = rotTag.get(0).valueAsFloat();
+                        final float pitch = rotTag.get(1).valueAsFloat();
+                        final String id = idTag.value();
+
+                        EntityType<?> type = EntityType.byString(id).orElse(null);
+                        if (type != null) {
+                            Entity entity = type.create(nmsWorld);
+                            if (entity != null) {
+                                final CompoundTag tag = (CompoundTag) adapter.fromNativeLin(linTag);
+                                for (final String name : Constants.NO_COPY_ENTITY_NBT_FIELDS) {
+                                    tag.remove(name);
+                                }
+                                entity.load(tag);
+                                entity.absMoveTo(x, y, z, yaw, pitch);
+                                entity.setUUID(NbtUtils.uuid(nativeTag));
+                                if (!nmsWorld.addFreshEntity(entity, CreatureSpawnEvent.SpawnReason.CUSTOM)) {
+                                    LOGGER.warn(
+                                            "Error creating entity of type `{}` in world `{}` at location `{},{},{}`",
+                                            id,
+                                            nmsWorld.getWorld().getName(),
+                                            x,
+                                            y,
+                                            z
+                                    );
+                                    // Unsuccessful create should not be saved to history
+                                    iterator.remove();
+                                }
+                            }
+                        }
+                    }
+                };
+            }
+
+            // set tiles
+            Map<BlockVector3, FaweCompoundTag> tiles = set.tiles();
+            if (tiles != null && !tiles.isEmpty()) {
+                if (syncTasks == null) {
+                    syncTasks = new Runnable[1];
+                }
+
+                syncTasks[0] = () -> {
+                    for (final Map.Entry<BlockVector3, FaweCompoundTag> entry : tiles.entrySet()) {
+                        final FaweCompoundTag nativeTag = entry.getValue();
+                        final BlockVector3 blockHash = entry.getKey();
+                        final int x = blockHash.x() + bx;
+                        final int y = blockHash.y();
+                        final int z = blockHash.z() + bz;
+                        final BlockPos pos = new BlockPos(x, y, z);
+
+                        synchronized (nmsWorld) {
+                            BlockEntity tileEntity = nmsWorld.getBlockEntity(pos);
+                            if (tileEntity == null || tileEntity.isRemoved()) {
+                                nmsWorld.removeBlockEntity(pos);
+                                tileEntity = nmsWorld.getBlockEntity(pos);
+                            }
+                            if (tileEntity != null) {
+                                final CompoundTag tag = (CompoundTag) adapter.fromNativeLin(nativeTag.linTag());
+                                tag.put("x", IntTag.valueOf(x));
+                                tag.put("y", IntTag.valueOf(y));
+                                tag.put("z", IntTag.valueOf(z));
+                                tileEntity.load(tag);
+                            }
+                        }
+                    }
+                };
+            }
+
+            Runnable callback;
+            if (bitMask == 0 && biomes == null && !lightUpdate) {
+                callback = null;
+            } else {
+                int finalMask = bitMask != 0 ? bitMask : lightUpdate ? set.getBitMask() : 0;
+                callback = () -> {
+                    // Set Modified
+                    nmsChunk.setLightCorrect(true); // Set Modified
+                    nmsChunk.mustNotSave = false;
+                    nmsChunk.setUnsaved(true);
+                    // send to player
+                    if (!set
+                            .getSideEffectSet()
+                            .shouldApply(SideEffect.LIGHTING) || !Settings.settings().LIGHTING.DELAY_PACKET_SENDING || finalMask == 0 && biomes != null) {
+                        this.send();
+                    }
+                    if (finalizer != null) {
+                        finalizer.run();
+                    }
+                };
+            }
+            return handleCallFinalizer(syncTasks, callback, finalizer);
         }
     }
 
@@ -906,18 +785,6 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
             sectionLock.writeLock().unlock();
         }
         this.blocks[layer] = arr;
-    }
-
-    private char[] loadPrivately(int layer) {
-        layer -= getMinSectionPosition();
-        if (super.sections[layer] != null) {
-            synchronized (super.sectionLocks[layer]) {
-                if (super.sections[layer].isFull() && super.blocks[layer] != null) {
-                    return super.blocks[layer];
-                }
-            }
-        }
-        return PaperweightGetBlocks.this.update(layer, null, true);
     }
 
     @Override
@@ -998,7 +865,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                 }
                 return data;
             } catch (IllegalAccessException | InterruptedException e) {
-                e.printStackTrace();
+                LOGGER.error("Could not read block data from palette", e);
                 throw new RuntimeException(e);
             } finally {
                 lock.release();
@@ -1040,7 +907,16 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
             synchronized (this) {
                 levelChunk = this.levelChunk;
                 if (levelChunk == null) {
-                    this.levelChunk = levelChunk = ensureLoaded(this.serverLevel, chunkX, chunkZ);
+                    try {
+                        this.levelChunk = levelChunk = ensureLoaded(this.serverLevel).get();
+                    } catch (InterruptedException | ExecutionException e) {
+                        LOGGER.error("Could not get chunk at {},{}", chunkX, chunkZ, e);
+                        throw new FaweException(
+                                TextComponent.of("Could not get chunk at " + chunkX + "," + chunkZ + ": " + e.getMessage()),
+                                FaweException.Type.OTHER,
+                                false
+                        );
+                    }
                 }
             }
         }

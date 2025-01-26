@@ -47,7 +47,7 @@ public interface IChunkGet extends IBlocks, Trimable, InputExtent, ITileInput {
 
     }
 
-    <T extends Future<T>> T call(IChunkSet set, Runnable finalize);
+    <T extends Future<T>> T call(IQueueExtent<? extends IChunk> owner, IChunkSet set, Runnable finalize);
 
     @Deprecated(forRemoval = true, since = "2.11.2")
     default CompoundTag getEntity(UUID uuid) {
@@ -90,7 +90,7 @@ public interface IChunkGet extends IBlocks, Trimable, InputExtent, ITileInput {
     }
 
     /**
-     * Lock the {@link IChunkGet#call(IChunkSet, Runnable)} method to the current thread using a reentrant lock. Also locks
+     * Lock the {@link IChunkGet#call(IQueueExtent, IChunkSet, Runnable)} method to the current thread using a reentrant lock. Also locks
      * related methods e.g. {@link IChunkGet#setCreateCopy(boolean)}
      *
      * @since 2.8.2
@@ -98,7 +98,7 @@ public interface IChunkGet extends IBlocks, Trimable, InputExtent, ITileInput {
     default void lockCall() {}
 
     /**
-     * Unlock {@link IChunkGet#call(IChunkSet, Runnable)} (and other related methods) to executions from other threads
+     * Unlock {@link IChunkGet#call(IQueueExtent, IChunkSet, Runnable)} (and other related methods) to executions from other threads
      *
      * @since 2.8.2
      */

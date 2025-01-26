@@ -4,8 +4,10 @@ import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.extent.processor.heightmap.HeightMapType;
 import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.fastasyncworldedit.core.queue.IBlocks;
+import com.fastasyncworldedit.core.queue.IChunk;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.IChunkSet;
+import com.fastasyncworldedit.core.queue.IQueueExtent;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
@@ -131,7 +133,7 @@ public final class NullChunkGet implements IChunkGet {
     }
 
     @Nullable
-    public <T extends Future<T>> T call(@Nonnull IChunkSet set, @Nonnull Runnable finalize) {
+    public <T extends Future<T>> T call(IQueueExtent<? extends IChunk> owner, @Nonnull IChunkSet set, @Nonnull Runnable finalize) {
         return null;
     }
 

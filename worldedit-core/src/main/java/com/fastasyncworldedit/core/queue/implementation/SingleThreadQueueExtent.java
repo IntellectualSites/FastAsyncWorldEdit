@@ -32,6 +32,7 @@ import com.sk89q.worldedit.world.World;
 import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
 import org.apache.logging.log4j.Logger;
 
+import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -69,6 +70,7 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
     private int lastException = Integer.MIN_VALUE;
     private int exceptionCount = 0;
     private SideEffectSet sideEffectSet = SideEffectSet.defaults();
+    private int targetSize = Settings.settings().QUEUE.TARGET_SIZE;
 
     public SingleThreadQueueExtent() {
     }
@@ -135,6 +137,10 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
         return world;
     }
 
+    public void setTargetSize(int targetSize) {
+        this.targetSize = targetSize;
+    }
+
     /**
      * Sets the cached boolean array of length {@code FaweException.Type.values().length} that determines if a thrown
      * {@link FaweException} of type {@link FaweException.Type} should be output to console, rethrown to attempt to be visible
@@ -168,6 +174,7 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
         this.setPostProcessor(EmptyBatchProcessor.getInstance());
         this.world = null;
         this.faweExceptionReasonsUsed = new boolean[FaweException.Type.values().length];
+        this.targetSize = Settings.settings().QUEUE.TARGET_SIZE;
     }
 
     /**
@@ -260,6 +267,13 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
     }
 
     @Override
+    public <V extends Future<V>> V submitTaskUnchecked(Callable<V> callable) {
+        V future = (V) Fawe.instance().getQueueHandler().submitToBlocking(callable);
+        submissions.add(future);
+        return future;
+    }
+
+    @Override
     public synchronized boolean trim(boolean aggressive) {
         cacheGet.trim(aggressive);
         cacheSet.trim(aggressive);
@@ -324,7 +338,7 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
             // If queueing is enabled AND either of the following
             //  - memory is low & queue size > num threads + 8
             //  - queue size > target size and primary queue has less than num threads submissions
-            int targetSize = lowMem ? Settings.settings().QUEUE.PARALLEL_THREADS + 8 : Settings.settings().QUEUE.TARGET_SIZE;
+            int targetSize = lowMem ? Settings.settings().QUEUE.PARALLEL_THREADS + 8 : this.targetSize;
             if (enabledQueue && size > targetSize && (lowMem || Fawe.instance().getQueueHandler().isUnderutilized())) {
                 chunk = chunks.removeFirst();
                 final Future future = submitUnchecked(chunk);

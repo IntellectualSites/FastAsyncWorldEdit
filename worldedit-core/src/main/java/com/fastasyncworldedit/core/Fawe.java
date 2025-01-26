@@ -135,6 +135,7 @@ public class Fawe {
             } catch (Throwable ignored) {
             }
         }, 0);
+        TaskManager.taskManager().repeatAsync(MemUtil::checkAndSetApproachingLimit, 1);
 
         TaskManager.taskManager().repeat(timer, 1);
         uuidKeyQueuedExecutorService = new KeyQueuedExecutorService<>(new ThreadPoolExecutor(
@@ -418,6 +419,7 @@ public class Fawe {
                 if (heapSize < heapMaxSize) {
                     return;
                 }
+                LOGGER.warn("High memory usage detected, FAWE will attempt to slow operations to prevent a crash.");
                 MemUtil.memoryLimitedTask();
             }, null, null);
 

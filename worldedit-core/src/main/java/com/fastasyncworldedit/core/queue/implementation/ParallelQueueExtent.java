@@ -132,6 +132,7 @@ public class ParallelQueueExtent extends PassthroughExtent {
         queue.setFastMode(fastmode);
         queue.setSideEffectSet(sideEffectSet);
         queue.setFaweExceptionArray(faweExceptionReasonsUsed);
+        queue.setTargetSize(Settings.settings().QUEUE.TARGET_SIZE * Settings.settings().QUEUE.THREAD_TARGET_SIZE_PERCENT / 100);
         enter(queue);
         return queue;
     }
