@@ -21,7 +21,7 @@ jobs:
       - name: Build on ${{ matrix.os }}
         run: ./gradlew build -s
       - name: Archive artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
             name: FastAsyncWorldEdit-SNAPSHOT
             path: worldedit-bukkit/build/libs/FastAsyncWorldEdit-*.jar
