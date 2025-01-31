@@ -45,7 +45,6 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkStatus;
 import net.minecraft.world.level.chunk.GlobalPalette;
 import net.minecraft.world.level.chunk.HashMapPalette;
@@ -57,13 +56,13 @@ import net.minecraft.world.level.chunk.PalettedContainer;
 import net.minecraft.world.level.chunk.SingleValuePalette;
 import net.minecraft.world.level.entity.PersistentEntitySectionManager;
 import org.apache.logging.log4j.Logger;
+import org.bukkit.Chunk;
 import org.bukkit.craftbukkit.v1_20_R3.CraftChunk;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodType;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -82,7 +81,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Semaphore;
 import java.util.function.IntFunction;
 
-import static java.lang.invoke.MethodType.methodType;
 import static net.minecraft.core.registries.Registries.BIOME;
 
 public final class PaperweightPlatformAdapter extends NMSAdapter {
@@ -105,12 +103,6 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
 
     private static final MethodHandle methodRemoveGameEventListener;
     private static final MethodHandle methodremoveTickingBlockEntity;
-
-    /*
-     * This is a workaround for the changes from https://hub.spigotmc.org/stash/projects/SPIGOT/repos/craftbukkit/commits/1fddefce1cdce44010927b888432bf70c0e88cde#src/main/java/org/bukkit/craftbukkit/CraftChunk.java
-     * and is only needed to support 1.19.4 versions before *and* after this change.
-     */
-    private static final MethodHandle CRAFT_CHUNK_GET_HANDLE;
 
     private static final Field fieldRemove;
 
@@ -224,20 +216,6 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        MethodHandle craftChunkGetHandle;
-        final MethodType type = methodType(LevelChunk.class);
-        try {
-            craftChunkGetHandle = lookup.findVirtual(CraftChunk.class, "getHandle", type);
-        } catch (NoSuchMethodException | IllegalAccessException e) {
-            try {
-                final MethodType newType = methodType(ChunkAccess.class, ChunkStatus.class);
-                craftChunkGetHandle = lookup.findVirtual(CraftChunk.class, "getHandle", newType);
-                craftChunkGetHandle = MethodHandles.insertArguments(craftChunkGetHandle, 1, ChunkStatus.FULL);
-            } catch (NoSuchMethodException | IllegalAccessException ex) {
-                throw new RuntimeException(ex);
-            }
-        }
-        CRAFT_CHUNK_GET_HANDLE = craftChunkGetHandle;
     }
 
     static boolean setSectionAtomic(
@@ -291,7 +269,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                     .thenApply(chunk -> {
                         addTicket(serverLevel, chunkX, chunkZ);
                         try {
-                            return (LevelChunk) CRAFT_CHUNK_GET_HANDLE.invoke(chunk);
+                            return toLevelChunk(chunk);
                         } catch (Throwable e) {
                             LOGGER.error("Could not asynchronously load chunk at {},{}", chunkX, chunkZ, e);
                             return null;
@@ -313,6 +291,10 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             }
         }
         return CompletableFuture.supplyAsync(() -> TaskManager.taskManager().sync(() -> serverLevel.getChunk(chunkX, chunkZ)));
+    }
+
+    private static LevelChunk toLevelChunk(Chunk chunk) {
+        return (LevelChunk) ((CraftChunk) chunk).getHandle(ChunkStatus.FULL);
     }
 
     public static @Nullable LevelChunk getChunkImmediatelyAsync(ServerLevel serverLevel, int chunkX, int chunkZ) {
