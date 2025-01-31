@@ -84,7 +84,21 @@ public class ParallelQueueExtent extends PassthroughExtent {
         this.sideEffectSet = sideEffectSet == null ? SideEffectSet.defaults() : sideEffectSet;
     }
 
+    /**
+     * Removes the extent currently associated with the calling thread.
+     */
+    @Deprecated(forRemoval = true, since = "TODO")
+    public static void clearCurrentExtent() {
+        FaweThread.clearCurrentExtent();
+    }
 
+    /**
+     * Sets the extent associated with the calling thread.
+     */
+    @Deprecated(forRemoval = true, since = "TODO")
+    public static void setCurrentExtent(Extent extent) {
+        FaweThread.setCurrentExtent(extent);
+    }
 
     private void enter(Extent extent) {
         FaweThread.setCurrentExtent(extent);
