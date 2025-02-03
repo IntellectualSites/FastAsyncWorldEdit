@@ -19,6 +19,7 @@ import com.fastasyncworldedit.core.internal.simd.VectorizedFilter;
 import com.fastasyncworldedit.core.queue.Filter;
 import com.fastasyncworldedit.core.queue.IQueueChunk;
 import com.fastasyncworldedit.core.queue.IQueueExtent;
+import com.fastasyncworldedit.core.util.task.FaweThread;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
@@ -53,7 +54,6 @@ import java.util.stream.IntStream;
 public class ParallelQueueExtent extends PassthroughExtent {
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
-    private static final ThreadLocal<Extent> extents = new ThreadLocal<>();
 
     private final World world;
     private final QueueHandler handler;
@@ -87,29 +87,31 @@ public class ParallelQueueExtent extends PassthroughExtent {
     /**
      * Removes the extent currently associated with the calling thread.
      */
+    @Deprecated(forRemoval = true, since = "TODO")
     public static void clearCurrentExtent() {
-        extents.remove();
+        FaweThread.clearCurrentExtent();
     }
 
     /**
      * Sets the extent associated with the calling thread.
      */
+    @Deprecated(forRemoval = true, since = "TODO")
     public static void setCurrentExtent(Extent extent) {
-        extents.set(extent);
+        FaweThread.setCurrentExtent(extent);
     }
 
     private void enter(Extent extent) {
-        setCurrentExtent(extent);
+        FaweThread.setCurrentExtent(extent);
     }
 
     private void exit() {
-        clearCurrentExtent();
+        FaweThread.clearCurrentExtent();
     }
 
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     public IQueueExtent<IQueueChunk> getExtent() {
-        Extent extent = extents.get();
+        Extent extent = FaweThread.getCurrentExtent();
         if (extent == null) {
             extent = super.getExtent();
         }
