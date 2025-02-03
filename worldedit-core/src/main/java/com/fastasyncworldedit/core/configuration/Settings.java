@@ -289,8 +289,18 @@ public class Settings extends Config {
         @Comment({"Show additional information in console. It helps us at IntellectualSites to find out more about an issue.",
                 "Leave it off if you don't need it, it can spam your console."})
         public boolean DEBUG = false;
-        @Comment({"Whether or not FAWE should notify you on startup about new versions available."})
-        public boolean UPDATE_NOTIFICATIONS = true;
+
+        @Migrate("enabled-components.update-notification")
+        @Comment({"Whether or not FAWE should notify you on startup about new available snapshots."})
+        public boolean SNAPSHOT_UPDATE_NOTIFICATIONS = true;
+
+        @Migrate("enabled-components.update-notification")
+        @Comment({"Whether or not FAWE should notify you on startup about new releases."})
+        public boolean RELEASE_UPDATE_NOTIFICATIONS = true;
+
+        @Migrate("enabled-components.update-notification")
+        @Comment({"Whether or not FAWE should notify you for updates (snapshot / release) on join (with the required permission)"})
+        public boolean NOTIFY_UPDATE_INGAME = true;
 
     }
 
