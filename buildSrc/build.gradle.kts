@@ -23,7 +23,7 @@ val properties = Properties().also { props ->
 dependencies {
     implementation(gradleApi())
     implementation("org.ajoberstar.grgit:grgit-gradle:5.3.0")
-    implementation("com.gradleup.shadow:shadow-gradle-plugin:8.3.5")
+    implementation("com.gradleup.shadow:shadow-gradle-plugin:8.3.6")
     implementation("io.papermc.paperweight.userdev:io.papermc.paperweight.userdev.gradle.plugin:1.7.7")
     constraints {
         val asmVersion = "[9.7,)"
