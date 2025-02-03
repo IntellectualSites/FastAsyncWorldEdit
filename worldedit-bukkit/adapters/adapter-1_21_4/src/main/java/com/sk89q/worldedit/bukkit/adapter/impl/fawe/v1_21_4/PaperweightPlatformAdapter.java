@@ -626,11 +626,12 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
 
     public static BiomeType adapt(Holder<Biome> biome, LevelAccessor levelAccessor) {
         final Registry<Biome> biomeRegistry = levelAccessor.registryAccess().lookupOrThrow(BIOME);
-        if (biomeRegistry.getKey(biome.value()) == null) {
-            return biomeRegistry.asHolderIdMap().getId(biome) == -1 ? BiomeTypes.OCEAN
-                    : null;
+        final int id = biomeRegistry.getId(biome.value());
+        if (id < 0) {
+            // this shouldn't be the case, but other plugins can be weird
+            return BiomeTypes.OCEAN;
         }
-        return BiomeTypes.get(biome.unwrapKey().orElseThrow().location().toString());
+        return BiomeTypes.getLegacy(id);
     }
 
     static void removeBeacon(BlockEntity beacon, LevelChunk levelChunk) {
