@@ -381,7 +381,7 @@ public class CharFilterBlock extends ChunkFilterBlock {
             return states[getArr[this.index + (y << 8)]];
         } else if ((layerAdd > 0 && layerAdd < (maxLayer - layer)) || (layerAdd < 0 && layerAdd < (minLayer - layer))) {
             final int newLayer = layer + layerAdd;
-            final int index = this.index + ((y & 15) << 8);
+            final int index = (this.index + ((y & 15) << 8)) & 4095;
             return states[get.sections[newLayer].get(get, newLayer, index)];
         }
         return BlockTypes.__RESERVED__.getDefaultState();
