@@ -42,6 +42,9 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
+import jdk.jfr.Category;
+import jdk.jfr.Event;
+import jdk.jfr.Name;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
@@ -100,11 +103,11 @@ public class ParallelQueueExtent extends PassthroughExtent {
         FaweThread.setCurrentExtent(extent);
     }
 
-    private void enter(Extent extent) {
+    void enter(Extent extent) {
         FaweThread.setCurrentExtent(extent);
     }
 
-    private void exit() {
+    void exit() {
         FaweThread.clearCurrentExtent();
     }
 
@@ -129,13 +132,12 @@ public class ParallelQueueExtent extends PassthroughExtent {
     }
 
     @SuppressWarnings("rawtypes")
-    private IQueueExtent<IQueueChunk> getNewQueue() {
+    IQueueExtent<IQueueChunk> getNewQueue() {
         SingleThreadQueueExtent queue = (SingleThreadQueueExtent) handler.getQueue(world, this.processor, this.postProcessor);
         queue.setFastMode(fastmode);
         queue.setSideEffectSet(sideEffectSet);
         queue.setFaweExceptionArray(faweExceptionReasonsUsed);
         queue.setTargetSize(Settings.settings().QUEUE.TARGET_SIZE * Settings.settings().QUEUE.THREAD_TARGET_SIZE_PERCENT / 100);
-        enter(queue);
         return queue;
     }
 
@@ -158,62 +160,32 @@ public class ParallelQueueExtent extends PassthroughExtent {
             getExtent().flush();
             filter.finish();
         } else {
-            final ForkJoinTask[] tasks = IntStream.range(0, size).mapToObj(i -> handler.submit(() -> {
-                try {
-                    final Filter newFilter = filter.fork();
-                    final Region newRegion = region.clone();
-                    // Create a chunk that we will reuse/reset for each operation
-                    final SingleThreadQueueExtent queue = (SingleThreadQueueExtent) getNewQueue();
-                    synchronized (queue) {
-                        try {
-                            ChunkFilterBlock block = null;
-                            while (true) {
-                                // Get the next chunk posWeakChunk
-                                final int chunkX;
-                                final int chunkZ;
-                                synchronized (chunksIter) {
-                                    if (!chunksIter.hasNext()) {
-                                        break;
-                                    }
-                                    final BlockVector2 pos = chunksIter.next();
-                                    chunkX = pos.x();
-                                    chunkZ = pos.z();
-                                }
-                                block = queue.apply(block, newFilter, newRegion, chunkX, chunkZ, full);
-                            }
-                            queue.flush();
-                            filter.finish();
-                        } catch (Throwable t) {
-                            if (t instanceof FaweException) {
-                                Fawe.handleFaweException(faweExceptionReasonsUsed, (FaweException) t, LOGGER);
-                            } else if (t.getCause() instanceof FaweException) {
-                                Fawe.handleFaweException(faweExceptionReasonsUsed, (FaweException) t.getCause(), LOGGER);
-                            } else {
-                                throw t;
-                            }
-                        }
-                    }
-                } catch (Throwable e) {
-                    String message = e.getMessage();
-                    int hash = message != null ? message.hashCode() : 0;
-                    if (lastException != hash) {
-                        lastException = hash;
-                        exceptionCount = 0;
-                        LOGGER.catching(e);
-                    } else if (exceptionCount < Settings.settings().QUEUE.PARALLEL_THREADS) {
-                        exceptionCount++;
-                        LOGGER.warn(message);
-                    }
-                } finally {
-                    exit();
-                }
-            })).toArray(ForkJoinTask[]::new);
-            // Join filters
-            for (ForkJoinTask task : tasks) {
-                if (task != null) {
-                    task.quietlyJoin();
-                }
+            @Category("FAWE")
+            @Name("ComputeEvent")
+            class ComputeEvent extends Event {
+                public String type;
             }
+            final ComputeEvent rawCompute = new ComputeEvent();
+            rawCompute.type = "raw";
+            rawCompute.begin();
+            final ComputeEvent fullCompute = new ComputeEvent();
+            fullCompute.type = "full";
+            fullCompute.begin();
+            ForkJoinTask<?> task = this.handler.submit(new ApplyTask<>(region, filter, ParallelQueueExtent.this, full) {
+                @Override
+                protected void compute() {
+                    super.compute();
+                    rawCompute.commit();
+                    // the root task takes care of the post-process invocation
+                    for (ForkJoinTask<?> task1 : postProcess()) {
+                        task1.quietlyJoin();
+                    }
+                    fullCompute.commit();
+                }
+            });
+            // wait for task to finish
+            task.quietlyJoin();
+            // Join filters
             filter.join();
         }
         return filter;
