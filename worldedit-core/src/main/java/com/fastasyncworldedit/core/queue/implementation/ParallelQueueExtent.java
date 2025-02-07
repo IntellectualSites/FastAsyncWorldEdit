@@ -1,6 +1,5 @@
 package com.fastasyncworldedit.core.queue.implementation;
 
-import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.extent.NullExtent;
@@ -42,9 +41,6 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
-import jdk.jfr.Category;
-import jdk.jfr.Event;
-import jdk.jfr.Name;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
@@ -52,7 +48,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ForkJoinTask;
-import java.util.stream.IntStream;
 
 public class ParallelQueueExtent extends PassthroughExtent {
 
@@ -160,27 +155,14 @@ public class ParallelQueueExtent extends PassthroughExtent {
             getExtent().flush();
             filter.finish();
         } else {
-            @Category("FAWE")
-            @Name("ComputeEvent")
-            class ComputeEvent extends Event {
-                public String type;
-            }
-            final ComputeEvent rawCompute = new ComputeEvent();
-            rawCompute.type = "raw";
-            rawCompute.begin();
-            final ComputeEvent fullCompute = new ComputeEvent();
-            fullCompute.type = "full";
-            fullCompute.begin();
             ForkJoinTask<?> task = this.handler.submit(new ApplyTask<>(region, filter, ParallelQueueExtent.this, full) {
                 @Override
                 protected void compute() {
                     super.compute();
-                    rawCompute.commit();
                     // the root task takes care of the post-process invocation
                     for (ForkJoinTask<?> task1 : postProcess()) {
                         task1.quietlyJoin();
                     }
-                    fullCompute.commit();
                 }
             });
             // wait for task to finish
