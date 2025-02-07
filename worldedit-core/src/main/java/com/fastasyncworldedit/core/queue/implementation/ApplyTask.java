@@ -111,6 +111,11 @@ class ApplyTask<F extends Filter> extends RecursiveAction implements Runnable {
                         processRegion(regionX, regionZ, this.shift);
                         continue;
                     }
+                    if (this.shift == 0 && !this.commonState.region.containsChunk(regionX, regionZ)) {
+                        // if shift == 0, region ccords are chunk coords
+                        continue; // chunks not intersecting with the region don't need a task
+                    }
+
                     // creating more tasks will likely help parallelism as other threads aren't *that* busy
                     subtask = new ApplyTask<>(
                             this.commonState,
@@ -152,7 +157,7 @@ class ApplyTask<F extends Filter> extends RecursiveAction implements Runnable {
             for (int chunkX = regionX << shift; chunkX <= ((regionX  + 1) << shift) - 1; chunkX++) {
                 for (int chunkZ = regionZ << shift; chunkZ <= ((regionZ  + 1) << shift) - 1; chunkZ++) {
                     if (!this.commonState.region.containsChunk(chunkX, chunkZ)) {
-                        continue; // chunks not intersecting with the region don't need a task
+                        continue; // chunks not intersecting with the region must not be processed
                     }
                     applyChunk(chunkX, chunkZ, state);
                 }
