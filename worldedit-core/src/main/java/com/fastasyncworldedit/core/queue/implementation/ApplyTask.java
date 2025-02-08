@@ -99,8 +99,8 @@ class ApplyTask<F extends Filter> extends RecursiveAction implements Runnable {
 
     @Override
     protected void compute() {
-        ApplyTask<F> subtask = null;
         if (this.minChunkX != this.maxChunkX || this.minChunkZ != this.maxChunkZ) {
+            ApplyTask<F> subtask = null;
             int minRegionX = this.minChunkX >> this.shift;
             int minRegionZ = this.minChunkZ >> this.shift;
             int maxRegionX = this.maxChunkX >> this.shift;
@@ -131,18 +131,18 @@ class ApplyTask<F extends Filter> extends RecursiveAction implements Runnable {
                     subtask.fork();
                 }
             }
+            // try processing tasks in reverse order if not processed already, otherwise "wait" for completion
+            while (subtask != null) {
+                if (subtask.tryUnfork()) {
+                    subtask.invoke();
+                } else {
+                    subtask.quietlyJoin();
+                }
+                subtask = subtask.before;
+            }
         } else {
             // we reached a task for a single chunk, let's process it
             processChunk(this.minChunkX, this.minChunkZ);
-        }
-        // try processing tasks in reverse order if not processed already, otherwise "wait" for completion
-        while (subtask != null) {
-            if (subtask.tryUnfork()) {
-                subtask.invoke();
-            } else {
-                subtask.quietlyJoin();
-            }
-            subtask = subtask.before;
         }
         if (this.shift == INITIAL_REGION_SHIFT) {
             onCompletion();
