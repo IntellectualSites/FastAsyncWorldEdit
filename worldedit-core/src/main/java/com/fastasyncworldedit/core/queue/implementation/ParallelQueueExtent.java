@@ -155,16 +155,7 @@ public class ParallelQueueExtent extends PassthroughExtent {
             getExtent().flush();
             filter.finish();
         } else {
-            ForkJoinTask<?> task = this.handler.submit(new ApplyTask<>(region, filter, ParallelQueueExtent.this, full) {
-                @Override
-                protected void compute() {
-                    super.compute();
-                    // the root task takes care of the post-process invocation
-                    for (ForkJoinTask<?> task1 : postProcess()) {
-                        task1.quietlyJoin();
-                    }
-                }
-            });
+            ForkJoinTask<?> task = this.handler.submit(new ApplyTask<>(region, filter, this, full));
             // wait for task to finish
             task.quietlyJoin();
             // Join filters

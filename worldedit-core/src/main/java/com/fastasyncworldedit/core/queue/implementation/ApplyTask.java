@@ -23,6 +23,8 @@ class ApplyTask<F extends Filter> extends RecursiveAction implements Runnable {
     private final int minChunkZ;
     private final int maxChunkX;
     private final int maxChunkZ;
+    // Note: shift == INITIAL_REGION_SHIFT means we are in the root node.
+    // compute() relies on that when triggering postProcess
     private final int shift;
 
     @Override
@@ -112,7 +114,7 @@ class ApplyTask<F extends Filter> extends RecursiveAction implements Runnable {
                         continue;
                     }
                     if (this.shift == 0 && !this.commonState.region.containsChunk(regionX, regionZ)) {
-                        // if shift == 0, region ccords are chunk coords
+                        // if shift == 0, region coords are chunk coords
                         continue; // chunks not intersecting with the region don't need a task
                     }
 
@@ -136,22 +138,19 @@ class ApplyTask<F extends Filter> extends RecursiveAction implements Runnable {
         // try processing tasks in reverse order if not processed already, otherwise "wait" for completion
         while (subtask != null) {
             if (subtask.tryUnfork()) {
-                subtask.compute();
+                subtask.invoke();
             } else {
                 subtask.quietlyJoin();
             }
             subtask = subtask.before;
         }
+        if (this.shift == INITIAL_REGION_SHIFT) {
+            onCompletion();
+        }
     }
 
     private void processRegion(int regionX, int regionZ, int shift) {
-        final ThreadState<F> state = this.commonState.stateCache.computeIfAbsent(
-                Thread.currentThread(),
-                __ -> new ThreadState<>(
-                        (SingleThreadQueueExtent) this.commonState.parallelQueueExtent.getNewQueue(),
-                        (F) this.commonState.originalFilter.fork()
-                )
-        );
+        final ThreadState<F> state = getState();
         this.commonState.parallelQueueExtent.enter(state.queue);
         try {
             for (int chunkX = regionX << shift; chunkX <= ((regionX  + 1) << shift) - 1; chunkX++) {
@@ -168,14 +167,19 @@ class ApplyTask<F extends Filter> extends RecursiveAction implements Runnable {
 
     }
 
-    private void processChunk(int chunkX, int chunkZ) {
-        final ThreadState<F> state = this.commonState.stateCache.computeIfAbsent(
+    @SuppressWarnings("unchecked")
+    private ThreadState<F> getState() {
+        return this.commonState.stateCache.computeIfAbsent(
                 Thread.currentThread(),
                 __ -> new ThreadState<>(
                         (SingleThreadQueueExtent) this.commonState.parallelQueueExtent.getNewQueue(),
                         (F) this.commonState.originalFilter.fork()
                 )
         );
+    }
+
+    private void processChunk(int chunkX, int chunkZ) {
+        final ThreadState<F> state = getState();
         this.commonState.parallelQueueExtent.enter(state.queue);
         try {
             applyChunk(chunkX, chunkZ, state);
@@ -195,13 +199,23 @@ class ApplyTask<F extends Filter> extends RecursiveAction implements Runnable {
         );
     }
 
-    ForkJoinTask<?>[] postProcess() {
+    private void onCompletion() {
+        for (ForkJoinTask<?> task : postProcess()) {
+            if (task.tryUnfork()) {
+                task.invoke();
+            } else {
+                task.quietlyJoin();
+            }
+        }
+    }
+
+    private ForkJoinTask<?>[] postProcess() {
         final Collection<ThreadState<F>> values = this.commonState.stateCache.values();
         ForkJoinTask<?>[] tasks = new ForkJoinTask[values.size()];
-        int i = 0;
+        int i = values.size() - 1;
         for (final ThreadState<F> value : values) {
             tasks[i] = ForkJoinTask.adapt(value.queue::flush).fork();
-            i++;
+            i--;
         }
         return tasks;
     }
