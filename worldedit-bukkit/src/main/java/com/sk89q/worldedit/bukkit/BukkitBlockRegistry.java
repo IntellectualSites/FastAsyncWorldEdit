@@ -151,14 +151,11 @@ public class BukkitBlockRegistry extends BundledBlockRegistry {
     //FAWE start
     @Override
     public Collection<String> values() {
-        ArrayList<String> blocks = new ArrayList<>();
-        for (Material m : Material.values()) {
-            if (!m.isLegacy() && m.isBlock()) {
-                BlockData blockData = m.createBlockData();
-                blocks.add(blockData.getAsString());
-            }
+        BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
+        if (adapter != null) {
+            return adapter.getRegisteredDefaultBlockStates();
         }
-        return blocks;
+        return super.values();
     }
 
     @Override
