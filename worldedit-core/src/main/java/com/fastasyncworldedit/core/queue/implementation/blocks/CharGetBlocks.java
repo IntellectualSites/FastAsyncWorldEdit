@@ -7,6 +7,7 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 
+import java.lang.invoke.VarHandle;
 import java.util.Arrays;
 
 public abstract class CharGetBlocks extends CharBlocks implements IChunkGet {
@@ -28,6 +29,7 @@ public abstract class CharGetBlocks extends CharBlocks implements IChunkGet {
     public synchronized boolean trim(boolean aggressive) {
         for (int i = 0; i < sectionCount; i++) {
             sections[i] = EMPTY;
+            VarHandle.storeStoreFence();
             blocks[i] = null;
         }
         return true;
@@ -51,6 +53,7 @@ public abstract class CharGetBlocks extends CharBlocks implements IChunkGet {
     public synchronized boolean trim(boolean aggressive, int layer) {
         layer -= minSectionPosition;
         sections[layer] = EMPTY;
+        VarHandle.storeStoreFence();
         blocks[layer] = null;
         return true;
     }
