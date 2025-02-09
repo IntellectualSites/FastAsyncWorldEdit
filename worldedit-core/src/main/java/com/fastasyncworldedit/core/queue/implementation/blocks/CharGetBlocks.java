@@ -25,10 +25,11 @@ public abstract class CharGetBlocks extends CharBlocks implements IChunkGet {
     }
 
     @Override
-    public synchronized boolean trim(boolean aggressive) {
+    public boolean trim(boolean aggressive) {
         for (int i = 0; i < sectionCount; i++) {
-            sections[i] = EMPTY;
-            blocks[i] = null;
+            synchronized (sectionLocks[i]) {
+                blocks[i] = null;
+            }
         }
         return true;
     }
@@ -48,11 +49,12 @@ public abstract class CharGetBlocks extends CharBlocks implements IChunkGet {
     }
 
     @Override
-    public synchronized boolean trim(boolean aggressive, int layer) {
+    public boolean trim(boolean aggressive, int layer) {
         layer -= minSectionPosition;
-        sections[layer] = EMPTY;
-        blocks[layer] = null;
-        return true;
+        synchronized (sectionLocks[layer]) {
+            blocks[layer] = null;
+            return true;
+        }
     }
 
     @Override

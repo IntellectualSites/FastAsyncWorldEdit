@@ -1013,7 +1013,7 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
         } else {
             for (int i = getMinSectionPosition(); i <= getMaxSectionPosition(); i++) {
                 int layer = i - getMinSectionPosition();
-                if (!hasSection(i) || !super.sections[layer].isFull()) {
+                if (!hasSection(i) || super.blocks[layer] == null) {
                     continue;
                 }
                 LevelChunkSection existing = getSections(true)[layer];
