@@ -16,7 +16,7 @@ public class FaweForkJoinWorkerThreadFactory implements ForkJoinPool.ForkJoinWor
 
     @Override
     public ForkJoinWorkerThread newThread(ForkJoinPool pool) {
-        final ForkJoinWorkerThread worker = ForkJoinPool.defaultForkJoinWorkerThreadFactory.newThread(pool);
+        final ForkJoinWorkerThread worker = new FaweThread(pool);
         worker.setName(String.format(nameFormat, idCounter.getAndIncrement()));
         return worker;
     }
