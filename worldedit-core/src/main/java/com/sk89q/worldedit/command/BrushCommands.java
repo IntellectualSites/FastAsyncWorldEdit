@@ -532,7 +532,7 @@ public class BrushCommands {
         int maxY = player.getWorld().getMaxY();
         try {
             brush = new StencilBrush(stream, rotation, yscale, onlyWhite,
-                    "#clipboard".equalsIgnoreCase(image)
+                    isClipboard(image)
                             ? session.getClipboard().getClipboard() : null, minY, maxY
             );
         } catch (EmptyClipboardException ignored) {
@@ -903,23 +903,15 @@ public class BrushCommands {
         int minY = player.getWorld().getMinY();
         int maxY = player.getWorld().getMaxY();
         if (flat) {
-            try {
-                brush = new FlattenBrush(stream, rotation, yscale, layers, smooth,
-                        "#clipboard".equalsIgnoreCase(image)
-                                ? session.getClipboard().getClipboard() : null, shape, minY, maxY
-                );
-            } catch (EmptyClipboardException ignored) {
-                brush = new FlattenBrush(stream, rotation, yscale, layers, smooth, null, shape, minY, maxY);
-            }
+            brush = new FlattenBrush(stream, rotation, yscale, layers, smooth,
+                    isClipboard(image)
+                            ? session.getClipboard().getClipboard() : null, shape, minY, maxY
+            );
         } else {
-            try {
-                brush = new HeightBrush(stream, rotation, yscale, layers, smooth,
-                        "#clipboard".equalsIgnoreCase(image)
-                                ? session.getClipboard().getClipboard() : null, minY, maxY
-                );
-            } catch (EmptyClipboardException ignored) {
-                brush = new HeightBrush(stream, rotation, yscale, layers, smooth, null, minY, maxY);
-            }
+            brush = new HeightBrush(stream, rotation, yscale, layers, smooth,
+                    isClipboard(image)
+                            ? session.getClipboard().getClipboard() : null, minY, maxY
+            );
         }
         if (randomRotate) {
             brush.setRandomRotate(true);
@@ -927,8 +919,12 @@ public class BrushCommands {
         set(context, brush, "worldedit.brush.height").setSize(radius);
     }
 
+    private static boolean isClipboard(String image) {
+        return "#clipboard".equalsIgnoreCase(image);
+    }
+
     private InputStream getHeightmapStream(String filename) throws FileNotFoundException {
-        if (filename == null || "none".equalsIgnoreCase(filename)) {
+        if (filename == null || "none".equalsIgnoreCase(filename) || isClipboard(filename)) {
             return null;
         }
         String filenamePng = filename.endsWith(".png") ? filename : filename + ".png";
