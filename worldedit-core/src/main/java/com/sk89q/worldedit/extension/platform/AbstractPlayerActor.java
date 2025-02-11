@@ -280,14 +280,8 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
         int yPlusSearchHeight = y + WorldEdit.getInstance().getConfiguration().defaultVerticalHeight;
         int maxY = Math.min(world.getMaxY(), yPlusSearchHeight) + 2;
 
-        //FAWE start - mutable
-        MutableBlockVector3 mutable = new MutableBlockVector3(x, y, z);
-        //FAWE end
-
         while (y <= maxY) {
-            //FAWE start - mutable
-            if (isLocationGoodForStanding(mutable.mutY(y))
-                    //FAWE end
+            if (isLocationGoodForStanding(BlockVector3.at(x, y, z))
                     && trySetPosition(Vector3.at(x + 0.5, y, z + 0.5))) {
                 return true;
             }
@@ -308,14 +302,8 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
         int yLessSearchHeight = y - WorldEdit.getInstance().getConfiguration().defaultVerticalHeight;
         int minY = Math.min(world.getMinY() + 1, yLessSearchHeight);
 
-        //FAWE start - mutable
-        MutableBlockVector3 mutable = new MutableBlockVector3(x, y, z);
-        //FAWE end
-
         while (y >= minY) {
-            //FAWE start - mutable
-            if (isLocationGoodForStanding(mutable.mutY(y))
-                    //FAWE end
+            if (isLocationGoodForStanding(BlockVector3.at(x, y, z))
                     && trySetPosition(Vector3.at(x + 0.5, y, z + 0.5))) {
                 return true;
             }
