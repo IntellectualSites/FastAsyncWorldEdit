@@ -53,7 +53,7 @@ public abstract class QueueHandler implements Trimable, Runnable {
             null,
             false,
             Settings.settings().QUEUE.PARALLEL_THREADS,
-            Settings.settings().QUEUE.PARALLEL_THREADS * 2,
+            Settings.settings().QUEUE.PARALLEL_THREADS,
             0,
             pool -> true,
             60,
