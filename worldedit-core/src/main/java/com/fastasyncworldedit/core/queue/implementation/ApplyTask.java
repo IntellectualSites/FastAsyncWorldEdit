@@ -1,10 +1,14 @@
 package com.fastasyncworldedit.core.queue.implementation;
 
+import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.extent.filter.block.ChunkFilterBlock;
+import com.fastasyncworldedit.core.internal.exception.FaweException;
 import com.fastasyncworldedit.core.queue.Filter;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
+import org.apache.logging.log4j.Logger;
 
 import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
@@ -13,6 +17,8 @@ import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.RecursiveAction;
 
 class ApplyTask<F extends Filter> extends RecursiveAction implements Runnable {
+
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     private static final int INITIAL_REGION_SHIFT = 5;
     private static final int SHIFT_REDUCTION = 2;
@@ -37,7 +43,8 @@ class ApplyTask<F extends Filter> extends RecursiveAction implements Runnable {
             Region region,
             ParallelQueueExtent parallelQueueExtent,
             ConcurrentMap<Thread, ThreadState<F>> stateCache,
-            boolean full
+            boolean full,
+            boolean[] faweExceptionReasonsUsed
     ) {
 
     }
@@ -59,14 +66,15 @@ class ApplyTask<F extends Filter> extends RecursiveAction implements Runnable {
             final Region region,
             final F filter,
             final ParallelQueueExtent parallelQueueExtent,
-            final boolean full
+            final boolean full, final boolean[] faweExceptionReasonsUsed
     ) {
         this.commonState = new CommonState<>(
                 filter,
                 region.clone(), // clone only once, assuming the filter doesn't modify that clone
                 parallelQueueExtent,
                 new ConcurrentHashMap<>(),
-                full
+                full,
+                faweExceptionReasonsUsed
         );
         this.before = null;
         final BlockVector3 minimumPoint = region.getMinimumPoint();
@@ -136,7 +144,7 @@ class ApplyTask<F extends Filter> extends RecursiveAction implements Runnable {
                 if (subtask.tryUnfork()) {
                     subtask.invoke();
                 } else {
-                    subtask.quietlyJoin();
+                    subtask.join();
                 }
                 subtask = subtask.before;
             }
@@ -189,14 +197,24 @@ class ApplyTask<F extends Filter> extends RecursiveAction implements Runnable {
     }
 
     private void applyChunk(int chunkX, int chunkZ, ThreadState<F> state) {
-        state.block = state.queue.apply(
-                state.block,
-                state.filter,
-                this.commonState.region,
-                chunkX,
-                chunkZ,
-                this.commonState.full
-        );
+        try {
+            state.block = state.queue.apply(
+                    state.block,
+                    state.filter,
+                    this.commonState.region,
+                    chunkX,
+                    chunkZ,
+                    this.commonState.full
+            );
+        } catch (Throwable t) {
+            if (t instanceof FaweException faweException) {
+                Fawe.handleFaweException(this.commonState.faweExceptionReasonsUsed, faweException, LOGGER);
+            } else if (t.getCause() instanceof FaweException faweException) {
+                Fawe.handleFaweException(this.commonState.faweExceptionReasonsUsed, faweException, LOGGER);
+            } else {
+                throw t;
+            }
+        }
     }
 
     private void onCompletion() {
@@ -204,7 +222,7 @@ class ApplyTask<F extends Filter> extends RecursiveAction implements Runnable {
             if (task.tryUnfork()) {
                 task.invoke();
             } else {
-                task.quietlyJoin();
+                task.join();
             }
         }
     }

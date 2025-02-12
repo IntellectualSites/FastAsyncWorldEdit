@@ -63,8 +63,6 @@ public class ParallelQueueExtent extends PassthroughExtent {
     private final boolean fastmode;
     private final SideEffectSet sideEffectSet;
     private int changes;
-    private int lastException = Integer.MIN_VALUE;
-    private int exceptionCount = 0;
 
     public ParallelQueueExtent(QueueHandler handler, World world, boolean fastmode, @Nullable SideEffectSet sideEffectSet) {
         super(handler.getQueue(world, new BatchProcessorHolder(), new BatchProcessorHolder()));
@@ -155,9 +153,15 @@ public class ParallelQueueExtent extends PassthroughExtent {
             getExtent().flush();
             filter.finish();
         } else {
-            ForkJoinTask<?> task = this.handler.submit(new ApplyTask<>(region, filter, this, full));
+            ForkJoinTask<?> task = this.handler.submit(
+                    new ApplyTask<>(region, filter, this, full, this.faweExceptionReasonsUsed)
+            );
             // wait for task to finish
-            task.quietlyJoin();
+            try {
+                task.join();
+            } catch (Throwable e) {
+                LOGGER.catching(e);
+            }
             // Join filters
             filter.join();
         }
