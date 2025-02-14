@@ -18,32 +18,13 @@ public abstract class CharBlocks implements IBlocks {
     protected static final Section FULL = new Section() {
         @Override
         public char[] get(CharBlocks blocks, int layer, char[] arr) {
-            if (arr == null) {
-                // Chunk probably trimmed mid-operations, but do nothing about it to avoid other issues
-                synchronized (blocks.sectionLocks[layer]) {
-                    LOGGER.warn("Unexpected null section, please report this occurrence alongside a debugpaste.");
-                    return getSkipFull(blocks, layer, false);
-                }
-            }
             return arr;
         }
 
         // Ignore aggressive switch here.
         @Override
         public char[] get(CharBlocks blocks, int layer, char[] arr, boolean aggressive) {
-            if (arr == null) {
-                // Chunk probably trimmed mid-operations, but do nothing about it to avoid other issues
-                synchronized (blocks.sectionLocks[layer]) {
-                    LOGGER.warn("Unexpected null section, please report this occurrence alongside a debugpaste.");
-                    return getSkipFull(blocks, layer, aggressive);
-                }
-            }
             return arr;
-        }
-
-        @Override
-        public boolean isFull() {
-            return true;
         }
     };
     protected static final Section EMPTY = new Section() {
@@ -56,13 +37,8 @@ public abstract class CharBlocks implements IBlocks {
         @Override
         public char[] get(CharBlocks blocks, int layer, char[] arr, boolean aggressive) {
             synchronized (blocks.sectionLocks[layer]) {
-                return getSkipFull(blocks, layer, aggressive);
+                return update(blocks, layer, aggressive);
             }
-        }
-
-        @Override
-        public boolean isFull() {
-            return false;
         }
     };
     public char[][] blocks;
@@ -136,18 +112,6 @@ public abstract class CharBlocks implements IBlocks {
         return data;
     }
 
-    protected char[] loadPrivately(int layer) {
-        layer -= getMinSectionPosition();
-        synchronized (sectionLocks[layer]) {
-            char[] data = blocks[layer];
-            if (data != null) {
-                return data;
-            }
-        }
-        return update(layer, null, true);
-    }
-
-    // Not synchronized as any subsequent methods called from this class will be, or the section shouldn't appear as loaded anyway.
     @Override
     public boolean hasSection(int layer) {
         layer -= minSectionPosition;
@@ -244,7 +208,7 @@ public abstract class CharBlocks implements IBlocks {
 
     public abstract static class Section {
 
-        static char[] getSkipFull(CharBlocks blocks, int layer, boolean aggressive) {
+        static char[] update(CharBlocks blocks, int layer, boolean aggressive) {
             char[] arr = blocks.blocks[layer];
             if (arr == null) {
                 arr = blocks.blocks[layer] = blocks.update(layer, null, aggressive);
@@ -264,21 +228,13 @@ public abstract class CharBlocks implements IBlocks {
 
         abstract char[] get(CharBlocks blocks, int layer, char[] data, boolean aggressive);
 
-        public abstract boolean isFull();
-
         public final char get(CharBlocks blocks, int layer, int index, char[] data) {
             int normalized = layer - blocks.minSectionPosition;
             char[] section = get(blocks, normalized, data);
-            if (section == null) {
-                synchronized (blocks.sectionLocks[normalized]) {
-                    blocks.reset(layer);
-                    section = EMPTY.get(blocks, normalized, data, false);
-                }
-            }
             return section[index];
         }
 
-        public final synchronized void set(CharBlocks blocks, int layer, int index, char value, char[] data) {
+        public final void set(CharBlocks blocks, int layer, int index, char value, char[] data) {
             layer -= blocks.minSectionPosition;
             get(blocks, layer, data)[index] = value;
         }
