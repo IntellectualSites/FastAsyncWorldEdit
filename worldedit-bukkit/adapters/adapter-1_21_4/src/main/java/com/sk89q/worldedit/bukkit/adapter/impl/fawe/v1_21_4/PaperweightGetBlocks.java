@@ -69,9 +69,7 @@ import org.enginehub.linbus.tree.LinListTag;
 import org.enginehub.linbus.tree.LinStringTag;
 import org.enginehub.linbus.tree.LinTagType;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.AbstractCollection;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -468,7 +466,7 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
                     }
 
                     if (createCopy) {
-                        char[] tmpLoad = loadPrivately(layerNo);
+                        char[] tmpLoad = load(layerNo);
                         char[] copyArr = new char[4096];
                         System.arraycopy(tmpLoad, 0, copyArr, 0, 4096);
                         copy.storeSection(getSectionIndex, copyArr);
@@ -530,7 +528,7 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
                                 this.reset();
                             } else if (!Arrays.equals(
                                     update(getSectionIndex, new char[4096], true),
-                                    loadPrivately(layerNo)
+                                    load(layerNo)
                             )) {
                                 this.reset(layerNo);
                         /*} else if (lock.isModified()) {
@@ -548,7 +546,7 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
 
                         newSection = PaperweightPlatformAdapter.newChunkSection(
                                 layerNo,
-                                this::loadPrivately,
+                                this::load,
                                 setArr,
                                 adapter,
                                 biomeRegistry,
