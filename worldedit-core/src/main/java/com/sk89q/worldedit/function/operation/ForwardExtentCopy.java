@@ -42,11 +42,11 @@ import com.fastasyncworldedit.core.util.ProcessorTraverser;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.entity.metadata.EntityProperties;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.CombinedRegionFunction;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.RegionMaskingFilter;
@@ -63,11 +63,9 @@ import com.sk89q.worldedit.math.transform.Transform;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.FlatRegion;
 import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import org.apache.logging.log4j.Logger;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -483,7 +481,7 @@ public class ForwardExtentCopy implements Operation {
             extent = clip.getExtent();
         }
         IQueueExtent<IQueueChunk> queue = null;
-        if (Settings.settings().EXPERIMENTAL.IMPROVED_ENTITY_EDITS) {
+        if (Settings.settings().EXPERIMENTAL.IMPROVED_ENTITY_EDITS && !(source instanceof Clipboard)) {
             ParallelQueueExtent parallel = new ExtentTraverser<>(extent).findAndGet(ParallelQueueExtent.class);
             if (parallel != null) {
                 queue = parallel.getExtent();
@@ -491,7 +489,11 @@ public class ForwardExtentCopy implements Operation {
                 queue = new ExtentTraverser<>(extent).findAndGet(SingleThreadQueueExtent.class);
             }
             if (queue == null) {
-                LOGGER.warn("Could not find IQueueExtent instance for entity retrieval, OncePerChunkExtent will not work.");
+                LOGGER.warn("Could not find IQueueExtent from `" + source.getClass().getName() +
+                        "` instance for entity retrieval, OncePerChunkExtent will not work.");
+                if (Settings.settings().ENABLED_COMPONENTS.DEBUG) {
+                    ExtentTraverser.printNestedExtents(source);
+                }
             }
         }
         if (queue == null) {
