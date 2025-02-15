@@ -472,6 +472,7 @@ public class FastSchematicReaderV3 implements ClipboardReader {
                 transformer.transform(x, y, z, id, LinCompoundTag.of(Map.of()));
                 continue;
             }
+            tag = tag.toBuilder().putString("id", id).remove("Id").build();
             tag = this.dataFixer.fixUp(fixType, tag);
             if (tag == null) {
                 LOGGER.warn("Failed to fix-up entity for {} @ {},{},{} - skipping", id, x, y, z);
