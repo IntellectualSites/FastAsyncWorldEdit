@@ -117,7 +117,7 @@ class ApplyTask<F extends Filter> extends RecursiveAction implements Runnable {
             for (int regionX = minRegionX; regionX <= maxRegionX; regionX++) {
                 for (int regionZ = minRegionZ; regionZ <= maxRegionZ; regionZ++) {
                     if (ForkJoinTask.getSurplusQueuedTaskCount() > Settings.settings().QUEUE.PARALLEL_THREADS) {
-                        // assume we can do a bigger batch of work here - the other threads are busy for a while
+                        // assume we should do a bigger batch of work here - the other threads are busy for a while
                         processRegion(regionX, regionZ, this.shift);
                         continue;
                     }
@@ -218,7 +218,7 @@ class ApplyTask<F extends Filter> extends RecursiveAction implements Runnable {
     }
 
     private void onCompletion() {
-        for (ForkJoinTask<?> task : postProcess()) {
+        for (ForkJoinTask<?> task : flushQueues()) {
             if (task.tryUnfork()) {
                 task.invoke();
             } else {
@@ -227,7 +227,7 @@ class ApplyTask<F extends Filter> extends RecursiveAction implements Runnable {
         }
     }
 
-    private ForkJoinTask<?>[] postProcess() {
+    private ForkJoinTask<?>[] flushQueues() {
         final Collection<ThreadState<F>> values = this.commonState.stateCache.values();
         ForkJoinTask<?>[] tasks = new ForkJoinTask[values.size()];
         int i = values.size() - 1;
