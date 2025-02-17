@@ -64,7 +64,7 @@ public class ExtentTraverser<T extends Extent> {
             ReflectionUtils.setFailsafeFieldValue(field, root, next);
             return true;
         } catch (Throwable e) {
-            e.printStackTrace();
+            LOGGER.error(e);
             return false;
         }
     }
@@ -80,7 +80,7 @@ public class ExtentTraverser<T extends Extent> {
     }
 
     @Nullable
-    public <U extends Extent> U findAndGet(Class<U> clazz) {
+    public <U extends Extent> U findAndGet(Class<? super U> clazz) {
         ExtentTraverser<U> traverser = find(clazz);
         return (traverser != null) ? traverser.get() : null;
     }
@@ -97,7 +97,7 @@ public class ExtentTraverser<T extends Extent> {
             }
             return null;
         } catch (Throwable e) {
-            e.printStackTrace();
+            LOGGER.error(e);
             return null;
         }
     }
@@ -114,7 +114,7 @@ public class ExtentTraverser<T extends Extent> {
             }
             return null;
         } catch (Throwable e) {
-            e.printStackTrace();
+            LOGGER.error(e);
             return null;
         }
     }
@@ -135,7 +135,7 @@ public class ExtentTraverser<T extends Extent> {
             }
             return null;
         } catch (Throwable e) {
-            e.printStackTrace();
+            LOGGER.error(e);
             return null;
         }
     }
