@@ -8,6 +8,9 @@ import com.fastasyncworldedit.core.queue.Filter;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
+import jdk.jfr.Category;
+import jdk.jfr.Event;
+import jdk.jfr.Name;
 import org.apache.logging.log4j.Logger;
 
 import java.util.Collection;
@@ -21,7 +24,7 @@ class ApplyTask<F extends Filter> extends RecursiveAction implements Runnable {
     private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     private static final int INITIAL_REGION_SHIFT = 5;
-    private static final int SHIFT_REDUCTION = 2;
+    private static final int SHIFT_REDUCTION = 1;
 
     private final CommonState<F> commonState;
     private final ApplyTask<F> before;
@@ -116,7 +119,7 @@ class ApplyTask<F extends Filter> extends RecursiveAction implements Runnable {
             // This task covers multiple regions. Create one subtask per region
             for (int regionX = minRegionX; regionX <= maxRegionX; regionX++) {
                 for (int regionZ = minRegionZ; regionZ <= maxRegionZ; regionZ++) {
-                    if (ForkJoinTask.getSurplusQueuedTaskCount() > Settings.settings().QUEUE.PARALLEL_THREADS) {
+                    if (shouldProcessDirectly()) {
                         // assume we should do a bigger batch of work here - the other threads are busy for a while
                         processRegion(regionX, regionZ, this.shift);
                         continue;
@@ -155,6 +158,10 @@ class ApplyTask<F extends Filter> extends RecursiveAction implements Runnable {
         if (this.shift == INITIAL_REGION_SHIFT) {
             onCompletion();
         }
+    }
+
+    private boolean shouldProcessDirectly() {
+        return ForkJoinTask.getSurplusQueuedTaskCount() > Math.max(3, 1 << this.shift);
     }
 
     private void processRegion(int regionX, int regionZ, int shift) {
