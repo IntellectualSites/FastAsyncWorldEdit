@@ -77,6 +77,9 @@ public class BukkitPlayer extends AbstractPlayerActor {
     private final WorldEditPlugin plugin;
     //FAWE start
     private final PermissionAttachment permAttachment;
+    // We require the StackWalker to show hidden frames, due to the usage of the c.sk89q.we...AsyncCommandBuilder in WorldGuard
+    // (in that case, all WG references are hidden in lambdas and not shown in the default walker)
+    private final StackWalker stackWalker = StackWalker.getInstance(StackWalker.Option.SHOW_HIDDEN_FRAMES);
 
     /**
      * This constructs a new {@link BukkitPlayer} for the given {@link Player}.
@@ -222,7 +225,14 @@ public class BukkitPlayer extends AbstractPlayerActor {
     @Override
     public void print(Component component) {
         //FAWE start - Add FAWE prefix to all messages
-        component = Caption.color(TranslatableComponent.of("prefix", component), getLocale());
+        final boolean isWorldGuardCaller = stackWalker.walk(frames -> frames
+                .dropWhile(frame -> frame.getClassName().startsWith("com.sk89q.worldedit"))
+                .takeWhile(frame -> !frame.getClassName().startsWith("org.bukkit"))
+                .filter(frame -> frame.getClassName().startsWith("com.sk89q.worldguard"))
+                .findFirst()).isPresent();
+        if (!isWorldGuardCaller) {
+            component = Caption.color(TranslatableComponent.of("prefix", component), getLocale());
+        }
         //FAWE end
         TextAdapter.sendMessage(player, WorldEditText.format(component, getLocale()));
     }
