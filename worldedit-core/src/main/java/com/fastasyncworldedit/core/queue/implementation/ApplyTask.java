@@ -1,16 +1,12 @@
 package com.fastasyncworldedit.core.queue.implementation;
 
 import com.fastasyncworldedit.core.Fawe;
-import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.extent.filter.block.ChunkFilterBlock;
 import com.fastasyncworldedit.core.internal.exception.FaweException;
 import com.fastasyncworldedit.core.queue.Filter;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
-import jdk.jfr.Category;
-import jdk.jfr.Event;
-import jdk.jfr.Name;
 import org.apache.logging.log4j.Logger;
 
 import java.util.Collection;
