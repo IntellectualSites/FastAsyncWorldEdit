@@ -34,6 +34,7 @@ import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
 /**
@@ -50,7 +51,13 @@ public abstract class QueueHandler implements Trimable, Runnable {
             Settings.settings().QUEUE.PARALLEL_THREADS,
             new FaweForkJoinWorkerThreadFactory("FAWE Fork Join Pool Primary - %s"),
             null,
-            false
+            false,
+            Settings.settings().QUEUE.PARALLEL_THREADS,
+            Settings.settings().QUEUE.PARALLEL_THREADS,
+            0,
+            pool -> true,
+            60,
+            TimeUnit.SECONDS
     );
 
     /**
