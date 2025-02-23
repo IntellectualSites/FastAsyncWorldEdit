@@ -83,7 +83,7 @@ public class ParallelQueueExtent extends PassthroughExtent {
     /**
      * Removes the extent currently associated with the calling thread.
      */
-    @Deprecated(forRemoval = true, since = "TODO")
+    @Deprecated(forRemoval = true, since = "2.13.0")
     public static void clearCurrentExtent() {
         FaweThread.clearCurrentExtent();
     }
@@ -91,7 +91,7 @@ public class ParallelQueueExtent extends PassthroughExtent {
     /**
      * Sets the extent associated with the calling thread.
      */
-    @Deprecated(forRemoval = true, since = "TODO")
+    @Deprecated(forRemoval = true, since = "2.13.0")
     public static void setCurrentExtent(Extent extent) {
         FaweThread.setCurrentExtent(extent);
     }

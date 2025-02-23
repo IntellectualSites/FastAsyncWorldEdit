@@ -43,7 +43,7 @@ public class SaturatePattern extends AbstractPattern {
      * @param extent extent to set to
      * @param util   {@link TextureUtil} to use to get textures
      * @param color  color to saturate to
-     * @since TODO
+     * @since 2.13.0
      */
     private SaturatePattern(Extent extent, TextureUtil util, int color) {
         this.extent = extent;

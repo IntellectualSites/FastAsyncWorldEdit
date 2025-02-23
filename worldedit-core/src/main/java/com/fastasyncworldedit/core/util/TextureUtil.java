@@ -661,7 +661,7 @@ public class TextureUtil implements TextureHolder {
      * Create a copy of this {@link TextureUtil} instance if required for thread safety.
      *
      * @return either this {@link TextureUtil} instance if thread safe or a new copied instance.
-     * @since TODO
+     * @since 2.13.0
      */
     public TextureUtil fork() {
         // Default implementation should be thread safe (only array lookups)

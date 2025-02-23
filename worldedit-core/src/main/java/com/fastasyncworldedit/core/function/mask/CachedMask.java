@@ -27,7 +27,7 @@ public class CachedMask extends AbstractDelegateMask implements ResettableMask {
      * @param local If the area will be small
      * @since 2.4.0
      */
-    @Deprecated(forRemoval = true, since = "TODO")
+    @Deprecated(forRemoval = true, since = "2.13.0")
     public CachedMask(Mask mask, boolean local) {
         super(mask);
         hasExtent = mask instanceof AbstractExtentMask;

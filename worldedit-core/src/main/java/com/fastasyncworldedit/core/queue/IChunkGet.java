@@ -73,7 +73,7 @@ public interface IChunkGet extends IBlocks, Trimable, InputExtent, ITileInput {
     /**
      * Get the entities in the chunk as "full" entities.
      *
-     * @since TODO;
+     * @since 2.13.0;
      */
     Set<Entity> getFullEntities();
 

@@ -41,7 +41,7 @@ public class AverageColorPattern extends AbstractExtentPattern {
      * @param extent extent to set to
      * @param util   {@link TextureUtil} to use to get textures
      * @param color  color to saturate to
-     * @since TODO
+     * @since 2.13.0
      */
     private AverageColorPattern(Extent extent, TextureUtil util, int color) {
         super(extent);

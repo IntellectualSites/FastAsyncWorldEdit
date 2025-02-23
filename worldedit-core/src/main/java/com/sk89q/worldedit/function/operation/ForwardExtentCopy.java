@@ -473,7 +473,7 @@ public class ForwardExtentCopy implements Operation {
      * @param source Source extent
      * @param region Optional regions for entities to be within
      * @return Collection of entities (may not be filled until an operation completes on the chunks)
-     * @since TODO
+     * @since 2.13.0
      */
     public static Collection<Entity> getEntities(Extent source, Region region) {
         Extent extent = source;

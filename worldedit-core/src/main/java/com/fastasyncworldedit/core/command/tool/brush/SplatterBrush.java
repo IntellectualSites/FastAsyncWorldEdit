@@ -26,7 +26,7 @@ public class SplatterBrush extends ScatterBrush {
     }
 
     @Override
-    @Deprecated(forRemoval = true, since = "TODO")
+    @Deprecated(forRemoval = true, since = "2.13.0")
     public void apply(
             final EditSession editSession,
             final LocalBlockVectorSet placed,

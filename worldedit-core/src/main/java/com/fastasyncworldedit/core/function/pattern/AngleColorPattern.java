@@ -34,7 +34,7 @@ public class AngleColorPattern extends AnglePattern {
      * @param extent   extent to set to
      * @param distance distance to use to calculate angle
      * @param util     {@link TextureUtil} to use to get textures
-     * @since TODO
+     * @since 2.13.0
      */
     private AngleColorPattern(Extent extent, int distance, TextureUtil util) {
         super(extent, distance);

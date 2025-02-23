@@ -20,7 +20,7 @@ public class SplatterBrushMask extends AbstractExtentMask {
     /**
      * @deprecated in favour of {@link SplatterBrushMask#SplatterBrushMask(EditSession, BlockVector3, int, Mask, BlockVector3Set)}
      */
-    @Deprecated(forRemoval = true, since = "TODO")
+    @Deprecated(forRemoval = true, since = "2.13.0")
     public SplatterBrushMask(
             EditSession editSession,
             BlockVector3 position,
@@ -39,7 +39,7 @@ public class SplatterBrushMask extends AbstractExtentMask {
      * @param size2       radius squared
      * @param surface     surface mask
      * @param placed      {@link BlockVector3Set} of placed blocks
-     * @since TODO
+     * @since 2.13.0
      */
     public SplatterBrushMask(
             EditSession editSession,

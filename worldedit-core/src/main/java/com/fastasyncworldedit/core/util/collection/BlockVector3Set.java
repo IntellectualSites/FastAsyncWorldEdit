@@ -90,7 +90,7 @@ public interface BlockVector3Set extends Set<BlockVector3> {
      * Copy this {@link BlockVector3Set} instance
      *
      * @return copied instance
-     * @since TODO
+     * @since 2.13.0
      */
     BlockVector3Set copy();
 

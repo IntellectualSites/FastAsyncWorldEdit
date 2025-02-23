@@ -39,7 +39,7 @@ public class ShadePattern extends AbstractPattern {
      * @param extent extent to set to
      * @param darken if the shade should darken or lighten colours
      * @param util   {@link TextureUtil} to use for textures
-     * @since TODO
+     * @since 2.13.0
      */
     private ShadePattern(Extent extent, boolean darken, TextureUtil util) {
         checkNotNull(extent);

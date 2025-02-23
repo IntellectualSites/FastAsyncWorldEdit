@@ -15,7 +15,7 @@ import java.util.Set;
  * - All vectors must be in a 65534 * 65534 area centered around the first entry
  * - This will use 8 bytes for every 64 BlockVector2s (about 600x less than a HashSet)
  *
- * @since TODO
+ * @since 2.13.0
  */
 public class LocalBlockVector2Set implements Set<BlockVector2> {
 
@@ -26,7 +26,7 @@ public class LocalBlockVector2Set implements Set<BlockVector2> {
     /**
      * New LocalBlockVectorSet that will set the offset x and z to the first value given.
      *
-     * @since TODO
+     * @since 2.13.0
      */
     public LocalBlockVector2Set() {
         offsetX = offsetZ = Integer.MAX_VALUE;

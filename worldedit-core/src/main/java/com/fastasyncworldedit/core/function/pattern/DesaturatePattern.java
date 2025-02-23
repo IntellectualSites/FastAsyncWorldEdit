@@ -36,7 +36,7 @@ public class DesaturatePattern extends AbstractPattern {
      * @param extent extent to set to
      * @param value  decimal percent to desaturate by (0 -> 1)
      * @param util   {@link TextureUtil} to use for textures
-     * @since TODO
+     * @since 2.13.0
      */
     private DesaturatePattern(Extent extent, double value, TextureUtil util) {
         this.extent = extent;

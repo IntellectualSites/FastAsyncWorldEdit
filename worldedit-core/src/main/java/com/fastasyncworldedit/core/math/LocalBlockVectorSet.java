@@ -62,7 +62,7 @@ public class LocalBlockVectorSet implements BlockVector3Set {
      * New wrapped LocalBlockVectorSet allowing "upgrading" to a {@link BlockVectorSet} as necessary
      *
      * @param set existing {@link LocalBlockVectorSet} to wrap
-     * @since TODO
+     * @since 2.13.0
      */
     public static BlockVector3Set wrap(LocalBlockVectorSet set) {
         return new BlockVector3SetHolder(set);
@@ -71,7 +71,7 @@ public class LocalBlockVectorSet implements BlockVector3Set {
     /**
      * New wrapped LocalBlockVectorSet allowing "upgrading" to a {@link BlockVectorSet} as necessary
      *
-     * @since TODO
+     * @since 2.13.0
      */
     public static BlockVector3Set wrapped() {
         return new BlockVector3SetHolder(new LocalBlockVectorSet());
@@ -82,7 +82,7 @@ public class LocalBlockVectorSet implements BlockVector3Set {
      *
      * @param x x offset
      * @param z z offset
-     * @since TODO
+     * @since 2.13.0
      */
     public static BlockVector3Set wrapped(int x, int z) {
         return new BlockVector3SetHolder(new LocalBlockVectorSet(x, z));
@@ -94,7 +94,7 @@ public class LocalBlockVectorSet implements BlockVector3Set {
      * @param x x offset
      * @param y y offset
      * @param z z offset
-     * @since TODO
+     * @since 2.13.0
      */
     public static BlockVector3Set wrapped(int x, int y, int z) {
         return new BlockVector3SetHolder(new LocalBlockVectorSet(x, y, z));
@@ -153,7 +153,7 @@ public class LocalBlockVectorSet implements BlockVector3Set {
      * @deprecated use {@link LocalBlockVectorSet#copy()}
      */
     @Override
-    @Deprecated(forRemoval = true, since = "TODO")
+    @Deprecated(forRemoval = true, since = "2.13.0")
     public LocalBlockVectorSet clone() {
         return copy();
     }

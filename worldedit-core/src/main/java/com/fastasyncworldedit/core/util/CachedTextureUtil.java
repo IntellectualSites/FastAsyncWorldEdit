@@ -28,7 +28,7 @@ public class CachedTextureUtil extends DelegateTextureUtil {
      * @param colorBiomeMap color biome map to (copy and) use
      * @param colorLayerMap color layer map to (copy and) use
      * @throws FileNotFoundException
-     * @since TODO
+     * @since 2.13.0
      */
     protected CachedTextureUtil(
             TextureUtil parent,

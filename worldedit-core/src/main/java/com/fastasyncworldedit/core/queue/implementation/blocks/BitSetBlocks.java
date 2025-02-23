@@ -33,7 +33,7 @@ public class BitSetBlocks implements IChunkSet {
     /**
      * @deprecated use {@link BitSetBlocks#BitSetBlocks(BlockState, int, int, int, int)}
      */
-    @Deprecated(forRemoval = true, since = "TODO")
+    @Deprecated(forRemoval = true, since = "2.13.0")
     public BitSetBlocks(BlockState blockState, int minSectionPosition, int maxSectionPosition) {
         this(blockState, minSectionPosition, maxSectionPosition, 0, 0);
     }

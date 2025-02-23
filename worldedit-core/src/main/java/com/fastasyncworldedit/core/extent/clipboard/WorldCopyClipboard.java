@@ -29,7 +29,7 @@ public class WorldCopyClipboard extends ReadOnlyClipboard {
     /**
      * @deprecated use {@link WorldCopyClipboard#of(Extent, Region)}
      */
-    @Deprecated(forRemoval = true, since = "TODO")
+    @Deprecated(forRemoval = true, since = "2.13.0")
     public WorldCopyClipboard(Supplier<Extent> supplier, Region region) {
         this(supplier, region, true, false);
     }
@@ -37,7 +37,7 @@ public class WorldCopyClipboard extends ReadOnlyClipboard {
     /**
      * @deprecated use {@link WorldCopyClipboard#of(Extent, Region, boolean, boolean)}
      */
-    @Deprecated(forRemoval = true, since = "TODO")
+    @Deprecated(forRemoval = true, since = "2.13.0")
     public WorldCopyClipboard(Supplier<Extent> supplier, Region region, boolean hasEntities, boolean hasBiomes) {
         super(region);
         this.hasBiomes = hasBiomes;

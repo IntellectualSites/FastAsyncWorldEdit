@@ -752,7 +752,7 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
      * @param chunkMinY The minimum Y level of the chunk
      * @param chunkMaxY  The maximum Y level of the chunk
      * @return If the entire chunk is contained by this region
-     * @since TODO
+     * @since 2.13.0
      */
     public boolean chunkContainedBy(int chunkX, int chunkZ, int chunkMinY, int chunkMaxY) {
         int bx = chunkX << 4;

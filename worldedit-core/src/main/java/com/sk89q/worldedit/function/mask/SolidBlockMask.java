@@ -55,7 +55,7 @@ public class SolidBlockMask extends AbstractExtentMask {
 
     /**
      * {@return whether the given block state is considered solid by this mask}
-     * @since TODO
+     * @since 2.13.0
      */
     public static boolean isSolid(BlockState blockState) {
         return SOLID[blockState.getOrdinal()];

@@ -19,7 +19,7 @@ public enum ProcessorScope {
     /**
      * @deprecated use {@link ProcessorScope#READING_BLOCKS}
      */
-    @Deprecated(forRemoval = true, since = "TODO")
+    @Deprecated(forRemoval = true, since = "2.13.0")
     READING_SET_BLOCKS(4);
 
     private final int value;

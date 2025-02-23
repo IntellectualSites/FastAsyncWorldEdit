@@ -24,7 +24,7 @@ import java.util.function.Consumer;
 /**
  * Extent/processor that runs a task the first time a chunk GET is loaded
  *
- * @since TODO
+ * @since 2.13.0
  */
 public class OncePerChunkExtent extends AbstractDelegateExtent implements IBatchProcessor {
 
@@ -39,7 +39,7 @@ public class OncePerChunkExtent extends AbstractDelegateExtent implements IBatch
      * @param extent the extent
      * @param queue  Queue to load chunk GET from if acting as extent not processor
      * @param task   Consumer task for the chunk GET
-     * @since TODO
+     * @since 2.13.0
      */
     public OncePerChunkExtent(
             @Nonnull Extent extent,

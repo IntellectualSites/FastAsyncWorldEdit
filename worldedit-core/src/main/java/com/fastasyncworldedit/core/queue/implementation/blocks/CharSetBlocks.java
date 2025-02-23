@@ -34,7 +34,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
     /**
      * @deprecated Use {@link CharSetBlocks#newInstance(int, int)}
      */
-    @Deprecated(forRemoval = true, since = "TODO")
+    @Deprecated(forRemoval = true, since = "2.13.0")
     public static CharSetBlocks newInstance() {
         return POOL.poll();
     }
