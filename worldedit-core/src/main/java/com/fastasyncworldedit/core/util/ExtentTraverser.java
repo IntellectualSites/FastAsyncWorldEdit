@@ -80,7 +80,7 @@ public class ExtentTraverser<T extends Extent> {
     }
 
     @Nullable
-    public <U extends Extent> U findAndGet(Class<? super U> clazz) {
+    public <U extends Extent> U findAndGet(@SuppressWarnings("BoundedWildcard") Class<U> clazz) {
         ExtentTraverser<U> traverser = find(clazz);
         return (traverser != null) ? traverser.get() : null;
     }
