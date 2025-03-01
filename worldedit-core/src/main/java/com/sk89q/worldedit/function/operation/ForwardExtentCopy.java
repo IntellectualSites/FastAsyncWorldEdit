@@ -481,7 +481,7 @@ public class ForwardExtentCopy implements Operation {
             extent = clip.getExtent();
         }
         IQueueExtent<IQueueChunk> queue = null;
-        if (Settings.settings().EXPERIMENTAL.IMPROVED_ENTITY_EDITS && !(source instanceof Clipboard)) {
+        if (Settings.settings().EXPERIMENTAL.IMPROVED_ENTITY_EDITS && new ExtentTraverser<>(source).findAndGet(Clipboard.class) == null) {
             ParallelQueueExtent parallel = new ExtentTraverser<>(extent).findAndGet(ParallelQueueExtent.class);
             if (parallel != null) {
                 queue = parallel.getExtent();
