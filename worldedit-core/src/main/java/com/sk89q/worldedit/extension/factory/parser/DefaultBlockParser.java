@@ -538,7 +538,10 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
             //FAWE end
         }
 
-        if (DeprecationUtil.isSign(blockType)) {
+        //FAWE start - only handle if extra data is actually supplied or if the user has permission for nbt
+        boolean allowWorkingDefault = context.requireActor().hasPermission("worldedit.anyblock.nbt") && nbt != null;
+        if (DeprecationUtil.isSign(blockType) && (blockAndExtraData.length > 1 || allowWorkingDefault)) {
+            //FAWE end
             // Allow special sign text syntax
             String[] text = new String[4];
             text[0] = blockAndExtraData.length > 1 ? blockAndExtraData[1] : "";
@@ -546,7 +549,9 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
             text[2] = blockAndExtraData.length > 3 ? blockAndExtraData[3] : "";
             text[3] = blockAndExtraData.length > 4 ? blockAndExtraData[4] : "";
             return validate(context, new SignBlock(state, text));
-        } else if (blockType == BlockTypes.SPAWNER && (blockAndExtraData.length > 1 || nbt != null)) {
+            //FAWE start - only handle if extra data is actually supplied or if the user has permission for nbt
+        } else if (blockType == BlockTypes.SPAWNER && (blockAndExtraData.length > 1 || allowWorkingDefault)) {
+            //FAWE end
             // Allow setting mob spawn type
             String mobName;
             if (blockAndExtraData.length > 1) {
@@ -563,7 +568,9 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
                 mobName = EntityTypes.PIG.id();
             }
             return validate(context, new MobSpawnerBlock(state, mobName));
-        } else if ((blockType == BlockTypes.PLAYER_HEAD || blockType == BlockTypes.PLAYER_WALL_HEAD) && (blockAndExtraData.length > 1 || nbt != null)) {
+            //FAWE start - only handle if extra data is actually supplied or if the user has permission for nbt
+        } else if ((blockType == BlockTypes.PLAYER_HEAD || blockType == BlockTypes.PLAYER_WALL_HEAD) && (blockAndExtraData.length > 1 || allowWorkingDefault)) {
+            //FAWE end
             // allow setting type/player/rotation
             if (blockAndExtraData.length == 1) {
                 return validate(context, new SkullBlock(state));
@@ -600,7 +607,17 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
             }
             CompoundTag nbt = holder.getNbtData();
             if (nbt != null) {
-                if (!actor.hasPermission("worldedit.anyblock.nbt")) {
+                if (actor.hasPermission("worldedit.anyblock.nbt")) {
+                    return holder;
+                }
+                if (nbt.equals(holder.getBlockType().getDefaultState().getNbtData())) {
+                    if (!actor.hasPermission("worldedit.anyblock.default-nbt")) {
+                        throw new DisallowedUsageException(Caption.of(
+                                "fawe.error.nbt.forbidden",
+                                TextComponent.of("worldedit.anyblock.default-nbt")
+                        ));
+                    }
+                } else {
                     throw new DisallowedUsageException(Caption.of(
                             "fawe.error.nbt.forbidden",
                             TextComponent.of("worldedit.anyblock.nbt")
