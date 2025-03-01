@@ -926,6 +926,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
 
     @Override
     public synchronized boolean trim(boolean aggressive, int layer) {
+        chunkExisting.trim(aggressive, layer);
         return this.trim(aggressive);
     }
 
