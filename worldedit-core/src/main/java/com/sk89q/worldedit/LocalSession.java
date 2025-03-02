@@ -1573,8 +1573,10 @@ public class LocalSession implements TextureHolder {
     public void dispatchCUISelection(Actor actor) {
         checkNotNull(actor);
 
-        if (!hasCUISupport && useServerCUI) {
-            updateServerCUI(actor);
+        if (!hasCUISupport) {
+            if (useServerCUI) {
+                updateServerCUI(actor);
+            }
             return;
         }
 
