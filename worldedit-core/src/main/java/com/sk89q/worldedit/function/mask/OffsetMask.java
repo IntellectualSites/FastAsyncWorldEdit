@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.function.mask;
 
+import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -115,6 +116,10 @@ public class OffsetMask extends AbstractMask {
     @Override
     public boolean test(BlockVector3 vector) {
         //FAWE start - ignore resultant position outside world height range
+        if (vector instanceof MutableBlockVector3) {
+            // make sure we don't modify a vector passed from the outside
+            vector = vector.toImmutable();
+        }
         BlockVector3 testPos = vector.add(offset);
         if (testPos.y() < minY || testPos.y() > maxY) {
             return false;
