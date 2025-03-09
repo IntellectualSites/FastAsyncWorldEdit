@@ -579,7 +579,8 @@ public class SchematicCommands {
         AsyncCommandBuilder.wrap(task, actor)
                 .registerWithSupervisor(worldEdit.getSupervisor(), "Saving schematic " + filename)
                 .setDelayMessage(Caption.of("worldedit.schematic.save.saving"))
-                .onSuccess(filename + " saved" + (overwrite ? " (overwriting previous file)." : "."), null)
+                .onSuccess(Caption.of("fawe.worldedit.schematic.schematic.saved", filename, (overwrite ?
+            " (overwriting previous file)." : ".")), null)
                 .onFailure(
                         Caption.of("worldedit.schematic.failed-to-save"),
                         worldEdit.getPlatformManager().getPlatformCommandManager().getExceptionConverter()
@@ -1001,13 +1002,9 @@ public class SchematicCommands {
                 int limit = actor.getLimit().SCHEM_FILE_NUM_LIMIT;
 
                 if (numFiles >= limit) {
-                    TextComponent noSlotsErr = TextComponent.of( //TODO - to be moved into captions/translatablecomponents
-                            String.format(
-                                    "You have " + numFiles + "/" + limit + " saved schematics. Delete some to save this one!",
-                                    TextColor.RED
-                            ));
                     LOGGER.info(actor.getName() + " failed to save " + file.getCanonicalPath() + " - too many schematics!");
-                    throw new WorldEditException(noSlotsErr) {
+                    actor.print(Caption.of("fawe.error.schematic.over.count.limit", numFiles, limit).color(TextColor.RED));
+                    throw new WorldEditException(Caption.of("fawe.error.schematic.over.limit", numFiles, limit)) {
                     };
                 }
             }
@@ -1034,9 +1031,7 @@ public class SchematicCommands {
                     closer.close(); // release the new .schem file so that its size can be measured
                     double filesizeKb = Files.size(Paths.get(file.getAbsolutePath())) / 1000.0;
 
-                    TextComponent filesizeNotif = TextComponent.of( //TODO - to be moved into captions/translatablecomponents
-                            SCHEMATIC_NAME + " size: " + String.format("%.1f", filesizeKb) + "kb", TextColor.GRAY);
-                    actor.print(filesizeNotif);
+                    actor.print(Caption.of("fawe.worldedit.schematic.schematic.size", SCHEMATIC_NAME, String.format("%.1f", filesizeKb)));
 
                     if (checkFilesize) {
 
@@ -1049,17 +1044,11 @@ public class SchematicCommands {
 
                         if ((curKb) > allocatedKb) {
                             file.delete();
-                            TextComponent notEnoughKbErr = TextComponent.of(
-                                    //TODO - to be moved into captions/translatablecomponents
-                                    "You're about to be at " + String.format("%.1f", curKb) + "kb of schematics. ("
-                                            + String.format(
-                                            "%dkb",
-                                            allocatedKb
-                                    ) + " available) Delete some first to save this one!",
-                                    TextColor.RED
-                            );
+                            actor.print(Caption.of("fawe.error.schematic.over.disk.limit", String.format("%.1f", curKb)
+                                            , String.format("%dkb", allocatedKb)).color(TextColor.RED));
                             LOGGER.info(actor.getName() + " failed to save " + SCHEMATIC_NAME + " - not enough space!");
-                            throw new WorldEditException(notEnoughKbErr) {
+                            throw new WorldEditException(Caption.of("fawe.error.schematic.over.disk.limit", String.format("%.1f", curKb)
+                                    , String.format("%dkb", allocatedKb))) {
                             };
                         }
                         if (overwrite) {
@@ -1068,23 +1057,13 @@ public class SchematicCommands {
                         } else {
                             numFiles++;
                         }
-                        TextComponent kbRemainingNotif = TextComponent.of(
-                                //TODO - to be moved into captions/translatablecomponents
-                                "You have " + String.format("%.1f", (allocatedKb - curKb)) + "kb left for schematics.",
-                                TextColor.GRAY
-                        );
-                        actor.print(kbRemainingNotif);
+
+                        actor.print(Caption.of("fawe.worldedit.schematic.schematic.disk.space", String.format("%.1f", (allocatedKb - curKb))));
                     }
 
                     if (Settings.settings().PATHS.PER_PLAYER_SCHEMATICS && actor.getLimit().SCHEM_FILE_NUM_LIMIT > -1) {
 
-                        TextComponent slotsRemainingNotif = TextComponent.of(
-                                //TODO - to be moved into captions/translatablecomponents
-                                "You have " + (actor.getLimit().SCHEM_FILE_NUM_LIMIT - numFiles)
-                                        + " schematic file slots left.",
-                                TextColor.GRAY
-                        );
-                        actor.print(slotsRemainingNotif);
+                        actor.print(Caption.of("fawe.worldedit.schematic.schematic.slots.free", (actor.getLimit().SCHEM_FILE_NUM_LIMIT - numFiles)));
                     }
                     LOGGER.info(actor.getName() + " saved " + file.getCanonicalPath());
                 } else {
