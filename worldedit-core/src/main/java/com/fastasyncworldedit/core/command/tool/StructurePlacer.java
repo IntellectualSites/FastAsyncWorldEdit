@@ -12,6 +12,7 @@ import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.world.generation.StructureType;
 
 import javax.annotation.Nullable;
@@ -36,7 +37,7 @@ public class StructurePlacer implements BlockTool {
 
     @Override
     public boolean canUse(Actor player) {
-        return player.hasPermission("worldedit.tool.feature");
+        return player.hasPermission("worldedit.tool.structure");
     }
 
     @Override
@@ -48,21 +49,24 @@ public class StructurePlacer implements BlockTool {
             Location clicked,
             @Nullable Direction face
     ) {
-
         try (EditSession editSession = session.createEditSession(player)) {
             try {
-                boolean successful = false;
+                int affected = 0;
 
-                final BlockVector3 pos = clicked.toVector().add().toBlockPoint();
+                final BlockVector3 pos = clicked.toBlockPoint();
                 for (int i = 0; i < 10; i++) {
-                    if (structure.place(editSession, pos)) {
-                        successful = true;
+                    affected = editSession.generateStructure(structure, pos);
+                    if (affected > 0) {
                         break;
                     }
                 }
 
-                if (!successful) {
-                    player.print(Caption.of("worldedit.tool.feature.failed"));
+                session.remember(editSession);
+
+                if (affected == 0) {
+                    player.print(Caption.of("worldedit.generate.structure.failed"));
+                } else {
+                    player.print(Caption.of("worldedit.structure.created", TextComponent.of(affected)));
                 }
             } catch (MaxChangedBlocksException e) {
                 player.print(Caption.of("worldedit.tool.max-block-changes"));
