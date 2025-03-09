@@ -372,7 +372,7 @@ public class GenerationCommands {
     @CommandPermissions("worldedit.generation.feature")
     public int feature(
             Actor actor, LocalSession session, EditSession editSession,
-            @Arg(desc = "Type of feature to place", def = "forest_rock")
+            @Arg(desc = "Type of feature to place")
             ConfiguredFeatureType feature
     ) throws WorldEditException {
         //FAWE start
@@ -402,7 +402,7 @@ public class GenerationCommands {
         if (affected > 0) {
             actor.printInfo(Caption.of("worldedit.structure.created", TextComponent.of(affected)));
         } else {
-            actor.printError(Caption.of("worldedit.structure.failed"));
+            actor.printError(Caption.of("worldedit.generate.structure.failed"));
         }
         return affected;
         //FAWE end

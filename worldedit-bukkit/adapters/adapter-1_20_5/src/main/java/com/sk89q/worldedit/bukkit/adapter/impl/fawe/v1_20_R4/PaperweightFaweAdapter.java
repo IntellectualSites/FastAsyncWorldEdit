@@ -63,8 +63,16 @@ import net.minecraft.core.WritableRegistry;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.data.worldgen.features.AquaticFeatures;
+import net.minecraft.data.worldgen.features.CaveFeatures;
+import net.minecraft.data.worldgen.features.EndFeatures;
+import net.minecraft.data.worldgen.features.NetherFeatures;
+import net.minecraft.data.worldgen.features.PileFeatures;
+import net.minecraft.data.worldgen.features.TreeFeatures;
+import net.minecraft.data.worldgen.features.VegetationFeatures;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.dedicated.DedicatedServer;
@@ -111,7 +119,10 @@ import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -722,10 +733,46 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
     public void setupFeatures() {
         DedicatedServer server = ((CraftServer) Bukkit.getServer()).getServer();
 
+        // All these features should be the "face" selected
+        Set<String> face_features = Arrays
+                .stream(new Class[]{AquaticFeatures.class, PileFeatures.class, TreeFeatures.class, VegetationFeatures.class})
+                .flatMap(c -> Arrays.stream(c.getFields()))
+                .filter(f -> {
+                    int modifiers = f.getModifiers();
+                    return Modifier.isPublic(modifiers) && Modifier.isStatic(modifiers) && Modifier.isFinal(modifiers);
+                })
+                .filter(f -> f.getType().equals(ResourceKey.class))
+                .map(f -> {
+                    try {
+                        Object val = f.get(null);
+                        return val;
+                    } catch (IllegalAccessException e) {
+                        LOGGER.error(e);
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull)
+                .map(o -> (ResourceKey) o)
+                .map(k -> k.location().toString())
+                .collect(Collectors.toCollection(java.util.HashSet::new));
+        face_features.add(CaveFeatures.DRIPSTONE_CLUSTER.location().toString());
+        face_features.add(CaveFeatures.LARGE_DRIPSTONE.location().toString());
+        face_features.add(CaveFeatures.POINTED_DRIPSTONE.location().toString());
+        face_features.add(CaveFeatures.GLOW_LICHEN.location().toString());
+        face_features.add(CaveFeatures.CAVE_VINE.location().toString());
+        face_features.add(CaveFeatures.CAVE_VINE_IN_MOSS.location().toString());
+        face_features.add(CaveFeatures.MOSS_VEGETATION.location().toString());
+        face_features.add(CaveFeatures.DRIPLEAF.location().toString());
+        face_features.add(EndFeatures.CHORUS_PLANT.location().toString());
+        face_features.add(NetherFeatures.SMALL_BASALT_COLUMNS.location().toString());
+        face_features.add(NetherFeatures.LARGE_BASALT_COLUMNS.location().toString());
+        face_features.add(NetherFeatures.GLOWSTONE_EXTRA.location().toString());
+
         // Features
         for (ResourceLocation name : server.registryAccess().registryOrThrow(Registries.CONFIGURED_FEATURE).keySet()) {
-            if (ConfiguredFeatureType.REGISTRY.get(name.toString()) == null) {
-                ConfiguredFeatureType.REGISTRY.register(name.toString(), new ConfiguredFeatureType(name.toString()));
+            String id = name.toString();
+            if (ConfiguredFeatureType.REGISTRY.get(id) == null) {
+                ConfiguredFeatureType.REGISTRY.register(id, new ConfiguredFeatureType(id, face_features.contains(id)));
             }
         }
 

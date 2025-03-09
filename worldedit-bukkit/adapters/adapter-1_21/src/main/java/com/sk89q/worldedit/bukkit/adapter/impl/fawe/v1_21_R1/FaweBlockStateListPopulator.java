@@ -5,6 +5,8 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeManager;
@@ -18,6 +20,7 @@ import net.minecraft.world.level.lighting.LevelLightEngine;
 import net.minecraft.world.level.material.FluidState;
 import org.bukkit.craftbukkit.util.BlockStateListPopulator;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class FaweBlockStateListPopulator extends BlockStateListPopulator {
@@ -35,8 +38,15 @@ public class FaweBlockStateListPopulator extends BlockStateListPopulator {
     }
 
     @Override
+    @Nonnull
     public ServerLevel getLevel() {
         return world.getLevel();
+    }
+
+    @Override
+    @Nonnull
+    public DifficultyInstance getCurrentDifficultyAt(final BlockPos pos) {
+        return world.getCurrentDifficultyAt(pos);
     }
 
     @Override
@@ -45,8 +55,15 @@ public class FaweBlockStateListPopulator extends BlockStateListPopulator {
     }
 
     @Override
+    @Nonnull
     public ChunkSource getChunkSource() {
         return world.getChunkSource();
+    }
+
+    @Override
+    @Nonnull
+    public RandomSource getRandom() {
+        return world.getRandom();
     }
 
     @Override
@@ -55,11 +72,13 @@ public class FaweBlockStateListPopulator extends BlockStateListPopulator {
     }
 
     @Override
+    @Nonnull
     public BiomeManager getBiomeManager() {
         return world.getBiomeManager();
     }
 
     @Override
+    @Nonnull
     public Holder<Biome> getUncachedNoiseBiome(final int biomeX, final int biomeY, final int biomeZ) {
         return world.getUncachedNoiseBiome(biomeX, biomeY, biomeZ);
     }
@@ -70,6 +89,7 @@ public class FaweBlockStateListPopulator extends BlockStateListPopulator {
     }
 
     @Override
+    @Nonnull
     public FeatureFlagSet enabledFeatures() {
         return world.enabledFeatures();
     }
@@ -80,6 +100,7 @@ public class FaweBlockStateListPopulator extends BlockStateListPopulator {
     }
 
     @Override
+    @Nonnull
     public LevelLightEngine getLightEngine() {
         return world.getLightEngine();
     }
@@ -101,6 +122,7 @@ public class FaweBlockStateListPopulator extends BlockStateListPopulator {
     }
 
     @Override
+    @Nonnull
     public WorldBorder getWorldBorder() {
         return world.getWorldBorder();
     }
@@ -121,6 +143,7 @@ public class FaweBlockStateListPopulator extends BlockStateListPopulator {
     }
 
     @Override
+    @Nonnull
     public BlockState getBlockState(final BlockPos pos) {
         return world.getBlockState(pos);
     }
