@@ -24,9 +24,20 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.Keyed;
 import com.sk89q.worldedit.registry.NamespacedRegistry;
 
-public record ConfiguredFeatureType(String id) implements Keyed {
+import java.util.Arrays;
+import java.util.List;
+
+//FAWE start - place on face
+public record ConfiguredFeatureType(String id, boolean place_on_face) implements Keyed {
+//FAWE end
 
     public static final NamespacedRegistry<ConfiguredFeatureType> REGISTRY = new NamespacedRegistry<>("configured feature type");
+
+    //FAWE start - place on face
+    public ConfiguredFeatureType(String id) {
+        this (id, false);
+    }
+    //FAWE end
 
     @Override
     public String toString() {
