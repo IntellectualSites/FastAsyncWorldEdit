@@ -68,6 +68,7 @@
   "fawe.worldedit.schematic.schematic.move.failed": "{0} no moved: {1}",
   "fawe.worldedit.schematic.schematic.loaded": "{0} loaded. Paste it with //paste",
   "fawe.worldedit.schematic.schematic.saved": "{0} saved{1}",
+  "fawe.worldedit.schematic.schematic.overwritten": " (overwriting previous file)",
   "fawe.worldedit.schematic.schematic.none": "No files found.",
   "fawe.worldedit.schematic.schematic.load-failure": "File could not be read or it does not exist: {0}. If you are specifying a format, you may not be specifying the correct one. Sponge schematic v2 and v3 both use the .schem file extension. To allow FAWE to select the format, do not specify one. If you are using a litematica schematic, it is not supported!",
   "fawe.worldedit.schematic.schematic.size": "{0} size {1} kb",

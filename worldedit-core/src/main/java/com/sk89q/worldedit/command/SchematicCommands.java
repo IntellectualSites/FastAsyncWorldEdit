@@ -579,8 +579,7 @@ public class SchematicCommands {
         AsyncCommandBuilder.wrap(task, actor)
                 .registerWithSupervisor(worldEdit.getSupervisor(), "Saving schematic " + filename)
                 .setDelayMessage(Caption.of("worldedit.schematic.save.saving"))
-                .onSuccess(Caption.of("fawe.worldedit.schematic.schematic.saved", filename, (overwrite ?
-            " (overwriting previous file)." : ".")), null)
+                .onSuccess(Caption.of("fawe.worldedit.schematic.schematic.saved", filename, (overwrite ? Caption.of("fawe.worldedit.schematic.schematic.overwritten") : ".")), null)
                 .onFailure(
                         Caption.of("worldedit.schematic.failed-to-save"),
                         worldEdit.getPlatformManager().getPlatformCommandManager().getExceptionConverter()
@@ -1044,11 +1043,9 @@ public class SchematicCommands {
 
                         if ((curKb) > allocatedKb) {
                             file.delete();
-                            actor.print(Caption.of("fawe.error.schematic.over.disk.limit", String.format("%.1f", curKb)
-                                            , String.format("%dkb", allocatedKb)).color(TextColor.RED));
+                            actor.print(Caption.of("fawe.error.schematic.over.disk.limit", String.format("%.1f", curKb), String.format("%dkb", allocatedKb)).color(TextColor.RED));
                             LOGGER.info(actor.getName() + " failed to save " + SCHEMATIC_NAME + " - not enough space!");
-                            throw new WorldEditException(Caption.of("fawe.error.schematic.over.disk.limit", String.format("%.1f", curKb)
-                                    , String.format("%dkb", allocatedKb))) {
+                            throw new WorldEditException(Caption.of("fawe.error.schematic.over.disk.limit", String.format("%.1f", curKb), String.format("%dkb", allocatedKb))) {
                             };
                         }
                         if (overwrite) {
