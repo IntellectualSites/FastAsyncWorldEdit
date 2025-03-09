@@ -12,6 +12,7 @@ import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.world.generation.ConfiguredFeatureType;
 
 import javax.annotation.Nullable;
@@ -48,21 +49,25 @@ public class FeaturePlacer implements BlockTool {
             Location clicked,
             @Nullable Direction face
     ) {
-
         try (EditSession editSession = session.createEditSession(player)) {
             try {
-                boolean successful = false;
+                int affected = 0;
 
-                final BlockVector3 pos = clicked.toVector().add().toBlockPoint();
+                final BlockVector3 pos = clicked.toBlockPoint();
                 for (int i = 0; i < 10; i++) {
-                    if (feature.place(editSession, pos)) {
-                        successful = true;
+                    affected = editSession.generateFeature(
+                            feature,
+                            feature.place_on_face() && face != null ? pos.add(face.toBlockVector()) : pos
+                    );
+                    if (affected > 0) {
                         break;
                     }
                 }
 
-                if (!successful) {
-                    player.print(Caption.of("worldedit.tool.feature.failed"));
+                if (affected == 0) {
+                    player.print(Caption.of("worldedit.generate.feature.failed"));
+                } else {
+                    player.print(Caption.of("worldedit.feature.created", TextComponent.of(affected)));
                 }
             } catch (MaxChangedBlocksException e) {
                 player.print(Caption.of("worldedit.tool.max-block-changes"));

@@ -24,7 +24,6 @@ import com.fastasyncworldedit.core.command.tool.StructurePlacer;
 import com.fastasyncworldedit.core.command.tool.brush.InspectBrush;
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.google.common.collect.Collections2;
-import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
@@ -257,7 +256,7 @@ public class ToolCommands {
     @CommandPermissions("worldedit.tool.feature")
     public void feature(
             Player player, LocalSession session,
-            @Arg(desc = "Type of feature to place", def = "forest_rock")
+            @Arg(desc = "Type of feature to place")
             ConfiguredFeatureType feature
     ) throws WorldEditException {
         setTool(player, session, new FeaturePlacer(feature), "worldedit.tool.feature.equip");
@@ -271,7 +270,7 @@ public class ToolCommands {
     @CommandPermissions("worldedit.tool.structure")
     public void structure(
             Player player, LocalSession session,
-            @Arg(desc = "Type of structure to place", def = "")
+            @Arg(desc = "Type of structure to place")
             StructureType feature
     ) throws WorldEditException {
         setTool(player, session, new StructurePlacer(feature), "worldedit.tool.structure.equip");
