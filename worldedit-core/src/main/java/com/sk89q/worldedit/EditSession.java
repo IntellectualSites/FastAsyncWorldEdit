@@ -2348,17 +2348,18 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         final int ceilRadiusX = (int) Math.ceil(radiusX);
         final int ceilRadiusZ = (int) Math.ceil(radiusZ);
 
-        double rx2 = Math.pow(radiusX, 2);
-        double ry2 = Math.pow(height, 2);
-        double rz2 = Math.pow(radiusZ, 2);
+        final double rx2 = Math.pow(radiusX, 2);
+        final double ry2 = Math.pow(radiusZ, 2);
+        final double rz2 = Math.pow(height, 2);
+        final int layers = Math.abs(height);
 
         int cx = pos.x();
         int cy = pos.y();
         int cz = pos.z();
 
-        for (int y = 0; y < height; ++y) {
-            double ySquaredMinusHeightOverHeightSquared = Math.pow(y - height, 2) / ry2;
-            int yy = cy + y;
+        for (int y = 0; y < layers; ++y) {
+            double ySquaredMinusHeightOverHeightSquared = Math.pow(y - layers, 2) / ry2;
+            int yy = height < 0 ? cy - y : cy + y;
             forX:
             for (int x = 0; x <= ceilRadiusX; ++x) {
                 double xSquaredOverRadiusX = Math.pow(x, 2) / rx2;
@@ -2380,7 +2381,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
                         double xNext = Math.pow(x + thickness, 2) / rx2 + zSquaredOverRadiusZ - ySquaredMinusHeightOverHeightSquared;
                         double yNext = xSquaredOverRadiusX + zSquaredOverRadiusZ - Math.pow(y + thickness - height, 2) / ry2;
                         double zNext = xSquaredOverRadiusX + Math.pow(z + thickness, 2) / rz2 - ySquaredMinusHeightOverHeightSquared;
-                        if (xNext <= 0 && zNext <= 0 && (yNext <= 0 && y + thickness != height)) {
+                        if (xNext <= 0 && zNext <= 0 && (yNext <= 0 && y + thickness != layers)) {
                             continue;
                         }
                     }
