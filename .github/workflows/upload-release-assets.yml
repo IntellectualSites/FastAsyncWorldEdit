@@ -24,3 +24,5 @@ jobs:
           files: 'worldedit-bukkit/build/libs/FastAsyncWorldEdit-*.jar'
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           release-tag: ${{ github.event.release.tag_name }}
+    outputs:
+      tag: ${{ github.event.release.tag_name }}

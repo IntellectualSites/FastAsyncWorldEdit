@@ -1,9 +1,9 @@
 name: Announce release on discord
-#on:
-#  workflow_run:
-#    workflows: ["Upload release assets"]
-#    types:
-#      - completed
+on:
+  workflow_run:
+    workflows: [Upload release assets]
+    types:
+      - completed
 jobs:
   send_announcement:
     runs-on: ubuntu-latest
@@ -18,9 +18,9 @@ jobs:
           args: |
             "<@&525015715300900875> <@&706463154804097105> <@&671372968462516240>"
             ""
-            "<:fawe:730750370984493106> **FastAsyncWorldEdit ${{ github.event.release.tag_name }} has been released!**"
+            "<:fawe:730750370984493106> **FastAsyncWorldEdit ${{ github.event.workflow_run.outputs.tag }} has been released!**"
             ""
-            "Click here to view changelog: https://github.com/IntellectualSites/FastAsyncWorldEdit/releases/tag/${{ github.event.release.tag_name }}"
+            "Click here to view changelog: https://github.com/IntellectualSites/FastAsyncWorldEdit/releases/tag/${{ github.event.workflow_run.outputs.tag }}"
             ""
             "The download is available at:"
             "- Spigot: <https://www.spigotmc.org/resources/13932/>"
