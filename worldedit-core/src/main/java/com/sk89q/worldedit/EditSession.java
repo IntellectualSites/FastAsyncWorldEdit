@@ -3664,7 +3664,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
                 }
 
                 for (BlockVector3 recurseDirection : recurseDirections) {
-                    queue.add(current.add(recurseDirection));
+                    queue.add(current.toImmutable().add(recurseDirection));
                 }
             }
         }
