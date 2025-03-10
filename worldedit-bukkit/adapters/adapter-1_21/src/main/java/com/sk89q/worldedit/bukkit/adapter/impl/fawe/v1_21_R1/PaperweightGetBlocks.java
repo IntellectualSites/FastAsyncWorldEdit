@@ -471,7 +471,7 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
                     }
 
                     if (createCopy) {
-                        char[] tmpLoad = loadPrivately(layerNo);
+                        char[] tmpLoad = load(layerNo);
                         char[] copyArr = new char[4096];
                         System.arraycopy(tmpLoad, 0, copyArr, 0, 4096);
                         copy.storeSection(getSectionIndex, copyArr);
@@ -534,7 +534,7 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
                             } else if (existingSection != getSections(false)[getSectionIndex]) {
                                 this.sections[getSectionIndex] = existingSection;
                                 this.reset();
-                            } else if (!Arrays.equals(update(getSectionIndex, new char[4096], true), loadPrivately(layerNo))) {
+                            } else if (!Arrays.equals(update(getSectionIndex, new char[4096], true), load(layerNo))) {
                                 this.reset(layerNo);
                             /*} else if (lock.isModified()) {
                                 this.reset(layerNo);*/
@@ -551,7 +551,7 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
 
                         newSection = PaperweightPlatformAdapter.newChunkSection(
                                 layerNo,
-                                this::loadPrivately,
+                                this::load,
                                 setArr,
                                 adapter,
                                 biomeRegistry,
@@ -1052,7 +1052,7 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
         } else {
             for (int i = getMinSectionPosition(); i <= getMaxSectionPosition(); i++) {
                 int layer = i - getMinSectionPosition();
-                if (!hasSection(i) || !super.sections[layer].isFull()) {
+                if (!hasSection(i) || super.blocks[layer] == null) {
                     continue;
                 }
                 LevelChunkSection existing = getSections(true)[layer];
