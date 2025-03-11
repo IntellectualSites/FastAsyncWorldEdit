@@ -3298,7 +3298,9 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
                 outer:
                 for (BlockVector3 position : region) {
                     for (BlockVector3 recurseDirection : recurseDirections) {
+                        //FAWE start - mutable
                         BlockVector3 neighbor = mutable.setComponents(position).add(recurseDirection);
+                        //FAWE end
 
                         if (outside.contains(neighbor)) {
                             newOutside.add(position);
@@ -3313,7 +3315,9 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
             outer:
             for (BlockVector3 position : region) {
                 for (BlockVector3 recurseDirection : recurseDirections) {
+                    //FAWE start - mutable
                     BlockVector3 neighbor = mutable.setComponents(position).add(recurseDirection);
+                    //FAWE end
 
                     if (outside.contains(neighbor)) {
                         continue outer;
