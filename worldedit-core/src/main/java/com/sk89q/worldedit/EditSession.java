@@ -3644,11 +3644,10 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     }
 
     private void recurseHollow(Region region, BlockVector3 origin, Set<BlockVector3> outside, Mask mask) {
-        // FAWE start - use BlockVector3Set instead of LinkedList
+        // FAWE start - use BlockVector3Set instead of LinkedList & mutable BV3
         final BlockVector3Set queue = BlockVector3Set.getAppropriateVectorSet(region);
         queue.add(origin);
 
-        //FAWE start - mutable
         MutableBlockVector3 mutable = new MutableBlockVector3();
 
         while (!queue.isEmpty()) {
@@ -3667,9 +3666,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
                 }
 
                 for (BlockVector3 recurseDirection : recurseDirections) {
-                    //FAWE start - mutable
                     queue.add(mutable.setComponents(current).add(recurseDirection));
-                    // FAWE end
                 }
             }
         }
