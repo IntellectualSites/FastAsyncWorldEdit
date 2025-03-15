@@ -53,7 +53,7 @@ public class BlockCategoryMask extends AbstractExtentMask {
     //FAWE start
     @Override
     public boolean test(Extent extent, BlockVector3 vector) {
-        return category.contains(extent.getBlock(vector));
+        return category.contains(vector.getBlock(extent));
     }
 
     /**
