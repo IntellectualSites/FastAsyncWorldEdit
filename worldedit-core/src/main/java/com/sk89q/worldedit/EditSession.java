@@ -3298,7 +3298,9 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
                 outer:
                 for (BlockVector3 position : region) {
                     for (BlockVector3 recurseDirection : recurseDirections) {
-                        BlockVector3 neighbor = position.add(recurseDirection);
+                        //FAWE start - mutable
+                        BlockVector3 neighbor = mutable.setComponents(position).add(recurseDirection);
+                        //FAWE end
 
                         if (outside.contains(neighbor)) {
                             newOutside.add(position);
@@ -3313,7 +3315,9 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
             outer:
             for (BlockVector3 position : region) {
                 for (BlockVector3 recurseDirection : recurseDirections) {
-                    BlockVector3 neighbor = position.add(recurseDirection);
+                    //FAWE start - mutable
+                    BlockVector3 neighbor = mutable.setComponents(position).add(recurseDirection);
+                    //FAWE end
 
                     if (outside.contains(neighbor)) {
                         continue outer;
@@ -3644,9 +3648,11 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     }
 
     private void recurseHollow(Region region, BlockVector3 origin, Set<BlockVector3> outside, Mask mask) {
-        // FAWE start - use BlockVector3Set instead of LinkedList
+        // FAWE start - use BlockVector3Set instead of LinkedList & mutable BV3
         final BlockVector3Set queue = BlockVector3Set.getAppropriateVectorSet(region);
         queue.add(origin);
+
+        MutableBlockVector3 mutable = new MutableBlockVector3();
 
         while (!queue.isEmpty()) {
             Iterator<BlockVector3> iter = queue.iterator();
@@ -3664,7 +3670,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
                 }
 
                 for (BlockVector3 recurseDirection : recurseDirections) {
-                    queue.add(current.add(recurseDirection));
+                    queue.add(mutable.setComponents(current).add(recurseDirection));
                 }
             }
         }
