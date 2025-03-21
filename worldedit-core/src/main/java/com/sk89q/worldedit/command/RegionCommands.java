@@ -235,7 +235,7 @@ public class RegionCommands {
             @Arg(desc = "The pattern of blocks to place")
                     Pattern pattern,
             @Arg(desc = "The thickness of the line", def = "0")
-                    int thickness,
+                    double thickness,
             @Switch(name = 'h', desc = "Generate only a shell")
                     boolean shell
     ) throws WorldEditException {
@@ -268,7 +268,7 @@ public class RegionCommands {
             @Arg(desc = "The pattern of blocks to place")
                     Pattern pattern,
             @Arg(desc = "The thickness of the curve", def = "0")
-                    int thickness,
+                    double thickness,
             @Switch(name = 'h', desc = "Generate only a shell")
                     boolean shell
     ) throws WorldEditException {

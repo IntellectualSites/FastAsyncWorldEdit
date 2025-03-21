@@ -208,6 +208,11 @@ public interface BlockStateHolder<B extends BlockStateHolder<B>> extends TileEnt
     }
     //FAWE end
 
+    /**
+     * Gets a String representation of this BlockStateHolder, in the format expected by WorldEdit's block parsers.
+     *
+     * @return a string representation
+     */
     default String getAsString() {
         if (getStates().isEmpty()) {
             return this.getBlockType().id();

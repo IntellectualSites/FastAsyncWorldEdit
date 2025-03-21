@@ -312,9 +312,10 @@ public class WorldEditPlugin extends JavaPlugin {
         /*
 
         // Block & Item
-        for (Material material : Material.values()) {
-            if (material.isBlock() && !material.isLegacy()) {
-                BlockType.REGISTRY.register(material.getKey().toString(), new BlockType(material.getKey().toString(), blockState -> {
+        Registry.MATERIAL.forEach(material -> {
+            String key = material.getKey().toString();
+            if (material.isBlock()) {
+                BlockType.REGISTRY.register(key, new BlockType(key, blockState -> {
                     // TODO Use something way less hacky than this.
                     ParserContext context = new ParserContext();
                     context.setPreferringWildcard(true);
@@ -331,13 +332,13 @@ public class WorldEditPlugin extends JavaPlugin {
                         }
                         return defaultState;
                     } catch (InputParseException e) {
-                        LOGGER.warn("Error loading block state for " + material.getKey(), e);
+                        LOGGER.warn("Error loading block state for " + key, e);
                         return blockState;
                     }
                 }));
             }
-            if (material.isItem() && !material.isLegacy()) {
-                ItemType.REGISTRY.register(material.getKey().toString(), new ItemType(material.getKey().toString()));
+            if (material.isItem()) {
+                ItemType.REGISTRY.register(key, new ItemType(key));
             }
         }
 */
@@ -359,10 +360,12 @@ public class WorldEditPlugin extends JavaPlugin {
         // Tags
         try {
             for (Tag<Material> blockTag : Bukkit.getTags(Tag.REGISTRY_BLOCKS, Material.class)) {
-                BlockCategory.REGISTRY.register(blockTag.getKey().toString(), new BlockCategory(blockTag.getKey().toString()));
+                String key = blockTag.getKey().toString();
+                BlockCategory.REGISTRY.register(key, new BlockCategory(blockTag.getKey().toString()));
             }
             for (Tag<Material> itemTag : Bukkit.getTags(Tag.REGISTRY_ITEMS, Material.class)) {
-                ItemCategory.REGISTRY.register(itemTag.getKey().toString(), new ItemCategory(itemTag.getKey().toString()));
+                String key = itemTag.getKey().toString();
+                ItemCategory.REGISTRY.register(key, new ItemCategory(itemTag.getKey().toString()));
             }
         } catch (NoSuchMethodError ignored) {
             LOGGER.warn(
