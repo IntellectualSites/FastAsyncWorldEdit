@@ -343,7 +343,11 @@ public final class BlockTypes {
     @Nullable
     public static final BlockType BUDDING_AMETHYST = init();
     @Nullable
+    public static final BlockType BUSH = init();
+    @Nullable
     public static final BlockType CACTUS = init();
+    @Nullable
+    public static final BlockType CACTUS_FLOWER = init();
     @Nullable
     public static final BlockType CAKE = init();
     @Nullable
@@ -805,6 +809,8 @@ public final class BlockTypes {
     @Nullable
     public static final BlockType FIRE_CORAL_WALL_FAN = init();
     @Nullable
+    public static final BlockType FIREFLY_BUSH = init();
+    @Nullable
     public static final BlockType FLETCHING_TABLE = init();
     @Nullable
     public static final BlockType FLOWERING_AZALEA = init();
@@ -1015,6 +1021,8 @@ public final class BlockTypes {
     public static final BlockType LAVA = init();
     @Nullable
     public static final BlockType LAVA_CAULDRON = init();
+    @Nullable
+    public static final BlockType LEAF_LITTER = init();
     @Nullable
     public static final BlockType LECTERN = init();
     @Nullable
@@ -1782,6 +1790,8 @@ public final class BlockTypes {
     @Nullable
     public static final BlockType SEAGRASS = init();
     @Nullable
+    public static final BlockType SHORT_DRY_GRASS  = init();
+    @Nullable
     public static final BlockType SHORT_GRASS = init();
     @Nullable
     public static final BlockType SEA_LANTERN = init();
@@ -1975,6 +1985,8 @@ public final class BlockTypes {
     @Nullable
     public static final BlockType SWEET_BERRY_BUSH = init();
     @Nullable
+    public static final BlockType TALL_DRY_GRASS = init();
+    @Nullable
     public static final BlockType TALL_GRASS = init();
     @Nullable
     public static final BlockType TALL_SEAGRASS = init();
@@ -1982,6 +1994,10 @@ public final class BlockTypes {
     public static final BlockType TARGET = init();
     @Nullable
     public static final BlockType TERRACOTTA = init();
+    @Nullable
+    public static final BlockType TEST_BLOCK = init();
+    @Nullable
+    public static final BlockType TEST_INSTANCE_BLOCK = init();
     @Nullable
     public static final BlockType TINTED_GLASS = init();
     @Nullable
@@ -2213,6 +2229,8 @@ public final class BlockTypes {
     public static final BlockType WHITE_WALL_BANNER = init();
     @Nullable
     public static final BlockType WHITE_WOOL = init();
+    @Nullable
+    public static final BlockType WILDFLOWERS = init();
     @Nullable
     public static final BlockType WITHER_ROSE = init();
     @Nullable
