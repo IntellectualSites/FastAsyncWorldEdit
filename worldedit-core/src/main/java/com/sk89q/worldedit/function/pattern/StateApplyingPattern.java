@@ -19,7 +19,6 @@
 
 package com.sk89q.worldedit.function.pattern;
 
-import com.google.common.collect.Maps;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.Property;
@@ -36,8 +35,8 @@ import static com.sk89q.worldedit.blocks.Blocks.resolveProperties;
 public class StateApplyingPattern extends AbstractExtentPattern {
 
     private final Map<String, String> states;
-    //FAWE - avoid race conditions
-    private final Map<BlockType, Map<Property<Object>, Object>> cache = new ConcurrentHashMap<>();
+    //FAWE - avoid race conditions, faster property applications
+    private final Map<BlockType, PropertyApplication[]> cache = new ConcurrentHashMap<>();
     //FAWE end
 
     public StateApplyingPattern(Extent extent, Map<String, String> statesToSet) {
@@ -47,16 +46,40 @@ public class StateApplyingPattern extends AbstractExtentPattern {
 
     @Override
     public BaseBlock applyBlock(BlockVector3 position) {
-        BlockState block = getExtent().getBlock(position);
-        for (Entry<Property<Object>, Object> entry : cache
-                .computeIfAbsent(block.getBlockType(), (b -> resolveProperties(states, b))).entrySet()) {
-            //FAWE start
-            if (block.getBlockType().hasProperty(entry.getKey().getKey())) {
-                block = block.with(entry.getKey(), entry.getValue());
+        //FAWE start
+        BlockState block = position.getBlock(getExtent());
+        final BlockType blockType = block.getBlockType();
+        // weak consistency is enough, no need to use computeIfAbsent
+        PropertyApplication[] applications = cache.get(blockType);
+        if (applications == null) {
+            applications = resolvePropertiesFor(blockType);
+            cache.put(blockType, applications);
+        }
+        for (PropertyApplication entry : applications) {
+            if (blockType.hasProperty(entry.property().getKey())) {
+                block = block.with(entry.property(), entry.value());
             }
             //FAWE end
         }
         return block.toBaseBlock();
     }
+
+    //FAWE start - faster property application
+    private record PropertyApplication(Property<Object> property, Object value) {
+
+    }
+
+    private PropertyApplication[] resolvePropertiesFor(BlockType blockType) {
+        Map<Property<Object>, Object> map = resolveProperties(states, blockType);
+        final PropertyApplication[] applications = new PropertyApplication[map.size()];
+        int i = 0;
+        for (Entry<Property<Object>, Object> entry : map.entrySet()) {
+            Property<Object> property = entry.getKey();
+            Object o = entry.getValue();
+            applications[i++] = new PropertyApplication(property, o);
+        }
+        return applications;
+    }
+    //FAWE end
 
 }
