@@ -13,6 +13,7 @@ import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.fastasyncworldedit.core.queue.IChunkSet;
 import com.fastasyncworldedit.core.util.MathMan;
 import com.fastasyncworldedit.core.util.NbtUtils;
+import com.fastasyncworldedit.core.util.TaskManager;
 import com.fastasyncworldedit.core.util.collection.AdaptedMap;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.BukkitEntity;
@@ -69,9 +70,7 @@ import org.enginehub.linbus.tree.LinListTag;
 import org.enginehub.linbus.tree.LinStringTag;
 import org.enginehub.linbus.tree.LinTagType;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.AbstractCollection;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -344,38 +343,41 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
                 }
             copies.put(copyKey, copy);
         }
-        // Remove existing tiles. Create a copy so that we can remove blocks
-        Map<BlockPos, BlockEntity> chunkTiles = new HashMap<>(nmsChunk.getBlockEntities());
-        List<BlockEntity> beacons = null;
-        if (!chunkTiles.isEmpty()) {
-            for (Map.Entry<BlockPos, BlockEntity> entry : chunkTiles.entrySet()) {
-                final BlockPos pos = entry.getKey();
-                final int lx = pos.getX() & 15;
-                final int ly = pos.getY();
-                final int lz = pos.getZ() & 15;
-                final int layer = ly >> 4;
-                if (!set.hasSection(layer)) {
-                    continue;
-                }
-
-                int ordinal = set.getBlock(lx, ly, lz).getOrdinal();
-                if (ordinal != BlockTypesCache.ReservedIDs.__RESERVED__) {
-                    BlockEntity tile = entry.getValue();
-                    if (PaperLib.isPaper() && tile instanceof BeaconBlockEntity) {
-                        if (beacons == null) {
-                            beacons = new ArrayList<>();
-                        }
-                        beacons.add(tile);
-                        PaperweightPlatformAdapter.removeBeacon(tile, nmsChunk);
+        List<BlockEntity> beacons = TaskManager.taskManager().sync(() -> {
+            // Remove existing tiles. Create a copy so that we can remove blocks
+            Map<BlockPos, BlockEntity> chunkTiles = new HashMap<>(nmsChunk.getBlockEntities());
+            List<BlockEntity> beaconEntities = null;
+            if (!chunkTiles.isEmpty()) {
+                for (Map.Entry<BlockPos, BlockEntity> entry : chunkTiles.entrySet()) {
+                    final BlockPos pos = entry.getKey();
+                    final int lx = pos.getX() & 15;
+                    final int ly = pos.getY();
+                    final int lz = pos.getZ() & 15;
+                    final int layer = ly >> 4;
+                    if (!set.hasSection(layer)) {
                         continue;
                     }
-                    nmsChunk.removeBlockEntity(tile.getBlockPos());
-                    if (createCopy) {
-                        copy.storeTile(tile);
+
+                    int ordinal = set.getBlock(lx, ly, lz).getOrdinal();
+                    if (ordinal != BlockTypesCache.ReservedIDs.__RESERVED__) {
+                        BlockEntity tile = entry.getValue();
+                        if (PaperLib.isPaper() && tile instanceof BeaconBlockEntity) {
+                            if (beaconEntities == null) {
+                                beaconEntities = new ArrayList<>();
+                            }
+                            beaconEntities.add(tile);
+                            PaperweightPlatformAdapter.removeBeacon(tile, nmsChunk);
+                            continue;
+                        }
+                        nmsChunk.removeBlockEntity(tile.getBlockPos());
+                        if (createCopy) {
+                            copy.storeTile(tile);
+                        }
                     }
                 }
             }
-        }
+            return beaconEntities;
+        });
         final BiomeType[][] biomes = set.getBiomes();
 
         int bitMask = 0;
@@ -574,14 +576,14 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
 
             Map<HeightMapType, int[]> heightMaps = set.getHeightMaps();
             for (Map.Entry<HeightMapType, int[]> entry : heightMaps.entrySet()) {
-                PaperweightGetBlocks.this.setHeightmapToGet(entry.getKey(), entry.getValue());
+                this.setHeightmapToGet(entry.getKey(), entry.getValue());
             }
-            PaperweightGetBlocks.this.setLightingToGet(
+            this.setLightingToGet(
                     set.getLight(),
                     set.getMinSectionPosition(),
                     set.getMaxSectionPosition()
             );
-            PaperweightGetBlocks.this.setSkyLightingToGet(
+            this.setSkyLightingToGet(
                     set.getSkyLight(),
                     set.getMinSectionPosition(),
                     set.getMaxSectionPosition()
