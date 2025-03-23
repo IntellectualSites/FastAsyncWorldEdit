@@ -64,6 +64,16 @@ public abstract class Tag<V, LT extends LinTag<? extends V>> implements ToLinTag
     }
 
     public abstract int getTypeCode();
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        } else if (!this.getClass().equals(o.getClass())) {
+            return false;
+        }
+        return linTag.equals(((Tag<?, ?>) o).linTag);
+    }
     //FAWE end
 
 }
