@@ -539,7 +539,8 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
         }
 
         //FAWE start - only handle if extra data is actually supplied or if the user has permission for nbt
-        boolean allowWorkingDefault = context.requireActor().hasPermission("worldedit.anyblock.nbt") && nbt != null;
+        boolean allowWorkingDefault = nbt != null &&
+                (context.getActor() == null || context.getActor().hasPermission("worldedit.anyblock.nbt"));
         if (DeprecationUtil.isSign(blockType) && (blockAndExtraData.length > 1 || allowWorkingDefault)) {
             //FAWE end
             // Allow special sign text syntax
