@@ -43,6 +43,7 @@ public interface IFawe {
      */
     Preloader getPreloader(boolean initialise);
 
+    @Deprecated(forRemoval = true, since = "TODO")
     default boolean isChunksStretched() {
         return true;
     }
