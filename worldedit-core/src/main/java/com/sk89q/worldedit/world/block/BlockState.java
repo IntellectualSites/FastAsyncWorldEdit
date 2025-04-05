@@ -72,6 +72,7 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
     private CompoundInput compoundInput = CompoundInput.NULL;
     //FAWE end
     private final BlockType blockType;
+    private final LazyReference<String> lazyStringRepresentation;
 
     //FAWE start
     public BlockState(BlockType blockType, int internalId, int ordinal) {
@@ -80,6 +81,7 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
         this.ordinal = ordinal;
         this.ordinalChar = (char) ordinal;
         this.emptyBaseBlock = new BlanketBaseBlock(this);
+        this.lazyStringRepresentation = LazyReference.from(BlockStateHolder.super::getAsString);
     }
 
     public BlockState(BlockType blockType, int internalId, int ordinal, @Nonnull CompoundTag tile) {
@@ -88,6 +90,7 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
         this.ordinal = ordinal;
         this.ordinalChar = (char) ordinal;
         this.emptyBaseBlock = new BlanketBaseBlock(this, tile);
+        this.lazyStringRepresentation = LazyReference.from(BlockStateHolder.super::getAsString);
     }
 
     /**
@@ -499,6 +502,11 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
     }
 
     //FAWE end
+
+    @Override
+    public String getAsString() {
+        return lazyStringRepresentation.getValue();
+    }
 
     @Override
     public String toString() {
