@@ -212,7 +212,6 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * NONE = Place blocks without worrying about placement order.
      * </p>
      */
-    @Deprecated
     public enum ReorderMode {
         MULTI_STAGE("multi"),
         FAST("fast"),
@@ -399,7 +398,6 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      *
      * @param reorderMode The reorder mode
      */
-    @Deprecated
     public void setReorderMode(ReorderMode reorderMode) {
         //FAWE start - we don't do physics so we don't need this
         switch (reorderMode) {
@@ -421,7 +419,6 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      *
      * @return the reorder mode
      */
-    @Deprecated
     public ReorderMode getReorderMode() {
         if (isQueueEnabled()) {
             return ReorderMode.MULTI_STAGE;
@@ -483,7 +480,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * Returns queue status.
      *
      * @return whether the queue is enabled
-     * @deprecated Use {@link EditSession#isBufferingEnabled()} instead.
+     * @deprecated Use {@link EditSession#getReorderMode()} with MULTI_STAGE instead.
      */
     @Deprecated
     public boolean isQueueEnabled() {
@@ -496,7 +493,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * Queue certain types of block for better reproduction of those blocks. Uses
      * {@link ReorderMode#MULTI_STAGE}.
      *
-     * @deprecated There is no specific replacement, instead enable what you want specifically.
+     * @deprecated Use {@link EditSession#setReorderMode(ReorderMode)} with MULTI_STAGE instead.
      */
     @Deprecated
     public void enableQueue() {
@@ -506,9 +503,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     }
 
     /**
-     * Disable the queue. This will flush the session.
-     *
-     * @deprecated Use {@link EditSession#disableBuffering()} instead.
+     * Disable the queue. This will close the queue.
      */
     @Deprecated
     public void disableQueue() {
@@ -844,15 +839,6 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
             disableQueue();
         }
         //FAWE end
-    }
-
-    /**
-     * Check if this session has any buffering extents enabled.
-     *
-     * @return {@code true} if any extents are buffering
-     */
-    public boolean isBufferingEnabled() {
-        return isBatchingChunks();
     }
 
     /**
@@ -1204,40 +1190,6 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         editSession.changes = 1;
     }
     //FAWE end
-
-    /**
-     * Gets whether this EditSession will track history.
-     *
-     * @return whether history is tracked
-     */
-    public boolean isTrackingHistory() {
-        //FAWE start
-        return history;
-        //FAWE end
-    }
-
-    /**
-     * Sets whether this EditSession will track history.
-     *
-     * @param trackHistory whether to track history
-     */
-    public void setTrackingHistory(boolean trackHistory) {
-        //FAWE start
-        if (trackHistory) {
-            if (this.history) {
-                if (this.changeSet == null) {
-                    throw new IllegalStateException("No ChangeSetExtent is available");
-                }
-                enableHistory(this.changeSet);
-            }
-        } else {
-            if (this.history) {
-                disableHistory();
-                this.history = false;
-            }
-        }
-        //FAWE end
-    }
 
     /**
      * Get the number of changed blocks.
@@ -2396,18 +2348,17 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         final int ceilRadiusX = (int) Math.ceil(radiusX);
         final int ceilRadiusZ = (int) Math.ceil(radiusZ);
 
-        final double rx2 = Math.pow(radiusX, 2);
-        final double ry2 = Math.pow(radiusZ, 2);
-        final double rz2 = Math.pow(height, 2);
-        final int layers = Math.abs(height);
+        double rx2 = Math.pow(radiusX, 2);
+        double ry2 = Math.pow(height, 2);
+        double rz2 = Math.pow(radiusZ, 2);
 
         int cx = pos.x();
         int cy = pos.y();
         int cz = pos.z();
 
-        for (int y = 0; y < layers; ++y) {
-            double ySquaredMinusHeightOverHeightSquared = Math.pow(y - layers, 2) / ry2;
-            int yy = height < 0 ? cy - y : cy + y;
+        for (int y = 0; y < height; ++y) {
+            double ySquaredMinusHeightOverHeightSquared = Math.pow(y - height, 2) / ry2;
+            int yy = cy + y;
             forX:
             for (int x = 0; x <= ceilRadiusX; ++x) {
                 double xSquaredOverRadiusX = Math.pow(x, 2) / rx2;
@@ -2429,7 +2380,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
                         double xNext = Math.pow(x + thickness, 2) / rx2 + zSquaredOverRadiusZ - ySquaredMinusHeightOverHeightSquared;
                         double yNext = xSquaredOverRadiusX + zSquaredOverRadiusZ - Math.pow(y + thickness - height, 2) / ry2;
                         double zNext = xSquaredOverRadiusX + Math.pow(z + thickness, 2) / rz2 - ySquaredMinusHeightOverHeightSquared;
-                        if (xNext <= 0 && zNext <= 0 && (yNext <= 0 && y + thickness != layers)) {
+                        if (xNext <= 0 && zNext <= 0 && (yNext <= 0 && y + thickness != height)) {
                             continue;
                         }
                     }
@@ -3788,159 +3739,6 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         return changed;
     }
 
-    public int morph(BlockVector3 position, double brushSize, int minErodeFaces, int numErodeIterations, int minDilateFaces, int numDilateIterations) throws MaxChangedBlocksException {
-        int ceilBrushSize = (int) Math.ceil(brushSize);
-        int bufferSize = ceilBrushSize * 2 + 3;  // + 1 due to checking the adjacent blocks, plus the 0th block
-        // Store block states in a 3d array so we can do multiple mutations then commit.
-        // Two are required as for each iteration, one is "current" and the other is "new"
-        BlockState[][][] currentBuffer = new BlockState[bufferSize][bufferSize][bufferSize];
-        BlockState[][][] nextBuffer = new BlockState[bufferSize][bufferSize][bufferSize];
-
-        // Simply used for swapping the two
-        BlockState[][][] tmp;
-
-        // Load into buffer
-        for (int x = 0; x < bufferSize; x++) {
-            for (int y = 0; y < bufferSize; y++) {
-                for (int z = 0; z < bufferSize; z++) {
-                    BlockState blockState = getBlock(position.add(x - ceilBrushSize - 1, y - ceilBrushSize - 1, z - ceilBrushSize - 1));
-                    currentBuffer[x][y][z] = blockState;
-                    nextBuffer[x][y][z] = blockState;
-                }
-            }
-        }
-
-        double brushSizeSq = brushSize * brushSize;
-        Map<BlockState, Integer> blockStateFrequency = new HashMap<>();
-        int totalFaces;
-        int highestFreq;
-        BlockState highestState;
-        for (int i = 0; i < numErodeIterations; i++) {
-            for (int x = 0; x <= ceilBrushSize * 2; x++) {
-                int realX = x - ceilBrushSize;
-                int xsqr = realX * realX;
-                for (int y = 0; y <= ceilBrushSize * 2; y++) {
-                    int realY = y - ceilBrushSize;
-                    int ysqr = realY * realY;
-                    for (int z = 0; z <= ceilBrushSize * 2; z++) {
-                        int realZ = z - ceilBrushSize;
-                        int zsqr = realZ * realZ;
-                        if (xsqr + ysqr + zsqr > brushSizeSq) {
-                            continue;
-                        }
-
-                        // Copy across changes
-                        nextBuffer[x + 1][y + 1][z + 1] = currentBuffer[x + 1][y + 1][z + 1];
-
-                        BlockState blockState = currentBuffer[x + 1][y + 1][z + 1];
-
-                        if (blockState.getBlockType().getMaterial().isLiquid() || blockState.getBlockType().getMaterial().isAir()) {
-                            continue;
-                        }
-
-                        blockStateFrequency.clear();
-                        totalFaces = 0;
-                        highestFreq = 0;
-                        highestState = blockState;
-                        for (BlockVector3 vec3 : recurseDirections) {
-                            BlockState adj = currentBuffer[x + 1 + vec3.x()][y + 1 + vec3.y()][z + 1 + vec3.z()];
-
-                            if (!adj.getBlockType().getMaterial().isLiquid() && !adj.getBlockType().getMaterial().isAir()) {
-                                continue;
-                            }
-
-                            totalFaces++;
-                            int newFreq = blockStateFrequency.getOrDefault(adj, 0) + 1;
-                            blockStateFrequency.put(adj, newFreq);
-
-                            if (newFreq > highestFreq) {
-                                highestFreq = newFreq;
-                                highestState = adj;
-                            }
-                        }
-
-                        if (totalFaces >= minErodeFaces) {
-                            nextBuffer[x + 1][y + 1][z + 1] = highestState;
-                        }
-                    }
-                }
-            }
-            // Swap current and next
-            tmp = currentBuffer;
-            currentBuffer = nextBuffer;
-            nextBuffer = tmp;
-        }
-
-        for (int i = 0; i < numDilateIterations; i++) {
-            for (int x = 0; x <= ceilBrushSize * 2; x++) {
-                int realX = x - ceilBrushSize;
-                int xsqr = realX * realX;
-                for (int y = 0; y <= ceilBrushSize * 2; y++) {
-                    int realY = y - ceilBrushSize;
-                    int ysqr = realY * realY;
-                    for (int z = 0; z <= ceilBrushSize * 2; z++) {
-                        int realZ = z - ceilBrushSize;
-                        int zsqr = realZ * realZ;
-                        if (xsqr + ysqr + zsqr > brushSizeSq) {
-                            continue;
-                        }
-
-                        // Copy across changes
-                        nextBuffer[x + 1][y + 1][z + 1] = currentBuffer[x + 1][y + 1][z + 1];
-
-                        BlockState blockState = currentBuffer[x + 1][y + 1][z + 1];
-                        // Needs to be empty
-                        if (!blockState.getBlockType().getMaterial().isLiquid() && !blockState.getBlockType().getMaterial().isAir()) {
-                            continue;
-                        }
-
-                        blockStateFrequency.clear();
-                        totalFaces = 0;
-                        highestFreq = 0;
-                        highestState = blockState;
-                        for (BlockVector3 vec3 : recurseDirections) {
-                            BlockState adj = currentBuffer[x + 1 + vec3.x()][y + 1 + vec3.y()][z + 1 + vec3.z()];
-                            if (adj.getBlockType().getMaterial().isLiquid() || adj.getBlockType().getMaterial().isAir()) {
-                                continue;
-                            }
-
-                            totalFaces++;
-                            int newFreq = blockStateFrequency.getOrDefault(adj, 0) + 1;
-                            blockStateFrequency.put(adj, newFreq);
-
-                            if (newFreq > highestFreq) {
-                                highestFreq = newFreq;
-                                highestState = adj;
-                            }
-                        }
-
-                        if (totalFaces >= minDilateFaces) {
-                            nextBuffer[x + 1][y + 1][z + 1] = highestState;
-                        }
-                    }
-                }
-            }
-            // Swap current and next
-            tmp = currentBuffer;
-            currentBuffer = nextBuffer;
-            nextBuffer = tmp;
-        }
-
-        // Commit to world
-        int changed = 0;
-        for (int x = 0; x < bufferSize; x++) {
-            for (int y = 0; y < bufferSize; y++) {
-                for (int z = 0; z < bufferSize; z++) {
-                    if (setBlock(position.add(x - ceilBrushSize - 1, y - ceilBrushSize - 1, z - ceilBrushSize - 1), currentBuffer[x][y][z])) {
-                        changed++;
-                    }
-                }
-            }
-        }
-
-        return changed;
-    }
-
     private static final BlockVector3[] recurseDirections = {
             Direction.NORTH.toBlockVector(),
             Direction.EAST.toBlockVector(),
@@ -4261,5 +4059,4 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         return changes;
     }
     //FAWE end
-
 }

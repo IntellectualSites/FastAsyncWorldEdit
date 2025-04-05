@@ -229,8 +229,7 @@ public class CommandUtil {
             return suggestion;
         }
         String substr = suggestion.getSubstring();
-        // Check if there is a space inside the substring, and suggest starting from there instead.
-        int sp = substr.trim().lastIndexOf(' ');
+        int sp = substr.lastIndexOf(' ');
         if (sp < 0) {
             return suggestion;
         }

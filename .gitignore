@@ -16,7 +16,6 @@ target
 forge-download
 out
 run
-.jqwik-database
 
 /dependency-reduced-pom.xml
 *-private.sh

@@ -47,7 +47,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class ChangeSetExtent extends AbstractDelegateExtent {
 
     private final ChangeSet changeSet;
-    private boolean enabled;
 
     /**
      * Create a new instance.
@@ -56,56 +55,22 @@ public class ChangeSetExtent extends AbstractDelegateExtent {
      * @param changeSet the change set
      */
     public ChangeSetExtent(Extent extent, ChangeSet changeSet) {
-        this(extent, changeSet, true);
-    }
-
-    /**
-     * Create a new instance.
-     *
-     * @param extent the extent
-     * @param changeSet the change set
-     * @param enabled if the extent is enabled
-     */
-    public ChangeSetExtent(Extent extent, ChangeSet changeSet, boolean enabled) {
         super(extent);
         checkNotNull(changeSet);
         this.changeSet = changeSet;
-        this.enabled = true;
-    }
-
-    /**
-     * If this extent is enabled and should perform change tracking.
-     *
-     * @return if enabled
-     */
-    public boolean isEnabled() {
-        return this.enabled;
-    }
-
-    /**
-     * Sets whether this extent is enabled and should perform change tracking.
-     *
-     * @param enabled whether to enable
-     */
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
     }
 
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 location, B block) throws WorldEditException {
-        if (enabled) {
-            BaseBlock previous = getFullBlock(location);
-            changeSet.add(new BlockChange(location, previous, block));
-        }
+        BaseBlock previous = getFullBlock(location);
+        changeSet.add(new BlockChange(location, previous, block));
         return super.setBlock(location, block);
     }
 
     @Override
     public boolean setBiome(BlockVector3 position, BiomeType biome) {
-        if (enabled) {
-            BiomeType previous = getBiome(position);
-            changeSet.add(new BiomeChange3D(position, previous, biome));
-        }
+        BiomeType previous = getBiome(position);
+        changeSet.add(new BiomeChange3D(position, previous, biome));
         return super.setBiome(position, biome);
     }
 
@@ -113,8 +78,8 @@ public class ChangeSetExtent extends AbstractDelegateExtent {
     @Override
     public Entity createEntity(Location location, BaseEntity state) {
         Entity entity = super.createEntity(location, state);
-        if (enabled && entity != null) {
-            changeSet.add(new EntityCreate(location, state, entity));
+        if (entity != null) {
+            changeSet.add(new EntityCreate(location, entity.getState(), entity));
         }
         return entity;
     }
@@ -124,7 +89,7 @@ public class ChangeSetExtent extends AbstractDelegateExtent {
     @Nullable
     public Entity createEntity(Location location, BaseEntity state, UUID uuid) {
         Entity entity = super.createEntity(location, state, uuid);
-        if (enabled && entity != null) {
+        if (entity != null) {
             changeSet.add(new EntityCreate(location, entity.getState(), entity));
         }
         return entity;
@@ -142,9 +107,6 @@ public class ChangeSetExtent extends AbstractDelegateExtent {
     }
 
     private List<? extends Entity> wrapEntities(List<? extends Entity> entities) {
-        if (!enabled) {
-            return entities;
-        }
         List<Entity> newList = new ArrayList<>(entities.size());
         for (Entity entity : entities) {
             newList.add(new TrackedEntity(entity));

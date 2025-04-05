@@ -22,7 +22,6 @@ package com.sk89q.worldedit.extent.reorder;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.AbstractBufferingExtent;
 import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.extent.world.SideEffectExtent;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.OperationQueue;
 import com.sk89q.worldedit.function.operation.RunContext;
@@ -44,10 +43,7 @@ import java.util.Map;
 
 /**
  * Re-orders blocks into several stages.
- *
- * @deprecated Use {@link SideEffectExtent} with {@link SideEffectExtent#setPostEditSimulationEnabled} instead.
  */
-@Deprecated
 public class MultiStageReorder extends AbstractBufferingExtent implements ReorderingExtent {
 
     private static final Map<BlockType, PlacementPriority> priorityMap = new HashMap<>();
