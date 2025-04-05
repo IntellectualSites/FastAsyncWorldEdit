@@ -23,16 +23,15 @@ import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.world.DataException;
 import com.sk89q.worldedit.world.World;
-import org.enginehub.linbus.stream.LinBinaryIO;
-import org.enginehub.linbus.tree.LinCompoundTag;
-import org.enginehub.linbus.tree.LinRootEntry;
 
 import javax.annotation.Nullable;
-import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
 public abstract class McRegionChunkStore extends ChunkStore {
+
+    protected String curFilename = null;
+    protected McRegionReader cachedReader = null;
 
     /**
      * Get the filename of a region file.
@@ -52,11 +51,22 @@ public abstract class McRegionChunkStore extends ChunkStore {
             IOException {
         //FAWE end
         String filename = getFilename(pos);
+        if (curFilename != null) {
+            if (curFilename.equals(filename)) {
+                return cachedReader;
+            } else {
+                try {
+                    cachedReader.close();
+                } catch (IOException ignored) {
+                }
+            }
+        }
         //FAWE start - biome and entity restore
         InputStream stream = getInputStream(filename, worldname, folderOverride);
         //FAWE end
+        cachedReader = new McRegionReader(stream);
         //curFilename = filename;
-        return new McRegionReader(stream);
+        return cachedReader;
     }
 
     @Override
@@ -96,5 +106,12 @@ public abstract class McRegionChunkStore extends ChunkStore {
     protected abstract InputStream getInputStream(String name, String worldName, @Nullable String folderOverride) throws
             IOException, DataException;
     //FAWE end
+
+    @Override
+    public void close() throws IOException {
+        if (cachedReader != null) {
+            cachedReader.close();
+        }
+    }
 
 }

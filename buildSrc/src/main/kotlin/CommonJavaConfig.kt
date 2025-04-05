@@ -36,16 +36,13 @@ fun Project.applyCommonJavaConfiguration(sourcesJar: Boolean, banSlf4j: Boolean 
     }
 
     tasks.withType<Test>().configureEach {
-        useJUnitPlatform {
-            includeEngines("junit-jupiter", "jqwik")
-        }
+        useJUnitPlatform()
     }
 
     dependencies {
         "compileOnly"("com.google.code.findbugs:jsr305:3.0.2")
         "testImplementation"("org.junit.jupiter:junit-jupiter-api:5.11.1")
         "testImplementation"("org.junit.jupiter:junit-jupiter-params:5.11.1")
-        "testImplementation"("net.jqwik:jqwik:1.9.0")
         "testImplementation"("org.mockito:mockito-core:5.14.0")
         "testImplementation"("org.mockito:mockito-junit-jupiter:5.14.0")
         "testRuntimeOnly"("org.junit.jupiter:junit-jupiter-engine:5.11.1")

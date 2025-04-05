@@ -1354,46 +1354,6 @@ public final class BlockTypes {
     @Nullable
     public static final BlockType PACKED_MUD = init();
     @Nullable
-    public static final BlockType PALE_HANGING_MOSS = init();
-    @Nullable
-    public static final BlockType PALE_MOSS_BLOCK = init();
-    @Nullable
-    public static final BlockType PALE_MOSS_CARPET = init();
-    @Nullable
-    public static final BlockType PALE_OAK_BUTTON = init();
-    @Nullable
-    public static final BlockType PALE_OAK_DOOR = init();
-    @Nullable
-    public static final BlockType PALE_OAK_FENCE = init();
-    @Nullable
-    public static final BlockType PALE_OAK_FENCE_GATE = init();
-    @Nullable
-    public static final BlockType PALE_OAK_HANGING_SIGN = init();
-    @Nullable
-    public static final BlockType PALE_OAK_LEAVES = init();
-    @Nullable
-    public static final BlockType PALE_OAK_LOG = init();
-    @Nullable
-    public static final BlockType PALE_OAK_PLANKS = init();
-    @Nullable
-    public static final BlockType PALE_OAK_PRESSURE_PLATE = init();
-    @Nullable
-    public static final BlockType PALE_OAK_SAPLING = init();
-    @Nullable
-    public static final BlockType PALE_OAK_SIGN = init();
-    @Nullable
-    public static final BlockType PALE_OAK_SLAB = init();
-    @Nullable
-    public static final BlockType PALE_OAK_STAIRS = init();
-    @Nullable
-    public static final BlockType PALE_OAK_TRAPDOOR = init();
-    @Nullable
-    public static final BlockType PALE_OAK_WALL_HANGING_SIGN = init();
-    @Nullable
-    public static final BlockType PALE_OAK_WALL_SIGN = init();
-    @Nullable
-    public static final BlockType PALE_OAK_WOOD = init();
-    @Nullable
     public static final BlockType PEARLESCENT_FROGLIGHT = init();
     @Nullable
     public static final BlockType PEONY = init();
@@ -1569,8 +1529,6 @@ public final class BlockTypes {
     public static final BlockType POTTED_ORANGE_TULIP = init();
     @Nullable
     public static final BlockType POTTED_OXEYE_DAISY = init();
-    @Nullable
-    public static final BlockType POTTED_PALE_OAK_SAPLING = init();
     @Nullable
     public static final BlockType POTTED_PINK_TULIP = init();
     @Nullable
@@ -1948,10 +1906,6 @@ public final class BlockTypes {
     public static final BlockType STRIPPED_OAK_LOG = init();
     @Nullable
     public static final BlockType STRIPPED_OAK_WOOD = init();
-    @Nullable
-    public static final BlockType STRIPPED_PALE_OAK_LOG = init();
-    @Nullable
-    public static final BlockType STRIPPED_PALE_OAK_WOOD = init();
     @Nullable
     public static final BlockType STRIPPED_SPRUCE_LOG = init();
     @Nullable

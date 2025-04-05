@@ -32,6 +32,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.SetMultimap;
 import com.google.common.util.concurrent.ListeningExecutorService;
+import com.google.common.util.concurrent.MoreExecutors;
 import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.event.platform.BlockInteractEvent;
@@ -61,6 +62,7 @@ import com.sk89q.worldedit.scripting.RhinoCraftScriptEngine;
 import com.sk89q.worldedit.session.SessionManager;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.util.concurrency.EvenMoreExecutors;
 import com.sk89q.worldedit.util.concurrency.LazyReference;
 import com.sk89q.worldedit.util.eventbus.EventBus;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
@@ -128,6 +130,12 @@ public final class WorldEdit {
     @Deprecated
     private final EditSessionFactory editSessionFactory = new EditSessionFactory.EditSessionFactoryImpl();
     private final SessionManager sessions = new SessionManager(this);
+    private final ListeningExecutorService executorService = MoreExecutors.listeningDecorator(EvenMoreExecutors.newBoundedCachedThreadPool(
+            0,
+            1,
+            20,
+            "WorldEdit Task Executor - %s"
+    ));
     private final Supervisor supervisor = new SimpleSupervisor();
     //FAWE start
     private final LazyReference<TranslationManager> translationManager =
@@ -200,7 +208,7 @@ public final class WorldEdit {
      * @return the executor service
      */
     public ListeningExecutorService getExecutorService() {
-        return platformManager.getExecutorService();
+        return executorService;
     }
 
     /**

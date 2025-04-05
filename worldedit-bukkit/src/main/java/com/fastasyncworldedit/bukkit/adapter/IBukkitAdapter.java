@@ -166,8 +166,10 @@ public interface IBukkitAdapter {
      */
     default Material adapt(ItemType itemType) {
         checkNotNull(itemType);
-        NamespacedKey key = checkNotNull(NamespacedKey.fromString(itemType.id()), "Item type key is invalid");
-        return Registry.MATERIAL.get(key);
+        if (!itemType.id().startsWith("minecraft:")) {
+            throw new IllegalArgumentException("Bukkit only supports Minecraft items");
+        }
+        return Material.getMaterial(itemType.id().substring(10).toUpperCase(Locale.ROOT));
     }
 
     /**
@@ -178,8 +180,11 @@ public interface IBukkitAdapter {
      */
     default Material adapt(BlockType blockType) {
         checkNotNull(blockType);
-        NamespacedKey key = checkNotNull(NamespacedKey.fromString(blockType.id()), "Block type key is invalid");
-        return Registry.MATERIAL.get(key);
+        if (!blockType.id().startsWith("minecraft:")) {
+            throw new IllegalArgumentException("Bukkit only supports Minecraft blocks");
+        }
+        String id = blockType.id().substring(10).toUpperCase(Locale.ROOT);
+        return Material.getMaterial(id);
     }
 
     default org.bukkit.entity.EntityType adapt(EntityType entityType) {

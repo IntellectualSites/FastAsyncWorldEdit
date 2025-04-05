@@ -103,7 +103,8 @@ public class PaperweightServerLevelDelegateProxy implements InvocationHandler {
         if (tileEntity == null) {
             return null;
         }
-        tileEntity.loadWithComponents(
+        BlockEntity newEntity = tileEntity.getType().create(blockPos, getBlockState(blockPos));
+        newEntity.loadWithComponents(
                 (CompoundTag) adapter.fromNativeLin(this.editSession.getFullBlock(
                         blockPos.getX(),
                         blockPos.getY(),
@@ -112,7 +113,7 @@ public class PaperweightServerLevelDelegateProxy implements InvocationHandler {
                 this.serverLevel.registryAccess()
         );
 
-        return tileEntity;
+        return newEntity;
     }
 
     private BlockState getBlockState(BlockPos blockPos) {
