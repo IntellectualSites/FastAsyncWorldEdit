@@ -22,6 +22,7 @@ package com.sk89q.worldedit.command;
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.extent.clipboard.URIClipboardHolder;
 import com.fastasyncworldedit.core.function.mask.IdMask;
+import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.fastasyncworldedit.core.regions.selector.FuzzyRegionSelector;
 import com.fastasyncworldedit.core.regions.selector.PolyhedralRegionSelector;
 import com.fastasyncworldedit.core.util.MaskTraverser;
@@ -536,12 +537,13 @@ public class SelectionCommands {
         int minY = 0;
         boolean found = false;
 
+        MutableBlockVector3 mutable = new MutableBlockVector3();
         outer: for (int y = min.y(); y <= max.y(); y++) {
             for (int x = min.x(); x <= max.x(); x++) {
                 for (int z = min.z(); z <= max.z(); z++) {
-                    BlockVector3 vec = BlockVector3.at(x, y, z);
+                    mutable.setComponents(x, y, z);
 
-                    if (mask.test(vec)) {
+                    if (mask.test(mutable)) {
                         found = true;
                         minY = y;
 
@@ -561,9 +563,9 @@ public class SelectionCommands {
         outer: for (int y = max.y(); y > minY; y--) {
             for (int x = min.x(); x <= max.x(); x++) {
                 for (int z = min.z(); z <= max.z(); z++) {
-                    BlockVector3 vec = BlockVector3.at(x, y, z);
+                    mutable.setComponents(x, y, z);
 
-                    if (mask.test(vec)) {
+                    if (mask.test(mutable)) {
                         maxY = y;
                         break outer;
                     }
@@ -576,9 +578,9 @@ public class SelectionCommands {
         outer: for (int x = min.x(); x <= max.x(); x++) {
             for (int z = min.z(); z <= max.z(); z++) {
                 for (int y = minY; y <= maxY; y++) {
-                    BlockVector3 vec = BlockVector3.at(x, y, z);
+                    mutable.setComponents(x, y, z);
 
-                    if (mask.test(vec)) {
+                    if (mask.test(mutable)) {
                         minX = x;
                         break outer;
                     }
@@ -591,9 +593,9 @@ public class SelectionCommands {
         outer: for (int x = max.x(); x > minX; x--) {
             for (int z = min.z(); z <= max.z(); z++) {
                 for (int y = minY; y <= maxY; y++) {
-                    BlockVector3 vec = BlockVector3.at(x, y, z);
+                    mutable.setComponents(x, y, z);
 
-                    if (mask.test(vec)) {
+                    if (mask.test(mutable)) {
                         maxX = x;
                         break outer;
                     }
@@ -606,9 +608,9 @@ public class SelectionCommands {
         outer: for (int z = min.z(); z <= max.z(); z++) {
             for (int x = minX; x <= maxX; x++) {
                 for (int y = minY; y <= maxY; y++) {
-                    BlockVector3 vec = BlockVector3.at(x, y, z);
+                    mutable.setComponents(x, y, z);
 
-                    if (mask.test(vec)) {
+                    if (mask.test(mutable)) {
                         minZ = z;
                         break outer;
                     }
@@ -621,9 +623,9 @@ public class SelectionCommands {
         outer: for (int z = max.z(); z > minZ; z--) {
             for (int x = minX; x <= maxX; x++) {
                 for (int y = minY; y <= maxY; y++) {
-                    BlockVector3 vec = BlockVector3.at(x, y, z);
+                    mutable.setComponents(x, y, z);
 
-                    if (mask.test(vec)) {
+                    if (mask.test(mutable)) {
                         maxZ = z;
                         break outer;
                     }
