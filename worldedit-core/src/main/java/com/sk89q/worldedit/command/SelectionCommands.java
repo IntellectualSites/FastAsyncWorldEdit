@@ -21,8 +21,10 @@ package com.sk89q.worldedit.command;
 
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.extent.clipboard.URIClipboardHolder;
+import com.fastasyncworldedit.core.extent.filter.MaskFilter;
+import com.fastasyncworldedit.core.extent.filter.block.FilterBlock;
 import com.fastasyncworldedit.core.function.mask.IdMask;
-import com.fastasyncworldedit.core.math.MutableBlockVector3;
+import com.fastasyncworldedit.core.queue.Filter;
 import com.fastasyncworldedit.core.regions.selector.FuzzyRegionSelector;
 import com.fastasyncworldedit.core.regions.selector.PolyhedralRegionSelector;
 import com.fastasyncworldedit.core.util.MaskTraverser;
@@ -49,7 +51,6 @@ import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.block.BlockDistributionCounter;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.MaskIntersection;
-import com.sk89q.worldedit.function.mask.Masks;
 import com.sk89q.worldedit.function.mask.RegionMask;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.visitor.RegionVisitor;
@@ -519,7 +520,7 @@ public class SelectionCommands {
     )
     @Logging(REGION)
     @CommandPermissions("worldedit.selection.trim")
-    public void trim(Actor actor, World world, LocalSession session,
+    public void trim(Actor actor, World world, LocalSession session, EditSession editSession,
                      @Arg(desc = "Mask of blocks to keep within the selection", def = "#existing")
                          Mask mask) throws WorldEditException {
         // Avoid checking blocks outside the original region but within the cuboid region
@@ -527,118 +528,49 @@ public class SelectionCommands {
         if (!(originalRegion instanceof CuboidRegion)) {
             mask = new MaskIntersection(new RegionMask(originalRegion), mask);
         }
+        //FAWE start
+        new MaskTraverser(mask).setNewExtent(editSession);
 
         // Result region will be cuboid
-        CuboidRegion region = originalRegion.getBoundingBox();
+        final CuboidRegion region = originalRegion.getBoundingBox();
 
-        BlockVector3 min = region.getMinimumPoint();
-        BlockVector3 max = region.getMaximumPoint();
+        final BlockVector3 min = region.getMinimumPoint();
+        final BlockVector3 max = region.getMaximumPoint();
 
-        int minY = 0;
-        boolean found = false;
+        final int[] values = new int[]{
+                min.x(),
+                max.x(),
+                min.y(),
+                max.y(),
+                min.z(),
+                max.z()
+        };
 
-        MutableBlockVector3 mutable = new MutableBlockVector3();
-        outer: for (int y = min.y(); y <= max.y(); y++) {
-            for (int x = min.x(); x <= max.x(); x++) {
-                for (int z = min.z(); z <= max.z(); z++) {
-                    mutable.setComponents(x, y, z);
-
-                    if (mask.test(mutable)) {
-                        found = true;
-                        minY = y;
-
-                        break outer;
-                    }
-                }
-            }
-        }
-
-        // If anything was found in the first pass, then the remaining variables are guaranteed to be set
-        if (!found) {
-            throw new StopExecutionException(Caption.of("worldedit.trim.no-blocks"));
-        }
-
-        int maxY = minY;
-
-        outer: for (int y = max.y(); y > minY; y--) {
-            for (int x = min.x(); x <= max.x(); x++) {
-                for (int z = min.z(); z <= max.z(); z++) {
-                    mutable.setComponents(x, y, z);
-
-                    if (mask.test(mutable)) {
-                        maxY = y;
-                        break outer;
-                    }
-                }
-            }
-        }
-
-        int minX = 0;
-
-        outer: for (int x = min.x(); x <= max.x(); x++) {
-            for (int z = min.z(); z <= max.z(); z++) {
-                for (int y = minY; y <= maxY; y++) {
-                    mutable.setComponents(x, y, z);
-
-                    if (mask.test(mutable)) {
-                        minX = x;
-                        break outer;
-                    }
-                }
-            }
-        }
-
-        int maxX = minX;
-
-        outer: for (int x = max.x(); x > minX; x--) {
-            for (int z = min.z(); z <= max.z(); z++) {
-                for (int y = minY; y <= maxY; y++) {
-                    mutable.setComponents(x, y, z);
-
-                    if (mask.test(mutable)) {
-                        maxX = x;
-                        break outer;
-                    }
-                }
-            }
-        }
-
-        int minZ = 0;
-
-        outer: for (int z = min.z(); z <= max.z(); z++) {
-            for (int x = minX; x <= maxX; x++) {
-                for (int y = minY; y <= maxY; y++) {
-                    mutable.setComponents(x, y, z);
-
-                    if (mask.test(mutable)) {
-                        minZ = z;
-                        break outer;
-                    }
-                }
-            }
-        }
-
-        int maxZ = minZ;
-
-        outer: for (int z = max.z(); z > minZ; z--) {
-            for (int x = minX; x <= maxX; x++) {
-                for (int y = minY; y <= maxY; y++) {
-                    mutable.setComponents(x, y, z);
-
-                    if (mask.test(mutable)) {
-                        maxZ = z;
-                        break outer;
-                    }
-                }
-            }
-        }
+        editSession.apply(
+                region, new MaskFilter<>(
+                        new Filter() {
+                            @Override
+                            public void applyBlock(final FilterBlock block) {
+                                values[0] = Math.min(values[0], block.x());
+                                values[1] = Math.max(values[1], block.x());
+                                values[2] = Math.min(values[2], block.y());
+                                values[3] = Math.max(values[3], block.y());
+                                values[4] = Math.min(values[4], block.z());
+                                values[5] = Math.max(values[5], block.z());
+                            }
+                        }, mask
+                ), true
+        );
 
         final CuboidRegionSelector selector;
         if (session.getRegionSelector(world) instanceof ExtendingCuboidRegionSelector) {
-            selector = new ExtendingCuboidRegionSelector(world, BlockVector3.at(minX, minY, minZ), BlockVector3.at(maxX, maxY, maxZ));
+            selector = new ExtendingCuboidRegionSelector(world, BlockVector3.at(values[0], values[2], values[4]),
+                    BlockVector3.at(values[1], values[3], values[5]));
         } else {
-            selector = new CuboidRegionSelector(world, BlockVector3.at(minX, minY, minZ), BlockVector3.at(maxX, maxY, maxZ));
+            selector = new CuboidRegionSelector(world, BlockVector3.at(values[0], values[2], values[4]),
+                    BlockVector3.at(values[1], values[3], values[5]));
         }
+        //FAWE end
         session.setRegionSelector(world, selector);
 
         session.getRegionSelector(world).learnChanges();
