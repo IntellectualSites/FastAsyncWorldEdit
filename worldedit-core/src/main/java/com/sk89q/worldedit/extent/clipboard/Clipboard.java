@@ -435,29 +435,11 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable, Fl
                     continue;
                 }
                 Location pos = entity.getLocation();
-                if (entity.getType().equals(EntityTypes.LEASH_KNOT)) {
-                    var state = entity.getState();
-                    var nbtData = new HashMap<>(state.getNbtData().getValue());
-                    var posAsMap = new HashMap<String, Tag<?, ?>>();
-                    posAsMap.put("X", new IntTag(pos.getBlockX()));
-                    posAsMap.put("Y", new IntTag(pos.getBlockY()));
-                    posAsMap.put("Z", new IntTag(pos.getBlockZ()));
-                    nbtData.put("OldPos", new CompoundTag(posAsMap));
-                    state.setNbtData(new CompoundTag(nbtData));
-                    Location newPos = new Location(pos.getExtent(), pos.x() + entityOffsetX,
-                            pos.y() + entityOffsetY, pos.z() + entityOffsetZ, pos.getYaw(),
-                            pos.getPitch()
-                    );
-
-                    extent.createEntity(newPos, state);
-                } else {
-                    Location newPos = new Location(pos.getExtent(), pos.x() + entityOffsetX,
-                            pos.y() + entityOffsetY, pos.z() + entityOffsetZ, pos.getYaw(),
-                            pos.getPitch()
-                    );
-
-                    extent.createEntity(newPos, entity.getState());
-                }
+                Location newPos = new Location(pos.getExtent(), pos.x() + entityOffsetX,
+                        pos.y() + entityOffsetY, pos.z() + entityOffsetZ, pos.getYaw(),
+                        pos.getPitch()
+                );
+                extent.createEntity(newPos, entity.getState());
             }
         }
         if (close) {
