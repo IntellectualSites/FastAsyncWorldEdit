@@ -21,6 +21,7 @@ package com.sk89q.worldedit.command;
 
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.extent.clipboard.URIClipboardHolder;
+import com.fastasyncworldedit.core.extent.filter.ForkedFilter;
 import com.fastasyncworldedit.core.extent.filter.MaskFilter;
 import com.fastasyncworldedit.core.extent.filter.block.FilterBlock;
 import com.fastasyncworldedit.core.function.mask.IdMask;
@@ -523,52 +524,94 @@ public class SelectionCommands {
     public void trim(Actor actor, World world, LocalSession session, EditSession editSession,
                      @Arg(desc = "Mask of blocks to keep within the selection", def = "#existing")
                          Mask mask) throws WorldEditException {
+        //FAWE start
         // Avoid checking blocks outside the original region but within the cuboid region
         Region originalRegion = session.getSelection(world);
-        if (!(originalRegion instanceof CuboidRegion)) {
-            mask = new MaskIntersection(new RegionMask(originalRegion), mask);
-        }
-        //FAWE start
         new MaskTraverser(mask).setNewExtent(editSession);
 
         // Result region will be cuboid
         final CuboidRegion region = originalRegion.getBoundingBox();
 
-        final BlockVector3 min = region.getMinimumPoint();
+        // subtract offset to determine if there was any change later
+        final BlockVector3 min = region.getMinimumPoint().subtract(BlockVector3.ONE);
         final BlockVector3 max = region.getMaximumPoint();
 
-        final int[] values = new int[]{
-                min.x(),
-                max.x(),
-                min.y(),
-                max.y(),
-                min.z(),
-                max.z()
-        };
+        class TrimFilter extends ForkedFilter<TrimFilter> {
+            private int minX;
+            private int minY;
+            private int minZ;
+            private int maxX;
+            private int maxY;
+            private int maxZ;
 
-        editSession.apply(
-                region, new MaskFilter<>(
-                        new Filter() {
-                            @Override
-                            public void applyBlock(final FilterBlock block) {
-                                values[0] = Math.min(values[0], block.x());
-                                values[1] = Math.max(values[1], block.x());
-                                values[2] = Math.min(values[2], block.y());
-                                values[3] = Math.max(values[3], block.y());
-                                values[4] = Math.min(values[4], block.z());
-                                values[5] = Math.max(values[5], block.z());
-                            }
-                        }, mask
-                ), true
-        );
+            public TrimFilter(final BlockVector3 min, final BlockVector3 max) {
+                super(null);
+                this.minX = max.x();
+                this.minY = max.y();
+                this.minZ = max.z();
+                this.maxX = min.x();
+                this.maxY = min.y();
+                this.maxZ = min.z();
+            }
+
+            public TrimFilter(
+                    final TrimFilter root,
+                    final int minX,
+                    final int minY,
+                    final int minZ,
+                    final int maxX,
+                    final int maxY,
+                    final int maxZ
+            ) {
+                super(root);
+                this.minX = minX;
+                this.minY = minY;
+                this.minZ = minZ;
+                this.maxX = maxX;
+                this.maxY = maxY;
+                this.maxZ = maxZ;
+            }
+
+            @Override
+            public void applyBlock(final FilterBlock block) {
+                this.minX = Math.min(this.minX, block.x());
+                this.maxX = Math.max(this.maxX, block.x());
+                this.minY = Math.min(this.minY, block.y());
+                this.maxY = Math.max(this.maxY, block.y());
+                this.minZ = Math.min(this.minZ, block.z());
+                this.maxZ = Math.max(this.maxZ, block.z());
+            }
+
+            @Override
+            public TrimFilter init() {
+                return new TrimFilter(this, this.minX, this.minY, this.minZ, this.maxX, this.maxY, this.maxZ);
+            }
+
+            @Override
+            public void join(final TrimFilter filter) {
+                this.minX = Math.min(this.minX, filter.minX);
+                this.maxX = Math.max(this.maxX, filter.maxX);
+                this.minY = Math.min(this.minY, filter.minY);
+                this.maxY = Math.max(this.maxY, filter.maxY);
+                this.minZ = Math.min(this.minZ, filter.minZ);
+                this.maxZ = Math.max(this.maxZ, filter.maxZ);
+            }
+
+        }
+        TrimFilter result = editSession.apply(region, new MaskFilter<>(new TrimFilter(min, max), mask), true).getParent();
 
         final CuboidRegionSelector selector;
+        final BlockVector3 newMin = BlockVector3.at(result.minX, result.minY, result.minZ);
+        final BlockVector3 newMax = BlockVector3.at(result.maxX, result.maxY, result.maxZ);
+
+        // If anything was found, then all variables are guaranteed to be set to something inside the region
+        if (newMax.equals(min)) {
+            throw new StopExecutionException(Caption.of("worldedit.trim.no-blocks"));
+        }
         if (session.getRegionSelector(world) instanceof ExtendingCuboidRegionSelector) {
-            selector = new ExtendingCuboidRegionSelector(world, BlockVector3.at(values[0], values[2], values[4]),
-                    BlockVector3.at(values[1], values[3], values[5]));
+            selector = new ExtendingCuboidRegionSelector(world, newMin, newMax);
         } else {
-            selector = new CuboidRegionSelector(world, BlockVector3.at(values[0], values[2], values[4]),
-                    BlockVector3.at(values[1], values[3], values[5]));
+            selector = new CuboidRegionSelector(world, newMin, newMax);
         }
         //FAWE end
         session.setRegionSelector(world, selector);
