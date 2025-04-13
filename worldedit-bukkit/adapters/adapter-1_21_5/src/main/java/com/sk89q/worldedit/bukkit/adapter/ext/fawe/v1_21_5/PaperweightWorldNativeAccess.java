@@ -17,7 +17,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldedit.bukkit.adapter.impl.v1_21_5;
+package com.sk89q.worldedit.bukkit.adapter.ext.fawe.v1_21_5;
 
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.internal.block.BlockStateIdAccess;
@@ -184,4 +184,10 @@ public class PaperweightWorldNativeAccess implements WorldNativeAccess<LevelChun
     public void onBlockStateChange(BlockPos pos, net.minecraft.world.level.block.state.BlockState oldState, net.minecraft.world.level.block.state.BlockState newState) {
         getWorld().updatePOIOnBlockStateChange(pos, oldState, newState);
     }
+
+    @Override
+    public void flush() {
+
+    }
+
 }

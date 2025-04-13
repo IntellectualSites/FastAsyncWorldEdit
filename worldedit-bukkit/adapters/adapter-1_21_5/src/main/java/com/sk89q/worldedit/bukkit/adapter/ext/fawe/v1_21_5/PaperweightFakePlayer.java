@@ -17,7 +17,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldedit.bukkit.adapter.impl.v1_21_5;
+package com.sk89q.worldedit.bukkit.adapter.ext.fawe.v1_21_5;
 
 import com.mojang.authlib.GameProfile;
 import net.minecraft.network.chat.Component;

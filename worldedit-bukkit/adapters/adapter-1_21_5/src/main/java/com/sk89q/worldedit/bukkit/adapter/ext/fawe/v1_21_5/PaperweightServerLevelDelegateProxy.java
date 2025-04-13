@@ -17,7 +17,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldedit.bukkit.adapter.impl.v1_21_5;
+package com.sk89q.worldedit.bukkit.adapter.ext.fawe.v1_21_5;
 
 import com.google.common.collect.ImmutableTable;
 import com.google.common.collect.Table;
@@ -100,7 +100,7 @@ public class PaperweightServerLevelDelegateProxy implements InvocationHandler, A
     }
 
     private BlockState getBlockState(BlockPos blockPos) {
-        return adapter.adapt(this.editSession.getBlockWithBuffer(adapt(blockPos)));
+        return adapter.adapt(this.editSession.getBlock(blockPos.getX(), blockPos.getY(), blockPos.getZ()));
     }
 
     private boolean isStateAtPosition(BlockPos blockPos, Predicate<BlockState> predicate) {
@@ -150,7 +150,8 @@ public class PaperweightServerLevelDelegateProxy implements InvocationHandler, A
         ResourceLocation id = serverLevel.registryAccess().lookupOrThrow(Registries.ENTITY_TYPE).getKey(entity.getType());
         CompoundTag tag = new CompoundTag();
         entity.saveWithoutId(tag);
-        BaseEntity baseEntity = new BaseEntity(EntityTypes.get(id.toString()), LazyReference.from(() -> (LinCompoundTag) adapter.toNative(tag)));
+        BaseEntity baseEntity = new BaseEntity(EntityTypes.get(id.toString()),
+                LazyReference.from(() -> (LinCompoundTag) adapter.toNativeLin(tag)));
 
         return editSession.createEntity(location, baseEntity) != null;
     }
@@ -164,7 +165,7 @@ public class PaperweightServerLevelDelegateProxy implements InvocationHandler, A
             editSession.setBlock(
                 blockPos,
                 adapter.adapt(blockEntity.getBlockState())
-                    .toBaseBlock(LazyReference.from(() -> (LinCompoundTag) adapter.toNative(tag)))
+                    .toBaseBlock(LazyReference.from(() -> (LinCompoundTag) adapter.toNativeLin(tag)))
             );
         }
     }
