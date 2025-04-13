@@ -24,7 +24,7 @@ import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.event.extent.ActorSaveClipboardEvent;
 import com.fastasyncworldedit.core.extent.clipboard.MultiClipboardHolder;
 import com.fastasyncworldedit.core.extent.clipboard.URIClipboardHolder;
-import com.fastasyncworldedit.core.extent.clipboard.io.schematic.MinecraftStructure;
+import com.fastasyncworldedit.core.math.transform.MutatingOperationTransformHolder;
 import com.fastasyncworldedit.core.util.MainUtil;
 import com.google.common.collect.Multimap;
 import com.sk89q.worldedit.LocalConfiguration;
@@ -158,9 +158,11 @@ public class SchematicCommands {
             @Arg(desc = "File name.")
                     String filename,
             @Switch(name = 'o', desc = "Overwrite/replace existing clipboard(s)")
-                    boolean overwrite
-//            @Switch(name = 'r', desc = "Apply random rotation") <- not implemented below.
-//                    boolean randomRotate
+                    boolean overwrite,
+            @Switch(name = 'r', desc = "Apply random rotation (static by default)")
+                    boolean randomRotate,
+            @Switch(name = 'd', desc = "Random rotation is dynamic, changing each use")
+                    boolean dynamicRandom
     ) throws FilenameException {
         final ClipboardFormat format = ClipboardFormats.findByAlias(formatName);
         if (format == null) {
@@ -169,16 +171,41 @@ public class SchematicCommands {
         }
         try {
             MultiClipboardHolder all = ClipboardFormats.loadAllFromInput(actor, filename, null, true);
-            if (all != null) {
-                if (overwrite) {
-                    session.setClipboard(all);
-                } else {
-                    session.addClipboard(all);
-                }
+            if (all == null) {
                 actor.print(Caption.of("fawe.worldedit.schematic.schematic.loaded", filename));
+                return;
             }
+            if (randomRotate) {
+                for (ClipboardHolder holder : all) {
+                    setRandomRotateTransform(dynamicRandom, holder);
+                }
+                setRandomRotateTransform(dynamicRandom, all);
+            }
+            if (overwrite) {
+                session.setClipboard(all);
+            } else {
+                session.addClipboard(all);
+            }
+            actor.print(Caption.of("fawe.worldedit.schematic.schematic.loaded", filename));
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private static void setRandomRotateTransform(boolean dynamicRandom, ClipboardHolder holder) {
+        if (dynamicRandom) {
+            MutatingOperationTransformHolder<AffineTransform> mutating = new MutatingOperationTransformHolder<>(
+                    new AffineTransform(), t -> {
+                int rotate = 90 * ThreadLocalRandom.current().nextInt(4);
+                return t.rotateY(rotate);
+            }
+            );
+            holder.setTransform(mutating);
+        } else {
+            AffineTransform transform = new AffineTransform();
+            int rotate = 90 * ThreadLocalRandom.current().nextInt(4);
+            transform = transform.rotateY(rotate);
+            holder.setTransform(transform);
         }
     }
 
@@ -319,7 +346,9 @@ public class SchematicCommands {
             @Arg(desc = "Format name.", def = "")
                     String formatName,
             @Switch(name = 'r', desc = "Apply random rotation to the clipboard")
-                    boolean randomRotate
+                    boolean randomRotate,
+            @Switch(name = 'd', desc = "Random rotation is dynamic, changing each use")
+                    boolean dynamicRandom
             //FAWE end
     ) throws FilenameException {
         LocalConfiguration config = worldEdit.getConfiguration();
@@ -435,10 +464,7 @@ public class SchematicCommands {
             closer.register(in);
             format.hold(actor, uri, in);
             if (randomRotate) {
-                AffineTransform transform = new AffineTransform();
-                int rotate = 90 * ThreadLocalRandom.current().nextInt(4);
-                transform = transform.rotateY(rotate);
-                session.getClipboard().setTransform(transform);
+                setRandomRotateTransform(dynamicRandom, session.getClipboard());
             }
             actor.print(Caption.of("fawe.worldedit.schematic.schematic.loaded", filename));
         } catch (IllegalArgumentException e) {
@@ -889,6 +915,7 @@ public class SchematicCommands {
         protected void writeToOutputStream(OutputStream outputStream) throws IOException, WorldEditException {
             Clipboard clipboard = holder.getClipboard();
             Transform transform = holder.getTransform();
+            transform.mutate(); //FAWE: mutate transform
             Clipboard target = clipboard.transform(transform);
 
             try (Closer closer = Closer.create()) {
@@ -928,6 +955,7 @@ public class SchematicCommands {
             Clipboard target;
 
             //FAWE start
+            transform.mutate();
             boolean checkFilesize = Settings.settings().PATHS.PER_PLAYER_SCHEMATICS
                     && actor.getLimit().SCHEM_FILE_SIZE_LIMIT > -1;
 
