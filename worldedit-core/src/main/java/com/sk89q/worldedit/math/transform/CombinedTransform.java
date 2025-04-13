@@ -96,4 +96,11 @@ public class CombinedTransform implements Transform {
         }
     }
 
+    @Override
+    public void mutate() {
+        for (Transform transform : transforms) {
+            transform.mutate();
+        }
+    }
+
 }

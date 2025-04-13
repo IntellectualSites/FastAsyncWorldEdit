@@ -404,6 +404,7 @@ public class ClipboardCommands {
             final Clipboard target;
             // If we have a transform, bake it into the copy
             if (!transform.isIdentity()) {
+                transform.mutate();
                 target = clipboard.transform(transform);
             } else {
                 target = clipboard;
@@ -472,9 +473,10 @@ public class ClipboardCommands {
         Region region = clipboard.getRegion().clone();
         if (selectPasted || onlySelect || removeEntities) {
             BlockVector3 clipboardOffset = clipboard.getRegion().getMinimumPoint().subtract(clipboard.getOrigin());
-            BlockVector3 realTo = to.add(holder.getTransform().apply(clipboardOffset.toVector3()).toBlockPoint());
-            BlockVector3 max = realTo.add(holder
-                    .getTransform()
+            Transform transform = holder.getTransform();
+            transform.mutate();
+            BlockVector3 realTo = to.add(transform.apply(clipboardOffset.toVector3()).toBlockPoint());
+            BlockVector3 max = realTo.add(transform
                     .apply(region.getMaximumPoint().subtract(region.getMinimumPoint()).toVector3())
                     .toBlockPoint());
             if (removeEntities) {
@@ -564,6 +566,7 @@ public class ClipboardCommands {
 
         if (selectPasted || onlySelect || removeEntities) {
             BlockVector3 clipboardOffset = clipboard.getRegion().getMinimumPoint().subtract(clipboard.getOrigin());
+            holder.getTransform().mutate(); //FAWE: mutate transform
             Vector3 realTo = to.toVector3().add(holder.getTransform().apply(clipboardOffset.toVector3()));
             Vector3 max = realTo.add(holder
                     .getTransform()

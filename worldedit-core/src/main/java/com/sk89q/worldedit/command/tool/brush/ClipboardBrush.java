@@ -90,6 +90,7 @@ public class ClipboardBrush implements Brush {
             int rotate = 90 * ThreadLocalRandom.current().nextInt(4);
             transform = ((AffineTransform) transform).rotateY(rotate);
             if (originalTransform != null) {
+                originalTransform.mutate();
                 transform = originalTransform.combine(transform);
             }
         }

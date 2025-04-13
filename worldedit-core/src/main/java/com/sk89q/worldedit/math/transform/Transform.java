@@ -58,4 +58,18 @@ public interface Transform {
      */
     Transform combine(Transform other);
 
+    //FAWE start- mutating transforms
+
+    /**
+     * Perform a mutation on this transform, if supported. Else, does nothing. This mutation will depend on the specific
+     * transform implementation.
+     * <p>
+     * Implementation detail: it may be possible for this method to be called multiple times before an operation actually occurs.
+     *
+     * @since TODO
+     */
+    default void mutate() {
+    }
+    //FAWE end
+
 }
