@@ -185,16 +185,16 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                 PAPER_CHUNK_GEN_ALL_ENTITIES.setAccessible(true);
             } catch (NoSuchMethodException ignored) {
                 // Non-Paper
-                SERVER_LEVEL_ENTITY_MANAGER = ServerLevel.class.getDeclaredField(Refraction.pickName("entityManager", "N"));
+                SERVER_LEVEL_ENTITY_MANAGER = ServerLevel.class.getDeclaredField(Refraction.pickName("entityManager", "O"));
                 SERVER_LEVEL_ENTITY_MANAGER.setAccessible(true);
             }
 
-            Method palettedContaienrGet = PalettedContainer.class.getDeclaredMethod(
+            Method palettedContainerGet = PalettedContainer.class.getDeclaredMethod(
                     Refraction.pickName("get", "a"),
                     int.class
             );
-            palettedContaienrGet.setAccessible(true);
-            PALETTED_CONTAINER_GET = lookup.unreflect(palettedContaienrGet);
+            palettedContainerGet.setAccessible(true);
+            PALETTED_CONTAINER_GET = lookup.unreflect(palettedContainerGet);
         } catch (RuntimeException | Error e) {
             throw e;
         } catch (Exception e) {
