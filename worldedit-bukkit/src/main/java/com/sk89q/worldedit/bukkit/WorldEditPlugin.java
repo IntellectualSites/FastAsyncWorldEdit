@@ -21,8 +21,8 @@ package com.sk89q.worldedit.bukkit;
 
 import com.fastasyncworldedit.bukkit.BukkitPermissionAttachmentManager;
 import com.fastasyncworldedit.bukkit.FaweBukkit;
-import com.fastasyncworldedit.core.util.UpdateNotification;
 import com.fastasyncworldedit.core.Fawe;
+import com.fastasyncworldedit.core.util.UpdateNotification;
 import com.fastasyncworldedit.core.util.WEManager;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
@@ -300,6 +300,7 @@ public class WorldEditPlugin extends JavaPlugin {
         setupTags();
         setupBiomes(false); // FAWE - load biomes later. Initialize biomes twice to allow for the registry to be present for
         // plugins requiring WE biomes during startup, as well as allowing custom biomes loaded later on to be present in WE.
+        ((BukkitImplAdapter<?>) adapter.value().get()).setupFeatures();
         WorldEdit.getInstance().getEventBus().post(new PlatformReadyEvent(platform));
     }
 
