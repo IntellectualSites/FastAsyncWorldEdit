@@ -205,7 +205,7 @@ tasks.withType<ShadowJar>().configureEach {
         }
         relocate("net.royawesome.jlibnoise", "com.sk89q.worldedit.jlibnoise")
         relocate("org.incendo.serverlib", "com.fastasyncworldedit.serverlib") {
-            include(dependency("dev.notmyfault.serverlib:ServerLib:2.3.6"))
+            include(dependency("dev.notmyfault.serverlib:ServerLib:2.3.7"))
         }
         relocate("com.intellectualsites.paster", "com.fastasyncworldedit.paster") {
             include(dependency("com.intellectualsites.paster:Paster"))
