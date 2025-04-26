@@ -1,6 +1,7 @@
 package com.fastasyncworldedit.bukkit;
 
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissibleBase;
 import org.bukkit.permissions.PermissionAttachment;
@@ -19,8 +20,11 @@ public class BukkitPermissionAttachmentManager {
         this.plugin = plugin;
     }
 
-    public PermissionAttachment getOrAddAttachment(@Nullable final Player p) {
-        if (p == null) {
+    public PermissionAttachment getOrAddAttachment(@Nullable Player p) {
+        if (p instanceof OfflinePlayer offline) {
+            p = offline.getPlayer();
+        }
+        if (p == null || !p.isOnline()) {
             return null;
         }
         if (p.hasMetadata("NPC")) {
