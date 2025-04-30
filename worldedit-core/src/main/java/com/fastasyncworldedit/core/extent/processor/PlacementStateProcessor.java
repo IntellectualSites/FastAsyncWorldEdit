@@ -506,16 +506,13 @@ public abstract class PlacementStateProcessor extends AbstractDelegateExtent imp
 
     @Override
     public BaseBlock applyBlock(BlockVector3 position) {
-        if (finished.get()) {
-            return null;
-        }
         BaseBlock block = extent.getFullBlock(position);
-        if (!mask.test(block)) {
-            return null;
+        if (finished.get() || !mask.test(block)) {
+            return block;
         }
         if (REQUIRES_SECOND_PASS.test(block) && ADJACENT_STAIR_MASK.test(extent, position)) {
             postCompleteSecondPasses.put(new SecondPass(position), (char) 0);
-            return null;
+            return block;
         }
         char newOrdinal = getBlockOrdinal(position.x(), position.y(), position.z(), block.toBlockState());
         if (block.getOrdinalChar() != newOrdinal) {
@@ -526,7 +523,7 @@ public abstract class PlacementStateProcessor extends AbstractDelegateExtent imp
             }
             return state.toBaseBlock();
         }
-        return null;
+        return block;
     }
 
     protected record SecondPass(int x, int y, int z, FaweCompoundTag tile) {
