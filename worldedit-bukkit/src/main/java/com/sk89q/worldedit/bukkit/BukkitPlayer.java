@@ -33,6 +33,7 @@ import com.sk89q.worldedit.extension.platform.AbstractPlayerActor;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.internal.cui.CUIEvent;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.session.SessionKey;
@@ -51,6 +52,7 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.gamemode.GameMode;
 import com.sk89q.worldedit.world.gamemode.GameModes;
+import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -73,10 +75,12 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class BukkitPlayer extends AbstractPlayerActor {
 
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
+
     private final Player player;
     private final WorldEditPlugin plugin;
     //FAWE start
-    private final PermissionAttachment permAttachment;
+    private PermissionAttachment permAttachment = null;
 
     /**
      * This constructs a new {@link BukkitPlayer} for the given {@link Player}.
@@ -89,7 +93,6 @@ public class BukkitPlayer extends AbstractPlayerActor {
         super(player != null ? getExistingMap(WorldEditPlugin.getInstance(), player) : new ConcurrentHashMap<>());
         this.plugin = WorldEditPlugin.getInstance();
         this.player = player;
-        this.permAttachment = plugin.getPermissionAttachmentManager().getOrAddAttachment(player);
     }
     //FAWE end
 
@@ -105,7 +108,6 @@ public class BukkitPlayer extends AbstractPlayerActor {
         this.plugin = plugin;
         this.player = player;
         //FAWE start
-        this.permAttachment = plugin.getPermissionAttachmentManager().getOrAddAttachment(player);
         if (player != null && Settings.settings().CLIPBOARD.USE_DISK) {
             BukkitPlayer cached = WorldEditPlugin.getInstance().getCachedPlayer(player);
             if (cached == null) {
@@ -297,6 +299,17 @@ public class BukkitPlayer extends AbstractPlayerActor {
             }
         }
         if (usesuperperms) {
+            if (this.permAttachment == null) {
+                this.permAttachment = plugin.getPermissionAttachmentManager().getOrAddAttachment(player);
+            }
+            if (this.permAttachment == null) {
+                LOGGER.warn(
+                        "Attempted to set permission for offline player `{}`, UUID: `{}`?!",
+                        player.getName(),
+                        player.getUniqueId()
+                );
+                return;
+            }
             permAttachment.setPermission(permission, value);
         }
     }
