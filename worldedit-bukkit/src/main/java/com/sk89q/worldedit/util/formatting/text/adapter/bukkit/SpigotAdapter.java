@@ -38,9 +38,7 @@ import com.sk89q.worldedit.util.formatting.text.serializer.gson.GsonComponentSer
 import com.sk89q.worldedit.util.formatting.text.serializer.legacy.LegacyComponentSerializer;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.chat.ChatVersion;
 import net.md_5.bungee.chat.ComponentSerializer;
-import net.md_5.bungee.chat.VersionedComponentSerializer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -71,7 +69,11 @@ final class SpigotAdapter implements Adapter {
                 final Field gsonField = field(ComponentSerializer.class, "gson");
                 tmpGson = (Gson) gsonField.get(null);
             } catch (NoSuchFieldException ignored) {
-                tmpGson = VersionedComponentSerializer.forVersion(ChatVersion.V1_21_5).getGson();
+                Class<?> versionedComponentSerializerClass = Class.forName("net.md_5.bungee.chat.VersionedComponentSerializer");
+                Class<?> chatVersionClass = Class.forName("net.md_5.bungee.chat.ChatVersion");
+                var arg = chatVersionClass.getField("V1_21_5").get(null);
+                var versionedSerializer = versionedComponentSerializerClass.getMethod("forVersion", chatVersionClass).invoke(null, arg);
+                tmpGson = (Gson) versionedComponentSerializerClass.getMethod("getGson").invoke(versionedSerializer);
             }
             gson = tmpGson;
             // WorldEdit end
