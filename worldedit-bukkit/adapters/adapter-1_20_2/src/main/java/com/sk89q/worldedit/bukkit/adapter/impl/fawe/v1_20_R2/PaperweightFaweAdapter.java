@@ -139,8 +139,8 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
         return resourceLocation == null ? null : resourceLocation.toString();
     }
 
-    private static void readEntityIntoTag(Entity entity, net.minecraft.nbt.CompoundTag compoundTag) {
-        entity.save(compoundTag);
+    private static boolean readEntityIntoTag(Entity entity, net.minecraft.nbt.CompoundTag compoundTag) {
+        return entity.save(compoundTag);
     }
 
     @Override
@@ -334,7 +334,9 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
             EntityType type = com.sk89q.worldedit.world.entity.EntityTypes.get(id);
             Supplier<LinCompoundTag> saveTag = () -> {
                 final net.minecraft.nbt.CompoundTag minecraftTag = new net.minecraft.nbt.CompoundTag();
-                readEntityIntoTag(mcEntity, minecraftTag);
+                if (!readEntityIntoTag(mcEntity, minecraftTag)) {
+                    return null;
+                }
                 //add Id for AbstractChangeSet to work
                 final LinCompoundTag tag = (LinCompoundTag) toNativeLin(minecraftTag);
                 final Map<String, LinTag<?>> tags = NbtUtils.getLinCompoundTagValues(tag);
