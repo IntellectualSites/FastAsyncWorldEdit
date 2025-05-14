@@ -92,6 +92,7 @@ public class SchemGen implements Resource {
         if (transform.isIdentity()) {
             clipboard.paste(extent, mutable, false);
         } else {
+            transform.mutate();
             clipboard.paste(extent, mutable, false, transform);
         }
         mutable.mutY(y);
