@@ -21,6 +21,7 @@ package com.sk89q.worldedit.command.argument;
 
 import com.fastasyncworldedit.core.extent.ResettableExtent;
 import com.fastasyncworldedit.core.extent.SupplyingExtent;
+import com.fastasyncworldedit.core.math.transform.MutatingOperationTransformHolder;
 import com.sk89q.worldedit.EmptyClipboardException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
@@ -98,7 +99,7 @@ public class FactoryConverter<T> implements ArgumentConverter<T> {
                             try {
                                 ClipboardHolder holder = context.getSession().getClipboard();
                                 Transform transform = holder.getTransform();
-                                transform.mutate(); //FAWE: mutate transform
+                                MutatingOperationTransformHolder.transform(transform); //FAWE: mutate transform
                                 Extent target;
                                 if (transform.isIdentity()) {
                                     target = holder.getClipboard();

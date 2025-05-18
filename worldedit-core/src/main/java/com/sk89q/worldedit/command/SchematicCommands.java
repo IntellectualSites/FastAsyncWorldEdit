@@ -915,7 +915,7 @@ public class SchematicCommands {
         protected void writeToOutputStream(OutputStream outputStream) throws IOException, WorldEditException {
             Clipboard clipboard = holder.getClipboard();
             Transform transform = holder.getTransform();
-            transform.mutate(); //FAWE: mutate transform
+            MutatingOperationTransformHolder.transform(transform); //FAWE: mutate transform
             Clipboard target = clipboard.transform(transform);
 
             try (Closer closer = Closer.create()) {
@@ -955,7 +955,7 @@ public class SchematicCommands {
             Clipboard target;
 
             //FAWE start
-            transform.mutate();
+            MutatingOperationTransformHolder.transform(transform);
             boolean checkFilesize = Settings.settings().PATHS.PER_PLAYER_SCHEMATICS
                     && actor.getLimit().SCHEM_FILE_SIZE_LIMIT > -1;
 

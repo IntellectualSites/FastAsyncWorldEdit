@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.session;
 
+import com.fastasyncworldedit.core.math.transform.MutatingOperationTransformHolder;
 import com.fastasyncworldedit.core.util.MaskTraverser;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.extent.Extent;
@@ -144,7 +145,7 @@ public class PasteBuilder {
         //FAWE start
         Extent extent = clipboard;
         if (!transform.isIdentity()) {
-            transform.mutate();
+            MutatingOperationTransformHolder.transform(transform);
             extent = new BlockTransformExtent(extent, transform);
         }
         //FAWE end

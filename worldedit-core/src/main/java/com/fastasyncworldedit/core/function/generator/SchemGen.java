@@ -1,6 +1,7 @@
 package com.fastasyncworldedit.core.function.generator;
 
 import com.fastasyncworldedit.core.math.MutableBlockVector3;
+import com.fastasyncworldedit.core.math.transform.MutatingOperationTransformHolder;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
@@ -92,7 +93,7 @@ public class SchemGen implements Resource {
         if (transform.isIdentity()) {
             clipboard.paste(extent, mutable, false);
         } else {
-            transform.mutate();
+            MutatingOperationTransformHolder.transform(transform);
             clipboard.paste(extent, mutable, false, transform);
         }
         mutable.mutY(y);
