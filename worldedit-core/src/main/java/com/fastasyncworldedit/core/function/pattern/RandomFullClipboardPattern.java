@@ -1,6 +1,7 @@
 package com.fastasyncworldedit.core.function.pattern;
 
 import com.fastasyncworldedit.core.math.MutableBlockVector3;
+import com.fastasyncworldedit.core.math.transform.MutatingOperationTransformHolder;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
@@ -67,7 +68,7 @@ public class RandomFullClipboardPattern extends AbstractPattern {
         if (newTransform.isIdentity()) {
             clipboard.paste(extent, set, false);
         } else {
-            newTransform.mutate();
+            MutatingOperationTransformHolder.transform(newTransform);
             clipboard.paste(extent, set, false, newTransform);
         }
         return true;

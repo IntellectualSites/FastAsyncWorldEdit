@@ -1,6 +1,8 @@
 package com.fastasyncworldedit.core.math.transform;
 
+import com.fastasyncworldedit.core.extent.transform.MultiTransform;
 import com.sk89q.worldedit.math.Vector3;
+import com.sk89q.worldedit.math.transform.CombinedTransform;
 import com.sk89q.worldedit.math.transform.Transform;
 
 import java.util.function.Function;
@@ -26,6 +28,23 @@ public class MutatingOperationTransformHolder<T extends Transform> implements Tr
     public MutatingOperationTransformHolder(T transform, Function<? super T, ? extends T> operation) {
         this.transform = transform;
         this.operation = operation;
+    }
+
+    /**
+     * Perform a mutation on the given transform, if supported. Else, does nothing. This mutation will depend on the specific
+     * transform implementation.
+     * <p>
+     * Implementation detail: it may be possible for this method to be called multiple times before an operation actually occurs.
+     *
+     * @since TODO
+     */
+    public static void transform(Transform transform) {
+        switch (transform) {
+            case MutatingOperationTransformHolder<?> mutating -> mutating.mutate();
+            case CombinedTransform combined -> combined.getTransforms().forEach(MutatingOperationTransformHolder::transform);
+            default -> {
+            }
+        }
     }
 
     /**
