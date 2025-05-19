@@ -20,11 +20,14 @@
 package com.sk89q.worldedit.function.entity;
 
 import com.fastasyncworldedit.core.util.TaskManager;
+import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
+import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.EntityFunction;
+import com.sk89q.worldedit.internal.Constants;
 import com.sk89q.worldedit.internal.helper.MCDirections;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
@@ -37,6 +40,7 @@ import com.sk89q.worldedit.world.entity.EntityTypes;
 import org.enginehub.linbus.tree.LinCompoundTag;
 import org.enginehub.linbus.tree.LinFloatTag;
 import org.enginehub.linbus.tree.LinListTag;
+import org.enginehub.linbus.tree.LinIntArrayTag;
 import org.enginehub.linbus.tree.LinNumberTag;
 import org.enginehub.linbus.tree.LinTagType;
 
@@ -134,17 +138,27 @@ public class ExtentEntityCopy implements EntityFunction {
             // If the entity has stored the location in the NBT data, we use that location
             LinCompoundTag tag = state.getNbt();
             boolean hasTilePosition = false;
-            if (tag != null
-                    && tag.value().get("TileX") instanceof LinNumberTag<?> tagX
-                    && tag.value().get("TileY") instanceof LinNumberTag<?> tagY
-                    && tag.value().get("TileZ") instanceof LinNumberTag<?> tagZ
-            ) {
-                location = location.setPosition(Vector3.at(
-                        tagX.value().intValue(),
-                        tagY.value().intValue(),
-                        tagZ.value().intValue()
-                ).add(0.5, 0.5, 0.5));
-                hasTilePosition = true;
+            if (tag != null) {
+                if (tag.value().get("block_pos") instanceof LinIntArrayTag blockPos && blockPos.value().length == 3) {
+                    // New block_pos value
+                    location = location.setPosition(Vector3.at(
+                            blockPos.value()[0],
+                            blockPos.value()[1],
+                            blockPos.value()[2]
+                    ).add(0.5, 0.5, 0.5));
+                    hasTilePosition = true;
+                } else if (tag.value().get("TileX") instanceof LinNumberTag<?> tagX
+                        && tag.value().get("TileY") instanceof LinNumberTag<?> tagY
+                        && tag.value().get("TileZ") instanceof LinNumberTag<?> tagZ
+                ) {
+                    // Legacy TileX/Y/Z values
+                    location = location.setPosition(Vector3.at(
+                            tagX.value().intValue(),
+                            tagY.value().intValue(),
+                            tagZ.value().intValue()
+                    ).add(0.5, 0.5, 0.5));
+                    hasTilePosition = true;
+                }
             }
 
             Vector3 pivot = from.round().add(0.5, 0.5, 0.5);
@@ -229,17 +243,33 @@ public class ExtentEntityCopy implements EntityFunction {
             // Handle hanging entities (paintings, item frames, etc.)
 
             LinCompoundTag.Builder builder = tag.toBuilder();
+            Vector3 tilePosition = null;
+
+            if (tag.value().get("block_pos") instanceof LinIntArrayTag blockPos) {
+                tilePosition = Vector3.at(
+                        blockPos.value()[0], blockPos.value()[1], blockPos.value()[2]
+                );
+            }
+
             if (tag.value().get("TileX") instanceof LinNumberTag<?> tagX
-                    && tag.value().get("TileY") instanceof LinNumberTag<?> tagY
-                    && tag.value().get("TileZ") instanceof LinNumberTag<?> tagZ) {
-                Vector3 tilePosition = Vector3.at(
+                && tag.value().get("TileY") instanceof LinNumberTag<?> tagY
+                && tag.value().get("TileZ") instanceof LinNumberTag<?> tagZ) {
+                tilePosition = Vector3.at(
                         tagX.value().intValue(), tagY.value().intValue(), tagZ.value().intValue()
                 );
+            }
+
+            if (tilePosition != null) {
                 BlockVector3 newTilePosition = transform.apply(tilePosition.subtract(from)).add(to).toBlockPoint();
 
-                builder.putInt("TileX", newTilePosition.x())
-                        .putInt("TileY", newTilePosition.y())
-                        .putInt("TileZ", newTilePosition.z());
+                if (WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).getDataVersion() < Constants.DATA_VERSION_MC_1_21_5) {
+                    // TODO remove when we drop support for 1.21.4
+                    builder.putInt("TileX", newTilePosition.x())
+                            .putInt("TileY", newTilePosition.y())
+                            .putInt("TileZ", newTilePosition.z());
+                } else {
+                    builder.putIntArray("block_pos", new int[]{newTilePosition.x(), newTilePosition.y(), newTilePosition.z()});
+                }
 
                 if (tag.value().get("Facing") instanceof LinNumberTag<?> tagFacing) {
                     boolean isPainting = state.getType() == EntityTypes.PAINTING; // Paintings have different facing values
