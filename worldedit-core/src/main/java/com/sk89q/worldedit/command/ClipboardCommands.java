@@ -32,6 +32,7 @@ import com.fastasyncworldedit.core.extent.clipboard.URIClipboardHolder;
 import com.fastasyncworldedit.core.extent.clipboard.WorldCopyClipboard;
 import com.fastasyncworldedit.core.internal.io.FastByteArrayOutputStream;
 import com.fastasyncworldedit.core.limit.FaweLimit;
+import com.fastasyncworldedit.core.math.transform.MutatingOperationTransformHolder;
 import com.fastasyncworldedit.core.util.ImgurUtility;
 import com.fastasyncworldedit.core.util.MainUtil;
 import com.fastasyncworldedit.core.util.MaskTraverser;
@@ -404,6 +405,7 @@ public class ClipboardCommands {
             final Clipboard target;
             // If we have a transform, bake it into the copy
             if (!transform.isIdentity()) {
+                MutatingOperationTransformHolder.transform(transform);
                 target = clipboard.transform(transform);
             } else {
                 target = clipboard;
@@ -472,9 +474,10 @@ public class ClipboardCommands {
         Region region = clipboard.getRegion().clone();
         if (selectPasted || onlySelect || removeEntities) {
             BlockVector3 clipboardOffset = clipboard.getRegion().getMinimumPoint().subtract(clipboard.getOrigin());
-            BlockVector3 realTo = to.add(holder.getTransform().apply(clipboardOffset.toVector3()).toBlockPoint());
-            BlockVector3 max = realTo.add(holder
-                    .getTransform()
+            Transform transform = holder.getTransform();
+            MutatingOperationTransformHolder.transform(transform);
+            BlockVector3 realTo = to.add(transform.apply(clipboardOffset.toVector3()).toBlockPoint());
+            BlockVector3 max = realTo.add(transform
                     .apply(region.getMaximumPoint().subtract(region.getMinimumPoint()).toVector3())
                     .toBlockPoint());
             if (removeEntities) {
@@ -564,6 +567,7 @@ public class ClipboardCommands {
 
         if (selectPasted || onlySelect || removeEntities) {
             BlockVector3 clipboardOffset = clipboard.getRegion().getMinimumPoint().subtract(clipboard.getOrigin());
+            MutatingOperationTransformHolder.transform(holder.getTransform()); //FAWE: mutate transform
             Vector3 realTo = to.toVector3().add(holder.getTransform().apply(clipboardOffset.toVector3()));
             Vector3 max = realTo.add(holder
                     .getTransform()
