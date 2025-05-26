@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.command.tool.brush;
 
+import com.fastasyncworldedit.core.math.transform.MutatingOperationTransformHolder;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
@@ -90,6 +91,7 @@ public class ClipboardBrush implements Brush {
             int rotate = 90 * ThreadLocalRandom.current().nextInt(4);
             transform = ((AffineTransform) transform).rotateY(rotate);
             if (originalTransform != null) {
+                MutatingOperationTransformHolder.transform(originalTransform);
                 transform = originalTransform.combine(transform);
             }
         }
