@@ -225,7 +225,10 @@ public class MinecraftStructure implements ClipboardReader, ClipboardWriter {
         // Blocks
         LinListTag.Builder<@org.jetbrains.annotations.NotNull LinCompoundTag> blocks = LinListTag.builder(LinTagType.compoundTag());
         for (final BlockVector3 pos : clipboard) {
-            final BlockState block = clipboard.getBlock(pos);
+            final BaseBlock block = clipboard.getFullBlock(pos);
+            if (block.getBlockType() == BlockTypes.STRUCTURE_VOID) {
+                continue;
+            }
             LinCompoundTag.Builder entry = LinCompoundTag.builder()
                     .putInt("state", ordinals.get(block.getOrdinalChar()))
                     .put("pos", LinListTag.of(LinTagType.intTag(), List.of(
@@ -233,12 +236,9 @@ public class MinecraftStructure implements ClipboardReader, ClipboardWriter {
                             LinIntTag.of(pos.y() - min.y()),
                             LinIntTag.of(pos.z() - min.z())
                     )));
-            final BaseBlock baseBlock = clipboard.getFullBlock(pos);
-            if (baseBlock != null) {
-                final LinCompoundTag nbt = baseBlock.getNbt();
-                if (nbt != null) {
-                    entry.put("nbt", nbt.toBuilder().remove("x").remove("y").remove("z").build());
-                }
+            final LinCompoundTag nbt = block.getNbt();
+            if (nbt != null) {
+                entry.put("nbt", nbt.toBuilder().remove("x").remove("y").remove("z").build());
             }
             blocks.add(entry.build());
         }
