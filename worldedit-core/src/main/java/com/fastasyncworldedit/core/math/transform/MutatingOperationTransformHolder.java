@@ -1,6 +1,5 @@
 package com.fastasyncworldedit.core.math.transform;
 
-import com.fastasyncworldedit.core.extent.transform.MultiTransform;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.transform.CombinedTransform;
 import com.sk89q.worldedit.math.transform.Transform;
@@ -36,15 +35,35 @@ public class MutatingOperationTransformHolder<T extends Transform> implements Tr
      * <p>
      * Implementation detail: it may be possible for this method to be called multiple times before an operation actually occurs.
      *
+     * @param transform Transform to transform
      * @since TODO
      */
-    public static void transform(Transform transform) {
-        switch (transform) {
-            case MutatingOperationTransformHolder<?> mutating -> mutating.mutate();
-            case CombinedTransform combined -> combined.getTransforms().forEach(MutatingOperationTransformHolder::transform);
-            default -> {
+    public static Transform transform(Transform transform) {
+        return transform(transform, false);
+    }
+
+    /**
+     * Perform a mutation on the given transform, if supported. Else, does nothing. This mutation will depend on the specific
+     * transform implementation.
+     * <p>
+     * Implementation detail: it may be possible for this method to be called multiple times before an operation actually occurs.
+     *
+     * @param transform Transform to transform
+     * @param parallel  If the context is potentially parallel, meaning the given transform will be copied if required
+     * @since TODO
+     */
+    public static Transform transform(Transform transform, boolean parallel) {
+        return switch (transform) {
+            case MutatingOperationTransformHolder<?> mutating -> parallel ? mutating.copy().mutate() : mutating.mutate();
+            case CombinedTransform combined -> {
+                if (!parallel) {
+                    combined.getTransforms().forEach(t -> transform(t, false));
+                    yield combined;
+                }
+                yield new CombinedTransform(combined.getTransforms().stream().map(t -> transform(t, true)).toList());
             }
-        }
+            default -> transform;
+        };
     }
 
     /**
@@ -52,10 +71,11 @@ public class MutatingOperationTransformHolder<T extends Transform> implements Tr
      *
      * @since TODO
      */
-    public void mutate() {
+    public MutatingOperationTransformHolder<T> mutate() {
         if (operation != null) {
             transform = operation.apply(transform);
         }
+        return this;
     }
 
     @Override
@@ -76,6 +96,13 @@ public class MutatingOperationTransformHolder<T extends Transform> implements Tr
     @Override
     public Transform combine(final Transform other) {
         return transform.combine(other);
+    }
+
+    public MutatingOperationTransformHolder<T> copy() {
+        // I don't think we should see nested mutating, but you never know
+        T transform = this.transform instanceof MutatingOperationTransformHolder<?> mutating ? (T) mutating.copy() :
+                this.transform;
+        return new MutatingOperationTransformHolder<>(transform, operation);
     }
 
 }

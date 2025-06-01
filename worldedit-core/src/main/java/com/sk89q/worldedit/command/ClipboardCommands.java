@@ -405,8 +405,7 @@ public class ClipboardCommands {
             final Clipboard target;
             // If we have a transform, bake it into the copy
             if (!transform.isIdentity()) {
-                MutatingOperationTransformHolder.transform(transform);
-                target = clipboard.transform(transform);
+                target = clipboard.transform(MutatingOperationTransformHolder.transform(transform));
             } else {
                 target = clipboard;
             }
@@ -474,8 +473,7 @@ public class ClipboardCommands {
         Region region = clipboard.getRegion().clone();
         if (selectPasted || onlySelect || removeEntities) {
             BlockVector3 clipboardOffset = clipboard.getRegion().getMinimumPoint().subtract(clipboard.getOrigin());
-            Transform transform = holder.getTransform();
-            MutatingOperationTransformHolder.transform(transform);
+            Transform transform = MutatingOperationTransformHolder.transform(holder.getTransform());
             BlockVector3 realTo = to.add(transform.apply(clipboardOffset.toVector3()).toBlockPoint());
             BlockVector3 max = realTo.add(transform
                     .apply(region.getMaximumPoint().subtract(region.getMinimumPoint()).toVector3())
@@ -567,11 +565,9 @@ public class ClipboardCommands {
 
         if (selectPasted || onlySelect || removeEntities) {
             BlockVector3 clipboardOffset = clipboard.getRegion().getMinimumPoint().subtract(clipboard.getOrigin());
-            MutatingOperationTransformHolder.transform(holder.getTransform()); //FAWE: mutate transform
-            Vector3 realTo = to.toVector3().add(holder.getTransform().apply(clipboardOffset.toVector3()));
-            Vector3 max = realTo.add(holder
-                    .getTransform()
-                    .apply(region.getMaximumPoint().subtract(region.getMinimumPoint()).toVector3()));
+            Transform transform = MutatingOperationTransformHolder.transform(holder.getTransform()); //FAWE: mutate transform
+            Vector3 realTo = to.toVector3().add(transform.apply(clipboardOffset.toVector3()));
+            Vector3 max = realTo.add(transform.apply(region.getMaximumPoint().subtract(region.getMinimumPoint()).toVector3()));
 
             // FAWE start - entity remova;l
             if (removeEntities) {

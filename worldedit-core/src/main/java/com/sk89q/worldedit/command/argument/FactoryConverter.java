@@ -98,8 +98,7 @@ public class FactoryConverter<T> implements ArgumentConverter<T> {
                         context -> {
                             try {
                                 ClipboardHolder holder = context.getSession().getClipboard();
-                                Transform transform = holder.getTransform();
-                                MutatingOperationTransformHolder.transform(transform); //FAWE: mutate transform
+                                Transform transform = MutatingOperationTransformHolder.transform(holder.getTransform()); //FAWE: mutate transform
                                 Extent target;
                                 if (transform.isIdentity()) {
                                     target = holder.getClipboard();

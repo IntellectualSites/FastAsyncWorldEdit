@@ -914,8 +914,7 @@ public class SchematicCommands {
 
         protected void writeToOutputStream(OutputStream outputStream) throws IOException, WorldEditException {
             Clipboard clipboard = holder.getClipboard();
-            Transform transform = holder.getTransform();
-            MutatingOperationTransformHolder.transform(transform); //FAWE: mutate transform
+            Transform transform = MutatingOperationTransformHolder.transform(holder.getTransform()); //FAWE: mutate transform
             Clipboard target = clipboard.transform(transform);
 
             try (Closer closer = Closer.create()) {
@@ -951,11 +950,10 @@ public class SchematicCommands {
         @Override
         public Void call() throws Exception {
             Clipboard clipboard = holder.getClipboard();
-            Transform transform = holder.getTransform();
+            Transform transform = MutatingOperationTransformHolder.transform(holder.getTransform()); //FAWE - mutating transform
             Clipboard target;
 
             //FAWE start
-            MutatingOperationTransformHolder.transform(transform);
             boolean checkFilesize = Settings.settings().PATHS.PER_PLAYER_SCHEMATICS
                     && actor.getLimit().SCHEM_FILE_SIZE_LIMIT > -1;
 

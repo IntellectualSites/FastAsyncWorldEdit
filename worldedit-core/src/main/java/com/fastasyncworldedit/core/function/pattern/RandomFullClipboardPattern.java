@@ -68,7 +68,7 @@ public class RandomFullClipboardPattern extends AbstractPattern {
         if (newTransform.isIdentity()) {
             clipboard.paste(extent, set, false);
         } else {
-            MutatingOperationTransformHolder.transform(newTransform);
+            MutatingOperationTransformHolder.transform(newTransform, true);
             clipboard.paste(extent, set, false, newTransform);
         }
         return true;
