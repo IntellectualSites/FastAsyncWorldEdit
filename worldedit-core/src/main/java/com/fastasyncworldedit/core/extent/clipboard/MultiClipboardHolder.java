@@ -3,10 +3,12 @@ package com.fastasyncworldedit.core.extent.clipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.session.ClipboardHolder;
 
+import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -14,7 +16,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public class MultiClipboardHolder extends URIClipboardHolder {
+public class MultiClipboardHolder extends URIClipboardHolder implements Iterable<URIClipboardHolder> {
 
     private final List<URIClipboardHolder> holders;
     private Clipboard[] cached;
@@ -192,6 +194,11 @@ public class MultiClipboardHolder extends URIClipboardHolder {
                 e.printStackTrace();
             }
         }
+    }
+
+    @Override
+    public @Nonnull Iterator<URIClipboardHolder> iterator() {
+        return holders.iterator();
     }
 
 }
