@@ -144,8 +144,9 @@ public class PasteBuilder {
     public Operation build() {
         //FAWE start
         Extent extent = clipboard;
+        Transform transform = this.transform;
         if (!transform.isIdentity()) {
-            MutatingOperationTransformHolder.transform(transform, true);
+            transform = MutatingOperationTransformHolder.transform(transform, true);
             extent = new BlockTransformExtent(extent, transform);
         }
         //FAWE end
