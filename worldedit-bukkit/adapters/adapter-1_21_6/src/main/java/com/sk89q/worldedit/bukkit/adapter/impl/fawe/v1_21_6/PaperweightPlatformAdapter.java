@@ -190,7 +190,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                 PAPER_CHUNK_GEN_ALL_ENTITIES.setAccessible(true);
             } catch (NoSuchMethodException ignored) {
                 // Non-Paper
-                SERVER_LEVEL_ENTITY_MANAGER = ServerLevel.class.getDeclaredField(Refraction.pickName("entityManager", "O"));
+                SERVER_LEVEL_ENTITY_MANAGER = ServerLevel.class.getDeclaredField(Refraction.pickName("entityManager", "P"));
                 SERVER_LEVEL_ENTITY_MANAGER.setAccessible(true);
             }
 
