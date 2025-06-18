@@ -1888,8 +1888,7 @@ class PaperweightDataConverters implements com.sk89q.worldedit.world.DataFixer {
 
                                 if (object == null) {
                                     try {
-                                        // TODO
-                                        // object = Component.Serializer.fromJson(s, MinecraftServer.getServer().registryAccess());
+                                        object = ComponentConverter.Serializer.fromJson(s, MinecraftServer.getServer().registryAccess());
                                     } catch (JsonParseException jsonparseexception1) {
                                         ;
                                     }
@@ -1897,8 +1896,7 @@ class PaperweightDataConverters implements com.sk89q.worldedit.world.DataFixer {
 
                                 if (object == null) {
                                     try {
-                                        // TODO
-                                        // object = Component.Serializer.fromJsonLenient(s, MinecraftServer.getServer().registryAccess());
+                                        object = ComponentConverter.Serializer.fromJsonLenient(s, MinecraftServer.getServer().registryAccess());
                                     } catch (JsonParseException jsonparseexception2) {
                                         ;
                                     }
@@ -1912,8 +1910,7 @@ class PaperweightDataConverters implements com.sk89q.worldedit.world.DataFixer {
                             object = Component.literal("");
                         }
 
-                        // TODO
-                        //nbttaglist.set(i, StringTag.valueOf(Component.Serializer.toJson((Component) object, MinecraftServer.getServer().registryAccess())));
+                        nbttaglist.set(i, StringTag.valueOf(ComponentConverter.Serializer.toJson((Component) object, MinecraftServer.getServer().registryAccess())));
                     }
 
                     nbttagcompound1.put("pages", nbttaglist);
@@ -2554,8 +2551,7 @@ class PaperweightDataConverters implements com.sk89q.worldedit.world.DataFixer {
 
                     if (object == null) {
                         try {
-                            // TODO
-                            // object = Component.Serializer.fromJson(s1, MinecraftServer.getServer().registryAccess());
+                            object = ComponentConverter.Serializer.fromJson(s1, MinecraftServer.getServer().registryAccess());
                         } catch (JsonParseException jsonparseexception1) {
                             ;
                         }
@@ -2563,8 +2559,7 @@ class PaperweightDataConverters implements com.sk89q.worldedit.world.DataFixer {
 
                     if (object == null) {
                         try {
-                            // TODO
-                            // object = Component.Serializer.fromJsonLenient(s1, MinecraftServer.getServer().registryAccess());
+                            object = ComponentConverter.Serializer.fromJsonLenient(s1, MinecraftServer.getServer().registryAccess());
                         } catch (JsonParseException jsonparseexception2) {
                             ;
                         }
@@ -2578,8 +2573,7 @@ class PaperweightDataConverters implements com.sk89q.worldedit.world.DataFixer {
                 object = Component.literal("");
             }
 
-            // TODO
-            // nbttagcompound.putString(s, Component.Serializer.toJson((Component) object, MinecraftServer.getServer().registryAccess()));
+            nbttagcompound.putString(s, ComponentConverter.Serializer.toJson((Component) object, MinecraftServer.getServer().registryAccess()));
         }
     }
 
