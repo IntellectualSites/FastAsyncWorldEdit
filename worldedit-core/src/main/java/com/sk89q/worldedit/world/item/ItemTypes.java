@@ -1604,6 +1604,8 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType MUSIC_DISC_FAR = init();
     @Nullable
+    public static final ItemType MUSIC_DISC_LAVA_CHICKEN = init();
+    @Nullable
     public static final ItemType MUSIC_DISC_MALL = init();
     @Nullable
     public static final ItemType MUSIC_DISC_MELLOHI = init();
