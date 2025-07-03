@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.command;
 
 import com.fastasyncworldedit.core.Fawe;
+import com.fastasyncworldedit.core.command.factory.StructureGeneratorFactory;
 import com.fastasyncworldedit.core.command.tool.brush.BlendBall;
 import com.fastasyncworldedit.core.command.tool.brush.BlobBrush;
 import com.fastasyncworldedit.core.command.tool.brush.BrushSettings;
@@ -66,6 +67,7 @@ import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.command.argument.Arguments;
+import com.sk89q.worldedit.command.factory.FeatureGeneratorFactory;
 import com.sk89q.worldedit.command.factory.ReplaceFactory;
 import com.sk89q.worldedit.command.factory.TreeGeneratorFactory;
 import com.sk89q.worldedit.command.tool.BrushTool;
@@ -124,6 +126,8 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import com.sk89q.worldedit.world.generation.ConfiguredFeatureType;
+import com.sk89q.worldedit.world.generation.StructureType;
 import org.anarres.parallelgzip.ParallelGZIPOutputStream;
 import org.enginehub.piston.annotation.Command;
 import org.enginehub.piston.annotation.CommandContainer;
@@ -1630,10 +1634,46 @@ public class BrushCommands {
         tool.setSize(brushSize);
         tool.setBrush(new MorphBrush(5, 1, 2, 1), "worldedit.brush.morph");
 
-        player.printInfo(TranslatableComponent.of("worldedit.brush.morph.equip", TextComponent.of((int) brushSize)));
+        player.printInfo(TranslatableComponent.of("worldedit.brush.morph.equip", TextComponent.of((int) brushSize)));;
+    }
+
+    @Command(
+            name = "feature",
+            desc = "Feature brush, paints Minecraft generation features"
+    )
+    @CommandPermissions("worldedit.brush.feature")
+    public void feature(Player player, LocalSession localSession,
+                        @Arg(desc = "The shape of the region")
+                        RegionFactory shape,
+                        @Arg(desc = "The size of the brush", def = "5")
+                        double radius,
+                        @Arg(desc = "The density of the brush", def = "5")
+                        double density,
+                        @Arg(desc = "The type of feature to use")
+                        ConfiguredFeatureType type) throws WorldEditException {
+        setOperationBasedBrush(player, localSession, radius,
+                new Paint(new FeatureGeneratorFactory(type), density / 100), shape, "worldedit.brush.feature");
     }
 
     //FAWE start
+    @Command(
+            name = "structure",
+            desc = "Structure brush, paints Minecraft generation structures"
+    )
+    @CommandPermissions("worldedit.brush.feature")
+    public void structure(Player player, LocalSession localSession,
+                        @Arg(desc = "The shape of the region")
+                        RegionFactory shape,
+                        @Arg(desc = "The size of the brush", def = "5")
+                        double radius,
+                        @Arg(desc = "The density of the brush", def = "5")
+                        double density,
+                        @Arg(desc = "The type of feature to use")
+                        StructureType type) throws WorldEditException {
+        setOperationBasedBrush(player, localSession, radius,
+                new Paint(new StructureGeneratorFactory(type), density / 100), shape, "worldedit.brush.structure");
+    }
+
     public BrushSettings process(Player player, Arguments arguments, BrushSettings settings)
             throws WorldEditException {
         LocalSession session = worldEdit.getSessionManager().get(player);
