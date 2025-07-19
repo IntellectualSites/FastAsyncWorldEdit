@@ -206,10 +206,9 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
 
     private static final String WRONG_VERSION =
             """
-            This version of WorldEdit has not been tested with the current Minecraft version.
+            This version of FastAsyncWorldEdit has not been tested with the current Minecraft version.
             While it may work, there might be unexpected issues.
-            It is recommended to use a version of WorldEdit that supports your Minecraft version.
-            For more information, see https://worldedit.enginehub.org/en/latest/faq/#bukkit-adapters
+            It is recommended to use a version of FastAsyncWorldEdit that supports your Minecraft version.
             """.stripIndent();
 
     // ------------------------------------------------------------------------
