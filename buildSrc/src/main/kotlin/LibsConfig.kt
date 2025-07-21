@@ -1,4 +1,5 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import com.vanniktech.maven.publish.MavenPublishBaseExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.ExternalModuleDependency
@@ -28,7 +29,7 @@ import javax.inject.Inject
 fun Project.applyLibrariesConfiguration() {
     applyCommonConfiguration()
     apply(plugin = "java-base")
-    apply(plugin = "maven-publish")
+    apply(plugin = "com.vanniktech.maven.publish")
     apply(plugin = "com.gradleup.shadow")
     apply(plugin = "signing")
 
@@ -41,7 +42,6 @@ fun Project.applyLibrariesConfiguration() {
     val relocations = mapOf(
         "net.kyori.text" to "com.sk89q.worldedit.util.formatting.text",
         "net.kyori.minecraft" to "com.sk89q.worldedit.util.kyori"
-
     )
 
     tasks.register<ShadowJar>("jar") {
@@ -214,60 +214,72 @@ fun Project.applyLibrariesConfiguration() {
         }
     }
 
+    // the publish plugin does not allow custom platforms as of now and requires the java or java-library plugin to work with
+    // the builtin platforms. tried a few things, but updating this file to support the new plugin results in quite a few errors.
+    // -> configure the component for the publication ourselves, and delegate the rest to the extension of the plugin.
+    // logs an error that "no compatible plugin [can be] found in <module> for publishing" - but at least it works (:
     configure<PublishingExtension> {
         publications {
-            register<MavenPublication>("maven") {
+            create("maven", MavenPublication::class.java) {
                 from(libsComponent)
+            }
+        }
+    }
 
-                group = "com.fastasyncworldedit"
-                artifactId = "FastAsyncWorldEdit-Libs-${project.name.replaceFirstChar(Char::titlecase)}"
-                version = version
+    configure<MavenPublishBaseExtension> {
+        coordinates(
+                groupId = "com.fastasyncworldedit",
+                artifactId = "FastAsyncWorldEdit-Libs-${project.name.replaceFirstChar(Char::titlecase)}",
+                version = "$version"
+        )
+        pom {
+            name.set("${rootProject.name}-Libs" + " " + project.version)
+            description.set("Blazingly fast Minecraft world manipulation for artists, builders and everyone else.")
+            url.set("https://github.com/IntellectualSites/FastAsyncWorldEdit")
 
-                pom {
-                    name.set("${rootProject.name}-Libs" + " " + project.version)
-                    description.set("Blazingly fast Minecraft world manipulation for artists, builders and everyone else.")
-                    url.set("https://github.com/IntellectualSites/FastAsyncWorldEdit")
-
-                    licenses {
-                        license {
-                            name.set("GNU General Public License, Version 3.0")
-                            url.set("https://www.gnu.org/licenses/gpl-3.0.html")
-                            distribution.set("repo")
-                        }
-                    }
-
-                    developers {
-                        developer {
-                            id.set("NotMyFault")
-                            name.set("Alexander Brandes")
-                            email.set("contact(at)notmyfault.dev")
-                            organization.set("IntellectualSites")
-                        }
-                        developer {
-                            id.set("SirYwell")
-                            name.set("Hannes Greule")
-                            organization.set("IntellectualSites")
-                        }
-                        developer {
-                            id.set("dordsor21")
-                            name.set("dordsor21")
-                            organization.set("IntellectualSites")
-                        }
-                    }
-
-                    scm {
-                        url.set("https://github.com/IntellectualSites/FastAsyncWorldEdit")
-                        connection.set("scm:git:https://github.com/IntellectualSites/FastAsyncWorldEdit.git")
-                        developerConnection.set("scm:git:git@github.com:IntellectualSites/FastAsyncWorldEdit.git")
-                        tag.set("${project.version}")
-                    }
-
-                    issueManagement {
-                        system.set("GitHub")
-                        url.set("https://github.com/IntellectualSites/FastAsyncWorldEdit/issues")
-                    }
+            licenses {
+                license {
+                    name.set("GNU General Public License, Version 3.0")
+                    url.set("https://www.gnu.org/licenses/gpl-3.0.html")
+                    distribution.set("repo")
                 }
             }
+
+            developers {
+                developer {
+                    id.set("NotMyFault")
+                    name.set("Alexander Brandes")
+                    email.set("contact(at)notmyfault.dev")
+                    organization.set("IntellectualSites")
+                    organizationUrl.set("https://github.com/IntellectualSites")
+                }
+                developer {
+                    id.set("SirYwell")
+                    name.set("Hannes Greule")
+                    organization.set("IntellectualSites")
+                    organizationUrl.set("https://github.com/IntellectualSites")
+                }
+                developer {
+                    id.set("dordsor21")
+                    name.set("dordsor21")
+                    organization.set("IntellectualSites")
+                    organizationUrl.set("https://github.com/IntellectualSites")
+                }
+            }
+
+            scm {
+                url.set("https://github.com/IntellectualSites/FastAsyncWorldEdit")
+                connection.set("scm:git:https://github.com/IntellectualSites/FastAsyncWorldEdit.git")
+                developerConnection.set("scm:git:git@github.com:IntellectualSites/FastAsyncWorldEdit.git")
+                tag.set("${project.version}")
+            }
+
+            issueManagement {
+                system.set("GitHub")
+                url.set("https://github.com/IntellectualSites/FastAsyncWorldEdit/issues")
+            }
+
+            publishToMavenCentral()
         }
     }
 
