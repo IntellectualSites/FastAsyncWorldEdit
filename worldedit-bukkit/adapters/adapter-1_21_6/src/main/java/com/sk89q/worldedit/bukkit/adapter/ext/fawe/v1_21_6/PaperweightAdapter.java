@@ -981,46 +981,7 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
      */
     @Override
     public net.minecraft.nbt.Tag fromNativeLin(LinTag<?> foreign) {
-        if (foreign == null) {
-            return null;
-        }
-        if (foreign instanceof LinCompoundTag compoundTag) {
-            net.minecraft.nbt.CompoundTag tag = new net.minecraft.nbt.CompoundTag();
-            for (var entry : compoundTag.value().entrySet()) {
-                tag.put(entry.getKey(), fromNativeLin(entry.getValue()));
-            }
-            return tag;
-        } else if (foreign instanceof LinByteTag byteTag) {
-            return net.minecraft.nbt.ByteTag.valueOf(byteTag.valueAsByte());
-        } else if (foreign instanceof LinByteArrayTag byteArrayTag) {
-            return new net.minecraft.nbt.ByteArrayTag(byteArrayTag.value());
-        } else if (foreign instanceof LinDoubleTag doubleTag) {
-            return net.minecraft.nbt.DoubleTag.valueOf(doubleTag.valueAsDouble());
-        } else if (foreign instanceof LinFloatTag floatTag) {
-            return net.minecraft.nbt.FloatTag.valueOf(floatTag.valueAsFloat());
-        } else if (foreign instanceof LinIntTag intTag) {
-            return net.minecraft.nbt.IntTag.valueOf(intTag.valueAsInt());
-        } else if (foreign instanceof LinIntArrayTag intArrayTag) {
-            return new net.minecraft.nbt.IntArrayTag(intArrayTag.value());
-        } else if (foreign instanceof LinLongArrayTag longArrayTag) {
-            return new net.minecraft.nbt.LongArrayTag(longArrayTag.value());
-        } else if (foreign instanceof LinListTag<?> listTag) {
-            net.minecraft.nbt.ListTag tag = new net.minecraft.nbt.ListTag();
-            for (var t : listTag.value()) {
-                tag.add(fromNativeLin(t));
-            }
-            return tag;
-        } else if (foreign instanceof LinLongTag longTag) {
-            return net.minecraft.nbt.LongTag.valueOf(longTag.valueAsLong());
-        } else if (foreign instanceof LinShortTag shortTag) {
-            return net.minecraft.nbt.ShortTag.valueOf(shortTag.valueAsShort());
-        } else if (foreign instanceof LinStringTag stringTag) {
-            return net.minecraft.nbt.StringTag.valueOf(stringTag.value());
-        } else if (foreign instanceof LinEndTag) {
-            return net.minecraft.nbt.EndTag.INSTANCE;
-        } else {
-            throw new IllegalArgumentException("Don't know how to make NMS " + foreign.getClass().getCanonicalName());
-        }
+        return this.fromNative(foreign);
     }
 
     private static byte identifyRawElementType(net.minecraft.nbt.ListTag list) {
