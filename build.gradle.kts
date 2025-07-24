@@ -1,11 +1,11 @@
 import org.ajoberstar.grgit.Grgit
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
 import org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED
-import java.net.URI
 import java.time.format.DateTimeFormatter
 import xyz.jpenilla.runpaper.task.RunServer
 
 plugins {
+    id("com.gradleup.nmcp.aggregation") version "1.0.2"
     id("xyz.jpenilla.run-paper") version "2.3.1"
 }
 
@@ -101,4 +101,14 @@ tasks {
                 .toTypedArray())
 
     }
+}
+
+nmcpAggregation {
+    centralPortal {
+        publishingType = "AUTOMATIC"
+        username = providers.gradleProperty("mavenCentralUsername")
+        password = providers.gradleProperty("mavenCentralPassword")
+    }
+
+    publishAllProjectsProbablyBreakingProjectIsolation()
 }
