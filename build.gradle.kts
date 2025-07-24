@@ -6,7 +6,6 @@ import java.time.format.DateTimeFormatter
 import xyz.jpenilla.runpaper.task.RunServer
 
 plugins {
-    id("io.github.gradle-nexus.publish-plugin") version "2.0.0"
     id("xyz.jpenilla.run-paper") version "2.3.1"
 }
 
@@ -101,14 +100,5 @@ tasks {
         pluginJars(*project(":worldedit-bukkit").getTasksByName("shadowJar", false).map { (it as Jar).archiveFile }
                 .toTypedArray())
 
-    }
-}
-
-nexusPublishing {
-    this.repositories {
-        sonatype {
-            nexusUrl.set(URI.create("https://s01.oss.sonatype.org/service/local/"))
-            snapshotRepositoryUrl.set(URI.create("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
-        }
     }
 }
