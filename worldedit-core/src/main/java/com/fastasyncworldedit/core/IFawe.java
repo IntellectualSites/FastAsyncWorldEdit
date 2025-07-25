@@ -19,6 +19,10 @@ public interface IFawe {
 
     Collection<FaweMaskManager> getMaskManagers();
 
+    /**
+     * @deprecated for removal with no replacement. Out of scope for FAWE.
+     */
+    @Deprecated(forRemoval = true, since = "TODO")
     default ImageViewer getImageViewer(Player player) {
         return null;
     }

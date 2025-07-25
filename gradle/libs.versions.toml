@@ -10,7 +10,6 @@ snakeyaml = "2.0"
 # Plugins
 dummypermscompat = "1.10"
 worldguard-bukkit = "7.0.14"
-mapmanager = "1.8.0-SNAPSHOT"
 griefprevention = "17.0.0"
 griefdefender = "2.1.0-SNAPSHOT"
 residence = "4.5._13.1"
@@ -66,7 +65,6 @@ snakeyaml = { group = "org.yaml", name = "snakeyaml", version.ref = "snakeyaml" 
 # Plugins
 dummypermscompat = { group = "com.sk89q", name = "dummypermscompat", version.ref = "dummypermscompat" }
 worldguard = { group = "com.sk89q.worldguard", name = "worldguard-bukkit", version.ref = "worldguard-bukkit" }
-mapmanager = { group = "com.github.InventivetalentDev", name = "MapManager", version.ref = "mapmanager" }
 griefprevention = { group = "com.github.TechFortress", name = "GriefPrevention", version.ref = "griefprevention" }
 griefdefender = { group = "com.griefdefender", name = "api", version.ref = "griefdefender" }
 residence = { group = "com.bekvon.bukkit.residence", name = "Residence", version.ref = "residence" }
