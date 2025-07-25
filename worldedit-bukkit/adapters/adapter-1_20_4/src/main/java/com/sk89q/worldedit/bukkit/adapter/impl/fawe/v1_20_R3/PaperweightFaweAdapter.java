@@ -35,6 +35,7 @@ import com.sk89q.worldedit.registry.state.IntegerProperty;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.SideEffect;
+import com.sk89q.worldedit.util.concurrency.LazyReference;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.world.RegenOptions;
 import com.sk89q.worldedit.world.biome.BiomeType;
@@ -548,7 +549,8 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
     public BaseItemStack adapt(org.bukkit.inventory.ItemStack itemStack) {
         final ItemStack nmsStack = CraftItemStack.asNMSCopy(itemStack);
         final BaseItemStack weStack = new BaseItemStack(BukkitAdapter.asItemType(itemStack.getType()), itemStack.getAmount());
-        weStack.setNbt(((LinCompoundTag) toNativeLin(nmsStack.getTag())));
+        // We should be fine to perform this later as we're using a deep-copied itemstack (above)
+        weStack.setNbtReference(LazyReference.from(() -> ((LinCompoundTag) toNativeLin(nmsStack.getTag()))));
         return weStack;
     }
 

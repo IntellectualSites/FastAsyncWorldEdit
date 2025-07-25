@@ -549,13 +549,14 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
     public BaseItemStack adapt(org.bukkit.inventory.ItemStack itemStack) {
         final RegistryAccess.Frozen registryAccess = DedicatedServer.getServer().registryAccess();
         final ItemStack nmsStack = CraftItemStack.asNMSCopy(itemStack);
-        final net.minecraft.nbt.Tag tag = COMPONENTS_CODEC.encodeStart(
+        // We should be fine to perform this later as we're using a deep-copied itemstack (above)
+        final Supplier<net.minecraft.nbt.Tag> tag = () -> COMPONENTS_CODEC.encodeStart(
                 registryAccess.createSerializationContext(NbtOps.INSTANCE),
                 nmsStack.getComponentsPatch()
         ).getOrThrow();
         return new BaseItemStack(
                 BukkitAdapter.asItemType(itemStack.getType()),
-                LazyReference.from(() -> (LinCompoundTag) toNativeLin(tag)),
+                LazyReference.from(() -> (LinCompoundTag) toNativeLin(tag.get())),
                 itemStack.getAmount()
         );
     }
