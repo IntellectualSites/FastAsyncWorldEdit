@@ -46,7 +46,7 @@ text = "3.0.4"
 piston = "0.5.10"
 
 # Tests
-mockito = "5.17.0"
+mockito = "5.18.0"
 
 # Gradle plugins
 pluginyml = "0.6.0"
