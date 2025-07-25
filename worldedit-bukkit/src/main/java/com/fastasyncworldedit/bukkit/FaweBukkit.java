@@ -111,21 +111,7 @@ public class FaweBukkit implements IFawe, Listener {
 
     @Override
     public synchronized ImageViewer getImageViewer(com.sk89q.worldedit.entity.Player player) {
-        try {
-            PluginManager manager = Bukkit.getPluginManager();
-
-            if (manager.getPlugin("PacketListenerApi") == null) {
-                LOGGER.error("PacketListener not found! Please install PacketListenerAPI v3.7.6 or above before attempting to " +
-                        "complete image-related edits");
-            }
-            if (manager.getPlugin("MapManager") == null) {
-                LOGGER.error("MapManager not found! Please install PacketListenerAPI v1.7.8 or above before attempting to " +
-                        "complete image-related edits");
-            }
-            return new BukkitImageViewer(BukkitAdapter.adapt(player));
-        } catch (Throwable ignored) {
-        }
-        return null;
+        throw new UnsupportedOperationException("No longer supported.");
     }
 
     @Override
