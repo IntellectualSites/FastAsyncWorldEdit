@@ -74,6 +74,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Semaphore;
@@ -669,12 +670,16 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         ExceptionCollector<RuntimeException> collector = new ExceptionCollector<>();
         if (PaperLib.isPaper()) {
             if (POST_CHUNK_REWRITE) {
-                try {
-                    //noinspection unchecked
-                    return (List<Entity>) PAPER_CHUNK_GEN_ALL_ENTITIES.invoke(chunk.level.getEntityLookup().getChunk(chunk.locX, chunk.locZ));
-                } catch (IllegalAccessException | InvocationTargetException e) {
-                    throw new RuntimeException("Failed to lookup entities [POST_CHUNK_REWRITE=true]", e);
-                }
+                return Optional.ofNullable(chunk.level
+                        .getEntityLookup()
+                        .getChunk(chunk.locX, chunk.locZ)).map(c -> {
+                    try {
+                        //noinspection unchecked
+                        return (List<Entity>) PAPER_CHUNK_GEN_ALL_ENTITIES.invoke(c);
+                    } catch (IllegalAccessException | InvocationTargetException e) {
+                        throw new RuntimeException("Failed to lookup entities [PAPER=true]", e);
+                    }
+                }).orElse(Collections.emptyList());
             }
             try {
                 EntityList entityList = (EntityList) LEVEL_CHUNK_ENTITIES.get(chunk);
