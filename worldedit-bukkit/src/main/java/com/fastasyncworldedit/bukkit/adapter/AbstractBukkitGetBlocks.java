@@ -11,6 +11,8 @@ import com.fastasyncworldedit.core.queue.IQueueExtent;
 import com.fastasyncworldedit.core.queue.implementation.QueueHandler;
 import com.fastasyncworldedit.core.queue.implementation.blocks.CharGetBlocks;
 import com.fastasyncworldedit.core.util.MemUtil;
+import com.fastasyncworldedit.core.util.task.FaweThreadUtil;
+import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import org.apache.logging.log4j.Logger;
@@ -86,16 +88,18 @@ public abstract class AbstractBukkitGetBlocks<ServerLevel, LevelChunk> extends C
         final int finalCopyKey = copyKey;
         // Run immediately if possible
         if (chunk != null) {
-            return tryWrappedInternalCall(set, finalizer, finalCopyKey, chunk, nmsWorld);
+            return tryInternalCall(set, finalizer, finalCopyKey, chunk, nmsWorld);
         }
         // Submit via the STQE as that will help handle excessive queuing by waiting for the submission count to fall below the
         // target size
+        final Extent extent = FaweThreadUtil.getCurrentExtent();
         nmsChunkFuture.thenApply(nmsChunk -> owner.submitTaskUnchecked(() -> (T) tryWrappedInternalCall(
                 set,
                 finalizer,
                 finalCopyKey,
                 nmsChunk,
-                nmsWorld
+                nmsWorld,
+                extent
         )));
         // If we have re-submitted, return a completed future to prevent potential deadlocks where a future reliant on the
         // above submission is halting the BlockingExecutor, and preventing the above task from actually running. The futures
@@ -104,6 +108,22 @@ public abstract class AbstractBukkitGetBlocks<ServerLevel, LevelChunk> extends C
     }
 
     private <T extends Future<T>> T tryWrappedInternalCall(
+            IChunkSet set,
+            Runnable finalizer,
+            int copyKey,
+            LevelChunk nmsChunk,
+            ServerLevel nmsWorld,
+            Extent extent
+    ) {
+        FaweThreadUtil.setCurrentExtent(extent);
+        try {
+            return tryInternalCall(set, finalizer, copyKey, nmsChunk, nmsWorld);
+        } finally {
+            FaweThreadUtil.clearCurrentExtent();
+        }
+    }
+
+    private <T extends Future<T>> T tryInternalCall(
             IChunkSet set,
             Runnable finalizer,
             int copyKey,
@@ -120,17 +140,20 @@ public abstract class AbstractBukkitGetBlocks<ServerLevel, LevelChunk> extends C
         }
     }
 
-    protected <T extends Future<T>> T handleCallFinalizer(Runnable[] syncTasks, Runnable callback, Runnable finalizer) throws
+    protected <T extends Future<T>> T handleCallFinalizer(
+            final Runnable[] syncTasks,
+            final Runnable callback,
+            final Runnable finalizer
+    ) throws
             Exception {
         if (syncTasks != null) {
             QueueHandler queueHandler = Fawe.instance().getQueueHandler();
-            Runnable[] finalSyncTasks = syncTasks;
 
             // Chain the sync tasks and the callback
             Callable<Future<?>> chain = () -> {
                 try {
                     // Run the sync tasks
-                    for (Runnable task : finalSyncTasks) {
+                    for (Runnable task : syncTasks) {
                         if (task != null) {
                             task.run();
                         }

@@ -15,6 +15,7 @@ import com.fastasyncworldedit.core.queue.Trimable;
 import com.fastasyncworldedit.core.queue.implementation.QueuePool;
 import com.fastasyncworldedit.core.util.MathMan;
 import com.fastasyncworldedit.core.util.collection.CleanableThreadLocal;
+import com.fastasyncworldedit.core.util.task.FaweBasicThreadFactory;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -647,9 +648,13 @@ public enum FaweCache implements Trimable {
     public ThreadPoolExecutor newBlockingExecutor(String name, Logger logger) {
         int nThreads = Settings.settings().QUEUE.PARALLEL_THREADS;
         LinkedBlockingQueue<Runnable> queue = new LinkedBlockingQueue<>();
-        return new ThreadPoolExecutor(nThreads, nThreads,
-                0L, TimeUnit.MILLISECONDS, queue,
-                new ThreadFactoryBuilder().setNameFormat(name).build(),
+        return new ThreadPoolExecutor(
+                nThreads,
+                nThreads,
+                0L,
+                TimeUnit.MILLISECONDS,
+                queue,
+                new FaweBasicThreadFactory(name),
                 new ThreadPoolExecutor.CallerRunsPolicy()
         ) {
 
