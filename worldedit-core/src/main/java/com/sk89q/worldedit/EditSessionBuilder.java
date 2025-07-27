@@ -468,6 +468,10 @@ public final class EditSessionBuilder {
         if (sideEffectSet == null) {
             sideEffectSet = fastMode ? FAST_SIDE_EFFECTS : SideEffectSet.defaults();
         }
+        sideEffectSet = sideEffectSet.with(
+                SideEffect.ENTITY_EVENTS,
+                fastMode || limit.SKIP_ENTITY_SPAWN_EVENTS ? SideEffect.State.OFF : SideEffect.State.ON
+        );
         if (checkMemory == null) {
             checkMemory = actor != null && !this.fastMode;
         }
