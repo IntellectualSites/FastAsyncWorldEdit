@@ -31,6 +31,7 @@ public class FaweLimit {
     public boolean CONFIRM_LARGE = true;
     public boolean RESTRICT_HISTORY_TO_REGIONS = true;
     public boolean ALLOW_LEGACY = true;
+    public boolean SKIP_ENTITY_SPAWN_EVENTS = false;
     public Set<String> STRIP_NBT = null;
     public boolean UNIVERSAL_DISALLOWED_BLOCKS = true;
     public Set<String> DISALLOWED_BLOCKS = null;
@@ -288,6 +289,7 @@ public class FaweLimit {
                 && (STRIP_NBT == null || STRIP_NBT.isEmpty())
                 // && !UNIVERSAL_DISALLOWED_BLOCKS --> do not include this, it effectively has no relevance
                 && ALLOW_LEGACY
+                && SKIP_ENTITY_SPAWN_EVENTS
                 && (DISALLOWED_BLOCKS == null || DISALLOWED_BLOCKS.isEmpty())
                 && (REMAP_PROPERTIES == null || REMAP_PROPERTIES.isEmpty())
                 && MAX_RADIUS == Integer.MAX_VALUE
@@ -331,6 +333,7 @@ public class FaweLimit {
         STRIP_NBT = limit.STRIP_NBT;
         UNIVERSAL_DISALLOWED_BLOCKS = limit.UNIVERSAL_DISALLOWED_BLOCKS;
         ALLOW_LEGACY = limit.ALLOW_LEGACY;
+        SKIP_ENTITY_SPAWN_EVENTS  = limit.SKIP_ENTITY_SPAWN_EVENTS;
         DISALLOWED_BLOCKS = limit.DISALLOWED_BLOCKS;
         REMAP_PROPERTIES = limit.REMAP_PROPERTIES;
         MAX_RADIUS = limit.MAX_RADIUS;
@@ -359,6 +362,7 @@ public class FaweLimit {
         limit.STRIP_NBT = STRIP_NBT;
         limit.UNIVERSAL_DISALLOWED_BLOCKS = UNIVERSAL_DISALLOWED_BLOCKS;
         limit.ALLOW_LEGACY = ALLOW_LEGACY;
+        limit.SKIP_ENTITY_SPAWN_EVENTS = SKIP_ENTITY_SPAWN_EVENTS;
         limit.DISALLOWED_BLOCKS = DISALLOWED_BLOCKS;
         limit.REMAP_PROPERTIES = REMAP_PROPERTIES;
         limit.MAX_RADIUS = MAX_RADIUS;

@@ -33,6 +33,7 @@ public enum SideEffect {
     //FAWE end
     VALIDATION(State.OFF, true),
     ENTITY_AI(State.OFF, true),
+    ENTITY_EVENTS(State.ON, true),
     EVENTS(State.OFF, true),
     /**
      * Internal use only.
