@@ -646,11 +646,18 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                     .getChunk(chunk.locX, chunk.locZ)).map(ChunkEntitySlices::getAllEntities).orElse(Collections.emptyList());
         }
         try {
-            //noinspection unchecked
-            return ((PersistentEntitySectionManager<Entity>) (SERVER_LEVEL_ENTITY_MANAGER.get(chunk.level))).getEntities(chunk.getPos());
+            return getEntitySectionManager(chunk.level).getEntities(chunk.getPos());
         } catch (IllegalAccessException e) {
             throw new RuntimeException("Failed to lookup entities [PAPER=false]", e);
         }
+    }
+
+    /**
+     * Spigot only
+     */
+    static PersistentEntitySectionManager<Entity> getEntitySectionManager(ServerLevel level) throws IllegalAccessException {
+        //noinspection unchecked
+        return (PersistentEntitySectionManager<Entity>) (SERVER_LEVEL_ENTITY_MANAGER.get(level));
     }
 
     record FakeIdMapBlock(int size) implements IdMap<net.minecraft.world.level.block.state.BlockState> {
