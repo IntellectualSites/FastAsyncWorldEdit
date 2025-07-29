@@ -10,7 +10,7 @@ import java.io.IOException;
 /**
  * @deprecated for removal with no replacement. Out of scope for FAWE.
  */
-@Deprecated(forRemoval = true, since = "TODO")
+@Deprecated(forRemoval = true, since = "2.13.1")
 public class BukkitImageViewer implements ImageViewer {
 
     public BukkitImageViewer(Player player) {

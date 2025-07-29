@@ -11,7 +11,7 @@ import java.util.function.Function;
  * the start of an operation.
  *
  * @param <T> transform to mutate type
- * @since TODO
+ * @since 2.13.1
  */
 public class MutatingOperationTransformHolder<T extends Transform> implements Transform {
 
@@ -22,7 +22,7 @@ public class MutatingOperationTransformHolder<T extends Transform> implements Tr
      * Construct new instance
      *
      * @param transform transform to mutate
-     * @since TODO
+     * @since 2.13.1
      */
     public MutatingOperationTransformHolder(T transform, Function<? super T, ? extends T> operation) {
         this.transform = transform;
@@ -36,7 +36,7 @@ public class MutatingOperationTransformHolder<T extends Transform> implements Tr
      * Implementation detail: it may be possible for this method to be called multiple times before an operation actually occurs.
      *
      * @param transform Transform to transform
-     * @since TODO
+     * @since 2.13.1
      */
     public static Transform transform(Transform transform) {
         return transform(transform, false);
@@ -50,7 +50,7 @@ public class MutatingOperationTransformHolder<T extends Transform> implements Tr
      *
      * @param transform Transform to transform
      * @param parallel  If the context is potentially parallel, meaning the given transform will be copied if required
-     * @since TODO
+     * @since 2.13.1
      */
     public static Transform transform(Transform transform, boolean parallel) {
         return switch (transform) {
@@ -69,7 +69,7 @@ public class MutatingOperationTransformHolder<T extends Transform> implements Tr
     /**
      * Apply the mutator to the transform
      *
-     * @since TODO
+     * @since 2.13.1
      */
     public MutatingOperationTransformHolder<T> mutate() {
         if (operation != null) {

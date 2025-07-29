@@ -22,7 +22,7 @@ public interface IFawe {
     /**
      * @deprecated for removal with no replacement. Out of scope for FAWE.
      */
-    @Deprecated(forRemoval = true, since = "TODO")
+    @Deprecated(forRemoval = true, since = "2.13.1")
     default ImageViewer getImageViewer(Player player) {
         return null;
     }
@@ -47,7 +47,7 @@ public interface IFawe {
      */
     Preloader getPreloader(boolean initialise);
 
-    @Deprecated(forRemoval = true, since = "TODO")
+    @Deprecated(forRemoval = true, since = "2.13.1")
     default boolean isChunksStretched() {
         return true;
     }
