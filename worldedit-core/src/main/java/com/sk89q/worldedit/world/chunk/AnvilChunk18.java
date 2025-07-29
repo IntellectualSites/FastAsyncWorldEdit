@@ -25,20 +25,28 @@ import com.sk89q.jnbt.ListTag;
 import com.sk89q.jnbt.LongArrayTag;
 import com.sk89q.jnbt.NBTUtils;
 import com.sk89q.jnbt.Tag;
+import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.Property;
+import com.sk89q.worldedit.util.concurrency.LazyReference;
 import com.sk89q.worldedit.world.DataException;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import com.sk89q.worldedit.world.entity.EntityTypes;
 import com.sk89q.worldedit.world.storage.InvalidFormatException;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import org.enginehub.linbus.tree.LinCompoundTag;
+import org.enginehub.linbus.tree.LinListTag;
+import org.enginehub.linbus.tree.LinTagType;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 /**
  * The chunk format for Minecraft 1.18 and newer
@@ -46,11 +54,13 @@ import java.util.Map;
 public class AnvilChunk18 implements Chunk {
 
     private final CompoundTag rootTag;
+    private final Supplier<LinCompoundTag> entityTagSupplier;
     private final Int2ObjectOpenHashMap<BlockState[]> blocks;
     private final int rootX;
     private final int rootZ;
 
     private Map<BlockVector3, Map<String, Tag<?, ?>>> tileEntities;
+    private List<BaseEntity> entities;
 
     /**
      * Construct the chunk with a compound tag.
@@ -58,8 +68,9 @@ public class AnvilChunk18 implements Chunk {
      * @param tag the tag to read
      * @throws DataException on a data error
      */
-    public AnvilChunk18(CompoundTag tag) throws DataException {
+    public AnvilChunk18(CompoundTag tag, Supplier<LinCompoundTag> entityTag) throws DataException {
         rootTag = tag;
+        entityTagSupplier = entityTag;
 
         rootX = NBTUtils.getChildTag(rootTag.getValue(), "xPos", IntTag.class).getValue();
         rootZ = NBTUtils.getChildTag(rootTag.getValue(), "zPos", IntTag.class).getValue();
@@ -105,7 +116,7 @@ public class AnvilChunk18 implements Chunk {
                                 try {
                                     blockState = getBlockStateWith(blockState, property, value);
                                 } catch (IllegalArgumentException e) {
-                                    throw new InvalidFormatException("Invalid block state for " + blockState.getBlockType().getId() + ", " + property.getName() + ": " + value);
+                                    throw new InvalidFormatException("Invalid block state for " + blockState.getBlockType().id() + ", " + property.getName() + ": " + value);
                                 }
                             }
                         }
@@ -197,9 +208,9 @@ public class AnvilChunk18 implements Chunk {
 
     @Override
     public BaseBlock getBlock(BlockVector3 position) throws DataException {
-        int x = position.getX() - rootX * 16;
-        int y = position.getY();
-        int z = position.getZ() - rootZ * 16;
+        int x = position.x() - rootX * 16;
+        int y = position.y();
+        int z = position.z() - rootZ * 16;
 
         int section = y >> 4;
         int yIndex = y & 0x0F;
@@ -217,6 +228,39 @@ public class AnvilChunk18 implements Chunk {
         }
 
         return state.toBaseBlock();
+    }
+
+    @Override
+    public List<BaseEntity> getEntities() throws DataException {
+        if (entities == null) {
+            populateEntities();
+        }
+        return entities;
+    }
+
+    /**
+     * Used to load the biomes.
+     */
+    private void populateEntities() {
+        entities = new ArrayList<>();
+        LinCompoundTag entityTag;
+        if (entityTagSupplier == null || (entityTag = entityTagSupplier.get()) == null) {
+            return;
+        }
+        LinListTag<LinCompoundTag> tags = entityTag.findListTag(
+                "Entities", LinTagType.compoundTag()
+        );
+        if (tags == null) {
+            return;
+        }
+
+        for (LinCompoundTag tag : tags.value()) {
+            entities.add(new BaseEntity(
+                    EntityTypes.get(tag.getTag("id", LinTagType.stringTag()).value()),
+                    LazyReference.computed(tag)
+            ));
+        }
+
     }
 
 }
