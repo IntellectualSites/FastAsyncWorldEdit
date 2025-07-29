@@ -73,6 +73,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Semaphore;
@@ -651,14 +652,16 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
 
     static List<Entity> getEntities(LevelChunk chunk) {
         if (PaperLib.isPaper()) {
-            try {
-                //noinspection unchecked
-                return (List<Entity>) PAPER_CHUNK_GEN_ALL_ENTITIES.invoke(chunk.level
-                        .moonrise$getEntityLookup()
-                        .getChunk(chunk.locX, chunk.locZ));
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                throw new RuntimeException("Failed to lookup entities [PAPER=true]", e);
-            }
+            return Optional.ofNullable(chunk.level
+                    .moonrise$getEntityLookup()
+                    .getChunk(chunk.locX, chunk.locZ)).map(c -> {
+                try {
+                    //noinspection unchecked
+                    return (List<Entity>) PAPER_CHUNK_GEN_ALL_ENTITIES.invoke(c);
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                    throw new RuntimeException("Failed to lookup entities [PAPER=true]", e);
+                }
+            }).orElse(Collections.emptyList());
         }
         try {
             //noinspection unchecked
