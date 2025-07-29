@@ -4,7 +4,7 @@ import com.sk89q.worldedit.extent.Extent;
 import org.jetbrains.annotations.ApiStatus;
 
 @ApiStatus.Internal
-public interface FaweThread {
+public sealed interface FaweThread permits FaweBasicThread, FaweForkJoinThread {
 
     /**
      * Removes the extent currently associated with the calling thread.

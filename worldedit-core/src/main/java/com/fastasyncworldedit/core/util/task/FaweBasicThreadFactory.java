@@ -13,7 +13,6 @@ import java.util.concurrent.atomic.AtomicLong;
 @ApiStatus.Internal
 public class FaweBasicThreadFactory implements ThreadFactory {
 
-    private final ThreadFactory parent = Executors.defaultThreadFactory();
     private final String nameFormat;
     private final AtomicLong count;
 
@@ -24,11 +23,15 @@ public class FaweBasicThreadFactory implements ThreadFactory {
 
     @Override
     public Thread newThread(@Nonnull final Runnable runnable) {
-        Thread thread = parent.newThread(runnable);
+        Thread thread = new FaweBasicThread(runnable);
         if (nameFormat != null) {
             // requireNonNull is safe because we create `count` if (and only if) we have a nameFormat.
             thread.setName(String.format(Locale.ROOT, nameFormat, count.getAndIncrement()));
         }
+        if (thread.isDaemon())
+            thread.setDaemon(false);
+        if (thread.getPriority() != Thread.NORM_PRIORITY)
+            thread.setPriority(Thread.NORM_PRIORITY);
         return thread;
     }
 

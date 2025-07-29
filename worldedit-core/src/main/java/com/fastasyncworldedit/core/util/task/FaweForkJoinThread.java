@@ -7,11 +7,11 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinWorkerThread;
 
 @ApiStatus.Internal
-public class FaweForkJoinThread extends ForkJoinWorkerThread implements FaweThread {
+public final class FaweForkJoinThread extends ForkJoinWorkerThread implements FaweThread {
 
     private Extent currentExtent;
 
-    protected FaweForkJoinThread(final ForkJoinPool pool) {
+    FaweForkJoinThread(final ForkJoinPool pool) {
         super(null, pool, true);
     }
 

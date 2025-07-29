@@ -4,14 +4,13 @@ import com.sk89q.worldedit.extent.Extent;
 import org.jetbrains.annotations.ApiStatus;
 
 @ApiStatus.Internal
-public class FaweBasicThread extends Thread implements FaweThread {
+public final class FaweBasicThread extends Thread implements FaweThread {
 
     private Extent currentExtent;
 
-    protected FaweBasicThread() {
-        super();
+    FaweBasicThread(Runnable runnable) {
+        super(runnable);
     }
-
 
     @Override
     public void clearCurrentExtent() {
