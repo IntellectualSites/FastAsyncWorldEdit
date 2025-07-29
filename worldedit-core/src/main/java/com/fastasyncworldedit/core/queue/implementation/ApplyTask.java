@@ -23,6 +23,7 @@ class ApplyTask<F extends Filter> extends RecursiveAction implements Runnable {
     private static final int SHIFT_REDUCTION = 1;
 
     private final CommonState<F> commonState;
+    private final Region region;
     private final ApplyTask<F> before;
     private final int minChunkX;
     private final int minChunkZ;
@@ -39,7 +40,6 @@ class ApplyTask<F extends Filter> extends RecursiveAction implements Runnable {
 
     private record CommonState<F extends Filter>(
             F originalFilter,
-            Region region,
             ParallelQueueExtent parallelQueueExtent,
             ConcurrentMap<Thread, ThreadState<F>> stateCache,
             boolean full,
@@ -69,12 +69,12 @@ class ApplyTask<F extends Filter> extends RecursiveAction implements Runnable {
     ) {
         this.commonState = new CommonState<>(
                 filter,
-                region.clone(), // clone only once, assuming the filter doesn't modify that clone
                 parallelQueueExtent,
                 new ConcurrentHashMap<>(),
                 full,
                 faweExceptionReasonsUsed
         );
+        this.region = region.clone();
         this.before = null;
         final BlockVector3 minimumPoint = region.getMinimumPoint();
         this.minChunkX = minimumPoint.x() >> 4;
@@ -88,6 +88,7 @@ class ApplyTask<F extends Filter> extends RecursiveAction implements Runnable {
 
     private ApplyTask(
             final CommonState<F> commonState,
+            final Region region,
             final ApplyTask<F> before,
             final int minChunkX,
             final int maxChunkX,
@@ -96,6 +97,7 @@ class ApplyTask<F extends Filter> extends RecursiveAction implements Runnable {
             final int higherShift
     ) {
         this.commonState = commonState;
+        this.region = region.clone();
         this.minChunkX = minChunkX;
         this.maxChunkX = maxChunkX;
         this.minChunkZ = minChunkZ;
@@ -120,7 +122,7 @@ class ApplyTask<F extends Filter> extends RecursiveAction implements Runnable {
                         processRegion(regionX, regionZ, this.shift);
                         continue;
                     }
-                    if (this.shift == 0 && !this.commonState.region.containsChunk(regionX, regionZ)) {
+                    if (this.shift == 0 && !this.region.containsChunk(regionX, regionZ)) {
                         // if shift == 0, region coords are chunk coords
                         continue; // chunks not intersecting with the region don't need a task
                     }
@@ -128,6 +130,7 @@ class ApplyTask<F extends Filter> extends RecursiveAction implements Runnable {
                     // creating more tasks will likely help parallelism as other threads aren't *that* busy
                     subtask = new ApplyTask<>(
                             this.commonState,
+                            this.region,
                             subtask,
                             regionX << this.shift,
                             ((regionX + 1) << this.shift) - 1,
@@ -166,7 +169,7 @@ class ApplyTask<F extends Filter> extends RecursiveAction implements Runnable {
         try {
             for (int chunkX = regionX << shift; chunkX <= ((regionX  + 1) << shift) - 1; chunkX++) {
                 for (int chunkZ = regionZ << shift; chunkZ <= ((regionZ  + 1) << shift) - 1; chunkZ++) {
-                    if (!this.commonState.region.containsChunk(chunkX, chunkZ)) {
+                    if (!this.region.containsChunk(chunkX, chunkZ)) {
                         continue; // chunks not intersecting with the region must not be processed
                     }
                     applyChunk(chunkX, chunkZ, state);
@@ -204,7 +207,7 @@ class ApplyTask<F extends Filter> extends RecursiveAction implements Runnable {
             state.block = state.queue.apply(
                     state.block,
                     state.filter,
-                    this.commonState.region,
+                    this.region,
                     chunkX,
                     chunkZ,
                     this.commonState.full
