@@ -192,7 +192,7 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
             };
         }
         if (set == null) {
-            set = (x, z) -> CharSetBlocks.newInstance(x, z);
+            set = CharSetBlocks::newInstance;
         }
         this.cacheGet = get;
         this.cacheSet = set;

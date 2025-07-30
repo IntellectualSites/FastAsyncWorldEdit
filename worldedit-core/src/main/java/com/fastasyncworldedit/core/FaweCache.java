@@ -15,10 +15,10 @@ import com.fastasyncworldedit.core.queue.Trimable;
 import com.fastasyncworldedit.core.queue.implementation.QueuePool;
 import com.fastasyncworldedit.core.util.MathMan;
 import com.fastasyncworldedit.core.util.collection.CleanableThreadLocal;
+import com.fastasyncworldedit.core.util.task.FaweBasicThreadFactory;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.sk89q.jnbt.ByteArrayTag;
 import com.sk89q.jnbt.ByteTag;
 import com.sk89q.jnbt.CompoundTag;
@@ -46,7 +46,6 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -647,9 +646,13 @@ public enum FaweCache implements Trimable {
     public ThreadPoolExecutor newBlockingExecutor(String name, Logger logger) {
         int nThreads = Settings.settings().QUEUE.PARALLEL_THREADS;
         LinkedBlockingQueue<Runnable> queue = new LinkedBlockingQueue<>();
-        return new ThreadPoolExecutor(nThreads, nThreads,
-                0L, TimeUnit.MILLISECONDS, queue,
-                new ThreadFactoryBuilder().setNameFormat(name).build(),
+        return new ThreadPoolExecutor(
+                nThreads,
+                nThreads,
+                0L,
+                TimeUnit.MILLISECONDS,
+                queue,
+                new FaweBasicThreadFactory(name),
                 new ThreadPoolExecutor.CallerRunsPolicy()
         ) {
 
