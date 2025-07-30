@@ -463,6 +463,10 @@ public final class EditSessionBuilder {
             // Keep heightmaps to maintain behaviour
             sideEffectSet = fastMode ? SideEffectSet.none().with(SideEffect.HEIGHTMAPS) : SideEffectSet.defaults();
         }
+        sideEffectSet = sideEffectSet.with(
+                SideEffect.ENTITY_EVENTS,
+                fastMode || limit.SKIP_ENTITY_SPAWN_EVENTS ? SideEffect.State.OFF : SideEffect.State.ON
+        );
         if (checkMemory == null) {
             checkMemory = actor != null && !this.fastMode;
         }
