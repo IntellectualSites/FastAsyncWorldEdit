@@ -6,6 +6,8 @@ import com.fastasyncworldedit.core.queue.IQueueExtent;
 import com.fastasyncworldedit.core.util.MathMan;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
+import com.sk89q.worldedit.util.SideEffect;
+import io.papermc.lib.PaperLib;
 import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.longs.LongArraySet;
 import it.unimi.dsi.fastutil.longs.LongIterator;
@@ -41,10 +43,12 @@ public abstract class StarlightRelighter<SERVER_LEVEL, CHUNK_POS> implements Rel
     private final ReentrantLock areaLock = new ReentrantLock();
     private final NMSRelighter delegate;
     protected final SERVER_LEVEL serverLevel;
+    protected final boolean obfuscateAntiXRay;
 
     protected StarlightRelighter(SERVER_LEVEL serverLevel, IQueueExtent<?> queue) {
         this.serverLevel = serverLevel;
         this.delegate = new NMSRelighter(queue);
+        this.obfuscateAntiXRay = PaperLib.isPaper() && queue.getSideEffectSet().shouldApply(SideEffect.PAPER_ANTI_XRAY);
     }
 
     protected Set<CHUNK_POS> convertChunkKeysToChunkPos(LongSet chunks) {

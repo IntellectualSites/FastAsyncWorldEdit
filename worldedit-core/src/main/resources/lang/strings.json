@@ -649,6 +649,8 @@
   "worldedit.sideeffect.entity_ai.description": "Updates Entity AI paths for the block changes",
   "worldedit.sideeffect.events": "Mod/Plugin Events",
   "worldedit.sideeffect.events.description": "Tells other mods/plugins about these changes when applicable",
+  "worldedit.sideeffect.paper_anti_xray": "Anti-X-Ray Obfuscation",
+  "worldedit.sideeffect.paper_anti_xray.description": "Obfuscates block changes with Papers anti-x-ray system (if enabled)",
   "worldedit.sideeffect.state.on": "On",
   "worldedit.sideeffect.state.delayed": "Delayed",
   "worldedit.sideeffect.state.off": "Off",

@@ -750,7 +750,7 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
                     if (!set
                             .getSideEffectSet()
                             .shouldApply(SideEffect.LIGHTING) || !Settings.settings().LIGHTING.DELAY_PACKET_SENDING || finalMask == 0 && biomes != null) {
-                        this.send();
+                        this.send(set.getSideEffectSet().shouldApply(SideEffect.PAPER_ANTI_XRAY));
                     }
                     if (finalizer != null) {
                         finalizer.run();
@@ -791,9 +791,9 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
     }
 
     @Override
-    public void send() {
+    public void send(boolean obfuscateAntiXRay) {
         synchronized (sendLock) {
-            PaperweightPlatformAdapter.sendChunk(new IntPair(chunkX, chunkZ), serverLevel, chunkX, chunkZ);
+            PaperweightPlatformAdapter.sendChunk(new IntPair(chunkX, chunkZ), serverLevel, chunkX, chunkZ, obfuscateAntiXRay);
         }
     }
 

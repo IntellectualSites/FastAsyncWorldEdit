@@ -14,6 +14,7 @@ import com.sk89q.worldedit.registry.state.DirectionalProperty;
 import com.sk89q.worldedit.registry.state.EnumProperty;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.util.Direction;
+import com.sk89q.worldedit.util.SideEffect;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
@@ -931,7 +932,10 @@ public class NMSRelighter implements Relighter {
                     ChunkHolder<?> chunk = (ChunkHolder<?>) queue.getOrCreateChunk(x, z);
                     chunk.setBitMask(bitMask);
                     chunk.flushLightToGet();
-                    Fawe.platform().getPlatformAdapter().sendChunk(chunk.getOrCreateGet(), bitMask, true);
+                    Fawe.platform().getPlatformAdapter().sendChunk(
+                            chunk.getOrCreateGet(), bitMask, true,
+                            queue.getSideEffectSet().shouldApply(SideEffect.PAPER_ANTI_XRAY)
+                    );
                     iter.remove();
                 }
                 finished.set(true);
