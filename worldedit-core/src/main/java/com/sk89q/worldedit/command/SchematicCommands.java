@@ -24,6 +24,7 @@ import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.event.extent.ActorSaveClipboardEvent;
 import com.fastasyncworldedit.core.extent.clipboard.MultiClipboardHolder;
 import com.fastasyncworldedit.core.extent.clipboard.URIClipboardHolder;
+import com.fastasyncworldedit.core.internal.exception.FaweException;
 import com.fastasyncworldedit.core.math.transform.MutatingOperationTransformHolder;
 import com.fastasyncworldedit.core.util.MainUtil;
 import com.google.common.collect.Multimap;
@@ -576,15 +577,20 @@ public class SchematicCommands {
         ClipboardHolder holder = session.getClipboard();
 
         SchematicSaveTask task = new SchematicSaveTask(actor, f, dir, format, holder, overwrite);
-        AsyncCommandBuilder.wrap(task, actor)
-                .registerWithSupervisor(worldEdit.getSupervisor(), "Saving schematic " + filename)
-                .setDelayMessage(Caption.of("worldedit.schematic.save.saving"))
-                .onSuccess(Caption.of("fawe.worldedit.schematic.schematic.saved", filename, (overwrite ? Caption.of("fawe.worldedit.schematic.schematic.overwritten") : ".")), null)
-                .onFailure(
-                        Caption.of("worldedit.schematic.failed-to-save"),
-                        worldEdit.getPlatformManager().getPlatformCommandManager().getExceptionConverter()
-                )
-                .buildAndExec(worldEdit.getExecutorService());
+        AsyncCommandBuilder
+            .wrap(task, actor)
+            .registerWithSupervisor(worldEdit.getSupervisor(), "Saving schematic " + filename)
+            .setDelayMessage(Caption.of("worldedit.schematic.save.saving"))
+            .onSuccess(
+                overwrite
+                    ? Caption.of("fawe.worldedit.schematic.schematic.overwritten")
+                    : Caption.of("fawe.worldedit.schematic.schematic.saved", filename), null
+            )
+            .onFailure(
+                Caption.of("worldedit.schematic.failed-to-save"),
+                worldEdit.getPlatformManager().getPlatformCommandManager().getExceptionConverter()
+            )
+            .buildAndExec(worldEdit.getExecutorService());
     }
 
     @Command(
@@ -1002,9 +1008,7 @@ public class SchematicCommands {
 
                 if (numFiles >= limit) {
                     LOGGER.info(actor.getName() + " failed to save " + file.getCanonicalPath() + " - too many schematics!");
-                    actor.print(Caption.of("fawe.error.schematic.over.count.limit", numFiles, limit).color(TextColor.RED));
-                    throw new WorldEditException(Caption.of("fawe.error.schematic.over.limit", numFiles, limit)) {
-                    };
+                    throw new FaweException(Caption.of("fawe.error.schematic.over.limit", numFiles, limit));
                 }
             }
             //FAWE end
@@ -1043,10 +1047,12 @@ public class SchematicCommands {
 
                         if ((curKb) > allocatedKb) {
                             file.delete();
-                            actor.print(Caption.of("fawe.error.schematic.over.disk.limit", String.format("%.1f", curKb), String.format("%dkb", allocatedKb)).color(TextColor.RED));
                             LOGGER.info(actor.getName() + " failed to save " + SCHEMATIC_NAME + " - not enough space!");
-                            throw new WorldEditException(Caption.of("fawe.error.schematic.over.disk.limit", String.format("%.1f", curKb), String.format("%dkb", allocatedKb))) {
-                            };
+                            throw new FaweException(Caption.of(
+                                    "fawe.error.schematic.over.disk.limit",
+                                    String.format("%.1f", curKb),
+                                    String.format("%dkb", allocatedKb)
+                            ));
                         }
                         if (overwrite) {
                             new File(curFilepath).delete();
@@ -1059,7 +1065,6 @@ public class SchematicCommands {
                     }
 
                     if (Settings.settings().PATHS.PER_PLAYER_SCHEMATICS && actor.getLimit().SCHEM_FILE_NUM_LIMIT > -1) {
-
                         actor.print(Caption.of("fawe.worldedit.schematic.schematic.slots.free", (actor.getLimit().SCHEM_FILE_NUM_LIMIT - numFiles)));
                     }
                     LOGGER.info(actor.getName() + " saved " + file.getCanonicalPath());
