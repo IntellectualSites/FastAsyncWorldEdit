@@ -47,6 +47,8 @@ import com.sk89q.worldedit.function.block.BlockReplace;
 import com.sk89q.worldedit.function.mask.BlockMask;
 import com.sk89q.worldedit.function.mask.ExistingBlockMask;
 import com.sk89q.worldedit.function.mask.Mask;
+import com.sk89q.worldedit.function.mask.MaskIntersection;
+import com.sk89q.worldedit.function.mask.RegionMask;
 import com.sk89q.worldedit.function.mask.SolidBlockMask;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.Operations;
@@ -584,18 +586,20 @@ public interface Extent extends InputExtent, OutputExtent {
 
     //TODO: probably update these for 1.18 etc.
     default void addOres(Region region, Mask mask) throws WorldEditException {
+        mask = new MaskIntersection(new RegionMask(region), mask);
         addOre(region, mask, BlockTypes.DIRT.getDefaultState(), 33, 10, 100, getMinY(), getMaxY());
         addOre(region, mask, BlockTypes.GRAVEL.getDefaultState(), 33, 8, 100, getMinY(), getMaxY());
         addOre(region, mask, BlockTypes.ANDESITE.getDefaultState(), 33, 10, 100, getMinY(), 79);
         addOre(region, mask, BlockTypes.DIORITE.getDefaultState(), 33, 10, 100, getMinY(), 79);
         addOre(region, mask, BlockTypes.GRANITE.getDefaultState(), 33, 10, 100, getMinY(), 79);
-        addOre(region, mask, BlockTypes.COAL_ORE.getDefaultState(), 17, 20, 100, 0, 127);
-        addOre(region, mask, BlockTypes.IRON_ORE.getDefaultState(), 9, 20, 100, 0, 63);
-        addOre(region, mask, BlockTypes.GOLD_ORE.getDefaultState(), 9, 2, 100, 0, 31);
-        addOre(region, mask, BlockTypes.REDSTONE_ORE.getDefaultState(), 8, 8, 100, 0, 15);
-        addOre(region, mask, BlockTypes.DIAMOND_ORE.getDefaultState(), 8, 1, 100, 0, 15);
-        addOre(region, mask, BlockTypes.LAPIS_ORE.getDefaultState(), 7, 1, 100, 0, 15);
-        addOre(region, mask, BlockTypes.EMERALD_ORE.getDefaultState(), 5, 1, 100, 4, 31);
+        addOre(region, mask, BlockTypes.COAL_ORE.getDefaultState(), 17, 20, 100, 0, 320);
+        addOre(region, mask, BlockTypes.COPPER_ORE.getDefaultState(), 13, 20, 100, -16, 112);
+        addOre(region, mask, BlockTypes.IRON_ORE.getDefaultState(), 9, 20, 100, -64, 320);
+        addOre(region, mask, BlockTypes.GOLD_ORE.getDefaultState(), 9, 2, 100, -32, 256);
+        addOre(region, mask, BlockTypes.REDSTONE_ORE.getDefaultState(), 8, 8, 100, -64, 16);
+        addOre(region, mask, BlockTypes.DIAMOND_ORE.getDefaultState(), 8, 1, 100, -64, 16);
+        addOre(region, mask, BlockTypes.LAPIS_ORE.getDefaultState(), 7, 1, 100, -64, 64);
+        addOre(region, mask, BlockTypes.EMERALD_ORE.getDefaultState(), 5, 1, 100, -16, 320);
     }
 
     /**
