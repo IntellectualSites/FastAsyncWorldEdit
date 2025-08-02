@@ -1,8 +1,11 @@
 package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_21_6;
 
+import com.fastasyncworldedit.core.util.MathMan;
+import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
+import net.minecraft.core.SectionPos;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
@@ -25,6 +28,7 @@ import javax.annotation.Nullable;
 
 public class FaweBlockStateListPopulator extends BlockStateListPopulator {
 
+    private final Long2ObjectOpenHashMap<PaperweightChunkAccessProxy> chunkProxies = new Long2ObjectOpenHashMap<>();
     private final ServerLevel world;
 
     public FaweBlockStateListPopulator(ServerLevel world) {
@@ -68,7 +72,13 @@ public class FaweBlockStateListPopulator extends BlockStateListPopulator {
 
     @Override
     public ChunkAccess getChunk(final int chunkX, final int chunkZ, final ChunkStatus leastStatus, final boolean create) {
-        return world.getChunk(chunkX, chunkZ, leastStatus, create);
+        ChunkAccess worldChunk = world.getChunk(chunkX, chunkZ, leastStatus, create);
+        PaperweightChunkAccessProxy proxy = chunkProxies.compute(
+                MathMan.pairInt(chunkX, chunkZ),
+                (k, v) -> v == null ? PaperweightChunkAccessProxy.getInstance() : v
+        );
+        proxy.parent = worldChunk;
+        return proxy;
     }
 
     @Override
@@ -86,6 +96,39 @@ public class FaweBlockStateListPopulator extends BlockStateListPopulator {
     @Override
     public int getSeaLevel() {
         return world.getSeaLevel();
+    }
+
+    @Override
+    public @Nonnull ChunkAccess getChunk(final @Nonnull BlockPos pos) {
+        ChunkAccess worldChunk = world.getChunk(pos);
+        PaperweightChunkAccessProxy proxy = chunkProxies.compute(
+                MathMan.pairInt(SectionPos.blockToSectionCoord(pos.getX()), SectionPos.blockToSectionCoord(pos.getZ())),
+                (k, v) -> v == null ? PaperweightChunkAccessProxy.getInstance() : v
+        );
+        proxy.parent = worldChunk;
+        return proxy;
+    }
+
+    @Override
+    public @Nonnull ChunkAccess getChunk(final int chunkX, final int chunkZ) {
+        ChunkAccess worldChunk = world.getChunk(chunkX, chunkZ);
+        PaperweightChunkAccessProxy proxy = chunkProxies.compute(
+                MathMan.pairInt(chunkX, chunkZ),
+                (k, v) -> v == null ? PaperweightChunkAccessProxy.getInstance() : v
+        );
+        proxy.parent = worldChunk;
+        return proxy;
+    }
+
+    @Override
+    public @Nonnull ChunkAccess getChunk(final int chunkX, final int chunkZ, final @Nonnull ChunkStatus chunkStatus) {
+        ChunkAccess worldChunk = world.getChunk(chunkX, chunkZ, chunkStatus);
+        PaperweightChunkAccessProxy proxy = chunkProxies.compute(
+                MathMan.pairInt(chunkX, chunkZ),
+                (k, v) -> v == null ? PaperweightChunkAccessProxy.getInstance() : v
+        );
+        proxy.parent = worldChunk;
+        return proxy;
     }
 
     @Override
