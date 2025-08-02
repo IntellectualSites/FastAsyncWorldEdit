@@ -587,18 +587,17 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
     @Override
     public boolean generateFeature(ConfiguredFeatureType feature, World world, EditSession editSession, BlockVector3 pt) {
         //FAWE start
-        ServerLevel serverLevel = ((CraftWorld) world).getHandle();
+        ServerLevel serverLevel = getServerLevel(world);
         ChunkGenerator generator = serverLevel.getMinecraftWorld().getChunkSource().getGenerator();
 
         ConfiguredFeature<?, ?> configuredFeature = serverLevel
                 .registryAccess()
                 .registryOrThrow(Registries.CONFIGURED_FEATURE)
                 .get(ResourceLocation.tryParse(feature.id()));
-        FaweBlockStateListPopulator populator = new FaweBlockStateListPopulator(serverLevel);
 
-        Map<BlockPos, CraftBlockState> placed = TaskManager.taskManager().sync(() -> {
-            serverLevel.captureTreeGeneration = true;
-            serverLevel.captureBlockStates = true;
+        FaweBlockStateListPopulator populator = new FaweBlockStateListPopulator(serverLevel);
+        List<CraftBlockState> placed = TaskManager.taskManager().sync(() -> {
+            preCaptureStates(serverLevel);
             try {
                 if (!configuredFeature.place(
                         populator,
@@ -608,16 +607,11 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
                 )) {
                     return null;
                 }
-                Map<BlockPos, CraftBlockState> placedBlocks = populator.getList().stream().collect(Collectors.toMap(
-                        CraftBlockState::getPosition,
-                        craftBlockState -> craftBlockState
-                ));
-                placedBlocks.putAll(serverLevel.capturedBlockStates);
+                List<CraftBlockState> placedBlocks = new ArrayList<>(populator.getList());
+                placedBlocks.addAll(serverLevel.capturedBlockStates.values());
                 return placedBlocks;
             } finally {
-                serverLevel.captureBlockStates = false;
-                serverLevel.captureTreeGeneration = false;
-                serverLevel.capturedBlockStates.clear();
+                postCaptureBlockStates(serverLevel);
             }
         });
 
@@ -627,7 +621,7 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
 
     @Override
     public boolean generateStructure(StructureType type, World world, EditSession editSession, BlockVector3 pt) {
-        ServerLevel serverLevel = ((CraftWorld) world).getHandle();
+        ServerLevel serverLevel = getServerLevel(world);
         Structure k = serverLevel
                 .registryAccess()
                 .registryOrThrow(Registries.STRUCTURE)
@@ -642,9 +636,8 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
 
         //FAWE start
         FaweBlockStateListPopulator populator = new FaweBlockStateListPopulator(serverLevel);
-        Map<BlockPos, CraftBlockState> placed = TaskManager.taskManager().sync(() -> {
-            serverLevel.captureTreeGeneration = true;
-            serverLevel.captureBlockStates = true;
+        List<CraftBlockState> placed = TaskManager.taskManager().sync(() -> {
+            preCaptureStates(serverLevel);
             try {
                 StructureStart structureStart = k.generate(
                         serverLevel.registryAccess(),
@@ -685,17 +678,12 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
                             ),
                             chunkPosx
                     ));
-                    Map<BlockPos, CraftBlockState> placedBlocks = populator.getList().stream().collect(Collectors.toMap(
-                            CraftBlockState::getPosition,
-                            craftBlockState -> craftBlockState
-                    ));
-                    placedBlocks.putAll(serverLevel.capturedBlockStates);
+                    List<CraftBlockState> placedBlocks = new ArrayList<>(populator.getList());
+                    placedBlocks.addAll(serverLevel.capturedBlockStates.values());
                     return placedBlocks;
                 }
             } finally {
-                serverLevel.captureBlockStates = false;
-                serverLevel.captureTreeGeneration = false;
-                serverLevel.capturedBlockStates.clear();
+                postCaptureBlockStates(serverLevel);
             }
         });
 
@@ -706,18 +694,17 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
     private boolean placeFeatureIntoSession(
             final EditSession editSession,
             final FaweBlockStateListPopulator populator,
-            final Map<BlockPos, CraftBlockState> placed
+            final List<CraftBlockState> placed
     ) {
         if (placed == null || placed.isEmpty()) {
             return false;
         }
 
-        for (Map.Entry<BlockPos, CraftBlockState> entry : placed.entrySet()) {
-            CraftBlockState craftBlockState = entry.getValue();
-            if (entry.getValue() == null) {
+        for (CraftBlockState craftBlockState : placed) {
+            if (craftBlockState == null) {
                 continue;
             }
-            BlockPos pos = entry.getKey();
+            BlockPos pos = craftBlockState.getPosition();
             editSession.setBlock(pos.getX(), pos.getY(), pos.getZ(), BukkitAdapter.adapt(craftBlockState.getBlockData()));
             BlockEntity blockEntity = populator.getBlockEntity(pos);
             if (blockEntity != null) {
