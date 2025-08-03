@@ -167,16 +167,14 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
                 continue;
             }
             // add each block and tile
-            char[] blocksGet;
-            char[] tmp = get.load(layer);
-            if (tmp == null) {
+            // assume "get" is a copy and doesn't get modified further
+            char[] blocksGet = get.load(layer);
+            if (blocksGet == null) {
                 blocksGet = FaweCache.INSTANCE.EMPTY_CHAR_4096;
-            } else {
-                System.arraycopy(tmp, 0, (blocksGet = new char[4096]), 0, 4096);
             }
-            char[] blocksSet;
+            // assume "set" is a copy and doesn't get modified further
             // loadIfPresent shouldn't be null if set.hasSection(layer) is true
-            System.arraycopy(Objects.requireNonNull(set.loadIfPresent(layer)), 0, (blocksSet = new char[4096]), 0, 4096);
+            char[] blocksSet = Objects.requireNonNull(set.loadIfPresent(layer));
 
             // Account for negative layers
             int by = layer << 4;
