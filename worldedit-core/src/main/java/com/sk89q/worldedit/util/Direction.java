@@ -66,6 +66,11 @@ public enum Direction {
     ASCENDING_EAST(Vector3.at(1, 1, 0), Flag.ASCENDING_CARDINAL, 0 + 18, 2 + 18), // 20
     ASCENDING_SOUTH(Vector3.at(0, 1, 1), Flag.ASCENDING_CARDINAL, 1 + 18, 3 + 18), // 21
     ASCENDING_WEST(Vector3.at(-1, 1, 0), Flag.ASCENDING_CARDINAL, 2 + 18, 0 + 18), // 22
+
+    DESCENDING_NORTH(Vector3.at(0, -1, -1), Flag.ASCENDING_CARDINAL, 3 + 22, 1 + 22), // 23
+    DESCENDING_EAST(Vector3.at(1, -1, 0), Flag.ASCENDING_CARDINAL, 0 + 22, 2 + 22), // 24
+    DESCENDING_SOUTH(Vector3.at(0, -1, 1), Flag.ASCENDING_CARDINAL, 1 + 22, 3 + 22), // 25
+    DESCENDING_WEST(Vector3.at(-1, -1, 0), Flag.ASCENDING_CARDINAL, 2 + 22, 0 + 22), // 26
     ;
     //FAWE end
 
