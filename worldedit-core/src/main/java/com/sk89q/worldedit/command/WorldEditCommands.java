@@ -75,8 +75,7 @@ public class WorldEditCommands {
     public void version(Actor actor) {
         //FAWE start - use own, minimized message that doesn't print "Platforms" and "Capabilities"
         FaweVersion fVer = Fawe.instance().getVersion();
-        String fVerStr = fVer == null ? "unknown" : "-" + fVer.build;
-        actor.print(TextComponent.of("FastAsyncWorldEdit" + fVerStr));
+        actor.print(TextComponent.of(fVer == null ? "FastAsyncWorldEdit-unknown" : fVer.toString()));
         actor.print(TextComponent.of("Authors: Empire92, MattBDev, IronApollo, dordsor21 and NotMyFault"));
         actor.print(TextComponent.of("Wiki: https://intellectualsites.github.io/fastasyncworldedit-documentation/")
                 .clickEvent(ClickEvent.openUrl("https://intellectualsites.github.io/fastasyncworldedit-documentation/")));
