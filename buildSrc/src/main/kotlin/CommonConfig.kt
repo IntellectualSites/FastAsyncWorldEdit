@@ -45,15 +45,15 @@ fun Project.applyCommonConfiguration() {
                     continue
                 }
                 add(conf.name, "com.google.guava:guava") {
-                    version { require("31.1-jre") }
+                    version { require("33.3.1-jre") }
                     because("Mojang provides Guava")
                 }
                 add(conf.name, "com.google.code.gson:gson") {
-                    version { require("2.10") }
+                    version { require("2.11.0") }
                     because("Mojang provides Gson")
                 }
                 add(conf.name, "it.unimi.dsi:fastutil") {
-                    version { require("8.5.9") }
+                    version { require("8.5.15") }
                     because("Mojang provides FastUtil")
                 }
             }

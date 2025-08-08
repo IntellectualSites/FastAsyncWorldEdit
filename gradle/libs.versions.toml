@@ -1,11 +1,11 @@
 [versions]
 # Minecraft expectations
 paper = "1.21-R0.1-SNAPSHOT"
-fastutil = "8.5.9"
-guava = "31.1-jre"
-log4j = "2.19.0"
-gson = "2.10"
-snakeyaml = "2.0"
+fastutil = "8.5.15"
+guava = "33.3.1-jre"
+log4j = "2.24.1"
+gson = "2.11.0"
+snakeyaml = "2.2"
 
 # Plugins
 dummypermscompat = "1.10"
