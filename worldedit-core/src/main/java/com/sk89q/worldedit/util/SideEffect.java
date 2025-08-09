@@ -24,16 +24,19 @@ import com.fastasyncworldedit.core.configuration.Settings;
 import java.util.Locale;
 
 public enum SideEffect {
-    //FAWE start - adjust defaults, add history and heightmaps
+    //FAWE start - adjust defaults, add history, heightmaps and entity events
     HISTORY(State.ON, true),
     HEIGHTMAPS(State.ON, true),
     LIGHTING(Settings.settings().LIGHTING.MODE == 0 ? State.OFF : State.ON, true),
     NEIGHBORS(State.OFF, true),
     UPDATE(State.OFF, true),
+    /**
+     * API use only.
+     */
+    ENTITY_EVENTS(State.ON, false),
     //FAWE end
     VALIDATION(State.OFF, true),
     ENTITY_AI(State.OFF, true),
-    ENTITY_EVENTS(State.ON, true),
     EVENTS(State.OFF, true),
     /**
      * Internal use only.
