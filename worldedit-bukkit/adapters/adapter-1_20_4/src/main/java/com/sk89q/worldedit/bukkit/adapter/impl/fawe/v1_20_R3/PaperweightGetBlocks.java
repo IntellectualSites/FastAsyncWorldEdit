@@ -680,16 +680,18 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
                                         z
                                 );
                                 if (!set.getSideEffectSet().shouldApply(SideEffect.ENTITY_EVENTS)) {
+                                    entity.spawnReason = CreatureSpawnEvent.SpawnReason.CUSTOM;
+                                    entity.generation = false;
                                     if (PaperLib.isPaper()) {
                                         if (!nmsWorld.getEntityLookup().addNewEntity(entity)) {
                                             onError.run();
                                         }
-                                        return;
+                                        continue;
                                     }
                                     // Not paper
                                     try {
                                         PaperweightPlatformAdapter.getEntitySectionManager(nmsWorld).addNewEntity(entity);
-                                        return;
+                                        continue;
                                     } catch (IllegalAccessException e) {
                                         // Fallback
                                         LOGGER.warn("Error bypassing entity events on spawn on Spigot", e);

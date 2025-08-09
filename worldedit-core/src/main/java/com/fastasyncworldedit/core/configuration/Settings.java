@@ -200,7 +200,7 @@ public class Settings extends Config {
                 }
                 limit.UNIVERSAL_DISALLOWED_BLOCKS &= newLimit.UNIVERSAL_DISALLOWED_BLOCKS;
                 limit.ALLOW_LEGACY &= newLimit.ALLOW_LEGACY;
-                limit.SKIP_ENTITY_SPAWN_EVENTS |= newLimit.SKIP_ENTITY_SPAWN_EVENTS;
+                limit.SKIP_ENTITY_SPAWN_EVENTS |= newLimit.SKIP_CREATURE_SPAWN_EVENTS;
 
                 if (limit.DISALLOWED_BLOCKS == null) {
                     limit.DISALLOWED_BLOCKS = newLimit.DISALLOWED_BLOCKS.isEmpty() ? Collections.emptySet() : new HashSet<>(
@@ -464,11 +464,11 @@ public class Settings extends Config {
         })
         public boolean ALLOW_LEGACY = true;
         @Comment({
-                "If sending entity spawn events should be skipped upon creation.",
+                "If sending creature spawn events should be skipped upon creation.",
                 " - Will not work when setting entities directly to a world, rather than using an EditSession(Builder)",
                 " - Setting fast-placement to false forces writing directly to the world (for example)."
         })
-        public boolean SKIP_ENTITY_SPAWN_EVENTS = true;
+        public boolean SKIP_CREATURE_SPAWN_EVENTS = false;
         @Comment({
                 "List of blocks to deny use of. Can be either an entire block type or a block with a specific property value.",
                 "Where block properties are specified, any blockstate with the property will be disallowed (e.g. all directions",
@@ -865,6 +865,11 @@ public class Settings extends Config {
                 "If unlimited limits should still require /confirm on large. Defaults to limits.default.confirm-large otherwise."
         })
         public boolean LIMIT_UNLIMITED_CONFIRMS = true;
+
+        @Comment({
+                "If unlimited limits should skip sending creature spawn events. Using //fast will still disable spawn events."
+        })
+        public boolean LIMIT_UNLIMITED_SKIPS_CREATURE_SPAWN_EVENTS = true;
 
     }
 

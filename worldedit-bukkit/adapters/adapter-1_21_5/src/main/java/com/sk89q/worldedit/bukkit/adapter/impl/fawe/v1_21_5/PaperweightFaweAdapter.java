@@ -322,10 +322,11 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
     }
 
     private static final Set<SideEffect> SUPPORTED_SIDE_EFFECTS = Sets.immutableEnumSet(
-            SideEffect.HISTORY,
-            SideEffect.HEIGHTMAPS,
-            SideEffect.LIGHTING,
-            SideEffect.NEIGHBORS
+        SideEffect.HISTORY,
+        SideEffect.HEIGHTMAPS,
+        SideEffect.LIGHTING,
+        SideEffect.NEIGHBORS,
+        SideEffect.ENTITY_EVENTS
     );
 
     @Override
