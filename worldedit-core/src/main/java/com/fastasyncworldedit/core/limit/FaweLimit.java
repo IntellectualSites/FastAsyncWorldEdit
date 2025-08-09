@@ -132,6 +132,7 @@ public class FaweLimit {
         MAX.STRIP_NBT = Collections.emptySet();
         MAX.UNIVERSAL_DISALLOWED_BLOCKS = false;
         MAX.ALLOW_LEGACY = true;
+        MAX.SKIP_ENTITY_SPAWN_EVENTS = Settings.settings().GENERAL.LIMIT_UNLIMITED_SKIPS_CREATURE_SPAWN_EVENTS;
         MAX.DISALLOWED_BLOCKS = Collections.emptySet();
         MAX.REMAP_PROPERTIES = Collections.emptySet();
         MAX.MAX_RADIUS = Integer.MAX_VALUE;
@@ -289,7 +290,7 @@ public class FaweLimit {
                 && (STRIP_NBT == null || STRIP_NBT.isEmpty())
                 // && !UNIVERSAL_DISALLOWED_BLOCKS --> do not include this, it effectively has no relevance
                 && ALLOW_LEGACY
-                && SKIP_ENTITY_SPAWN_EVENTS
+                // && SKIP_ENTITY_SPAWN_EVENTS --> do not include as it can be false for unlimited anyway
                 && (DISALLOWED_BLOCKS == null || DISALLOWED_BLOCKS.isEmpty())
                 && (REMAP_PROPERTIES == null || REMAP_PROPERTIES.isEmpty())
                 && MAX_RADIUS == Integer.MAX_VALUE
