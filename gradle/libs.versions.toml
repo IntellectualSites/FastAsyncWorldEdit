@@ -14,7 +14,7 @@ griefprevention = "17.0.0"
 griefdefender = "2.1.0-SNAPSHOT"
 residence = "4.5._13.1"
 towny = "0.101.2.1"
-plotsquared = "7.5.4"
+plotsquared = "7.5.6"
 
 # Third party
 bstats = "3.1.0"
