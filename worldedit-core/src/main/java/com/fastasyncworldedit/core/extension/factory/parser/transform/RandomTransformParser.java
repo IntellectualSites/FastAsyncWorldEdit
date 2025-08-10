@@ -23,7 +23,7 @@ public class RandomTransformParser extends InputParser<ResettableExtent> {
     }
 
     @Override
-    public Stream<String> getSuggestions(String input) {
+    public Stream<String> getSuggestions(String input, ParserContext context) {
         if (input.isEmpty()) {
             return Stream.empty();
         }
@@ -36,7 +36,7 @@ public class RandomTransformParser extends InputParser<ResettableExtent> {
             builder.append(split.get(i)).append(',');
         }
         String previous = builder.toString();
-        return worldEdit.getTransformFactory().getSuggestions(split.get(split.size() - 1)).stream()
+        return worldEdit.getTransformFactory().getSuggestions(split.getLast(), context).stream()
                 .map(s -> previous + s);
     }
 
