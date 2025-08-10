@@ -652,6 +652,7 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
 
                 syncTasks[1] = () -> {
                     Iterator<FaweCompoundTag> iterator = entities.iterator();
+                    // TODO: TheMeinerLP: Add LeashKnot again
                     while (iterator.hasNext()) {
                         final FaweCompoundTag nativeTag = iterator.next();
                         final LinCompoundTag linTag = nativeTag.linTag();
@@ -674,12 +675,14 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
                             Entity entity = type.create(nmsWorld);
                             if (entity != null) {
                                 final CompoundTag tag = (CompoundTag) adapter.fromNativeLin(linTag);
+                                // TODO: TheMeinerLP: Add LeashKnot again
                                 for (final String name : Constants.NO_COPY_ENTITY_NBT_FIELDS) {
                                     tag.remove(name);
                                 }
                                 entity.load(tag);
                                 entity.absMoveTo(x, y, z, yaw, pitch);
                                 entity.setUUID(NbtUtils.uuid(nativeTag));
+                                // TODO: TheMeinerLP: Add LeashKnot again
                                 if (!nmsWorld.addFreshEntity(entity, CreatureSpawnEvent.SpawnReason.CUSTOM)) {
                                     LOGGER.warn(
                                             "Error creating entity of type `{}` in world `{}` at location `{},{},{}`",
