@@ -31,11 +31,11 @@ dependencies {
     implementation(libs.gson)
 
     // Logging
-    implementation(libs.log4jBom) {
+    implementation(libs.log4j.bom) {
         because("We control Log4J on this platform")
     }
-    implementation(libs.log4jApi)
-    implementation(libs.log4jCore)
+    implementation(libs.log4j.api)
+    implementation(libs.log4j.core)
     implementation(libs.commonsCli)
     api(libs.parallelgzip) { isTransitive = false }
     api(libs.lz4Java)

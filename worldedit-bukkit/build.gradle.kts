@@ -87,8 +87,8 @@ dependencies {
     }
 
     // Logging
-    localImplementation(libs.log4jApi)
-    localImplementation(libs.log4jBom) {
+    localImplementation(libs.log4j.api)
+    localImplementation(libs.log4j.bom) {
         because("Spigot provides Log4J (sort of, not in API, implicitly part of server)")
     }
 
@@ -107,13 +107,13 @@ dependencies {
     compileOnly(libs.griefdefender) { isTransitive = false }
     compileOnly(libs.residence) { isTransitive = false }
     compileOnly(libs.towny) { isTransitive = false }
-    compileOnly(libs.plotSquaredBukkit) { isTransitive = false }
-    compileOnly(libs.plotSquaredCore) { isTransitive = false }
+    compileOnly(libs.plotsquared.bukkit) { isTransitive = false }
+    compileOnly(libs.plotsquared.core) { isTransitive = false }
 
     // Third party
     implementation(libs.paperlib)
-    implementation(libs.bstatsBukkit) { isTransitive = false }
-    implementation(libs.bstatsBase) { isTransitive = false }
+    implementation(libs.bstats.bukkit) { isTransitive = false }
+    implementation(libs.bstats.base) { isTransitive = false }
     implementation(libs.serverlib)
     implementation(libs.paster) { isTransitive = false }
     api(libs.lz4Java) { isTransitive = false }

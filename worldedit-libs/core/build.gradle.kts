@@ -9,9 +9,9 @@ dependencies {
         exclude(group = "junit", module = "junit")
     }
     "shade"(libs.jlibnoise)
-    "shade"(libs.piston)
-    "shade"(libs.pistonRuntime)
-    "shade"(libs.pistonImpl)
+    "shade"(libs.piston.core)
+    "shade"(libs.piston.coreAp.runtime)
+    "shade"(libs.piston.defaultImpl)
     // Linbus
     "shade"(platform(libs.linBus.bom))
     "shade"(libs.linBus.common)
