@@ -56,8 +56,8 @@ mod-publish-plugin = "0.8.4"
 # Minecraft expectations
 paper = { group = "io.papermc.paper", name = "paper-api", version.ref = "paper" }
 fastutil = { group = "it.unimi.dsi", name = "fastutil", version.ref = "fastutil" }
-log4jBom = { group = "org.apache.logging.log4j", name = "log4j-bom", version.ref = "log4j" }
-log4jApi = { group = "org.apache.logging.log4j", name = "log4j-api", version.ref = "log4j" }
+log4j-bom = { group = "org.apache.logging.log4j", name = "log4j-bom", version.ref = "log4j" }
+log4j-api = { group = "org.apache.logging.log4j", name = "log4j-api", version.ref = "log4j" }
 guava = { group = "com.google.guava", name = "guava", version.ref = "guava" }
 gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
 snakeyaml = { group = "org.yaml", name = "snakeyaml", version.ref = "snakeyaml" }
@@ -69,12 +69,12 @@ griefprevention = { group = "com.github.TechFortress", name = "GriefPrevention",
 griefdefender = { group = "com.griefdefender", name = "api", version.ref = "griefdefender" }
 residence = { group = "com.bekvon.bukkit.residence", name = "Residence", version.ref = "residence" }
 towny = { group = "com.palmergames.bukkit.towny", name = "towny", version.ref = "towny" }
-plotSquaredCore = { group = "com.intellectualsites.plotsquared", name = "plotsquared-core", version.ref = "plotsquared" }
-plotSquaredBukkit = { group = "com.intellectualsites.plotsquared", name = "plotsquared-bukkit", version.ref = "plotsquared" }
+plotsquared-core = { group = "com.intellectualsites.plotsquared", name = "plotsquared-core", version.ref = "plotsquared" }
+plotsquared-bukkit = { group = "com.intellectualsites.plotsquared", name = "plotsquared-bukkit", version.ref = "plotsquared" }
 
 # Third Party
-bstatsBase = { group = "org.bstats", name = "bstats-base", version.ref = "bstats" }
-bstatsBukkit = { group = "org.bstats", name = "bstats-bukkit", version.ref = "bstats" }
+bstats-base = { group = "org.bstats", name = "bstats-base", version.ref = "bstats" }
+bstats-bukkit = { group = "org.bstats", name = "bstats-bukkit", version.ref = "bstats" }
 sparsebitset = { group = "com.zaxxer", name = "SparseBitSet", version.ref = "sparsebitset" }
 parallelgzip = { group = "org.anarres", name = "parallelgzip", version.ref = "parallelgzip" }
 truezip = { group = "de.schlichtherle", name = "truezip", version.ref = "truezip" }
@@ -84,8 +84,8 @@ findbugs = { group = "com.google.code.findbugs", name = "jsr305", version.ref = 
 rhino = { group = "org.mozilla", name = "rhino-runtime", version.ref = "rhino-runtime" }
 zstd = { group = "com.github.luben", name = "zstd-jni", version.ref = "zstd-jni" }
 antlr4 = { group = "org.antlr", name = "antlr4", version.ref = "antlr4" }
-antlr4Runtime = { group = "org.antlr", name = "antlr4-runtime", version.ref = "antlr4" }
-jsonSimple = { group = "com.googlecode.json-simple", name = "json-simple", version.ref = "json-simple" }
+antlr4-runtime = { group = "org.antlr", name = "antlr4-runtime", version.ref = "antlr4" }
+json-simple = { group = "com.googlecode.json-simple", name = "json-simple", version.ref = "json-simple" }
 jlibnoise = { group = "com.sk89q.lib", name = "jlibnoise", version.ref = "jlibnoise" }
 jchronic = { group = "com.sk89q", name = "jchronic", version.ref = "jchronic" }
 lz4Java = { group = "org.lz4", name = "lz4-java", version.ref = "lz4-java" }
@@ -113,15 +113,15 @@ adventureTextSerializerGson = { group = "net.kyori", name = "text-serializer-gso
 adventureTextSerializerLegacy = { group = "net.kyori", name = "text-serializer-legacy", version.ref = "text" }
 adventureTextSerializerPlain = { group = "net.kyori", name = "text-serializer-plain", version.ref = "text" }
 ## Piston
-piston = { group = "org.enginehub.piston", name = "core", version.ref = "piston" }
-pistonImpl = { group = "org.enginehub.piston", name = "default-impl", version.ref = "piston" }
-pistonAnnotations = { group = "org.enginehub.piston.core-ap", name = "annotations", version.ref = "piston" }
-pistonProcessor = { group = "org.enginehub.piston.core-ap", name = "processor", version.ref = "piston" }
-pistonRuntime = { group = "org.enginehub.piston.core-ap", name = "runtime", version.ref = "piston" }
+piston-core = { group = "org.enginehub.piston", name = "core", version.ref = "piston" }
+piston-defaultImpl = { group = "org.enginehub.piston", name = "default-impl", version.ref = "piston" }
+piston-coreAp-annotations = { group = "org.enginehub.piston.core-ap", name = "annotations", version.ref = "piston" }
+piston-coreAp-processor = { group = "org.enginehub.piston.core-ap", name = "processor", version.ref = "piston" }
+piston-coreAp-runtime = { group = "org.enginehub.piston.core-ap", name = "runtime", version.ref = "piston" }
 
 # Tests
 mockito = { group = "org.mockito", name = "mockito-core", version.ref = "mockito" }
-log4jCore = { group = "org.apache.logging.log4j", name = "log4j-core", version.ref = "log4j" }
+log4j-core = { group = "org.apache.logging.log4j", name = "log4j-core", version.ref = "log4j" }
 
 [plugins]
 pluginyml = { id = "net.minecrell.plugin-yml.bukkit", version.ref = "pluginyml" }

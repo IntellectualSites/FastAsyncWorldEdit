@@ -1,4 +1,5 @@
 import org.gradle.plugins.ide.idea.model.IdeaModel
+import org.gradle.api.plugins.antlr.AntlrTask
 
 plugins {
     `java-library`
@@ -31,10 +32,10 @@ dependencies {
     implementation(libs.snakeyaml)
 
     // Logging
-    implementation(libs.log4jApi)
+    implementation(libs.log4j.api)
 
     // Plugins
-    compileOnly(libs.plotSquaredCore) { isTransitive = false }
+    compileOnly(libs.plotsquared.core) { isTransitive = false }
 
     // ensure this is on the classpath for the AP
     annotationProcessor(libs.guava)
@@ -53,12 +54,12 @@ dependencies {
     compileOnly(libs.sparsebitset)
     compileOnly(libs.parallelgzip) { isTransitive = false }
     antlr(libs.antlr4)
-    implementation(libs.antlr4Runtime)
-    implementation(libs.jsonSimple) { isTransitive = false }
+    implementation(libs.antlr4.runtime)
+    implementation(libs.json.simple) { isTransitive = false }
     implementation(platform(libs.linBus.bom))
 
     // Tests
-    testRuntimeOnly(libs.log4jCore)
+    testRuntimeOnly(libs.log4j.core)
     testImplementation(libs.parallelgzip)
 }
 

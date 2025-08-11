@@ -1,6 +1,6 @@
 applyLibrariesConfiguration()
 
 dependencies {
-    "shade"(libs.pistonAnnotations)
-    "shade"(libs.pistonProcessor)
+    "shade"(libs.piston.coreAp.annotations)
+    "shade"(libs.piston.coreAp.processor)
 }
