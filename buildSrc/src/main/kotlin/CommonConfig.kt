@@ -10,7 +10,11 @@ fun Project.applyCommonConfiguration() {
     version = rootProject.version
 
     repositories {
-        mavenCentral()
+        mavenCentral {
+            mavenContent {
+                releasesOnly()
+            }
+        }
         maven {
             name = "EngineHub"
             url = uri("https://maven.enginehub.org/repo/")
@@ -21,6 +25,9 @@ fun Project.applyCommonConfiguration() {
         maven {
             name = "OSS Sonatype Snapshots"
             url = uri("https://oss.sonatype.org/content/repositories/snapshots/")
+            mavenContent {
+                snapshotsOnly()
+            }
         }
         maven {
             name = "Athion"
@@ -37,7 +44,7 @@ fun Project.applyCommonConfiguration() {
 
     configurations.all {
         resolutionStrategy {
-            cacheChangingModulesFor(5, "MINUTES")
+            cacheChangingModulesFor(1, "DAYS")
         }
     }
 
