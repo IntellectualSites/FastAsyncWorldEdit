@@ -184,39 +184,40 @@ tasks.withType<ShadowJar>().configureEach {
 
         exclude(dependency("$group:$name"))
 
-        include(dependency(":worldedit-core"))
-        include(dependency(":worldedit-libs:bukkit"))
+        include(dependency(projects.worldeditCore))
+        include(dependency(projects.worldeditLibs.bukkit))
         // Purposefully not included, we assume (even though no API exposes it) that Log4J will be present at runtime
         // If it turns out not to be true for Spigot/Paper, our only two official platforms, this can be uncommented.
         // include(dependency("org.apache.logging.log4j:log4j-api"))
-        include(dependency("org.antlr:antlr4-runtime"))
+        include(dependency(libs.antlr4.runtime))
         // ZSTD does not work if relocated. https://github.com/luben/zstd-jni/issues/189 Use not latest as it can be difficult
         // to obtain latest ZSTD lib
-        include(dependency("com.github.luben:zstd-jni:1.4.8-1"))
+        include(dependency(libs.zstd))
         relocate("org.bstats", "com.sk89q.worldedit.bstats") {
-            include(dependency("org.bstats:"))
+            include(dependency(libs.bstats.bukkit))
+            include(dependency(libs.bstats.base))
         }
         relocate("io.papermc.lib", "com.sk89q.worldedit.bukkit.paperlib") {
-            include(dependency("io.papermc:paperlib"))
+            include(dependency(libs.paperlib))
         }
         relocate("it.unimi.dsi.fastutil", "com.sk89q.worldedit.bukkit.fastutil") {
-            include(dependency("it.unimi.dsi:fastutil"))
+            include(dependency(libs.fastutil))
         }
         relocate("net.royawesome.jlibnoise", "com.sk89q.worldedit.jlibnoise")
         relocate("org.incendo.serverlib", "com.fastasyncworldedit.serverlib") {
-            include(dependency("dev.notmyfault.serverlib:ServerLib:2.3.7"))
+            include(dependency(libs.serverlib))
         }
         relocate("com.intellectualsites.paster", "com.fastasyncworldedit.paster") {
-            include(dependency("com.intellectualsites.paster:Paster"))
+            include(dependency(libs.paster))
         }
         relocate("org.lz4", "com.fastasyncworldedit.core.lz4") {
-            include(dependency("org.lz4:lz4-java:1.8.0"))
+            include(dependency(libs.lz4Java))
         }
         relocate("com.zaxxer", "com.fastasyncworldedit.core.math") {
-            include(dependency("com.zaxxer:SparseBitSet:1.3"))
+            include(dependency(libs.sparsebitset))
         }
         relocate("org.anarres", "com.fastasyncworldedit.core.internal.io") {
-            include(dependency("org.anarres:parallelgzip:1.0.5"))
+            include(dependency(libs.parallelgzip))
         }
     }
 
@@ -230,7 +231,7 @@ tasks.withType<ShadowJar>().configureEach {
     }
 }
 
-tasks.named("assemble").configure {
+tasks.named<DefaultTask>("assemble").configure {
     dependsOn("shadowJar")
     dependsOn("reobfShadowJar")
 }

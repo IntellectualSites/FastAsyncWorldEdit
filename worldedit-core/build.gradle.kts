@@ -81,7 +81,7 @@ tasks.named<AntlrTask>("generateGrammarSource").configure {
     )
 }
 
-tasks.named("sourcesJar") {
+tasks.named<Jar>("sourcesJar") {
     mustRunAfter("generateGrammarSource")
 }
 
@@ -104,8 +104,10 @@ sourceSets.named("main") {
 
 tasks.named<Copy>("processResources") {
     filesMatching("fawe.properties") {
-        expand("version" to "$version",
+        expand(
+                "version" to "$version",
                 "commit" to "${rootProject.ext["revision"]}",
-                "date" to "${rootProject.ext["date"]}")
+                "date" to "${rootProject.ext["date"]}"
+        )
     }
 }
