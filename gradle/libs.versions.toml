@@ -25,7 +25,7 @@ adventure-bukkit = "4.4.1"
 checkerqual = "3.51.0"
 truezip = "6.8.4"
 auto-value = "1.11.0"
-findbugs = "3.0.2"
+jsr305 = "3.0.2"
 rhino-runtime = "1.7.15"
 zstd-jni = "1.4.8-1" # Not latest as it can be difficult to obtain latest ZSTD libs
 antlr4 = "4.13.2"
@@ -47,12 +47,31 @@ piston = "0.5.10"
 
 # Tests
 mockito = "5.19.0"
+junit = "5.11.1"
 
 # Gradle plugins
 pluginyml = "0.6.0"
 mod-publish-plugin = "0.8.4"
+grgit = "5.3.2"
+shadow = "9.0.1"
+paperweight = "2.0.0-SNAPSHOT"
+codecov = "0.2.0"
+
+
+jqwik = "1.9.0"
+
+# Minimum versions we apply to make dependencies support newer Java
+minimumAsm = "9.7"
+minimumJdependency = "2.10"
+#minimumTinyRemapper = "0.8.11"
+
 
 [libraries]
+# Gradle plugins
+grgit = { group = "org.ajoberstar.grgit", name = "grgit-gradle", version.ref = "grgit" }
+shadow = { group = "com.gradleup.shadow", name = "shadow-gradle-plugin", version.ref = "shadow" }
+paperweight = { group = "io.papermc.paperweight.userdev", name = "io.papermc.paperweight.userdev.gradle.plugin", version.ref = "paperweight" }
+
 # Minecraft expectations
 paper = { group = "io.papermc.paper", name = "paper-api", version.ref = "paper" }
 fastutil = { group = "it.unimi.dsi", name = "fastutil", version.ref = "fastutil" }
@@ -77,10 +96,10 @@ bstats-base = { group = "org.bstats", name = "bstats-base", version.ref = "bstat
 bstats-bukkit = { group = "org.bstats", name = "bstats-bukkit", version.ref = "bstats" }
 sparsebitset = { group = "com.zaxxer", name = "SparseBitSet", version.ref = "sparsebitset" }
 parallelgzip = { group = "org.anarres", name = "parallelgzip", version.ref = "parallelgzip" }
-truezip = { group = "de.schlichtherle", name = "truezip", version.ref = "truezip" }
-autoValueAnnotations = { group = "com.google.auto.value", name = "auto-value-annotations", version.ref = "auto-value" }
+trueZip = { group = "de.schlichtherle", name = "truezip", version.ref = "truezip" }
 autoValue = { group = "com.google.auto.value", name = "auto-value", version.ref = "auto-value" }
-findbugs = { group = "com.google.code.findbugs", name = "jsr305", version.ref = "findbugs" }
+autoValue-annotations = { group = "com.google.auto.value", name = "auto-value-annotations", version.ref = "auto-value" }
+jsr305 = { group = "com.google.code.findbugs", name = "jsr305", version.ref = "jsr305" }
 rhino = { group = "org.mozilla", name = "rhino-runtime", version.ref = "rhino-runtime" }
 zstd = { group = "com.github.luben", name = "zstd-jni", version.ref = "zstd-jni" }
 antlr4 = { group = "org.antlr", name = "antlr4", version.ref = "antlr4" }
@@ -99,6 +118,7 @@ paster = { group = "com.intellectualsites.paster", name = "Paster", version.ref 
 vault = { group = "com.github.MilkBowl", name = "VaultAPI", version.ref = "vault" }
 serverlib = { group = "dev.notmyfault.serverlib", name = "ServerLib", version.ref = "serverlib" }
 checkerqual = { group = "org.checkerframework", name = "checker-qual", version.ref = "checkerqual" }
+
 linBus-bom = { group = "org.enginehub.lin-bus", name = "lin-bus-bom", version.ref = "linbus" }
 linBus-common = { group = "org.enginehub.lin-bus", name = "lin-bus-common" }
 linBus-stream = { group = "org.enginehub.lin-bus", name = "lin-bus-stream" }
@@ -107,22 +127,48 @@ linBus-format-snbt = { group = "org.enginehub.lin-bus.format", name = "lin-bus-f
 
 # Internal
 ## Text
-adventureTextAdapterBukkit = { group = "net.kyori", name = "text-adapter-bukkit", version.ref = "text-adapter" }
-adventureTextApi = { group = "net.kyori", name = "text-api", version.ref = "text" }
-adventureTextSerializerGson = { group = "net.kyori", name = "text-serializer-gson", version.ref = "text" }
-adventureTextSerializerLegacy = { group = "net.kyori", name = "text-serializer-legacy", version.ref = "text" }
-adventureTextSerializerPlain = { group = "net.kyori", name = "text-serializer-plain", version.ref = "text" }
-## Piston
-piston-core = { group = "org.enginehub.piston", name = "core", version.ref = "piston" }
-piston-defaultImpl = { group = "org.enginehub.piston", name = "default-impl", version.ref = "piston" }
-piston-coreAp-annotations = { group = "org.enginehub.piston.core-ap", name = "annotations", version.ref = "piston" }
-piston-coreAp-processor = { group = "org.enginehub.piston.core-ap", name = "processor", version.ref = "piston" }
-piston-coreAp-runtime = { group = "org.enginehub.piston.core-ap", name = "runtime", version.ref = "piston" }
+kyoriText-adapter-bukkit = { group = "net.kyori", name = "text-adapter-bukkit", version.ref = "text-adapter" }
+kyoriText-api = { group = "net.kyori", name = "text-api", version.ref = "text" }
+kyoriText-serializer-gson = { group = "net.kyori", name = "text-serializer-gson", version.ref = "text" }
+kyoriText-serializer-legacy = { group = "net.kyori", name = "text-serializer-legacy", version.ref = "text" }
+kyoriText-serializer-plain = { group = "net.kyori", name = "text-serializer-plain", version.ref = "text" }
 
-# Tests
-mockito = { group = "org.mockito", name = "mockito-core", version.ref = "mockito" }
+junit-bom = { group = "org.junit", name = "junit-bom", version.ref = "junit" }
+junit-jupiter-api = { group = "org.junit.jupiter", name = "junit-jupiter-api" }
+junit-jupiter-params = { group = "org.junit.jupiter", name = "junit-jupiter-params" }
+junit-jupiter-engine = { group = "org.junit.jupiter", name = "junit-jupiter-engine" }
+
+jqwik = { group = "net.jqwik", name = "jqwik", version.ref = "jqwik" }
+
+mockito-bom = { group = "org.mockito", name = "mockito-bom", version.ref = "mockito" }
+mockito-core = { group = "org.mockito", name = "mockito-core" }
+mockito-junit-jupiter = { group = "org.mockito", name = "mockito-core" }
+
 log4j-core = { group = "org.apache.logging.log4j", name = "log4j-core", version.ref = "log4j" }
+
+## Piston
+[libraries.piston-core]
+module = "org.enginehub.piston:core"
+version.ref = "piston"
+
+[libraries.piston-defaultImpl]
+module = "org.enginehub.piston:default-impl"
+version.ref = "piston"
+
+[libraries.piston-coreAp-annotations]
+module = "org.enginehub.piston.core-ap:annotations"
+version.ref = "piston"
+
+[libraries.piston-coreAp-processor]
+module = "org.enginehub.piston.core-ap:processor"
+version.ref = "piston"
+
+[libraries.piston-coreAp-runtime]
+module = "org.enginehub.piston.core-ap:runtime"
+version.ref = "piston"
+
 
 [plugins]
 pluginyml = { id = "net.minecrell.plugin-yml.bukkit", version.ref = "pluginyml" }
 mod-publish-plugin = { id = "me.modmuss50.mod-publish-plugin", version.ref = "mod-publish-plugin" }
+codecov = { id = "org.enginehub.codecov", version.ref = "codecov" }

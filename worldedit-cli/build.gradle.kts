@@ -2,43 +2,33 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 plugins {
     `java-library`
-
+    id("buildlogic.platform")
     alias(libs.plugins.pluginyml)
 }
 
-project.description = "CLI"
-
-applyPlatformAndCoreConfiguration()
-applyShadowConfiguration()
-
-addJarManifest(
-        WorldEditKind.Standalone("com.sk89q.worldedit.cli.CLIWorldEdit"),
-        extraAttributes = mapOf(
-                // We don't have any multi-release stuff, but Log4J does.
-                "Multi-Release" to "true",
-        ),
-)
+platform {
+    kind = buildlogic.WorldEditKind.Standalone("com.sk89q.worldedit.cli.CLIWorldEdit")
+    extraAttributes = mapOf(
+        // We don't have any multi-release stuff, but Log4J does.
+        "Multi-Release" to "true",
+    )
+}
 
 dependencies {
-    // Modules
-    api(projects.worldeditCore)
-    compileOnly(projects.worldeditLibs.core.ap)
-    annotationProcessor(projects.worldeditLibs.core.ap)
-
-    // Minecraft expectations
-    annotationProcessor(libs.guava)
-    implementation(libs.guava)
-    implementation(libs.gson)
-
-    // Logging
-    implementation(libs.log4j.bom) {
+    "compileOnly"(project(":worldedit-libs:core:ap"))
+    "annotationProcessor"(project(":worldedit-libs:core:ap"))
+    "annotationProcessor"(libs.guava)
+    "api"(project(":worldedit-core"))
+    "implementation"(platform(libs.log4j.bom)) {
         because("We control Log4J on this platform")
     }
-    implementation(libs.log4j.api)
-    implementation(libs.log4j.core)
-    implementation(libs.commonsCli)
-    api(libs.parallelgzip) { isTransitive = false }
-    api(libs.lz4Java)
+    "implementation"(libs.log4j.api)
+    "implementation"(libs.log4j.core)
+    "implementation"(libs.commonsCli)
+    "implementation"(libs.guava)
+    "implementation"(libs.gson)
+    "api"(libs.parallelgzip) { isTransitive = false }
+    "api"(libs.lz4Java)
 }
 
 tasks.named<ShadowJar>("shadowJar") {
@@ -48,6 +38,7 @@ tasks.named<ShadowJar>("shadowJar") {
         relocate("net.jpountz", "com.fastasyncworldedit.core.jpountz")
         relocate("org.lz4", "com.fastasyncworldedit.core.lz4")
     }
+    //TODO Upstream doesn't include the line below so we should see if we need it or not.
     archiveFileName.set(moduleIdentifier)
     minimize {
         exclude(dependency("org.apache.logging.log4j:log4j-core"))
@@ -56,6 +47,13 @@ tasks.named<ShadowJar>("shadowJar") {
 
 tasks.named("assemble").configure {
     dependsOn("shadowJar")
+}
+
+configure<PublishingExtension> {
+    publications.named<MavenPublication>("maven") {
+        artifactId = the<BasePluginExtension>().archivesName.get()
+        from(components["java"])
+    }
 }
 
 val moduleIdentifier = "${rootProject.name}-${project.description}-${project.version}.jar"

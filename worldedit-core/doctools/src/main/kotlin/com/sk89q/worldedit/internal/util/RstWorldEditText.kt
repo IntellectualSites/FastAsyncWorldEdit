@@ -53,8 +53,8 @@ private fun formatAsRst(component: Component, currentDeco: String? = null): Char
             deco?.let {
                 require(currentDeco == null) {
                     "Nested decorations are hell in RST. \n" +
-                            "Existing: $currentDeco; New: $deco\n" +
-                            "Offender: ${TextHelper.reduceToText(component)}"
+                        "Existing: $currentDeco; New: $deco\n" +
+                        "Offender: ${TextHelper.reduceToText(component)}"
                 }
                 content.rstDeco(deco)
             }

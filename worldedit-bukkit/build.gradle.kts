@@ -4,13 +4,14 @@ import me.modmuss50.mpp.ReleaseType
 
 plugins {
     `java-library`
+    id("buildlogic.platform")
     alias(libs.plugins.mod.publish.plugin)
 }
 
-project.description = "Bukkit"
-
-applyPlatformAndCoreConfiguration()
-applyShadowConfiguration()
+platform {
+    kind = buildlogic.WorldEditKind.Plugin
+    includeClasspath = true
+}
 
 repositories {
     maven {
@@ -18,9 +19,10 @@ repositories {
         url = uri("https://repo.papermc.io/repository/maven-public/")
     }
     maven {
-        name = "EngineHub"
+        name = "EngineHub Repository"
         url = uri("https://maven.enginehub.org/repo/")
     }
+    mavenCentral()
     maven {
         name = "JitPack"
         url = uri("https://jitpack.io")
@@ -38,6 +40,10 @@ repositories {
         url = uri("https://repo.glaremasters.me/repository/towny/")
     }
     maven("https://s01.oss.sonatype.org/content/repositories/snapshots/") // TODO Remove when 4.17.0 is released
+    maven {
+        name = "Athion"
+        url = uri("https://ci.athion.net/plugin/repository/tools/")
+    }
     flatDir { dir(File("src/main/resources")) }
 }
 
@@ -46,6 +52,8 @@ val localImplementation = configurations.create("localImplementation") {
     isCanBeConsumed = false
     isCanBeResolved = false
 }
+configurations["compileOnly"].extendsFrom(localImplementation)
+configurations["testImplementation"].extendsFrom(localImplementation)
 
 val adapters = configurations.create("adapters") {
     description = "Adapters to include in the JAR (Mojmap)"
@@ -69,34 +77,31 @@ val adaptersReobf = configurations.create("adaptersReobf") {
 }
 
 dependencies {
-    // Modules
-    api(projects.worldeditCore)
-    api(projects.worldeditLibs.bukkit)
+    "api"(project(":worldedit-core"))
+    "api"(project(":worldedit-libs:bukkit"))
+
+    "localImplementation"(libs.paper) {
+        exclude("junit", "junit")
+        exclude(group = "org.slf4j", module = "slf4j-api")
+    }
+    "localImplementation"(platform(libs.log4j.bom)) {
+        because("Spigot provides Log4J (sort of, not in API, implicitly part of server)")
+    }
+    "localImplementation"(libs.log4j.api)
+
+    "implementation"(libs.paperlib)
+    "compileOnly"(libs.dummypermscompat) {
+        exclude("com.github.MilkBowl", "VaultAPI")
+    }
+    "implementation"(libs.bstats.bukkit) { isTransitive = false }
+    "implementation"(libs.bstats.base) { isTransitive = false }
+    "implementation"(libs.fastutil)
 
     project.project(":worldedit-bukkit:adapters").subprojects.forEach {
         "adapters"(project(it.path))
     }
-
-    // Minecraft expectations
-    implementation(libs.fastutil)
-
-    // Platform expectations
-    compileOnly(libs.paper) {
-        exclude("junit", "junit")
-        exclude(group = "org.slf4j", module = "slf4j-api")
-    }
-
-    // Logging
-    localImplementation(libs.log4j.api)
-    localImplementation(libs.log4j.bom) {
-        because("Spigot provides Log4J (sort of, not in API, implicitly part of server)")
-    }
-
     // Plugins
     compileOnly(libs.vault) { isTransitive = false }
-    compileOnly(libs.dummypermscompat) {
-        exclude("com.github.MilkBowl", "VaultAPI")
-    }
     compileOnly(libs.worldguard) {
         exclude("com.sk89q.worldedit", "worldedit-bukkit")
         exclude("com.sk89q.worldedit", "worldedit-core")
@@ -111,9 +116,6 @@ dependencies {
     compileOnly(libs.plotsquared.core) { isTransitive = false }
 
     // Third party
-    implementation(libs.paperlib)
-    implementation(libs.bstats.bukkit) { isTransitive = false }
-    implementation(libs.bstats.base) { isTransitive = false }
     implementation(libs.serverlib)
     implementation(libs.paster) { isTransitive = false }
     api(libs.lz4Java) { isTransitive = false }
@@ -123,7 +125,6 @@ dependencies {
     compileOnlyApi(libs.checkerqual)
 
     // Tests
-    testImplementation(libs.mockito)
     testImplementation(libs.adventureApi)
     testImplementation(libs.checkerqual)
     testImplementation(libs.paper) { isTransitive = true }
@@ -136,15 +137,6 @@ tasks.named<Copy>("processResources") {
         expand(mapOf("internalVersion" to internalVersion))
     }
 }
-
-tasks.named<Jar>("jar") {
-    manifest {
-        attributes("Class-Path" to CLASSPATH,
-                "WorldEdit-Version" to project.version)
-    }
-}
-
-addJarManifest(WorldEditKind.Plugin, includeClasspath = true)
 
 tasks.register<ShadowJar>("reobfShadowJar") {
     archiveFileName.set("${rootProject.name}-Bukkit-${project.version}.${archiveExtension.getOrElse("jar")}")
@@ -220,7 +212,6 @@ tasks.withType<ShadowJar>().configureEach {
             include(dependency(libs.parallelgzip))
         }
     }
-
     project.project(":worldedit-bukkit:adapters").subprojects.forEach {
         dependencies {
             include(dependency("${it.group}:${it.name}"))
@@ -231,7 +222,7 @@ tasks.withType<ShadowJar>().configureEach {
     }
 }
 
-tasks.named<DefaultTask>("assemble").configure {
+tasks.named("assemble").configure {
     dependsOn("shadowJar")
     dependsOn("reobfShadowJar")
 }
@@ -280,4 +271,10 @@ publishMods {
     }
 
     // dryRun.set(true) // For testing
+}
+
+configure<PublishingExtension> {
+    publications.named<MavenPublication>("maven") {
+        from(components["java"])
+    }
 }

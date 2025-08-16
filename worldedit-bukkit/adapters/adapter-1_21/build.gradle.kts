@@ -1,13 +1,8 @@
 import io.papermc.paperweight.userdev.PaperweightUserDependenciesExtension
 
 plugins {
-    java
-}
+    id("buildlogic.adapter")
 
-applyPaperweightAdapterConfiguration()
-
-repositories {
-    gradlePluginPortal()
 }
 
 dependencies {
