@@ -152,7 +152,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                 fieldThreadingDetector.setAccessible(true);
                 fieldLock = ThreadingDetector.class.getDeclaredField(Refraction.pickName("lock", "c"));
                 fieldLock.setAccessible(true);
-                SERVER_LEVEL_ENTITY_MANAGER = ServerLevel.class.getDeclaredField(Refraction.pickName("entityManager", "N"));
+                SERVER_LEVEL_ENTITY_MANAGER = ServerLevel.class.getDeclaredField(Refraction.pickName("entityManager", "O"));
                 SERVER_LEVEL_ENTITY_MANAGER.setAccessible(true);
             } else {
                 // in paper, the used methods are synchronized properly
