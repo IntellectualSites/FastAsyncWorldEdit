@@ -1003,19 +1003,29 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
 
     @Override
     @SuppressWarnings("unchecked")
-    public synchronized boolean trim(boolean aggressive) {
-        skyLight = new DataLayer[getSectionCount()];
-        blockLight = new DataLayer[getSectionCount()];
+    public boolean trim(boolean aggressive) {
+        synchronized (this) {
+            if (sections == null && (!aggressive || levelChunk == null)) {
+                skyLight = new DataLayer[getSectionCount()];
+                blockLight = new DataLayer[getSectionCount()];
+                return !aggressive || super.trim(true);
+            }
+        }
         if (aggressive) {
             sectionLock.writeLock().lock();
-            sections = null;
-            levelChunk = null;
-            sectionLock.writeLock().unlock();
-            return super.trim(true);
-        } else if (sections == null) {
-            // don't bother trimming if there are no sections stored.
-            return true;
-        } else {
+            try {
+                synchronized (this) {
+                    skyLight = new DataLayer[getSectionCount()];
+                    blockLight = new DataLayer[getSectionCount()];
+                    sections = null;
+                    levelChunk = null;
+                    return super.trim(true);
+                }
+            } finally {
+                sectionLock.writeLock().unlock();
+            }
+        }
+        synchronized (this) {
             for (int i = getMinSectionPosition(); i <= getMaxSectionPosition(); i++) {
                 int layer = i - getMinSectionPosition();
                 if (!hasSection(i) || super.blocks[layer] == null) {
