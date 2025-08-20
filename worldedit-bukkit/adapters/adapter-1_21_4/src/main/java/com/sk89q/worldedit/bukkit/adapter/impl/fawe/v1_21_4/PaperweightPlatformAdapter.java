@@ -20,13 +20,10 @@ import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import io.papermc.lib.PaperLib;
-import io.papermc.paper.antixray.ChunkPacketBlockControllerAntiXray;
-import io.papermc.paper.antixray.ChunkPacketInfoAntiXray;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.IdMap;
 import net.minecraft.core.Registry;
-import net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData;
 import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ChunkHolder;
@@ -105,8 +102,6 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
     private static final MethodHandle methodremoveTickingBlockEntity;
 
     private static final Field fieldRemove;
-
-    private static final Field fieldChunkData;
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
 
@@ -191,16 +186,6 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             );
             palettedContaienrGet.setAccessible(true);
             PALETTED_CONTAINER_GET = lookup.unreflect(palettedContaienrGet);
-
-            if (PaperLib.isPaper()) {
-                fieldChunkData = ClientboundLevelChunkWithLightPacket.class.getDeclaredField(Refraction.pickName(
-                        "chunkData",
-                        "d"
-                ));
-                fieldChunkData.setAccessible(true);
-            } else {
-                fieldChunkData = null; // not needed on Spigot as we don't touch Anti-X-Ray there
-            }
         } catch (RuntimeException | Error e) {
             throw e;
         } catch (Exception e) {
@@ -363,19 +348,8 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                             nmsWorld.getLightEngine(),
                             null,
                             null,
-                            false // false so we can handle anti-X-Ray ourselves
+                            obfuscateAntiXRay
                     );
-                    if (obfuscateAntiXRay && nmsWorld.chunkPacketBlockController instanceof ChunkPacketBlockControllerAntiXray antiXray) {
-                        ChunkPacketInfoAntiXray info = antiXray.getChunkPacketInfo(packet, levelChunk);
-                        info.setNearbyChunks(
-                                nmsWorld.getChunkIfLoaded(chunkX - 1, chunkZ),
-                                nmsWorld.getChunkIfLoaded(chunkX + 1, chunkZ),
-                                nmsWorld.getChunkIfLoaded(chunkX, chunkZ - 1),
-                                nmsWorld.getChunkIfLoaded(chunkX, chunkZ + 1)
-                        );
-                        fieldChunkData.set(packet, new ClientboundLevelChunkPacketData(levelChunk, info));
-                        antiXray.obfuscate(info);
-                    }
                 } else {
                     // deprecated on paper - deprecation suppressed
                     packet = new ClientboundLevelChunkWithLightPacket(
@@ -386,8 +360,6 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                     );
                 }
                 nearbyPlayers(nmsWorld, pos).forEach(p -> p.connection.send(packet));
-            } catch (IllegalAccessException e) {
-                LOGGER.error("Failed to reflectively apply anti x-ray data", e);
             } finally {
                 NMSAdapter.endChunkPacketSend(nmsWorld.getWorld().getName(), pair, lockHolder);
             }
