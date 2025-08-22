@@ -261,7 +261,7 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
         @Override
         public boolean isFormat(File file) {
             String name = file.getName().toLowerCase(Locale.ROOT);
-            if (!name.endsWith(".schematic") && !name.endsWith(".mcedit") && !name.endsWith(".mce")) {
+            if (name.endsWith(".mcedit") || name.endsWith(".mce")) {
                 return false;
             }
             return super.isFormat(file);
