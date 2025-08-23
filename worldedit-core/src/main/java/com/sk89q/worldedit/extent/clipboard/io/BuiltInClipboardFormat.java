@@ -40,7 +40,6 @@ import it.unimi.dsi.fastutil.io.FastBufferedInputStream;
 import org.anarres.parallelgzip.ParallelGZIPOutputStream;
 import org.enginehub.linbus.stream.LinBinaryIO;
 import org.enginehub.linbus.stream.LinReadOptions;
-import org.enginehub.linbus.tree.LinCompoundTag;
 import org.enginehub.linbus.tree.LinRootEntry;
 
 import java.io.BufferedInputStream;
@@ -261,7 +260,11 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
 
         @Override
         public boolean isFormat(File file) {
-            return MCEDIT_SCHEMATIC.isFormat(file);
+            String name = file.getName().toLowerCase(Locale.ROOT);
+            if (name.endsWith(".mcedit") || name.endsWith(".mce")) {
+                return false;
+            }
+            return super.isFormat(file);
         }
 
         @Override
@@ -272,7 +275,7 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
 
     /**
      * @deprecated Slow, resource intensive, but sometimes safer than using the recommended
-     *         {@link BuiltInClipboardFormat#FAST}.
+     *         {@link BuiltInClipboardFormat#FAST_V2}.
      *         Avoid using with any large schematics/clipboards for reading/writing.
      */
     @Deprecated
