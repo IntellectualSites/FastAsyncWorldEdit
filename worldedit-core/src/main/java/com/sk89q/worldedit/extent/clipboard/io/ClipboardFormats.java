@@ -141,7 +141,7 @@ public class ClipboardFormats {
     //FAWE start - optimize format detection for builtin / known formats
 
     /**
-     * Detect the format of given a file.
+     * Detect the format of a given file.
      *
      * @param file the file
      * @return the format, otherwise null if one cannot be detected
@@ -157,7 +157,7 @@ public class ClipboardFormats {
 
         /* Conditions for known formats
             FAST_V3:             Compound_Tag("") -> Compound_Tag("Schematic") -> Int_Tag("Version") == 3
-            MINECRAFT_STRUCTURE: Compound_Tag("") -> len(Nbt_List_Tag("size"))
+            MINECRAFT_STRUCTURE: Compound_Tag("") -> exist(Nbt_List_Tag("size" || "palette" || "blocks" || "entities"))
             FAST_V2:             Compound_Tag("Schematic") -> Int_Tag("Version") == 2
             SPONGE_V1:           Compound_Tag("Schematic") -> Int_Tag("Version") == 1
             MC_EDIT:             Compound_Tag("Schematic") -> exist(Byte_Array_Tag("Blocks") || String_Tag("Materials"))
@@ -175,7 +175,7 @@ public class ClipboardFormats {
             final String rootName = new String(inputStream.readNBytes(rootNameTagLength));
             if (rootName.isEmpty()) {
                 // Only FAST_V3 and MINECRAFT_STRUCTURE use empty named root compound tags
-                // FAST_V3 only contains a single child component - if that's not present only MINECRAFT_STRUCTURE is possible
+                // FAST_V3 only contains a single child component - if that's not present, only MINECRAFT_STRUCTURE is possible
                 do {
                     byte type = inputStream.readByte();
                     if (type == NBTConstants.TYPE_END) {
@@ -187,7 +187,8 @@ public class ClipboardFormats {
                         break;
                     }
                     // search for almost all known compound children for a fast return path (lowercase is specific enough for now)
-                    if (type == NBTConstants.TYPE_LIST && (name.equals("size") || name.equals("palette") || name.equals("blocks") || name.equals("entities"))) {
+                    if (type == NBTConstants.TYPE_LIST &&
+                            (name.equals("size") || name.equals("palette") || name.equals("blocks") || name.equals("entities"))) {
                         return BuiltInClipboardFormat.MINECRAFT_STRUCTURE;
                     }
                     nbtInputStream.readTagPayloadLazy(type, 0); // skip unwanted tags and continue search
@@ -200,7 +201,8 @@ public class ClipboardFormats {
                     return findByFileInExternalFormats(file);
                 }
                 String name = nbtInputStream.readNamedTagName(type);
-                if ((type == NBTConstants.TYPE_BYTE_ARRAY && name.equals("Blocks")) || (type == NBTConstants.TYPE_STRING && name.equals("Materials"))) {
+                if ((type == NBTConstants.TYPE_BYTE_ARRAY && name.equals("Blocks")) ||
+                        (type == NBTConstants.TYPE_STRING && name.equals("Materials"))) {
                     return BuiltInClipboardFormat.MCEDIT_SCHEMATIC;
                 }
                 if (type == NBTConstants.TYPE_INT && name.equals("Version")) {
@@ -227,6 +229,12 @@ public class ClipboardFormats {
         return findByFileInExternalFormats(file);
     }
 
+    /**
+     * Detect the clipboard format for a specified file while skipping optimized builtin formats
+     *
+     * @param file the file
+     * @return the format or {@code null}
+     */
     private static ClipboardFormat findByFileInExternalFormats(File file) {
         if (registeredFormats.size() == FAST_SEARCH_BUILTIN_FORMATS.size()) {
             return null;
