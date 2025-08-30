@@ -5,7 +5,7 @@ import java.time.format.DateTimeFormatter
 import xyz.jpenilla.runpaper.task.RunServer
 
 plugins {
-    id("com.gradleup.nmcp.aggregation") version "1.0.2"
+    id("com.gradleup.nmcp.aggregation") version "1.1.0"
     id("xyz.jpenilla.run-paper") version "2.3.1"
 }
 
