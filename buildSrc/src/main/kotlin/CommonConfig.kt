@@ -14,6 +14,9 @@ fun Project.applyCommonConfiguration() {
         maven {
             name = "EngineHub"
             url = uri("https://maven.enginehub.org/repo/")
+            content {
+                excludeModule("io.papermc.paper", "dev-bundle")
+            }
         }
         maven {
             name = "OSS Sonatype Snapshots"
@@ -22,6 +25,13 @@ fun Project.applyCommonConfiguration() {
         maven {
             name = "Athion"
             url = uri("https://ci.athion.net/plugin/repository/tools/")
+        }
+        maven {
+            name = "IntellectualSites"
+            url = uri("https://repo.intellectualsites.dev/repository/paper-dev-bundles/")
+            content {
+                includeModule("io.papermc.paper", "dev-bundle")
+            }
         }
     }
 
