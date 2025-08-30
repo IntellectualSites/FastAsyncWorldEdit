@@ -866,7 +866,8 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
         SideEffect.VALIDATION,
         SideEffect.ENTITY_AI,
         SideEffect.EVENTS,
-        SideEffect.UPDATE
+        SideEffect.UPDATE,
+        SideEffect.PAPER_ANTI_XRAY
     );
 
     @Override

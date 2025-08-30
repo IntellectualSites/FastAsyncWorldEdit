@@ -317,7 +317,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
     }
 
     @SuppressWarnings("deprecation")
-    public static void sendChunk(IntPair pair, ServerLevel nmsWorld, int chunkX, int chunkZ) {
+    public static void sendChunk(IntPair pair, ServerLevel nmsWorld, int chunkX, int chunkZ, boolean obfuscateAntiXRay) {
         ChunkHolder chunkHolder = getPlayerChunk(nmsWorld, chunkX, chunkZ);
         if (chunkHolder == null) {
             return;
@@ -347,7 +347,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                             nmsWorld.getLightEngine(),
                             null,
                             null,
-                            false // last false is to not bother with x-ray
+                            obfuscateAntiXRay
                     );
                 } else {
                     // deprecated on paper - deprecation suppressed
