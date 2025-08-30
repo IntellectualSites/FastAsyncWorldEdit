@@ -51,6 +51,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -172,7 +173,7 @@ public class ClipboardFormats {
             if (rootNameTagLength != 0 && rootNameTagLength != 9) { // Only allow "" and "Schematic"
                 return findByFileInExternalFormats(file);
             }
-            final String rootName = new String(inputStream.readNBytes(rootNameTagLength));
+            final String rootName = new String(inputStream.readNBytes(rootNameTagLength), StandardCharsets.UTF_8);
             if (rootName.isEmpty()) {
                 // Only FAST_V3 and MINECRAFT_STRUCTURE use empty named root compound tags
                 // FAST_V3 only contains a single child component - if that's not present, only MINECRAFT_STRUCTURE is possible
