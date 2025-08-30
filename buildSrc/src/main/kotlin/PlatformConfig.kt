@@ -1,4 +1,3 @@
-import com.github.jengelman.gradle.plugins.shadow.ShadowExtension
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.api.Project
 import org.gradle.api.component.AdhocComponentWithVariants
@@ -36,10 +35,6 @@ fun Project.applyPlatformAndCoreConfiguration() {
         ext["internalVersion"] = "$version"
     }
 
-    configure<ShadowExtension> {
-        addShadowVariantIntoJavaComponent.set(false)
-    }
-
     configure<JavaPluginExtension> {
         disableAutoTargetJvm()
         withJavadocJar()
@@ -50,6 +45,9 @@ fun Project.applyPlatformAndCoreConfiguration() {
     }
 
     val javaComponent = components["java"] as AdhocComponentWithVariants
+    javaComponent.withVariantsFromConfiguration(configurations["shadowRuntimeElements"]) {
+        skip()
+    }
 
     val publishingExtension = the<PublishingExtension>()
 

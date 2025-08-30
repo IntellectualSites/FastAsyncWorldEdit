@@ -45,7 +45,7 @@ fun Project.applyLibrariesConfiguration() {
     )
 
     tasks.register<ShadowJar>("jar") {
-        configurations.set(listOf(project.configurations["shade"]))
+        configurations = listOf(project.configurations["shade"])
         archiveClassifier.set("")
 
         dependencies {
