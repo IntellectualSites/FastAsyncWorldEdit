@@ -77,10 +77,10 @@ codecov {
 
 allprojects {
     gradle.projectsEvaluated {
-        tasks.withType(JavaCompile::class) {
+        tasks.withType<JavaCompile>().configureEach {
             options.compilerArgs.addAll(arrayOf("-Xmaxerrs", "1000"))
         }
-        tasks.withType(Test::class) {
+        tasks.withType<Test>().configureEach {
             testLogging {
                 events(FAILED)
                 exceptionFormat = FULL
