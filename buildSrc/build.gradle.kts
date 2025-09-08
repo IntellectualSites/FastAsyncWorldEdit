@@ -22,7 +22,7 @@ val properties = Properties().also { props ->
 
 dependencies {
     implementation(gradleApi())
-    implementation("org.ajoberstar.grgit:grgit-gradle:5.3.2")
+    implementation("org.ajoberstar.grgit:grgit-gradle:5.3.3")
     implementation("com.gradleup.shadow:shadow-gradle-plugin:8.3.9")
     implementation("io.papermc.paperweight.userdev:io.papermc.paperweight.userdev.gradle.plugin:2.0.0-SNAPSHOT")
     constraints {
