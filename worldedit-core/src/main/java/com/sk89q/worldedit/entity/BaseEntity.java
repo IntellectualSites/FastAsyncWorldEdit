@@ -25,8 +25,14 @@ import com.sk89q.worldedit.world.NbtValued;
 import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.entity.EntityTypes;
 import org.enginehub.linbus.tree.LinCompoundTag;
+import org.enginehub.linbus.tree.LinIntArrayTag;
+import org.enginehub.linbus.tree.LinLongTag;
+import org.enginehub.linbus.tree.LinTag;
 
 import javax.annotation.Nullable;
+
+import java.util.Map;
+import java.util.UUID;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -118,6 +124,33 @@ public class BaseEntity implements NbtValued {
     //FAWE start
     public BaseEntity(CompoundTag tag) {
         this(EntityTypes.parse(tag.getString("Id")), tag);
+    }
+
+    /**
+     * Attempt to retrieve the entity's UUID from its NBT tag
+     *
+     * @return entity UUID if possible to retrieve
+     * @since TODO
+     */
+    @Nullable
+    public UUID getUUID() {
+        LinCompoundTag tag = getNbt();
+        if (tag == null) {
+            return null;
+        }
+        Map<String, LinTag<?>> value = tag.value();
+        if (value.get("UUID") instanceof LinIntArrayTag intArrayTag) {
+            int[] arr = intArrayTag.value();
+            return new UUID((long) arr[0] << 32 | (arr[1] & 0xFFFFFFFFL), (long) arr[2] << 32 | (arr[3] & 0xFFFFFFFFL));
+        } else if (value.get("UUIDMost") instanceof LinLongTag longTag) {
+            return new UUID(longTag.value(), ((LinLongTag) value.get("UUIDLeast")).value());
+        } else if (value.get("WorldUUIDMost") instanceof LinLongTag longTag) {
+            return new UUID(longTag.value(), ((LinLongTag) value.get("WorldUUIDLeast")).value());
+        } else if (value.get("PersistentIDMSB") instanceof LinLongTag longTag) {
+            return new UUID(longTag.value(), ((LinLongTag) value.get("PersistentIDLSB")).value());
+        } else {
+            return null;
+        }
     }
     //FAWE end
 
