@@ -81,6 +81,7 @@ allprojects {
             options.compilerArgs.addAll(arrayOf("-Xmaxerrs", "1000"))
         }
         tasks.withType<Test>().configureEach {
+            maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).takeIf { it > 0 } ?: 1
             testLogging {
                 events(FAILED)
                 exceptionFormat = FULL
