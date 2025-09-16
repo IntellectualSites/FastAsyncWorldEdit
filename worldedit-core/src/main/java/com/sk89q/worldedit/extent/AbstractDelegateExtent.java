@@ -25,6 +25,7 @@ import com.fastasyncworldedit.core.extent.HistoryExtent;
 import com.fastasyncworldedit.core.extent.NullExtent;
 import com.fastasyncworldedit.core.history.changeset.AbstractChangeSet;
 import com.fastasyncworldedit.core.internal.exception.FaweException;
+import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.fastasyncworldedit.core.queue.Filter;
 import com.fastasyncworldedit.core.queue.IBatchProcessor;
 import com.fastasyncworldedit.core.util.ExtentTraverser;
@@ -425,8 +426,8 @@ public class AbstractDelegateExtent implements Extent {
     }
 
     @Override
-    public boolean setTile(int x, int y, int z, CompoundTag tile) throws WorldEditException {
-        return setBlock(x, y, z, getBlock(x, y, z).toBaseBlock(tile));
+    public boolean tile(int x, int y, int z, FaweCompoundTag tile) throws WorldEditException {
+        return setBlock(x, y, z, getBlock(x, y, z).toBaseBlock(tile == null ? null : tile.linTag()));
     }
     //FAWE end
 

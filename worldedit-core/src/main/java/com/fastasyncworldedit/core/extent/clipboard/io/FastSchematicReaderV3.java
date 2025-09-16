@@ -5,6 +5,7 @@ import com.fastasyncworldedit.core.extent.clipboard.SimpleClipboard;
 import com.fastasyncworldedit.core.internal.io.ResettableFileInputStream;
 import com.fastasyncworldedit.core.internal.io.VarIntStreamIterator;
 import com.fastasyncworldedit.core.math.MutableBlockVector3;
+import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.fastasyncworldedit.core.util.IOUtil;
 import com.fastasyncworldedit.core.util.MathMan;
 import com.sk89q.jnbt.CompoundTag;
@@ -40,6 +41,8 @@ import org.apache.logging.log4j.Logger;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.enginehub.linbus.tree.LinCompoundTag;
+import org.enginehub.linbus.tree.LinIntArrayTag;
+import org.enginehub.linbus.tree.LinTagType;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.io.BufferedInputStream;
@@ -66,7 +69,7 @@ import java.util.zip.GZIPInputStream;
  * Not necessarily much faster than {@link com.sk89q.worldedit.extent.clipboard.io.sponge.SpongeSchematicV3Reader}, but uses a
  * stream based approach to keep the memory overhead minimal (especially in larger schematics)
  *
- * @since TODO
+ * @since 2.11.1
  */
 @SuppressWarnings("removal") // JNBT
 public class FastSchematicReaderV3 implements ClipboardReader {
@@ -87,6 +90,7 @@ public class FastSchematicReaderV3 implements ClipboardReader {
 
     private VersionedDataFixer dataFixer;
     private BlockVector3 offset;
+    private BlockVector3 origin = BlockVector3.ZERO;
     private BlockState[] blockPalette;
     private BiomeType[] biomePalette;
     private int dataVersion = -1;
@@ -136,6 +140,24 @@ public class FastSchematicReaderV3 implements ClipboardReader {
                     this.dataVersion = this.dataInputStream.readInt();
                     this.dataFixer = ReaderUtil.getVersionedDataFixer(this.dataVersion, platform, platform.getDataVersion());
                 }
+                case "Metadata" -> {
+                    LinCompoundTag metadataCompoundTag =
+                            (LinCompoundTag) this.nbtInputStream.readTagPayload(NBTConstants.TYPE_COMPOUND, 0).toLinTag();
+
+                    LinCompoundTag worldEditTag = metadataCompoundTag.findTag("WorldEdit", LinTagType.compoundTag());
+                    if (worldEditTag != null) { // allowed to be optional
+                        LinIntArrayTag originTag = worldEditTag.findTag("Origin", LinTagType.intArrayTag());
+                        if (originTag != null) { // allowed to be optional
+                            int[] parts = originTag.value();
+
+                            if (parts.length != 3) {
+                                throw new IOException("`Metadata > WorldEdit > Origin` int array length is invalid.");
+                            }
+
+                            this.origin = BlockVector3.at(parts[0], parts[1], parts[2]);
+                        }
+                    }
+                }
                 case "Offset" -> {
                     this.dataInputStream.skipNBytes(4); // Array Length field (4 byte int)
                     this.offset = BlockVector3.at(
@@ -172,7 +194,7 @@ public class FastSchematicReaderV3 implements ClipboardReader {
 
         clipboard.setOrigin(this.offset.multiply(-1));
         if (clipboard instanceof SimpleClipboard simpleClipboard && !this.offset.equals(BlockVector3.ZERO)) {
-            clipboard = new BlockArrayClipboard(simpleClipboard, this.offset);
+            clipboard = new BlockArrayClipboard(simpleClipboard, this.offset.add(this.origin));
         }
         return clipboard;
     }
@@ -450,6 +472,7 @@ public class FastSchematicReaderV3 implements ClipboardReader {
                 transformer.transform(x, y, z, id, LinCompoundTag.of(Map.of()));
                 continue;
             }
+            tag = tag.toBuilder().putString("id", id).remove("Id").build();
             tag = this.dataFixer.fixUp(fixType, tag);
             if (tag == null) {
                 LOGGER.warn("Failed to fix-up entity for {} @ {},{},{} - skipping", id, x, y, z);
@@ -626,12 +649,11 @@ public class FastSchematicReaderV3 implements ClipboardReader {
     }
 
     private EntityTransformer provideTileEntityTransformer(Clipboard clipboard) {
-        //noinspection deprecation
-        return (x, y, z, id, tag) -> clipboard.setTile(
+        return (x, y, z, id, tag) -> clipboard.tile(
                 MathMan.roundInt(x + clipboard.getMinimumPoint().x()),
                 MathMan.roundInt(y + clipboard.getMinimumPoint().y()),
                 MathMan.roundInt(z + clipboard.getMinimumPoint().z()),
-                new CompoundTag(tag)
+                FaweCompoundTag.of(tag)
         );
     }
 

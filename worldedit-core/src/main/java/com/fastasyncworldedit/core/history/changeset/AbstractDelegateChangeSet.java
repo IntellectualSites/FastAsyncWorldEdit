@@ -1,6 +1,6 @@
 package com.fastasyncworldedit.core.history.changeset;
 
-import com.sk89q.jnbt.CompoundTag;
+import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
@@ -47,26 +47,6 @@ public class AbstractDelegateChangeSet extends AbstractChangeSet {
     }
 
     @Override
-    public void addTileCreate(CompoundTag tag) {
-        parent.addTileCreate(tag);
-    }
-
-    @Override
-    public void addTileRemove(CompoundTag tag) {
-        parent.addTileRemove(tag);
-    }
-
-    @Override
-    public void addEntityRemove(CompoundTag tag) {
-        parent.addEntityRemove(tag);
-    }
-
-    @Override
-    public void addEntityCreate(CompoundTag tag) {
-        parent.addEntityCreate(tag);
-    }
-
-    @Override
     public void addBiomeChange(int x, int y, int z, BiomeType from, BiomeType to) {
         parent.addBiomeChange(x, y, z, from, to);
     }
@@ -74,6 +54,11 @@ public class AbstractDelegateChangeSet extends AbstractChangeSet {
     @Override
     public Iterator<Change> getIterator(BlockBag blockBag, int mode, boolean redo) {
         return parent.getIterator(blockBag, mode, redo);
+    }
+
+    @Override
+    public ChangeExchangeCoordinator getCoordinatedChanges(final BlockBag blockBag, final int mode, final boolean dir) {
+        return parent.getCoordinatedChanges(blockBag, mode, dir);
     }
 
     @Override
@@ -139,6 +124,26 @@ public class AbstractDelegateChangeSet extends AbstractChangeSet {
     @Override
     public Iterator<Change> forwardIterator() {
         return parent.forwardIterator();
+    }
+
+    @Override
+    public void addTileCreate(final FaweCompoundTag tag) {
+        parent.addTileCreate(tag);
+    }
+
+    @Override
+    public void addTileRemove(final FaweCompoundTag tag) {
+        parent.addTileRemove(tag);
+    }
+
+    @Override
+    public void addEntityRemove(final FaweCompoundTag tag) {
+        parent.addEntityRemove(tag);
+    }
+
+    @Override
+    public void addEntityCreate(final FaweCompoundTag tag) {
+        parent.addEntityCreate(tag);
     }
 
     @Override

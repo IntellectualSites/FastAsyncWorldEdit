@@ -2,12 +2,16 @@ package com.fastasyncworldedit.core.queue.implementation.chunk;
 
 import com.fastasyncworldedit.core.extent.filter.block.ChunkFilterBlock;
 import com.fastasyncworldedit.core.extent.processor.heightmap.HeightMapType;
+import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.fastasyncworldedit.core.queue.Filter;
+import com.fastasyncworldedit.core.queue.IChunk;
 import com.fastasyncworldedit.core.queue.IChunkSet;
 import com.fastasyncworldedit.core.queue.IQueueChunk;
-import com.sk89q.jnbt.CompoundTag;
+import com.fastasyncworldedit.core.queue.IQueueExtent;
+import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.util.SideEffectSet;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -16,6 +20,7 @@ import com.sk89q.worldedit.world.block.BlockTypes;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
@@ -53,11 +58,9 @@ public final class NullChunk implements IQueueChunk {
         return false;
     }
 
-    public boolean setTile(int x, int y, int z, @Nonnull CompoundTag tag) {
+    @Override
+    public boolean tile(final int x, final int y, final int z, final FaweCompoundTag tag) {
         return false;
-    }
-
-    public void setEntity(@Nonnull CompoundTag tag) {
     }
 
     public void removeEntity(@Nonnull UUID uuid) {
@@ -87,6 +90,16 @@ public final class NullChunk implements IQueueChunk {
         return false;
     }
 
+    @Override
+    public void setSideEffectSet(SideEffectSet sideEffectSet) {
+
+    }
+
+    @Override
+    public SideEffectSet getSideEffectSet() {
+        return SideEffectSet.none();
+    }
+
     @Nonnull
     public int[] getHeightMap(@Nullable HeightMapType type) {
         return new int[256];
@@ -110,6 +123,10 @@ public final class NullChunk implements IQueueChunk {
     }
 
     public void setFullBright(int layer) {
+    }
+
+    @Override
+    public void entity(final FaweCompoundTag tag) {
     }
 
     public void removeSectionLighting(int layer, boolean sky) {
@@ -147,25 +164,26 @@ public final class NullChunk implements IQueueChunk {
         return BlockTypes.__RESERVED__.getDefaultState();
     }
 
+    @Override
+    public Map<BlockVector3, FaweCompoundTag> tiles() {
+        return Collections.emptyMap();
+    }
+
+    @Override
+    public @Nullable FaweCompoundTag tile(final int x, final int y, final int z) {
+        return null;
+    }
+
+    @Override
+    public Collection<FaweCompoundTag> entities() {
+        return Collections.emptyList();
+    }
+
     @Nonnull
     public BaseBlock getFullBlock(int x, int y, int z) {
         return BlockTypes.__RESERVED__.getDefaultState().toBaseBlock();
     }
 
-    @Nonnull
-    public Map<BlockVector3, CompoundTag> getTiles() {
-        return Collections.emptyMap();
-    }
-
-    @Nullable
-    public CompoundTag getTile(int x, int y, int z) {
-        return null;
-    }
-
-    @Nonnull
-    public Set<CompoundTag> getEntities() {
-        return Collections.emptySet();
-    }
 
     @Nullable
     public char[] load(int layer) {
@@ -178,14 +196,14 @@ public final class NullChunk implements IQueueChunk {
         return null;
     }
 
-    @Nullable
-    public CompoundTag getEntity(@Nonnull UUID uuid) {
-        return null;
-    }
-
     @Override
     public int setCreateCopy(boolean createCopy) {
         return -1;
+    }
+
+    @Override
+    public Set<Entity> getFullEntities() {
+        return Collections.emptySet();
     }
 
     @Override
@@ -226,7 +244,12 @@ public final class NullChunk implements IQueueChunk {
     }
 
     @Nullable
-    public <T extends Future<T>> T call(@Nullable IChunkSet set, @Nullable Runnable finalize) {
+    public <T extends Future<T>> T call(IQueueExtent<? extends IChunk> owner, @Nullable IChunkSet set, @Nullable Runnable finalize) {
+        return null;
+    }
+
+    @Override
+    public @Nullable FaweCompoundTag entity(final UUID uuid) {
         return null;
     }
 

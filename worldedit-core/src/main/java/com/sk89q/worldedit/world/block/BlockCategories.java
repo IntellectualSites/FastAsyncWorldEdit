@@ -28,6 +28,7 @@ package com.sk89q.worldedit.world.block;
 public final class BlockCategories {
 
     public static final BlockCategory ACACIA_LOGS = get("minecraft:acacia_logs");
+    public static final BlockCategory AIR = get("minecraft:air");
     public static final BlockCategory ALL_HANGING_SIGNS = get("minecraft:all_hanging_signs");
     public static final BlockCategory ALL_SIGNS = get("minecraft:all_signs");
     public static final BlockCategory ANCIENT_CITY_REPLACEABLE = get("minecraft:ancient_city_replaceable");
@@ -43,14 +44,18 @@ public final class BlockCategories {
     public static final BlockCategory BANNERS = get("minecraft:banners");
     public static final BlockCategory BASE_STONE_NETHER = get("minecraft:base_stone_nether");
     public static final BlockCategory BASE_STONE_OVERWORLD = get("minecraft:base_stone_overworld");
+    public static final BlockCategory BATS_SPAWNABLE_ON = get("minecraft:bats_spawnable_on");
     public static final BlockCategory BEACON_BASE_BLOCKS = get("minecraft:beacon_base_blocks");
     public static final BlockCategory BEDS = get("minecraft:beds");
+    public static final BlockCategory BEE_ATTRACTIVE = get("minecraft:bee_attractive");
     public static final BlockCategory BEE_GROWABLES = get("minecraft:bee_growables");
     public static final BlockCategory BEEHIVES = get("minecraft:beehives");
     public static final BlockCategory BIG_DRIPLEAF_PLACEABLE = get("minecraft:big_dripleaf_placeable");
     public static final BlockCategory BIRCH_LOGS = get("minecraft:birch_logs");
+    public static final BlockCategory BLOCKS_WIND_CHARGE_EXPLOSIONS = get("minecraft:blocks_wind_charge_explosions");
     public static final BlockCategory BUTTONS = get("minecraft:buttons");
     public static final BlockCategory CAMEL_SAND_STEP_SOUND_BLOCKS = get("minecraft:camel_sand_step_sound_blocks");
+    public static final BlockCategory CAMELS_SPAWNABLE_ON = get("minecraft:camels_spawnable_on");
     public static final BlockCategory CAMPFIRES = get("minecraft:campfires");
     public static final BlockCategory CANDLE_CAKES = get("minecraft:candle_cakes");
     public static final BlockCategory CANDLES = get("minecraft:candles");
@@ -74,7 +79,7 @@ public final class BlockCategories {
     public static final BlockCategory CRYSTAL_SOUND_BLOCKS = get("minecraft:crystal_sound_blocks");
     public static final BlockCategory DAMPENS_VIBRATIONS = get("minecraft:dampens_vibrations");
     public static final BlockCategory DARK_OAK_LOGS = get("minecraft:dark_oak_logs");
-    public static final BlockCategory DEAD_BUSH_MAY_PLACE_ON = get("minecraft:dead_bush_may_place_on");
+    @Deprecated public static final BlockCategory DEAD_BUSH_MAY_PLACE_ON = get("minecraft:dead_bush_may_place_on");
     public static final BlockCategory DEEPSLATE_ORE_REPLACEABLES = get("minecraft:deepslate_ore_replaceables");
     public static final BlockCategory DIAMOND_ORES = get("minecraft:diamond_ores");
     public static final BlockCategory DIRT = get("minecraft:dirt");
@@ -85,6 +90,8 @@ public final class BlockCategories {
     public static final BlockCategory DRAGON_IMMUNE = get("minecraft:dragon_immune");
     public static final BlockCategory DRAGON_TRANSPARENT = get("minecraft:dragon_transparent");
     public static final BlockCategory DRIPSTONE_REPLACEABLE_BLOCKS = get("minecraft:dripstone_replaceable_blocks");
+    public static final BlockCategory DRY_VEGETATION_MAY_PLACE_ON = get("minecraft:dry_vegetation_may_place_on");
+    public static final BlockCategory EDIBLE_FOR_SHEEP = get("minecraft:edible_for_sheep");
     public static final BlockCategory EMERALD_ORES = get("minecraft:emerald_ores");
     public static final BlockCategory ENCHANTMENT_POWER_PROVIDER = get("minecraft:enchantment_power_provider");
     public static final BlockCategory ENCHANTMENT_POWER_TRANSMITTER = get("minecraft:enchantment_power_transmitter");
@@ -134,6 +141,7 @@ public final class BlockCategories {
     public static final BlockCategory MINEABLE_HOE = get("minecraft:mineable/hoe");
     public static final BlockCategory MINEABLE_PICKAXE = get("minecraft:mineable/pickaxe");
     public static final BlockCategory MINEABLE_SHOVEL = get("minecraft:mineable/shovel");
+    public static final BlockCategory MOB_INTERACTABLE_DOORS = get("minecraft:mob_interactable_doors");
     public static final BlockCategory MOOSHROOMS_SPAWNABLE_ON = get("minecraft:mooshrooms_spawnable_on");
     public static final BlockCategory MOSS_REPLACEABLE = get("minecraft:moss_replaceable");
     public static final BlockCategory MUSHROOM_GROW_BLOCK = get("minecraft:mushroom_grow_block");
@@ -146,9 +154,11 @@ public final class BlockCategories {
     public static final BlockCategory OCCLUDES_VIBRATION_SIGNALS = get("minecraft:occludes_vibration_signals");
     public static final BlockCategory OVERWORLD_CARVER_REPLACEABLES = get("minecraft:overworld_carver_replaceables");
     public static final BlockCategory OVERWORLD_NATURAL_LOGS = get("minecraft:overworld_natural_logs");
+    public static final BlockCategory PALE_OAK_LOGS = get("minecraft:pale_oak_logs");
     public static final BlockCategory PARROTS_SPAWNABLE_ON = get("minecraft:parrots_spawnable_on");
     public static final BlockCategory PIGLIN_REPELLENTS = get("minecraft:piglin_repellents");
     public static final BlockCategory PLANKS = get("minecraft:planks");
+    public static final BlockCategory PLAYS_AMBIENT_DESERT_BLOCK_SOUNDS = get("minecraft:plays_ambient_desert_block_sounds");
     public static final BlockCategory POLAR_BEARS_SPAWNABLE_ON_ALTERNATE = get("minecraft:polar_bears_spawnable_on_alternate");
     public static final BlockCategory PORTALS = get("minecraft:portals");
     public static final BlockCategory PRESSURE_PLATES = get("minecraft:pressure_plates");
@@ -157,6 +167,7 @@ public final class BlockCategories {
     public static final BlockCategory RAILS = get("minecraft:rails");
     public static final BlockCategory REDSTONE_ORES = get("minecraft:redstone_ores");
     public static final BlockCategory REPLACEABLE = get("minecraft:replaceable");
+    public static final BlockCategory REPLACEABLE_BY_MUSHROOMS = get("minecraft:replaceable_by_mushrooms");
     public static final BlockCategory REPLACEABLE_BY_TREES = get("minecraft:replaceable_by_trees");
     @Deprecated public static final BlockCategory REPLACEABLE_PLANTS = get("minecraft:replaceable_plants");
     public static final BlockCategory SAND = get("minecraft:sand");
@@ -186,7 +197,8 @@ public final class BlockCategories {
     public static final BlockCategory STONE_PRESSURE_PLATES = get("minecraft:stone_pressure_plates");
     public static final BlockCategory STRIDER_WARM_BLOCKS = get("minecraft:strider_warm_blocks");
     public static final BlockCategory SWORD_EFFICIENT = get("minecraft:sword_efficient");
-    public static final BlockCategory TALL_FLOWERS = get("minecraft:tall_flowers");
+    public static final BlockCategory SWORD_INSTANTLY_MINES = get("minecraft:sword_instantly_mines");
+    @Deprecated public static final BlockCategory TALL_FLOWERS = get("minecraft:tall_flowers");
     public static final BlockCategory TERRACOTTA = get("minecraft:terracotta");
     public static final BlockCategory TRAIL_RUINS_REPLACEABLE = get("minecraft:trail_ruins_replaceable");
     public static final BlockCategory TRAPDOORS = get("minecraft:trapdoors");

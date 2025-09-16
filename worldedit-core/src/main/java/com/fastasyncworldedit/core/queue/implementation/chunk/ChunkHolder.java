@@ -3,18 +3,20 @@ package com.fastasyncworldedit.core.queue.implementation.chunk;
 import com.fastasyncworldedit.core.extent.filter.block.ChunkFilterBlock;
 import com.fastasyncworldedit.core.extent.processor.EmptyBatchProcessor;
 import com.fastasyncworldedit.core.extent.processor.heightmap.HeightMapType;
+import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.fastasyncworldedit.core.queue.Filter;
 import com.fastasyncworldedit.core.queue.IChunk;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.IChunkSet;
 import com.fastasyncworldedit.core.queue.IQueueChunk;
 import com.fastasyncworldedit.core.queue.IQueueExtent;
-import com.fastasyncworldedit.core.queue.implementation.ParallelQueueExtent;
 import com.fastasyncworldedit.core.util.MemUtil;
-import com.sk89q.jnbt.CompoundTag;
+import com.fastasyncworldedit.core.util.task.FaweThreadUtil;
+import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.util.SideEffectSet;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -22,6 +24,7 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -50,6 +53,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     private boolean isInit = false; // Lighting handles queue differently. It relies on the chunk cache and not doing init.
     private boolean createCopy = false;
     private long initTime = -1L;
+    private SideEffectSet sideEffectSet;
 
     private ChunkHolder() {
         this.delegate = NULL;
@@ -76,18 +80,8 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     }
 
     @Override
-    public boolean setTile(int x, int y, int z, CompoundTag tag) {
-        return delegate.set(this).setTile(x, y, z, tag);
-    }
-
-    @Override
-    public CompoundTag getTile(int x, int y, int z) {
-        return delegate.set(this).getTile(x, y, z);
-    }
-
-    @Override
-    public void setEntity(CompoundTag tag) {
-        delegate.set(this).setEntity(tag);
+    public void entity(final FaweCompoundTag tag) {
+        delegate.set(this).entity(tag);
     }
 
     @Override
@@ -159,13 +153,18 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         return chunkSet != null && chunkSet.hasBiomes(layer);
     }
 
-    public boolean isInit() {
-        return isInit;
+    @Override
+    public void setSideEffectSet(SideEffectSet sideEffectSet) {
+        this.sideEffectSet = sideEffectSet;
     }
 
     @Override
-    public CompoundTag getEntity(UUID uuid) {
-        return delegate.get(this).getEntity(uuid);
+    public SideEffectSet getSideEffectSet() {
+        return sideEffectSet;
+    }
+
+    public boolean isInit() {
+        return isInit;
     }
 
     @Override
@@ -880,25 +879,19 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     };
 
     @Override
-    public Map<BlockVector3, CompoundTag> getTiles() {
-        return delegate.get(this).getTiles();
-    }
-
-    @Override
-    public Set<CompoundTag> getEntities() {
-        return delegate.get(this).getEntities();
-    }
-
-    @Override
     public boolean hasSection(int layer) {
         return chunkExisting != null && chunkExisting.hasSection(layer);
+    }
+
+    @Override
+    public boolean hasNonEmptySection(final int layer) {
+        return chunkExisting != null && chunkExisting.hasNonEmptySection(layer);
     }
 
     @Override
     public synchronized void filterBlocks(Filter filter, ChunkFilterBlock block, @Nullable Region region, boolean full) {
         final IChunkGet get = getOrCreateGet();
         final IChunkSet set = getOrCreateSet();
-        set.setFastMode(fastmode);
         try {
             block.filter(this, get, set, filter, region, full);
         } finally {
@@ -933,6 +926,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
 
     @Override
     public synchronized boolean trim(boolean aggressive, int layer) {
+        chunkExisting.trim(aggressive, layer);
         return this.trim(aggressive);
     }
 
@@ -944,6 +938,11 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     @Override
     public boolean isEmpty() {
         return chunkSet == null || chunkSet.isEmpty();
+    }
+
+    @Override
+    public boolean tile(final int x, final int y, final int z, final FaweCompoundTag tag) {
+        return delegate.set(this).tile(x, y, z, tag);
     }
 
     /**
@@ -967,13 +966,21 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         return chunkSet;
     }
 
+    public final IChunkSet getChunkSet() {
+        return chunkSet;
+    }
+
     /**
      * Create a wrapped set object
      * - The purpose of wrapping is to allow different extents to intercept / alter behavior
      * - e.g., caching, optimizations, filtering
      */
     private IChunkSet newWrappedSet() {
-        return extent.getCachedSet(chunkX, chunkZ);
+        IChunkSet set = extent.getCachedSet(chunkX, chunkZ);
+        set.setFastMode(fastmode);
+        set.setSideEffectSet(sideEffectSet);
+        set.setBitMask(bitMask);
+        return set;
     }
 
     /**
@@ -1004,9 +1011,9 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     @Override
     public synchronized T call() {
         if (chunkSet != null && !chunkSet.isEmpty()) {
-            chunkSet.setBitMask(bitMask);
             IChunkSet copy = chunkSet.createCopy();
-            return this.call(copy, () -> {
+
+            return this.call(extent, copy, () -> {
                 // Do nothing
             });
         }
@@ -1016,8 +1023,9 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     /**
      * This method should never be called from outside ChunkHolder
      */
+
     @Override
-    public synchronized T call(IChunkSet set, Runnable finalize) {
+    public <U extends Future<U>> U call(IQueueExtent<? extends IChunk> owner, IChunkSet set, Runnable finalize) {
         if (set != null) {
             IChunkGet get = getOrCreateGet();
             try {
@@ -1035,7 +1043,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
                 } else {
                     finalizer = finalize;
                 }
-                return get.call(set, finalizer);
+                return get.call(extent, set, finalizer);
             } finally {
                 get.unlockCall();
                 untrackExtent();
@@ -1049,11 +1057,11 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     // This way, locking is spread across multiple STQEs, allowing for better performance
 
     private void trackExtent() {
-            ParallelQueueExtent.setCurrentExtent(extent);
+        FaweThreadUtil.setCurrentExtent(extent);
     }
 
     private void untrackExtent() {
-        ParallelQueueExtent.clearCurrentExtent();
+        FaweThreadUtil.clearCurrentExtent();
     }
 
     /**
@@ -1091,6 +1099,26 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     @Override
     public BlockState getBlock(int x, int y, int z) {
         return delegate.getBlock(this, x, y, z);
+    }
+
+    @Override
+    public Map<BlockVector3, FaweCompoundTag> tiles() {
+        return delegate.get(this).tiles();
+    }
+
+    @Override
+    public @Nullable FaweCompoundTag tile(final int x, final int y, final int z) {
+        return delegate.get(this).tile(x, y, z);
+    }
+
+    @Override
+    public Collection<FaweCompoundTag> entities() {
+        return delegate.get(this).entities();
+    }
+
+    @Override
+    public Set<Entity> getFullEntities() {
+        return delegate.get(this).getFullEntities();
     }
 
     @Override
@@ -1156,6 +1184,11 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     @Override
     public int[] getHeightMap(HeightMapType type) {
         return delegate.getHeightMap(this, type);
+    }
+
+    @Override
+    public @Nullable FaweCompoundTag entity(final UUID uuid) {
+        return delegate.get(this).entity(uuid);
     }
 
     public interface IBlockDelegate {

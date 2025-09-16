@@ -19,8 +19,6 @@
 
 package com.sk89q.worldedit.internal;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public final class Constants {
@@ -35,11 +33,11 @@ public final class Constants {
     public static final List<String> NO_COPY_ENTITY_NBT_FIELDS;
 
     static {
-        NO_COPY_ENTITY_NBT_FIELDS = Collections.unmodifiableList(Arrays.asList(
+        NO_COPY_ENTITY_NBT_FIELDS = List.of(
                 "UUIDLeast", "UUIDMost", "UUID", // Bukkit and Vanilla
                 "WorldUUIDLeast", "WorldUUIDMost", // Bukkit and Vanilla
                 "PersistentIDMSB", "PersistentIDLSB" // Forge
-        ));
+        );
     }
 
     /**
@@ -86,4 +84,43 @@ public final class Constants {
      */
     public static final int DATA_VERSION_MC_1_20 = 3463;
 
+    /**
+     * The DataVersion for Minecraft 1.21
+     */
+    public static final int DATA_VERSION_MC_1_21 = 3953;
+
+    /**
+     * The DataVersion for Minecraft 1.21.2
+     */
+    public static final int DATA_VERSION_MC_1_21_2 = 4080;
+
+    /**
+     * The DataVersion for Minecraft 1.21.3
+     */
+    public static final int DATA_VERSION_MC_1_21_3 = 4082;
+
+    /**
+     * The DataVersion for Minecraft 1.21.4
+     */
+    public static final int DATA_VERSION_MC_1_21_4 = 4189;
+
+    /**
+     * The DataVersion for Minecraft 1.21.5
+     */
+    public static final int DATA_VERSION_MC_1_21_5 = 4325;
+
+    /**
+     * The DataVersion for Minecraft 1.21.6
+     */
+    public static final int DATA_VERSION_MC_1_21_6 = 4435;
+
+    /**
+     * The DataVersion for Minecraft 1.21.7
+     */
+    public static final int DATA_VERSION_MC_1_21_7 = 4438;
+
+    /**
+     * The DataVersion for Minecraft 1.21.8
+     */
+    public static final int DATA_VERSION_MC_1_21_8 = 4440;
 }

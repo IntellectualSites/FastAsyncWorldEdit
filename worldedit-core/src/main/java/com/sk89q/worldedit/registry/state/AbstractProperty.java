@@ -140,10 +140,10 @@ public abstract class AbstractProperty<T> implements Property<T> {
 
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof Property)) {
+        if (!(obj instanceof Property property)) {
             return false;
         }
-        return getName().equals(((Property<?>) obj).getName());
+        return getName().equals(property.getName()) && property.getValues().equals(getValues());
     }
     //FAWE end
 }

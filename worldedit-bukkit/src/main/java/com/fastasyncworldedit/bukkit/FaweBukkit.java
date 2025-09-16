@@ -12,7 +12,6 @@ import com.fastasyncworldedit.bukkit.regions.TownyFeature;
 import com.fastasyncworldedit.bukkit.regions.WorldGuardFeature;
 import com.fastasyncworldedit.bukkit.util.BukkitTaskManager;
 import com.fastasyncworldedit.bukkit.util.ItemUtil;
-import com.fastasyncworldedit.bukkit.util.MinecraftVersion;
 import com.fastasyncworldedit.bukkit.util.image.BukkitImageViewer;
 import com.fastasyncworldedit.core.FAWEPlatformAdapterImpl;
 import com.fastasyncworldedit.core.Fawe;
@@ -58,7 +57,6 @@ public class FaweBukkit implements IFawe, Listener {
     private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     private final Plugin plugin;
-    private final boolean chunksStretched;
     private final FAWEPlatformAdapterImpl platformAdapter;
     private ItemUtil itemUtil;
     private Preloader preloader;
@@ -82,10 +80,6 @@ public class FaweBukkit implements IFawe, Listener {
             Bukkit.getServer().shutdown();
         }
 
-        MinecraftVersion version = MinecraftVersion.getCurrent();
-
-        chunksStretched = version.isEqualOrHigherThan(MinecraftVersion.NETHER);
-
         platformAdapter = new NMSAdapter();
 
         //PlotSquared support is limited to Spigot/Paper as of 02/20/2020
@@ -105,8 +99,8 @@ public class FaweBukkit implements IFawe, Listener {
         });
 
         // Warn if small-edits are enabled with extended world heights
-        if (version.isEqualOrHigherThan(MinecraftVersion.CAVES_18) && Settings.settings().HISTORY.SMALL_EDITS) {
-            LOGGER.warn("Small-edits enabled (maximum y range of 0 -> 256) with 1.18 world heights. Are you sure?");
+        if (Settings.settings().HISTORY.SMALL_EDITS) {
+            LOGGER.warn("Small-edits enabled (maximum y range of 0 -> 256) with 1.18+ world heights. Are you sure?");
         }
     }
 
@@ -117,21 +111,7 @@ public class FaweBukkit implements IFawe, Listener {
 
     @Override
     public synchronized ImageViewer getImageViewer(com.sk89q.worldedit.entity.Player player) {
-        try {
-            PluginManager manager = Bukkit.getPluginManager();
-
-            if (manager.getPlugin("PacketListenerApi") == null) {
-                LOGGER.error("PacketListener not found! Please install PacketListenerAPI v3.7.6 or above before attempting to " +
-                        "complete image-related edits");
-            }
-            if (manager.getPlugin("MapManager") == null) {
-                LOGGER.error("MapManager not found! Please install PacketListenerAPI v1.7.8 or above before attempting to " +
-                        "complete image-related edits");
-            }
-            return new BukkitImageViewer(BukkitAdapter.adapt(player));
-        } catch (Throwable ignored) {
-        }
-        return null;
+        throw new UnsupportedOperationException("No longer supported.");
     }
 
     @Override
@@ -300,11 +280,6 @@ public class FaweBukkit implements IFawe, Listener {
             return preloader;
         }
         return null;
-    }
-
-    @Override
-    public boolean isChunksStretched() {
-        return chunksStretched;
     }
 
     @Override

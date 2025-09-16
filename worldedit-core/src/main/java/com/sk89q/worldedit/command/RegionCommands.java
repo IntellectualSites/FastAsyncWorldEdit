@@ -29,6 +29,7 @@ import com.fastasyncworldedit.core.util.MaskTraverser;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
+import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
@@ -38,6 +39,7 @@ import com.sk89q.worldedit.command.util.annotation.Preload;
 import com.sk89q.worldedit.command.util.annotation.SynchronousSettingExpected;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.function.GroundFunction;
 import com.sk89q.worldedit.function.generator.FloraGenerator;
 import com.sk89q.worldedit.function.mask.ExistingBlockMask;
@@ -233,7 +235,7 @@ public class RegionCommands {
             @Arg(desc = "The pattern of blocks to place")
                     Pattern pattern,
             @Arg(desc = "The thickness of the line", def = "0")
-                    int thickness,
+                    double thickness,
             @Switch(name = 'h', desc = "Generate only a shell")
                     boolean shell
     ) throws WorldEditException {
@@ -266,7 +268,7 @@ public class RegionCommands {
             @Arg(desc = "The pattern of blocks to place")
                     Pattern pattern,
             @Arg(desc = "The thickness of the curve", def = "0")
-                    int thickness,
+                    double thickness,
             @Switch(name = 'h', desc = "Generate only a shell")
                     boolean shell
     ) throws WorldEditException {
@@ -461,7 +463,7 @@ public class RegionCommands {
         long volume = (((long) max.x() - (long) min.x() + 1) * ((long) max.y() - (long) min.y() + 1) * ((long) max.z() - (long) min
                 .z() + 1));
         FaweLimit limit = actor.getLimit();
-        if (volume >= limit.MAX_CHECKS) {
+        if (volume >= limit.MAX_CHECKS.get()) {
             throw FaweCache.MAX_CHECKS;
         }
         int affected;
@@ -594,7 +596,7 @@ public class RegionCommands {
                 session.getRegionSelector(world).learnChanges();
                 session.getRegionSelector(world).explainRegionAdjust(actor, session);
             } catch (RegionOperationException e) {
-                actor.printError(TextComponent.of(e.getMessage()));
+                actor.printError(e.getRichMessage());
             }
         }
 
@@ -640,7 +642,7 @@ public class RegionCommands {
                     int count,
             @Arg(desc = "How far to move the contents each stack", def = Offset.FORWARD)
             @Offset
-                    BlockVector3 direction,
+                    BlockVector3 offset,
             @Switch(name = 's', desc = "Shift the selection to the last stacked copy")
                     boolean moveSelection,
             @Switch(name = 'a', desc = "Ignore air blocks")
@@ -649,6 +651,8 @@ public class RegionCommands {
                     boolean copyEntities,
             @Switch(name = 'b', desc = "Also copy biomes")
                     boolean copyBiomes,
+            @Switch(name = 'r', desc = "Use block units")
+                    boolean blockUnits,
             @ArgFlag(name = 'm', desc = "Set the include mask, non-matching blocks become air")
                     Mask mask
     ) throws WorldEditException {
@@ -668,19 +672,24 @@ public class RegionCommands {
             combinedMask = mask;
         }
 
-        int affected = editSession.stackCuboidRegion(region, direction, count, copyEntities, copyBiomes, combinedMask);
+        int affected;
+        if (blockUnits) {
+            affected = editSession.stackRegionBlockUnits(region, offset, count, copyEntities, copyBiomes, combinedMask);
+        } else {
+            affected = editSession.stackCuboidRegion(region, offset, count, copyEntities, copyBiomes, combinedMask);
+        }
 
         if (moveSelection) {
             try {
                 final BlockVector3 size = region.getMaximumPoint().subtract(region.getMinimumPoint()).add(1, 1, 1);
-
-                final BlockVector3 shiftVector = direction.multiply(size).multiply(count);
+                final BlockVector3 shiftSize = blockUnits ? offset : offset.multiply(size);
+                final BlockVector3 shiftVector = shiftSize.multiply(count);
                 region.shift(shiftVector);
 
                 session.getRegionSelector(world).learnChanges();
                 session.getRegionSelector(world).explainRegionAdjust(actor, session);
             } catch (RegionOperationException e) {
-                actor.printError(TextComponent.of(e.getMessage()));
+                actor.printError(e.getRichMessage());
             }
         }
 
@@ -907,5 +916,34 @@ public class RegionCommands {
         actor.print(Caption.of("worldedit.flora.created", TextComponent.of(affected)));
         return affected;
     }
+
+    //FAWE start - block "fixing"
+    @Command(
+            name = "/fixblocks",
+            aliases = {"/updateblocks", "/fixconnect"},
+            desc = "\"Fixes\" all blocks in the region to the correct shape/connections based on surrounding blocks"
+    )
+    @CommandPermissions("worldedit.region.fixblocks")
+    @Logging(REGION)
+    @Confirm(Confirm.Processor.REGION)
+    @Preload(Preload.PreloadCheck.PRELOAD)
+    public int fixblocks(
+            Actor actor, EditSession editSession, @Selection Region region
+    ) {
+        int affected = editSession.setBlocks(
+                region,
+                WorldEdit
+                        .getInstance()
+                        .getPlatformManager()
+                        .queryCapability(Capability.WORLD_EDITING)
+                        .getPlatformPlacementProcessor(editSession, null, region)
+        );
+        if (affected != 0) {
+            actor.print(Caption.of("worldedit.set.done", TextComponent.of(affected)));
+
+        }
+        return affected;
+    }
+    //FAWE end
 
 }

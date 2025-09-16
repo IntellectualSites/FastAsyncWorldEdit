@@ -2,6 +2,7 @@ package com.fastasyncworldedit.core.extent;
 
 import com.fastasyncworldedit.core.history.changeset.AbstractChangeSet;
 import com.fastasyncworldedit.core.math.MutableBlockVector3;
+import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
@@ -74,7 +75,7 @@ public class HistoryExtent extends AbstractDelegateExtent {
     public Entity createEntity(Location location, BaseEntity state) {
         final Entity entity = super.createEntity(location, state);
         if (state != null) {
-            this.changeSet.addEntityCreate(state.getNbtData());
+            this.changeSet.addEntityCreate(FaweCompoundTag.of(state.getNbt()));
         }
         return entity;
     }
@@ -84,7 +85,7 @@ public class HistoryExtent extends AbstractDelegateExtent {
     public Entity createEntity(Location location, BaseEntity state, UUID uuid) {
         final Entity entity = super.createEntity(location, state, uuid);
         if (state != null) {
-            this.changeSet.addEntityCreate(state.getNbtData());
+            this.changeSet.addEntityCreate(FaweCompoundTag.of(state.getNbt()));
         }
         return entity;
     }
@@ -154,11 +155,10 @@ public class HistoryExtent extends AbstractDelegateExtent {
 
         @Override
         public boolean remove() {
-            final Location location = this.entity.getLocation();
             final BaseEntity state = this.entity.getState();
             final boolean success = this.entity.remove();
             if (state != null && success) {
-                HistoryExtent.this.changeSet.addEntityRemove(state.getNbtData());
+                HistoryExtent.this.changeSet.addEntityRemove(FaweCompoundTag.of(state.getNbt()));
             }
             return success;
         }

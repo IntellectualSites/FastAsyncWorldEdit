@@ -1,6 +1,6 @@
 package com.fastasyncworldedit.core.history.changeset;
 
-import com.sk89q.jnbt.CompoundTag;
+import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.history.change.Change;
 import com.sk89q.worldedit.world.World;
@@ -25,22 +25,22 @@ public class NullChangeSet extends AbstractChangeSet {
     }
 
     @Override
-    public final void addTileCreate(CompoundTag tag) {
+    public void addTileCreate(final FaweCompoundTag tag) {
 
     }
 
     @Override
-    public final void addTileRemove(CompoundTag tag) {
+    public void addTileRemove(final FaweCompoundTag tag) {
 
     }
 
     @Override
-    public final void addEntityRemove(CompoundTag tag) {
+    public void addEntityRemove(final FaweCompoundTag tag) {
 
     }
 
     @Override
-    public final void addEntityCreate(CompoundTag tag) {
+    public void addEntityCreate(final FaweCompoundTag tag) {
 
     }
 
@@ -52,6 +52,17 @@ public class NullChangeSet extends AbstractChangeSet {
     @Override
     public Iterator<Change> getIterator(BlockBag blockBag, int mode, boolean redo) {
         return getIterator(redo);
+    }
+
+    @Override
+    public ChangeExchangeCoordinator getCoordinatedChanges(final BlockBag blockBag, final int mode, final boolean dir) {
+        return new ChangeExchangeCoordinator(((exchanger, changes) -> {
+            try {
+                exchanger.exchange(null);
+            } catch (InterruptedException ignored) {
+                Thread.currentThread().interrupt();
+            }
+        }));
     }
 
     @Override

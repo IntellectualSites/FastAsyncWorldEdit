@@ -29,8 +29,10 @@ import com.fastasyncworldedit.core.extent.clipboard.DiskOptimizedClipboard;
 import com.fastasyncworldedit.core.extent.clipboard.MultiClipboardHolder;
 import com.fastasyncworldedit.core.extent.clipboard.ReadOnlyClipboard;
 import com.fastasyncworldedit.core.extent.clipboard.URIClipboardHolder;
+import com.fastasyncworldedit.core.extent.clipboard.WorldCopyClipboard;
 import com.fastasyncworldedit.core.internal.io.FastByteArrayOutputStream;
 import com.fastasyncworldedit.core.limit.FaweLimit;
+import com.fastasyncworldedit.core.math.transform.MutatingOperationTransformHolder;
 import com.fastasyncworldedit.core.util.ImgurUtility;
 import com.fastasyncworldedit.core.util.MainUtil;
 import com.fastasyncworldedit.core.util.MaskTraverser;
@@ -154,7 +156,7 @@ public class ClipboardCommands {
                 ((long) max.x() - (long) min.x() + 1) * ((long) max.y() - (long) min.y() + 1) * ((long) max.z() - (long) min
                         .z() + 1);
         FaweLimit limit = actor.getLimit();
-        if (volume >= limit.MAX_CHECKS) {
+        if (volume >= limit.MAX_CHECKS.get()) {
             throw FaweCache.MAX_CHECKS;
         }
         session.setClipboard(null);
@@ -188,11 +190,11 @@ public class ClipboardCommands {
         long volume = (((long) max.x() - (long) min.x() + 1) * ((long) max.y() - (long) min.y() + 1) * ((long) max.z() - (long) min
                 .z() + 1));
         FaweLimit limit = actor.getLimit();
-        if (volume >= limit.MAX_CHECKS) {
+        if (volume >= limit.MAX_CHECKS.get()) {
             throw FaweCache.MAX_CHECKS;
         }
         session.setClipboard(null);
-        ReadOnlyClipboard lazyClipboard = ReadOnlyClipboard.of(region, !skipEntities, copyBiomes);
+        ReadOnlyClipboard lazyClipboard = WorldCopyClipboard.of(editSession, region, !skipEntities, copyBiomes);
 
         lazyClipboard.setOrigin(session.getPlacementPosition(actor));
         session.setClipboard(new ClipboardHolder(lazyClipboard));
@@ -261,10 +263,10 @@ public class ClipboardCommands {
         long volume = (((long) max.x() - (long) min.x() + 1) * ((long) max.y() - (long) min.y() + 1) * ((long) max.z() - (long) min
                 .z() + 1));
         FaweLimit limit = actor.getLimit();
-        if (volume >= limit.MAX_CHECKS) {
+        if (volume >= limit.MAX_CHECKS.get()) {
             throw FaweCache.MAX_CHECKS;
         }
-        if (volume >= limit.MAX_CHANGES) {
+        if (volume >= limit.MAX_CHANGES.get()) {
             throw FaweCache.MAX_CHANGES;
         }
         session.setClipboard(null);
@@ -325,7 +327,7 @@ public class ClipboardCommands {
             } else {
                 throw e;
             }
-            Fawe.instance().getClipboardExecutor().submit(actor.getUniqueId(), () -> {
+            Fawe.instance().submitUUIDKeyQueuedTask(actor.getUniqueId(), () -> {
                 clipboard.close();
                 doc.getFile().delete();
             });
@@ -403,7 +405,7 @@ public class ClipboardCommands {
             final Clipboard target;
             // If we have a transform, bake it into the copy
             if (!transform.isIdentity()) {
-                target = clipboard.transform(transform);
+                target = clipboard.transform(MutatingOperationTransformHolder.transform(transform));
             } else {
                 target = clipboard;
             }
@@ -471,9 +473,9 @@ public class ClipboardCommands {
         Region region = clipboard.getRegion().clone();
         if (selectPasted || onlySelect || removeEntities) {
             BlockVector3 clipboardOffset = clipboard.getRegion().getMinimumPoint().subtract(clipboard.getOrigin());
-            BlockVector3 realTo = to.add(holder.getTransform().apply(clipboardOffset.toVector3()).toBlockPoint());
-            BlockVector3 max = realTo.add(holder
-                    .getTransform()
+            Transform transform = MutatingOperationTransformHolder.transform(holder.getTransform());
+            BlockVector3 realTo = to.add(transform.apply(clipboardOffset.toVector3()).toBlockPoint());
+            BlockVector3 max = realTo.add(transform
                     .apply(region.getMaximumPoint().subtract(region.getMinimumPoint()).toVector3())
                     .toBlockPoint());
             if (removeEntities) {
@@ -563,10 +565,9 @@ public class ClipboardCommands {
 
         if (selectPasted || onlySelect || removeEntities) {
             BlockVector3 clipboardOffset = clipboard.getRegion().getMinimumPoint().subtract(clipboard.getOrigin());
-            Vector3 realTo = to.toVector3().add(holder.getTransform().apply(clipboardOffset.toVector3()));
-            Vector3 max = realTo.add(holder
-                    .getTransform()
-                    .apply(region.getMaximumPoint().subtract(region.getMinimumPoint()).toVector3()));
+            Transform transform = MutatingOperationTransformHolder.transform(holder.getTransform()); //FAWE: mutate transform
+            Vector3 realTo = to.toVector3().add(transform.apply(clipboardOffset.toVector3()));
+            Vector3 max = realTo.add(transform.apply(region.getMaximumPoint().subtract(region.getMinimumPoint()).toVector3()));
 
             // FAWE start - entity remova;l
             if (removeEntities) {
@@ -637,6 +638,7 @@ public class ClipboardCommands {
 
     @Command(
             name = "/flip",
+            aliases = { "/mirror" },
             desc = "Flip the contents of the clipboard across the origin"
     )
     @CommandPermissions("worldedit.clipboard.flip")

@@ -34,6 +34,7 @@ import net.jpountz.lz4.LZ4Compressor;
 import net.jpountz.lz4.LZ4Factory;
 import net.jpountz.lz4.LZ4FastDecompressor;
 import org.apache.logging.log4j.Logger;
+import org.enginehub.linbus.tree.LinCompoundTag;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -424,8 +425,10 @@ public class MainUtil {
      * @param y   New Y coordinate
      * @param z   New Z coordinate
      * @return New tag
+     * @deprecated use {@link NbtUtils#withPosition} instead
      */
     @Nonnull
+    @Deprecated(forRemoval = true, since = "2.11.2")
     public static CompoundTag setPosition(@Nonnull CompoundTag tag, int x, int y, int z) {
         Map<String, Tag<?, ?>> value = new HashMap<>(tag.getValue());
         value.put("x", new IntTag(x));
@@ -440,8 +443,10 @@ public class MainUtil {
      * @param tag    Tag to copy
      * @param entity Entity
      * @return New tag
+     * @deprecated use {@link NbtUtils#withEntityInfo(LinCompoundTag, Entity)} instead
      */
     @Nonnull
+    @Deprecated(forRemoval = true, since = "2.11.2")
     public static CompoundTag setEntityInfo(@Nonnull CompoundTag tag, @Nonnull Entity entity) {
         Map<String, Tag<?, ?>> map = new HashMap<>(tag.getValue());
         map.put("Id", new StringTag(entity.getState().getType().id()));
@@ -701,7 +706,7 @@ public class MainUtil {
 
     public static File resolve(File dir, String filename, @Nullable ClipboardFormat format, boolean allowDir) {
         if (format != null) {
-            if (!filename.matches(".*\\.[\\w].*")) {
+            if (!filename.matches(".*\\.\\w.*")) {
                 filename = filename + "." + format.getPrimaryFileExtension();
             }
             return MainUtil.resolveRelative(new File(dir, filename));
@@ -709,6 +714,12 @@ public class MainUtil {
         if (allowDir) {
             File file = MainUtil.resolveRelative(new File(dir, filename));
             if (file.exists() && file.isDirectory()) {
+                return file;
+            }
+        }
+        if (filename.matches(".*\\.\\w.*")) {
+            File file = MainUtil.resolveRelative(new File(dir, filename));
+            if (file.exists()) {
                 return file;
             }
         }

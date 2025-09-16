@@ -744,6 +744,26 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
         return maxZ;
     }
 
+    /**
+     * Check if an entire chunk is contained by this region
+     *
+     * @param chunkX     chunk x coord
+     * @param chunkZ     chunk z coord
+     * @param chunkMinY The minimum Y level of the chunk
+     * @param chunkMaxY  The maximum Y level of the chunk
+     * @return If the entire chunk is contained by this region
+     * @since 2.13.0
+     */
+    public boolean chunkContainedBy(int chunkX, int chunkZ, int chunkMinY, int chunkMaxY) {
+        int bx = chunkX << 4;
+        int bz = chunkZ << 4;
+        int tx = bx + 15;
+        int tz = bz + 15;
+        BlockVector3 min = getMinimumPoint();
+        BlockVector3 max = getMaximumPoint();
+        return min.y() <= chunkMinY && max.y() >= chunkMaxY && min.x() <= bx && max.x() >= tx && min.z() <= bz && max.z() >= tz;
+    }
+
     @Override
     public void filter(
             final IChunk chunk,

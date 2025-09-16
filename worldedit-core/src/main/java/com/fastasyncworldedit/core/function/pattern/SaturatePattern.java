@@ -16,9 +16,9 @@ import java.awt.Color;
 
 public class SaturatePattern extends AbstractPattern {
 
-    private final TextureHolder holder;
+    private final transient TextureUtil util;
+    private final transient Extent extent;
     private final int color;
-    private final Extent extent;
 
     /**
      * Create a new {@link Pattern} instance
@@ -32,20 +32,33 @@ public class SaturatePattern extends AbstractPattern {
      */
     public SaturatePattern(Extent extent, TextureHolder holder, int r, int g, int b, int a) {
         this.extent = extent;
-        this.holder = holder;
+        this.util = holder.getTextureUtil();
         this.color = new Color(MathMan.clamp(r, 0, 255), MathMan.clamp(g, 0, 255), MathMan.clamp(b, 0, 255), MathMan.clamp(a, 0
                 , 255)).getRGB();
+    }
+
+    /**
+     * Create a new {@link Pattern} instance
+     *
+     * @param extent extent to set to
+     * @param util   {@link TextureUtil} to use to get textures
+     * @param color  color to saturate to
+     * @since 2.13.0
+     */
+    private SaturatePattern(Extent extent, TextureUtil util, int color) {
+        this.extent = extent;
+        this.util = util;
+        this.color = color;
     }
 
     @Override
     public BaseBlock applyBlock(BlockVector3 position) {
         BlockType type = extent.getBlock(position).getBlockType();
-        TextureUtil util = holder.getTextureUtil();
         int currentColor;
         if (type == BlockTypes.GRASS_BLOCK) {
-            currentColor = holder.getTextureUtil().getColor(extent.getBiome(position));
+            currentColor = util.getColor(extent.getBiome(position));
         } else {
-            currentColor = holder.getTextureUtil().getColor(type);
+            currentColor = util.getColor(type);
         }
         int newColor = TextureUtil.multiplyColor(currentColor, color);
         return util.getNearestBlock(newColor).getDefaultState().toBaseBlock();
@@ -54,12 +67,11 @@ public class SaturatePattern extends AbstractPattern {
     @Override
     public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
         BlockType type = get.getBlock(extent).getBlockType();
-        TextureUtil util = holder.getTextureUtil();
         int currentColor;
         if (type == BlockTypes.GRASS_BLOCK) {
-            currentColor = holder.getTextureUtil().getColor(extent.getBiome(get));
+            currentColor = util.getColor(extent.getBiome(get));
         } else {
-            currentColor = holder.getTextureUtil().getColor(type);
+            currentColor = util.getColor(type);
         }
         if (currentColor == 0) {
             return false;
@@ -70,6 +82,11 @@ public class SaturatePattern extends AbstractPattern {
             return false;
         }
         return set.setBlock(extent, newBlock.getDefaultState());
+    }
+
+    @Override
+    public Pattern fork() {
+        return new SaturatePattern(extent, util.fork(), color);
     }
 
 }

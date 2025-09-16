@@ -1,9 +1,10 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import io.papermc.paperweight.userdev.attribute.Obfuscation
+import me.modmuss50.mpp.ReleaseType
 
 plugins {
     `java-library`
-    alias(libs.plugins.minotaur)
+    alias(libs.plugins.mod.publish.plugin)
 }
 
 project.description = "Bukkit"
@@ -47,19 +48,24 @@ val localImplementation = configurations.create("localImplementation") {
 }
 
 val adapters = configurations.create("adapters") {
-    description = "Adapters to include in the JAR"
+    description = "Adapters to include in the JAR (Mojmap)"
     isCanBeConsumed = false
     isCanBeResolved = true
     shouldResolveConsistentlyWith(configurations["runtimeClasspath"])
     attributes {
-        attribute(Obfuscation.OBFUSCATION_ATTRIBUTE,
-                if ((project.findProperty("enginehub.obf.none") as String?).toBoolean()) {
-                    objects.named(Obfuscation.NONE)
-                } else {
-                    objects.named(Obfuscation.OBFUSCATED)
-                }
-        )
+        attribute(Obfuscation.OBFUSCATION_ATTRIBUTE, objects.named(Obfuscation.NONE))
     }
+}
+
+val adaptersReobf = configurations.create("adaptersReobf") {
+    description = "Adapters to include in the JAR (Spigot-Mapped)"
+    isCanBeConsumed = false
+    isCanBeResolved = true
+    shouldResolveConsistentlyWith(configurations["runtimeClasspath"])
+    attributes {
+        attribute(Obfuscation.OBFUSCATION_ATTRIBUTE, objects.named(Obfuscation.OBFUSCATED))
+    }
+    extendsFrom(adapters)
 }
 
 dependencies {
@@ -97,7 +103,6 @@ dependencies {
         exclude("com.sk89q.worldedit.worldedit-libs", "bukkit")
         exclude("com.sk89q.worldedit.worldedit-libs", "core")
     }
-    compileOnly(libs.mapmanager) { isTransitive = false }
     compileOnly(libs.griefprevention) { isTransitive = false }
     compileOnly(libs.griefdefender) { isTransitive = false }
     compileOnly(libs.residence) { isTransitive = false }
@@ -141,9 +146,37 @@ tasks.named<Jar>("jar") {
 
 addJarManifest(WorldEditKind.Plugin, includeClasspath = true)
 
-tasks.named<ShadowJar>("shadowJar") {
-    configurations.add(adapters)
+tasks.register<ShadowJar>("reobfShadowJar") {
     archiveFileName.set("${rootProject.name}-Bukkit-${project.version}.${archiveExtension.getOrElse("jar")}")
+    configurations = listOf(
+        project.configurations.runtimeClasspath.get(), // as is done by shadow for the default shadowJar
+        adaptersReobf
+    )
+
+    // as is done by shadow for the default shadowJar
+    from(sourceSets.main.map { it.output })
+    manifest.inheritFrom(tasks.jar.get().manifest)
+    exclude("META-INF/INDEX.LIST", "META-INF/*.SF", "META-INF/*.DSA", "META-INF/*.RSA", "module-info.class")
+
+    manifest {
+        attributes(
+            "FAWE-Plugin-Jar-Type" to "spigot"
+        )
+    }
+}
+
+tasks.named<ShadowJar>("shadowJar") {
+    archiveFileName.set("${rootProject.name}-Paper-${project.version}.${archiveExtension.getOrElse("jar")}")
+    configurations.add(adapters)
+    manifest {
+        attributes(
+            "paperweight-mappings-namespace" to "mojang",
+            "FAWE-Plugin-Jar-Type" to "mojang"
+        )
+    }
+}
+
+tasks.withType<ShadowJar>().configureEach {
     dependencies {
         // In tandem with not bundling log4j, we shouldn't relocate base package here.
         // relocate("org.apache.logging", "com.sk89q.worldedit.log4j")
@@ -169,8 +202,9 @@ tasks.named<ShadowJar>("shadowJar") {
         relocate("it.unimi.dsi.fastutil", "com.sk89q.worldedit.bukkit.fastutil") {
             include(dependency("it.unimi.dsi:fastutil"))
         }
+        relocate("net.royawesome.jlibnoise", "com.sk89q.worldedit.jlibnoise")
         relocate("org.incendo.serverlib", "com.fastasyncworldedit.serverlib") {
-            include(dependency("dev.notmyfault.serverlib:ServerLib:2.3.6"))
+            include(dependency("dev.notmyfault.serverlib:ServerLib:2.3.7"))
         }
         relocate("com.intellectualsites.paster", "com.fastasyncworldedit.paster") {
             include(dependency("com.intellectualsites.paster:Paster"))
@@ -198,20 +232,51 @@ tasks.named<ShadowJar>("shadowJar") {
 
 tasks.named("assemble").configure {
     dependsOn("shadowJar")
+    dependsOn("reobfShadowJar")
 }
 
-tasks {
-    modrinth {
-        token.set(System.getenv("MODRINTH_TOKEN"))
-        projectId.set("fastasyncworldedit")
-        versionName.set("${project.version}")
-        versionNumber.set("${project.version}")
-        versionType.set("release")
-        uploadFile.set(file("build/libs/${rootProject.name}-Bukkit-${project.version}.jar"))
-        gameVersions.addAll(listOf("1.21", "1.20.6", "1.20.5", "1.20.3", "1.20.2", "1.20.1", "1.20", "1.19.4"))
-        loaders.addAll(listOf("paper", "spigot"))
-        changelog.set("The changelog is available on GitHub: https://github.com/IntellectualSites/" +
-                "FastAsyncWorldEdit/releases/tag/${project.version}")
-        syncBodyFrom.set(rootProject.file("README.md").readText())
+publishMods {
+    displayName.set("${project.version}")
+    version.set("${project.version}")
+    type.set(ReleaseType.STABLE)
+    changelog.set("The changelog is available on GitHub: https://github.com/IntellectualSites/" +
+            "FastAsyncWorldEdit/releases/tag/${project.version}")
+
+    val common = modrinthOptions {
+        accessToken.set(System.getenv("MODRINTH_TOKEN"))
+        projectId.set("z4HZZnLr")
+        projectDescription.set(providers.fileContents { layout.projectDirectory.file("README.md") as File }.asText)
     }
+
+    // We publish the reobfJar twice to ensure that the modrinth download menu picks the right jar for the platform regardless
+    // of minecraft version.
+
+    val mojmapPaperVersions = listOf("1.20.6", "1.21.7", "1.21.8")
+    val spigotMappedPaperVersions = listOf("1.20.2", "1.20.4")
+
+    // Mark reobfJar as spigot only for 1.20.5+
+    modrinth("spigot") {
+        from(common)
+        file.set(tasks.named<ShadowJar>("reobfShadowJar").flatMap { it.archiveFile })
+        minecraftVersions.set(mojmapPaperVersions)
+        modLoaders.set(listOf("spigot"))
+    }
+
+    // Mark reobfJar as spigot & paper for <1.20.5
+    modrinth("spigotAndOldPaper") {
+        from(common)
+        file.set(tasks.named<ShadowJar>("reobfShadowJar").flatMap { it.archiveFile })
+        minecraftVersions.set(spigotMappedPaperVersions)
+        modLoaders.set(listOf("paper", "spigot"))
+    }
+
+    // Mark mojang mapped jar as paper 1.20.5+ only
+    modrinth {
+        from(common)
+        file.set(tasks.named<ShadowJar>("shadowJar").flatMap { it.archiveFile })
+        minecraftVersions.set(mojmapPaperVersions)
+        modLoaders.set(listOf("paper"))
+    }
+
+    // dryRun.set(true) // For testing
 }

@@ -440,7 +440,7 @@ public class BrushTool
                     Caption.of("fawe.error.no-perm", StringMan.join(current.getPermissions(), ",")));
             return false;
         }
-        try (EditSession editSession = session.createEditSession(player, current.toString(), brush.setsSynchronously())) {
+        try (EditSession editSession = session.createEditSession(player, current.toString())) {
             Location target = player.getBlockTrace(getRange(), true, traceMask);
 
             if (target == null) {

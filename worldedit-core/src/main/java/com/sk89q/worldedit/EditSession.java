@@ -38,7 +38,7 @@ import com.fastasyncworldedit.core.function.generator.GenBase;
 import com.fastasyncworldedit.core.function.generator.OreGen;
 import com.fastasyncworldedit.core.function.generator.SchemGen;
 import com.fastasyncworldedit.core.function.mask.BlockMaskBuilder;
-import com.fastasyncworldedit.core.function.mask.MaskUnion;
+import com.sk89q.worldedit.function.mask.MaskUnion;
 import com.fastasyncworldedit.core.function.mask.ResettableMask;
 import com.fastasyncworldedit.core.function.mask.SingleBlockTypeMask;
 import com.fastasyncworldedit.core.function.mask.WallMakeMask;
@@ -127,6 +127,7 @@ import com.sk89q.worldedit.regions.FlatRegion;
 import com.sk89q.worldedit.regions.NullRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.RegionIntersection;
+import com.sk89q.worldedit.regions.RegionOperationException;
 import com.sk89q.worldedit.regions.Regions;
 import com.sk89q.worldedit.regions.shape.ArbitraryBiomeShape;
 import com.sk89q.worldedit.regions.shape.ArbitraryShape;
@@ -169,7 +170,7 @@ import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.sk89q.worldedit.function.block.SnowSimulator.snowy;
+import static com.sk89q.worldedit.function.block.SnowSimulator.SNOWY;
 import static com.sk89q.worldedit.regions.Regions.asFlatRegion;
 import static com.sk89q.worldedit.regions.Regions.maximumBlockY;
 import static com.sk89q.worldedit.regions.Regions.minimumBlockY;
@@ -211,6 +212,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * NONE = Place blocks without worrying about placement order.
      * </p>
      */
+    @Deprecated
     public enum ReorderMode {
         MULTI_STAGE("multi"),
         FAST("fast"),
@@ -397,6 +399,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      *
      * @param reorderMode The reorder mode
      */
+    @Deprecated
     public void setReorderMode(ReorderMode reorderMode) {
         //FAWE start - we don't do physics so we don't need this
         switch (reorderMode) {
@@ -418,6 +421,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      *
      * @return the reorder mode
      */
+    @Deprecated
     public ReorderMode getReorderMode() {
         if (isQueueEnabled()) {
             return ReorderMode.MULTI_STAGE;
@@ -463,7 +467,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      */
     @Deprecated
     public long getBlockChangeLimit() {
-        return originalLimit.MAX_CHANGES;
+        return originalLimit.MAX_CHANGES.get();
     }
 
     /**
@@ -472,14 +476,14 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * @param limit the limit (&gt;= 0) or -1 for no limit
      */
     public void setBlockChangeLimit(long limit) {
-        this.limit.MAX_CHANGES = limit;
+        this.limit.MAX_CHANGES.set(limit);
     }
 
     /**
      * Returns queue status.
      *
      * @return whether the queue is enabled
-     * @deprecated Use {@link EditSession#getReorderMode()} with MULTI_STAGE instead.
+     * @deprecated Use {@link EditSession#isBufferingEnabled()} instead.
      */
     @Deprecated
     public boolean isQueueEnabled() {
@@ -492,7 +496,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * Queue certain types of block for better reproduction of those blocks. Uses
      * {@link ReorderMode#MULTI_STAGE}.
      *
-     * @deprecated Use {@link EditSession#setReorderMode(ReorderMode)} with MULTI_STAGE instead.
+     * @deprecated There is no specific replacement, instead enable what you want specifically.
      */
     @Deprecated
     public void enableQueue() {
@@ -502,7 +506,9 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     }
 
     /**
-     * Disable the queue. This will close the queue.
+     * Disable the queue. This will flush the session.
+     *
+     * @deprecated Use {@link EditSession#disableBuffering()} instead.
      */
     @Deprecated
     public void disableQueue() {
@@ -838,6 +844,15 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
             disableQueue();
         }
         //FAWE end
+    }
+
+    /**
+     * Check if this session has any buffering extents enabled.
+     *
+     * @return {@code true} if any extents are buffering
+     */
+    public boolean isBufferingEnabled() {
+        return isBatchingChunks();
     }
 
     /**
@@ -1191,6 +1206,40 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     //FAWE end
 
     /**
+     * Gets whether this EditSession will track history.
+     *
+     * @return whether history is tracked
+     */
+    public boolean isTrackingHistory() {
+        //FAWE start
+        return history;
+        //FAWE end
+    }
+
+    /**
+     * Sets whether this EditSession will track history.
+     *
+     * @param trackHistory whether to track history
+     */
+    public void setTrackingHistory(boolean trackHistory) {
+        //FAWE start
+        if (trackHistory) {
+            if (this.history) {
+                if (this.changeSet == null) {
+                    throw new IllegalStateException("No ChangeSetExtent is available");
+                }
+                enableHistory(this.changeSet);
+            }
+        } else {
+            if (this.history) {
+                disableHistory();
+                this.history = false;
+            }
+        }
+        //FAWE end
+    }
+
+    /**
      * Get the number of changed blocks.
      *
      * @return the number of changes
@@ -1284,8 +1333,8 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         Operations.completeBlindly(commit());
         // Check fails
         FaweLimit used = getLimitUsed();
-        if (used.MAX_FAILS > 0) {
-            if (used.MAX_CHANGES > 0 || used.MAX_ENTITIES > 0) {
+        if (used.MAX_FAILS.get() > 0) {
+            if (used.MAX_CHANGES.get() > 0 || used.MAX_ENTITIES.get() > 0) {
                 actor.print(Caption.of("fawe.error.worldedit.some.fails", used.MAX_FAILS));
             } else if (new ExtentTraverser<>(getExtent()).findAndGet(FaweRegionExtent.class) != null) {
                 actor.print(Caption.of("fawe.cancel.reason.outside.region"));
@@ -1804,18 +1853,59 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
     public int stackCuboidRegion(
-            Region region, BlockVector3 offset, int count,
-            boolean copyEntities, boolean copyBiomes, Mask mask
+            Region region,
+            BlockVector3 offset,
+            int count,
+            boolean copyEntities,
+            boolean copyBiomes,
+            Mask mask
     ) throws MaxChangedBlocksException {
+        checkNotNull(region);
+        checkNotNull(offset);
+
+        BlockVector3 size = region.getMaximumPoint().subtract(region.getMinimumPoint()).add(1, 1, 1);
+        try {
+            return stackRegionBlockUnits(region, offset.multiply(size), count, copyEntities, copyBiomes, mask);
+        } catch (RegionOperationException e) {
+            // Should never be able to happen
+            throw new AssertionError(e);
+        }
+    }
+
+    /**
+     * Stack a region using block units.
+     *
+     * @param region       the region to stack
+     * @param offset       how far to move the contents each stack in block units
+     * @param count        the number of times to stack
+     * @param copyEntities true to copy entities
+     * @param copyBiomes   true to copy biomes
+     * @param mask         source mask for the operation (only matching blocks are copied)
+     * @return number of blocks affected
+     * @throws MaxChangedBlocksException thrown if too many blocks are changed
+     * @throws RegionOperationException  thrown if the region operation is invalid
+     */
+    public int stackRegionBlockUnits(
+            Region region,
+            BlockVector3 offset,
+            int count,
+            boolean copyEntities,
+            boolean copyBiomes,
+            Mask mask
+    ) throws MaxChangedBlocksException, RegionOperationException {
         checkNotNull(region);
         checkNotNull(offset);
         checkArgument(count >= 1, "count >= 1 required");
 
         BlockVector3 size = region.getMaximumPoint().subtract(region.getMinimumPoint()).add(1, 1, 1);
+        BlockVector3 offsetAbs = offset.abs();
+        if (offsetAbs.x() < size.x() && offsetAbs.y() < size.y() && offsetAbs.z() < size.z()) {
+            throw new RegionOperationException(Caption.of("worldedit.stack.intersecting-region"));
+        }
         BlockVector3 to = region.getMinimumPoint();
         ForwardExtentCopy copy = new ForwardExtentCopy(this, region, this, to);
         copy.setRepetitions(count);
-        copy.setTransform(new AffineTransform().translate(offset.multiply(size)));
+        copy.setTransform(new AffineTransform().translate(offset));
         copy.setCopyingEntities(copyEntities);
         copy.setCopyingBiomes(copyBiomes);
         final Region allowedRegion;
@@ -2306,17 +2396,18 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         final int ceilRadiusX = (int) Math.ceil(radiusX);
         final int ceilRadiusZ = (int) Math.ceil(radiusZ);
 
-        double rx2 = Math.pow(radiusX, 2);
-        double ry2 = Math.pow(height, 2);
-        double rz2 = Math.pow(radiusZ, 2);
+        final double rx2 = Math.pow(radiusX, 2);
+        final double ry2 = Math.pow(radiusZ, 2);
+        final double rz2 = Math.pow(height, 2);
+        final int layers = Math.abs(height);
 
         int cx = pos.x();
         int cy = pos.y();
         int cz = pos.z();
 
-        for (int y = 0; y < height; ++y) {
-            double ySquaredMinusHeightOverHeightSquared = Math.pow(y - height, 2) / ry2;
-            int yy = cy + y;
+        for (int y = 0; y < layers; ++y) {
+            double ySquaredMinusHeightOverHeightSquared = Math.pow(y - layers, 2) / ry2;
+            int yy = height < 0 ? cy - y : cy + y;
             forX:
             for (int x = 0; x <= ceilRadiusX; ++x) {
                 double xSquaredOverRadiusX = Math.pow(x, 2) / rx2;
@@ -2338,7 +2429,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
                         double xNext = Math.pow(x + thickness, 2) / rx2 + zSquaredOverRadiusZ - ySquaredMinusHeightOverHeightSquared;
                         double yNext = xSquaredOverRadiusX + zSquaredOverRadiusZ - Math.pow(y + thickness - height, 2) / ry2;
                         double zNext = xSquaredOverRadiusX + Math.pow(z + thickness, 2) / rz2 - ySquaredMinusHeightOverHeightSquared;
-                        if (xNext <= 0 && zNext <= 0 && (yNext <= 0 && y + thickness != height)) {
+                        if (xNext <= 0 && zNext <= 0 && (yNext <= 0 && y + thickness != layers)) {
                             continue;
                         }
                     }
@@ -2746,8 +2837,8 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
                         if (setBlock(mutable, air)) {
                             if (y > getMinY()) {
                                 BlockState block = getBlock(mutable2);
-                                if (block.getStates().containsKey(snowy)) {
-                                    if (setBlock(mutable2, block.with(snowy, false))) {
+                                if (block.getBlockType().hasProperty(SNOWY)) {
+                                    if (setBlock(mutable2, block.with(SNOWY, false))) {
                                         affected++;
                                     }
                                 }
@@ -3256,7 +3347,9 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
                 outer:
                 for (BlockVector3 position : region) {
                     for (BlockVector3 recurseDirection : recurseDirections) {
-                        BlockVector3 neighbor = position.add(recurseDirection);
+                        //FAWE start - mutable
+                        BlockVector3 neighbor = mutable.setComponents(position).add(recurseDirection);
+                        //FAWE end
 
                         if (outside.contains(neighbor)) {
                             newOutside.add(position);
@@ -3271,7 +3364,9 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
             outer:
             for (BlockVector3 position : region) {
                 for (BlockVector3 recurseDirection : recurseDirections) {
-                    BlockVector3 neighbor = position.add(recurseDirection);
+                    //FAWE start - mutable
+                    BlockVector3 neighbor = mutable.setComponents(position).add(recurseDirection);
+                    //FAWE end
 
                     if (outside.contains(neighbor)) {
                         continue outer;
@@ -3480,7 +3575,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     )
             throws MaxChangedBlocksException {
 
-        LocalBlockVectorSet vset = new LocalBlockVectorSet();
+        BlockVector3Set vset = LocalBlockVectorSet.wrapped();
         List<Node> nodes = new ArrayList<>(nodevectors.size());
 
         Interpolation interpol = new KochanekBartelsInterpolation();
@@ -3519,7 +3614,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         if (radius < 1) {
             return vset;
         }
-        LocalBlockVectorSet returnset = new LocalBlockVectorSet();
+        BlockVector3Set returnset = LocalBlockVectorSet.wrapped();
         int ceilrad = (int) Math.ceil(radius);
 
         for (BlockVector3 v : vset) {
@@ -3545,7 +3640,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         if (radius < 1) {
             return vset;
         }
-        final LocalBlockVectorSet returnset = new LocalBlockVectorSet();
+        final BlockVector3Set returnset = LocalBlockVectorSet.wrapped();
         final int ceilrad = (int) Math.ceil(radius);
         for (BlockVector3 v : vset) {
             final int tipx = v.x();
@@ -3563,8 +3658,8 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     }
 
     public Set<BlockVector3> getOutline(Set<BlockVector3> vset) {
-        final LocalBlockVectorSet returnset = new LocalBlockVectorSet();
-        final LocalBlockVectorSet newset = new LocalBlockVectorSet();
+        final BlockVector3Set returnset = LocalBlockVectorSet.wrapped();
+        final BlockVector3Set newset = LocalBlockVectorSet.wrapped();
         newset.addAll(vset);
         for (BlockVector3 v : newset) {
             final int x = v.x();
@@ -3582,8 +3677,8 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     //FAWE end
 
     public Set<BlockVector3> getHollowed(Set<BlockVector3> vset) {
-        final Set<BlockVector3> returnset = new LocalBlockVectorSet();
-        final LocalBlockVectorSet newset = new LocalBlockVectorSet();
+        final BlockVector3Set returnset = LocalBlockVectorSet.wrapped();
+        final BlockVector3Set newset = LocalBlockVectorSet.wrapped();
         newset.addAll(vset);
         for (BlockVector3 v : newset) {
             final int x = v.x();
@@ -3602,8 +3697,11 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     }
 
     private void recurseHollow(Region region, BlockVector3 origin, Set<BlockVector3> outside, Mask mask) {
-        final LocalBlockVectorSet queue = new LocalBlockVectorSet();
+        // FAWE start - use BlockVector3Set instead of LinkedList & mutable BV3
+        final BlockVector3Set queue = BlockVector3Set.getAppropriateVectorSet(region);
         queue.add(origin);
+
+        MutableBlockVector3 mutable = new MutableBlockVector3();
 
         while (!queue.isEmpty()) {
             Iterator<BlockVector3> iter = queue.iterator();
@@ -3621,10 +3719,11 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
                 }
 
                 for (BlockVector3 recurseDirection : recurseDirections) {
-                    queue.add(current.add(recurseDirection));
+                    queue.add(mutable.setComponents(current).add(recurseDirection));
                 }
             }
         }
+        // FAWE end
     }
 
     public int makeBiomeShape(
@@ -3686,6 +3785,159 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
                             changed, timedOut.get()
                     ));
         }
+        return changed;
+    }
+
+    public int morph(BlockVector3 position, double brushSize, int minErodeFaces, int numErodeIterations, int minDilateFaces, int numDilateIterations) throws MaxChangedBlocksException {
+        int ceilBrushSize = (int) Math.ceil(brushSize);
+        int bufferSize = ceilBrushSize * 2 + 3;  // + 1 due to checking the adjacent blocks, plus the 0th block
+        // Store block states in a 3d array so we can do multiple mutations then commit.
+        // Two are required as for each iteration, one is "current" and the other is "new"
+        BlockState[][][] currentBuffer = new BlockState[bufferSize][bufferSize][bufferSize];
+        BlockState[][][] nextBuffer = new BlockState[bufferSize][bufferSize][bufferSize];
+
+        // Simply used for swapping the two
+        BlockState[][][] tmp;
+
+        // Load into buffer
+        for (int x = 0; x < bufferSize; x++) {
+            for (int y = 0; y < bufferSize; y++) {
+                for (int z = 0; z < bufferSize; z++) {
+                    BlockState blockState = getBlock(position.add(x - ceilBrushSize - 1, y - ceilBrushSize - 1, z - ceilBrushSize - 1));
+                    currentBuffer[x][y][z] = blockState;
+                    nextBuffer[x][y][z] = blockState;
+                }
+            }
+        }
+
+        double brushSizeSq = brushSize * brushSize;
+        Map<BlockState, Integer> blockStateFrequency = new HashMap<>();
+        int totalFaces;
+        int highestFreq;
+        BlockState highestState;
+        for (int i = 0; i < numErodeIterations; i++) {
+            for (int x = 0; x <= ceilBrushSize * 2; x++) {
+                int realX = x - ceilBrushSize;
+                int xsqr = realX * realX;
+                for (int y = 0; y <= ceilBrushSize * 2; y++) {
+                    int realY = y - ceilBrushSize;
+                    int ysqr = realY * realY;
+                    for (int z = 0; z <= ceilBrushSize * 2; z++) {
+                        int realZ = z - ceilBrushSize;
+                        int zsqr = realZ * realZ;
+                        if (xsqr + ysqr + zsqr > brushSizeSq) {
+                            continue;
+                        }
+
+                        // Copy across changes
+                        nextBuffer[x + 1][y + 1][z + 1] = currentBuffer[x + 1][y + 1][z + 1];
+
+                        BlockState blockState = currentBuffer[x + 1][y + 1][z + 1];
+
+                        if (blockState.getBlockType().getMaterial().isLiquid() || blockState.getBlockType().getMaterial().isAir()) {
+                            continue;
+                        }
+
+                        blockStateFrequency.clear();
+                        totalFaces = 0;
+                        highestFreq = 0;
+                        highestState = blockState;
+                        for (BlockVector3 vec3 : recurseDirections) {
+                            BlockState adj = currentBuffer[x + 1 + vec3.x()][y + 1 + vec3.y()][z + 1 + vec3.z()];
+
+                            if (!adj.getBlockType().getMaterial().isLiquid() && !adj.getBlockType().getMaterial().isAir()) {
+                                continue;
+                            }
+
+                            totalFaces++;
+                            int newFreq = blockStateFrequency.getOrDefault(adj, 0) + 1;
+                            blockStateFrequency.put(adj, newFreq);
+
+                            if (newFreq > highestFreq) {
+                                highestFreq = newFreq;
+                                highestState = adj;
+                            }
+                        }
+
+                        if (totalFaces >= minErodeFaces) {
+                            nextBuffer[x + 1][y + 1][z + 1] = highestState;
+                        }
+                    }
+                }
+            }
+            // Swap current and next
+            tmp = currentBuffer;
+            currentBuffer = nextBuffer;
+            nextBuffer = tmp;
+        }
+
+        for (int i = 0; i < numDilateIterations; i++) {
+            for (int x = 0; x <= ceilBrushSize * 2; x++) {
+                int realX = x - ceilBrushSize;
+                int xsqr = realX * realX;
+                for (int y = 0; y <= ceilBrushSize * 2; y++) {
+                    int realY = y - ceilBrushSize;
+                    int ysqr = realY * realY;
+                    for (int z = 0; z <= ceilBrushSize * 2; z++) {
+                        int realZ = z - ceilBrushSize;
+                        int zsqr = realZ * realZ;
+                        if (xsqr + ysqr + zsqr > brushSizeSq) {
+                            continue;
+                        }
+
+                        // Copy across changes
+                        nextBuffer[x + 1][y + 1][z + 1] = currentBuffer[x + 1][y + 1][z + 1];
+
+                        BlockState blockState = currentBuffer[x + 1][y + 1][z + 1];
+                        // Needs to be empty
+                        if (!blockState.getBlockType().getMaterial().isLiquid() && !blockState.getBlockType().getMaterial().isAir()) {
+                            continue;
+                        }
+
+                        blockStateFrequency.clear();
+                        totalFaces = 0;
+                        highestFreq = 0;
+                        highestState = blockState;
+                        for (BlockVector3 vec3 : recurseDirections) {
+                            BlockState adj = currentBuffer[x + 1 + vec3.x()][y + 1 + vec3.y()][z + 1 + vec3.z()];
+                            if (adj.getBlockType().getMaterial().isLiquid() || adj.getBlockType().getMaterial().isAir()) {
+                                continue;
+                            }
+
+                            totalFaces++;
+                            int newFreq = blockStateFrequency.getOrDefault(adj, 0) + 1;
+                            blockStateFrequency.put(adj, newFreq);
+
+                            if (newFreq > highestFreq) {
+                                highestFreq = newFreq;
+                                highestState = adj;
+                            }
+                        }
+
+                        if (totalFaces >= minDilateFaces) {
+                            nextBuffer[x + 1][y + 1][z + 1] = highestState;
+                        }
+                    }
+                }
+            }
+            // Swap current and next
+            tmp = currentBuffer;
+            currentBuffer = nextBuffer;
+            nextBuffer = tmp;
+        }
+
+        // Commit to world
+        int changed = 0;
+        for (int x = 0; x < bufferSize; x++) {
+            for (int y = 0; y < bufferSize; y++) {
+                for (int z = 0; z < bufferSize; z++) {
+                    if (setBlock(position.add(x - ceilBrushSize - 1, y - ceilBrushSize - 1, z - ceilBrushSize - 1), currentBuffer[x][y][z])) {
+                        changed++;
+                    }
+                }
+            }
+        }
+
         return changed;
     }
 
@@ -3883,7 +4135,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
 
     @Override
     public Clipboard lazyCopy(Region region) {
-        WorldCopyClipboard faweClipboard = new WorldCopyClipboard(() -> this, region);
+        WorldCopyClipboard faweClipboard = WorldCopyClipboard.of(this, region);
         faweClipboard.setOrigin(region.getMinimumPoint());
         return faweClipboard;
     }
@@ -4009,4 +4261,5 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         return changes;
     }
     //FAWE end
+
 }

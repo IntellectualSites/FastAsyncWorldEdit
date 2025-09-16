@@ -1,57 +1,56 @@
 [versions]
 # Minecraft expectations
 paper = "1.21-R0.1-SNAPSHOT"
-fastutil = "8.5.9"
-guava = "31.1-jre"
-log4j = "2.19.0"
-gson = "2.10"
-snakeyaml = "2.0"
+fastutil = "8.5.15"
+guava = "33.3.1-jre"
+log4j = "2.24.1"
+gson = "2.11.0"
+snakeyaml = "2.2"
 
 # Plugins
 dummypermscompat = "1.10"
-worldguard-bukkit = "7.0.10"
-mapmanager = "1.8.0-SNAPSHOT"
+worldguard-bukkit = "7.0.14"
 griefprevention = "17.0.0"
 griefdefender = "2.1.0-SNAPSHOT"
 residence = "4.5._13.1"
-towny = "0.100.3.9"
-plotsquared = "7.3.8"
+towny = "0.101.2.4"
+plotsquared = "7.5.7"
 
 # Third party
-bstats = "3.0.2"
+bstats = "3.1.0"
 sparsebitset = "1.3"
 parallelgzip = "1.0.5"
-adventure = "4.17.0"
-adventure-bukkit = "4.3.3"
-checkerqual = "3.45.0"
+adventure = "4.24.0"
+adventure-bukkit = "4.4.1"
+checkerqual = "3.51.0"
 truezip = "6.8.4"
 auto-value = "1.11.0"
 findbugs = "3.0.2"
 rhino-runtime = "1.7.15"
 zstd-jni = "1.4.8-1" # Not latest as it can be difficult to obtain latest ZSTD libs
-antlr4 = "4.13.1"
+antlr4 = "4.13.2"
 json-simple = "1.1.1"
 jlibnoise = "1.0.0"
 jchronic = "0.2.4a"
 lz4-java = "1.8.0"
 lz4-stream = "1.0.0"
-commons-cli = "1.8.0"
+commons-cli = "1.10.0"
 paperlib = "1.0.8"
-paster = "1.1.6"
+paster = "1.1.7"
 vault = "1.7.1"
-serverlib = "2.3.6"
-linbus = "0.1.2"
+serverlib = "2.3.7"
+linbus = "0.2.0"
 ## Internal
 text-adapter = "3.0.6"
 text = "3.0.4"
 piston = "0.5.10"
 
 # Tests
-mockito = "5.12.0"
+mockito = "5.19.0"
 
 # Gradle plugins
 pluginyml = "0.6.0"
-minotaur = "2.8.7"
+mod-publish-plugin = "0.8.4"
 
 [libraries]
 # Minecraft expectations
@@ -66,7 +65,6 @@ snakeyaml = { group = "org.yaml", name = "snakeyaml", version.ref = "snakeyaml" 
 # Plugins
 dummypermscompat = { group = "com.sk89q", name = "dummypermscompat", version.ref = "dummypermscompat" }
 worldguard = { group = "com.sk89q.worldguard", name = "worldguard-bukkit", version.ref = "worldguard-bukkit" }
-mapmanager = { group = "com.github.InventivetalentDev", name = "MapManager", version.ref = "mapmanager" }
 griefprevention = { group = "com.github.TechFortress", name = "GriefPrevention", version.ref = "griefprevention" }
 griefdefender = { group = "com.griefdefender", name = "api", version.ref = "griefdefender" }
 residence = { group = "com.bekvon.bukkit.residence", name = "Residence", version.ref = "residence" }
@@ -127,4 +125,4 @@ log4jCore = { group = "org.apache.logging.log4j", name = "log4j-core", version.r
 
 [plugins]
 pluginyml = { id = "net.minecrell.plugin-yml.bukkit", version.ref = "pluginyml" }
-minotaur = { id = "com.modrinth.minotaur", version.ref = "minotaur" }
+mod-publish-plugin = { id = "me.modmuss50.mod-publish-plugin", version.ref = "mod-publish-plugin" }

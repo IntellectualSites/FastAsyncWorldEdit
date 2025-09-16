@@ -49,6 +49,7 @@ public interface BlockVector3Set extends Set<BlockVector3> {
             return new LocalBlockVectorSet();
         }
     }
+
     boolean add(int x, int y, int z);
 
     boolean contains(int x, int y, int z);
@@ -77,12 +78,20 @@ public interface BlockVector3Set extends Set<BlockVector3> {
     /**
      * If a radius is contained by the set
      *
-     * @param x      x radius center
-     * @param y      y radius center
-     * @param z      z radius center
+     * @param x x radius center
+     * @param y y radius center
+     * @param z z radius center
      * @return if radius is contained by the set
      * @since 2.9.2
      */
     boolean containsRadius(int x, int y, int z, int radius);
+
+    /**
+     * Copy this {@link BlockVector3Set} instance
+     *
+     * @return copied instance
+     * @since 2.13.0
+     */
+    BlockVector3Set copy();
 
 }

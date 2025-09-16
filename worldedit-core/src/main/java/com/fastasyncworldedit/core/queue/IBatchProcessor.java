@@ -3,15 +3,17 @@ package com.fastasyncworldedit.core.queue;
 import com.fastasyncworldedit.core.extent.processor.EmptyBatchProcessor;
 import com.fastasyncworldedit.core.extent.processor.MultiBatchProcessor;
 import com.fastasyncworldedit.core.extent.processor.ProcessorScope;
-import com.sk89q.jnbt.CompoundTag;
+import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
+import com.fastasyncworldedit.core.util.NbtUtils;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 
 import javax.annotation.Nullable;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.function.Function;
@@ -50,7 +52,18 @@ public interface IBatchProcessor {
     }
 
     /**
-     * Convert this processor into an Extent based processor instead of a queue batch based one.
+     * Process a chunk GET. Method typically only called when a chunk is loaded into memory (miss from
+     * {@link com.fastasyncworldedit.core.queue.implementation.SingleThreadQueueExtent cache}).
+     *
+     * @param get GET chunk loaded
+     * @return processed get chunk
+     */
+    default IChunkGet processGet(IChunkGet get) {
+        return get;
+    }
+
+    /**
+     * Convert this processor into an Extent based processor instead of a queue batch based on.
      */
     @Nullable
     Extent construct(Extent child);
@@ -62,40 +75,41 @@ public interface IBatchProcessor {
      * @return false if chunk is empty of blocks
      */
     default boolean trimY(IChunkSet set, int minY, int maxY, final boolean keepInsideRange) {
-        int minLayer = (minY - 1) >> 4;
-        int maxLayer = (maxY + 1) >> 4;
+        int minLayer = minY >> 4;
+        int maxLayer = maxY >> 4;
         if (keepInsideRange) {
-            for (int layer = set.getMinSectionPosition(); layer <= minLayer; layer++) {
-                if (set.hasSection(layer)) {
-                    if (layer == minLayer) {
-                        char[] arr = set.loadIfPresent(layer);
-                        if (arr != null) {
-                            int index = (minY & 15) << 8;
-                            for (int i = 0; i < index; i++) {
-                                arr[i] = BlockTypesCache.ReservedIDs.__RESERVED__;
-                            }
-                            set.setBlocks(layer, arr);
-                        }
-                    } else {
-                        set.setBlocks(layer, null);
+            for (int layer = set.getMinSectionPosition(); layer <= set.getMaxSectionPosition(); layer++) {
+                if (!set.hasSection(layer)) {
+                    continue;
+                }
+                // wipe all data from chunk layers above or below the max / min layer
+                if (layer < minLayer || layer > maxLayer) {
+                    set.setBlocks(layer, null);
+                    continue;
+                }
+                // if chunk layer / section is fully enclosed by minY to maxY, keep as is
+                if (layer > minLayer && layer < maxLayer) {
+                    continue;
+                }
+                char[] blocks = set.loadIfPresent(layer);
+                if (blocks == null) {
+                    continue;
+                }
+                // When on the minimum layer (as defined by minY), remove blocks up to minY (exclusive)
+                if (layer == minLayer) {
+                    int index = (minY & 15) << 8;
+                    for (int i = 0; i < index; i++) {
+                        blocks[i] = BlockTypesCache.ReservedIDs.__RESERVED__;
                     }
                 }
-            }
-            for (int layer = maxLayer; layer <= set.getMaxSectionPosition(); layer++) {
-                if (set.hasSection(layer)) {
-                    if (layer == maxLayer) {
-                        char[] arr = set.loadIfPresent(layer);
-                        if (arr != null) {
-                            int index = ((maxY + 1) & 15) << 8;
-                            for (int i = index; i < arr.length; i++) {
-                                arr[i] = BlockTypesCache.ReservedIDs.__RESERVED__;
-                            }
-                            set.setBlocks(layer, arr);
-                        }
-                    } else {
-                        set.setBlocks(layer, null);
+                // When on the maximum layer (as defined by maxY), remove blocks above maxY (exclusive)
+                if (layer == maxLayer) {
+                    int index = ((maxY & 15) + 1) << 8;
+                    for (int i = index; i < blocks.length; i++) {
+                        blocks[i] = BlockTypesCache.ReservedIDs.__RESERVED__;
                     }
                 }
+                set.setBlocks(layer, blocks);
             }
             try {
                 int layer = (minY - 15) >> 4;
@@ -126,9 +140,7 @@ public interface IBatchProcessor {
                 char[] arr = set.loadIfPresent(layer);
                 if (arr != null) {
                     int index = (minY & 15) << 8;
-                    for (int i = index; i < 4096; i++) {
-                        arr[i] = BlockTypesCache.ReservedIDs.__RESERVED__;
-                    }
+                    Arrays.fill(arr, index, 4096, (char) BlockTypesCache.ReservedIDs.__RESERVED__);
                 }
                 set.setBlocks(layer, arr);
             } else if (layer == maxLayer) {
@@ -155,11 +167,11 @@ public interface IBatchProcessor {
      */
     @Deprecated(forRemoval = true, since = "2.8.4")
     default boolean trimNBT(IChunkSet set, Function<BlockVector3, Boolean> contains) {
-        Set<CompoundTag> ents = set.getEntities();
+        Collection<FaweCompoundTag> ents = set.entities();
         if (!ents.isEmpty()) {
-            ents.removeIf(ent -> !contains.apply(ent.getEntityPosition().toBlockPoint()));
+            ents.removeIf(ent -> !contains.apply(NbtUtils.entityPosition(ent).toBlockPoint()));
         }
-        Map<BlockVector3, CompoundTag> tiles = set.getTiles();
+        Map<BlockVector3, FaweCompoundTag> tiles = set.tiles();
         if (!tiles.isEmpty()) {
             tiles.entrySet().removeIf(blockVector3CompoundTagEntry -> !contains
                     .apply(blockVector3CompoundTagEntry.getKey()));
@@ -176,11 +188,11 @@ public interface IBatchProcessor {
     default boolean trimNBT(
             IChunkSet set, Function<BlockVector3, Boolean> containsEntity, Function<BlockVector3, Boolean> containsTile
     ) {
-        Set<CompoundTag> ents = set.getEntities();
+        Collection<FaweCompoundTag> ents = set.entities();
         if (!ents.isEmpty()) {
-            ents.removeIf(ent -> !containsEntity.apply(ent.getEntityPosition().toBlockPoint()));
+            ents.removeIf(ent -> !containsEntity.apply(NbtUtils.entityPosition(ent).toBlockPoint()));
         }
-        Map<BlockVector3, CompoundTag> tiles = set.getTiles();
+        Map<BlockVector3, FaweCompoundTag> tiles = set.tiles();
         if (!tiles.isEmpty()) {
             tiles.entrySet().removeIf(blockVector3CompoundTagEntry -> !containsTile.apply(blockVector3CompoundTagEntry.getKey()));
         }

@@ -44,7 +44,7 @@ public interface Brush {
     /**
      * If this brush is expected to set blocks synchronously, i.e. from one thread (at a time)
      *
-     * @since TODO
+     * @since 2.12.0
      */
     default boolean setsSynchronously() {
         return true;

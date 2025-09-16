@@ -82,10 +82,10 @@ For additional information about compiling FastAsyncWorldEdit, read the [compili
 
 ## Special thanks
 
-<a href="https://jb.gg/OpenSourceSupport"><img src="https://resources.jetbrains.com/storage/products/company/brand/logos/jb_beam.svg" width="150">
-</a>
 
-[JetBrains](https://jb.gg/OpenSourceSupport), creators of the IntelliJ IDEA, supports us with their Open Source Licenses.
+[![JetBrains logo.](https://resources.jetbrains.com/storage/products/company/brand/logos/jetbrains.svg)](https://jb.gg/OpenSource)
+<br>
+The creators of IntelliJ IDEA, supports us with their Open Source Licenses.
 
 <a href="https://yourkit.com/"><img src="https://www.yourkit.com/images/yklogo.png" width="200">
 </a>

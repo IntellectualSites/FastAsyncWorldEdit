@@ -269,7 +269,8 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
         int minSection = Math.max(get.getMinSectionPosition(), getMinimumY() >> 4);
         int maxSection = Math.min(get.getMaxSectionPosition(), getMaximumY() >> 4);
         for (int layer = minSection; layer <= maxSection; layer++) {
-            if ((!full && !get.hasSection(layer)) || !filter.appliesLayer(chunk, layer)) {
+            //if ((!full && !get.hasSection(layer)) || !filter.appliesLayer(chunk, layer)) {
+            if (!full && !get.hasSection(layer)) {
                 return;
             }
             block = block.initLayer(get, set, layer);
@@ -319,7 +320,8 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
             int layer,
             boolean full
     ) {
-        if ((!full && !get.hasSection(layer)) || !filter.appliesLayer(chunk, layer)) {
+        //if ((!full && !get.hasSection(layer)) || !filter.appliesLayer(chunk, layer)) {
+        if (!full && !get.hasSection(layer)) {
             return;
         }
         block = block.initLayer(get, set, layer);
@@ -341,7 +343,8 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
             int maxZ,
             boolean full
     ) {
-        if ((!full && !get.hasSection(layer)) || !filter.appliesLayer(chunk, layer)) {
+        //if ((!full && !get.hasSection(layer)) || !filter.appliesLayer(chunk, layer)) {
+        if (!full && !get.hasSection(layer)) {
             return;
         }
         block = block.initLayer(get, set, layer);
@@ -359,7 +362,8 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
             int yEnd,
             boolean full
     ) {
-        if ((!full && !get.hasSection(layer)) || !filter.appliesLayer(chunk, layer)) {
+        //if ((!full && !get.hasSection(layer)) || !filter.appliesLayer(chunk, layer)) {
+        if (!full && !get.hasSection(layer)) {
             return;
         }
         block = block.initLayer(get, set, layer);
@@ -377,6 +381,9 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
                 && contains(tx, ty, tz);
     }
 
+    /**
+     * {@return whether this region <b>intersects</b> with the AABB of the given chunk}
+     */
     default boolean containsChunk(int chunkX, int chunkZ) {
         int bx = chunkX << 4;
         int bz = chunkZ << 4;
@@ -399,7 +406,9 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
         if (tx >= min.x() && bx <= max.x() && tz >= min.z() && bz <= max.z()) {
             // contains some
             boolean processExtra = false;
-            for (int layer = getMinimumY() >> 4; layer <= getMaximumY() >> 4; layer++) {
+            final int minLayer = Math.max(getMinimumY(), chunk.getMinY()) >> 4;
+            final int maxLayer = Math.min(getMaximumY(), chunk.getMaxY()) >> 4;
+            for (int layer = minLayer; layer <= maxLayer; layer++) {
                 if (!set.hasSection(layer)) {
                     continue;
                 }
@@ -453,7 +462,9 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
         if (tx >= min.x() && bx <= max.x() && tz >= min.z() && bz <= max.z()) {
             // contains some
             boolean processExtra = false;
-            for (int layer = getMinimumY() >> 4; layer <= getMaximumY() >> 4; layer++) {
+            final int minLayer = Math.max(getMinimumY(), chunk.getMinY()) >> 4;
+            final int maxLayer = Math.min(getMaximumY(), chunk.getMaxY()) >> 4;
+            for (int layer = minLayer; layer <= maxLayer; layer++) {
                 int by = layer << 4;
                 int ty = by + 15;
                 if (containsEntireCuboid(bx, tx, by, ty, bz, tz)) {

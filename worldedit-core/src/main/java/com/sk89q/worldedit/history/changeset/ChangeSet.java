@@ -83,7 +83,7 @@ public interface ChangeSet extends Closeable {
      * @return the change count
      * @deprecated History could be larger than int max value so FAWE prefers {@link ChangeSet#longSize()}
      */
-    @Deprecated(since = "TODO")
+    @Deprecated(since = "2.11.1")
     int size();
 
     //FAWE start
@@ -93,7 +93,7 @@ public interface ChangeSet extends Closeable {
      * History could be larger than int max value so FAWE prefers this method.
      *
      * @return the change count
-     * @since TODO
+     * @since 2.11.1
      */
     default long longSize() {
         return size();

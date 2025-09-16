@@ -20,7 +20,10 @@
 package com.sk89q.worldedit.world.biome;
 
 import javax.annotation.Nullable;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
 
 /**
  * Stores a list of common {@link BiomeType BiomeTypes}.
@@ -179,6 +182,8 @@ public final class BiomeTypes {
     @Nullable
     public static final BiomeType OLD_GROWTH_SPRUCE_TAIGA = get("minecraft:old_growth_spruce_taiga");
     @Nullable
+    public static final BiomeType PALE_GARDEN = get("minecraft:pale_garden");
+    @Nullable
     public static final BiomeType PLAINS = get("minecraft:plains");
     @Nullable
     public static final BiomeType RIVER = get("minecraft:river");
@@ -295,10 +300,18 @@ public final class BiomeTypes {
     }
 
     public static BiomeType getLegacy(int legacyId) {
-        for (BiomeType type : values()) {
-            if (type.getLegacyId() == legacyId) {
-                return type;
+        class BiomeTypeIdCache {
+            private static final List<BiomeType> byId = create();
+
+            private static List<BiomeType> create() {
+                BiomeType[] array = values().toArray(new BiomeType[0]);
+                Arrays.sort(array, Comparator.comparing(BiomeType::getLegacyId));
+                return List.of(array);
             }
+
+        }
+        if (legacyId >= 0 && legacyId < BiomeTypeIdCache.byId.size()) {
+            return BiomeTypeIdCache.byId.get(legacyId);
         }
         return null;
     }

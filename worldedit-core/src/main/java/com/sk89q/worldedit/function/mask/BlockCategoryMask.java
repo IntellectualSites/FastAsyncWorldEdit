@@ -22,6 +22,7 @@ package com.sk89q.worldedit.function.mask;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockCategory;
+import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
 import javax.annotation.Nullable;
@@ -52,7 +53,16 @@ public class BlockCategoryMask extends AbstractExtentMask {
     //FAWE start
     @Override
     public boolean test(Extent extent, BlockVector3 vector) {
-        return category.contains(extent.getBlock(vector));
+        return category.contains(vector.getBlock(extent));
+    }
+
+    /**
+     * Test a specific block against this category mask
+     *
+     * @since 2.12.3
+     */
+    public <B extends BlockStateHolder<B>> boolean test(B blockStateHolder) {
+        return category.contains(blockStateHolder);
     }
     //FAWE end
 

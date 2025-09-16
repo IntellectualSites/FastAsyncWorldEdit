@@ -11,6 +11,7 @@ import com.fastasyncworldedit.core.util.ExtentTraverser;
 import com.fastasyncworldedit.core.util.TextureUtil;
 import com.fastasyncworldedit.core.util.image.ImageUtil;
 import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.command.argument.Arguments;
@@ -67,7 +68,7 @@ public class ProvideBindings extends Bindings {
         EditSessionHolder holder = context.injectedValue(Key.of(EditSessionHolder.class)).orElse(null);
         EditSession editSession = holder != null ? holder.session() : null;
         if (editSession == null) {
-            editSession = localSession.createEditSession(actor, command, synchronousSetting);
+            editSession = localSession.createEditSession(actor, command);
             editSession.enableStandardMode();
         } else {
             LimitExtent limitExtent = new ExtentTraverser<>(editSession).findAndGet(LimitExtent.class);
@@ -83,15 +84,19 @@ public class ProvideBindings extends Bindings {
                     }
                 }
             }
-            Request.request().setEditSession(editSession);
         }
+        Request.request().setEditSession(editSession);
         return editSession;
     }
 
     @Selection
     @Binding
     public Region selection(LocalSession localSession) {
-        return localSession.getSelection();
+        try {
+            return localSession.getSelection();
+        } catch (IncompleteRegionException ignore) {
+            return null;
+        }
     }
 
     @Binding

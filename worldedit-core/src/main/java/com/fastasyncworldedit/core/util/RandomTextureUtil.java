@@ -8,14 +8,44 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class RandomTextureUtil extends CachedTextureUtil {
 
-    public RandomTextureUtil(TextureUtil parent) throws FileNotFoundException {
-        super(parent);
-    }
-
     private int index;
     private final int[] biomeMixBuffer = new int[3];
     private final Int2ObjectOpenHashMap<Integer> offsets = new Int2ObjectOpenHashMap<>();
     private final Int2ObjectOpenHashMap<int[]> biomeMixes = new Int2ObjectOpenHashMap<>();
+
+    public RandomTextureUtil(TextureUtil parent) throws FileNotFoundException {
+        super(parent);
+    }
+
+    /**
+     * Create a new instance
+     *
+     * @param parent        parent {@link TextureUtil}
+     * @param colorBlockMap color block map to (copy and) use
+     * @param colorBiomeMap color biome map to (copy and) use
+     * @param colorLayerMap color layer map to (copy and) use
+     * @throws FileNotFoundException
+     * @since 2.13.0
+     */
+    private RandomTextureUtil(
+            TextureUtil parent,
+            Int2ObjectOpenHashMap<BlockType> colorBlockMap,
+            Int2ObjectOpenHashMap<Integer> colorBiomeMap,
+            Int2ObjectOpenHashMap<BlockType[]> colorLayerMap
+    ) throws FileNotFoundException {
+        super(parent, colorBlockMap, colorBiomeMap, colorLayerMap);
+    }
+
+    @Override
+    public TextureUtil fork() {
+        try {
+            // I don't think we should copy the "randomness" from this existing pattern?
+            return new RandomTextureUtil(parent, colorBlockMap, colorBiomeMap, colorLayerMap);
+        } catch (FileNotFoundException e) {
+            // This should never happen
+            throw new RuntimeException(e);
+        }
+    }
 
     protected int addRandomColor(int c1, int c2) {
         int red1 = (c1 >> 16) & 0xFF;

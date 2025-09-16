@@ -3,6 +3,7 @@ package com.fastasyncworldedit.core.queue;
 import com.fastasyncworldedit.core.extent.filter.block.FilterBlock;
 import com.sk89q.worldedit.regions.Region;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
@@ -10,30 +11,26 @@ import javax.annotation.Nullable;
  */
 public interface Filter {
 
-    /**
-     * Checks whether a chunk should be read.
-     *
-     * @param chunkX the x coordinate in the chunk
-     * @param chunkZ the z coordinate in the chunk
-     */
-    default boolean appliesChunk(
-            int chunkX,
-            int chunkZ
-    ) {
-        return true;
-    }
+//    /**
+//     * Checks whether a chunk should be read.
+//     *
+//     * @param chunkX the x coordinate in the chunk
+//     * @param chunkZ the z coordinate in the chunk
+//     */
+//    default boolean appliesChunk(int chunkX, int chunkZ) {
+//        return true;
+//    }
 
     /**
-     * Do something with the IChunk<br> - Return null if you don't want to filter blocks<br> -
-     * Return the chunk if you do want to filter blocks<br>
+     * Do something with the IChunk<br>
      */
-    default <T extends IChunk> T applyChunk(T chunk, @Nullable Region region) {
+    default @Nonnull <T extends IChunk> T applyChunk(T chunk, @Nullable Region region) {
         return chunk;
     }
 
-    default boolean appliesLayer(IChunk chunk, int layer) {
-        return true;
-    }
+//    default boolean appliesLayer(IChunk chunk, int layer) {
+//        return true;
+//    }
 
     /**
      * Make changes to the block here<br> - e.g., block.setId(...)<br> - Note: Performance is
@@ -59,6 +56,15 @@ public interface Filter {
     }
 
     default void join() {
+
+    }
+
+    /**
+     * Signals to the filter the edit has concluded
+     *
+     * @since 2.12.3
+     */
+    default void finish() {
 
     }
 

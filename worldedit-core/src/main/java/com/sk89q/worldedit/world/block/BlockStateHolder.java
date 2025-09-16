@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.world.block;
 
+import com.fastasyncworldedit.core.queue.IBlocks;
 import com.fastasyncworldedit.core.queue.ITileInput;
 import com.fastasyncworldedit.core.registry.state.PropertyKey;
 import com.sk89q.jnbt.CompoundTag;
@@ -201,8 +202,17 @@ public interface BlockStateHolder<B extends BlockStateHolder<B>> extends TileEnt
     default BaseBlock toBaseBlock(ITileInput input, int x, int y, int z) {
         throw new UnsupportedOperationException("State is immutable");
     }
+
+    default BaseBlock toBaseBlock(IBlocks blocks, int x, int y, int z) {
+        throw new UnsupportedOperationException("State is immutable");
+    }
     //FAWE end
 
+    /**
+     * Gets a String representation of this BlockStateHolder, in the format expected by WorldEdit's block parsers.
+     *
+     * @return a string representation
+     */
     default String getAsString() {
         if (getStates().isEmpty()) {
             return this.getBlockType().id();

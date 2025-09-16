@@ -154,6 +154,7 @@ public class LocalSession implements TextureHolder {
     private transient TextureUtil texture;
     private transient ResettableExtent transform = null;
     private transient World currentWorld;
+    private transient boolean fastMode = false;
     //FAWE end
     private transient ClipboardHolder clipboard;
     private transient final Object clipboardLock = new Object();
@@ -930,7 +931,7 @@ public class LocalSession implements TextureHolder {
                     }
                 } catch (EmptyClipboardException ignored) {
                 }
-                DiskOptimizedClipboard doc = Fawe.instance().getClipboardExecutor().submit(
+                DiskOptimizedClipboard doc = Fawe.instance().submitUUIDKeyQueuedTask(
                         uuid,
                         () -> DiskOptimizedClipboard.loadFromFile(file)
                 ).get();
@@ -954,7 +955,7 @@ public class LocalSession implements TextureHolder {
                     } else {
                         continue;
                     }
-                    Fawe.instance().getClipboardExecutor().submit(uuid, () -> {
+                    Fawe.instance().submitUUIDKeyQueuedTask(uuid, () -> {
                         doc.close(); // Ensure closed before deletion
                         doc.getFile().delete();
                     });
@@ -1572,8 +1573,10 @@ public class LocalSession implements TextureHolder {
     public void dispatchCUISelection(Actor actor) {
         checkNotNull(actor);
 
-        if (!hasCUISupport && useServerCUI) {
-            updateServerCUI(actor);
+        if (!hasCUISupport) {
+            if (useServerCUI) {
+                updateServerCUI(actor);
+            }
             return;
         }
 
@@ -1725,25 +1728,12 @@ public class LocalSession implements TextureHolder {
      * @return an edit session
      */
     public EditSession createEditSession(Actor actor) {
-        //FAWE start
+        //FAWE start - save command used
         return createEditSession(actor, null);
     }
 
     public EditSession createEditSession(Actor actor, String command) {
-        return createEditSession(actor, command, false);
-    }
-
-    /**
-     * Construct a new edit session.
-     *
-     * @param actor                    the actor
-     * @param command                  the command executed resulting in the creation of the edit session
-     * @param expectSynchronousSetting if it is expected that blocks will only be set synchronously, i.e. from one thread (at a
-     *                                 time)
-     * @return an edit session
-     * @since TODO
-     */
-    public EditSession createEditSession(Actor actor, String command, boolean expectSynchronousSetting) {
+        //FAWE end
         checkNotNull(actor);
 
         World world = null;
@@ -1754,18 +1744,18 @@ public class LocalSession implements TextureHolder {
         }
 
         // Create an edit session
-        EditSession editSession;
         EditSessionBuilder builder = WorldEdit.getInstance().newEditSessionBuilder().world(world);
         if (actor.isPlayer() && actor instanceof Player) {
             BlockBag blockBag = getBlockBag((Player) actor);
             builder.actor(actor);
             builder.blockBag(blockBag);
         }
+        //FAWE start
         builder.command(command);
-        builder.fastMode(!this.sideEffectSet.doesApplyAny());
-        builder.expectSynchronousSetting(expectSynchronousSetting);
+        builder.fastMode(this.fastMode);
+        builder.setSideEffectSet(this.sideEffectSet);
 
-        editSession = builder.build();
+        EditSession editSession = builder.build();
 
         if (mask != null) {
             editSession.setMask(mask);
@@ -1777,7 +1767,7 @@ public class LocalSession implements TextureHolder {
             editSession.addTransform(transform);
         }
         editSession.setTickingWatchdog(tickingWatchdog);
-
+        //FAWE end
         return editSession;
     }
     //FAWE end
@@ -1816,7 +1806,9 @@ public class LocalSession implements TextureHolder {
      */
     @Deprecated
     public boolean hasFastMode() {
-        return !this.sideEffectSet.doesApplyAny();
+        //FAWE start - use fastmode boolean not side effects
+        return this.fastMode;
+        //FAWE end
     }
 
     /**
@@ -1826,7 +1818,9 @@ public class LocalSession implements TextureHolder {
      */
     @Deprecated
     public void setFastMode(boolean fastMode) {
-        this.sideEffectSet = fastMode ? SideEffectSet.none() : SideEffectSet.defaults();
+        //FAWE start - use fastmode boolean not side effects
+        this.fastMode = fastMode;
+        //FAWE end
     }
 
     /**
@@ -1834,6 +1828,7 @@ public class LocalSession implements TextureHolder {
      *
      * @return The reorder mode
      */
+    @Deprecated
     public EditSession.ReorderMode getReorderMode() {
         return EditSession.ReorderMode.FAST;
     }
@@ -1843,6 +1838,7 @@ public class LocalSession implements TextureHolder {
      *
      * @param reorderMode The reorder mode
      */
+    @Deprecated
     public void setReorderMode(EditSession.ReorderMode reorderMode) {
     }
 

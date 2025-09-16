@@ -65,6 +65,7 @@ import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.entity.EntityTypes;
 import com.sk89q.worldedit.world.item.ItemType;
+import net.minecraft.SharedConstants;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
@@ -124,7 +125,6 @@ import org.bukkit.craftbukkit.block.data.CraftBlockData;
 import org.bukkit.craftbukkit.entity.CraftEntity;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
-import org.bukkit.craftbukkit.util.CraftMagicNumbers;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.generator.ChunkGenerator;
@@ -194,9 +194,9 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
         // A simple test
         CraftServer.class.cast(Bukkit.getServer());
 
-        int dataVersion = CraftMagicNumbers.INSTANCE.getDataVersion();
-        if (dataVersion != 3953) {
-            throw new UnsupportedClassVersionError("Not 1.21!");
+        int dataVersion = SharedConstants.getCurrentVersion().getDataVersion().getVersion();
+        if (dataVersion != 3953 && dataVersion != 3955) {
+            throw new UnsupportedClassVersionError("Not 1.21(.1)!");
         }
 
         serverWorldsField = CraftServer.class.getDeclaredField("worlds");
@@ -213,7 +213,7 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
         );
         chunkProviderExecutorField.setAccessible(true);
 
-        this.dataFixer = new PaperweightDataConverters(CraftMagicNumbers.INSTANCE.getDataVersion(), this);
+        this.dataFixer = new PaperweightDataConverters(dataVersion, this);
 
         Watchdog watchdog;
         try {
@@ -289,8 +289,8 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
      * @param entity the entity
      * @param tag the tag
      */
-    private static void readEntityIntoTag(Entity entity, net.minecraft.nbt.CompoundTag tag) {
-        entity.save(tag);
+    private static boolean readEntityIntoTag(Entity entity, net.minecraft.nbt.CompoundTag tag) {
+        return entity.save(tag);
     }
 
     private static Block getBlockFromType(BlockType blockType) {
@@ -476,15 +476,12 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
         CraftEntity craftEntity = ((CraftEntity) entity);
         Entity mcEntity = craftEntity.getHandle();
 
-        // Do not allow creating of passenger entity snapshots, passengers are included in the vehicle entity
-        if (mcEntity.isPassenger()) {
-            return null;
-        }
-
         String id = getEntityId(mcEntity);
 
         net.minecraft.nbt.CompoundTag tag = new net.minecraft.nbt.CompoundTag();
-        readEntityIntoTag(mcEntity, tag);
+        if (!readEntityIntoTag(mcEntity, tag)) {
+            return null;
+        }
         return new BaseEntity(
             EntityTypes.get(id),
             LazyReference.from(() -> (LinCompoundTag) toNativeLin(tag))
@@ -886,12 +883,12 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
     }
 
     private static final Set<SideEffect> SUPPORTED_SIDE_EFFECTS = Sets.immutableEnumSet(
-        SideEffect.NEIGHBORS,
-        SideEffect.LIGHTING,
-        SideEffect.VALIDATION,
-        SideEffect.ENTITY_AI,
-        SideEffect.EVENTS,
-        SideEffect.UPDATE
+            //FAWE start - FAWE-supported side effects
+            SideEffect.HISTORY,
+            SideEffect.HEIGHTMAPS,
+            SideEffect.LIGHTING,
+            SideEffect.NEIGHBORS
+            //FAWE end
     );
 
     @Override

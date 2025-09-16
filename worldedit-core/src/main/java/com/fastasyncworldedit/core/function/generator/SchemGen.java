@@ -1,6 +1,7 @@
 package com.fastasyncworldedit.core.function.generator;
 
 import com.fastasyncworldedit.core.math.MutableBlockVector3;
+import com.fastasyncworldedit.core.math.transform.MutatingOperationTransformHolder;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
@@ -27,7 +28,7 @@ public class SchemGen implements Resource {
     /**
      * @deprecated Use {@link SchemGen#SchemGen(Mask, Extent, List, boolean, Region)}
      */
-    @Deprecated(forRemoval = true, since = "TODO")
+    @Deprecated(forRemoval = true, since = "2.11.1")
     public SchemGen(Mask mask, Extent extent, List<ClipboardHolder> clipboards, boolean randomRotate) {
         this.mask = mask;
         this.extent = extent;
@@ -39,7 +40,7 @@ public class SchemGen implements Resource {
     /**
      * New instance. Places a schematic on terrain at a given x,z when appropriate
      *
-     * @since TODO
+     * @since 2.11.1
      */
     public SchemGen(Mask mask, Extent extent, List<ClipboardHolder> clipboards, boolean randomRotate, Region region) {
         this.mask = mask;
@@ -92,7 +93,7 @@ public class SchemGen implements Resource {
         if (transform.isIdentity()) {
             clipboard.paste(extent, mutable, false);
         } else {
-            clipboard.paste(extent, mutable, false, transform);
+            clipboard.paste(extent, mutable, false, MutatingOperationTransformHolder.transform(transform, true));
         }
         mutable.mutY(y);
         return true;

@@ -1,17 +1,30 @@
 package com.fastasyncworldedit.core.util;
 
+import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
+import com.sk89q.worldedit.entity.Entity;
+import com.sk89q.worldedit.math.Vector3;
+import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.storage.InvalidFormatException;
 import org.enginehub.linbus.tree.LinByteTag;
 import org.enginehub.linbus.tree.LinCompoundTag;
+import org.enginehub.linbus.tree.LinDoubleTag;
+import org.enginehub.linbus.tree.LinIntArrayTag;
 import org.enginehub.linbus.tree.LinIntTag;
+import org.enginehub.linbus.tree.LinListTag;
+import org.enginehub.linbus.tree.LinLongTag;
 import org.enginehub.linbus.tree.LinShortTag;
 import org.enginehub.linbus.tree.LinTag;
 import org.enginehub.linbus.tree.LinTagType;
 
+import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
-public class NbtUtils {
+public final class NbtUtils {
+
+    private NbtUtils() {
+    }
 
     /**
      * Get child tag of a NBT structure.
@@ -77,6 +90,140 @@ public class NbtUtils {
         Map<String, LinTag<?>> value = new HashMap<>();
         value.putAll(tag.value());
         return value;
+    }
+
+    /**
+     * Tries to extract UUID information from a compound tag
+     *
+     * @param compoundTag the compound tag to extract uuid information from
+     * @return the extracted UUID
+     * @since 2.11.2
+     */
+    public static UUID uuid(FaweCompoundTag compoundTag) {
+        final LinCompoundTag linTag = compoundTag.linTag();
+        {
+            final LinIntArrayTag uuidTag = linTag.findTag("UUID", LinTagType.intArrayTag());
+            if (uuidTag != null) {
+                int[] arr = uuidTag.value();
+                return new UUID((long) arr[0] << 32 | (arr[1] & 0xFFFFFFFFL), (long) arr[2] << 32 | (arr[3] & 0xFFFFFFFFL));
+            }
+        }
+        {
+            final LinLongTag uuidMostTag = linTag.findTag("UUIDMost", LinTagType.longTag());
+            if (uuidMostTag != null) {
+                return new UUID(uuidMostTag.valueAsLong(), linTag.getTag("UUIDLeast", LinTagType.longTag()).valueAsLong());
+            }
+        }
+        {
+            final LinLongTag uuidMostTag = linTag.findTag("WorldUUIDMost", LinTagType.longTag());
+            if (uuidMostTag != null) {
+                return new UUID(uuidMostTag.valueAsLong(), linTag.getTag("WorldUUIDLeast", LinTagType.longTag()).valueAsLong());
+            }
+
+        }
+        {
+            final LinLongTag uuidMostTag = linTag.findTag("PersistentIDMSB", LinTagType.longTag());
+            if (uuidMostTag != null) {
+                return new UUID(uuidMostTag.valueAsLong(), linTag.getTag("PersistentIDLSB", LinTagType.longTag()).valueAsLong());
+            }
+
+        }
+        throw new IllegalArgumentException("no uuid present");
+
+    }
+
+    /**
+     * Create a copy of the tag and modify the (x, y, z) coordinates
+     *
+     * @param tag Tag to copy
+     * @param x   New X coordinate
+     * @param y   New Y coordinate
+     * @param z   New Z coordinate
+     * @return New tag
+     * @since 2.11.2
+     */
+    public static @Nonnull LinCompoundTag withPosition(@Nonnull LinCompoundTag tag, int x, int y, int z) {
+        return tag.toBuilder()
+                .putInt("x", x)
+                .putInt("y", y)
+                .putInt("z", z)
+                .build();
+    }
+
+    /**
+     * Create a copy of the tag and modify the (x, y, z) coordinates
+     *
+     * @param tag Tag to copy
+     * @param x   New X coordinate
+     * @param y   New Y coordinate
+     * @param z   New Z coordinate
+     * @return New tag
+     * @since 2.11.2
+     */
+    public static @Nonnull FaweCompoundTag withPosition(@Nonnull FaweCompoundTag tag, int x, int y, int z) {
+        return FaweCompoundTag.of(withPosition(tag.linTag(), x, y, z));
+    }
+
+    /**
+     * {@return a copy of the given tag with the Id and the Pos of the given entity}
+     *
+     * @param tag    the tag to copy
+     * @param entity the entity to use the Id and the Pos from
+     * @since 2.11.2
+     */
+    public static @Nonnull LinCompoundTag withEntityInfo(@Nonnull LinCompoundTag tag, @Nonnull Entity entity) {
+        final LinCompoundTag.Builder builder = tag.toBuilder()
+                .putString("Id", entity.getState().getType().id());
+        LinListTag<LinDoubleTag> pos = tag.findListTag("Pos", LinTagType.doubleTag());
+        if (pos != null) { // TODO why only if pos != null?
+            Location loc = entity.getLocation();
+            final LinListTag<LinDoubleTag> newPos = LinListTag.builder(LinTagType.doubleTag())
+                    .add(LinDoubleTag.of(loc.x()))
+                    .add(LinDoubleTag.of(loc.y()))
+                    .add(LinDoubleTag.of(loc.z()))
+                    .build();
+            builder.put("Pos", newPos);
+        }
+        return builder.build();
+    }
+
+    /**
+     * Adds a UUID to the given map
+     *
+     * @param map  the map to insert to
+     * @param uuid the uuid to insert
+     * @since 2.11.2
+     */
+    public static void addUUIDToMap(Map<String, LinTag<?>> map, UUID uuid) {
+        int[] uuidArray = new int[4];
+        uuidArray[0] = (int) (uuid.getMostSignificantBits() >> 32);
+        uuidArray[1] = (int) uuid.getMostSignificantBits();
+        uuidArray[2] = (int) (uuid.getLeastSignificantBits() >> 32);
+        uuidArray[3] = (int) uuid.getLeastSignificantBits();
+        map.put("UUID", LinIntArrayTag.of(uuidArray));
+
+        map.put("UUIDMost", LinLongTag.of(uuid.getMostSignificantBits()));
+        map.put("UUIDLeast", LinLongTag.of(uuid.getLeastSignificantBits()));
+
+        map.put("WorldUUIDMost", LinLongTag.of(uuid.getMostSignificantBits()));
+        map.put("WorldUUIDLeast", LinLongTag.of(uuid.getLeastSignificantBits()));
+
+        map.put("PersistentIDMSB", LinLongTag.of(uuid.getMostSignificantBits()));
+        map.put("PersistentIDLSB", LinLongTag.of(uuid.getLeastSignificantBits()));
+    }
+
+    /**
+     * {@return the position data of the given tag}
+     *
+     * @param compoundTag the tag to extract position information from
+     * @since 2.12.0
+     */
+    public static Vector3 entityPosition(FaweCompoundTag compoundTag) {
+        LinListTag<LinDoubleTag> pos = compoundTag.linTag().getListTag("Pos", LinTagType.doubleTag());
+        double x = pos.get(0).valueAsDouble();
+        double y = pos.get(1).valueAsDouble();
+        double z = pos.get(2).valueAsDouble();
+        return Vector3.at(x, y, z);
     }
 
 }

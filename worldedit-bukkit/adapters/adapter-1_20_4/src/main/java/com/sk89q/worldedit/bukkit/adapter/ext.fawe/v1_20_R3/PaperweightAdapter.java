@@ -286,8 +286,8 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
      * @param entity the entity
      * @param tag the tag
      */
-    private static void readEntityIntoTag(Entity entity, net.minecraft.nbt.CompoundTag tag) {
-        entity.save(tag);
+    private static boolean readEntityIntoTag(Entity entity, net.minecraft.nbt.CompoundTag tag) {
+        return entity.save(tag);
     }
 
     private static Block getBlockFromType(BlockType blockType) {
@@ -481,7 +481,9 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
         String id = getEntityId(mcEntity);
 
         net.minecraft.nbt.CompoundTag tag = new net.minecraft.nbt.CompoundTag();
-        readEntityIntoTag(mcEntity, tag);
+        if (!readEntityIntoTag(mcEntity, tag)) {
+            return null;
+        }
         return new BaseEntity(
                 com.sk89q.worldedit.world.entity.EntityTypes.get(id),
                 LazyReference.from(() -> (LinCompoundTag) toNativeLin(tag))
@@ -856,12 +858,12 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
     }
 
     private static final Set<SideEffect> SUPPORTED_SIDE_EFFECTS = Sets.immutableEnumSet(
-        SideEffect.NEIGHBORS,
-        SideEffect.LIGHTING,
-        SideEffect.VALIDATION,
-        SideEffect.ENTITY_AI,
-        SideEffect.EVENTS,
-        SideEffect.UPDATE
+            //FAWE start - FAWE-supported side effects
+            SideEffect.HISTORY,
+            SideEffect.HEIGHTMAPS,
+            SideEffect.LIGHTING,
+            SideEffect.NEIGHBORS
+            //FAWE end
     );
 
     @Override

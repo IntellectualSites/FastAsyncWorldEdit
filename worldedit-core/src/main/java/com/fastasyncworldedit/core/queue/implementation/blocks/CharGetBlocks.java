@@ -1,5 +1,6 @@
 package com.fastasyncworldedit.core.queue.implementation.blocks;
 
+import com.fastasyncworldedit.core.queue.IBlocks;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.IChunkSet;
 import com.sk89q.worldedit.world.block.BaseBlock;
@@ -20,14 +21,15 @@ public abstract class CharGetBlocks extends CharBlocks implements IChunkGet {
     @Override
     public BaseBlock getFullBlock(int x, int y, int z) {
         BlockState state = BlockTypesCache.states[get(x, y, z)];
-        return state.toBaseBlock(this, x, y, z);
+        return state.toBaseBlock((IBlocks) this, x, y, z);
     }
 
     @Override
-    public synchronized boolean trim(boolean aggressive) {
+    public boolean trim(boolean aggressive) {
         for (int i = 0; i < sectionCount; i++) {
-            sections[i] = EMPTY;
-            blocks[i] = null;
+            synchronized (sectionLocks[i]) {
+                blocks[i] = null;
+            }
         }
         return true;
     }
@@ -47,11 +49,12 @@ public abstract class CharGetBlocks extends CharBlocks implements IChunkGet {
     }
 
     @Override
-    public synchronized boolean trim(boolean aggressive, int layer) {
+    public boolean trim(boolean aggressive, int layer) {
         layer -= minSectionPosition;
-        sections[layer] = EMPTY;
-        blocks[layer] = null;
-        return true;
+        synchronized (sectionLocks[layer]) {
+            blocks[layer] = null;
+            return true;
+        }
     }
 
     @Override

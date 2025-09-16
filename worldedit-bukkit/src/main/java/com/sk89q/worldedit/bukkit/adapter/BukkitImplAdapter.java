@@ -23,6 +23,7 @@ import com.fastasyncworldedit.bukkit.FaweBukkit;
 import com.fastasyncworldedit.bukkit.adapter.IBukkitAdapter;
 import com.fastasyncworldedit.bukkit.adapter.NMSRelighterFactory;
 import com.fastasyncworldedit.core.Fawe;
+import com.fastasyncworldedit.core.extent.processor.PlacementStateProcessor;
 import com.fastasyncworldedit.core.extent.processor.lighting.RelighterFactory;
 import com.fastasyncworldedit.core.queue.IBatchProcessor;
 import com.fastasyncworldedit.core.queue.IChunkGet;
@@ -34,6 +35,7 @@ import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.function.mask.BlockTypeMask;
 import com.sk89q.worldedit.internal.wna.WorldNativeAccess;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -52,6 +54,7 @@ import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 import org.bukkit.Keyed;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
@@ -64,7 +67,9 @@ import org.enginehub.linbus.tree.LinCompoundTag;
 import org.enginehub.linbus.tree.LinTag;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -330,6 +335,22 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
         return null;
     }
 
+    /**
+     * Returns an iterable of all blocks in their default state as string representations known to the server.
+     *
+     * @return an iterable containing the default state strings of all valid blocks
+     */
+    default Collection<String> getRegisteredDefaultBlockStates() {
+        ArrayList<String> blocks = new ArrayList<>();
+        for (Material m : Material.values()) {
+            if (!m.isLegacy() && m.isBlock()) {
+                BlockData blockData = m.createBlockData();
+                blocks.add(blockData.getAsString());
+            }
+        }
+        return blocks;
+    }
+
     @Deprecated
     default Tag toNative(T foreign) {
         return LinBusConverter.toJnbtTag(toNativeLin(foreign));
@@ -400,6 +421,14 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
      * @since 2.1.0
      */
     default IBatchProcessor getTickingPostProcessor() {
+        return null;
+    }
+
+    /**
+     * Returns an {@link PlacementStateProcessor} instance for processing placed blocks to "fix" them.
+     * @since 2.12.3
+     */
+    default PlacementStateProcessor getPlatformPlacementProcessor(Extent extent, BlockTypeMask mask, Region region) {
         return null;
     }
     //FAWE end

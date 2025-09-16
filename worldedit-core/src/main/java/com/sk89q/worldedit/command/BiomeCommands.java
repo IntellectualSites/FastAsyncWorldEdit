@@ -181,7 +181,7 @@ public class BiomeCommands {
     @Logging(REGION)
     @Preload(Preload.PreloadCheck.PRELOAD)
     @SynchronousSettingExpected // TODO improve using filter/chunk-based-placement
-    @Confirm(Confirm.Processor.REGION)
+    @Confirm(Confirm.Processor.NULLABLE_REGION)
     @CommandPermissions("worldedit.biome.set")
     public void setBiome(
             Actor actor, World world, LocalSession session, EditSession editSession,
@@ -206,7 +206,7 @@ public class BiomeCommands {
 
         RegionFunction replace = new BiomeReplace(editSession, target);
         if (mask != null) {
-            replace = new RegionMaskingFilter(editSession, mask, replace);
+            replace = new RegionMaskingFilter(mask, replace);
         }
         RegionVisitor visitor = new RegionVisitor(region, replace);
         Operations.completeLegacy(visitor);

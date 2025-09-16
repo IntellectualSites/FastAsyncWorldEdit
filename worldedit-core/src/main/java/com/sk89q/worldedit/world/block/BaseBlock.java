@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.world.block;
 
+import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.fastasyncworldedit.core.registry.state.PropertyKey;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEditException;
@@ -262,15 +263,15 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
 
     @Override
     public void applyTileEntity(OutputExtent output, int x, int y, int z) {
-        CompoundTag nbt = getNbtData();
+        LinCompoundTag nbt = getNbt();
         if (nbt != null) {
-            output.setTile(x, y, z, nbt);
+            output.tile(x, y, z, FaweCompoundTag.of(nbt));
         }
     }
 
     @Override
     public BaseBlock withPropertyId(int propertyId) {
-        return getBlockType().withPropertyId(propertyId).toBaseBlock(getNbtData());
+        return getBlockType().withPropertyId(propertyId).toBaseBlock(getNbtReference());
     }
 
     @Override
@@ -285,7 +286,7 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
 
     @Override
     public <V> BaseBlock with(PropertyKey property, V value) {
-        return toImmutableState().with(property, value).toBaseBlock(getNbtData());
+        return toImmutableState().with(property, value).toBaseBlock(getNbtReference());
     }
 
     @Override
@@ -308,14 +309,29 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
     }
     //FAWE end
 
+    /**
+     * Gets a string representation of this BaseBlock, in the format expected by WorldEdit's block parsers.
+     *
+     * <p>
+     * If NBT data is present, it will be included in the string. If you only want the underlying block state, call
+     * this method on the return value from {@link #toImmutableState()} instead.
+     * </p>
+     *
+     * @return The string representation
+     */
     @Override
-    public String toString() {
+    public String getAsString() {
         String nbtString = "";
         if (nbtData != null) {
             nbtString = LinStringIO.writeToString(nbtData.getValue());
         }
 
         return blockState.getAsString() + nbtString;
+    }
+
+    @Override
+    public String toString() {
+        return getAsString();
     }
 
 }

@@ -23,6 +23,7 @@ import com.fastasyncworldedit.core.extent.clipboard.SimpleClipboard;
 import com.fastasyncworldedit.core.function.visitor.Order;
 import com.fastasyncworldedit.core.math.MutableBlockVector2;
 import com.fastasyncworldedit.core.math.OffsetBlockVector3;
+import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.google.common.collect.Iterators;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEditException;
@@ -200,16 +201,17 @@ public class BlockArrayClipboard implements Clipboard {
 
     //FAWE start
     @Override
-    public boolean setTile(int x, int y, int z, CompoundTag tag) {
+    public boolean tile(int x, int y, int z, FaweCompoundTag tag) {
         x -= offset.x();
         y -= offset.y();
         z -= offset.z();
-        return getParent().setTile(x, y, z, tag);
+        return getParent().tile(x, y, z, tag);
     }
 
 
+    @Deprecated(forRemoval = true, since = "2.11.2")
     public boolean setTile(BlockVector3 position, CompoundTag tag) {
-        return setTile(position.x(), position.y(), position.z(), tag);
+        return tile(position.x(), position.y(), position.z(), FaweCompoundTag.of(tag.toLinTag()));
     }
 
     @Override

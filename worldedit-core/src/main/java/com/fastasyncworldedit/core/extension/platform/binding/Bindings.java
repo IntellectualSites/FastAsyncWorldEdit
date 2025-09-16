@@ -92,7 +92,7 @@ public class Bindings {
 
         // If the method provides all parameters
         if (provide) {
-            store.injectValue(key, access -> Optional.of(invoke(null, argsFunc, access, method)));
+            store.injectValue(key, access -> Optional.ofNullable(invoke(null, argsFunc, access, method)));
         } else { // If the method consumes a String argument
             manager.registerConverter(key, new ArgumentConverter<Object>() {
                 @Override
@@ -129,7 +129,7 @@ public class Bindings {
                 Function<InjectedValueAccess, Object> func = argsFunc[i];
                 if (func != null) {
                     Optional optional = (Optional) func.apply(access);
-                    args[i] = optional.get();
+                    args[i] = optional.orElse(null);
                 } else {
                     args[i] = arg;
                 }

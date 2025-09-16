@@ -1,6 +1,7 @@
 package com.fastasyncworldedit.core.extent.filter.block;
 
 import com.fastasyncworldedit.core.FaweCache;
+import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.fastasyncworldedit.core.queue.Filter;
 import com.fastasyncworldedit.core.queue.FilterBlockMask;
 import com.fastasyncworldedit.core.queue.IBlocks;
@@ -8,11 +9,11 @@ import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.IChunkSet;
 import com.fastasyncworldedit.core.queue.implementation.Flood;
 import com.fastasyncworldedit.core.queue.implementation.blocks.CharGetBlocks;
-import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.util.concurrency.LazyReference;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -20,12 +21,15 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
+import org.enginehub.linbus.tree.LinCompoundTag;
+import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import static com.sk89q.worldedit.world.block.BlockTypesCache.states;
 
+@ApiStatus.NonExtendable
 public class CharFilterBlock extends ChunkFilterBlock {
 
     private static final SetDelegate FULL = (block, value) -> block.setArr[block.index] = value;
@@ -33,14 +37,14 @@ public class CharFilterBlock extends ChunkFilterBlock {
 
     private int maxLayer;
     private int minLayer;
-    private CharGetBlocks get;
-    private IChunkSet set;
-    private char[] getArr;
+    protected CharGetBlocks get;
+    protected IChunkSet set;
+    protected char[] getArr;
     @Nullable
-    private char[] setArr;
-    private SetDelegate delegate;
+    protected char[] setArr;
+    protected SetDelegate delegate;
     // local
-    private int layer;
+    protected int layer;
     private int index;
     private int x;
     private int y;
@@ -169,14 +173,11 @@ public class CharFilterBlock extends ChunkFilterBlock {
     }
 
     @Override
-    public synchronized final void filter(Filter filter) {
-        initSet();
+    public synchronized void filter(Filter filter) {
         for (y = 0, index = 0; y < 16; y++) {
             for (z = 0; z < 16; z++) {
                 for (x = 0; x < 16; x++, index++) {
-                    if (setArr[index] != BlockTypesCache.ReservedIDs.__RESERVED__) {
-                        filter.applyBlock(this);
-                    }
+                    filter.applyBlock(this);
                 }
             }
         }
@@ -262,8 +263,8 @@ public class CharFilterBlock extends ChunkFilterBlock {
         final BlockState state = getBlock();
         final BlockMaterial material = state.getMaterial();
         if (material.hasContainer()) {
-            final CompoundTag tag = get.getTile(x, y + yy, z);
-            return state.toBaseBlock(tag);
+            final FaweCompoundTag tag = get.tile(x, y + yy, z);
+            return state.toBaseBlock(tag == null ? null : tag.linTag());
         }
         return state.toBaseBlock();
     }
@@ -271,16 +272,28 @@ public class CharFilterBlock extends ChunkFilterBlock {
     @Override
     public void setFullBlock(BaseBlock block) {
         delegate.set(this, block.getOrdinalChar());
-        final CompoundTag nbt = block.getNbtData();
+        final LazyReference<LinCompoundTag> nbt = block.getNbtReference();
         if (nbt != null) { // TODO optimize check via ImmutableBaseBlock
-            set.setTile(x, yy + y, z, nbt);
+            set.tile(x, yy + y, z, FaweCompoundTag.of(nbt));
         }
     }
 
     @Override
-    public final CompoundTag getNbtData() {
-        return get.getTile(x, y + yy, z);
+    public @Nullable LinCompoundTag getNbt() {
+        final FaweCompoundTag tile = get.tile(x, y + yy, z);
+        if (tile == null) {
+            return null;
+        }
+        return tile.linTag();
     }
+
+    @Override
+    public void setNbt(@Nullable final LinCompoundTag nbtData) {
+        if (nbtData != null) {
+            set.tile(x, y + yy, z, FaweCompoundTag.of(nbtData));
+        }
+    }
+
     /*
     NORTH(Vector3.at(0, 0, -1), Flag.CARDINAL, 3, 1),
     EAST(Vector3.at(1, 0, 0), Flag.CARDINAL, 0, 2),
@@ -289,9 +302,9 @@ public class CharFilterBlock extends ChunkFilterBlock {
      */
 
     @Override
-    public void setNbtData(CompoundTag tag) {
-        if (tag != null) {
-            set.setTile(x, y + yy, z, tag);
+    public void setNbtReference(@Nullable final LazyReference<LinCompoundTag> nbtData) {
+        if (nbtData != null) {
+            set.tile(x, y + yy, z, FaweCompoundTag.of(nbtData));
         }
     }
 
@@ -341,8 +354,7 @@ public class CharFilterBlock extends ChunkFilterBlock {
         }
         if (layer > minLayer) {
             final int newLayer = layer - 1;
-            final CharGetBlocks chunk = this.get;
-            return states[chunk.sections[newLayer].get(chunk, newLayer, index + 3840)];
+            return states[get.get(newLayer, index + 3840)];
         }
         return BlockTypes.__RESERVED__.getDefaultState();
     }
@@ -354,8 +366,7 @@ public class CharFilterBlock extends ChunkFilterBlock {
         }
         if (layer < maxLayer) {
             final int newLayer = layer + 1;
-            final CharGetBlocks chunk = this.get;
-            return states[chunk.sections[newLayer].get(chunk, newLayer, index - 3840)];
+            return states[get.get(newLayer, index - 3840)];
         }
         return BlockTypes.__RESERVED__.getDefaultState();
     }
@@ -368,8 +379,8 @@ public class CharFilterBlock extends ChunkFilterBlock {
             return states[getArr[this.index + (y << 8)]];
         } else if ((layerAdd > 0 && layerAdd < (maxLayer - layer)) || (layerAdd < 0 && layerAdd < (minLayer - layer))) {
             final int newLayer = layer + layerAdd;
-            final int index = this.index + ((y & 15) << 8);
-            return states[get.sections[newLayer].get(get, newLayer, index)];
+            final int index = (this.index + ((y & 15) << 8)) & 4095;
+            return states[get.get(newLayer, index)];
         }
         return BlockTypes.__RESERVED__.getDefaultState();
     }
@@ -383,7 +394,7 @@ public class CharFilterBlock extends ChunkFilterBlock {
     }
 
     //Set delegate
-    private SetDelegate initSet() {
+    protected final SetDelegate initSet() {
         setArr = set.load(layer);
         return delegate = FULL;
     }
@@ -394,6 +405,11 @@ public class CharFilterBlock extends ChunkFilterBlock {
             return get.getBiomeType(x & 15, y, z & 15);
         }
         return getExtent().getBiomeType(x, y, z);
+    }
+
+    @Override
+    public BiomeType getBiome(final BlockVector3 position) {
+        return this.getBiomeType(position.x(), position.y(), position.z());
     }
 
     @Override
@@ -415,7 +431,8 @@ public class CharFilterBlock extends ChunkFilterBlock {
         return getExtent().setBiome(x, y, z, biome);
     }
 
-    private interface SetDelegate {
+    @ApiStatus.Internal
+    protected interface SetDelegate {
 
         void set(@Nonnull CharFilterBlock block, char value);
 

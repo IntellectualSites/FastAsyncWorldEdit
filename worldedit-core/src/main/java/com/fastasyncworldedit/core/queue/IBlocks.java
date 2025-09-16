@@ -3,6 +3,8 @@ package com.fastasyncworldedit.core.queue;
 import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.internal.io.FastByteArrayOutputStream;
 import com.fastasyncworldedit.core.internal.io.FaweOutputStream;
+import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
+import com.fastasyncworldedit.core.util.collection.AdaptedMap;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.platform.Capability;
@@ -12,14 +14,17 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import com.sk89q.worldedit.world.registry.BlockRegistry;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
- * A shared interface for IGetBlocks and ISetBlocks.
+ * A shared interface for IGetBlocks and ISetBlocks. Represents a chunk.
  */
 public interface IBlocks extends Trimable {
 
@@ -31,6 +36,17 @@ public interface IBlocks extends Trimable {
      * @return if blocks/a block section is present
      */
     boolean hasSection(int layer);
+
+    /**
+     * {@return whether the chunk has a section that has any non-air/reserved blocks}
+     * This method might be conservative and return {@code true} even if the section is empty.
+     *
+     * @param layer the section's layer
+     * @since 2.12.3
+     */
+    default boolean hasNonEmptySection(int layer) {
+        return hasSection(layer);
+    }
 
     /**
      * Obtain the specified chunk section stored as an array of ordinals. Uses normal minecraft chunk-section position indices
@@ -54,11 +70,38 @@ public interface IBlocks extends Trimable {
 
     BlockState getBlock(int x, int y, int z);
 
-    Map<BlockVector3, CompoundTag> getTiles();
+    @Deprecated(forRemoval = true, since = "2.11.2")
+    default Map<BlockVector3, CompoundTag> getTiles() {
+        return AdaptedMap.values(tiles(), ct -> FaweCompoundTag.of(ct.toLinTag()), IBlocks::toCompoundTag);
+    }
 
-    CompoundTag getTile(int x, int y, int z);
+    Map<BlockVector3, FaweCompoundTag> tiles();
 
-    Set<CompoundTag> getEntities();
+    @Deprecated(forRemoval = true, since = "2.11.2")
+    default CompoundTag getTile(int x, int y, int z) {
+        final FaweCompoundTag tile = tile(x, y, z);
+        if (tile == null) {
+            return null;
+        }
+        return toCompoundTag(tile);
+    }
+
+    @SuppressWarnings({"deprecation"})
+    private static @Nonnull CompoundTag toCompoundTag(FaweCompoundTag tile) {
+        return new CompoundTag(tile.linTag());
+    }
+
+    @Nullable
+    FaweCompoundTag tile(int x, int y, int z);
+
+    @Deprecated(forRemoval = true, since = "2.11.2")
+    default Set<CompoundTag> getEntities() {
+        return entities().stream()
+                .map(IBlocks::toCompoundTag)
+                .collect(Collectors.toSet());
+    }
+
+    Collection<FaweCompoundTag> entities();
 
     BiomeType getBiomeType(int x, int y, int z);
 
@@ -91,6 +134,16 @@ public interface IBlocks extends Trimable {
      * height worlds, this will only return under 0 if blocks are stored outside the default range.
      */
     int getMinSectionPosition();
+
+    /**
+     * Get the chunk x coordinate
+     */
+    int getX();
+
+    /**
+     * Get the chunk z coordinate
+     */
+    int getZ();
 
     default byte[] toByteArray(boolean full, boolean stretched) {
         return toByteArray(null, getBitMask(), full, stretched);

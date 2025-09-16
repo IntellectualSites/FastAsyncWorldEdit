@@ -4,16 +4,19 @@ import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.extent.processor.heightmap.HeightMapType;
 import com.fastasyncworldedit.core.math.BlockVector3ChunkMap;
+import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.fastasyncworldedit.core.queue.IChunkSet;
 import com.fastasyncworldedit.core.queue.Pool;
-import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.util.SideEffectSet;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 
+import javax.annotation.Nullable;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashSet;
@@ -25,23 +28,40 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
 
     private static final Pool<CharSetBlocks> POOL = FaweCache.INSTANCE.registerPool(
             CharSetBlocks.class,
-            CharSetBlocks::new,
-            Settings.settings().QUEUE.POOL
+            CharSetBlocks::new, Settings.settings().QUEUE.POOL
     );
 
+    /**
+     * @deprecated Use {@link CharSetBlocks#newInstance(int, int)}
+     */
+    @Deprecated(forRemoval = true, since = "2.13.0")
     public static CharSetBlocks newInstance() {
         return POOL.poll();
+    }
+
+    /**
+     * Create a new {@link CharSetBlocks} instance
+     *
+     * @param x chunk x
+     * @param z chunk z
+     * @return New pooled CharSetBlocks instance.
+     */
+    public static CharSetBlocks newInstance(int x, int z) {
+        CharSetBlocks set = POOL.poll();
+        set.init(x, z);
+        return set;
     }
 
     public BiomeType[][] biomes;
     public char[][] light;
     public char[][] skyLight;
-    public BlockVector3ChunkMap<CompoundTag> tiles;
-    public HashSet<CompoundTag> entities;
+    public BlockVector3ChunkMap<FaweCompoundTag> tiles;
+    public HashSet<FaweCompoundTag> entities;
     public HashSet<UUID> entityRemoves;
     public EnumMap<HeightMapType, int[]> heightMaps;
     private boolean fastMode = false;
     private int bitMask = -1;
+    private SideEffectSet sideEffectSet = SideEffectSet.defaults();
 
     private CharSetBlocks() {
         // Expand as we go
@@ -49,7 +69,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
     }
 
     @Override
-    public synchronized void recycle() {
+    public void recycle() {
         reset();
         POOL.offer(this);
     }
@@ -71,17 +91,17 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
     }
 
     @Override
-    public Map<BlockVector3, CompoundTag> getTiles() {
+    public Map<BlockVector3, FaweCompoundTag> tiles() {
         return tiles == null ? Collections.emptyMap() : tiles;
     }
 
     @Override
-    public CompoundTag getTile(int x, int y, int z) {
+    public @Nullable FaweCompoundTag tile(final int x, final int y, final int z) {
         return tiles == null ? null : tiles.get(x, y, z);
     }
 
     @Override
-    public Set<CompoundTag> getEntities() {
+    public Collection<FaweCompoundTag> entities() {
         return entities == null ? Collections.emptySet() : entities;
     }
 
@@ -121,7 +141,6 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
     public void setBlocks(int layer, char[] data) {
         updateSectionIndexRange(layer);
         layer -= minSectionPosition;
-        this.sections[layer] = data == null ? EMPTY : FULL;
         this.blocks[layer] = data;
     }
 
@@ -132,12 +151,12 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
     }
 
     @Override
-    public boolean setTile(int x, int y, int z, CompoundTag tile) {
+    public boolean tile(final int x, final int y, final int z, final FaweCompoundTag tag) {
         if (tiles == null) {
             tiles = new BlockVector3ChunkMap<>();
         }
         updateSectionIndexRange(y >> 4);
-        tiles.put(x, y, z, tile);
+        tiles.put(x, y, z, tag);
         return true;
     }
 
@@ -259,7 +278,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
     }
 
     @Override
-    public void setEntity(CompoundTag tag) {
+    public void entity(final FaweCompoundTag tag) {
         if (entities == null) {
             entities = new HashSet<>();
         }
@@ -329,7 +348,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
     @Override
     public boolean hasBiomes(int layer) {
         layer -= minSectionPosition;
-        if (layer < 0 || layer >= sections.length) {
+        if (layer < 0 || layer >= blocks.length) {
             return false;
         }
         return biomes != null && biomes[layer] != null;
@@ -372,8 +391,21 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
                 heightMaps != null ? new EnumMap<>(heightMaps) : null,
                 defaultOrdinal(),
                 fastMode,
-                bitMask
+                bitMask,
+                sideEffectSet,
+                getX(),
+                getZ()
         );
+    }
+
+    @Override
+    public void setSideEffectSet(SideEffectSet sideEffectSet) {
+        this.sideEffectSet = sideEffectSet;
+    }
+
+    @Override
+    public SideEffectSet getSideEffectSet() {
+        return sideEffectSet;
     }
 
     static char[][] createLightCopy(char[][] lightArr, int sectionCount) {
@@ -422,20 +454,16 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
 
     private void resizeSectionsArrays(int diff, boolean appendNew) {
         char[][] tmpBlocks = new char[sectionCount][];
-        Section[] tmpSections = new Section[sectionCount];
         Object[] tmpSectionLocks = new Object[sectionCount];
         int destPos = appendNew ? 0 : diff;
         System.arraycopy(blocks, 0, tmpBlocks, destPos, blocks.length);
-        System.arraycopy(sections, 0, tmpSections, destPos, sections.length);
-        System.arraycopy(sectionLocks, 0, tmpSectionLocks, destPos, sections.length);
+        System.arraycopy(sectionLocks, 0, tmpSectionLocks, destPos, blocks.length);
         int toFillFrom = appendNew ? sectionCount - diff : 0;
         int toFillTo = appendNew ? sectionCount : diff;
         for (int i = toFillFrom; i < toFillTo; i++) {
-            tmpSections[i] = EMPTY;
             tmpSectionLocks[i] = new Object();
         }
         blocks = tmpBlocks;
-        sections = tmpSections;
         sectionLocks = tmpSectionLocks;
         if (biomes != null) {
             BiomeType[][] tmpBiomes = new BiomeType[sectionCount][64];

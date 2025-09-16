@@ -12,6 +12,7 @@ import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.provideDelegate
 import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.the
+import org.gradle.kotlin.dsl.withType
 import org.gradle.plugins.signing.SigningExtension
 
 fun Project.applyPlatformAndCoreConfiguration() {
@@ -19,8 +20,9 @@ fun Project.applyPlatformAndCoreConfiguration() {
     apply(plugin = "java")
     apply(plugin = "eclipse")
     apply(plugin = "idea")
+    apply(plugin = "com.gradleup.nmcp.aggregation")
     apply(plugin = "maven-publish")
-    apply(plugin = "com.github.johnrengelman.shadow")
+    apply(plugin = "com.gradleup.shadow")
     apply(plugin = "signing")
 
     applyCommonJavaConfiguration(
@@ -66,7 +68,7 @@ fun Project.applyPlatformAndCoreConfiguration() {
 
                 group = "com.fastasyncworldedit"
                 artifactId = "${rootProject.name}-${project.description}"
-                version = version
+                version = "$version"
 
                 pom {
                     name.set("${rootProject.name}-${project.description}" + " " + project.version)
@@ -110,7 +112,7 @@ fun Project.applyPlatformAndCoreConfiguration() {
                         tag.set("${project.version}")
                     }
 
-                    issueManagement{
+                    issueManagement {
                         system.set("GitHub")
                         url.set("https://github.com/IntellectualSites/FastAsyncWorldEdit/issues")
                     }
@@ -132,7 +134,8 @@ fun Project.applyPlatformAndCoreConfiguration() {
 }
 
 fun Project.applyShadowConfiguration() {
-    tasks.named<ShadowJar>("shadowJar") {
+    tasks.withType<ShadowJar>().configureEach {
+        relocate("com.sk89q.jchronic", "com.sk89q.worldedit.jchronic")
         dependencies {
             include(project(":worldedit-libs:core"))
             include(project(":worldedit-libs:${project.name.replace("worldedit-", "")}"))
@@ -149,7 +152,7 @@ fun Project.applyShadowConfiguration() {
 
 val CLASSPATH = listOf("truezip", "truevfs", "js")
     .map { "$it.jar" }
-    .flatMap { listOf(it, "FastAsyncWorldEdit/$it") }
+    .flatMap { listOf(it, "FastAsyncWorldEdit/$it", "../$it", "../FastAsyncWorldEdit/$it") }
     .joinToString(separator = " ")
 
 sealed class WorldEditKind(

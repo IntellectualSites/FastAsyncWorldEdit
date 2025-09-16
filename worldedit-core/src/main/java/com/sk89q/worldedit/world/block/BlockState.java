@@ -22,6 +22,7 @@ package com.sk89q.worldedit.world.block;
 import com.fastasyncworldedit.core.command.SuggestInputParseException;
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.function.mask.SingleBlockStateMask;
+import com.fastasyncworldedit.core.queue.IBlocks;
 import com.fastasyncworldedit.core.queue.ITileInput;
 import com.fastasyncworldedit.core.registry.state.PropertyKey;
 import com.fastasyncworldedit.core.util.MutableCharSequence;
@@ -71,6 +72,7 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
     private CompoundInput compoundInput = CompoundInput.NULL;
     //FAWE end
     private final BlockType blockType;
+    private final LazyReference<String> lazyStringRepresentation;
 
     //FAWE start
     public BlockState(BlockType blockType, int internalId, int ordinal) {
@@ -79,6 +81,7 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
         this.ordinal = ordinal;
         this.ordinalChar = (char) ordinal;
         this.emptyBaseBlock = new BlanketBaseBlock(this);
+        this.lazyStringRepresentation = LazyReference.from(BlockStateHolder.super::getAsString);
     }
 
     public BlockState(BlockType blockType, int internalId, int ordinal, @Nonnull CompoundTag tile) {
@@ -87,6 +90,7 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
         this.ordinal = ordinal;
         this.ordinalChar = (char) ordinal;
         this.emptyBaseBlock = new BlanketBaseBlock(this, tile);
+        this.lazyStringRepresentation = LazyReference.from(BlockStateHolder.super::getAsString);
     }
 
     /**
@@ -311,6 +315,11 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
             return newState != this.getInternalId() ? type.withStateId(newState) : this;
         } catch (ClassCastException e) {
             throw new IllegalArgumentException("Property not found: " + property);
+        } catch (Exception e) {
+            throw new UnsupportedOperationException(
+                    "Error resolving property " + property.getName() + " for block type " + getBlockType().id() + "(nullable) value " + value,
+                    e
+            );
         }
     }
 
@@ -321,6 +330,11 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
             return (V) ap.getValue(this.getInternalId());
         } catch (ClassCastException e) {
             throw new IllegalArgumentException("Property not found: " + property);
+        } catch (Exception e) {
+            throw new UnsupportedOperationException(
+                    "Error resolving property " + property.getName() + " for blocktype " + getBlockType().id(),
+                    e
+            );
         }
     }
 
@@ -336,6 +350,11 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
             return newState != this.getInternalId() ? type.withStateId(newState) : this;
         } catch (ClassCastException e) {
             throw new IllegalArgumentException("Property not found: " + property);
+        } catch (Exception e) {
+            throw new UnsupportedOperationException(
+                    "Error resolving property " + property.getName() + " for block type " + getBlockType().id() + "(nullable) value " + value,
+                    e
+            );
         }
     }
 
@@ -350,7 +369,7 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
         BlockState newState = this;
         for (Property<?> prop : ot.getProperties()) {
             PropertyKey key = prop.getKey();
-            if (blockType.hasProperty(key)) {
+            if (blockType.hasProperty(prop)) {
                 newState = newState.with(key, other.getState(key));
             }
         }
@@ -476,7 +495,18 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
     public BaseBlock toBaseBlock(ITileInput input, int x, int y, int z) {
         return compoundInput.get(this, input, x, y, z);
     }
+
+    @Override
+    public BaseBlock toBaseBlock(final IBlocks blocks, final int x, final int y, final int z) {
+        return compoundInput.get(this, blocks, x, y, z);
+    }
+
     //FAWE end
+
+    @Override
+    public String getAsString() {
+        return lazyStringRepresentation.getValue();
+    }
 
     @Override
     public String toString() {

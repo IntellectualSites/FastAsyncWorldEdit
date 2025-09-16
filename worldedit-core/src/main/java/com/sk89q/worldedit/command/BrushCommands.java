@@ -77,6 +77,7 @@ import com.sk89q.worldedit.command.tool.brush.CylinderBrush;
 import com.sk89q.worldedit.command.tool.brush.GravityBrush;
 import com.sk89q.worldedit.command.tool.brush.HollowCylinderBrush;
 import com.sk89q.worldedit.command.tool.brush.HollowSphereBrush;
+import com.sk89q.worldedit.command.tool.brush.MorphBrush;
 import com.sk89q.worldedit.command.tool.brush.OperationFactoryBrush;
 import com.sk89q.worldedit.command.tool.brush.SmoothBrush;
 import com.sk89q.worldedit.command.tool.brush.SnowSmoothBrush;
@@ -93,6 +94,8 @@ import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.function.Contextual;
 import com.sk89q.worldedit.function.factory.Apply;
 import com.sk89q.worldedit.function.factory.ApplyLayer;
+import com.sk89q.worldedit.function.factory.ApplyRegion;
+import com.sk89q.worldedit.function.factory.BiomeFactory;
 import com.sk89q.worldedit.function.factory.Deform;
 import com.sk89q.worldedit.function.factory.Paint;
 import com.sk89q.worldedit.function.factory.Snow;
@@ -104,14 +107,20 @@ import com.sk89q.worldedit.internal.annotation.ClipboardMask;
 import com.sk89q.worldedit.internal.expression.Expression;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
+import com.sk89q.worldedit.regions.factory.CuboidRegionFactory;
 import com.sk89q.worldedit.regions.factory.CylinderRegionFactory;
+import com.sk89q.worldedit.regions.factory.FixedHeightCuboidRegionFactory;
+import com.sk89q.worldedit.regions.factory.FixedHeightCylinderRegionFactory;
 import com.sk89q.worldedit.regions.factory.RegionFactory;
+import com.sk89q.worldedit.regions.factory.SphereRegionFactory;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.util.TreeGenerator;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
@@ -532,7 +541,7 @@ public class BrushCommands {
         int maxY = player.getWorld().getMaxY();
         try {
             brush = new StencilBrush(stream, rotation, yscale, onlyWhite,
-                    "#clipboard".equalsIgnoreCase(image)
+                    isClipboard(image)
                             ? session.getClipboard().getClipboard() : null, minY, maxY
             );
         } catch (EmptyClipboardException ignored) {
@@ -903,23 +912,15 @@ public class BrushCommands {
         int minY = player.getWorld().getMinY();
         int maxY = player.getWorld().getMaxY();
         if (flat) {
-            try {
-                brush = new FlattenBrush(stream, rotation, yscale, layers, smooth,
-                        "#clipboard".equalsIgnoreCase(image)
-                                ? session.getClipboard().getClipboard() : null, shape, minY, maxY
-                );
-            } catch (EmptyClipboardException ignored) {
-                brush = new FlattenBrush(stream, rotation, yscale, layers, smooth, null, shape, minY, maxY);
-            }
+            brush = new FlattenBrush(stream, rotation, yscale, layers, smooth,
+                    isClipboard(image)
+                            ? session.getClipboard().getClipboard() : null, shape, minY, maxY
+            );
         } else {
-            try {
-                brush = new HeightBrush(stream, rotation, yscale, layers, smooth,
-                        "#clipboard".equalsIgnoreCase(image)
-                                ? session.getClipboard().getClipboard() : null, minY, maxY
-                );
-            } catch (EmptyClipboardException ignored) {
-                brush = new HeightBrush(stream, rotation, yscale, layers, smooth, null, minY, maxY);
-            }
+            brush = new HeightBrush(stream, rotation, yscale, layers, smooth,
+                    isClipboard(image)
+                            ? session.getClipboard().getClipboard() : null, minY, maxY
+            );
         }
         if (randomRotate) {
             brush.setRandomRotate(true);
@@ -927,8 +928,12 @@ public class BrushCommands {
         set(context, brush, "worldedit.brush.height").setSize(radius);
     }
 
+    private static boolean isClipboard(String image) {
+        return "#clipboard".equalsIgnoreCase(image);
+    }
+
     private InputStream getHeightmapStream(String filename) throws FileNotFoundException {
-        if (filename == null || "none".equalsIgnoreCase(filename)) {
+        if (filename == null || "none".equalsIgnoreCase(filename) || isClipboard(filename)) {
             return null;
         }
         String filenamePng = filename.endsWith(".png") ? filename : filename + ".png";
@@ -1414,7 +1419,7 @@ public class BrushCommands {
 
         //FAWE start
         FaweLimit limit = Settings.settings().getLimit(player);
-        iterations = Math.min(limit.MAX_ITERATIONS, iterations);
+        iterations = Math.min(limit.MAX_ITERATIONS.get(), iterations);
         //FAWE end
 
         set(context, new SmoothBrush(iterations, mask), "worldedit.brush.smooth").setSize(radius);
@@ -1452,7 +1457,7 @@ public class BrushCommands {
 
         //FAWE start
         FaweLimit limit = Settings.settings().getLimit(player);
-        iterations = Math.min(limit.MAX_ITERATIONS, iterations);
+        iterations = Math.min(limit.MAX_ITERATIONS.get(), iterations);
         //FAWE end
 
         set(context, new SnowSmoothBrush(iterations, snowBlockCount, mask), "worldedit.brush.snowsmooth").setSize(radius);
@@ -1556,6 +1561,78 @@ public class BrushCommands {
         set(context, new ButcherBrush(flags), "worldedit.brush.butcher").setSize(radius);
     }
 
+    @Command(name = "biome",
+            desc = "Biome brush, sets biomes in the area"
+    )
+    @CommandPermissions("worldedit.brush.biome")
+    public void biome(Player player, LocalSession localSession,
+              @Arg(desc = "The shape of the region")
+                    RegionFactory shape,
+              @Arg(desc = "The size of the brush", def = "5")
+                    double radius,
+              @Arg(desc = "The biome type")
+                    BiomeType biomeType,
+              @Switch(name = 'c', desc = "Whether to set the full column")
+                    boolean column
+    ) throws WorldEditException {
+        if (column) {
+            // Convert this shape factory to a column-based one, if possible
+            if (shape instanceof CylinderRegionFactory || shape instanceof SphereRegionFactory) {
+                // Sphere regions that are Y-expended are just cylinders
+                shape = new FixedHeightCylinderRegionFactory(player.getWorld().getMinY(), player.getWorld().getMaxY());
+            } else if (shape instanceof CuboidRegionFactory) {
+                shape = new FixedHeightCuboidRegionFactory(player.getWorld().getMinY(), player.getWorld().getMaxY());
+            } else {
+                player.printError(TranslatableComponent.of("worldedit.brush.biome.column-supported-types"));
+                return;
+            }
+        }
+
+        setOperationBasedBrush(player, localSession, radius,
+            new ApplyRegion(new BiomeFactory(biomeType)), shape, "worldedit.brush.biome");
+        player.printInfo(TranslatableComponent.of("worldedit.setbiome.warning"));
+    }
+
+    @Command(
+            name = "morph",
+            desc = "Morph brush, morphs blocks in the area"
+    )
+    @CommandPermissions("worldedit.brush.morph")
+    public void morph(Player player, LocalSession session,
+                      @Arg(desc = "The size of the brush", def = "5")
+                      double brushSize,
+                      @Arg(desc = "Minimum number of faces for erosion", def = "3")
+                      int minErodeFaces,
+                      @Arg(desc = "Erode iterations", def = "1")
+                      int numErodeIterations,
+                      @Arg(desc = "Minimum number of faces for dilation", def = "3")
+                      int minDilateFaces,
+                      @Arg(desc = "Dilate iterations", def = "1")
+                      int numDilateIterations) throws WorldEditException {
+        worldEdit.checkMaxBrushRadius(brushSize);
+        BrushTool tool = session.getBrushTool(player.getItemInHand(HandSide.MAIN_HAND).getType());
+        tool.setSize(brushSize);
+        tool.setBrush(new MorphBrush(minErodeFaces, numErodeIterations, minDilateFaces, numDilateIterations), "worldedit.brush.morph");
+
+        player.printInfo(TranslatableComponent.of("worldedit.brush.morph.equip", TextComponent.of((int) brushSize)));
+    }
+
+    @Command(
+            name = "dilate",
+            desc = "Dilate preset for morph brush, dilates blocks in the area"
+    )
+    @CommandPermissions("worldedit.brush.morph")
+    public void dilate(Player player, LocalSession session,
+                       @Arg(desc = "The size of the brush", def = "5")
+                       double brushSize) throws WorldEditException {
+        worldEdit.checkMaxBrushRadius(brushSize);
+        BrushTool tool = session.getBrushTool(player.getItemInHand(HandSide.MAIN_HAND).getType());
+        tool.setSize(brushSize);
+        tool.setBrush(new MorphBrush(5, 1, 2, 1), "worldedit.brush.morph");
+
+        player.printInfo(TranslatableComponent.of("worldedit.brush.morph.equip", TextComponent.of((int) brushSize)));
+    }
+
     //FAWE start
     public BrushSettings process(Player player, Arguments arguments, BrushSettings settings)
             throws WorldEditException {
@@ -1600,13 +1677,11 @@ public class BrushCommands {
     }
     //FAWE end
 
-    static void setOperationBasedBrush(
-            Player player, LocalSession session, double radius,
-            Contextual<? extends Operation> factory,
-            RegionFactory shape,
-            String permission
-    ) throws WorldEditException {
-        WorldEdit.getInstance().checkMaxBrushRadius(radius, player);
+    static void setOperationBasedBrush(Player player, LocalSession session, double radius,
+                                        Contextual<? extends Operation> factory,
+                                        RegionFactory shape,
+                                        String permission) throws WorldEditException {
+        WorldEdit.getInstance().checkMaxBrushRadius(radius);
         BrushTool tool = session.getBrushTool(player.getItemInHand(HandSide.MAIN_HAND).getType());
         tool.setSize(radius);
         tool.setFill(null);

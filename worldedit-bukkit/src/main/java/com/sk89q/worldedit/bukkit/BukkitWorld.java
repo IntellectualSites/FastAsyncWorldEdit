@@ -24,12 +24,12 @@ import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.internal.exception.FaweException;
+import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.implementation.packet.ChunkPacket;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
-import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseItem;
@@ -118,9 +118,9 @@ public class BukkitWorld extends AbstractWorld {
         HAS_MIN_Y = temp;
     }
 
-    private WeakReference<World> worldRef;
+    protected WeakReference<World> worldRef;
     //FAWE start
-    private final String worldNameRef;
+    protected final String worldNameRef;
     //FAWE end
     private final WorldNativeAccess<?, ?, ?> worldNativeAccess;
 
@@ -665,7 +665,7 @@ public class BukkitWorld extends AbstractWorld {
     }
 
     @Override
-    public boolean setTile(int x, int y, int z, CompoundTag tile) throws WorldEditException {
+    public boolean tile(int x, int y, int z, FaweCompoundTag tile) throws WorldEditException {
         return false;
     }
 

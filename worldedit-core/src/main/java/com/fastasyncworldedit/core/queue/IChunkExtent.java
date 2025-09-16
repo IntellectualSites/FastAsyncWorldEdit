@@ -1,11 +1,7 @@
 package com.fastasyncworldedit.core.queue;
 
-import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.jnbt.DoubleTag;
-import com.sk89q.jnbt.ListTag;
-import com.sk89q.jnbt.NBTUtils;
-import com.sk89q.jnbt.StringTag;
-import com.sk89q.jnbt.Tag;
+import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
+import com.fastasyncworldedit.core.util.NbtUtils;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
@@ -16,6 +12,12 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
+import org.enginehub.linbus.tree.LinCompoundTag;
+import org.enginehub.linbus.tree.LinDoubleTag;
+import org.enginehub.linbus.tree.LinListTag;
+import org.enginehub.linbus.tree.LinStringTag;
+import org.enginehub.linbus.tree.LinTag;
+import org.enginehub.linbus.tree.LinTagType;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,9 +41,9 @@ public interface IChunkExtent<T extends IChunk> extends Extent {
     }
 
     @Override
-    default boolean setTile(int x, int y, int z, CompoundTag tile) throws WorldEditException {
+    default boolean tile(int x, int y, int z, FaweCompoundTag tile) throws WorldEditException {
         final IChunk chunk = getOrCreateChunk(x >> 4, z >> 4);
-        return chunk.setTile(x & 15, y, z & 15, tile);
+        return chunk.tile(x & 15, y, z & 15, tile);
     }
 
     @Override
@@ -124,19 +126,19 @@ public interface IChunkExtent<T extends IChunk> extends Extent {
     @Override
     default Entity createEntity(Location location, BaseEntity entity, UUID uuid) {
         final IChunk chunk = getOrCreateChunk(location.getBlockX() >> 4, location.getBlockZ() >> 4);
-        Map<String, Tag<?, ?>> map = new HashMap<>(entity.getNbtData().getValue()); //do not modify original entity data
-        map.put("Id", new StringTag(entity.getType().getName()));
+        Map<String, LinTag<?>> map = new HashMap<>(entity.getNbt().value()); //do not modify original entity data
+        map.put("Id", LinStringTag.of(entity.getType().getName()));
 
         //Set pos
-        List<DoubleTag> posList = new ArrayList<>();
-        posList.add(new DoubleTag(location.x()));
-        posList.add(new DoubleTag(location.y()));
-        posList.add(new DoubleTag(location.z()));
-        map.put("Pos", new ListTag(DoubleTag.class, posList));
+        List<LinDoubleTag> posList = new ArrayList<>();
+        posList.add(LinDoubleTag.of(location.x()));
+        posList.add(LinDoubleTag.of(location.y()));
+        posList.add(LinDoubleTag.of(location.z()));
+        map.put("Pos", LinListTag.of(LinTagType.doubleTag(), posList));
 
-        NBTUtils.addUUIDToMap(map, uuid);
+        NbtUtils.addUUIDToMap(map, uuid);
 
-        chunk.setEntity(new CompoundTag(map));
+        chunk.entity(FaweCompoundTag.of(LinCompoundTag.of(map)));
         return new IChunkEntity(this, location, uuid, entity);
     }
 

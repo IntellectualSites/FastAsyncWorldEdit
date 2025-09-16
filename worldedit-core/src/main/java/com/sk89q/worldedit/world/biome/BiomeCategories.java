@@ -56,6 +56,7 @@ public final class BiomeCategories {
     public static final BiomeCategory HAS_STRUCTURE_STRONGHOLD = get("minecraft:has_structure/stronghold");
     public static final BiomeCategory HAS_STRUCTURE_SWAMP_HUT = get("minecraft:has_structure/swamp_hut");
     public static final BiomeCategory HAS_STRUCTURE_TRAIL_RUINS = get("minecraft:has_structure/trail_ruins");
+    public static final BiomeCategory HAS_STRUCTURE_TRIAL_CHAMBERS = get("minecraft:has_structure/trial_chambers");
     public static final BiomeCategory HAS_STRUCTURE_VILLAGE_DESERT = get("minecraft:has_structure/village_desert");
     public static final BiomeCategory HAS_STRUCTURE_VILLAGE_PLAINS = get("minecraft:has_structure/village_plains");
     public static final BiomeCategory HAS_STRUCTURE_VILLAGE_SAVANNA = get("minecraft:has_structure/village_savanna");
@@ -85,9 +86,11 @@ public final class BiomeCategories {
     public static final BiomeCategory REDUCE_WATER_AMBIENT_SPAWNS = get("minecraft:reduce_water_ambient_spawns");
     public static final BiomeCategory REQUIRED_OCEAN_MONUMENT_SURROUNDING = get("minecraft:required_ocean_monument_surrounding");
     public static final BiomeCategory SNOW_GOLEM_MELTS = get("minecraft:snow_golem_melts");
+    public static final BiomeCategory SPAWNS_COLD_VARIANT_FARM_ANIMALS = get("minecraft:spawns_cold_variant_farm_animals");
     public static final BiomeCategory SPAWNS_COLD_VARIANT_FROGS = get("minecraft:spawns_cold_variant_frogs");
     public static final BiomeCategory SPAWNS_GOLD_RABBITS = get("minecraft:spawns_gold_rabbits");
     public static final BiomeCategory SPAWNS_SNOW_FOXES = get("minecraft:spawns_snow_foxes");
+    public static final BiomeCategory SPAWNS_WARM_VARIANT_FARM_ANIMALS = get("minecraft:spawns_warm_variant_farm_animals");
     public static final BiomeCategory SPAWNS_WARM_VARIANT_FROGS = get("minecraft:spawns_warm_variant_frogs");
     public static final BiomeCategory SPAWNS_WHITE_RABBITS = get("minecraft:spawns_white_rabbits");
     public static final BiomeCategory STRONGHOLD_BIASED_TO = get("minecraft:stronghold_biased_to");

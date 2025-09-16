@@ -24,6 +24,9 @@ import com.fastasyncworldedit.core.function.pattern.PatternTraverser;
 import com.fastasyncworldedit.core.internal.exception.FaweException;
 import com.fastasyncworldedit.core.wrappers.LocationMaskedPlayerWrapper;
 import com.fastasyncworldedit.core.wrappers.WorldWrapper;
+import com.google.common.collect.Maps;
+import com.google.common.util.concurrent.ListeningExecutorService;
+import com.google.common.util.concurrent.MoreExecutors;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
@@ -46,8 +49,10 @@ import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.session.request.Request;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.SideEffect;
+import com.sk89q.worldedit.util.concurrency.EvenMoreExecutors;
 import com.sk89q.worldedit.util.eventbus.Subscribe;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.lifecycle.SimpleLifecycled;
 import com.sk89q.worldedit.world.World;
 import org.apache.logging.log4j.Logger;
 
@@ -75,7 +80,8 @@ public class PlatformManager {
 
     private final WorldEdit worldEdit;
     private final PlatformCommandManager platformCommandManager;
-    private final List<Platform> platforms = new ArrayList<>();
+    private final SimpleLifecycled<ListeningExecutorService> executorService;
+    private final Map<Platform, Boolean> platforms = Maps.newHashMap();
     private final Map<Capability, Platform> preferences = new EnumMap<>(Capability.class);
     @Nullable
     private String firstSeenVersion;
@@ -91,6 +97,7 @@ public class PlatformManager {
         checkNotNull(worldEdit);
         this.worldEdit = worldEdit;
         this.platformCommandManager = new PlatformCommandManager(worldEdit, this);
+        this.executorService = SimpleLifecycled.invalid();
 
         // Register this instance for events
         worldEdit.getEventBus().register(this);
@@ -108,7 +115,7 @@ public class PlatformManager {
 
         // Just add the platform to the list of platforms: we'll pick favorites
         // once all the platforms have been loaded
-        platforms.add(platform);
+        platforms.put(platform, false);
 
         // Make sure that versions are in sync
         if (firstSeenVersion != null) {
@@ -136,7 +143,7 @@ public class PlatformManager {
     public synchronized boolean unregister(Platform platform) {
         checkNotNull(platform);
 
-        boolean removed = platforms.remove(platform);
+        boolean removed = platforms.remove(platform) != null;
 
         if (removed) {
             LOGGER.info("Unregistering " + platform.getClass().getCanonicalName() + " from WorldEdit");
@@ -226,7 +233,7 @@ public class PlatformManager {
         Platform preferred = null;
         Preference highest = null;
 
-        for (Platform platform : platforms) {
+        for (Platform platform : platforms.keySet()) {
             Preference preference = platform.getCapabilities().get(capability);
             if (preference != null && (highest == null || preference.isPreferredOver(highest))) {
                 preferred = platform;
@@ -245,7 +252,7 @@ public class PlatformManager {
      * @return a list of platforms
      */
     public synchronized List<Platform> getPlatforms() {
-        return new ArrayList<>(platforms);
+        return new ArrayList<>(platforms.keySet());
     }
 
     /**
@@ -273,9 +280,7 @@ public class PlatformManager {
     public <T extends Actor> T createProxyActor(T base) {
         checkNotNull(base);
 
-        if (base instanceof Player) {
-            Player player = (Player) base;
-
+        if (base instanceof Player player) {
             Player permActor = queryCapability(Capability.PERMISSIONS).matchPlayer(player);
             if (permActor == null) {
                 permActor = player;
@@ -307,6 +312,21 @@ public class PlatformManager {
      */
     public PlatformCommandManager getPlatformCommandManager() {
         return platformCommandManager;
+    }
+
+    /**
+     * Get the executor service. Internal, not for API use.
+     *
+     * @return the executor service
+     */
+    public ListeningExecutorService getExecutorService() {
+        return executorService.valueOrThrow();
+    }
+
+    private static ListeningExecutorService createExecutor() {
+        return MoreExecutors.listeningDecorator(
+                EvenMoreExecutors.newBoundedCachedThreadPool(
+                        0, 1, 20, "WorldEdit Task Executor - %s"));
     }
 
     /**
@@ -365,6 +385,10 @@ public class PlatformManager {
     @Subscribe
     public void handleNewPlatformReady(PlatformReadyEvent event) {
         preferences.forEach((cap, platform) -> cap.ready(this, platform));
+        platforms.put(event.getPlatform(), true);
+        if (!executorService.isValid()) {
+            executorService.newValue(createExecutor());
+        }
     }
 
     /**
@@ -373,6 +397,11 @@ public class PlatformManager {
     @Subscribe
     public void handleNewPlatformUnready(PlatformUnreadyEvent event) {
         preferences.forEach((cap, platform) -> cap.unready(this, platform));
+        platforms.put(event.getPlatform(), false);
+        if (!platforms.containsValue(true)) {
+            executorService.value().ifPresent(ListeningExecutorService::shutdownNow);
+            executorService.invalidate();
+        }
     }
 
     private <T extends Tool> T reset(T tool) {
@@ -389,10 +418,9 @@ public class PlatformManager {
         Location location = event.getLocation();
 
         // At this time, only handle interaction from players
-        if (!(actor instanceof Player)) {
+        if (!(actor instanceof Player player)) {
             return;
         }
-        Player player = (Player) actor;
         LocalSession session = worldEdit.getSessionManager().get(actor);
 
         Request.reset();
@@ -463,7 +491,7 @@ public class PlatformManager {
         } else {
             actor.print(Caption.of("worldedit.command.error.report"));
             actor.print(TextComponent.of(e.getClass().getName()+ ": " + e.getMessage()));
-            e.printStackTrace();
+            LOGGER.error("Error occurred executing player action", e);
         }
     }
     //FAWE end
@@ -511,14 +539,7 @@ public class PlatformManager {
             }
             //FAWE start - add own message
         } catch (Throwable e) {
-            FaweException faweException = FaweException.get(e);
-            if (faweException != null) {
-                player.print(Caption.of("fawe.cancel.reason", faweException.getComponent()));
-            } else {
-                player.print(Caption.of("worldedit.command.error.report"));
-                player.print(TextComponent.of(e.getClass().getName() + ": " + e.getMessage()));
-                e.printStackTrace();
-            }
+            handleThrowable(e, player);
             //FAWE end
         } finally {
             Request.reset();

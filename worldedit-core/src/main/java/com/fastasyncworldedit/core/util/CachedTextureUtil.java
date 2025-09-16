@@ -7,17 +7,50 @@ import java.io.FileNotFoundException;
 
 public class CachedTextureUtil extends DelegateTextureUtil {
 
-    private final TextureUtil parent;
-    private final transient Int2ObjectOpenHashMap<BlockType> colorBlockMap;
-    private final transient Int2ObjectOpenHashMap<Integer> colorBiomeMap;
-    private final transient Int2ObjectOpenHashMap<BlockType[]> colorLayerMap;
+    protected final TextureUtil parent;
+    protected final transient Int2ObjectOpenHashMap<BlockType> colorBlockMap;
+    protected final transient Int2ObjectOpenHashMap<Integer> colorBiomeMap;
+    protected final transient Int2ObjectOpenHashMap<BlockType[]> colorLayerMap;
 
     public CachedTextureUtil(TextureUtil parent) throws FileNotFoundException {
         super(parent);
         this.parent = parent;
         this.colorBlockMap = new Int2ObjectOpenHashMap<>();
-        this.colorLayerMap = new Int2ObjectOpenHashMap<>();
         this.colorBiomeMap = new Int2ObjectOpenHashMap<>();
+        this.colorLayerMap = new Int2ObjectOpenHashMap<>();
+    }
+
+    /**
+     * Create a new instance
+     *
+     * @param parent        parent {@link TextureUtil}
+     * @param colorBlockMap color block map to (copy and) use
+     * @param colorBiomeMap color biome map to (copy and) use
+     * @param colorLayerMap color layer map to (copy and) use
+     * @throws FileNotFoundException
+     * @since 2.13.0
+     */
+    protected CachedTextureUtil(
+            TextureUtil parent,
+            Int2ObjectOpenHashMap<BlockType> colorBlockMap,
+            Int2ObjectOpenHashMap<Integer> colorBiomeMap,
+            Int2ObjectOpenHashMap<BlockType[]> colorLayerMap
+    ) throws FileNotFoundException {
+        super(parent);
+        this.parent = parent;
+        this.colorBlockMap = new Int2ObjectOpenHashMap<>(colorBlockMap);
+        this.colorBiomeMap = new Int2ObjectOpenHashMap<>(colorBiomeMap);
+        this.colorLayerMap = new Int2ObjectOpenHashMap<>(colorLayerMap);
+    }
+
+    @Override
+    public TextureUtil fork() {
+        try {
+            return new CachedTextureUtil(parent.fork(), colorBlockMap, colorBiomeMap, colorLayerMap);
+        } catch (FileNotFoundException e) {
+            // This should never happen
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

@@ -18,6 +18,7 @@ import com.fastasyncworldedit.core.util.task.FaweForkJoinWorkerThreadFactory;
 import com.fastasyncworldedit.core.wrappers.WorldWrapper;
 import com.google.common.util.concurrent.Futures;
 import com.sk89q.worldedit.world.World;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
@@ -33,6 +34,7 @@ import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
 /**
@@ -41,17 +43,21 @@ import java.util.function.Supplier;
 @SuppressWarnings({"unchecked", "rawtypes"})
 public abstract class QueueHandler implements Trimable, Runnable {
 
-    private static final int PROCESSORS = Runtime.getRuntime().availableProcessors();
-
     /**
      * Primary queue should be used for tasks that are unlikely to wait on other tasks, IO, etc. (i.e. spend most of their
      * time utilising CPU.
      */
     private final ForkJoinPool forkJoinPoolPrimary = new ForkJoinPool(
-            PROCESSORS,
+            Settings.settings().QUEUE.PARALLEL_THREADS,
             new FaweForkJoinWorkerThreadFactory("FAWE Fork Join Pool Primary - %s"),
             null,
-            false
+            false,
+            Settings.settings().QUEUE.PARALLEL_THREADS,
+            Settings.settings().QUEUE.PARALLEL_THREADS,
+            0,
+            pool -> true,
+            60,
+            TimeUnit.SECONDS
     );
 
     /**
@@ -59,7 +65,7 @@ public abstract class QueueHandler implements Trimable, Runnable {
      * primary queue. They may be IO-bound tasks.
      */
     private final ForkJoinPool forkJoinPoolSecondary = new ForkJoinPool(
-            PROCESSORS,
+            Settings.settings().QUEUE.PARALLEL_THREADS,
             new FaweForkJoinWorkerThreadFactory("FAWE Fork Join Pool Secondary - %s"),
             null,
             false
@@ -91,6 +97,11 @@ public abstract class QueueHandler implements Trimable, Runnable {
 
     protected QueueHandler() {
         TaskManager.taskManager().repeat(this, 1);
+    }
+
+    @ApiStatus.Internal
+    public ThreadPoolExecutor getBlockingExecutor() {
+        return blockingExecutor;
     }
 
     @Override
@@ -378,6 +389,11 @@ public abstract class QueueHandler implements Trimable, Runnable {
 //            return (T) forkJoinPoolSecondary.submit(chunk);
 //        }
         return (T) blockingExecutor.submit(chunk);
+    }
+
+    @ApiStatus.Internal
+    public <T extends Future<T>> T submitToBlocking(Callable<T> callable) {
+        return (T) blockingExecutor.submit(callable);
     }
 
     /**

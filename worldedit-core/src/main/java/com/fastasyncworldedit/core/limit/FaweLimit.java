@@ -1,21 +1,22 @@
 package com.fastasyncworldedit.core.limit;
 
 import com.fastasyncworldedit.core.FaweCache;
-import com.fastasyncworldedit.core.internal.exception.FaweException;
 import com.fastasyncworldedit.core.configuration.Settings;
 
 import java.util.Collections;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class FaweLimit {
 
     public int MAX_ACTIONS = 0;
-    public volatile long MAX_CHANGES = 0;
-    public volatile int MAX_FAILS = 0;
-    public volatile long MAX_CHECKS = 0;
-    public volatile int MAX_ITERATIONS = 0;
-    public volatile int MAX_BLOCKSTATES = 0;
-    public volatile int MAX_ENTITIES = 0;
+    public AtomicLong MAX_CHANGES = new AtomicLong();
+    public AtomicInteger MAX_FAILS = new AtomicInteger();
+    public AtomicLong MAX_CHECKS = new AtomicLong();
+    public AtomicInteger MAX_ITERATIONS = new AtomicInteger();
+    public AtomicInteger MAX_BLOCKSTATES = new AtomicInteger();
+    public AtomicInteger MAX_ENTITIES = new AtomicInteger();
     public int MAX_HISTORY = 0;
     public int SCHEM_FILE_SIZE_LIMIT = 0;
     public int SCHEM_FILE_NUM_LIMIT = 0;
@@ -113,12 +114,12 @@ public class FaweLimit {
         MAX.SPEED_REDUCTION = 0;
         MAX.INVENTORY_MODE = 0;
         MAX.MAX_ACTIONS = 1;
-        MAX.MAX_CHANGES = Long.MAX_VALUE;
-        MAX.MAX_FAILS = Integer.MAX_VALUE;
-        MAX.MAX_CHECKS = Long.MAX_VALUE;
-        MAX.MAX_ITERATIONS = Integer.MAX_VALUE;
-        MAX.MAX_BLOCKSTATES = Integer.MAX_VALUE;
-        MAX.MAX_ENTITIES = Integer.MAX_VALUE;
+        MAX.MAX_CHANGES = new AtomicLong(Long.MAX_VALUE);
+        MAX.MAX_FAILS = new AtomicInteger(Integer.MAX_VALUE);
+        MAX.MAX_CHECKS = new AtomicLong(Long.MAX_VALUE);
+        MAX.MAX_ITERATIONS = new AtomicInteger(Integer.MAX_VALUE);
+        MAX.MAX_BLOCKSTATES = new AtomicInteger(Integer.MAX_VALUE);
+        MAX.MAX_ENTITIES = new AtomicInteger(Integer.MAX_VALUE);
         MAX.MAX_HISTORY = Integer.MAX_VALUE;
         MAX.SCHEM_FILE_NUM_LIMIT = Integer.MAX_VALUE;
         MAX.SCHEM_FILE_SIZE_LIMIT = Integer.MAX_VALUE;
@@ -139,120 +140,144 @@ public class FaweLimit {
     }
 
     public boolean MAX_CHANGES() {
-        return MAX_CHANGES-- > 0;
+        return MAX_CHANGES.decrementAndGet() < 0;
     }
 
     public boolean MAX_FAILS() {
-        return MAX_FAILS-- > 0;
+        return MAX_FAILS.decrementAndGet() < 0;
     }
 
     public boolean MAX_CHECKS() {
-        return MAX_CHECKS-- > 0;
+        return MAX_CHECKS.decrementAndGet() < 0;
     }
 
     public boolean MAX_ITERATIONS() {
-        return MAX_ITERATIONS-- > 0;
+        return MAX_ITERATIONS.decrementAndGet() < 0;
     }
 
     public boolean MAX_BLOCKSTATES() {
-        return MAX_BLOCKSTATES-- > 0;
+        return MAX_BLOCKSTATES.decrementAndGet() < 0;
     }
 
     public boolean MAX_ENTITIES() {
-        return MAX_ENTITIES-- > 0;
+        return MAX_ENTITIES.decrementAndGet() < 0;
     }
 
-    public void THROW_MAX_CHANGES() throws FaweException  {
-        if (MAX_CHANGES-- <= 0) {
+    public void THROW_MAX_CHANGES() {
+        if (MAX_CHANGES.decrementAndGet() < 0) {
             throw FaweCache.MAX_CHANGES;
         }
     }
 
-    public void THROW_MAX_FAILS() throws FaweException  {
-        if (MAX_FAILS-- <= 0) {
+    public void THROW_MAX_FAILS() {
+        if (MAX_FAILS.decrementAndGet() < 0) {
             throw FaweCache.MAX_FAILS;
         }
     }
 
-    public void THROW_MAX_CHECKS() throws FaweException  {
-        if (MAX_CHECKS-- <= 0) {
+    public void THROW_MAX_CHECKS() {
+        if (MAX_CHECKS.decrementAndGet() < 0) {
             throw FaweCache.MAX_CHECKS;
         }
     }
 
-    public void THROW_MAX_ITERATIONS() throws FaweException  {
-        if (MAX_ITERATIONS-- <= 0) {
+    public void THROW_MAX_ITERATIONS() {
+        if (MAX_ITERATIONS.decrementAndGet() < 0) {
             throw FaweCache.MAX_ITERATIONS;
         }
     }
 
-    public void THROW_MAX_BLOCKSTATES() throws FaweException  {
-        if (MAX_BLOCKSTATES-- <= 0) {
+    public void THROW_MAX_BLOCKSTATES() {
+        if (MAX_BLOCKSTATES.decrementAndGet() < 0) {
             throw FaweCache.MAX_TILES;
         }
     }
 
-    public void THROW_MAX_ENTITIES() throws FaweException  {
-        if (MAX_ENTITIES-- <= 0) {
+    public void THROW_MAX_ENTITIES() {
+        if (MAX_ENTITIES.decrementAndGet() < 0) {
             throw FaweCache.MAX_ENTITIES;
         }
     }
 
-    public void THROW_MAX_CHANGES(int amt) throws FaweException  {
-        if ((MAX_CHANGES -= amt) <= 0) {
+    public void THROW_MAX_CHANGES(int amt) {
+        if (amt == 0) {
+            return;
+        }
+        if (MAX_CHANGES.addAndGet(-amt) < 0) {
             throw FaweCache.MAX_CHANGES;
         }
     }
 
-    public void THROW_MAX_CHANGES(long amt) throws FaweException  {
-        if ((MAX_CHANGES -= amt) <= 0) {
+    public void THROW_MAX_CHANGES(long amt) {
+        if (amt == 0) {
+            return;
+        }
+        if (MAX_CHANGES.addAndGet(-amt) < 0) {
             throw FaweCache.MAX_CHANGES;
         }
     }
 
-    public void THROW_MAX_FAILS(int amt) throws FaweException  {
-        if ((MAX_FAILS -= amt) <= 0) {
+    public void THROW_MAX_FAILS(int amt) {
+        if (amt == 0) {
+            return;
+        }
+        if (MAX_FAILS.addAndGet(-amt) < 0) {
             throw FaweCache.MAX_FAILS;
         }
     }
 
-    public void THROW_MAX_CHECKS(int amt) throws FaweException  {
-        if ((MAX_CHECKS -= amt) <= 0) {
+    public void THROW_MAX_CHECKS(int amt) {
+        if (amt == 0) {
+            return;
+        }
+        if (MAX_CHECKS.addAndGet(-amt) < 0) {
             throw FaweCache.MAX_CHECKS;
         }
     }
 
-    public void THROW_MAX_CHECKS(long amt) throws FaweException  {
-        if ((MAX_CHECKS -= amt) <= 0) {
+    public void THROW_MAX_CHECKS(long amt) {
+        if (amt == 0) {
+            return;
+        }
+        if (MAX_CHECKS.addAndGet(-amt) < 0) {
             throw FaweCache.MAX_CHECKS;
         }
     }
 
-    public void THROW_MAX_ITERATIONS(int amt) throws FaweException  {
-        if ((MAX_ITERATIONS -= amt) <= 0) {
+    public void THROW_MAX_ITERATIONS(int amt) {
+        if (amt == 0) {
+            return;
+        }
+        if (MAX_ITERATIONS.addAndGet(-amt) < 0) {
             throw FaweCache.MAX_ITERATIONS;
         }
     }
 
-    public void THROW_MAX_BLOCKSTATES(int amt) throws FaweException {
-        if ((MAX_BLOCKSTATES -= amt) <= 0) {
+    public void THROW_MAX_BLOCKSTATES(int amt) {
+        if (amt == 0) {
+            return;
+        }
+        if (MAX_BLOCKSTATES.addAndGet(-amt) < 0) {
             throw FaweCache.MAX_TILES;
         }
     }
 
-    public void THROW_MAX_ENTITIES(int amt) throws FaweException  {
-        if ((MAX_ENTITIES -= amt) <= 0) {
+    public void THROW_MAX_ENTITIES(int amt) {
+        if (amt == 0) {
+            return;
+        }
+        if (MAX_ENTITIES.addAndGet(-amt) < 0) {
             throw FaweCache.MAX_ENTITIES;
         }
     }
 
     public boolean isUnlimited() {
-        return MAX_CHANGES == Long.MAX_VALUE
-                && MAX_FAILS == Integer.MAX_VALUE
-                && MAX_CHECKS == Long.MAX_VALUE
-                && MAX_ITERATIONS == Integer.MAX_VALUE
-                && MAX_BLOCKSTATES == Integer.MAX_VALUE
-                && MAX_ENTITIES == Integer.MAX_VALUE
+        return MAX_CHANGES.get() == Long.MAX_VALUE
+                && MAX_FAILS.get() == Integer.MAX_VALUE
+                && MAX_CHECKS.get() == Long.MAX_VALUE
+                && MAX_ITERATIONS.get() == Integer.MAX_VALUE
+                && MAX_BLOCKSTATES.get() == Integer.MAX_VALUE
+                && MAX_ENTITIES.get() == Integer.MAX_VALUE
                 && MAX_HISTORY == Integer.MAX_VALUE
                 && SCHEM_FILE_SIZE_LIMIT == Integer.MAX_VALUE
                 && SCHEM_FILE_NUM_LIMIT == Integer.MAX_VALUE
@@ -274,27 +299,27 @@ public class FaweLimit {
     /**
      * Get an {@link FaweLimit} representing the amount of a limit used from a given "original" limit
      *
-     * @since TODO
+     * @since 2.12.0
      */
     public FaweLimit getLimitUsed(FaweLimit originalLimit) {
         FaweLimit newLimit = new FaweLimit();
-        newLimit.MAX_CHANGES = originalLimit.MAX_CHANGES - this.MAX_CHANGES;
-        newLimit.MAX_FAILS = originalLimit.MAX_FAILS - this.MAX_FAILS;
-        newLimit.MAX_CHECKS = originalLimit.MAX_CHECKS - this.MAX_CHECKS;
-        newLimit.MAX_ITERATIONS = originalLimit.MAX_ITERATIONS - this.MAX_ITERATIONS;
-        newLimit.MAX_BLOCKSTATES = originalLimit.MAX_BLOCKSTATES - this.MAX_BLOCKSTATES;
-        newLimit.MAX_ENTITIES = originalLimit.MAX_ENTITIES - this.MAX_ENTITIES;
+        newLimit.MAX_CHANGES = new AtomicLong(originalLimit.MAX_CHANGES.get() - this.MAX_CHANGES.get());
+        newLimit.MAX_FAILS = new AtomicInteger(originalLimit.MAX_FAILS.get() - this.MAX_FAILS.get());
+        newLimit.MAX_CHECKS = new AtomicLong(originalLimit.MAX_CHECKS.get() - this.MAX_CHECKS.get());
+        newLimit.MAX_ITERATIONS = new AtomicInteger(originalLimit.MAX_ITERATIONS.get() - this.MAX_ITERATIONS.get());
+        newLimit.MAX_BLOCKSTATES = new AtomicInteger(originalLimit.MAX_BLOCKSTATES.get() - this.MAX_BLOCKSTATES.get());
+        newLimit.MAX_ENTITIES = new AtomicInteger(originalLimit.MAX_ENTITIES.get() - this.MAX_ENTITIES.get());
         return newLimit;
     }
 
     public void set(FaweLimit limit) {
         MAX_ACTIONS = limit.MAX_ACTIONS;
-        MAX_CHANGES = limit.MAX_CHANGES;
-        MAX_BLOCKSTATES = limit.MAX_BLOCKSTATES;
-        MAX_CHECKS = limit.MAX_CHECKS;
-        MAX_ENTITIES = limit.MAX_ENTITIES;
-        MAX_FAILS = limit.MAX_FAILS;
-        MAX_ITERATIONS = limit.MAX_ITERATIONS;
+        MAX_CHANGES.set(limit.MAX_CHANGES.get());
+        MAX_FAILS.set(limit.MAX_FAILS.get());
+        MAX_CHECKS.set(limit.MAX_CHECKS.get());
+        MAX_ITERATIONS.set(limit.MAX_ITERATIONS.get());
+        MAX_BLOCKSTATES.set(limit.MAX_BLOCKSTATES.get());
+        MAX_ENTITIES.set(limit.MAX_ENTITIES.get());
         MAX_HISTORY = limit.MAX_HISTORY;
         SCHEM_FILE_NUM_LIMIT = limit.SCHEM_FILE_NUM_LIMIT;
         SCHEM_FILE_SIZE_LIMIT = limit.SCHEM_FILE_SIZE_LIMIT;
@@ -346,10 +371,6 @@ public class FaweLimit {
     @Override
     public String toString() {
         return MAX_CHANGES + "";
-    }
-
-    public ProcessorFaweLimit toConcurrent() {
-        return new ProcessorFaweLimit(this);
     }
 
 }

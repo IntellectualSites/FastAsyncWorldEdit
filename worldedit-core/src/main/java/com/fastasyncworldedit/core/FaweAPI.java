@@ -32,6 +32,8 @@ import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.util.SideEffect;
+import com.sk89q.worldedit.util.SideEffectSet;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.world.World;
 import org.apache.logging.log4j.Logger;
@@ -119,7 +121,7 @@ public class FaweAPI {
      * @deprecated Opens streams that are not then closed. Use {@link ClipboardFormats#findByFile(File)} and its relevant
      *         methods to allow closing created streams/closing the reader (which will close the stream(s))
      */
-    @Deprecated(forRemoval = true, since = "TODO")
+    @Deprecated(forRemoval = true, since = "2.11.1")
     public static Clipboard load(File file) throws IOException {
         return ClipboardFormats.findByFile(file).load(file);
     }
@@ -355,8 +357,12 @@ public class FaweAPI {
             if (unwrapped instanceof IQueueExtent) {
                 queue = (IQueueExtent) unwrapped;
             } else if (Settings.settings().QUEUE.PARALLEL_THREADS > 1) {
-                ParallelQueueExtent parallel =
-                        new ParallelQueueExtent(Fawe.instance().getQueueHandler(), world, true);
+                ParallelQueueExtent parallel = new ParallelQueueExtent(
+                        Fawe.instance().getQueueHandler(),
+                        world,
+                        true,
+                        SideEffectSet.none().with(SideEffect.LIGHTING)
+                );
                 queue = parallel.getExtent();
             } else {
                 queue = Fawe.instance().getQueueHandler().getQueue(world);

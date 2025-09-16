@@ -28,8 +28,9 @@ import javax.inject.Inject
 fun Project.applyLibrariesConfiguration() {
     applyCommonConfiguration()
     apply(plugin = "java-base")
+    apply(plugin = "com.gradleup.nmcp.aggregation")
     apply(plugin = "maven-publish")
-    apply(plugin = "com.github.johnrengelman.shadow")
+    apply(plugin = "com.gradleup.shadow")
     apply(plugin = "signing")
 
     configurations {
@@ -41,7 +42,6 @@ fun Project.applyLibrariesConfiguration() {
     val relocations = mapOf(
         "net.kyori.text" to "com.sk89q.worldedit.util.formatting.text",
         "net.kyori.minecraft" to "com.sk89q.worldedit.util.kyori"
-
     )
 
     tasks.register<ShadowJar>("jar") {
@@ -221,7 +221,7 @@ fun Project.applyLibrariesConfiguration() {
 
                 group = "com.fastasyncworldedit"
                 artifactId = "FastAsyncWorldEdit-Libs-${project.name.replaceFirstChar(Char::titlecase)}"
-                version = version
+                version = "$version"
 
                 pom {
                     name.set("${rootProject.name}-Libs" + " " + project.version)
@@ -242,16 +242,19 @@ fun Project.applyLibrariesConfiguration() {
                             name.set("Alexander Brandes")
                             email.set("contact(at)notmyfault.dev")
                             organization.set("IntellectualSites")
+                            organizationUrl.set("https://github.com/IntellectualSites")
                         }
                         developer {
                             id.set("SirYwell")
                             name.set("Hannes Greule")
                             organization.set("IntellectualSites")
+                            organizationUrl.set("https://github.com/IntellectualSites")
                         }
                         developer {
                             id.set("dordsor21")
                             name.set("dordsor21")
                             organization.set("IntellectualSites")
+                            organizationUrl.set("https://github.com/IntellectualSites")
                         }
                     }
 

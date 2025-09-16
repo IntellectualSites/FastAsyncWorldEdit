@@ -7,8 +7,8 @@ import com.fastasyncworldedit.bukkit.adapter.NMSAdapter;
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.math.BitArrayUnstretched;
+import com.fastasyncworldedit.core.math.IntPair;
 import com.fastasyncworldedit.core.util.MathMan;
-import com.fastasyncworldedit.core.util.ReflectionUtils;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.mojang.datafixers.util.Either;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
@@ -45,7 +45,6 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkStatus;
 import net.minecraft.world.level.chunk.GlobalPalette;
 import net.minecraft.world.level.chunk.HashMapPalette;
@@ -57,14 +56,13 @@ import net.minecraft.world.level.chunk.PalettedContainer;
 import net.minecraft.world.level.chunk.SingleValuePalette;
 import net.minecraft.world.level.entity.PersistentEntitySectionManager;
 import org.apache.logging.log4j.Logger;
-import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.craftbukkit.v1_20_R2.CraftChunk;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodType;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -79,12 +77,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Semaphore;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-import java.util.function.Function;
+import java.util.function.IntFunction;
 
-import static java.lang.invoke.MethodType.methodType;
 import static net.minecraft.core.registries.Registries.BIOME;
 
 public final class PaperweightPlatformAdapter extends NMSAdapter {
@@ -108,12 +104,6 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
     private static final MethodHandle methodremoveTickingBlockEntity;
     private static final Field fieldBiomes;
 
-    /*
-     * This is a workaround for the changes from https://hub.spigotmc.org/stash/projects/SPIGOT/repos/craftbukkit/commits/1fddefce1cdce44010927b888432bf70c0e88cde#src/main/java/org/bukkit/craftbukkit/CraftChunk.java
-     * and is only needed to support 1.19.4 versions before *and* after this change.
-     */
-    private static final MethodHandle CRAFT_CHUNK_GET_HANDLE;
-
     private static final Field fieldRemove;
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
@@ -122,6 +112,8 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
     private static Method PAPER_CHUNK_GEN_ALL_ENTITIES;
     private static Field LEVEL_CHUNK_ENTITIES;
     private static Field SERVER_LEVEL_ENTITY_MANAGER;
+
+    static final MethodHandle PALETTED_CONTAINER_GET;
 
     static {
         final MethodHandles.Lookup lookup = MethodHandles.lookup();
@@ -212,37 +204,29 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             } catch (NoSuchFieldException ignored) {
             }
             POST_CHUNK_REWRITE = chunkRewrite;
+
+            Method palettedContaienrGet = PalettedContainer.class.getDeclaredMethod(
+                    Refraction.pickName("get", "a"),
+                    int.class
+            );
+            palettedContaienrGet.setAccessible(true);
+            PALETTED_CONTAINER_GET = lookup.unreflect(palettedContaienrGet);
         } catch (RuntimeException | Error e) {
             throw e;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        MethodHandle craftChunkGetHandle;
-        final MethodType type = methodType(LevelChunk.class);
-        try {
-            craftChunkGetHandle = lookup.findVirtual(CraftChunk.class, "getHandle", type);
-        } catch (NoSuchMethodException | IllegalAccessException e) {
-            try {
-                final MethodType newType = methodType(ChunkAccess.class, ChunkStatus.class);
-                craftChunkGetHandle = lookup.findVirtual(CraftChunk.class, "getHandle", newType);
-                craftChunkGetHandle = MethodHandles.insertArguments(craftChunkGetHandle, 1, ChunkStatus.FULL);
-            } catch (NoSuchMethodException | IllegalAccessException ex) {
-                throw new RuntimeException(ex);
-            }
-        }
-        CRAFT_CHUNK_GET_HANDLE = craftChunkGetHandle;
     }
 
     static boolean setSectionAtomic(
+            String worldName,
+            IntPair pair,
             LevelChunkSection[] sections,
             LevelChunkSection expected,
             LevelChunkSection value,
             int layer
     ) {
-        if (layer >= 0 && layer < sections.length) {
-            return ReflectionUtils.compareAndSet(sections, expected, value, layer);
-        }
-        return false;
+        return NMSAdapter.setSectionAtomic(worldName, pair, sections, expected, value, layer);
     }
 
     // There is no point in having a functional semaphore for paper servers.
@@ -268,12 +252,52 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                 }
             }
         } catch (Throwable e) {
-            e.printStackTrace();
+            LOGGER.error("Error apply DelegateSemaphore", e);
             throw new RuntimeException(e);
         }
     }
 
-    public static LevelChunk ensureLoaded(ServerLevel serverLevel, int chunkX, int chunkZ) {
+    public static CompletableFuture<LevelChunk> ensureLoaded(ServerLevel serverLevel, int chunkX, int chunkZ) {
+        LevelChunk levelChunk = getChunkImmediatelyAsync(serverLevel, chunkX, chunkZ);
+        if (levelChunk != null) {
+            return CompletableFuture.completedFuture(levelChunk);
+        }
+        if (PaperLib.isPaper()) {
+            CompletableFuture<LevelChunk> future = serverLevel
+                    .getWorld()
+                    .getChunkAtAsync(chunkX, chunkZ, true, true)
+                    .thenApply(chunk -> {
+                        addTicket(serverLevel, chunkX, chunkZ);
+                        try {
+                            return toLevelChunk(chunk);
+                        } catch (Throwable e) {
+                            LOGGER.error("Could not asynchronously load chunk at {},{}", chunkX, chunkZ, e);
+                            return null;
+                        }
+                    });
+            try {
+                if (!future.isCompletedExceptionally() || (future.isDone() && future.get() != null)) {
+                    return future;
+                }
+                Throwable t = future.exceptionNow();
+                LOGGER.error("Asynchronous chunk load at {},{} exceptionally completed immediately", chunkX, chunkZ, t);
+            } catch (InterruptedException | ExecutionException e) {
+                LOGGER.error(
+                        "Unexpected error when getting completed future at chunk {},{}. Returning to default.",
+                        chunkX,
+                        chunkZ,
+                        e
+                );
+            }
+        }
+        return CompletableFuture.supplyAsync(() -> TaskManager.taskManager().sync(() -> serverLevel.getChunk(chunkX, chunkZ)));
+    }
+
+    private static LevelChunk toLevelChunk(Chunk chunk) {
+        return (LevelChunk) ((CraftChunk) chunk).getHandle(ChunkStatus.FULL);
+    }
+
+    public static @Nullable LevelChunk getChunkImmediatelyAsync(ServerLevel serverLevel, int chunkX, int chunkZ) {
         if (!PaperLib.isPaper()) {
             LevelChunk nmsChunk = serverLevel.getChunkSource().getChunk(chunkX, chunkZ, false);
             if (nmsChunk != null) {
@@ -282,6 +306,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             if (Fawe.isMainThread()) {
                 return serverLevel.getChunk(chunkX, chunkZ);
             }
+            return null;
         } else {
             LevelChunk nmsChunk = serverLevel.getChunkSource().getChunkAtIfCachedImmediately(chunkX, chunkZ);
             if (nmsChunk != null) {
@@ -297,30 +322,8 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             if (Fawe.isMainThread()) {
                 return serverLevel.getChunk(chunkX, chunkZ);
             }
-            CompletableFuture<org.bukkit.Chunk> future = serverLevel.getWorld().getChunkAtAsync(chunkX, chunkZ, true, true);
-            try {
-                CraftChunk chunk;
-                try {
-                    chunk = (CraftChunk) future.get(10, TimeUnit.SECONDS);
-                } catch (TimeoutException e) {
-                    String world = serverLevel.getWorld().getName();
-                    // We've already taken 10 seconds we can afford to wait a little here.
-                    boolean loaded = TaskManager.taskManager().sync(() -> Bukkit.getWorld(world) != null);
-                    if (loaded) {
-                        LOGGER.warn("Chunk {},{} failed to load in 10 seconds in world {}. Retrying...", chunkX, chunkZ, world);
-                        // Retry chunk load
-                        chunk = (CraftChunk) serverLevel.getWorld().getChunkAtAsync(chunkX, chunkZ, true, true).get();
-                    } else {
-                        throw new UnsupportedOperationException("Cannot load chunk from unloaded world " + world + "!");
-                    }
-                }
-                addTicket(serverLevel, chunkX, chunkZ);
-                return (LevelChunk) CRAFT_CHUNK_GET_HANDLE.invoke(chunk);
-            } catch (Throwable e) {
-                e.printStackTrace();
-            }
+            return null;
         }
-        return TaskManager.taskManager().sync(() -> serverLevel.getChunk(chunkX, chunkZ));
     }
 
     private static void addTicket(ServerLevel serverLevel, int chunkX, int chunkZ) {
@@ -340,7 +343,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
     }
 
     @SuppressWarnings("deprecation")
-    public static void sendChunk(Object chunk, ServerLevel nmsWorld, int chunkX, int chunkZ) {
+    public static void sendChunk(IntPair pair, ServerLevel nmsWorld, int chunkX, int chunkZ) {
         ChunkHolder chunkHolder = getPlayerChunk(nmsWorld, chunkX, chunkZ);
         if (chunkHolder == null) {
             return;
@@ -361,26 +364,35 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         if (levelChunk == null) {
             return;
         }
+        StampLockHolder lockHolder = new StampLockHolder();
+        NMSAdapter.beginChunkPacketSend(nmsWorld.getWorld().getName(), pair, lockHolder);
+        if (lockHolder.chunkLock == null) {
+            return;
+        }
         MinecraftServer.getServer().execute(() -> {
-            ClientboundLevelChunkWithLightPacket packet;
-            if (PaperLib.isPaper()) {
-                packet = new ClientboundLevelChunkWithLightPacket(
-                        levelChunk,
-                        nmsWorld.getChunkSource().getLightEngine(),
-                        null,
-                        null,
-                        false // last false is to not bother with x-ray
-                );
-            } else {
-                // deprecated on paper - deprecation suppressed
-                packet = new ClientboundLevelChunkWithLightPacket(
-                        levelChunk,
-                        nmsWorld.getChunkSource().getLightEngine(),
-                        null,
-                        null
-                );
+            try {
+                ClientboundLevelChunkWithLightPacket packet;
+                if (PaperLib.isPaper()) {
+                    packet = new ClientboundLevelChunkWithLightPacket(
+                            levelChunk,
+                            nmsWorld.getChunkSource().getLightEngine(),
+                            null,
+                            null,
+                            false // last false is to not bother with x-ray
+                    );
+                } else {
+                    // deprecated on paper - deprecation suppressed
+                    packet = new ClientboundLevelChunkWithLightPacket(
+                            levelChunk,
+                            nmsWorld.getChunkSource().getLightEngine(),
+                            null,
+                            null
+                    );
+                }
+                nearbyPlayers(nmsWorld, coordIntPair).forEach(p -> p.connection.send(packet));
+            } finally {
+                NMSAdapter.endChunkPacketSend(nmsWorld.getWorld().getName(), pair, lockHolder);
             }
-            nearbyPlayers(nmsWorld, coordIntPair).forEach(p -> p.connection.send(packet));
         });
     }
 
@@ -403,7 +415,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
 
     public static LevelChunkSection newChunkSection(
             final int layer,
-            final Function<Integer, char[]> get,
+            final IntFunction<char[]> get,
             char[] set,
             CachedBukkitAdapter adapter,
             Registry<Biome> biomeRegistry,
@@ -419,9 +431,9 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         try {
             int num_palette;
             if (get == null) {
-                num_palette = createPalette(blockToPalette, paletteToBlock, blocksCopy, set, adapter, null);
+                num_palette = createPalette(blockToPalette, paletteToBlock, blocksCopy, set, adapter);
             } else {
-                num_palette = createPalette(layer, blockToPalette, paletteToBlock, blocksCopy, get, set, adapter, null);
+                num_palette = createPalette(layer, blockToPalette, paletteToBlock, blocksCopy, get, set, adapter);
             }
 
             int bitsPerEntry = MathMan.log2nlz(num_palette - 1);
@@ -635,11 +647,12 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
 
     public static BiomeType adapt(Holder<Biome> biome, LevelAccessor levelAccessor) {
         final Registry<Biome> biomeRegistry = levelAccessor.registryAccess().registryOrThrow(BIOME);
-        if (biomeRegistry.getKey(biome.value()) == null) {
-            return biomeRegistry.asHolderIdMap().getId(biome) == -1 ? BiomeTypes.OCEAN
-                    : null;
+        final int id = biomeRegistry.getId(biome.value());
+        if (id < 0) {
+            // this shouldn't be the case, but other plugins can be weird
+            return BiomeTypes.OCEAN;
         }
-        return BiomeTypes.get(biome.unwrapKey().orElseThrow().location().toString());
+        return BiomeTypes.getLegacy(id);
     }
 
     static void removeBeacon(BlockEntity beacon, LevelChunk levelChunk) {
@@ -655,7 +668,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             }
             methodremoveTickingBlockEntity.invoke(levelChunk, beacon.getBlockPos());
         } catch (Throwable throwable) {
-            throwable.printStackTrace();
+            LOGGER.error("Error removing beacon", throwable);
         }
     }
 
@@ -663,12 +676,16 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         ExceptionCollector<RuntimeException> collector = new ExceptionCollector<>();
         if (PaperLib.isPaper()) {
             if (POST_CHUNK_REWRITE) {
-                try {
-                    //noinspection unchecked
-                    return (List<Entity>) PAPER_CHUNK_GEN_ALL_ENTITIES.invoke(chunk.level.getEntityLookup().getChunk(chunk.locX, chunk.locZ));
-                } catch (IllegalAccessException | InvocationTargetException e) {
-                    throw new RuntimeException("Failed to lookup entities [POST_CHUNK_REWRITE=true]", e);
-                }
+                return Optional.ofNullable(chunk.level
+                        .getEntityLookup()
+                        .getChunk(chunk.locX, chunk.locZ)).map(c -> {
+                    try {
+                        //noinspection unchecked
+                        return (List<Entity>) PAPER_CHUNK_GEN_ALL_ENTITIES.invoke(c);
+                    } catch (IllegalAccessException | InvocationTargetException e) {
+                        throw new RuntimeException("Failed to lookup entities [PAPER=true]", e);
+                    }
+                }).orElse(Collections.emptyList());
             }
             try {
                 EntityList entityList = (EntityList) LEVEL_CHUNK_ENTITIES.get(chunk);

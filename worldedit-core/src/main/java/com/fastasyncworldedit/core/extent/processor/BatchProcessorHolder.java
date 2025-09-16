@@ -38,6 +38,16 @@ public class BatchProcessorHolder implements IBatchProcessorHolder {
     }
 
     @Override
+    public boolean processGet(final int chunkX, final int chunkZ) {
+        return getProcessor().processGet(chunkX, chunkZ);
+    }
+
+    @Override
+    public IChunkGet processGet(final IChunkGet get) {
+        return getProcessor().processGet(get);
+    }
+
+    @Override
     public void flush() {
         getProcessor().flush();
     }

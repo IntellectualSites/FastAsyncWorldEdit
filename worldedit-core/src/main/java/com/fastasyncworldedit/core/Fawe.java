@@ -14,8 +14,8 @@ import com.fastasyncworldedit.core.util.TaskManager;
 import com.fastasyncworldedit.core.util.TextureUtil;
 import com.fastasyncworldedit.core.util.WEManager;
 import com.fastasyncworldedit.core.util.task.KeyQueuedExecutorService;
+import com.fastasyncworldedit.core.util.task.UUIDKeyQueuedThreadFactory;
 import com.github.luben.zstd.Zstd;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import net.jpountz.lz4.LZ4Factory;
@@ -37,46 +37,43 @@ import java.lang.management.MemoryUsage;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
- * [ WorldEdit action]
- * |
- * \|/
+ * [ WorldEdit action ]
+ * <br>
  * [ EditSession ] - The change is processed (area restrictions, change limit, block type)
- * |
- * \|/
- * [Block change] - A block change from some location
- * |
- * \|/
+ * <br>
+ * [ Block change ] - A block change from some location
+ * <br>
  * [ Set Queue ] - The SetQueue manages the implementation specific queue
- * |
- * \|/
+ * <br>
  * [ Fawe Queue] - A queue of chunks - check if the queue has the chunk for a change
- * |
- * \|/
+ * <br>
  * [ Fawe Chunk Implementation ] - Otherwise create a new FaweChunk object which is a wrapper around the Chunk object
- * |
- * \|/
+ * <br>
  * [ Execution ] - When done, the queue then sets the blocks for the chunk, performs lighting updates and sends the chunk packet to the clients
  * <p>
  * Why it's faster:
- * - The chunk is modified directly rather than through the API
- * \ Removes some overhead, and means some processing can be done async
- * - Lighting updates are performed on the chunk level rather than for every block
- * \ e.g., A blob of stone: only the visible blocks need to have the lighting calculated
- * - Block changes are sent with a chunk packet
- * \ A chunk packet is generally quicker to create and smaller for large world edits
- * - No physics updates
- * \ Physics updates are slow, and are usually performed on each block
- * - Block data shortcuts
- * \ Some known blocks don't need to have the data set or accessed (e.g., air is never going to have data)
- * - Remove redundant extents
- * \ Up to 11 layers of extents can be removed
- * - History bypassing
- * \ FastMode bypasses history and means blocks in the world don't need to be checked and recorded
+ * <br> The chunk is modified directly rather than through the API
+ * - Removes some overhead, and means some processing can be done async
+ * <br> Lighting updates are performed on the chunk level rather than for every block
+ * - e.g., A blob of stone: only the visible blocks need to have the lighting calculated
+ * <br> Block changes are sent with a chunk packet
+ * - A chunk packet is generally quicker to create and smaller for large world edits
+ * <br> No physics updates
+ * - Physics updates are slow, and are usually performed on each block
+ * <br> Block data shortcuts
+ * - Some known blocks don't need to have the data set or accessed (e.g., air is never going to have data)
+ * <br> Remove redundant extents
+ * - Up to 11 layers of extents can be removed
+ * <br> History bypassing
+ * - FastMode bypasses history and means blocks in the world don't need to be checked and recorded
  */
 public class Fawe {
 
@@ -92,7 +89,7 @@ public class Fawe {
      * The platform specific implementation.
      */
     private final IFawe implementation;
-    private final KeyQueuedExecutorService<UUID> clipboardExecutor;
+    private final KeyQueuedExecutorService<UUID> uuidKeyQueuedExecutorService;
     private FaweVersion version;
     private TextureUtil textures;
     private QueueHandler queueHandler;
@@ -138,16 +135,16 @@ public class Fawe {
             } catch (Throwable ignored) {
             }
         }, 0);
+        TaskManager.taskManager().repeatAsync(MemUtil::checkAndSetApproachingLimit, 1);
 
         TaskManager.taskManager().repeat(timer, 1);
-
-        clipboardExecutor = new KeyQueuedExecutorService<>(new ThreadPoolExecutor(
+        uuidKeyQueuedExecutorService = new KeyQueuedExecutorService<>(new ThreadPoolExecutor(
                 1,
                 Settings.settings().QUEUE.PARALLEL_THREADS,
                 0L,
                 TimeUnit.MILLISECONDS,
                 new LinkedBlockingQueue<>(),
-                new ThreadFactoryBuilder().setNameFormat("FAWE Clipboard - %d").build()
+                new UUIDKeyQueuedThreadFactory()
         ));
     }
 
@@ -365,6 +362,18 @@ public class Fawe {
                     Settings.settings().QUEUE.PARALLEL_THREADS
             );
         }
+        if (Settings.settings().HISTORY.DELETE_DISK_ON_LOGOUT && Settings.settings().HISTORY.USE_DATABASE) {
+            LOGGER.warn("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            LOGGER.warn("!!!                                                                !!!");
+            LOGGER.warn("!!!    Using history database whilst deleting disk history!        !!!");
+            LOGGER.warn("!!!    You will not be able to rollback edits after a user logs    !!!");
+            LOGGER.warn("!!!    out, recommended to disable delete-disk-on-logout if you    !!!");
+            LOGGER.warn("!!!    you want to have full history rollback functionality.       !!!");
+            LOGGER.warn("!!!    Disable use-database if you do not need to have rollback    !!!");
+            LOGGER.warn("!!!    functionality and wish to disable this warning.             !!!");
+            LOGGER.warn("!!!                                                                !!!");
+            LOGGER.warn("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        }
         try {
             byte[] in = new byte[0];
             byte[] compressed = LZ4Factory.fastestJavaInstance().fastCompressor().compress(in);
@@ -410,6 +419,7 @@ public class Fawe {
                 if (heapSize < heapMaxSize) {
                     return;
                 }
+                LOGGER.warn("High memory usage detected, FAWE will attempt to slow operations to prevent a crash.");
                 MemUtil.memoryLimitedTask();
             }, null, null);
 
@@ -451,9 +461,58 @@ public class Fawe {
      *
      * @return Executor used for clipboard IO if clipboard on disk is enabled or null
      * @since 2.6.2
+     * @deprecated Use any of {@link Fawe#submitUUIDKeyQueuedTask(UUID, Runnable)},
+     * {@link Fawe#submitUUIDKeyQueuedTask(UUID, Runnable, Object)}, {@link Fawe#submitUUIDKeyQueuedTask(UUID, Callable)}
+     * to ensure if a thread is already a UUID-queued thread, the task is immediately run
      */
+    @Deprecated(forRemoval = true, since = "2.12.1")
     public KeyQueuedExecutorService<UUID> getClipboardExecutor() {
-        return this.clipboardExecutor;
+        return this.uuidKeyQueuedExecutorService;
+    }
+
+    /**
+     * Submit a task to the UUID key-queued executor
+     *
+     * @return Future representing the tank
+     * @since 2.12.1
+     */
+    public Future<?> submitUUIDKeyQueuedTask(UUID uuid, Runnable runnable) {
+        if (Thread.currentThread() instanceof UUIDKeyQueuedThreadFactory.UUIDKeyQueuedThread) {
+            runnable.run();
+            return CompletableFuture.completedFuture(null);
+        }
+        return this.uuidKeyQueuedExecutorService.submit(uuid, runnable);
+    }
+
+    /**
+     * Submit a task to the UUID key-queued executor
+     *
+     * @return Future representing the tank
+     * @since 2.12.1
+     */
+    public <T> Future<T> submitUUIDKeyQueuedTask(UUID uuid, Runnable runnable, T result) {
+        if (Thread.currentThread() instanceof UUIDKeyQueuedThreadFactory.UUIDKeyQueuedThread) {
+            runnable.run();
+            return CompletableFuture.completedFuture(result);
+        }
+        return this.uuidKeyQueuedExecutorService.submit(uuid, runnable, result);
+    }
+
+    /**
+     * Submit a task to the UUID key-queued executor
+     *
+     * @return Future representing the tank
+     * @since 2.12.1
+     */
+    public <T> Future<T> submitUUIDKeyQueuedTask(UUID uuid, Callable<T> callable) {
+        if (Thread.currentThread() instanceof UUIDKeyQueuedThreadFactory.UUIDKeyQueuedThread) {
+            try {
+                return CompletableFuture.completedFuture(callable.call());
+            } catch (Throwable t) {
+                return CompletableFuture.failedFuture(t);
+            }
+        }
+        return this.uuidKeyQueuedExecutorService.submit(uuid, callable);
     }
 
 }

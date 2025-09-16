@@ -48,4 +48,13 @@ public class MutableBlockVector2 extends BlockVector2 {
         return this;
     }
 
+    /**
+     * Create a new {@link BlockVector2} with the current x and z.
+     *
+     * @since 2.13.0
+     */
+    public BlockVector2 toImmutable() {
+        return BlockVector2.at(x, z);
+    }
+
 }

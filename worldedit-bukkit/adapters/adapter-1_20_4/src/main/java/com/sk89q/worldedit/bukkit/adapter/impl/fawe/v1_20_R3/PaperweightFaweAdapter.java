@@ -4,7 +4,9 @@ import com.fastasyncworldedit.bukkit.adapter.FaweAdapter;
 import com.fastasyncworldedit.bukkit.adapter.NMSRelighterFactory;
 import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.entity.LazyBaseEntity;
+import com.fastasyncworldedit.core.extent.processor.PlacementStateProcessor;
 import com.fastasyncworldedit.core.extent.processor.lighting.RelighterFactory;
+import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.fastasyncworldedit.core.queue.IBatchProcessor;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.implementation.packet.ChunkPacket;
@@ -12,6 +14,7 @@ import com.fastasyncworldedit.core.util.NbtUtils;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Sets;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
@@ -20,7 +23,7 @@ import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_20_R3.nbt.PaperweightLazy
 import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_20_R3.regen.PaperweightRegen;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.internal.block.BlockStateIdAccess;
+import com.sk89q.worldedit.function.mask.BlockTypeMask;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.internal.wna.WorldNativeAccess;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -32,7 +35,7 @@ import com.sk89q.worldedit.registry.state.IntegerProperty;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.SideEffect;
-import com.sk89q.worldedit.util.SideEffectSet;
+import com.sk89q.worldedit.util.concurrency.LazyReference;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.world.RegenOptions;
 import com.sk89q.worldedit.world.biome.BiomeType;
@@ -48,6 +51,7 @@ import io.papermc.lib.PaperLib;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.WritableRegistry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
 import net.minecraft.resources.ResourceLocation;
@@ -89,6 +93,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -97,6 +102,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.OptionalInt;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -115,18 +121,16 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
         }
     }
 
-    private final com.sk89q.worldedit.bukkit.adapter.ext.fawe.v1_20_R3.PaperweightAdapter parent;
-    // ------------------------------------------------------------------------
-    // Code that may break between versions of Minecraft
-    // ------------------------------------------------------------------------
     private final PaperweightMapChunkUtil mapUtil = new PaperweightMapChunkUtil();
-    private char[] ibdToStateOrdinal = null;
-    private int[] ordinalToIbdID = null;
-    private boolean initialised = false;
-    private Map<String, List<Property<?>>> allBlockProperties = null;
 
     public PaperweightFaweAdapter() throws NoSuchFieldException, NoSuchMethodException {
-        this.parent = new com.sk89q.worldedit.bukkit.adapter.ext.fawe.v1_20_R3.PaperweightAdapter();
+        super(new com.sk89q.worldedit.bukkit.adapter.ext.fawe.v1_20_R3.PaperweightAdapter());
+    }
+
+    public Function<BlockEntity, FaweCompoundTag> blockEntityToCompoundTag() {
+        return blockEntity -> FaweCompoundTag.of(
+                () -> (LinCompoundTag) toNativeLin(blockEntity.saveWithId())
+        );
     }
 
     @Nullable
@@ -135,8 +139,8 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
         return resourceLocation == null ? null : resourceLocation.toString();
     }
 
-    private static void readEntityIntoTag(Entity entity, net.minecraft.nbt.CompoundTag compoundTag) {
-        entity.save(compoundTag);
+    private static boolean readEntityIntoTag(Entity entity, net.minecraft.nbt.CompoundTag compoundTag) {
+        return entity.save(compoundTag);
     }
 
     @Override
@@ -144,18 +148,25 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
         return parent;
     }
 
+    @Override
+    protected void ensureInit() {
+        if (!this.initialised) {
+            init();
+        }
+    }
+
     private synchronized boolean init() {
-        if (ibdToStateOrdinal != null && ibdToStateOrdinal[1] != 0) {
+        if (ibdToOrdinal != null && ibdToOrdinal[1] != 0) {
             return false;
         }
-        ibdToStateOrdinal = new char[BlockTypesCache.states.length]; // size
-        ordinalToIbdID = new int[ibdToStateOrdinal.length]; // size
-        for (int i = 0; i < ibdToStateOrdinal.length; i++) {
+        ibdToOrdinal = new int[BlockTypesCache.states.length]; // size
+        ordinalToIbdID = new int[ibdToOrdinal.length]; // size
+        for (int i = 0; i < ibdToOrdinal.length; i++) {
             BlockState blockState = BlockTypesCache.states[i];
             PaperweightBlockMaterial material = (PaperweightBlockMaterial) blockState.getMaterial();
             int id = Block.BLOCK_STATE_REGISTRY.getId(material.getState());
             char ordinal = blockState.getOrdinalChar();
-            ibdToStateOrdinal[id] = ordinal;
+            ibdToOrdinal[id] = ordinal;
             ordinalToIbdID[ordinal] = id;
         }
         Map<String, List<Property<?>>> properties = new HashMap<>();
@@ -215,6 +226,15 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
         }
         initialised = true;
         return true;
+    }
+
+    @Override
+    public Collection<String> getRegisteredDefaultBlockStates() {
+        ArrayList<String> states = new ArrayList<>();
+        for (final Block block : BuiltInRegistries.BLOCK) {
+            states.add(CraftBlockData.fromData(block.defaultBlockState()).getAsString());
+        }
+        return states;
     }
 
     @Override
@@ -284,9 +304,16 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
         return state.toBaseBlock();
     }
 
+    private static final Set<SideEffect> SUPPORTED_SIDE_EFFECTS = Sets.immutableEnumSet(
+            SideEffect.HISTORY,
+            SideEffect.HEIGHTMAPS,
+            SideEffect.LIGHTING,
+            SideEffect.NEIGHBORS
+    );
+
     @Override
     public Set<SideEffect> getSupportedSideEffects() {
-        return SideEffectSet.defaults().getSideEffectsToApply();
+        return SUPPORTED_SIDE_EFFECTS;
     }
 
     @Override
@@ -307,7 +334,9 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
             EntityType type = com.sk89q.worldedit.world.entity.EntityTypes.get(id);
             Supplier<LinCompoundTag> saveTag = () -> {
                 final net.minecraft.nbt.CompoundTag minecraftTag = new net.minecraft.nbt.CompoundTag();
-                readEntityIntoTag(mcEntity, minecraftTag);
+                if (!readEntityIntoTag(mcEntity, minecraftTag)) {
+                    return null;
+                }
                 //add Id for AbstractChangeSet to work
                 final LinCompoundTag tag = (LinCompoundTag) toNativeLin(minecraftTag);
                 final Map<String, LinTag<?>> tags = NbtUtils.getLinCompoundTagValues(tag);
@@ -338,7 +367,7 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
     @Override
     public OptionalInt getInternalBlockStateId(BlockState state) {
         PaperweightBlockMaterial material = (PaperweightBlockMaterial) state.getMaterial();
-        net.minecraft.world.level.block.state.BlockState mcState = material.getCraftBlockData().getState();
+        net.minecraft.world.level.block.state.BlockState mcState = material.getState();
         return OptionalInt.of(Block.BLOCK_STATE_REGISTRY.getId(mcState));
     }
 
@@ -356,18 +385,18 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
     public char adaptToChar(net.minecraft.world.level.block.state.BlockState blockState) {
         int id = Block.BLOCK_STATE_REGISTRY.getId(blockState);
         if (initialised) {
-            return ibdToStateOrdinal[id];
+            return (char) ibdToOrdinal[id];
         }
         synchronized (this) {
             if (initialised) {
-                return ibdToStateOrdinal[id];
+                return (char) ibdToOrdinal[id];
             }
             try {
                 init();
-                return ibdToStateOrdinal[id];
+                return (char) ibdToOrdinal[id];
             } catch (ArrayIndexOutOfBoundsException e1) {
-                LOGGER.error("Attempted to convert {} with ID {} to char. ibdToStateOrdinal length: {}. Defaulting to air!",
-                        blockState.getBlock(), Block.BLOCK_STATE_REGISTRY.getId(blockState), ibdToStateOrdinal.length, e1
+                LOGGER.error("Attempted to convert {} with ID {} to char. ibdToOrdinal length: {}. Defaulting to air!",
+                        blockState.getBlock(), Block.BLOCK_STATE_REGISTRY.getId(blockState), ibdToOrdinal.length, e1
                 );
                 return BlockTypesCache.ReservedIDs.AIR;
             }
@@ -376,28 +405,28 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
 
     public char ibdIDToOrdinal(int id) {
         if (initialised) {
-            return ibdToStateOrdinal[id];
+            return (char) ibdToOrdinal[id];
         }
         synchronized (this) {
             if (initialised) {
-                return ibdToStateOrdinal[id];
+                return (char) ibdToOrdinal[id];
             }
             init();
-            return ibdToStateOrdinal[id];
+            return (char) ibdToOrdinal[id];
         }
     }
 
     @Override
-    public char[] getIbdToStateOrdinal() {
+    public int[] getIbdToOrdinal() {
         if (initialised) {
-            return ibdToStateOrdinal;
+            return ibdToOrdinal;
         }
         synchronized (this) {
             if (initialised) {
-                return ibdToStateOrdinal;
+                return ibdToOrdinal;
             }
             init();
-            return ibdToStateOrdinal;
+            return ibdToOrdinal;
         }
     }
 
@@ -431,7 +460,11 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
     @Override
     public <B extends BlockStateHolder<B>> BlockData adapt(B state) {
         PaperweightBlockMaterial material = (PaperweightBlockMaterial) state.getMaterial();
-        return material.getCraftBlockData();
+        return material.getBlockData();
+    }
+
+    public net.minecraft.world.level.block.state.BlockState adapt(BlockState blockState) {
+        return Block.stateById(getOrdinalToIbdID()[blockState.getOrdinal()]);
     }
 
     @Override
@@ -471,8 +504,7 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
 
     @Override
     public boolean canPlaceAt(org.bukkit.World world, BlockVector3 blockVector3, BlockState blockState) {
-        int internalId = BlockStateIdAccess.getBlockStateId(blockState);
-        net.minecraft.world.level.block.state.BlockState blockState1 = Block.stateById(internalId);
+        net.minecraft.world.level.block.state.BlockState blockState1 = Block.stateById(getOrdinalToIbdID()[blockState.getOrdinal()]);
         return blockState1.hasPostProcess(
                 getServerLevel(world),
                 new BlockPos(blockVector3.x(), blockVector3.y(), blockVector3.z())
@@ -517,7 +549,8 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
     public BaseItemStack adapt(org.bukkit.inventory.ItemStack itemStack) {
         final ItemStack nmsStack = CraftItemStack.asNMSCopy(itemStack);
         final BaseItemStack weStack = new BaseItemStack(BukkitAdapter.asItemType(itemStack.getType()), itemStack.getAmount());
-        weStack.setNbt(((LinCompoundTag) toNativeLin(nmsStack.getTag())));
+        // We should be fine to perform this later as we're using a deep-copied itemstack (above)
+        weStack.setNbtReference(LazyReference.from(() -> ((LinCompoundTag) toNativeLin(nmsStack.getTag()))));
         return weStack;
     }
 
@@ -600,6 +633,11 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
     @Override
     public IBatchProcessor getTickingPostProcessor() {
         return new PaperweightPostProcessor();
+    }
+
+    @Override
+    public PlacementStateProcessor getPlatformPlacementProcessor(Extent extent, BlockTypeMask mask, Region region) {
+        return new PaperweightPlacementStateProcessor(extent, mask, region);
     }
 
     private boolean wasAccessibleSinceLastSave(ChunkHolder holder) {

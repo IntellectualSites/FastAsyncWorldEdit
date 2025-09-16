@@ -6,15 +6,18 @@ import com.fastasyncworldedit.core.internal.exception.FaweClipboardVersionMismat
 import com.fastasyncworldedit.core.internal.io.ByteBufferInputStream;
 import com.fastasyncworldedit.core.jnbt.streamer.IntValueReader;
 import com.fastasyncworldedit.core.math.IntTriple;
+import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.fastasyncworldedit.core.util.MainUtil;
+import com.fastasyncworldedit.core.util.NbtUtils;
 import com.fastasyncworldedit.core.util.ReflectionUtils;
+import com.google.common.collect.Collections2;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.DoubleTag;
-import com.sk89q.jnbt.IntTag;
 import com.sk89q.jnbt.ListTag;
 import com.sk89q.jnbt.NBTInputStream;
 import com.sk89q.jnbt.NBTOutputStream;
 import com.sk89q.jnbt.Tag;
+import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
@@ -28,6 +31,8 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import org.apache.logging.log4j.Logger;
+import org.enginehub.linbus.tree.LinCompoundTag;
+import org.enginehub.linbus.tree.LinTagType;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
@@ -64,7 +69,7 @@ public class DiskOptimizedClipboard extends LinearClipboard {
     private static final int VERSION_2_HEADER_SIZE = 27; // Header size of "version 2" i.e. when NBT/entities could be saved
     private static final Map<String, LockHolder> LOCK_HOLDER_CACHE = new ConcurrentHashMap<>();
 
-    private final HashMap<IntTriple, CompoundTag> nbtMap;
+    private final HashMap<IntTriple, FaweCompoundTag> nbtMap;
     private final File file;
     private final int headerSize;
 
@@ -248,12 +253,12 @@ public class DiskOptimizedClipboard extends LinearClipboard {
         try (NBTInputStream nbtIS = new NBTInputStream(MainUtil.getCompressedIS(new ByteBufferInputStream(tmp)))) {
             Iterator<CompoundTag> iter = nbtIS.toIterator();
             while (nbtCount > 0 && iter.hasNext()) { // TileEntities are stored "before" entities
-                CompoundTag tag = iter.next();
-                int x = tag.getInt("x");
-                int y = tag.getInt("y");
-                int z = tag.getInt("z");
+                LinCompoundTag tag = iter.next().toLinTag();
+                int x = tag.getTag("x", LinTagType.intTag()).valueAsInt();
+                int y = tag.getTag("y", LinTagType.intTag()).valueAsInt();
+                int z = tag.getTag("z", LinTagType.intTag()).valueAsInt();
                 IntTriple pos = new IntTriple(x, y, z);
-                nbtMap.put(pos, tag);
+                nbtMap.put(pos, FaweCompoundTag.of(tag));
                 nbtCount--;
             }
             while (entitiesCount > 0 && iter.hasNext()) {
@@ -559,8 +564,8 @@ public class DiskOptimizedClipboard extends LinearClipboard {
             ))) {
                 if (!nbtMap.isEmpty()) {
                     try {
-                        for (CompoundTag tag : nbtMap.values()) {
-                            nbtOS.writeTag(tag);
+                        for (FaweCompoundTag tag : nbtMap.values()) {
+                            nbtOS.writeTag(new CompoundTag(tag.linTag()));
                         }
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -638,7 +643,7 @@ public class DiskOptimizedClipboard extends LinearClipboard {
 
     @Override
     public Collection<CompoundTag> getTileEntities() {
-        return nbtMap.values();
+        return Collections2.transform(nbtMap.values(), fct -> new CompoundTag(fct.linTag()));
     }
 
     public int getIndex(int x, int y, int z) {
@@ -656,10 +661,10 @@ public class DiskOptimizedClipboard extends LinearClipboard {
 
     private BaseBlock toBaseBlock(BlockState state, int i) {
         if (state.getMaterial().hasContainer() && !nbtMap.isEmpty()) {
-            CompoundTag nbt;
+            FaweCompoundTag nbt;
             if (nbtMap.size() < 4) {
                 nbt = null;
-                for (Map.Entry<IntTriple, CompoundTag> entry : nbtMap.entrySet()) {
+                for (Map.Entry<IntTriple, FaweCompoundTag> entry : nbtMap.entrySet()) {
                     IntTriple key = entry.getKey();
                     int index = getIndex(key.x(), key.y(), key.z());
                     if (index == i) {
@@ -674,15 +679,15 @@ public class DiskOptimizedClipboard extends LinearClipboard {
                 int x = newI - z * getWidth();
                 nbt = nbtMap.get(new IntTriple(x, y, z));
             }
-            return state.toBaseBlock(nbt);
+            return state.toBaseBlock(nbt == null ? null : nbt.linTag());
         }
         return state.toBaseBlock();
     }
 
     private BaseBlock toBaseBlock(BlockState state, int x, int y, int z) {
         if (state.getMaterial().hasContainer() && !nbtMap.isEmpty()) {
-            CompoundTag nbt = nbtMap.get(new IntTriple(x, y, z));
-            return state.toBaseBlock(nbt);
+            FaweCompoundTag nbt = nbtMap.get(new IntTriple(x, y, z));
+            return state.toBaseBlock(nbt == null ? null : nbt.linTag());
         }
         return state.toBaseBlock();
     }
@@ -709,12 +714,8 @@ public class DiskOptimizedClipboard extends LinearClipboard {
     }
 
     @Override
-    public boolean setTile(int x, int y, int z, CompoundTag tag) {
-        final Map<String, Tag<?, ?>> values = new HashMap<>(tag.getValue());
-        values.put("x", new IntTag(x));
-        values.put("y", new IntTag(y));
-        values.put("z", new IntTag(z));
-        nbtMap.put(new IntTriple(x, y, z), new CompoundTag(values));
+    public boolean tile(final int x, final int y, final int z, final FaweCompoundTag tile) throws WorldEditException {
+        nbtMap.put(new IntTriple(x, y, z), NbtUtils.withPosition(tile, x, y, z));
         return true;
     }
 

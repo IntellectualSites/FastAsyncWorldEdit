@@ -101,7 +101,7 @@ public interface ClipboardFormat {
      *
      * @param inputStream The stream
      * @return true if the given stream is of this format
-     * @since TODO
+     * @since 2.11.1
      */
     default boolean isFormat(InputStream inputStream) {
         return false;

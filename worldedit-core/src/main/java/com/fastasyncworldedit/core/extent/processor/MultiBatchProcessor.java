@@ -19,7 +19,7 @@ import org.apache.logging.log4j.Logger;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -77,11 +77,11 @@ public class MultiBatchProcessor implements IBatchProcessor {
 
     @Override
     public IChunkSet processSet(IChunk chunk, IChunkGet get, IChunkSet set) {
-        Map<Integer, List<IBatchProcessor>> ordered = new HashMap<>();
+        Map<ProcessorScope, List<IBatchProcessor>> ordered = new EnumMap<>(ProcessorScope.class);
         IChunkSet chunkSet = set;
         for (IBatchProcessor processor : processors) {
             if (processor.getScope() != ProcessorScope.ADDING_BLOCKS) {
-                ordered.computeIfAbsent(processor.getScope().intValue(), k -> new ArrayList<>())
+                ordered.computeIfAbsent(processor.getScope(), k -> new ArrayList<>())
                         .add(processor);
                 continue;
             }
@@ -121,7 +121,7 @@ public class MultiBatchProcessor implements IBatchProcessor {
         for (IBatchProcessor processor : processors) {
             try {
                 // We do NOT want to edit blocks in post processing
-                if (processor.getScope() != ProcessorScope.READING_SET_BLOCKS) {
+                if (processor.getScope() != ProcessorScope.READING_BLOCKS) {
                     continue;
                 }
                 futures.add(processor.postProcessSet(chunk, get, set));
@@ -152,7 +152,7 @@ public class MultiBatchProcessor implements IBatchProcessor {
         for (IBatchProcessor processor : processors) {
             try {
                 // We do NOT want to edit blocks in post processing
-                if (processor.getScope() != ProcessorScope.READING_SET_BLOCKS) {
+                if (processor.getScope() != ProcessorScope.READING_BLOCKS) {
                     continue;
                 }
                 processor.postProcess(chunk, get, set);
@@ -185,6 +185,14 @@ public class MultiBatchProcessor implements IBatchProcessor {
             }
         }
         return true;
+    }
+
+    @Override
+    public IChunkGet processGet(IChunkGet get) {
+        for (IBatchProcessor processor : this.processors) {
+            get = processor.processGet(get);
+        }
+        return get;
     }
 
     @Override
