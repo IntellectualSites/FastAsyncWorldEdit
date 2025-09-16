@@ -139,9 +139,9 @@ public class HistorySubCommands {
         //            finalQueue = SetQueue.IMP.getNewQueue(fp.getWorld(), true, false);
         //        }
         int count = 0;
-        UUID finalOther = other;
+        UUID finalOther = other.getUniqueId();
         long minTime = System.currentTimeMillis() - timeDiff;
-        for (Supplier<RollbackOptimizedHistory> supplier : database.getEdits(other, minTime, bot, top, !restore, restore)) {
+        for (Supplier<RollbackOptimizedHistory> supplier : database.getEdits(other.getUniqueId(), minTime, bot, top, !restore, restore)) {
             count++;
             RollbackOptimizedHistory edit = supplier.get();
             if (restore) {
