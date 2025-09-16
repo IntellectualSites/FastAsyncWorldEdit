@@ -15,20 +15,20 @@ platform {
 }
 
 dependencies {
-    "compileOnly"(project(":worldedit-libs:core:ap"))
-    "annotationProcessor"(project(":worldedit-libs:core:ap"))
-    "annotationProcessor"(libs.guava)
-    "api"(project(":worldedit-core"))
-    "implementation"(platform(libs.log4j.bom)) {
+    compileOnly(project(":worldedit-libs:core:ap"))
+    annotationProcessor(project(":worldedit-libs:core:ap"))
+    annotationProcessor(libs.guava)
+    api(project(":worldedit-core"))
+    implementation(platform(libs.log4j.bom)) {
         because("We control Log4J on this platform")
     }
-    "implementation"(libs.log4j.api)
-    "implementation"(libs.log4j.core)
-    "implementation"(libs.commonsCli)
-    "implementation"(libs.guava)
-    "implementation"(libs.gson)
-    "api"(libs.parallelgzip) { isTransitive = false }
-    "api"(libs.lz4Java)
+    implementation(libs.log4j.api)
+    implementation(libs.log4j.core)
+    implementation(libs.commonsCli)
+    implementation(libs.guava)
+    implementation(libs.gson)
+    api(libs.parallelgzip) { isTransitive = false }
+    api(libs.lz4Java)
 }
 
 tasks.named<ShadowJar>("shadowJar") {

@@ -4,7 +4,6 @@ import buildlogic.getLibrary
 plugins {
     id("eclipse")
     id("idea")
-//    id("checkstyle")
     id("buildlogic.common")
 }
 
@@ -21,14 +20,8 @@ tasks
         options.isDeprecation = true
         options.encoding = "UTF-8"
         options.compilerArgs.add("-parameters")
-        options.compilerArgs.add("-Werror")
         options.compilerArgs.add("--add-modules=jdk.incubator.vector")
     }
-
-//configure<CheckstyleExtension> {
-//    configFile = rootProject.file("config/checkstyle/checkstyle.xml")
-//    toolVersion = "10.16.0"
-//}
 
 tasks.withType<Test>().configureEach {
     useJUnitPlatform {
@@ -46,6 +39,7 @@ dependencies {
     "testImplementation"(stringyLibs.getLibrary("mockito-core"))
     "testImplementation"(stringyLibs.getLibrary("mockito-junit-jupiter"))
     "testRuntimeOnly"(stringyLibs.getLibrary("junit-jupiter-engine"))
+    "testRuntimeOnly"(stringyLibs.getLibrary("junit-platform-launcher"))
 }
 
 // Java 8 turns on doclint which we fail
@@ -54,9 +48,6 @@ tasks.withType<Javadoc>().configureEach {
     (options as StandardJavadocDocletOptions).apply {
         addStringOption("Xdoclint:none", "-quiet")
         addStringOption("-add-modules", "jdk.incubator.vector")
-
-        //addBooleanOption("Werror", true)
-        //addBooleanOption("Xdoclint:all", true)
         addBooleanOption("Xdoclint:-missing", true)
         tags(
             "apiNote:a:API Note:",
@@ -77,14 +68,4 @@ tasks.withType<Javadoc>().configureEach {
 configure<JavaPluginExtension> {
     withJavadocJar()
     withSourcesJar()
-//TODO Migrated from CommonJavaConfig.kt
-//    disableAutoTargetJvm()
-//    withJavadocJar()
-//    if (sourcesJar) {
-//        withSourcesJar()
-//    }
-}
-
-tasks.named("check").configure {
-    dependsOn("checkstyleMain", "checkstyleTest")
 }

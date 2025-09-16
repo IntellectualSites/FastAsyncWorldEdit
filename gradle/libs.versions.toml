@@ -1,6 +1,6 @@
 [versions]
 # Minecraft expectations
-paper = "1.21-R0.1-SNAPSHOT"
+paperApi = "1.21-R0.1-SNAPSHOT"
 fastutil = "8.5.15"
 guava = "33.3.1-jre"
 log4j = "2.24.1"
@@ -35,11 +35,12 @@ jchronic = "0.2.4a"
 lz4-java = "1.8.0"
 lz4-stream = "1.0.0"
 commons-cli = "1.10.0"
-paperlib = "1.0.8"
+paperLib = "1.0.8"
 paster = "1.1.7"
 vault = "1.7.1"
 serverlib = "2.3.7"
 linbus = "0.2.0"
+autoService = "1.1.1"
 ## Internal
 text-adapter = "3.0.6"
 text = "3.0.4"
@@ -53,7 +54,7 @@ junit = "5.11.1"
 pluginyml = "0.6.0"
 mod-publish-plugin = "0.8.4"
 grgit = "5.3.2"
-shadow = "9.0.1"
+shadow = "9.0.2"
 paperweight = "2.0.0-SNAPSHOT"
 codecov = "0.2.0"
 
@@ -73,7 +74,7 @@ shadow = { group = "com.gradleup.shadow", name = "shadow-gradle-plugin", version
 paperweight = { group = "io.papermc.paperweight.userdev", name = "io.papermc.paperweight.userdev.gradle.plugin", version.ref = "paperweight" }
 
 # Minecraft expectations
-paper = { group = "io.papermc.paper", name = "paper-api", version.ref = "paper" }
+paperApi = { group = "io.papermc.paper", name = "paper-api", version.ref = "paperApi" }
 fastutil = { group = "it.unimi.dsi", name = "fastutil", version.ref = "fastutil" }
 log4j-bom = { group = "org.apache.logging.log4j", name = "log4j-bom", version.ref = "log4j" }
 log4j-api = { group = "org.apache.logging.log4j", name = "log4j-api", version.ref = "log4j" }
@@ -110,7 +111,7 @@ jchronic = { group = "com.sk89q", name = "jchronic", version.ref = "jchronic" }
 lz4Java = { group = "org.lz4", name = "lz4-java", version.ref = "lz4-java" }
 lz4JavaStream = { group = "net.jpountz", name = "lz4-java-stream", version.ref = "lz4-stream" }
 commonsCli = { group = "commons-cli", name = "commons-cli", version.ref = "commons-cli" }
-paperlib = { group = "io.papermc", name = "paperlib", version.ref = "paperlib" }
+paperLib = { group = "io.papermc", name = "paperlib", version.ref = "paperLib" }
 adventureApi = { group = "net.kyori", name = "adventure-api", version.ref = "adventure" }
 adventureMiniMessage = { group = "net.kyori", name = "adventure-text-minimessage", version.ref = "adventure" }
 adventureBukkit = { group = "net.kyori", name = "adventure-platform-bukkit", version.ref = "adventure-bukkit" }
@@ -118,6 +119,8 @@ paster = { group = "com.intellectualsites.paster", name = "Paster", version.ref 
 vault = { group = "com.github.MilkBowl", name = "VaultAPI", version.ref = "vault" }
 serverlib = { group = "dev.notmyfault.serverlib", name = "ServerLib", version.ref = "serverlib" }
 checkerqual = { group = "org.checkerframework", name = "checker-qual", version.ref = "checkerqual" }
+
+autoService = { group = "com.google.auto.service", name = "auto-service", version.ref = "autoService" }
 
 linBus-bom = { group = "org.enginehub.lin-bus", name = "lin-bus-bom", version.ref = "linbus" }
 linBus-common = { group = "org.enginehub.lin-bus", name = "lin-bus-common" }
@@ -137,6 +140,7 @@ junit-bom = { group = "org.junit", name = "junit-bom", version.ref = "junit" }
 junit-jupiter-api = { group = "org.junit.jupiter", name = "junit-jupiter-api" }
 junit-jupiter-params = { group = "org.junit.jupiter", name = "junit-jupiter-params" }
 junit-jupiter-engine = { group = "org.junit.jupiter", name = "junit-jupiter-engine" }
+junit-platform-launcher = { group = "org.junit.platform", name = "junit-platform-launcher" }
 
 jqwik = { group = "net.jqwik", name = "jqwik", version.ref = "jqwik" }
 

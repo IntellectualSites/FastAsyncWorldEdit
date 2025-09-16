@@ -5,16 +5,7 @@ plugins {
     id("signing")
 }
 
-if (project.hasProperty("buildnumber")) {
-    ext["internalVersion"] = "$version;${rootProject.ext["gitCommitHash"]}"
-} else {
-    ext["internalVersion"] = "$version"
-}
-
-//TODO Check to see if still needed since this was migrated from PlatformConfig.kt
-//if (name in setOf("worldedit-core", "worldedit-bukkit", "worldedit-cli")) {
-//    the<JavaPluginExtension>().withSourcesJar()
-//}
+ext["internalVersion"] = "$version+${rootProject.ext["gitCommitHash"]}"
 
 val publishingExtension = the<PublishingExtension>()
 

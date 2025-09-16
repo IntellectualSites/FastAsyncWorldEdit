@@ -1,5 +1,6 @@
 import buildlogic.getLibrary
 import buildlogic.stringyLibs
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 plugins {
     id("com.gradleup.shadow")
@@ -10,7 +11,7 @@ val platform = extensions.create<buildlogic.PlatformExtension>("platform")
 platform.includeClasspath.convention(false)
 platform.extraAttributes.convention(mapOf())
 
-tasks.named<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shadowJar") {
+tasks.named<ShadowJar>("shadowJar") {
     archiveClassifier.set("dist")
     relocate("com.sk89q.jchronic", "com.sk89q.worldedit.jchronic")
     val jchronic = stringyLibs.getLibrary("jchronic").get()
@@ -36,7 +37,6 @@ javaComponent.withVariantsFromConfiguration(configurations["shadowRuntimeElement
     skip()
 }
 
-afterEvaluate {
     tasks.named<Jar>("jar") {
         val kind = platform.kind.get()
         val includeClasspath = platform.includeClasspath.get()
@@ -59,4 +59,3 @@ afterEvaluate {
         attributes.putAll(extraAttributes)
         manifest.attributes(attributes)
     }
-}

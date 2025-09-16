@@ -1,6 +1,11 @@
+import buildlogic.getLibrary
+import buildlogic.sourceSets
+import buildlogic.stringyLibs
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.shadowJar
 import io.papermc.paperweight.userdev.attribute.Obfuscation
 import me.modmuss50.mpp.ReleaseType
+import kotlin.getOrElse
 
 plugins {
     `java-library`
@@ -77,31 +82,30 @@ val adaptersReobf = configurations.create("adaptersReobf") {
 }
 
 dependencies {
-    "api"(project(":worldedit-core"))
-    "api"(project(":worldedit-libs:bukkit"))
+    api(project(":worldedit-core"))
+    api(project(":worldedit-libs:bukkit"))
 
-    "localImplementation"(libs.paper) {
+    localImplementation(libs.paperApi) {
         exclude("junit", "junit")
         exclude(group = "org.slf4j", module = "slf4j-api")
     }
-    "localImplementation"(platform(libs.log4j.bom)) {
+    localImplementation(platform(libs.log4j.bom)) {
         because("Spigot provides Log4J (sort of, not in API, implicitly part of server)")
     }
-    "localImplementation"(libs.log4j.api)
+    localImplementation(libs.log4j.api)
 
-    "implementation"(libs.paperlib)
-    "compileOnly"(libs.dummypermscompat) {
+    implementation(libs.paperLib)
+    compileOnly(libs.vault) { isTransitive = false }
+    compileOnly(libs.dummypermscompat) {
         exclude("com.github.MilkBowl", "VaultAPI")
     }
-    "implementation"(libs.bstats.bukkit) { isTransitive = false }
-    "implementation"(libs.bstats.base) { isTransitive = false }
-    "implementation"(libs.fastutil)
+    implementation(libs.bstats.bukkit) { isTransitive = false }
+    implementation(libs.bstats.base) { isTransitive = false }
+    implementation(libs.fastutil)
 
     project.project(":worldedit-bukkit:adapters").subprojects.forEach {
         "adapters"(project(it.path))
     }
-    // Plugins
-    compileOnly(libs.vault) { isTransitive = false }
     compileOnly(libs.worldguard) {
         exclude("com.sk89q.worldedit", "worldedit-bukkit")
         exclude("com.sk89q.worldedit", "worldedit-core")
@@ -125,9 +129,9 @@ dependencies {
     compileOnlyApi(libs.checkerqual)
 
     // Tests
+    testImplementation(libs.mockito.core)
     testImplementation(libs.adventureApi)
     testImplementation(libs.checkerqual)
-    testImplementation(libs.paper) { isTransitive = true }
 }
 
 tasks.named<Copy>("processResources") {
@@ -139,11 +143,27 @@ tasks.named<Copy>("processResources") {
 }
 
 tasks.register<ShadowJar>("reobfShadowJar") {
+    // The `fawe.properties` file from `worldedit-core` is not automatically
+    // included, so we explicitly add the `worldedit-core` source set output.
+    from(project(":worldedit-core").sourceSets.main.get().output)
     archiveFileName.set("${rootProject.name}-Bukkit-${project.version}.${archiveExtension.getOrElse("jar")}")
     configurations = listOf(
         project.configurations.runtimeClasspath.get(), // as is done by shadow for the default shadowJar
         adaptersReobf
     )
+    relocate("com.sk89q.jchronic", "com.sk89q.worldedit.jchronic")
+
+    dependencies {
+        include(project(":worldedit-libs:core"))
+        include(project(":worldedit-libs:${project.name.replace("worldedit-", "")}"))
+        include(project(":worldedit-core"))
+        include(dependency(libs.jchronic))
+        exclude(dependency(libs.jsr305))
+    }
+    minimize {
+        // jchronic uses reflection to load things, so we need to exclude it from minimizing
+        exclude(dependency(libs.jchronic))
+    }
 
     // as is done by shadow for the default shadowJar
     from(sourceSets.main.map { it.output })
@@ -173,15 +193,16 @@ tasks.withType<ShadowJar>().configureEach {
         // In tandem with not bundling log4j, we shouldn't relocate base package here.
         // relocate("org.apache.logging", "com.sk89q.worldedit.log4j")
         relocate("org.antlr.v4", "com.sk89q.worldedit.antlr4")
-
         exclude(dependency("$group:$name"))
 
-        include(dependency(projects.worldeditCore))
-        include(dependency(projects.worldeditLibs.bukkit))
+        include(dependency(":worldedit-core"))
+        include(dependency(":worldedit-libs:bukkit"))
         // Purposefully not included, we assume (even though no API exposes it) that Log4J will be present at runtime
         // If it turns out not to be true for Spigot/Paper, our only two official platforms, this can be uncommented.
         // include(dependency("org.apache.logging.log4j:log4j-api"))
-        include(dependency(libs.antlr4.runtime))
+        include(dependency("org.antlr:antlr4-runtime"))
+
+        exclude(dependency("$group:$name"))
         // ZSTD does not work if relocated. https://github.com/luben/zstd-jni/issues/189 Use not latest as it can be difficult
         // to obtain latest ZSTD lib
         include(dependency(libs.zstd))
@@ -190,21 +211,21 @@ tasks.withType<ShadowJar>().configureEach {
             include(dependency(libs.bstats.base))
         }
         relocate("io.papermc.lib", "com.sk89q.worldedit.bukkit.paperlib") {
-            include(dependency(libs.paperlib))
+            include(dependency("io.papermc:paperlib"))
         }
         relocate("it.unimi.dsi.fastutil", "com.sk89q.worldedit.bukkit.fastutil") {
-            include(dependency(libs.fastutil))
+            include(dependency("it.unimi.dsi:fastutil"))
         }
-        relocate("net.royawesome.jlibnoise", "com.sk89q.worldedit.jlibnoise")
+        relocate("net.royawesome.jlibnoise", "com.sk89q.worldedit.jlibnoise") {
+            include(dependency("com.sk89q.lib:jlibnoise"))
+        }
         relocate("org.incendo.serverlib", "com.fastasyncworldedit.serverlib") {
             include(dependency(libs.serverlib))
         }
         relocate("com.intellectualsites.paster", "com.fastasyncworldedit.paster") {
             include(dependency(libs.paster))
         }
-        relocate("org.lz4", "com.fastasyncworldedit.core.lz4") {
-            include(dependency(libs.lz4Java))
-        }
+        include(dependency(libs.lz4Java))
         relocate("com.zaxxer", "com.fastasyncworldedit.core.math") {
             include(dependency(libs.sparsebitset))
         }

@@ -1,3 +1,4 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.kotlin.dsl.apply
@@ -37,7 +38,7 @@ val relocations = mapOf(
         "net.kyori.minecraft" to "com.sk89q.worldedit.util.kyori",
 )
 
-tasks.register<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("jar") {
+tasks.register<ShadowJar>("jar") {
     configurations = listOf(project.configurations["shade"])
     archiveClassifier.set("")
 
@@ -117,7 +118,8 @@ tasks.register<Jar>("javadocJar") {
 }
 
 tasks.named("assemble").configure {
-    dependsOn("jar", "sourcesJar")
+    dependsOn(tasks.named("jar"))
+    dependsOn(tasks.named("sourcesJar"))
 }
 
 project.apply<LibsConfigPluginHack>()

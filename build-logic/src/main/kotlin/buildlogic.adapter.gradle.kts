@@ -1,5 +1,4 @@
 import buildlogic.stringyLibs
-import buildlogic.getVersion
 
 plugins {
     `java-library`
@@ -25,9 +24,20 @@ repositories {
 }
 
 dependencies {
-    "implementation"(project(":worldedit-bukkit"))
+    implementation(project(":worldedit-bukkit"))
+    constraints {
+        //Reduces the amount of libraries Gradle and IntelliJ need to resolve
+        implementation("net.kyori:adventure-bom") {
+            version { strictly("4.24.0") }
+            because("Ensure a consistent version of adventure is used.")
+        }
+    }
 }
 
 tasks.named("assemble") {
     dependsOn("reobfJar")
+}
+
+tasks.named<Javadoc>("javadoc") {
+    enabled = false
 }

@@ -8,52 +8,57 @@ plugins {
 
 dependencies {
     constraints {
-        "implementation"(libs.snakeyaml) {
+        implementation(libs.snakeyaml) {
             version { strictly("2.2") }
             because("Bukkit provides SnakeYaml")
         }
     }
 
-    "api"(project(":worldedit-libs:core"))
-    "compileOnly"(libs.trueZip)
-    "implementation"(libs.rhino)
-    "implementation"(libs.snakeyaml)
-    "implementation"(libs.guava)
-    "compileOnlyApi"(libs.jsr305)
-    "implementation"(libs.gson)
+    api(project(":worldedit-libs:core"))
+    compileOnly(libs.trueZip)
+    implementation(libs.rhino)
+    implementation(libs.snakeyaml)
+    implementation(libs.guava)
+    compileOnlyApi(libs.jsr305)
+    implementation(libs.gson)
 
-    "implementation"(libs.jchronic) {
+    implementation(libs.jchronic) {
         exclude(group = "junit", module = "junit")
     }
-    "implementation"(libs.jlibnoise)
+    implementation(libs.jlibnoise)
 
-    "implementation"(libs.log4j.api)
+    implementation(libs.log4j.api)
 
     compileOnly(libs.plotsquared.core) { isTransitive = false }
 
-    "implementation"(libs.fastutil)
+    implementation(libs.fastutil)
 
-    "antlr"(libs.antlr4)
-    "implementation"(libs.antlr4.runtime)
+    antlr(libs.antlr4)
+    implementation(libs.antlr4.runtime)
 
-    "compileOnly"(project(":worldedit-libs:core:ap"))
-    "annotationProcessor"(project(":worldedit-libs:core:ap"))
+    compileOnly(project(":worldedit-libs:core:ap"))
+    annotationProcessor(project(":worldedit-libs:core:ap"))
     // ensure this is on the classpath for the AP
-    "annotationProcessor"(libs.guava)
-    "compileOnly"(libs.autoValue.annotations)
-    "annotationProcessor"(libs.autoValue)
+    annotationProcessor(libs.guava)
+    compileOnly(libs.autoValue.annotations)
+    annotationProcessor(libs.autoValue)
 
-    "compileOnly"(libs.adventureApi)
-    "compileOnlyApi"(libs.adventureMiniMessage)
-    "implementation"(libs.zstd) { isTransitive = false }
-    "compileOnly"(libs.paster)
-    "compileOnly"(libs.lz4Java) { isTransitive = false }
-    "compileOnly"(libs.sparsebitset)
-    "compileOnly"(libs.parallelgzip) { isTransitive = false }
-    "implementation"(libs.json.simple) { isTransitive = false }
+    compileOnly(libs.autoService) {
+        because("Needed to resolve annotations in Piston")
+    }
+
+
+    compileOnly(libs.adventureApi)
+    compileOnlyApi(libs.adventureMiniMessage)
+    implementation(libs.zstd) { isTransitive = false }
+    compileOnly(libs.paster)
+    compileOnly(libs.lz4Java) { isTransitive = false }
+    compileOnly(libs.sparsebitset)
+    compileOnly(libs.parallelgzip) { isTransitive = false }
+    implementation(libs.json.simple) { isTransitive = false }
 
     // Tests
-    "testRuntimeOnly"(libs.log4j.core)
+    testRuntimeOnly(libs.log4j.core)
     testImplementation(libs.parallelgzip)
 }
 
