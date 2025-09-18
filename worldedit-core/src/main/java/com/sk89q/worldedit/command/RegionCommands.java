@@ -68,6 +68,8 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.RegionOperationException;
 import com.sk89q.worldedit.regions.Regions;
 import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.util.SideEffect;
+import com.sk89q.worldedit.util.SideEffectSet;
 import com.sk89q.worldedit.util.TreeGenerator.TreeType;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.world.RegenOptions;
@@ -300,17 +302,47 @@ public class RegionCommands {
             @Arg(desc = "The mask representing blocks to replace", def = "")
                     Mask from,
             @Arg(desc = "The pattern of blocks to replace with")
-                    Pattern to
+                    Pattern to,
+            @Switch(name = 'f', desc = "Do not recalculate heightmaps during this operation")
+                    boolean noHeightmaps
     ) throws WorldEditException {
-        if (from == null) {
-            from = new ExistingBlockMask(editSession);
-            //FAWE start > the mask will have been initialised with a WorldWrapper extent (very bad/slow
-        } else {
-            new MaskTraverser(from).setNewExtent(editSession);
+        EditSession sessionToUse = editSession;
+        LocalSession localSession = null;
+        SideEffectSet originalSideEffects = null;
+        if (noHeightmaps) {
+            // Create a temporary EditSession without HEIGHTMAP side effects
+            localSession = WorldEdit.getInstance().getSessionManager().get(actor);
+            originalSideEffects = localSession.getSideEffectSet();
+            SideEffectSet withoutHeightmaps = originalSideEffects.without(com.sk89q.worldedit.util.SideEffect.HEIGHTMAPS);
+            localSession.setSideEffectSet(withoutHeightmaps);
+            try {
+                sessionToUse = localSession.createEditSession(actor);
+            } catch (Exception e) {
+                // Fallback to provided session if creation fails
+                sessionToUse = editSession;
+            }
         }
-        int affected = editSession.replaceBlocks(region, from, to);
-        actor.print(Caption.of("worldedit.replace.replaced", TextComponent.of(affected)));
-        return affected;
+        try {
+            if (from == null) {
+                from = new ExistingBlockMask(sessionToUse);
+                //FAWE start > the mask will have been initialised with a WorldWrapper extent (very bad/slow
+            } else {
+                new MaskTraverser(from).setNewExtent(sessionToUse);
+            }
+            int affected = sessionToUse.replaceBlocks(region, from, to);
+            actor.print(Caption.of("worldedit.replace.replaced", TextComponent.of(affected)));
+            return affected;
+        } finally {
+            if (noHeightmaps) {
+                // Restore original side effects and close temporary session
+                if (localSession != null && originalSideEffects != null) {
+                    localSession.setSideEffectSet(originalSideEffects);
+                }
+                if (sessionToUse != null && sessionToUse != editSession) {
+                    sessionToUse.close();
+                }
+            }
+        }
     }
 
     @Command(
@@ -412,11 +444,38 @@ public class RegionCommands {
     public int walls(
             Actor actor, EditSession editSession, @Selection Region region,
             @Arg(desc = "The pattern of blocks to set")
-                    Pattern pattern
+                    Pattern pattern,
+            @Switch(name = 'f', desc = "Do not recalculate heightmaps during this operation")
+                    boolean noHeightmaps
     ) throws WorldEditException {
-        int affected = editSession.makeWalls(region, pattern);
-        actor.print(Caption.of("worldedit.walls.changed", TextComponent.of(affected)));
-        return affected;
+        EditSession sessionToUse = editSession;
+        LocalSession localSession = null;
+        SideEffectSet originalSideEffects = null;
+        if (noHeightmaps) {
+            localSession = WorldEdit.getInstance().getSessionManager().get(actor);
+            originalSideEffects = localSession.getSideEffectSet();
+            SideEffectSet withoutHeightmaps = originalSideEffects.without(SideEffect.HEIGHTMAPS);
+            localSession.setSideEffectSet(withoutHeightmaps);
+            try {
+                sessionToUse = localSession.createEditSession(actor);
+            } catch (Exception ignored) {
+                sessionToUse = editSession;
+            }
+        }
+        try {
+            int affected = sessionToUse.makeWalls(region, pattern);
+            actor.print(Caption.of("worldedit.walls.changed", TextComponent.of(affected)));
+            return affected;
+        } finally {
+            if (noHeightmaps) {
+                if (localSession != null && originalSideEffects != null) {
+                    localSession.setSideEffectSet(originalSideEffects);
+                }
+                if (sessionToUse != null && sessionToUse != editSession) {
+                    sessionToUse.close();
+                }
+            }
+        }
     }
 
     @Command(
