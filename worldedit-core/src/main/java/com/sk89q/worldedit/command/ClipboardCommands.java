@@ -74,6 +74,8 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.math.transform.Transform;
+import com.sk89q.worldedit.util.SideEffect;
+import com.sk89q.worldedit.util.SideEffectSet;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.NullRegion;
 import com.sk89q.worldedit.regions.Region;
@@ -458,34 +460,59 @@ public class ClipboardCommands {
             @Switch(name = 'b', desc = "Paste biomes if available")
                     boolean pasteBiomes,
             @Switch(name = 'x', desc = "Remove existing entities in the affected region")
-                    boolean removeEntities
+                    boolean removeEntities,
+            @Switch(name = 'f', desc = "Do not recalculate heightmaps during this operation")
+                    boolean noHeightmaps
     ) throws WorldEditException {
         ClipboardHolder holder = session.getClipboard();
         final Clipboard clipboard = holder.getClipboard();
         final BlockVector3 origin = clipboard.getOrigin();
         final BlockVector3 to = atOrigin ? origin : session.getPlacementPosition(actor);
-        checkPaste(actor, editSession, to, holder, clipboard);
-
-        if (!onlySelect) {
-            clipboard.paste(editSession, to, !ignoreAirBlocks, pasteEntities, pasteBiomes);
-        }
-
-        Region region = clipboard.getRegion().clone();
-        if (selectPasted || onlySelect || removeEntities) {
-            BlockVector3 clipboardOffset = clipboard.getRegion().getMinimumPoint().subtract(clipboard.getOrigin());
-            Transform transform = MutatingOperationTransformHolder.transform(holder.getTransform());
-            BlockVector3 realTo = to.add(transform.apply(clipboardOffset.toVector3()).toBlockPoint());
-            BlockVector3 max = realTo.add(transform
-                    .apply(region.getMaximumPoint().subtract(region.getMinimumPoint()).toVector3())
-                    .toBlockPoint());
-            if (removeEntities) {
-                editSession.getEntities(new CuboidRegion(realTo, max)).forEach(Entity::remove);
+        EditSession sessionToUse = editSession;
+        SideEffectSet originalSideEffects = null;
+        if (noHeightmaps) {
+            originalSideEffects = session.getSideEffectSet();
+            SideEffectSet withoutHeightmaps = originalSideEffects.without(SideEffect.HEIGHTMAPS);
+            session.setSideEffectSet(withoutHeightmaps);
+            try {
+                sessionToUse = session.createEditSession(actor);
+            } catch (Exception ignored) {
+                sessionToUse = editSession;
             }
-            if (selectPasted || onlySelect) {
-                RegionSelector selector = new CuboidRegionSelector(world, realTo, max);
-                session.setRegionSelector(world, selector);
-                selector.learnChanges();
-                selector.explainRegionAdjust(actor, session);
+        }
+        try {
+            checkPaste(actor, sessionToUse, to, holder, clipboard);
+
+            if (!onlySelect) {
+                clipboard.paste(sessionToUse, to, !ignoreAirBlocks, pasteEntities, pasteBiomes);
+            }
+
+            Region region = clipboard.getRegion().clone();
+            if (selectPasted || onlySelect || removeEntities) {
+                BlockVector3 clipboardOffset = clipboard.getRegion().getMinimumPoint().subtract(clipboard.getOrigin());
+                Transform transform = MutatingOperationTransformHolder.transform(holder.getTransform());
+                BlockVector3 realTo = to.add(transform.apply(clipboardOffset.toVector3()).toBlockPoint());
+                BlockVector3 max = realTo.add(transform
+                        .apply(region.getMaximumPoint().subtract(region.getMinimumPoint()).toVector3())
+                        .toBlockPoint());
+                if (removeEntities) {
+                    sessionToUse.getEntities(new CuboidRegion(realTo, max)).forEach(Entity::remove);
+                }
+                if (selectPasted || onlySelect) {
+                    RegionSelector selector = new CuboidRegionSelector(world, realTo, max);
+                    session.setRegionSelector(world, selector);
+                    selector.learnChanges();
+                    selector.explainRegionAdjust(actor, session);
+                }
+            }
+        } finally {
+            if (noHeightmaps) {
+                if (originalSideEffects != null) {
+                    session.setSideEffectSet(originalSideEffects);
+                }
+                if (sessionToUse != null && sessionToUse != editSession) {
+                    sessionToUse.close();
+                }
             }
         }
         if (onlySelect) {
@@ -527,7 +554,9 @@ public class ClipboardCommands {
                     Mask sourceMask,
             //FAWE start - entity removal
             @Switch(name = 'x', desc = "Remove existing entities in the affected region")
-                    boolean removeEntities
+                    boolean removeEntities,
+            @Switch(name = 'f', desc = "Do not recalculate heightmaps during this operation")
+                    boolean noHeightmaps
             //FAWE end
 
     ) throws WorldEditException {
@@ -536,7 +565,7 @@ public class ClipboardCommands {
         //FAWE start - use place
         if (holder.getTransform().isIdentity() && sourceMask == null) {
             place(actor, world, session, editSession, ignoreAirBlocks, atOrigin, selectPasted, onlySelect,
-                    pasteEntities, pasteBiomes, removeEntities
+                    pasteEntities, pasteBiomes, removeEntities, noHeightmaps
             );
             return;
         }
@@ -546,44 +575,67 @@ public class ClipboardCommands {
         List<Component> messages = Lists.newArrayList();
 
         BlockVector3 to = atOrigin ? clipboard.getOrigin() : session.getPlacementPosition(actor);
-        //FAWE start
-        checkPaste(actor, editSession, to, holder, clipboard);
-        //FAWE end
+        EditSession sessionToUse = editSession;
+        SideEffectSet originalSideEffects = null;
+        if (noHeightmaps) {
+            originalSideEffects = session.getSideEffectSet();
+            SideEffectSet withoutHeightmaps = originalSideEffects.without(SideEffect.HEIGHTMAPS);
+            session.setSideEffectSet(withoutHeightmaps);
+            try {
+                sessionToUse = session.createEditSession(actor);
+            } catch (Exception ignored) {
+                sessionToUse = editSession;
+            }
+        }
+        try {
+            //FAWE start
+            checkPaste(actor, sessionToUse, to, holder, clipboard);
+            //FAWE end
 
-        if (!onlySelect) {
-            Operation operation = holder
-                    .createPaste(editSession)
-                    .to(to)
-                    .ignoreAirBlocks(ignoreAirBlocks)
-                    .copyBiomes(pasteBiomes)
-                    .copyEntities(pasteEntities)
-                    .maskSource(sourceMask)
-                    .build();
+            if (!onlySelect) {
+                Operation operation = holder
+                        .createPaste(sessionToUse)
+                        .to(to)
+                        .ignoreAirBlocks(ignoreAirBlocks)
+                        .copyBiomes(pasteBiomes)
+                        .copyEntities(pasteEntities)
+                        .maskSource(sourceMask)
+                        .build();
             Operations.completeLegacy(operation);
             messages.addAll(Lists.newArrayList(operation.getStatusMessages()));
-        }
-
-        if (selectPasted || onlySelect || removeEntities) {
-            BlockVector3 clipboardOffset = clipboard.getRegion().getMinimumPoint().subtract(clipboard.getOrigin());
-            Transform transform = MutatingOperationTransformHolder.transform(holder.getTransform()); //FAWE: mutate transform
-            Vector3 realTo = to.toVector3().add(transform.apply(clipboardOffset.toVector3()));
-            Vector3 max = realTo.add(transform.apply(region.getMaximumPoint().subtract(region.getMinimumPoint()).toVector3()));
-
-            // FAWE start - entity remova;l
-            if (removeEntities) {
-                editSession.getEntities(new CuboidRegion(realTo.toBlockPoint(), max.toBlockPoint())).forEach(Entity::remove);
             }
-            if (selectPasted || onlySelect) {
-                //FAWE end
-                final CuboidRegionSelector selector;
-                if (session.getRegionSelector(world) instanceof ExtendingCuboidRegionSelector) {
-                    selector = new ExtendingCuboidRegionSelector(world, realTo.toBlockPoint(), max.toBlockPoint());
-                } else {
-                    selector = new CuboidRegionSelector(world, realTo.toBlockPoint(), max.toBlockPoint());
+
+            if (selectPasted || onlySelect || removeEntities) {
+                BlockVector3 clipboardOffset = clipboard.getRegion().getMinimumPoint().subtract(clipboard.getOrigin());
+                Transform transform = MutatingOperationTransformHolder.transform(holder.getTransform()); //FAWE: mutate transform
+                Vector3 realTo = to.toVector3().add(transform.apply(clipboardOffset.toVector3()));
+                Vector3 max = realTo.add(transform.apply(region.getMaximumPoint().subtract(region.getMinimumPoint()).toVector3()));
+
+                // FAWE start - entity removal
+                if (removeEntities) {
+                    sessionToUse.getEntities(new CuboidRegion(realTo.toBlockPoint(), max.toBlockPoint())).forEach(Entity::remove);
                 }
-                session.setRegionSelector(world, selector);
-                selector.learnChanges();
-                selector.explainRegionAdjust(actor, session);
+                if (selectPasted || onlySelect) {
+                    //FAWE end
+                    final CuboidRegionSelector selector;
+                    if (session.getRegionSelector(world) instanceof ExtendingCuboidRegionSelector) {
+                        selector = new ExtendingCuboidRegionSelector(world, realTo.toBlockPoint(), max.toBlockPoint());
+                    } else {
+                        selector = new CuboidRegionSelector(world, realTo.toBlockPoint(), max.toBlockPoint());
+                    }
+                    session.setRegionSelector(world, selector);
+                    selector.learnChanges();
+                    selector.explainRegionAdjust(actor, session);
+                }
+            }
+        } finally {
+            if (noHeightmaps) {
+                if (originalSideEffects != null) {
+                    session.setSideEffectSet(originalSideEffects);
+                }
+                if (sessionToUse != null && sessionToUse != editSession) {
+                    sessionToUse.close();
+                }
             }
         }
 

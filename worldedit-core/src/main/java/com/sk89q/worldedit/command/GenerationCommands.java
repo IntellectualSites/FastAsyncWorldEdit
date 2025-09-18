@@ -43,6 +43,8 @@ import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.Operations;
+import com.sk89q.worldedit.util.SideEffect;
+import com.sk89q.worldedit.util.SideEffectSet;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.function.visitor.RegionVisitor;
 import com.sk89q.worldedit.internal.annotation.Radii;
@@ -165,7 +167,9 @@ public class GenerationCommands {
             @Arg(desc = "The height of the cylinder", def = "1")
                     int height,
             @Switch(name = 'h', desc = "Make a hollow cylinder")
-                    boolean hollow
+                    boolean hollow,
+            @Switch(name = 'f', desc = "Do not recalculate heightmaps during this operation")
+                    boolean noHeightmaps
     ) throws WorldEditException {
         final double radiusX;
         final double radiusZ;
@@ -186,12 +190,35 @@ public class GenerationCommands {
         worldEdit.checkMaxRadius(height, actor);
 
         BlockVector3 pos = session.getPlacementPosition(actor);
-        int affected = editSession.makeCylinder(pos, pattern, radiusX, radiusZ, height, !hollow);
-        if (actor instanceof Player && Settings.settings().GENERAL.UNSTUCK_ON_GENERATE) {
-            ((Player) actor).findFreePosition();
+        EditSession sessionToUse = editSession;
+        SideEffectSet originalSideEffects = null;
+        if (noHeightmaps) {
+            originalSideEffects = session.getSideEffectSet();
+            SideEffectSet withoutHeightmaps = originalSideEffects.without(com.sk89q.worldedit.util.SideEffect.HEIGHTMAPS);
+            session.setSideEffectSet(withoutHeightmaps);
+            try {
+                sessionToUse = session.createEditSession(actor);
+            } catch (Exception ignored) {
+                sessionToUse = editSession;
+            }
         }
-        actor.print(Caption.of("worldedit.cyl.created", TextComponent.of(affected)));
-        return affected;
+        try {
+            int affected = sessionToUse.makeCylinder(pos, pattern, radiusX, radiusZ, height, !hollow);
+            if (actor instanceof Player && Settings.settings().GENERAL.UNSTUCK_ON_GENERATE) {
+                ((Player) actor).findFreePosition();
+            }
+            actor.print(Caption.of("worldedit.cyl.created", TextComponent.of(affected)));
+            return affected;
+        } finally {
+            if (noHeightmaps) {
+                if (originalSideEffects != null) {
+                    session.setSideEffectSet(originalSideEffects);
+                }
+                if (sessionToUse != null && sessionToUse != editSession) {
+                    sessionToUse.close();
+                }
+            }
+        }
     }
 
     @Command(
