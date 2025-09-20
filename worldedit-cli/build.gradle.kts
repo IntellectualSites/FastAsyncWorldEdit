@@ -60,7 +60,7 @@ tasks.named("assemble").configure {
 
 val moduleIdentifier = "${rootProject.name}-${project.description}-${project.version}.jar"
 val decoration = "\n****************************************"
-val websiteURL = "https://www.spigotmc.org/resources/13932/"
+val websiteURL = "https://modrinth.com/plugin/fastasyncworldedit/"
 
 bukkit {
     name = "FastAsyncWorldEdit-COMMAND_LINE_INTERFACE_NOT_A_PLUGIN"
@@ -71,7 +71,7 @@ bukkit {
             "* Stop your server, delete `$moduleIdentifier`" +
             " and download the proper one from:\n" +
             "* $websiteURL\n" +
-            "* (contains `-Bukkit-` instead of `-CLI-` in the name ;)" +
+            "* (contains `-Paper-` instead of `-CLI-` in the name ;)" +
             decoration
     version = rootProject.version.toString()
     website = websiteURL
