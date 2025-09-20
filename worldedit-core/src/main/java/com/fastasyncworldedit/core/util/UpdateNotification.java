@@ -29,14 +29,13 @@ public class UpdateNotification {
     private static final String GITHUB_LAST_RELEASE = "https://api.github.com/repos/IntellectualSites/FastAsyncWorldEdit/releases/latest";
     private static final String JENKINS_LAST_BUILD = "https://ci.athion.net/job/FastAsyncWorldEdit/lastSuccessfulBuild/api/json";
 
-    private static final String LINK_DOWNLOAD_SPIGOTMC = "https://www.spigotmc.org/resources/13932";
     private static final String LINK_DOWNLOAD_JENKINS = "https://ci.athion.net/job/FastAsyncWorldEdit";
     private static final String LINK_DOWNLOAD_MODRINTH = "https://modrinth.com/plugin/fastasyncworldedit";
     private static final String LINK_DOWNLOAD_HANGAR = "https://hangar.papermc.io/IntellectualSites/FastAsyncWorldEdit";
 
     private static final String CONSOLE_NOTIFICATION_OUTDATED_RELEASE = """
             A new release for FastAsyncWorldEdit is available: {}. You are currently on {}.
-            Download from {}, {} or {}""";
+            Download from {} or {}""";
     private static final String CONSOLE_NOTIFICATION_OUTDATED_BUILD = """
                                 An update for FastAsyncWorldEdit is available. You are {} build(s) out of date.
                                 You are running build {}, the latest version is build {}.
@@ -60,7 +59,7 @@ public class UpdateNotification {
         final FaweVersion installedVersion = Fawe.instance().getVersion();
         if (installedVersion == null || (installedVersion.build == 0 && installedVersion.snapshot)) {
             LOGGER.warn("You are using a snapshot or a custom version of FAWE. " +
-                    "This is not an official build distributed via https://www.spigotmc.org/resources/13932/");
+                    "This is not an official build distributed via https://ci.athion.net/job/FastAsyncWorldEdit/");
             return;
         }
         if (Settings.settings().ENABLED_COMPONENTS.SNAPSHOT_UPDATE_NOTIFICATIONS) {
@@ -88,7 +87,7 @@ public class UpdateNotification {
                     LOGGER.warn(CONSOLE_NOTIFICATION_OUTDATED_RELEASE,
                             StringUtil.joinString(lastRelease, ".", 0),
                             StringUtil.joinString(installedVersion.semver, ".", 0),
-                            LINK_DOWNLOAD_MODRINTH, LINK_DOWNLOAD_HANGAR, LINK_DOWNLOAD_SPIGOTMC
+                            LINK_DOWNLOAD_MODRINTH, LINK_DOWNLOAD_HANGAR
                     );
                 }
             });
@@ -185,13 +184,6 @@ public class UpdateNotification {
                                         .of("Hangar")
                                         .color(TextColor.BLUE)
                                         .clickEvent(ClickEvent.openUrl(LINK_DOWNLOAD_HANGAR)),
-                                TextComponent.empty().color(TextColor.GRAY)
-                        )),
-                        TextComponent.empty().children(List.of(
-                                TextComponent
-                                        .of("SpigotMC")
-                                        .color(TextColor.GOLD)
-                                        .clickEvent(ClickEvent.openUrl(LINK_DOWNLOAD_SPIGOTMC)),
                                 TextComponent.empty().color(TextColor.GRAY)
                         ))
                 ));
