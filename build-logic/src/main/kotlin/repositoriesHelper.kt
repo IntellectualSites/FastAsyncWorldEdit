@@ -6,6 +6,7 @@ import org.gradle.api.logging.Logging
 // This is because we have stronger up-time guarantees for our repository. However, Maven Central and Sonatype are
 // clearly even better, so we allow those as well. We also allow Gradle's plugin repository.
 private val ALLOWED_PREFIXES = listOf(
+    "https://repo.intellectualsites.dev",
     "https://maven.enginehub.org",
     "https://repo.maven.apache.org/maven2/",
     "https://s01.oss.sonatype.org/content/repositories/snapshots/",
