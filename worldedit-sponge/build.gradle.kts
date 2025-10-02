@@ -1,63 +1,98 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import org.spongepowered.gradle.plugin.config.PluginLoaders
+import org.spongepowered.plugin.metadata.model.PluginDependency
 
 plugins {
-    id("org.spongepowered.gradle.plugin")
+    alias(libs.plugins.sponge.spongegradle)
+    id("org.spongepowered.gradle.vanilla")
+    `java-library`
+    id("buildlogic.platform")
 }
 
-applyPlatformAndCoreConfiguration()
-applyShadowConfiguration()
+platform {
+    kind = buildlogic.WorldEditKind.Mod
+    includeClasspath = true
+}
 
-// I can't believe sponge sets this in a base plugin with no opt-out
-convention.getPlugin(JavaPluginConvention::class.java).apply {
-    setSourceCompatibility(null)
-    setTargetCompatibility(null)
+minecraft {
+    injectRepositories(false)
+    version(libs.versions.sponge.minecraft.get())
 }
 
 repositories {
-    maven { url = uri("https://repo.codemc.org/repository/maven-public") }
-}
-
-dependencies {
-    api(project(":worldedit-core"))
-    api(project(":worldedit-libs:sponge"))
-    api("org.spongepowered:spongeapi:7.1.0") {
-        exclude(group = "org.slf4j", module = "slf4j-api")
+    maven {
+        name = "EngineHub Repository"
+        url = uri("https://maven.enginehub.org/repo/")
     }
-    implementation(enforcedPlatform("org.apache.logging.log4j:log4j-bom:2.8.1") {
-        because("Sponge 8 provides Log4J at 2.8.1")
-    })
-    api("org.apache.logging.log4j:log4j-api")
-    api("org.bstats:bstats-sponge:1.7")
-    testImplementation("org.mockito:mockito-core:5.19.0")
-}
-
-<<<<<<< HEAD
-addJarManifest(WorldEditKind.Mod, includeClasspath = true)
-=======
-tasks.named<Jar>("jar") {
-    manifest {
-        attributes("Class-Path" to CLASSPATH,
-                "WorldEdit-Version" to project.version)
+    mavenCentral()
+    verifyEngineHubRepositories()
+    afterEvaluate {
+        verifyEngineHubRepositories()
     }
 }
->>>>>>> 18a55bc14... Add new experimental snapshot API (#524)
 
-tasks.named<ShadowJar>("shadowJar") {
-    dependencies {
-        relocate ("org.bstats", "com.sk89q.worldedit.sponge.bstats") {
-            include(dependency("org.bstats:bstats-sponge:1.5"))
+sponge {
+    injectRepositories(false)
+    apiVersion(libs.versions.sponge.api.asProvider().get())
+    license("GPL-3.0-or-later")
+    plugin("worldedit") {
+        loader {
+            name(PluginLoaders.JAVA_PLAIN)
+            version("1.0")
+        }
+        displayName("WorldEdit")
+        version(project.ext["internalVersion"].toString())
+        entrypoint("com.sk89q.worldedit.sponge.SpongeWorldEdit")
+        description("WorldEdit is an easy-to-use in-game world editor for Minecraft, supporting both single- and multi-player.")
+        links {
+            homepage("https://enginehub.org/worldedit/")
+            source("https://github.com/EngineHub/WorldEdit")
+            issues("https://github.com/EngineHub/WorldEdit/issues")
+        }
+        contributor("EngineHub") {
+            description("Various members of the EngineHub team")
+        }
+        dependency("spongeapi") {
+            loadOrder(PluginDependency.LoadOrder.AFTER)
+            optional(false)
         }
     }
 }
 
-if (project.hasProperty("signing")) {
-    apply(plugin = "signing")
+dependencies {
+    "api"(project(":worldedit-core"))
+    "api"(project(":worldedit-libs:sponge"))
 
-    configure<SigningExtension> {
-        sign("shadowJar")
+    "api"(libs.log4j.api)
+    "implementation"(libs.bstats.sponge)
+    "implementation"(libs.fastutil)
+    "testImplementation"(libs.mockito.core)
+
+    // Silence some warnings, since apparently this isn't on the compile classpath like it should be.
+    "compileOnly"(libs.errorprone.annotations)
+}
+
+configure<BasePluginExtension> {
+    archivesName.set("${project.name}-api${libs.versions.sponge.api.major.get()}")
+}
+
+tasks.named<ShadowJar>("shadowJar") {
+    dependencies {
+        include(dependency("org.bstats:"))
+        include(dependency("org.antlr:antlr4-runtime"))
+        include(dependency("com.sk89q.lib:jlibnoise"))
+
+        relocate("org.antlr.v4", "com.sk89q.worldedit.antlr4")
+        relocate("org.bstats", "com.sk89q.worldedit.sponge.bstats")
+        relocate("net.royawesome.jlibnoise", "com.sk89q.worldedit.jlibnoise")
     }
+}
+tasks.named("assemble").configure {
+    dependsOn("shadowJar")
+}
 
-    tasks.named("build").configure {
-        dependsOn("signShadowJar")
+configure<PublishingExtension> {
+    publications.named<MavenPublication>("maven") {
+        from(components["java"])
     }
 }
