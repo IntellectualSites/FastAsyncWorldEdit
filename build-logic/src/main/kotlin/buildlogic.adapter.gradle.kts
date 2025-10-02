@@ -14,6 +14,10 @@ paperweight {
 
 repositories {
     maven {
+        name = "PaperMC"
+        url = uri("https://repo.papermc.io/repository/maven-public/")
+    }
+    maven {
         name = "EngineHub Repository"
         url = uri("https://maven.enginehub.org/repo/")
     }
