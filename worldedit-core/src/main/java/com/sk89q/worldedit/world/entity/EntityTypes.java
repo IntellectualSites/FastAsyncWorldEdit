@@ -93,6 +93,8 @@ public final class EntityTypes {
     @Nullable
     public static final EntityType COMMAND_BLOCK_MINECART = get("minecraft:command_block_minecart");
     @Nullable
+    public static final EntityType COPPER_GOLEM = get("minecraft:copper_golem");
+    @Nullable
     public static final EntityType COW = get("minecraft:cow");
     @Nullable
     public static final EntityType CREAKING = get("minecraft:creaking");
@@ -203,6 +205,8 @@ public final class EntityTypes {
     public static final EntityType MANGROVE_BOAT = get("minecraft:mangrove_boat");
     @Nullable
     public static final EntityType MANGROVE_CHEST_BOAT = get("minecraft:mangrove_chest_boat");
+    @Nullable
+    public static final EntityType MANNEQUIN = get("minecraft:mannequin");
     @Nullable
     public static final EntityType MARKER = get("minecraft:marker");
     @Nullable
