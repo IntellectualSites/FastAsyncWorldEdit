@@ -82,7 +82,7 @@ allprojects {
 }
 
 applyCommonConfiguration()
-val supportedVersions = listOf("1.20.4", "1.20.5", "1.20.6", "1.21", "1.21.1", "1.21.4", "1.21.5", "1.21.8")
+val supportedVersions = listOf("1.20.4", "1.20.5", "1.20.6", "1.21", "1.21.1", "1.21.4", "1.21.5", "1.21.8", "1.21.9")
 
 tasks {
     supportedVersions.forEach {
