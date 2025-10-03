@@ -16,8 +16,6 @@ import java.util.UUID;
 
 public class RollbackOptimizedHistory extends DiskStorageHistory {
 
-    private static final Logger LOGGER = LogManagerCompat.getLogger();
-
     private long time;
 
     private int minX;
@@ -58,7 +56,6 @@ public class RollbackOptimizedHistory extends DiskStorageHistory {
         this.blockSize = (int) size;
         this.command = command;
         this.closed = true;
-        LOGGER.info("Size: {}", size);
     }
 
     public long getTime() {
