@@ -126,7 +126,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
     static {
         final MethodHandles.Lookup lookup = MethodHandles.lookup();
         try {
-            fieldData = PalettedContainer.class.getDeclaredField(Refraction.pickName("data", "d"));
+            fieldData = PalettedContainer.class.getDeclaredField(Refraction.pickName("data", "b"));
             fieldData.setAccessible(true);
 
             Class<?> dataClazz = fieldData.getType();
@@ -183,11 +183,11 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             methodGetVisibleChunk = lookup.unreflect(getVisibleChunkIfPresent);
 
             if (!PaperLib.isPaper()) {
-                fieldThreadingDetector = PalettedContainer.class.getDeclaredField(Refraction.pickName("threadingDetector", "f"));
+                fieldThreadingDetector = PalettedContainer.class.getDeclaredField(Refraction.pickName("threadingDetector", "d"));
                 fieldThreadingDetector.setAccessible(true);
                 fieldLock = ThreadingDetector.class.getDeclaredField(Refraction.pickName("lock", "c"));
                 fieldLock.setAccessible(true);
-                SERVER_LEVEL_ENTITY_MANAGER = ServerLevel.class.getDeclaredField(Refraction.pickName("entityManager", "P"));
+                SERVER_LEVEL_ENTITY_MANAGER = ServerLevel.class.getDeclaredField(Refraction.pickName("entityManager", "M"));
                 SERVER_LEVEL_ENTITY_MANAGER.setAccessible(true);
             } else {
                 // in paper, the used methods are synchronized properly
