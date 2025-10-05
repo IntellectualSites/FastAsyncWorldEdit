@@ -36,6 +36,7 @@ import com.fastasyncworldedit.core.math.transform.MutatingOperationTransformHold
 import com.fastasyncworldedit.core.util.ImgurUtility;
 import com.fastasyncworldedit.core.util.MainUtil;
 import com.fastasyncworldedit.core.util.MaskTraverser;
+import com.fastasyncworldedit.core.util.TaskManager;
 import com.fastasyncworldedit.core.util.task.RunnableVal;
 import com.google.common.collect.Lists;
 import com.sk89q.worldedit.EditSession;
@@ -98,6 +99,7 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.net.URL;
 import java.nio.file.Files;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -479,7 +481,14 @@ public class ClipboardCommands {
                     .apply(region.getMaximumPoint().subtract(region.getMinimumPoint()).toVector3())
                     .toBlockPoint());
             if (removeEntities) {
-                editSession.getEntities(new CuboidRegion(realTo, max)).forEach(Entity::remove);
+                // Collect entities on the current (command) thread, in case it benefits from asynchronous retrieval (unlikely)
+                final Collection<? extends Entity> entities = editSession.getEntities(new CuboidRegion(realTo, max));
+                // BukkitEntity#remove is synchronized, but it makes more sense to synchronize here beforehand in case many
+                // entities are affected. BukkitEntity will not synchronize if it's already called on the main thread.
+                TaskManager.taskManager().sync(() -> {
+                    entities.forEach(Entity::remove);
+                    return true;
+                });
             }
             if (selectPasted || onlySelect) {
                 RegionSelector selector = new CuboidRegionSelector(world, realTo, max);
