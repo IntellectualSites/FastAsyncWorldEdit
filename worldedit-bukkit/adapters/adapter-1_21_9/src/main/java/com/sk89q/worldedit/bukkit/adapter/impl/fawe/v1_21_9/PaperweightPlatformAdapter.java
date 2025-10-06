@@ -138,19 +138,20 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             fieldPalette = dataClazz.getDeclaredField(Refraction.pickName("palette", "c"));
             fieldPalette.setAccessible(true);
 
-            constructorPalettedContainer = MethodHandles.privateLookupIn(PalettedContainer.class, lookup).findConstructor(
-                    PalettedContainer.class,
-                    MethodType.methodType(
-                            void.class,
-                            Strategy.class,
-                            Configuration.class,
-                            BitStorage.class,
-                            Palette.class,
-                            List.class,
-                            Object.class,
-                            Object[].class
-                    )
-            );
+            {
+                final MethodType methodType = PaperLib.isPaper() ?
+                        MethodType.methodType(
+                                void.class, Strategy.class, Configuration.class, BitStorage.class,
+                                Palette.class, List.class, Object.class, Object[].class
+                        ) :
+                        MethodType.methodType(
+                                void.class, Strategy.class, Configuration.class, BitStorage.class,
+                                Palette.class
+                        );
+                constructorPalettedContainer = MethodHandles.privateLookupIn(PalettedContainer.class, lookup).findConstructor(
+                        PalettedContainer.class, methodType
+                );
+            }
             getConfigurationForBitCount = MethodHandles.privateLookupIn(Strategy.class, lookup)
                     .unreflect(Strategy.class.getDeclaredMethod(
                             Refraction.pickName("getConfigurationForBitCount", "a"), Integer.TYPE
@@ -509,16 +510,24 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                     Strategy.createForBlockStates(Block.BLOCK_STATE_REGISTRY);
             final Configuration blockConfiguration =
                     (Configuration) getConfigurationForBitCount.invoke(blockStrategy, bitsPerEntry);
-            @SuppressWarnings("unchecked") final PalettedContainer<net.minecraft.world.level.block.state.BlockState> blockStatePalettedContainer =
-                    (PalettedContainer<net.minecraft.world.level.block.state.BlockState>) constructorPalettedContainer.invoke(
-                            blockStrategy,
-                            blockConfiguration,
-                            nmsBits,
-                            blockConfiguration.createPalette(blockStrategy, palette),
-                            palette,
-                            Blocks.AIR.defaultBlockState(),
-                            null
-                    );
+            @SuppressWarnings("unchecked")
+            PalettedContainer<net.minecraft.world.level.block.state.BlockState> blockStatePalettedContainer =
+                    (PalettedContainer<net.minecraft.world.level.block.state.BlockState>) (PaperLib.isPaper() ?
+                            constructorPalettedContainer.invoke(
+                                    blockStrategy,
+                                    blockConfiguration,
+                                    nmsBits,
+                                    blockConfiguration.createPalette(blockStrategy, palette),
+                                    palette,
+                                    Blocks.AIR.defaultBlockState(),
+                                    null
+                            ) :
+                            constructorPalettedContainer.invoke(
+                                    blockStrategy,
+                                    blockConfiguration,
+                                    nmsBits,
+                                    blockConfiguration.createPalette(blockStrategy, palette)
+                            ));
             if (biomes == null) {
                 final Registry<Biome> biomeRegistry = registryAccess.lookupOrThrow(BIOME);
                 biomes = new PalettedContainer<>(
