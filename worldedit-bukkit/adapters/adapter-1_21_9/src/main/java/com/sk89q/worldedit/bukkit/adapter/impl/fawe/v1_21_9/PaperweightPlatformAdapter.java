@@ -11,6 +11,7 @@ import com.fastasyncworldedit.core.math.BitArrayUnstretched;
 import com.fastasyncworldedit.core.math.IntPair;
 import com.fastasyncworldedit.core.util.MathMan;
 import com.fastasyncworldedit.core.util.TaskManager;
+import com.mojang.serialization.DataResult;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.bukkit.adapter.Refraction;
@@ -33,29 +34,20 @@ import net.minecraft.server.level.ChunkHolder;
 import net.minecraft.server.level.ChunkMap;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.util.BitStorage;
 import net.minecraft.util.ProblemReporter;
-import net.minecraft.util.SimpleBitStorage;
 import net.minecraft.util.ThreadingDetector;
-import net.minecraft.util.ZeroBitStorage;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.chunk.Configuration;
-import net.minecraft.world.level.chunk.GlobalPalette;
-import net.minecraft.world.level.chunk.HashMapPalette;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.LevelChunkSection;
-import net.minecraft.world.level.chunk.LinearPalette;
-import net.minecraft.world.level.chunk.Palette;
 import net.minecraft.world.level.chunk.PalettedContainer;
 import net.minecraft.world.level.chunk.PalettedContainerFactory;
-import net.minecraft.world.level.chunk.SingleValuePalette;
+import net.minecraft.world.level.chunk.PalettedContainerRO;
 import net.minecraft.world.level.chunk.Strategy;
 import net.minecraft.world.level.chunk.status.ChunkStatus;
 import net.minecraft.world.level.entity.PersistentEntitySectionManager;
@@ -66,28 +58,25 @@ import org.apache.logging.log4j.Logger;
 import org.bukkit.Chunk;
 import org.bukkit.craftbukkit.CraftChunk;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Semaphore;
 import java.util.function.IntFunction;
+import java.util.stream.LongStream;
 
 import static net.minecraft.core.registries.Registries.BIOME;
 
@@ -100,8 +89,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
     public static final Field fieldStorage;
     public static final Field fieldPalette;
 
-    private static final MethodHandle constructorPalettedContainer;
-    private static final MethodHandle getConfigurationForBitCount;
+    private static final MethodHandle palettedContainerUnpackSpigot;
 
     private static final Field fieldTickingFluidCount;
     private static final Field fieldTickingBlockCount;
@@ -138,24 +126,12 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             fieldPalette = dataClazz.getDeclaredField(Refraction.pickName("palette", "c"));
             fieldPalette.setAccessible(true);
 
-            {
-                final MethodType methodType = PaperLib.isPaper() ?
-                        MethodType.methodType(
-                                void.class, Strategy.class, Configuration.class, BitStorage.class,
-                                Palette.class, List.class, Object.class, Object[].class
-                        ) :
-                        MethodType.methodType(
-                                void.class, Strategy.class, Configuration.class, BitStorage.class,
-                                Palette.class
-                        );
-                constructorPalettedContainer = MethodHandles.privateLookupIn(PalettedContainer.class, lookup).findConstructor(
-                        PalettedContainer.class, methodType
-                );
-            }
-            getConfigurationForBitCount = MethodHandles.privateLookupIn(Strategy.class, lookup)
-                    .unreflect(Strategy.class.getDeclaredMethod(
-                            Refraction.pickName("getConfigurationForBitCount", "a"), Integer.TYPE
-                    ));
+            //noinspection JavaLangInvokeHandleSignature - method is obfuscated
+            palettedContainerUnpackSpigot = PaperLib.isPaper() ? null : lookup.findStatic(
+                    PalettedContainer.class,
+                    "a", // unpack
+                    MethodType.methodType(DataResult.class, Strategy.class, PalettedContainerRO.PackedData.class)
+            );
 
             fieldTickingFluidCount = LevelChunkSection.class.getDeclaredField(Refraction.pickName(
                     "tickingFluidCount",
@@ -438,7 +414,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             CachedBukkitAdapter adapter,
             RegistryAccess registryAccess,
             @Nullable PalettedContainer<Holder<Biome>> biomes
-    ) throws Throwable {
+    ) {
         return newChunkSection(layer, null, blocks, adapter, registryAccess, biomes);
     }
 
@@ -449,7 +425,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             CachedBukkitAdapter adapter,
             RegistryAccess registryAccess,
             @Nullable PalettedContainer<Holder<Biome>> biomes
-    ) throws Throwable {
+    ) {
         if (set == null) {
             return newChunkSection(registryAccess, biomes);
         }
@@ -486,12 +462,6 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             }
 
             final long[] bits = Arrays.copyOfRange(blockStates, 0, blockBitArrayEnd);
-            final BitStorage nmsBits;
-            if (bitsPerEntry == 0) {
-                nmsBits = new ZeroBitStorage(4096);
-            } else {
-                nmsBits = new SimpleBitStorage(bitsPerEntry, 4096, bits);
-            }
             List<net.minecraft.world.level.block.state.BlockState> palette;
             if (bitsPerEntry < 9) {
                 palette = new ArrayList<>();
@@ -506,37 +476,22 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             }
 
             // Create palette with data
-            final Strategy<net.minecraft.world.level.block.state.BlockState> blockStrategy =
-                    Strategy.createForBlockStates(Block.BLOCK_STATE_REGISTRY);
-            final Configuration blockConfiguration =
-                    (Configuration) getConfigurationForBitCount.invoke(blockStrategy, bitsPerEntry);
-            @SuppressWarnings("unchecked")
-            PalettedContainer<net.minecraft.world.level.block.state.BlockState> blockStatePalettedContainer =
-                    (PalettedContainer<net.minecraft.world.level.block.state.BlockState>) (PaperLib.isPaper() ?
-                            constructorPalettedContainer.invoke(
-                                    blockStrategy,
-                                    blockConfiguration,
-                                    nmsBits,
-                                    blockConfiguration.createPalette(blockStrategy, palette),
-                                    palette,
-                                    Blocks.AIR.defaultBlockState(),
-                                    null
-                            ) :
-                            constructorPalettedContainer.invoke(
-                                    blockStrategy,
-                                    blockConfiguration,
-                                    nmsBits,
-                                    blockConfiguration.createPalette(blockStrategy, palette)
-                            ));
-            if (biomes == null) {
-                final Registry<Biome> biomeRegistry = registryAccess.lookupOrThrow(BIOME);
-                biomes = new PalettedContainer<>(
-                        biomeRegistry.getOrThrow(Biomes.PLAINS),
-                        Strategy.createForBiomes(biomeRegistry.asHolderIdMap())
-                );
+            var strategy = Strategy.createForBlockStates(Block.BLOCK_STATE_REGISTRY);
+            var packedData = new PalettedContainerRO.PackedData<>(palette, Optional.of(LongStream.of(bits)), bitsPerEntry);
+            DataResult<PalettedContainer<net.minecraft.world.level.block.state.BlockState>> result;
+            if (PaperLib.isPaper()) {
+                result = PalettedContainer.unpack(strategy, packedData, Blocks.AIR.defaultBlockState(), null);
+            } else {
+                //noinspection unchecked
+                result = (DataResult<PalettedContainer<net.minecraft.world.level.block.state.BlockState>>)
+                        palettedContainerUnpackSpigot.invokeExact(strategy, packedData);
             }
-
-            return new LevelChunkSection(blockStatePalettedContainer, biomes);
+            if (biomes == null) {
+                biomes = PalettedContainerFactory.create(registryAccess).createForBiomes();
+            }
+            return new LevelChunkSection(result.getOrThrow(), biomes);
+        } catch (Throwable e) {
+            throw new RuntimeException("Failed to create block palette", e);
         } finally {
             Arrays.fill(blockToPalette, Integer.MAX_VALUE);
             Arrays.fill(paletteToBlock, Integer.MAX_VALUE);
@@ -577,78 +532,64 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         }
         BukkitImplAdapter<?> adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
         // Don't stream this as typically will see 1-4 biomes; stream overhead is large for the small length
-        Map<BiomeType, Holder<Biome>> palette = new HashMap<>();
-        for (BiomeType biomeType : new LinkedList<>(Arrays.asList(biomes))) {
-            Holder<Biome> biome;
+        final List<Holder<Biome>> palette = new ArrayList<>();
+        for (BiomeType biomeType : new LinkedList<>(Set.of(biomes))) {
             if (biomeType == null) {
-                biome = biomeRegistry.byId(adapter.getInternalBiomeId(BiomeTypes.PLAINS));
-            } else {
-                biome = biomeRegistry.byId(adapter.getInternalBiomeId(biomeType));
+                palette.add(biomeRegistry.byId(adapter.getInternalBiomeId(BiomeTypes.PLAINS)));
+                continue;
             }
-            palette.put(biomeType, biome);
+            palette.add(biomeRegistry.byId(adapter.getInternalBiomeId(biomeType)));
         }
         int biomeCount = palette.size();
         int bitsPerEntry = MathMan.log2nlz(biomeCount - 1);
 
-
-        Object configuration = getConfigurationForBitCount.invoke(
-                Strategy.createForBlockStates(new FakeIdMapBiome(biomeCount)), bitsPerEntry
-        );
         if (bitsPerEntry > 3) {
             bitsPerEntry = MathMan.log2nlz(biomeRegistry.size() - 1);
-        }
-        PalettedContainer<Holder<Biome>> biomePalettedContainer = new PalettedContainer<>(
-                biomeRegistry.byIdOrThrow(adapter.getInternalBiomeId(BiomeTypes.PLAINS)),
-                Strategy.createForBiomes(biomeRegistry)
-        );
-
-        final Palette<Holder<Biome>> biomePalette;
-        if (bitsPerEntry == 0) {
-            biomePalette = new SingleValuePalette<>(new ArrayList<>(palette.values()));
-        } else if (bitsPerEntry == 4) {
-            biomePalette = LinearPalette.create(4, new ArrayList<>(palette.values()));
-        } else if (bitsPerEntry < 9) {
-            biomePalette = HashMapPalette.create(bitsPerEntry, new ArrayList<>(palette.values()));
-        } else {
-            biomePalette = new GlobalPalette<>(biomeRegistry);
         }
 
         int bitsPerEntryNonZero = Math.max(bitsPerEntry, 1); // We do want to use zero sometimes
         final int blocksPerLong = MathMan.floorZero((double) 64 / bitsPerEntryNonZero);
         final int arrayLength = MathMan.ceilZero(64f / blocksPerLong);
 
-
-        BitStorage bitStorage = bitsPerEntry == 0 ? new ZeroBitStorage(64) : new SimpleBitStorage(
-                bitsPerEntry,
-                64,
-                new long[arrayLength]
+        var strategy = Strategy.createForBiomes(biomeRegistry);
+        var packedData = new PalettedContainerRO.PackedData<>(
+                palette, Optional.of(LongStream.of(new long[arrayLength])), bitsPerEntry
         );
+        DataResult<PalettedContainer<Holder<Biome>>> result;
+        if (PaperLib.isPaper()) {
+            result = PalettedContainer.unpack(
+                    strategy,
+                    packedData,
+                    biomeRegistry.byIdOrThrow(adapter.getInternalBiomeId(BiomeTypes.PLAINS)),
+                    null
+            );
+        } else {
+            //noinspection unchecked
+            result = (DataResult<PalettedContainer<Holder<Biome>>>)
+                    palettedContainerUnpackSpigot.invokeExact(strategy, packedData);
+        }
+        var biomePalettedContainer = result.getOrThrow();
 
-        try {
-            Object data = dataConstructor.newInstance(configuration, bitStorage, biomePalette);
-            fieldData.set(biomePalettedContainer, data);
-            int index = 0;
-            for (int y = 0; y < 4; y++) {
-                for (int z = 0; z < 4; z++) {
-                    for (int x = 0; x < 4; x++, index++) {
-                        BiomeType biomeType = biomes[index];
-                        if (biomeType == null) {
-                            continue;
-                        }
-                        Holder<Biome> biome = biomeRegistry.byId(WorldEditPlugin
-                                .getInstance()
-                                .getBukkitImplAdapter()
-                                .getInternalBiomeId(biomeType));
-                        if (biome == null) {
-                            continue;
-                        }
-                        biomePalettedContainer.set(x, y, z, biome);
+        int index = 0;
+        for (int y = 0; y < 4; y++) {
+            for (int z = 0; z < 4; z++) {
+                for (int x = 0; x < 4; x++, index++) {
+                    BiomeType biomeType = biomes[index];
+                    if (biomeType == null) {
+                        continue;
                     }
+                    Holder<Biome> biome = biomeRegistry.byId(WorldEditPlugin
+                            .getInstance()
+                            .getBukkitImplAdapter()
+                            .getInternalBiomeId(biomeType));
+                    if (biome == null) {
+                        continue;
+                    }
+                    biomePalettedContainer.set(x, y, z, biome);
                 }
             }
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            throw new RuntimeException(e);
         }
+
         return biomePalettedContainer;
     }
 
@@ -696,48 +637,6 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         } catch (IllegalAccessException e) {
             throw new RuntimeException("Failed to lookup entities [PAPER=false]", e);
         }
-    }
-
-    record FakeIdMapBlock(int size) implements IdMap<net.minecraft.world.level.block.state.BlockState> {
-
-        @Override
-        public int getId(final net.minecraft.world.level.block.state.BlockState entry) {
-            return 0;
-        }
-
-        @Nullable
-        @Override
-        public net.minecraft.world.level.block.state.BlockState byId(final int index) {
-            return null;
-        }
-
-        @Nonnull
-        @Override
-        public Iterator<net.minecraft.world.level.block.state.BlockState> iterator() {
-            return Collections.emptyIterator();
-        }
-
-    }
-
-    record FakeIdMapBiome(int size) implements IdMap<Biome> {
-
-        @Override
-        public int getId(final Biome entry) {
-            return 0;
-        }
-
-        @Nullable
-        @Override
-        public Biome byId(final int index) {
-            return null;
-        }
-
-        @Nonnull
-        @Override
-        public Iterator<Biome> iterator() {
-            return Collections.emptyIterator();
-        }
-
     }
 
 }
