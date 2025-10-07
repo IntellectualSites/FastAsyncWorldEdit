@@ -17,6 +17,9 @@ dependencyResolutionManagement {
         maven {
             name = "EngineHub Repository"
             url = uri("https://maven.enginehub.org/repo/")
+            content {
+                excludeGroup("net.kyori")
+            }
         }
         mavenCentral()
     }

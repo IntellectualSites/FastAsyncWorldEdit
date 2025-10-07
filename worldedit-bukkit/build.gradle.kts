@@ -213,9 +213,6 @@ tasks.withType<ShadowJar>().configureEach {
         relocate("io.papermc.lib", "com.sk89q.worldedit.bukkit.paperlib") {
             include(dependency("io.papermc:paperlib"))
         }
-        relocate("it.unimi.dsi.fastutil", "com.sk89q.worldedit.bukkit.fastutil") {
-            include(dependency("it.unimi.dsi:fastutil"))
-        }
         relocate("net.royawesome.jlibnoise", "com.sk89q.worldedit.jlibnoise") {
             include(dependency("com.sk89q.lib:jlibnoise"))
         }
