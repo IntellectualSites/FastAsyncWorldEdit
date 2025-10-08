@@ -18,11 +18,9 @@ If you use other plugins which depend on WorldEdit, simply having FAWE installed
 ## Downloads
 
 Downloads are available either on SpigotMC, Modrinth or on CurseForge.
-- [SpigotMC](https://www.spigotmc.org/resources/13932/)
+- [Jenkins](https://ci.athion.net/job/FastAsyncWorldEdit/)
 - [Modrinth](https://modrinth.com/plugin/fastasyncworldedit/)
 - [CurseForge](https://dev.bukkit.org/projects/fawe)
-
-Snapshots are available on [Jenkins](https://ci.athion.net/job/FastAsyncWorldEdit/).
 
 ## Features
 
