@@ -1,17 +1,16 @@
-applyLibrariesConfiguration()
+plugins {
+    id("buildlogic.libs")
+}
 
 dependencies {
-    "shade"(libs.adventureTextApi)
-    "shade"(libs.adventureTextSerializerGson)
-    "shade"(libs.adventureTextSerializerLegacy)
-    "shade"(libs.adventureTextSerializerPlain)
-    "shade"(libs.jchronic) {
-        exclude(group = "junit", module = "junit")
-    }
-    "shade"(libs.jlibnoise)
-    "shade"(libs.piston)
-    "shade"(libs.pistonRuntime)
-    "shade"(libs.pistonImpl)
+    "shade"(libs.kyoriText.api)
+    "shade"(libs.kyoriText.serializer.gson)
+    "shade"(libs.kyoriText.serializer.legacy)
+    "shade"(libs.kyoriText.serializer.plain)
+    // These are here because they use net.kyori:text-api -- so they need to be relocated too
+    "shade"(libs.piston.core)
+    "shade"(libs.piston.coreAp.runtime)
+    "shade"(libs.piston.defaultImpl)
     // Linbus
     "shade"(platform(libs.linBus.bom))
     "shade"(libs.linBus.common)
