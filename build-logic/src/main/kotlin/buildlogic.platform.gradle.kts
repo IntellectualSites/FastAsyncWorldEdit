@@ -37,25 +37,25 @@ javaComponent.withVariantsFromConfiguration(configurations["shadowRuntimeElement
     skip()
 }
 
-    tasks.named<Jar>("jar") {
-        val kind = platform.kind.get()
-        val includeClasspath = platform.includeClasspath.get()
-        val extraAttributes = platform.extraAttributes.get()
+tasks.named<Jar>("jar") {
+    val kind = platform.kind.get()
+    val includeClasspath = platform.includeClasspath.get()
+    val extraAttributes = platform.extraAttributes.get()
 
-        val version = project(":worldedit-core").version
-        inputs.property("version", version)
-        val attributes = mutableMapOf(
+    val version = project(":worldedit-core").version
+    inputs.property("version", version)
+    val attributes = mutableMapOf(
             "Implementation-Version" to version,
             "WorldEdit-Version" to version,
             "WorldEdit-Kind" to kind.name,
             "Main-Class" to kind.mainClass
-        )
-        if (includeClasspath) {
-            attributes["Class-Path"] = listOf("truezip", "truevfs", "js")
+    )
+    if (includeClasspath) {
+        attributes["Class-Path"] = listOf("truezip", "truevfs", "js")
                 .map { "$it.jar" }
                 .flatMap { listOf(it, "WorldEdit/$it", "../$it", "../WorldEdit/$it") }
                 .joinToString(separator = " ")
-        }
-        attributes.putAll(extraAttributes)
-        manifest.attributes(attributes)
     }
+    attributes.putAll(extraAttributes)
+    manifest.attributes(attributes)
+}
