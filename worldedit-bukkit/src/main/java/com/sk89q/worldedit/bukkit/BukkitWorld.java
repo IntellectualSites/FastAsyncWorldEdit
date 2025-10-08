@@ -167,6 +167,14 @@ public class BukkitWorld extends AbstractWorld {
         return list;
     }
 
+    @Override
+    public int removeEntities(final Region region) {
+        List<com.sk89q.worldedit.entity.Entity> entities = getEntities(region);
+        return TaskManager.taskManager().sync(() -> entities.stream()
+                .mapToInt(entity -> entity.remove() ? 1 : 0).sum()
+        );
+    }
+
     //FAWE: createEntity was moved to IChunkExtent to prevent issues with Async Entity Add.
 
     /**

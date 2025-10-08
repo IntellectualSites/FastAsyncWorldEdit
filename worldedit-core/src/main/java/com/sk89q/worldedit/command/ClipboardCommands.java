@@ -36,7 +36,6 @@ import com.fastasyncworldedit.core.math.transform.MutatingOperationTransformHold
 import com.fastasyncworldedit.core.util.ImgurUtility;
 import com.fastasyncworldedit.core.util.MainUtil;
 import com.fastasyncworldedit.core.util.MaskTraverser;
-import com.fastasyncworldedit.core.util.TaskManager;
 import com.fastasyncworldedit.core.util.task.RunnableVal;
 import com.google.common.collect.Lists;
 import com.sk89q.worldedit.EditSession;
@@ -51,7 +50,6 @@ import com.sk89q.worldedit.command.util.Logging;
 import com.sk89q.worldedit.command.util.annotation.Confirm;
 import com.sk89q.worldedit.command.util.annotation.Preload;
 import com.sk89q.worldedit.command.util.annotation.SynchronousSettingExpected;
-import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
@@ -99,7 +97,6 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.net.URL;
 import java.nio.file.Files;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -481,14 +478,7 @@ public class ClipboardCommands {
                     .apply(region.getMaximumPoint().subtract(region.getMinimumPoint()).toVector3())
                     .toBlockPoint());
             if (removeEntities) {
-                // Collect entities on the current (command) thread, in case it benefits from asynchronous retrieval (unlikely)
-                final Collection<? extends Entity> entities = editSession.getEntities(new CuboidRegion(realTo, max));
-                // BukkitEntity#remove is synchronized, but it makes more sense to synchronize here beforehand in case many
-                // entities are affected. BukkitEntity will not synchronize if it's already called on the main thread.
-                TaskManager.taskManager().sync(() -> {
-                    entities.forEach(Entity::remove);
-                    return true;
-                });
+                editSession.removeEntities(new CuboidRegion(realTo, max));
             }
             if (selectPasted || onlySelect) {
                 RegionSelector selector = new CuboidRegionSelector(world, realTo, max);
@@ -578,9 +568,9 @@ public class ClipboardCommands {
             Vector3 realTo = to.toVector3().add(transform.apply(clipboardOffset.toVector3()));
             Vector3 max = realTo.add(transform.apply(region.getMaximumPoint().subtract(region.getMinimumPoint()).toVector3()));
 
-            // FAWE start - entity remova;l
+            // FAWE start - entity removal
             if (removeEntities) {
-                editSession.getEntities(new CuboidRegion(realTo.toBlockPoint(), max.toBlockPoint())).forEach(Entity::remove);
+                editSession.removeEntities(new CuboidRegion(realTo.toBlockPoint(), max.toBlockPoint()));
             }
             if (selectPasted || onlySelect) {
                 //FAWE end

@@ -176,6 +176,18 @@ public interface Extent extends InputExtent, OutputExtent {
     default void removeEntity(int x, int y, int z, UUID uuid) {
     }
 
+    /**
+     * Removes all entities in the given region.
+     *
+     * @param region the region
+     * @return the number of entities removed
+     */
+    default int removeEntities(Region region) {
+        return this.getEntities(region).stream()
+                .mapToInt(entity -> entity.remove() ? 1 : 0)
+                .sum();
+    }
+
     /*
     Queue based methods
     TODO NOT IMPLEMENTED:
