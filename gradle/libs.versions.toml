@@ -52,7 +52,7 @@ junit = "5.11.1"
 
 # Gradle plugins
 pluginyml = "0.6.0"
-mod-publish-plugin = "0.8.4"
+mod-publish-plugin = "1.0.0"
 grgit = "5.3.2"
 shadow = "9.0.2"
 paperweight = "2.0.0-SNAPSHOT"
