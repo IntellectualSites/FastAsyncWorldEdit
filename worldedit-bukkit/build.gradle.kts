@@ -13,6 +13,8 @@ plugins {
     alias(libs.plugins.mod.publish.plugin)
 }
 
+project.description = "Bukkit"
+
 platform {
     kind = buildlogic.WorldEditKind.Plugin
     includeClasspath = true

@@ -6,6 +6,8 @@ plugins {
     id("buildlogic.core-and-platform")
 }
 
+project.description = "Core"
+
 dependencies {
     constraints {
         implementation(libs.snakeyaml) {

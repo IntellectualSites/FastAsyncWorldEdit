@@ -6,6 +6,8 @@ plugins {
     alias(libs.plugins.pluginyml)
 }
 
+project.description = "CLI"
+
 platform {
     kind = buildlogic.WorldEditKind.Standalone("com.sk89q.worldedit.cli.CLIWorldEdit")
     extraAttributes = mapOf(
