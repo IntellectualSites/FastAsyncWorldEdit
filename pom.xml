@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.fastasyncworldedit</groupId>
+    <artifactId>fastasyncworldedit-parent</artifactId>
+    <version>2.13.3-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>FastAsyncWorldEdit</name>
+    <description>A high-performance WorldEdit fork optimized for speed</description>
+
+    <modules>
+        <module>worldedit-libs</module>
+        <module>worldedit-core</module>
+        <module>worldedit-bukkit</module>
+        <module>worldedit-cli</module>
+    </modules>
+
+    <profiles>
+        <!-- 
+            Run Paper Development Server Profile
+            
+            This profile configures the run-paper plugin to start a test server.
+            Unlike a full build, this doesn't trigger the entire reactor build.
+            
+            Usage:
+            1. Build the plugin (only needs to be done after code changes):
+               mvn package -pl worldedit-bukkit -am -DskipTests
+               
+            2. Run the server (does not rebuild):
+               mvn xyz.jpenilla:run-paper-maven-plugin:2.3.1:runServer -Prun-server
+               
+            The server will start with the plugin loaded in the 'run' directory.
+            
+            Note: Gradle's runServer task is more convenient as it automatically
+            handles the dependency on shadowJar without triggering a full build.
+        -->
+        <profile>
+            <id>run-server</id>
+            <build>
+                <plugins>
+                    <!-- Download Paper server JAR -->
+                    <plugin>
+                        <groupId>com.googlecode.maven-download-plugin</groupId>
+                        <artifactId>download-maven-plugin</artifactId>
+                        <version>1.7.1</version>
+                        <executions>
+                            <execution>
+                                <id>download-paper</id>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>wget</goal>
+                                </goals>
+                                <configuration>
+                                    <url>https://api.papermc.io/v2/projects/paper/versions/1.21.10/builds/50/downloads/paper-1.21.10-50.jar</url>
+                                    <outputDirectory>${project.basedir}/run</outputDirectory>
+                                    <outputFileName>server.jar</outputFileName>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <!-- Copy plugin JAR to server plugins directory -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <version>3.6.1</version>
+                        <executions>
+                            <execution>
+                                <id>copy-plugin</id>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>copy</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>${project.groupId}</groupId>
+                                            <artifactId>worldedit-bukkit</artifactId>
+                                            <version>${project.version}</version>
+                                            <classifier>Paper</classifier>
+                                            <type>jar</type>
+                                            <outputDirectory>${project.basedir}/run/plugins</outputDirectory>
+                                            <destFileName>FastAsyncWorldEdit.jar</destFileName>
+                                        </artifactItem>
+                                    </artifactItems>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <!-- Run the server -->
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>3.2.0</version>
+                        <configuration>
+                            <executable>java</executable>
+                            <arguments>
+                                <argument>-Xms1G</argument>
+                                <argument>-Xmx2G</argument>
+                                <argument>-DPaper.IgnoreJavaVersion=true</argument>
+                                <argument>-Dcom.mojang.eula.agree=true</argument>
+                                <argument>--add-modules=jdk.incubator.vector</argument>
+                                <argument>-jar</argument>
+                                <argument>${project.basedir}/run/server.jar</argument>
+                                <argument>nogui</argument>
+                            </arguments>
+                            <workingDirectory>${project.basedir}/run</workingDirectory>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <java.version>21</java.version>
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
+        
+        <!-- Dependency versions -->
+        <paper.version>1.21.10-R0.1-SNAPSHOT</paper.version>
+        <fastutil.version>8.5.15</fastutil.version>
+        <guava.version>33.3.1-jre</guava.version>
+        <log4j.version>2.24.1</log4j.version>
+        <gson.version>2.11.0</gson.version>
+        <snakeyaml.version>2.2</snakeyaml.version>
+        
+        <!-- EngineHub Libraries -->
+        <linbus.version>0.2.0</linbus.version>
+        <piston.version>master-SNAPSHOT</piston.version>
+        
+        <!-- Adventure -->
+        <adventure.version>4.24.0</adventure.version>
+        
+        <!-- Additional Libraries -->
+        <jlibnoise.version>1.0.0</jlibnoise.version>
+        <jchronic.version>0.2.4a</jchronic.version>
+        <sparsebitset.version>1.3</sparsebitset.version>
+        <antlr4.version>4.13.2</antlr4.version>
+        <adventure.version>4.24.0</adventure.version>
+        <adventure-bukkit.version>4.4.1</adventure-bukkit.version>
+    </properties>
+
+    <repositories>
+        <repository>
+            <id>papermc</id>
+            <url>https://repo.papermc.io/repository/maven-public/</url>
+        </repository>
+        <repository>
+            <id>enginehub</id>
+            <url>https://maven.enginehub.org/repo/</url>
+        </repository>
+        <repository>
+            <id>sonatype-snapshots</id>
+            <url>https://s01.oss.sonatype.org/content/repositories/snapshots/</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+        <repository>
+            <id>spigot-repo</id>
+            <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+        </repository>
+        <repository>
+            <id>enginehub-maven</id>
+            <url>https://maven.enginehub.org/repo/</url>
+        </repository>
+        <repository>
+            <id>maven-central</id>
+            <url>https://repo.maven.apache.org/maven2/</url>
+        </repository>
+    </repositories>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- Project modules -->
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>worldedit-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            
+            <!-- External dependencies -->
+            <dependency>
+                <groupId>io.papermc.paper</groupId>
+                <artifactId>paper-api</artifactId>
+                <version>${paper.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>it.unimi.dsi</groupId>
+                <artifactId>fastutil</artifactId>
+                <version>${fastutil.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${guava.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.kyori</groupId>
+                <artifactId>adventure-api</artifactId>
+                <version>${adventure.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.kyori</groupId>
+                <artifactId>adventure-platform-bukkit</artifactId>
+                <version>${adventure-bukkit.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.12.1</version>
+                    <configuration>
+                        <source>${java.version}</source>
+                        <target>${java.version}</target>
+                        <enablePreview>true</enablePreview>
+                        <compilerArgs>
+                            <arg>--enable-preview</arg>
+                        </compilerArgs>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-shade-plugin</artifactId>
+                    <version>3.5.1</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+</project>
