@@ -216,10 +216,7 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
         CraftServer.class.cast(Bukkit.getServer());
 
         int dataVersion = SharedConstants.getCurrentVersion().dataVersion().version();
-        if (dataVersion < Constants.DATA_VERSION_MC_1_21_9) {
-            throw new UnsupportedClassVersionError("Pre 1.21.9");
-        }
-        if (dataVersion > Constants.DATA_VERSION_MC_1_21_9) {
+        if (dataVersion != Constants.DATA_VERSION_MC_1_21_9 && dataVersion != Constants.DATA_VERSION_MC_1_21_10) {
             logger.warning(WRONG_VERSION);
         }
 
