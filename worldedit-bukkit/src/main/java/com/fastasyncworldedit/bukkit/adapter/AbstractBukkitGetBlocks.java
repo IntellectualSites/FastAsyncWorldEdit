@@ -52,7 +52,7 @@ public abstract class AbstractBukkitGetBlocks<ServerLevel, LevelChunk> extends C
         this.chunkPos = new IntPair(chunkX, chunkZ);
     }
 
-    protected abstract void send();
+    protected abstract void send(boolean obfuscateAntiXRay);
 
     protected abstract CompletableFuture<LevelChunk> ensureLoaded(ServerLevel serverLevel);
 
