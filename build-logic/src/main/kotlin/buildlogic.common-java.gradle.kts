@@ -58,7 +58,7 @@ tasks.withType<Javadoc>().configureEach {
                 "https://jd.advntr.dev/api/latest/",
                 "https://logging.apache.org/log4j/2.x/javadoc/log4j-api/",
                 "https://www.antlr.org/api/Java/",
-                "https://jd.papermc.io/paper/1.21.8/",
+                "https://jd.papermc.io/paper/1.21.10/",
                 "https://intellectualsites.github.io/fastasyncworldedit-javadocs/worldedit-core/"
         )
         docTitle = "${rootProject.name}-${project.description}" +  " " + "${rootProject.version}"

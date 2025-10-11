@@ -62,7 +62,7 @@ public abstract class AbstractBukkitGetBlocks<ServerLevel, LevelChunk> extends C
             int copyKey,
             LevelChunk nmsChunk,
             ServerLevel nmsWorld
-    ) throws Exception;
+    ) throws Throwable;
 
     @Override
     @SuppressWarnings({"rawtypes", "unchecked"})

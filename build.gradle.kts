@@ -93,7 +93,7 @@ allprojects {
     }
 }
 
-val supportedVersions: List<String> = listOf("1.20.4", "1.20.5", "1.20.6", "1.21", "1.21.1", "1.21.4", "1.21.5", "1.21.8")
+val supportedVersions: List<String> = listOf("1.20.4", "1.20.5", "1.20.6", "1.21", "1.21.1", "1.21.4", "1.21.5", "1.21.8", "1.21.10")
 
 tasks {
     supportedVersions.forEach {
@@ -107,7 +107,7 @@ tasks {
         }
     }
     runServer<RunServer> {
-        minecraftVersion("1.21.8")
+        minecraftVersion(supportedVersions.last())
         pluginJars(*project(":worldedit-bukkit").getTasksByName("shadowJar", false).map { (it as Jar).archiveFile }
                 .toTypedArray())
         jvmArgs("-Dcom.mojang.eula.agree=true")

@@ -1,3 +1,4 @@
+import buildlogic.getVersion
 import buildlogic.stringyLibs
 
 plugins {
@@ -16,10 +17,23 @@ repositories {
     maven {
         name = "PaperMC"
         url = uri("https://repo.papermc.io/repository/maven-public/")
+        content {
+            excludeModule("io.papermc.paper", "dev-bundle")
+        }
     }
     maven {
         name = "EngineHub Repository"
         url = uri("https://maven.enginehub.org/repo/")
+        content {
+            excludeModule("io.papermc.paper", "dev-bundle")
+        }
+    }
+    maven {
+        name = "IntellectualSites"
+        url = uri("https://repo.intellectualsites.dev/repository/paper-dev-bundles/")
+        content {
+            includeModule("io.papermc.paper", "dev-bundle")
+        }
     }
     mavenCentral()
     afterEvaluate {
@@ -32,7 +46,7 @@ dependencies {
     constraints {
         //Reduces the amount of libraries Gradle and IntelliJ need to resolve
         implementation("net.kyori:adventure-bom") {
-            version { strictly("4.24.0") }
+            version { strictly(stringyLibs.getVersion("adventure").strictVersion) }
             because("Ensure a consistent version of adventure is used.")
         }
     }
