@@ -337,7 +337,7 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
             int copyKey,
             LevelChunk nmsChunk,
             ServerLevel nmsWorld
-    ) throws Throwable {
+    ) throws Exception {
         PaperweightGetBlocks_Copy copy = createCopy ? new PaperweightGetBlocks_Copy(nmsChunk) : null;
         if (createCopy) {
             if (copies.containsKey(copyKey)) {

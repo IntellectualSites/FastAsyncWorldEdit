@@ -526,7 +526,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
     public static PalettedContainer<Holder<Biome>> getBiomePalettedContainer(
             BiomeType[] biomes,
             IdMap<Holder<Biome>> biomeRegistry
-    ) throws Throwable {
+    ) {
         if (biomes == null) {
             return null;
         }
@@ -564,9 +564,13 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                     null
             );
         } else {
-            //noinspection unchecked
-            result = (DataResult<PalettedContainer<Holder<Biome>>>)
-                    palettedContainerUnpackSpigot.invokeExact(strategy, packedData);
+            try {
+                //noinspection unchecked
+                result = (DataResult<PalettedContainer<Holder<Biome>>>)
+                        palettedContainerUnpackSpigot.invokeExact(strategy, packedData);
+            } catch (Throwable e) {
+                throw new RuntimeException("Failed to create biome palette for Spigot", e);
+            }
         }
         var biomePalettedContainer = result.getOrThrow();
 
