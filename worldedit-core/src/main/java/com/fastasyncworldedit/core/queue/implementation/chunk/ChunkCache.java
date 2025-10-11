@@ -62,9 +62,8 @@ public class ChunkCache<T extends Trimable> implements IChunkCache<T> {
                 if (!aggressive) {
                     return false;
                 }
-                synchronized (igb) {
-                    igb.trim(true);
-                }
+                // Don't synchronise here, let the implementation handle it
+                igb.trim(true);
             }
         }
         return result;
