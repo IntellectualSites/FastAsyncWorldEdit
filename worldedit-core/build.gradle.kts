@@ -3,11 +3,10 @@ import org.gradle.plugins.ide.idea.model.IdeaModel
 plugins {
     `java-library`
     antlr
+    id("buildlogic.core-and-platform")
 }
 
 project.description = "Core"
-
-applyPlatformAndCoreConfiguration()
 
 dependencies {
     constraints {
@@ -17,34 +16,40 @@ dependencies {
         }
     }
 
-    // Modules
-    api(projects.worldeditLibs.core)
-    compileOnly(projects.worldeditLibs.core.ap)
-    annotationProcessor(projects.worldeditLibs.core.ap)
-
-    // Minecraft expectations
-    implementation(libs.fastutil)
+    api(project(":worldedit-libs:core"))
+    compileOnly(libs.trueZip)
+    implementation(libs.rhino)
+    implementation(libs.snakeyaml)
     implementation(libs.guava)
+    compileOnlyApi(libs.jsr305)
     implementation(libs.gson)
 
-    // Platform expectations
-    implementation(libs.snakeyaml)
+    implementation(libs.jchronic) {
+        exclude(group = "junit", module = "junit")
+    }
+    implementation(libs.jlibnoise)
 
-    // Logging
-    implementation(libs.log4jApi)
+    implementation(libs.log4j.api)
 
-    // Plugins
-    compileOnly(libs.plotSquaredCore) { isTransitive = false }
+    compileOnly(libs.plotsquared.core) { isTransitive = false }
 
+    implementation(libs.fastutil)
+
+    antlr(libs.antlr4)
+    implementation(libs.antlr4.runtime)
+
+    compileOnly(project(":worldedit-libs:core:ap"))
+    annotationProcessor(project(":worldedit-libs:core:ap"))
     // ensure this is on the classpath for the AP
     annotationProcessor(libs.guava)
-    compileOnly(libs.autoValueAnnotations)
+    compileOnly(libs.autoValue.annotations)
     annotationProcessor(libs.autoValue)
 
-    // Third party
-    compileOnly(libs.truezip)
-    implementation(libs.findbugs)
-    implementation(libs.rhino)
+    compileOnly(libs.autoService) {
+        because("Needed to resolve annotations in Piston")
+    }
+
+
     compileOnly(libs.adventureApi)
     compileOnlyApi(libs.adventureMiniMessage)
     implementation(libs.zstd) { isTransitive = false }
@@ -52,31 +57,28 @@ dependencies {
     compileOnly(libs.lz4Java) { isTransitive = false }
     compileOnly(libs.sparsebitset)
     compileOnly(libs.parallelgzip) { isTransitive = false }
-    antlr(libs.antlr4)
-    implementation(libs.antlr4Runtime)
-    implementation(libs.jsonSimple) { isTransitive = false }
-    implementation(platform(libs.linBus.bom))
+    implementation(libs.json.simple) { isTransitive = false }
 
     // Tests
-    testRuntimeOnly(libs.log4jCore)
+    testRuntimeOnly(libs.log4j.core)
     testImplementation(libs.parallelgzip)
 }
 
-tasks.named<Test>("test") {
+tasks.test {
     maxHeapSize = "1G"
 }
 
-tasks.withType<JavaCompile>().configureEach {
+tasks.compileJava {
     dependsOn(":worldedit-libs:build")
     options.compilerArgs.add("-Aarg.name.key.prefix=")
 }
 
-tasks.named<AntlrTask>("generateGrammarSource").configure {
+tasks.generateGrammarSource {
     val pkg = "com.sk89q.worldedit.antlr"
     outputDirectory = file("build/generated-src/antlr/main/${pkg.replace('.', '/')}")
     arguments = listOf(
-            "-visitor", "-package", pkg,
-            "-Xexact-output-dir"
+        "-visitor", "-package", pkg,
+        "-Xexact-output-dir"
     )
 }
 
@@ -103,8 +105,17 @@ sourceSets.named("main") {
 
 tasks.named<Copy>("processResources") {
     filesMatching("fawe.properties") {
-        expand("version" to "$version",
+        expand(
+                "version" to "$version",
                 "commit" to "${rootProject.ext["revision"]}",
-                "date" to "${rootProject.ext["date"]}")
+                "date" to "${rootProject.ext["date"]}"
+        )
+    }
+}
+
+configure<PublishingExtension> {
+    publications.named<MavenPublication>("maven") {
+        artifactId = the<BasePluginExtension>().archivesName.get()
+        from(components["java"])
     }
 }
