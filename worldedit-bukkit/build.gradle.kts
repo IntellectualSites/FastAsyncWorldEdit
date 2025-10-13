@@ -263,7 +263,7 @@ publishMods {
     // We publish the reobfJar twice to ensure that the modrinth download menu picks the right jar for the platform regardless
     // of minecraft version.
 
-    val mojmapPaperVersions = listOf("1.20.6", "1.21.7", "1.21.8")
+    val mojmapPaperVersions = listOf("1.20.6", "1.21.7", "1.21.8", "1.21.9", "1.21.10")
     val spigotMappedPaperVersions = listOf("1.20.2", "1.20.4")
 
     // Mark reobfJar as spigot only for 1.20.5+

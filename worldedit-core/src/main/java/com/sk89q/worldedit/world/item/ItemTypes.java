@@ -61,6 +61,8 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType ACACIA_SAPLING = init();
     @Nullable
+    public static final ItemType ACACIA_SHELF = init();
+    @Nullable
     public static final ItemType ACACIA_SIGN = init();
     @Nullable
     public static final ItemType ACACIA_SLAB = init();
@@ -151,6 +153,8 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType BAMBOO_PRESSURE_PLATE = init();
     @Nullable
+    public static final ItemType BAMBOO_SHELF = init();
+    @Nullable
     public static final ItemType BAMBOO_RAFT = init();
     @Nullable
     public static final ItemType BAMBOO_SIGN = init();
@@ -215,6 +219,8 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType BIRCH_SAPLING = init();
     @Nullable
+    public static final ItemType BIRCH_SHELF = init();
+    @Nullable
     public static final ItemType BIRCH_SIGN = init();
     @Nullable
     public static final ItemType BIRCH_SLAB = init();
@@ -228,7 +234,8 @@ public final class ItemTypes {
     public static final ItemType BLACK_BANNER = init();
     @Nullable
     public static final ItemType BLACK_BED = init();
-    @Nullable public static final ItemType BLACK_BUNDLE = init();
+    @Nullable
+    public static final ItemType BLACK_BUNDLE = init();
     @Nullable
     public static final ItemType BLACK_CANDLE = init();
     @Nullable
@@ -273,7 +280,8 @@ public final class ItemTypes {
     public static final ItemType BLUE_BANNER = init();
     @Nullable
     public static final ItemType BLUE_BED = init();
-    @Nullable public static final ItemType BLUE_BUNDLE = init();
+    @Nullable
+    public static final ItemType BLUE_BUNDLE = init();
     @Nullable
     public static final ItemType BLUE_CANDLE = init();
     @Nullable
@@ -318,7 +326,8 @@ public final class ItemTypes {
     public static final ItemType BOOK = init();
     @Nullable
     public static final ItemType BOOKSHELF = init();
-    @Nullable public static final ItemType BORDURE_INDENTED_BANNER_PATTERN = init();
+    @Nullable
+    public static final ItemType BORDURE_INDENTED_BANNER_PATTERN = init();
     @Nullable
     public static final ItemType BOW = init();
     @Nullable
@@ -353,7 +362,8 @@ public final class ItemTypes {
     public static final ItemType BROWN_BANNER = init();
     @Nullable
     public static final ItemType BROWN_BED = init();
-    @Nullable public static final ItemType BROWN_BUNDLE = init();
+    @Nullable
+    public static final ItemType BROWN_BUNDLE = init();
     @Nullable
     public static final ItemType BROWN_CARPET = init();
     @Nullable
@@ -431,6 +441,7 @@ public final class ItemTypes {
     public static final ItemType CAULDRON = init();
     @Nullable
     public static final ItemType CAVE_SPIDER_SPAWN_EGG = init();
+    @Deprecated
     @Nullable
     public static final ItemType CHAIN = init();
     @Nullable
@@ -469,6 +480,8 @@ public final class ItemTypes {
     public static final ItemType CHERRY_PRESSURE_PLATE = init();
     @Nullable
     public static final ItemType CHERRY_SAPLING = init();
+    @Nullable
+    public static final ItemType CHERRY_SHELF = init();
     @Nullable
     public static final ItemType CHERRY_SIGN = init();
     @Nullable
@@ -592,17 +605,53 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType COOKIE = init();
     @Nullable
+    public static final ItemType COPPER_AXE = init();
+    @Nullable
+    public static final ItemType COPPER_BARS = init();
+    @Nullable
     public static final ItemType COPPER_BLOCK = init();
+    @Nullable
+    public static final ItemType COPPER_BOOTS = init();
     @Nullable
     public static final ItemType COPPER_BULB = init();
     @Nullable
+    public static final ItemType COPPER_CHAIN = init();
+    @Nullable
+    public static final ItemType COPPER_CHEST = init();
+    @Nullable
+    public static final ItemType COPPER_CHESTPLATE = init();
+    @Nullable
     public static final ItemType COPPER_DOOR = init();
+    @Nullable
+    public static final ItemType COPPER_GOLEM_SPAWN_EGG = init();
+    @Nullable
+    public static final ItemType COPPER_GOLEM_STATUE = init();
     @Nullable
     public static final ItemType COPPER_GRATE = init();
     @Nullable
+    public static final ItemType COPPER_HELMET = init();
+    @Nullable
+    public static final ItemType COPPER_HOE = init();
+    @Nullable
+    public static final ItemType COPPER_HORSE_ARMOR = init();
+    @Nullable
     public static final ItemType COPPER_INGOT = init();
     @Nullable
+    public static final ItemType COPPER_LANTERN = init();
+    @Nullable
+    public static final ItemType COPPER_LEGGINGS = init();
+    @Nullable
+    public static final ItemType COPPER_NUGGET = init();
+    @Nullable
     public static final ItemType COPPER_ORE = init();
+    @Nullable
+    public static final ItemType COPPER_PICKAXE = init();
+    @Nullable
+    public static final ItemType COPPER_SHOVEL = init();
+    @Nullable
+    public static final ItemType COPPER_SWORD = init();
+    @Nullable
+    public static final ItemType COPPER_TORCH = init();
     @Nullable
     public static final ItemType COPPER_TRAPDOOR = init();
     @Nullable
@@ -653,6 +702,8 @@ public final class ItemTypes {
     public static final ItemType CRIMSON_PRESSURE_PLATE = init();
     @Nullable
     public static final ItemType CRIMSON_ROOTS = init();
+    @Nullable
+    public static final ItemType CRIMSON_SHELF = init();
     @Nullable
     public static final ItemType CRIMSON_SIGN = init();
     @Nullable
@@ -741,6 +792,8 @@ public final class ItemTypes {
     public static final ItemType DARK_OAK_PRESSURE_PLATE = init();
     @Nullable
     public static final ItemType DARK_OAK_SAPLING = init();
+    @Nullable
+    public static final ItemType DARK_OAK_SHELF = init();
     @Nullable
     public static final ItemType DARK_OAK_SIGN = init();
     @Nullable
@@ -954,11 +1007,21 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType EXPOSED_COPPER = init();
     @Nullable
+    public static final ItemType EXPOSED_COPPER_BARS = init();
+    @Nullable
     public static final ItemType EXPOSED_COPPER_BULB = init();
+    @Nullable
+    public static final ItemType EXPOSED_COPPER_CHAIN = init();
+    @Nullable
+    public static final ItemType EXPOSED_COPPER_CHEST = init();
     @Nullable
     public static final ItemType EXPOSED_COPPER_DOOR = init();
     @Nullable
+    public static final ItemType EXPOSED_COPPER_GOLEM_STATUE = init();
+    @Nullable
     public static final ItemType EXPOSED_COPPER_GRATE = init();
+    @Nullable
+    public static final ItemType EXPOSED_COPPER_LANTERN = init();
     @Nullable
     public static final ItemType EXPOSED_COPPER_TRAPDOOR = init();
     @Nullable
@@ -967,6 +1030,8 @@ public final class ItemTypes {
     public static final ItemType EXPOSED_CUT_COPPER_SLAB = init();
     @Nullable
     public static final ItemType EXPOSED_CUT_COPPER_STAIRS = init();
+    @Nullable
+    public static final ItemType EXPOSED_LIGHTNING_ROD = init();
     @Nullable
     public static final ItemType EYE_ARMOR_TRIM_SMITHING_TEMPLATE = init();
     @Nullable
@@ -1244,6 +1309,8 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType IRON_BOOTS = init();
     @Nullable
+    public static final ItemType IRON_CHAIN = init();
+    @Nullable
     public static final ItemType IRON_CHESTPLATE = init();
     @Nullable
     public static final ItemType IRON_DOOR = init();
@@ -1303,6 +1370,8 @@ public final class ItemTypes {
     public static final ItemType JUNGLE_PRESSURE_PLATE = init();
     @Nullable
     public static final ItemType JUNGLE_SAPLING = init();
+    @Nullable
+    public static final ItemType JUNGLE_SHELF = init();
     @Nullable
     public static final ItemType JUNGLE_SIGN = init();
     @Nullable
@@ -1516,6 +1585,8 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType MANGROVE_ROOTS = init();
     @Nullable
+    public static final ItemType MANGROVE_SHELF = init();
+    @Nullable
     public static final ItemType MANGROVE_SIGN = init();
     @Nullable
     public static final ItemType MANGROVE_SLAB = init();
@@ -1712,6 +1783,8 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType OAK_SAPLING = init();
     @Nullable
+    public static final ItemType OAK_SHELF = init();
+    @Nullable
     public static final ItemType OAK_SIGN = init();
     @Nullable
     public static final ItemType OAK_SLAB = init();
@@ -1771,11 +1844,21 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType OXIDIZED_COPPER = init();
     @Nullable
+    public static final ItemType OXIDIZED_COPPER_BARS = init();
+    @Nullable
     public static final ItemType OXIDIZED_COPPER_BULB = init();
+    @Nullable
+    public static final ItemType OXIDIZED_COPPER_CHAIN = init();
+    @Nullable
+    public static final ItemType OXIDIZED_COPPER_CHEST = init();
     @Nullable
     public static final ItemType OXIDIZED_COPPER_DOOR = init();
     @Nullable
+    public static final ItemType OXIDIZED_COPPER_GOLEM_STATUE = init();
+    @Nullable
     public static final ItemType OXIDIZED_COPPER_GRATE = init();
+    @Nullable
+    public static final ItemType OXIDIZED_COPPER_LANTERN = init();
     @Nullable
     public static final ItemType OXIDIZED_COPPER_TRAPDOOR = init();
     @Nullable
@@ -1784,6 +1867,8 @@ public final class ItemTypes {
     public static final ItemType OXIDIZED_CUT_COPPER_SLAB = init();
     @Nullable
     public static final ItemType OXIDIZED_CUT_COPPER_STAIRS = init();
+    @Nullable
+    public static final ItemType OXIDIZED_LIGHTNING_ROD = init();
     @Nullable
     public static final ItemType PACKED_ICE = init();
     @Nullable
@@ -1805,6 +1890,7 @@ public final class ItemTypes {
     @Nullable public static final ItemType PALE_OAK_PLANKS = init();
     @Nullable public static final ItemType PALE_OAK_PRESSURE_PLATE = init();
     @Nullable public static final ItemType PALE_OAK_SAPLING = init();
+    @Nullable public static final ItemType PALE_OAK_SHELF = init();
     @Nullable public static final ItemType PALE_OAK_SIGN = init();
     @Nullable public static final ItemType PALE_OAK_SLAB = init();
     @Nullable public static final ItemType PALE_OAK_STAIRS = init();
@@ -2349,6 +2435,8 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType SPRUCE_SAPLING = init();
     @Nullable
+    public static final ItemType SPRUCE_SHELF = init();
+    @Nullable
     public static final ItemType SPRUCE_SIGN = init();
     @Nullable
     public static final ItemType SPRUCE_SLAB = init();
@@ -2593,6 +2681,8 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType WARPED_ROOTS = init();
     @Nullable
+    public static final ItemType WARPED_SHELF = init();
+    @Nullable
     public static final ItemType WARPED_SIGN = init();
     @Nullable
     public static final ItemType WARPED_SLAB = init();
@@ -2609,13 +2699,23 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType WAXED_CHISELED_COPPER = init();
     @Nullable
+    public static final ItemType WAXED_COPPER_BARS = init();
+    @Nullable
     public static final ItemType WAXED_COPPER_BLOCK = init();
     @Nullable
     public static final ItemType WAXED_COPPER_BULB = init();
     @Nullable
+    public static final ItemType WAXED_COPPER_CHAIN = init();
+    @Nullable
+    public static final ItemType WAXED_COPPER_CHEST = init();
+    @Nullable
     public static final ItemType WAXED_COPPER_DOOR = init();
     @Nullable
+    public static final ItemType WAXED_COPPER_GOLEM_STATUE = init();
+    @Nullable
     public static final ItemType WAXED_COPPER_GRATE = init();
+    @Nullable
+    public static final ItemType WAXED_COPPER_LANTERN = init();
     @Nullable
     public static final ItemType WAXED_COPPER_TRAPDOOR = init();
     @Nullable
@@ -2629,11 +2729,21 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType WAXED_EXPOSED_COPPER = init();
     @Nullable
+    public static final ItemType WAXED_EXPOSED_COPPER_BARS = init();
+    @Nullable
     public static final ItemType WAXED_EXPOSED_COPPER_BULB = init();
+    @Nullable
+    public static final ItemType WAXED_EXPOSED_COPPER_CHAIN = init();
+    @Nullable
+    public static final ItemType WAXED_EXPOSED_COPPER_CHEST = init();
     @Nullable
     public static final ItemType WAXED_EXPOSED_COPPER_DOOR = init();
     @Nullable
+    public static final ItemType WAXED_EXPOSED_COPPER_GOLEM_STATUE = init();
+    @Nullable
     public static final ItemType WAXED_EXPOSED_COPPER_GRATE = init();
+    @Nullable
+    public static final ItemType WAXED_EXPOSED_COPPER_LANTERN = init();
     @Nullable
     public static final ItemType WAXED_EXPOSED_COPPER_TRAPDOOR = init();
     @Nullable
@@ -2643,15 +2753,29 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType WAXED_EXPOSED_CUT_COPPER_STAIRS = init();
     @Nullable
+    public static final ItemType WAXED_EXPOSED_LIGHTNING_ROD = init();
+    @Nullable
+    public static final ItemType WAXED_LIGHTNING_ROD  = init();
+    @Nullable
     public static final ItemType WAXED_OXIDIZED_CHISELED_COPPER = init();
     @Nullable
     public static final ItemType WAXED_OXIDIZED_COPPER = init();
     @Nullable
+    public static final ItemType WAXED_OXIDIZED_COPPER_BARS = init();
+    @Nullable
     public static final ItemType WAXED_OXIDIZED_COPPER_BULB = init();
+    @Nullable
+    public static final ItemType WAXED_OXIDIZED_COPPER_CHAIN = init();
+    @Nullable
+    public static final ItemType WAXED_OXIDIZED_COPPER_CHEST = init();
     @Nullable
     public static final ItemType WAXED_OXIDIZED_COPPER_DOOR = init();
     @Nullable
+    public static final ItemType WAXED_OXIDIZED_COPPER_GOLEM_STATUE = init();
+    @Nullable
     public static final ItemType WAXED_OXIDIZED_COPPER_GRATE = init();
+    @Nullable
+    public static final ItemType WAXED_OXIDIZED_COPPER_LANTERN = init();
     @Nullable
     public static final ItemType WAXED_OXIDIZED_COPPER_TRAPDOOR = init();
     @Nullable
@@ -2661,15 +2785,27 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType WAXED_OXIDIZED_CUT_COPPER_STAIRS = init();
     @Nullable
+    public static final ItemType WAXED_OXIDIZED_LIGHTNING_ROD = init();
+    @Nullable
     public static final ItemType WAXED_WEATHERED_CHISELED_COPPER = init();
     @Nullable
     public static final ItemType WAXED_WEATHERED_COPPER = init();
     @Nullable
+    public static final ItemType WAXED_WEATHERED_COPPER_BARS = init();
+    @Nullable
     public static final ItemType WAXED_WEATHERED_COPPER_BULB = init();
+    @Nullable
+    public static final ItemType WAXED_WEATHERED_COPPER_CHAIN = init();
+    @Nullable
+    public static final ItemType WAXED_WEATHERED_COPPER_CHEST = init();
     @Nullable
     public static final ItemType WAXED_WEATHERED_COPPER_DOOR = init();
     @Nullable
+    public static final ItemType WAXED_WEATHERED_COPPER_GOLEM_STATUE = init();
+    @Nullable
     public static final ItemType WAXED_WEATHERED_COPPER_GRATE = init();
+    @Nullable
+    public static final ItemType WAXED_WEATHERED_COPPER_LANTERN = init();
     @Nullable
     public static final ItemType WAXED_WEATHERED_COPPER_TRAPDOOR = init();
     @Nullable
@@ -2679,17 +2815,29 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType WAXED_WEATHERED_CUT_COPPER_STAIRS = init();
     @Nullable
+    public static final ItemType WAXED_WEATHERED_LIGHTNING_ROD = init();
+    @Nullable
     public static final ItemType WAYFINDER_ARMOR_TRIM_SMITHING_TEMPLATE = init();
     @Nullable
     public static final ItemType WEATHERED_CHISELED_COPPER = init();
     @Nullable
     public static final ItemType WEATHERED_COPPER = init();
     @Nullable
+    public static final ItemType WEATHERED_COPPER_BARS = init();
+    @Nullable
     public static final ItemType WEATHERED_COPPER_BULB = init();
+    @Nullable
+    public static final ItemType WEATHERED_COPPER_CHAIN = init();
+    @Nullable
+    public static final ItemType WEATHERED_COPPER_CHEST = init();
     @Nullable
     public static final ItemType WEATHERED_COPPER_DOOR = init();
     @Nullable
+    public static final ItemType WEATHERED_COPPER_GOLEM_STATUE = init();
+    @Nullable
     public static final ItemType WEATHERED_COPPER_GRATE = init();
+    @Nullable
+    public static final ItemType WEATHERED_COPPER_LANTERN = init();
     @Nullable
     public static final ItemType WEATHERED_COPPER_TRAPDOOR = init();
     @Nullable
@@ -2698,6 +2846,8 @@ public final class ItemTypes {
     public static final ItemType WEATHERED_CUT_COPPER_SLAB = init();
     @Nullable
     public static final ItemType WEATHERED_CUT_COPPER_STAIRS = init();
+    @Nullable
+    public static final ItemType WEATHERED_LIGHTNING_ROD = init();
     @Nullable
     public static final ItemType WEEPING_VINES = init();
     @Nullable

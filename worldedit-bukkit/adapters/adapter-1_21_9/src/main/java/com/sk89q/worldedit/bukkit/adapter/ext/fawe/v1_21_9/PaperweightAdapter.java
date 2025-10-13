@@ -17,7 +17,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldedit.bukkit.adapter.ext.fawe.v1_21_6;
+package com.sk89q.worldedit.bukkit.adapter.ext.fawe.v1_21_9;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -36,7 +36,7 @@ import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
-import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_21_6.PaperweightFaweAdapter;
+import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_21_9.PaperweightFaweAdapter;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.extension.platform.Watchdog;
 import com.sk89q.worldedit.extent.Extent;
@@ -99,8 +99,6 @@ import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.server.level.ChunkResult;
 import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.progress.ChunkProgressListener;
-import net.minecraft.util.RandomSource;
 import net.minecraft.util.thread.BlockableEventLoop;
 import net.minecraft.world.Clearable;
 import net.minecraft.world.InteractionHand;
@@ -164,6 +162,7 @@ import org.enginehub.linbus.tree.LinTagType;
 import org.spigotmc.SpigotConfig;
 import org.spigotmc.WatchdogThread;
 
+import javax.annotation.Nullable;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -185,12 +184,11 @@ import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
-import static com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_21_6.PaperweightPlatformAdapter.createInput;
-import static com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_21_6.PaperweightPlatformAdapter.createOutput;
+import static com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_21_9.PaperweightPlatformAdapter.createInput;
+import static com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_21_9.PaperweightPlatformAdapter.createOutput;
 
 public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft.nbt.Tag> {
 
@@ -202,8 +200,12 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
     private final PaperweightDataConverters dataFixer;
     private final Watchdog watchdog;
 
-    private static final RandomSource random = RandomSource.create();
-
+    private static final String WRONG_VERSION =
+            """
+            This version of FastAsyncWorldEdit has not been tested with the current Minecraft version.
+            While it may work, there might be unexpected issues.
+            It is recommended to use a version of FastAsyncWorldEdit that supports your Minecraft version.
+            """.stripIndent();
 
     // ------------------------------------------------------------------------
     // Code that may break between versions of Minecraft
@@ -214,8 +216,8 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
         CraftServer.class.cast(Bukkit.getServer());
 
         int dataVersion = SharedConstants.getCurrentVersion().dataVersion().version();
-        if (dataVersion != Constants.DATA_VERSION_MC_1_21_6 && dataVersion != Constants.DATA_VERSION_MC_1_21_7 && dataVersion != Constants.DATA_VERSION_MC_1_21_8) {
-            throw new UnsupportedClassVersionError("Not 1.21.(6/7/8)!");
+        if (dataVersion != Constants.DATA_VERSION_MC_1_21_9 && dataVersion != Constants.DATA_VERSION_MC_1_21_10) {
+            logger.warning(WRONG_VERSION);
         }
 
         serverWorldsField = CraftServer.class.getDeclaredField("worlds");
@@ -741,7 +743,6 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
                     originalWorld.dimensionTypeRegistration(),
                     originalWorld.getChunkSource().getGenerator()
                 ),
-                new NoOpWorldLoadListener(),
                 originalWorld.isDebug(),
                 seed,
                 ImmutableList.of(),
@@ -1141,22 +1142,4 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
         }
     }
 
-    private static class NoOpWorldLoadListener implements ChunkProgressListener {
-        @Override
-        public void updateSpawnPos(ChunkPos spawnPos) {
-        }
-
-        @Override
-        public void onStatusChange(ChunkPos pos, @org.jetbrains.annotations.Nullable ChunkStatus status) {
-        }
-
-        @Override
-        public void start() {
-        }
-
-        @Override
-        public void stop() {
-        }
-
-    }
 }
