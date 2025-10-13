@@ -171,6 +171,20 @@ val sourcesElements = project.configurations.register("sourcesElements") {
     outgoing.artifact(tasks.named("sourcesJar"))
 }
 
+val javadocElements = project.configurations.register("javadocElements") {
+    isVisible = false
+    description = "Javadoc elements for libs"
+    isCanBeResolved = false
+    isCanBeConsumed = true
+    attributes {
+        attribute(Usage.USAGE_ATTRIBUTE, project.objects.named(Usage.JAVA_RUNTIME))
+        attribute(Category.CATEGORY_ATTRIBUTE, project.objects.named(Category.DOCUMENTATION))
+        attribute(Bundling.BUNDLING_ATTRIBUTE, project.objects.named(Bundling.SHADOWED))
+        attribute(DocsType.DOCS_TYPE_ATTRIBUTE, project.objects.named(DocsType.JAVADOC))
+    }
+    outgoing.artifact(tasks.named("javadocJar"))
+}
+
 libsComponent.addVariantsFromConfiguration(apiElements.get()) {
     mapToMavenScope("compile")
 }
@@ -182,6 +196,11 @@ libsComponent.addVariantsFromConfiguration(runtimeElements.get()) {
 libsComponent.addVariantsFromConfiguration(sourcesElements.get()) {
     mapToMavenScope("runtime")
 }
+
+libsComponent.addVariantsFromConfiguration(javadocElements.get()) {
+    mapToMavenScope("runtime")
+}
+
 val publishingExtension = the<PublishingExtension>()
 
 configure<SigningExtension> {
