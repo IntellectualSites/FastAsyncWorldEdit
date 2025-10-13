@@ -201,7 +201,8 @@ public class PaperweightGetBlocks_Copy implements IChunkGet {
             } else {
                 try {
                     for (int i = 0; i < 64; i++) {
-                        biomes[layer][i] = (Holder<Biome>) PaperweightPlatformAdapter.PALETTED_CONTAINER_GET.invoke(i);
+                        biomes[layer][i] = (Holder<Biome>) PaperweightPlatformAdapter.PALETTED_CONTAINER_GET
+                                .invoke(palettedContainer, i);
                     }
                 } catch (Throwable e) {
                     throw new RuntimeException(e);

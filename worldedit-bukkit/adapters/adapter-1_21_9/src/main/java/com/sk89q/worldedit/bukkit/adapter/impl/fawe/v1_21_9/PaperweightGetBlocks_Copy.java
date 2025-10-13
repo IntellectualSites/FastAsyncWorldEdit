@@ -1,4 +1,4 @@
-package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_20_R4;
+package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_21_9;
 
 import com.fastasyncworldedit.core.extent.processor.heightmap.HeightMapType;
 import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
@@ -19,7 +19,6 @@ import com.sk89q.worldedit.world.block.BlockTypesCache;
 import io.papermc.lib.PaperLib;
 import net.minecraft.core.Holder;
 import net.minecraft.nbt.Tag;
-import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.biome.Biome;
@@ -27,6 +26,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.PalettedContainer;
 import net.minecraft.world.level.chunk.PalettedContainerRO;
+import net.minecraft.world.level.storage.TagValueOutput;
 import org.apache.logging.log4j.Logger;
 import org.enginehub.linbus.tree.LinCompoundTag;
 
@@ -39,6 +39,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Future;
+
+import static com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_21_9.PaperweightPlatformAdapter.createOutput;
 
 public class PaperweightGetBlocks_Copy implements IChunkGet {
 
@@ -58,8 +60,8 @@ public class PaperweightGetBlocks_Copy implements IChunkGet {
     protected PaperweightGetBlocks_Copy(LevelChunk levelChunk) {
         this.levelChunk = levelChunk;
         this.serverLevel = levelChunk.level;
-        this.minHeight = serverLevel.getMinBuildHeight();
-        this.maxHeight = serverLevel.getMaxBuildHeight() - 1; // Minecraft max limit is exclusive.
+        this.minHeight = serverLevel.getMinY();
+        this.maxHeight = serverLevel.getMaxY() - 1; // Minecraft max limit is exclusive.
         this.blocks = new char[getSectionCount()][];
         this.chunkX = levelChunk.getPos().x;
         this.chunkZ = levelChunk.getPos().z;
@@ -68,29 +70,36 @@ public class PaperweightGetBlocks_Copy implements IChunkGet {
     protected void storeTile(BlockEntity blockEntity) {
         @SuppressWarnings("unchecked")
         BukkitImplAdapter<Tag> adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
+        // TODO (VI/O)
+        TagValueOutput output = createOutput();
+        blockEntity.saveWithId(output);
         tiles.put(
                 BlockVector3.at(
                         blockEntity.getBlockPos().getX(),
                         blockEntity.getBlockPos().getY(),
                         blockEntity.getBlockPos().getZ()
                 ),
-                FaweCompoundTag.of((LinCompoundTag) adapter.toNativeLin(blockEntity.saveWithId(DedicatedServer
-                        .getServer()
-                        .registryAccess())))
+                FaweCompoundTag.of((LinCompoundTag) adapter.toNativeLin(output.buildResult()))
         );
     }
 
     protected void storeEntity(Entity entity) {
         @SuppressWarnings("unchecked")
         BukkitImplAdapter<Tag> adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
-        net.minecraft.nbt.CompoundTag compoundTag = new net.minecraft.nbt.CompoundTag();
-        entity.save(compoundTag);
-        entities.add(FaweCompoundTag.of((LinCompoundTag) adapter.toNativeLin(compoundTag)));
+        // TODO (VI/O)
+        TagValueOutput output = createOutput();
+        entity.save(output);
+        entities.add(FaweCompoundTag.of((LinCompoundTag) adapter.toNativeLin(output.buildResult())));
     }
 
     @Override
     public Collection<FaweCompoundTag> entities() {
         return this.entities;
+    }
+
+    @Override
+    public Set<com.sk89q.worldedit.entity.Entity> getFullEntities() {
+        throw new UnsupportedOperationException("Cannot get full entities from GET copy.");
     }
 
     @Override
@@ -101,11 +110,6 @@ public class PaperweightGetBlocks_Copy implements IChunkGet {
             }
         }
         return null;
-    }
-
-    @Override
-    public Set<com.sk89q.worldedit.entity.Entity> getFullEntities() {
-        throw new UnsupportedOperationException("Cannot get full entities from GET copy.");
     }
 
     @Override
@@ -160,7 +164,7 @@ public class PaperweightGetBlocks_Copy implements IChunkGet {
         return chunkZ;
     }
 
-   @Override
+    @Override
     public BiomeType getBiomeType(int x, int y, int z) {
         Holder<Biome> biome = biomes[(y >> 4) - getMinSectionPosition()][(y & 12) << 2 | (z & 12) | (x & 12) >> 2];
         return PaperweightPlatformAdapter.adapt(biome, serverLevel);
@@ -204,8 +208,8 @@ public class PaperweightGetBlocks_Copy implements IChunkGet {
             } else {
                 try {
                     for (int i = 0; i < 64; i++) {
-                        biomes[layer][i] = (Holder<Biome>) PaperweightPlatformAdapter.PALETTED_CONTAINER_GET
-                                .invoke(palettedContainer, i);
+                        biomes[layer][i] =
+                                (Holder<Biome>) PaperweightPlatformAdapter.PALETTED_CONTAINER_GET.invoke(palettedContainer, i);
                     }
                 } catch (Throwable e) {
                     throw new RuntimeException(e);
