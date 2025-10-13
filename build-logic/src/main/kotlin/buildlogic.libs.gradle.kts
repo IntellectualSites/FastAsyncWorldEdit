@@ -120,6 +120,7 @@ tasks.register<Jar>("javadocJar") {
 tasks.named("assemble").configure {
     dependsOn(tasks.named("jar"))
     dependsOn(tasks.named("sourcesJar"))
+    dependsOn(tasks.named("javadocJar"))
 }
 
 project.apply<LibsConfigPluginHack>()
