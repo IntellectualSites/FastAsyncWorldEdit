@@ -271,7 +271,10 @@ public class PaperweightFaweWorldNativeAccess implements WorldNativeAccess<Level
                     return;
                 }
                 for (IntPair chunk : toSend) {
-                    PaperweightPlatformAdapter.sendChunk(chunk, getLevel().getWorld().getHandle(), chunk.x(), chunk.z());
+                    PaperweightPlatformAdapter.sendChunk(
+                            chunk, getLevel().getWorld().getHandle(), chunk.x(), chunk.z(),
+                            sideEffectSet != null && sideEffectSet.shouldApply(SideEffect.PAPER_ANTI_XRAY)
+                    );
                 }
             }
         };
@@ -288,7 +291,10 @@ public class PaperweightFaweWorldNativeAccess implements WorldNativeAccess<Level
                         sideEffectSet.shouldApply(SideEffect.UPDATE) ? 0 : 512
                 ));
                 for (IntPair chunk : cachedChunksToSend) {
-                    PaperweightPlatformAdapter.sendChunk(chunk, getLevel().getWorld().getHandle(), chunk.x(), chunk.z());
+                    PaperweightPlatformAdapter.sendChunk(
+                            chunk, getLevel().getWorld().getHandle(), chunk.x(), chunk.z(),
+                            sideEffectSet != null && sideEffectSet.shouldApply(SideEffect.PAPER_ANTI_XRAY)
+                    );
                 }
             }
         };
