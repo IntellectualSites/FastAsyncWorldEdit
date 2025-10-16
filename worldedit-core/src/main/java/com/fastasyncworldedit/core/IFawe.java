@@ -27,6 +27,16 @@ public interface IFawe {
         return null;
     }
 
+    /**
+     * Get a friendly name of the platform.
+     *
+     * <p>
+     * The name can be anything (reasonable). An example name may be
+     * "Bukkit" or "Forge".
+     * </p>
+     *
+     * @return the platform name
+     */
     String getPlatform();
 
     UUID getUUID(String name);
