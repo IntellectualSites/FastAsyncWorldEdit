@@ -3,20 +3,16 @@ package com.fastasyncworldedit.core.history;
 import com.fastasyncworldedit.core.database.DBHandler;
 import com.fastasyncworldedit.core.database.RollbackDatabase;
 import com.fastasyncworldedit.core.history.changeset.SimpleChangeSetSummary;
-import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
-import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.UUID;
 
 public class RollbackOptimizedHistory extends DiskStorageHistory {
-
-    private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     private long time;
 
@@ -58,7 +54,6 @@ public class RollbackOptimizedHistory extends DiskStorageHistory {
         this.blockSize = (int) size;
         this.command = command;
         this.closed = true;
-        LOGGER.info("Size: {}", size);
     }
 
     public long getTime() {
