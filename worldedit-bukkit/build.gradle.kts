@@ -163,8 +163,9 @@ tasks.register<ShadowJar>("reobfShadowJar") {
         exclude(dependency(libs.jsr305))
     }
     minimize {
-        // jchronic uses reflection to load things, so we need to exclude it from minimizing
+        // jchronic + lz4-java uses reflection to load things, so we need to exclude it from minimizing
         exclude(dependency(libs.jchronic))
+        exclude(dependency(libs.lz4Java))
     }
 
     // as is done by shadow for the default shadowJar
