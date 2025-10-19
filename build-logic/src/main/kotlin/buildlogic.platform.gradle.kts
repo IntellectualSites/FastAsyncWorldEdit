@@ -27,8 +27,9 @@ tasks.named<ShadowJar>("shadowJar") {
     exclude("LICENSE*")
     exclude("META-INF/maven/**")
     minimize {
-        // jchronic uses reflection to load things, so we need to exclude it from minimizing
+        // jchronic + lz4-java uses reflection to load things, so we need to exclude it from minimizing
         exclude(dependency(jchronic))
+        exclude(dependency(stringyLibs.getLibrary("lz4Java").get()))
     }
 }
 val javaComponent = components["java"] as AdhocComponentWithVariants
