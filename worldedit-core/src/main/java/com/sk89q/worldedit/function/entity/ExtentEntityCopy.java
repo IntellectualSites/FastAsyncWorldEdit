@@ -271,7 +271,7 @@ public class ExtentEntityCopy implements EntityFunction {
                     builder.putIntArray("block_pos", new int[]{newTilePosition.x(), newTilePosition.y(), newTilePosition.z()});
                 }
 
-                if (tag.value().get("Facing") instanceof LinNumberTag<?> tagFacing) {
+                if (tryGetFacingData(tag) instanceof FacingTagData(String facingKey, LinNumberTag<?> tagFacing)) {
                     boolean isPainting = state.getType() == EntityTypes.PAINTING; // Paintings have different facing values
                     Direction direction = isPainting
                             ? MCDirections.fromHorizontalHanging(tagFacing.value().intValue())
@@ -290,7 +290,7 @@ public class ExtentEntityCopy implements EntityFunction {
                                             ? MCDirections.toHorizontalHanging(newDirection)
                                             : MCDirections.toHanging(newDirection)
                             );
-                            builder.putByte("Facing", facingValue);
+                            builder.putByte(facingKey, facingValue);
                         }
                     }
                 }
