@@ -254,8 +254,8 @@ public class ExtentEntityCopy implements EntityFunction {
             }
 
             if (tag.value().get("TileX") instanceof LinNumberTag<?> tagX
-                && tag.value().get("TileY") instanceof LinNumberTag<?> tagY
-                && tag.value().get("TileZ") instanceof LinNumberTag<?> tagZ) {
+                    && tag.value().get("TileY") instanceof LinNumberTag<?> tagY
+                    && tag.value().get("TileZ") instanceof LinNumberTag<?> tagZ) {
                 tilePosition = Vector3.at(
                         tagX.value().intValue(), tagY.value().intValue(), tagZ.value().intValue()
                 );
@@ -264,7 +264,11 @@ public class ExtentEntityCopy implements EntityFunction {
             if (tilePosition != null) {
                 BlockVector3 newTilePosition = transform.apply(tilePosition.subtract(from)).add(to).toBlockPoint();
 
-                if (WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).getDataVersion() < Constants.DATA_VERSION_MC_1_21_5) {
+                if (WorldEdit
+                        .getInstance()
+                        .getPlatformManager()
+                        .queryCapability(Capability.WORLD_EDITING)
+                        .getDataVersion() < Constants.DATA_VERSION_MC_1_21_5) {
                     // TODO remove when we drop support for 1.21.4
                     builder.putInt("TileX", newTilePosition.x())
                             .putInt("TileY", newTilePosition.y())
@@ -276,38 +280,50 @@ public class ExtentEntityCopy implements EntityFunction {
                 if (tryGetFacingData(tag) instanceof FacingTagData(String facingKey, LinNumberTag<?> tagFacing)) {
                     if (state.getType() == EntityTypes.PAINTING) { // Paintings have different facing values
                         Direction direction = MCDirections.fromHorizontalHanging(tagFacing.value().intValue());
-                        Vector3 vector = transform.apply(direction.toVector()).subtract(transform.apply(Vector3.ZERO)).normalize();
+                        Vector3 vector = transform
+                                .apply(direction.toVector())
+                                .subtract(transform.apply(Vector3.ZERO))
+                                .normalize();
                         Direction newDirection = Direction.findClosest(vector, Flag.CARDINAL);
-                        byte facingValue = (byte) MCDirections.toHorizontalHanging(newDirection);
-                        builder.putByte(facingKey, facingValue);
+                        if (newDirection != null) {
+                            byte facingValue = (byte) MCDirections.toHorizontalHanging(newDirection);
+                            builder.putByte(facingKey, facingValue);
+                        }
                     } else {
                         Direction facingDirection = MCDirections.fromHanging(tagFacing.value().intValue());
-                        Vector3 facingVector = transform.apply(facingDirection.toVector()).subtract(transform.apply(Vector3.ZERO)).normalize();
+                        Vector3 facingVector = transform
+                                .apply(facingDirection.toVector())
+                                .subtract(transform.apply(Vector3.ZERO))
+                                .normalize();
                         Direction newFacingDirection = Direction.findClosest(facingVector, Flag.CARDINAL | Flag.UPRIGHT);
-                        byte facingValue = (byte) MCDirections.toHanging(newFacingDirection);
-                        builder.putByte(facingKey, facingValue);
+                        if (newFacingDirection != null) {
+                            byte facingValue = (byte) MCDirections.toHanging(newFacingDirection);
+                            builder.putByte(facingKey, facingValue);
 
-                        String itemRotationKey = "ItemRotation";
-                        if (!transform.isIdentity() && tag.value().get(itemRotationKey) instanceof LinByteTag tagItemRotation) {
-                            String itemId = getItemInItemFrame(tag);
-                            int availableRotations = itemId != null && itemId.equals("minecraft:filled_map") ? 4 : 8;
-                            Direction rotationBaseDirection =
-                                    facingDirection == Direction.UP || facingDirection == Direction.DOWN
-                                            ? Direction.NORTH
-                                            : Direction.UP;
-                            int itemRotation = tagItemRotation.value().intValue();
-                            Vector3 rotationVector = getItemRotationVector(
-                                    rotationBaseDirection, facingDirection.toVector(), itemRotation, availableRotations
-                            );
-                            Vector3 newRotationVector = transform.apply(rotationVector);
-                            Direction newRotationBaseDirection =
-                                    newFacingDirection == Direction.UP || newFacingDirection == Direction.DOWN
-                                            ? Direction.NORTH
-                                            : Direction.UP;
-                            byte newItemRotation = (byte) getItemRotationSteps(
-                                    newRotationBaseDirection, newFacingDirection, newRotationVector, availableRotations
-                            );
-                            builder.putByte(itemRotationKey, newItemRotation);
+                            String itemRotationKey = "ItemRotation";
+                            if (!transform.isIdentity() && tag
+                                    .value()
+                                    .get(itemRotationKey) instanceof LinByteTag tagItemRotation) {
+                                String itemId = getItemInItemFrame(tag);
+                                int availableRotations = itemId != null && itemId.equals("minecraft:filled_map") ? 4 : 8;
+                                Direction rotationBaseDirection =
+                                        facingDirection == Direction.UP || facingDirection == Direction.DOWN
+                                                ? Direction.NORTH
+                                                : Direction.UP;
+                                int itemRotation = tagItemRotation.value().intValue();
+                                Vector3 rotationVector = getItemRotationVector(
+                                        rotationBaseDirection, facingDirection.toVector(), itemRotation, availableRotations
+                                );
+                                Vector3 newRotationVector = transform.apply(rotationVector);
+                                Direction newRotationBaseDirection =
+                                        newFacingDirection == Direction.UP || newFacingDirection == Direction.DOWN
+                                                ? Direction.NORTH
+                                                : Direction.UP;
+                                byte newItemRotation = (byte) getItemRotationSteps(
+                                        newRotationBaseDirection, newFacingDirection, newRotationVector, availableRotations
+                                );
+                                builder.putByte(itemRotationKey, newItemRotation);
+                            }
                         }
                     }
                 }
