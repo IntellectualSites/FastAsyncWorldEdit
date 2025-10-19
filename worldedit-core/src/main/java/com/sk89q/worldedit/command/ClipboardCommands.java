@@ -50,7 +50,6 @@ import com.sk89q.worldedit.command.util.Logging;
 import com.sk89q.worldedit.command.util.annotation.Confirm;
 import com.sk89q.worldedit.command.util.annotation.Preload;
 import com.sk89q.worldedit.command.util.annotation.SynchronousSettingExpected;
-import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
@@ -479,7 +478,7 @@ public class ClipboardCommands {
                     .apply(region.getMaximumPoint().subtract(region.getMinimumPoint()).toVector3())
                     .toBlockPoint());
             if (removeEntities) {
-                editSession.getEntities(new CuboidRegion(realTo, max)).forEach(Entity::remove);
+                editSession.removeEntities(new CuboidRegion(realTo, max));
             }
             if (selectPasted || onlySelect) {
                 RegionSelector selector = new CuboidRegionSelector(world, realTo, max);
@@ -569,9 +568,9 @@ public class ClipboardCommands {
             Vector3 realTo = to.toVector3().add(transform.apply(clipboardOffset.toVector3()));
             Vector3 max = realTo.add(transform.apply(region.getMaximumPoint().subtract(region.getMinimumPoint()).toVector3()));
 
-            // FAWE start - entity remova;l
+            // FAWE start - entity removal
             if (removeEntities) {
-                editSession.getEntities(new CuboidRegion(realTo.toBlockPoint(), max.toBlockPoint())).forEach(Entity::remove);
+                editSession.removeEntities(new CuboidRegion(realTo.toBlockPoint(), max.toBlockPoint()));
             }
             if (selectPasted || onlySelect) {
                 //FAWE end
