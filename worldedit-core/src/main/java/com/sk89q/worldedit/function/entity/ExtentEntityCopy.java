@@ -20,11 +20,6 @@
 package com.sk89q.worldedit.function.entity;
 
 import com.fastasyncworldedit.core.util.TaskManager;
-import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.jnbt.CompoundTagBuilder;
-import com.sk89q.jnbt.FloatTag;
-import com.sk89q.jnbt.ListTag;
-import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
@@ -37,9 +32,15 @@ import com.sk89q.worldedit.math.transform.Transform;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.Direction.Flag;
 import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.util.concurrency.LazyReference;
 import com.sk89q.worldedit.world.entity.EntityTypes;
+import org.enginehub.linbus.tree.LinCompoundTag;
+import org.enginehub.linbus.tree.LinFloatTag;
+import org.enginehub.linbus.tree.LinListTag;
+import org.enginehub.linbus.tree.LinNumberTag;
+import org.enginehub.linbus.tree.LinTagType;
 
-import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -131,13 +132,19 @@ public class ExtentEntityCopy implements EntityFunction {
             Location newLocation;
             Location location = entity.getLocation();
             // If the entity has stored the location in the NBT data, we use that location
-            CompoundTag tag = state.getNbtData();
-            boolean hasTilePosition = tag != null && tag.containsKey("TileX") && tag.containsKey("TileY") && tag.containsKey(
-                    "TileZ");
-            if (hasTilePosition) {
-                location = location.setPosition(Vector3
-                        .at(tag.asInt("TileX"), tag.asInt("TileY"), tag.asInt("TileZ"))
-                        .add(0.5, 0.5, 0.5));
+            LinCompoundTag tag = state.getNbt();
+            boolean hasTilePosition = false;
+            if (tag != null
+                    && tag.value().get("TileX") instanceof LinNumberTag<?> tagX
+                    && tag.value().get("TileY") instanceof LinNumberTag<?> tagY
+                    && tag.value().get("TileZ") instanceof LinNumberTag<?> tagZ
+            ) {
+                location = location.setPosition(Vector3.at(
+                        tagX.value().intValue(),
+                        tagY.value().intValue(),
+                        tagZ.value().intValue()
+                ).add(0.5, 0.5, 0.5));
+                hasTilePosition = true;
             }
 
             Vector3 pivot = from.round().add(0.5, 0.5, 0.5);
@@ -160,6 +167,7 @@ public class ExtentEntityCopy implements EntityFunction {
             // Remove
             if (isRemoving() && success) {
                 //FAWE start
+                // TODO: why is the UUID check necessary?
                 UUID uuid = entity.getState().getNbtData().getUUID();
                 if (uuid != null) {
                     if (source != null) {
@@ -171,9 +179,9 @@ public class ExtentEntityCopy implements EntityFunction {
                         );
                     } else {
                         TaskManager.taskManager().sync(entity::remove);
-                        //FAWE end
                     }
                 }
+                //FAWE end
             }
 
             return success;
@@ -190,51 +198,54 @@ public class ExtentEntityCopy implements EntityFunction {
      * @return a new state or the existing one
      */
     private BaseEntity transformNbtData(BaseEntity state) {
-        CompoundTag tag = state.getNbtData();
+        LinCompoundTag tag = state.getNbt();
 
         if (tag != null) {
             // Handle leashed entities
-            Tag leashTag = tag.getValue().get("Leash");
-            if (leashTag instanceof CompoundTag) {
-                CompoundTag leashCompound = (CompoundTag) leashTag;
-                if (leashCompound.containsKey("X")) { // leashed to a fence
+            LinCompoundTag leashCompound = tag.findTag("Leash", LinTagType.compoundTag());
+            if (leashCompound != null) {
+                if (tag.value().get("X") instanceof LinNumberTag<?> tagX
+                        && tag.value().get("Y") instanceof LinNumberTag<?> tagY
+                        && tag.value().get("Z") instanceof LinNumberTag<?> tagZ
+                ) {
+                    // leashed to a fence
                     Vector3 tilePosition = Vector3.at(
-                            leashCompound.asInt("X"),
-                            leashCompound.asInt("Y"),
-                            leashCompound.asInt("Z")
+                            tagX.value().intValue(), tagY.value().intValue(), tagZ.value().intValue()
                     );
                     BlockVector3 newLeash = transform.apply(tilePosition.subtract(from)).add(to).toBlockPoint();
-                    return new BaseEntity(state.getType(), tag.createBuilder()
-                            .put("Leash", leashCompound.createBuilder()
-                                    .putInt("X", newLeash.x())
-                                    .putInt("Y", newLeash.y())
-                                    .putInt("Z", newLeash.z())
-                                    .build()
-                            ).build());
+                    return new BaseEntity(
+                            state.getType(), LazyReference.computed(tag.toBuilder()
+                            .put(
+                                    "Leash", leashCompound.toBuilder()
+                                            .putInt("X", newLeash.x())
+                                            .putInt("Y", newLeash.y())
+                                            .putInt("Z", newLeash.z())
+                                            .build()
+                            ).build())
+                    );
                 }
             }
 
             // Handle hanging entities (paintings, item frames, etc.)
-            boolean hasTilePosition = tag.containsKey("TileX") && tag.containsKey("TileY") && tag.containsKey("TileZ");
-            boolean hasFacing = tag.containsKey("Facing");
-            //FAWE Start
-            boolean hasRotation = tag.containsKey("Rotation");
-            //FAWE end
 
-            if (hasTilePosition) {
-                Vector3 tilePosition = Vector3.at(tag.asInt("TileX"), tag.asInt("TileY"), tag.asInt("TileZ"));
+            LinCompoundTag.Builder builder = tag.toBuilder();
+            if (tag.value().get("TileX") instanceof LinNumberTag<?> tagX
+                    && tag.value().get("TileY") instanceof LinNumberTag<?> tagY
+                    && tag.value().get("TileZ") instanceof LinNumberTag<?> tagZ) {
+                Vector3 tilePosition = Vector3.at(
+                        tagX.value().intValue(), tagY.value().intValue(), tagZ.value().intValue()
+                );
                 BlockVector3 newTilePosition = transform.apply(tilePosition.subtract(from)).add(to).toBlockPoint();
 
-                CompoundTagBuilder builder = tag.createBuilder()
-                        .putInt("TileX", newTilePosition.x())
+                builder.putInt("TileX", newTilePosition.x())
                         .putInt("TileY", newTilePosition.y())
                         .putInt("TileZ", newTilePosition.z());
 
-                if (tryGetFacingData(tag) instanceof FacingTagData(String facingKey, LinNumberTag<?> tagFacing)) {
+                if (tag.value().get("Facing") instanceof LinNumberTag<?> tagFacing) {
                     boolean isPainting = state.getType() == EntityTypes.PAINTING; // Paintings have different facing values
                     Direction direction = isPainting
-                            ? MCDirections.fromHorizontalHanging(tag.asInt("Facing"))
-                            : MCDirections.fromHanging(tag.asInt("Facing"));
+                            ? MCDirections.fromHorizontalHanging(tagFacing.value().intValue())
+                            : MCDirections.fromHanging(tagFacing.value().intValue());
 
                     if (direction != null) {
                         Vector3 vector = transform
@@ -244,63 +255,45 @@ public class ExtentEntityCopy implements EntityFunction {
                         Direction newDirection = Direction.findClosest(vector, Flag.CARDINAL);
 
                         if (newDirection != null) {
-                            builder.putByte(
-                                    "Facing",
-                                    (byte) (isPainting
+                            byte facingValue = (byte) (
+                                    isPainting
                                             ? MCDirections.toHorizontalHanging(newDirection)
-                                            : MCDirections.toHanging(newDirection))
+                                            : MCDirections.toHanging(newDirection)
                             );
-                            builder.putByte(facingKey, facingValue);
+                            builder.putByte("Facing", facingValue);
                         }
                     }
                 }
-
-                //FAWE start
-                if (hasRotation) {
-                    ListTag orgrot = state.getNbtData().getListTag("Rotation");
-                    // source extent may be null: use non-nullable destination instead since this is just a conversion into a vector.
-                    Vector3 orgDirection = new Location(destination, 0, 0, 0, orgrot.getFloat(0), orgrot.getFloat(1)).getDirection();
-                    Vector3 newDirection = transform.apply(orgDirection).subtract(transform.apply(Vector3.ZERO)).normalize();
-                    builder.put(
-                            "Rotation",
-                            new ListTag(
-                                    FloatTag.class,
-                                    Arrays.asList(
-                                            new FloatTag((float) newDirection.toYaw()),
-                                            new FloatTag((float) newDirection.toPitch())
-                                    )
-                            )
-                    );
-                }
-
-                return new BaseEntity(state.getType(), builder.build());
-            } else if (hasRotation) { //armor stands do not have a tile pos
-                CompoundTagBuilder builder = tag.createBuilder();
-
-                ListTag orgrot = state.getNbtData().getListTag("Rotation");
+            }
+            //FAWE Start
+            LinListTag<LinFloatTag> rotation = tag.findListTag("Rotation", LinTagType.floatTag());
+            if (rotation != null && rotation.value().size() == 2) {
                 // source extent may be null: use non-nullable destination instead since this is just a conversion into a vector.
-                Vector3 orgDirection = new Location(destination, 0, 0, 0, orgrot.getFloat(0), orgrot.getFloat(1)).getDirection();
+                Vector3 orgDirection = new Location(
+                        destination,
+                        0, 0, 0,
+                        rotation.get(0).valueAsFloat(),
+                        rotation.get(1).valueAsFloat()
+                ).getDirection();
                 Vector3 newDirection = transform.apply(orgDirection).subtract(transform.apply(Vector3.ZERO)).normalize();
                 builder.put(
-                        "Rotation",
-                        new ListTag(
-                                FloatTag.class,
-                                Arrays.asList(
-                                        new FloatTag((float) newDirection.toYaw()),
-                                        new FloatTag((float) newDirection.toPitch())
+                        "Rotation", LinListTag.of(
+                                LinTagType.floatTag(), List.of(
+                                        LinFloatTag.of((float) newDirection.toYaw()),
+                                        LinFloatTag.of((float) newDirection.toPitch())
                                 )
                         )
                 );
-
-                return new BaseEntity(state.getType(), builder.build());
-                //FAWE end
             }
+            //FAWE end
+            return new BaseEntity(state.getType(), LazyReference.computed(builder.build()));
         }
 
         return state;
     }
 
     private record FacingTagData(String facingKey, LinNumberTag<?> tagFacing) {
+
     }
 
     private static FacingTagData tryGetFacingData(LinCompoundTag tag) {
@@ -312,4 +305,5 @@ public class ExtentEntityCopy implements EntityFunction {
             return null;
         }
     }
+
 }
