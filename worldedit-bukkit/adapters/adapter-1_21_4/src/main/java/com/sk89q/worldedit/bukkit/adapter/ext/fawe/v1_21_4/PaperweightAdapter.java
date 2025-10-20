@@ -843,7 +843,8 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
             SideEffect.HISTORY,
             SideEffect.HEIGHTMAPS,
             SideEffect.LIGHTING,
-            SideEffect.NEIGHBORS
+            SideEffect.NEIGHBORS,
+            SideEffect.PAPER_ANTI_XRAY
             //FAWE end
     );
 
