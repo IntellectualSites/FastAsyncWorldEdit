@@ -9,7 +9,7 @@ plugins {
     jacoco
     id("buildlogic.common")
     id("com.gradleup.nmcp.aggregation") version "1.2.0"
-    id("xyz.jpenilla.run-paper") version "2.3.1"
+    id("xyz.jpenilla.run-paper") version "3.0.2"
 }
 
 var rootVersion by extra("2.14.1")
