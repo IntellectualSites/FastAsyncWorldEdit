@@ -436,4 +436,18 @@ public class MathMan {
         return (a & a - 1) == 0;
     }
 
+    /**
+     * Calculates the size an array needs to fit all elements, given that
+     * multiple elements can be stored in a single index.
+     *
+     * @param bitsPerEntry    the number of bits a single element occupies in the array
+     * @param numberOfEntries the number of elements to store in the array
+     * @return the size of the array needed to store the elements
+     * @since TODO
+     */
+    public static int longArrayLength(int bitsPerEntry, int numberOfEntries) {
+        int entriesPerLong = Long.SIZE / bitsPerEntry;
+        return Math.ceilDiv(numberOfEntries, entriesPerLong);
+    }
+
 }
