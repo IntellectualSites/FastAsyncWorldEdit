@@ -20,7 +20,6 @@
 package com.sk89q.worldedit.util;
 
 import com.google.common.base.Verify;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import java.util.Arrays;
@@ -35,13 +34,11 @@ public class SideEffectSet {
     //FAWE start - assign value map
     private static final SideEffectSet DEFAULT = new SideEffectSet(
             Arrays.stream(SideEffect.values())
-                    .filter(SideEffect::isExposed)
                     .collect(Collectors.toMap(Function.identity(), SideEffect::getDefaultValue)));
     //FAWE end
     private static final SideEffectSet NONE = new SideEffectSet(
-        Arrays.stream(SideEffect.values())
-            .filter(SideEffect::isExposed)
-            .collect(Collectors.toMap(Function.identity(), state -> SideEffect.State.OFF))
+            Arrays.stream(SideEffect.values())
+                    .collect(Collectors.toMap(Function.identity(), state -> SideEffect.State.OFF))
     );
 
     static {
