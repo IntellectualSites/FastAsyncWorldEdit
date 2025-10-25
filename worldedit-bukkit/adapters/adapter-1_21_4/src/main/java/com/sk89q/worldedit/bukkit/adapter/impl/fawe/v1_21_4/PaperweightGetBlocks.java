@@ -677,7 +677,7 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
                                     entity.spawnReason = CreatureSpawnEvent.SpawnReason.CUSTOM;
                                     entity.generation = false;
                                     if (PaperLib.isPaper()) {
-                                        if (!nmsWorld.moonrise$getEntityLookup().addNewEntity(entity)) {
+                                        if (!nmsWorld.moonrise$getEntityLookup().addNewEntity(entity, false)) {
                                             onError.run();
                                         }
                                         continue;
