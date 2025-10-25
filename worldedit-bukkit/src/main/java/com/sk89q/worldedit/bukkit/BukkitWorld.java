@@ -54,6 +54,8 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
+import com.sk89q.worldedit.world.generation.ConfiguredFeatureType;
+import com.sk89q.worldedit.world.generation.StructureType;
 import com.sk89q.worldedit.world.weather.WeatherType;
 import com.sk89q.worldedit.world.weather.WeatherTypes;
 import io.papermc.lib.PaperLib;
@@ -525,6 +527,26 @@ public class BukkitWorld extends AbstractWorld {
         }
         // We can't check, so assume yes.
         return true;
+    }
+
+    @Override
+    public boolean generateFeature(ConfiguredFeatureType type, EditSession editSession, BlockVector3 position) {
+        BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
+        if (adapter != null) {
+            return adapter.generateFeature(type, getWorld(), editSession, position);
+        }
+        // No adapter, we can't generate this.
+        return false;
+    }
+
+    @Override
+    public boolean generateStructure(StructureType type, EditSession editSession, BlockVector3 position) {
+        BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
+        if (adapter != null) {
+            return adapter.generateStructure(type, getWorld(), editSession, position);
+        }
+        // No adapter, we can't generate this.
+        return false;
     }
 
     private static volatile boolean hasWarnedImplError = false;
