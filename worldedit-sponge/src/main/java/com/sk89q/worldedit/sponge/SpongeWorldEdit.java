@@ -19,287 +19,306 @@
 
 package com.sk89q.worldedit.sponge;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.sk89q.worldedit.internal.anvil.ChunkDeleter.DELCHUNKS_FILE_NAME;
-
+import com.google.common.base.Joiner;
 import com.google.inject.Inject;
-import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.blocks.BaseItemStack;
+import com.sk89q.worldedit.command.util.PermissionCondition;
+import com.sk89q.worldedit.event.platform.CommandEvent;
+import com.sk89q.worldedit.event.platform.CommandSuggestionEvent;
 import com.sk89q.worldedit.event.platform.PlatformReadyEvent;
-import com.sk89q.worldedit.event.platform.SessionIdleEvent;
+import com.sk89q.worldedit.event.platform.PlatformUnreadyEvent;
+import com.sk89q.worldedit.event.platform.PlatformsRegisteredEvent;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extension.platform.Platform;
+import com.sk89q.worldedit.extension.platform.PlatformManager;
 import com.sk89q.worldedit.internal.anvil.ChunkDeleter;
-import com.sk89q.worldedit.sponge.adapter.AdapterLoadException;
-import com.sk89q.worldedit.sponge.adapter.SpongeImplAdapter;
-import com.sk89q.worldedit.sponge.adapter.SpongeImplLoader;
+import com.sk89q.worldedit.internal.command.CommandUtil;
+import com.sk89q.worldedit.registry.Registries;
 import com.sk89q.worldedit.sponge.config.SpongeConfiguration;
-import org.bstats.sponge.Metrics2;
+import com.sk89q.worldedit.world.biome.BiomeCategory;
+import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.block.BlockCategory;
+import com.sk89q.worldedit.world.generation.TreeType;
+import com.sk89q.worldedit.world.item.ItemCategory;
+import net.kyori.adventure.audience.Audience;
 import org.apache.logging.log4j.Logger;
+import org.bstats.sponge.Metrics;
+import org.spongepowered.api.ResourceKey;
+import org.spongepowered.api.Server;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockType;
-import org.spongepowered.api.block.BlockTypes;
-import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.block.entity.BlockEntity;
+import org.spongepowered.api.block.entity.CommandBlock;
+import org.spongepowered.api.command.Command;
+import org.spongepowered.api.command.CommandCause;
+import org.spongepowered.api.command.CommandCompletion;
+import org.spongepowered.api.command.CommandResult;
+import org.spongepowered.api.command.parameter.ArgumentReader;
 import org.spongepowered.api.config.ConfigDir;
-import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.block.InteractBlockEvent;
-import org.spongepowered.api.event.filter.cause.Root;
-import org.spongepowered.api.event.game.state.GameAboutToStartServerEvent;
-import org.spongepowered.api.event.game.state.GameInitializationEvent;
-import org.spongepowered.api.event.game.state.GamePostInitializationEvent;
-import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
-import org.spongepowered.api.event.game.state.GameStartedServerEvent;
-import org.spongepowered.api.event.game.state.GameStoppingServerEvent;
-import org.spongepowered.api.event.item.inventory.InteractItemEvent;
-import org.spongepowered.api.event.network.ClientConnectionEvent;
-import org.spongepowered.api.item.ItemType;
-import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.plugin.Plugin;
-import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.event.lifecycle.ConstructPluginEvent;
+import org.spongepowered.api.event.lifecycle.RegisterCommandEvent;
+import org.spongepowered.api.event.lifecycle.StartedEngineEvent;
+import org.spongepowered.api.event.lifecycle.StartingEngineEvent;
+import org.spongepowered.api.event.lifecycle.StoppingEngineEvent;
+import org.spongepowered.api.registry.RegistryTypes;
 import org.spongepowered.api.scheduler.Task;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.LocatableBlock;
+import org.spongepowered.api.world.generation.feature.FeatureTypes;
+import org.spongepowered.api.world.server.ServerWorld;
+import org.spongepowered.plugin.PluginContainer;
+import org.spongepowered.plugin.builtin.jvm.Plugin;
 
-import java.io.File;
-import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+
+import static com.sk89q.worldedit.internal.anvil.ChunkDeleter.DELCHUNKS_FILE_NAME;
+import static java.util.stream.Collectors.toList;
 
 /**
  * The Sponge implementation of WorldEdit.
  */
-@Plugin(id = SpongeWorldEdit.MOD_ID, name = "WorldEdit",
-        description = "WorldEdit is an easy-to-use in-game world editor for Minecraft",
-        url = "https://enginehub.org/worldedit/")
+@Plugin(SpongeWorldEdit.MOD_ID)
 public class SpongeWorldEdit {
-
-    @Inject
-    private Logger logger;
-
-    private Metrics2 metrics;
 
     public static final String MOD_ID = "worldedit";
     private static final int BSTATS_PLUGIN_ID = 3329;
 
-    private SpongePermissionsProvider provider;
-
-    @Inject
-    private PluginContainer container;
-
     private static SpongeWorldEdit inst;
-
-    public static PluginContainer container() {
-        return inst.container;
-    }
 
     public static SpongeWorldEdit inst() {
         return inst;
     }
 
+    private final Logger logger;
+    private final PluginContainer container;
+    private final SpongeConfiguration config;
+    private final Path workingDir;
+
+    private SpongePermissionsProvider provider;
     private SpongePlatform platform;
-    private SpongeImplAdapter spongeAdapter;
 
     @Inject
-    private SpongeConfiguration config;
-
-    @Inject @ConfigDir(sharedRoot = false)
-    private File workingDir;
-
-    @Inject
-    public SpongeWorldEdit(Metrics2.Factory metricsFactory) {
+    public SpongeWorldEdit(Logger logger,
+                           PluginContainer container,
+                           SpongeConfiguration config,
+                           Metrics.Factory metricsFactory,
+                           @ConfigDir(sharedRoot = false)
+                               Path workingDir) {
+        this.logger = logger;
+        this.container = container;
+        this.config = config;
+        this.workingDir = workingDir;
+        metricsFactory.make(BSTATS_PLUGIN_ID);
         inst = this;
-        metrics = metricsFactory.make(BSTATS_PLUGIN_ID);
     }
 
     @Listener
-    public void preInit(GamePreInitializationEvent event) {
-        // Load configuration
-        config.load();
+    public void onPluginConstruction(ConstructPluginEvent event) {
+        this.platform = new SpongePlatform(this);
 
-        Task.builder().interval(30, TimeUnit.SECONDS).execute(ThreadSafeCache.getInstance()).submit(this);
-    }
+        WorldEdit.getInstance().getPlatformManager().register(platform);
 
-    @Listener
-    public void init(GameInitializationEvent event) {
-        CUIChannelHandler.init();
-    }
+        this.provider = new SpongePermissionsProvider();
 
-    @Listener
-    public void postInit(GamePostInitializationEvent event) {
+        event.game().eventManager().registerListeners(
+            container,
+            new CUIChannelHandler.RegistrationHandler(),
+            MethodHandles.lookup()
+        );
+
+        event.game().eventManager().registerListeners(
+            container,
+            new SpongeWorldEditListener(this),
+            MethodHandles.lookup()
+        );
+
         logger.info("WorldEdit for Sponge (version " + getInternalVersion() + ") is loaded");
     }
 
     @Listener
-    public void serverAboutToStart(GameAboutToStartServerEvent event) {
-        if (this.platform != null) {
-            logger.warn("GameAboutToStartServerEvent occurred when GameStoppingServerEvent hasn't");
-            WorldEdit.getInstance().getPlatformManager().unregister(platform);
-        }
-
-        final Path delChunks = workingDir.toPath().resolve(DELCHUNKS_FILE_NAME);
+    public void serverStarting(StartingEngineEvent<Server> event) {
+        final Path delChunks = workingDir.resolve(DELCHUNKS_FILE_NAME);
         if (Files.exists(delChunks)) {
             ChunkDeleter.runFromFile(delChunks, true);
         }
+    }
 
-        this.platform = new SpongePlatform(this);
-        this.provider = new SpongePermissionsProvider();
+    @Listener
+    public void serverStarted(StartedEngineEvent<Server> event) {
+        event.engine().scheduler().submit(Task.builder()
+                .plugin(container)
+                .interval(30, TimeUnit.SECONDS)
+                .execute(ThreadSafeCache.getInstance())
+                .build());
 
-        for (BlockType blockType : Sponge.getRegistry().getAllOf(BlockType.class)) {
-            // TODO Handle blockstate stuff
-            String id = blockType.getId();
+        event.game().registry(RegistryTypes.BLOCK_TYPE).streamEntries().forEach(blockType -> {
+            String id = blockType.key().asString();
             if (!com.sk89q.worldedit.world.block.BlockType.REGISTRY.keySet().contains(id)) {
-                com.sk89q.worldedit.world.block.BlockType.REGISTRY.register(id, new com.sk89q.worldedit.world.block.BlockType(id));
+                com.sk89q.worldedit.world.block.BlockType.REGISTRY.register(id, new com.sk89q.worldedit.world.block.BlockType(
+                    id,
+                    input -> {
+                        BlockType spongeBlockType = Sponge.game().registry(RegistryTypes.BLOCK_TYPE).value(
+                            ResourceKey.resolve(input.getBlockType().id())
+                        );
+                        return SpongeAdapter.adapt(spongeBlockType.defaultState());
+                    }
+                ));
             }
-        }
+        });
 
-        for (ItemType itemType : Sponge.getRegistry().getAllOf(ItemType.class)) {
-            String id = itemType.getId();
+        event.game().registry(RegistryTypes.ITEM_TYPE).streamEntries().forEach(itemType -> {
+            String id = itemType.key().asString();
             if (!com.sk89q.worldedit.world.item.ItemType.REGISTRY.keySet().contains(id)) {
                 com.sk89q.worldedit.world.item.ItemType.REGISTRY.register(id, new com.sk89q.worldedit.world.item.ItemType(id));
             }
+        });
+
+        event.game().registry(RegistryTypes.ENTITY_TYPE).streamEntries().forEach(entityType -> {
+            String id = entityType.key().asString();
+            if (!com.sk89q.worldedit.world.entity.EntityType.REGISTRY.keySet().contains(id)) {
+                com.sk89q.worldedit.world.entity.EntityType.REGISTRY.register(id, new com.sk89q.worldedit.world.entity.EntityType(id));
+            }
+        });
+
+        for (ServerWorld world : event.engine().worldManager().worlds()) {
+            world.registry(RegistryTypes.BIOME).streamEntries().forEach(biomeType -> {
+                String id = biomeType.key().asString();
+                if (!BiomeType.REGISTRY.keySet().contains(id)) {
+                    BiomeType.REGISTRY.register(id, new BiomeType(id));
+                }
+            });
         }
 
-        WorldEdit.getInstance().getPlatformManager().register(platform);
+        // Disabled until https://github.com/SpongePowered/SpongeAPI/issues/2520 is resolved
+        // Will also need implementations in SpongeWorld to do placement
+        //        Sponge.server().registry(RegistryTypes.FEATURE).streamEntries().forEach(feature -> {
+        //            String id = feature.key().asString();
+        //            if (!ConfiguredFeatureType.REGISTRY.keySet().contains(id)) {
+        //                ConfiguredFeatureType.REGISTRY.register(id, new ConfiguredFeatureType(id));
+        //            }
+        //        });
+        //        Sponge.server().registry(RegistryTypes.STRUCTURE).streamEntries().forEach(structure -> {
+        //            String id = structure.key().asString();
+        //            if (!StructureType.REGISTRY.keySet().contains(id)) {
+        //                StructureType.REGISTRY.register(id, new StructureType(id));
+        //            }
+        //        });
+
+        event.game().registry(RegistryTypes.PLACED_FEATURE).streamEntries().forEach(feature -> {
+            String id = feature.key().asString();
+            var underlyingFeatureType = feature.value().feature().type();
+            if (underlyingFeatureType.equals(FeatureTypes.TREE) || underlyingFeatureType.equals(FeatureTypes.FALLEN_TREE) || underlyingFeatureType.equals(FeatureTypes.CORAL_TREE)) {
+                if (!TreeType.REGISTRY.keySet().contains(id)) {
+                    TreeType.REGISTRY.register(id, new TreeType(id));
+                }
+            }
+        });
+        event.game().registry(RegistryTypes.BLOCK_TYPE).tags().forEach(blockTypeTag -> {
+            String id = blockTypeTag.key().asString();
+            if (!BlockCategory.REGISTRY.keySet().contains(id)) {
+                BlockCategory.REGISTRY.register(id, new BlockCategory(id));
+            }
+        });
+        event.game().registry(RegistryTypes.ITEM_TYPE).tags().forEach(itemTypeTag -> {
+            String id = itemTypeTag.key().asString();
+            if (!ItemCategory.REGISTRY.keySet().contains(id)) {
+                ItemCategory.REGISTRY.register(id, new ItemCategory(id));
+            }
+        });
+        event.game().registry(RegistryTypes.BIOME).tags().forEach(biomeTag -> {
+            String id = biomeTag.key().asString();
+            if (!BiomeCategory.REGISTRY.keySet().contains(id)) {
+                BiomeCategory.REGISTRY.register(id, new BiomeCategory(id, () -> event.game().registry(RegistryTypes.BIOME).taggedValues(biomeTag).map(SpongeAdapter::adapt).collect(Collectors.toSet())));
+            }
+        });
+
+        Registries.get("");
+
+        config.load();
+        WorldEdit.getInstance().getEventBus().post(new PlatformReadyEvent(platform));
     }
 
     @Listener
-    public void serverStopping(GameStoppingServerEvent event) {
+    public void serverStopping(StoppingEngineEvent<Server> event) {
         WorldEdit worldEdit = WorldEdit.getInstance();
         worldEdit.getSessionManager().unload();
-        worldEdit.getPlatformManager().unregister(platform);
+        WorldEdit.getInstance().getEventBus().post(new PlatformUnreadyEvent(platform));
     }
 
     @Listener
-    public void serverStarted(GameStartedServerEvent event) {
-        WorldEdit.getInstance().getEventBus().post(new PlatformReadyEvent());
-
-        loadAdapter();
-    }
-
-    private void loadAdapter() {
-        WorldEdit worldEdit = WorldEdit.getInstance();
-
-        // Attempt to load a Sponge adapter
-        SpongeImplLoader adapterLoader = new SpongeImplLoader();
-
-        try {
-            adapterLoader.addFromPath(getClass().getClassLoader());
-        } catch (IOException e) {
-            logger.warn("Failed to search path for Sponge adapters");
-        }
-
-        try {
-            adapterLoader.addFromJar(container.getSource().get().toFile());
-        } catch (IOException e) {
-            logger.warn("Failed to search " + container.getSource().get().toFile() + " for Sponge adapters", e);
-        }
-        try {
-            spongeAdapter = adapterLoader.loadAdapter();
-            logger.info("Using " + spongeAdapter.getClass().getCanonicalName() + " as the Sponge adapter");
-        } catch (AdapterLoadException e) {
-            Platform platform = worldEdit.getPlatformManager().queryCapability(Capability.WORLD_EDITING);
-            if (platform instanceof SpongePlatform) {
-                logger.warn(e.getMessage());
-            } else {
-                logger.info("WorldEdit could not find a Sponge adapter for this MC version, " +
-                        "but it seems that you have another implementation of WorldEdit installed (" + platform.getPlatformName() + ") " +
-                        "that handles the world editing.");
-            }
-        }
-    }
-
-    public SpongeImplAdapter getAdapter() {
-        return this.spongeAdapter;
-    }
-
-    @Listener
-    public void onPlayerItemInteract(InteractItemEvent.Secondary event, @Root Player spongePlayer) {
-        if (platform == null) {
+    public void registerCommand(RegisterCommandEvent<Command.Raw> event) {
+        WorldEdit.getInstance().getEventBus().post(new PlatformsRegisteredEvent());
+        PlatformManager manager = WorldEdit.getInstance().getPlatformManager();
+        Platform commandsPlatform = manager.queryCapability(Capability.USER_COMMANDS);
+        if (commandsPlatform != platform || !platform.isHookingEvents()) {
+            // We're not in control of commands/events -- do not register.
             return;
         }
 
-        if (!platform.isHookingEvents()) return; // We have to be told to catch these events
+        List<org.enginehub.piston.Command> commands = manager.getPlatformCommandManager().getCommandManager()
+            .getAllCommands().toList();
+        for (org.enginehub.piston.Command command : commands) {
+            registerAdaptedCommand(event, command);
 
-        WorldEdit we = WorldEdit.getInstance();
-
-        SpongePlayer player = wrapPlayer(spongePlayer);
-        if (we.handleRightClick(player)) {
-            event.setCancelled(true);
-        }
-    }
-
-    @Listener
-    public void onPlayerInteract(InteractBlockEvent event, @Root Player spongePlayer) {
-        if (platform == null) {
-            return;
-        }
-
-        if (!platform.isHookingEvents()) return; // We have to be told to catch these events
-
-        WorldEdit we = WorldEdit.getInstance();
-
-        SpongePlayer player = wrapPlayer(spongePlayer);
-        com.sk89q.worldedit.world.World world = player.getWorld();
-
-        BlockSnapshot targetBlock = event.getTargetBlock();
-        Optional<Location<World>> optLoc = targetBlock.getLocation();
-
-        BlockType interactedType = targetBlock.getState().getType();
-        if (event instanceof InteractBlockEvent.Primary) {
-            if (interactedType != BlockTypes.AIR) {
-                if (!optLoc.isPresent()) {
-                    return;
-                }
-
-                Location<World> loc = optLoc.get();
-                com.sk89q.worldedit.util.Location pos = new com.sk89q.worldedit.util.Location(
-                        world, loc.getX(), loc.getY(), loc.getZ());
-
-                if (we.handleBlockLeftClick(player, pos)) {
-                    event.setCancelled(true);
-                }
-
-                if (we.handleArmSwing(player)) {
-                    event.setCancelled(true);
-                }
-            } else {
-                if (we.handleArmSwing(player)) {
-                    event.setCancelled(true);
-                }
-            }
-        } else if (event instanceof InteractBlockEvent.Secondary) {
-            if (!optLoc.isPresent()) {
-                return;
-            }
-
-            Location<World> loc = optLoc.get();
-            com.sk89q.worldedit.util.Location pos = new com.sk89q.worldedit.util.Location(
-                    world, loc.getX(), loc.getY(), loc.getZ());
-
-            if (we.handleBlockRightClick(player, pos)) {
-                event.setCancelled(true);
-            }
-
-            if (we.handleRightClick(player)) {
-                event.setCancelled(true);
+            Set<String> perms = command.getCondition().as(PermissionCondition.class)
+                .map(PermissionCondition::getPermissions)
+                .orElseGet(Collections::emptySet);
+            if (!perms.isEmpty()) {
+                perms.forEach(getPermissionsProvider()::registerPermission);
             }
         }
     }
 
-    @Listener
-    public void onPlayerQuit(ClientConnectionEvent.Disconnect event) {
-        WorldEdit.getInstance().getEventBus()
-                .post(new SessionIdleEvent(new SpongePlayer.SessionKeyImpl(event.getTargetEntity())));
+    private String rebuildArguments(String commandLabel, String args) {
+        int plSep = commandLabel.indexOf(':');
+        if (plSep >= 0 && plSep < commandLabel.length() + 1) {
+            commandLabel = commandLabel.substring(plSep + 1);
+        }
+
+        StringBuilder sb = new StringBuilder("/").append(commandLabel);
+
+        String[] split = args.split(" ", -1);
+        if (split.length > 0) {
+            sb.append(" ");
+        }
+        return Joiner.on(" ").appendTo(sb, split).toString();
     }
 
-    public static ItemStack toSpongeItemStack(BaseItemStack item) {
-        return inst().getAdapter().makeSpongeStack(item);
+    private void registerAdaptedCommand(RegisterCommandEvent<Command.Raw> event, org.enginehub.piston.Command command) {
+        CommandAdapter adapter = new CommandAdapter(command) {
+            @Override
+            public CommandResult process(CommandCause cause, ArgumentReader.Mutable arguments) {
+                CommandEvent weEvent = new CommandEvent(SpongeWorldEdit.inst().wrapCommandCause(cause), rebuildArguments(command.getName(), arguments.remaining()).trim());
+                WorldEdit.getInstance().getEventBus().post(weEvent);
+                return weEvent.isCancelled() ? CommandResult.success() : CommandResult.builder().build();
+            }
+
+            @Override
+            public List<CommandCompletion> complete(CommandCause cause, ArgumentReader.Mutable arguments) {
+                String args = rebuildArguments(command.getName(), arguments.remaining());
+                CommandSuggestionEvent weEvent = new CommandSuggestionEvent(SpongeWorldEdit.inst().wrapCommandCause(cause), args);
+                WorldEdit.getInstance().getEventBus().post(weEvent);
+                return CommandUtil.fixSuggestions(args, weEvent.getSuggestions())
+                    .stream().map(CommandCompletion::of).collect(toList());
+            }
+        };
+        event.register(
+            container, adapter, command.getName(), command.getAliases().toArray(new String[0])
+        );
+    }
+
+    public PluginContainer getPluginContainer() {
+        return container;
     }
 
     /**
@@ -311,46 +330,27 @@ public class SpongeWorldEdit {
         return this.config;
     }
 
-    /**
-     * Get the WorldEdit proxy for the given player.
-     *
-     * @param player the player
-     * @return the WorldEdit player
-     */
-    public SpongePlayer wrapPlayer(Player player) {
-        checkNotNull(player);
-        return new SpongePlayer(platform, player);
-    }
-
-    public Actor wrapCommandSource(CommandSource sender) {
-        if (sender instanceof Player) {
-            return wrapPlayer((Player) sender);
+    public Actor wrapCommandCause(CommandCause cause) {
+        Object rootCause = cause.root();
+        if (rootCause instanceof ServerPlayer serverPlayer) {
+            return SpongeAdapter.adapt(serverPlayer);
+        }
+        if (rootCause instanceof LocatableBlock locatableBlock) {
+            Optional<? extends BlockEntity> optionalBlockEntity = locatableBlock.world().blockEntity(locatableBlock.blockPosition());
+            if (optionalBlockEntity.isPresent()) {
+                BlockEntity blockEntity = optionalBlockEntity.get();
+                if (blockEntity instanceof CommandBlock commandBlock) {
+                    return new SpongeBlockCommandSender(this, commandBlock);
+                }
+            }
+        }
+        if (rootCause instanceof Audience audience) {
+            return new SpongeCommandSender(audience);
         }
 
-        return new SpongeCommandSender(this, sender);
+        throw new UnsupportedOperationException("Cannot wrap " + rootCause.getClass());
     }
 
-    /**
-     * Get the session for a player.
-     *
-     * @param player the player
-     * @return the session
-     */
-    public LocalSession getSession(Player player) {
-        checkNotNull(player);
-        return WorldEdit.getInstance().getSessionManager().get(wrapPlayer(player));
-    }
-
-    /**
-     * Get the WorldEdit proxy for the given world.
-     *
-     * @param world the world
-     * @return the WorldEdit world
-     */
-    public SpongeWorld getWorld(World world) {
-        checkNotNull(world);
-        return getAdapter().getWorld(world);
-    }
 
     /**
      * Get the WorldEdit proxy for the platform.
@@ -361,12 +361,16 @@ public class SpongeWorldEdit {
         return this.platform;
     }
 
+    SpongePlatform getInternalPlatform() {
+        return this.platform;
+    }
+
     /**
      * Get the working directory where WorldEdit's files are stored.
      *
      * @return the working directory
      */
-    public File getWorkingDir() {
+    public Path getWorkingDir() {
         return this.workingDir;
     }
 
@@ -376,7 +380,7 @@ public class SpongeWorldEdit {
      * @return a version string
      */
     String getInternalVersion() {
-        return container.getVersion().orElse("Unknown");
+        return container.metadata().version().toString();
     }
 
     public void setPermissionsProvider(SpongePermissionsProvider provider) {
@@ -386,5 +390,4 @@ public class SpongeWorldEdit {
     public SpongePermissionsProvider getPermissionsProvider() {
         return provider;
     }
-
 }

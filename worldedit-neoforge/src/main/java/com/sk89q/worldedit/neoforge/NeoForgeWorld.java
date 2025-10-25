@@ -17,7 +17,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldedit.fabric;
+package com.sk89q.worldedit.neoforge;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -35,17 +35,16 @@ import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.fabric.internal.ExtendedMinecraftServer;
-import com.sk89q.worldedit.fabric.internal.FabricEntity;
-import com.sk89q.worldedit.fabric.internal.FabricServerLevelDelegateProxy;
-import com.sk89q.worldedit.fabric.internal.FabricWorldNativeAccess;
-import com.sk89q.worldedit.fabric.internal.NBTConverter;
 import com.sk89q.worldedit.function.mask.AbstractExtentMask;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.internal.Constants;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
+import com.sk89q.worldedit.neoforge.internal.NBTConverter;
+import com.sk89q.worldedit.neoforge.internal.NeoForgeEntity;
+import com.sk89q.worldedit.neoforge.internal.NeoForgeServerLevelDelegateProxy;
+import com.sk89q.worldedit.neoforge.internal.NeoForgeWorldNativeAccess;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.Location;
@@ -61,7 +60,6 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.generation.ConfiguredFeatureType;
 import com.sk89q.worldedit.world.generation.StructureType;
-import com.sk89q.worldedit.world.generation.TreeType;
 import com.sk89q.worldedit.world.item.ItemTypes;
 import com.sk89q.worldedit.world.weather.WeatherType;
 import com.sk89q.worldedit.world.weather.WeatherTypes;
@@ -75,11 +73,11 @@ import net.minecraft.data.worldgen.placement.EndPlacements;
 import net.minecraft.data.worldgen.placement.TreePlacements;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.ProblemReporter;
 import net.minecraft.util.RandomSource;
+import net.minecraft.util.thread.BlockableEventLoop;
 import net.minecraft.world.Clearable;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -94,7 +92,6 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.chunk.ChunkAccess;
-import net.minecraft.world.level.chunk.ChunkSource;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.PalettedContainer;
 import net.minecraft.world.level.chunk.status.ChunkStatus;
@@ -105,7 +102,6 @@ import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureStart;
-import net.minecraft.world.level.storage.DerivedLevelData;
 import net.minecraft.world.level.storage.LevelData;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.PrimaryLevelData;
@@ -120,7 +116,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -139,29 +134,29 @@ import static com.google.common.base.Preconditions.checkState;
 /**
  * An adapter to Minecraft worlds for WorldEdit.
  */
-public class FabricWorld extends AbstractWorld {
+public class NeoForgeWorld extends AbstractWorld {
 
     private static final RandomSource random = RandomSource.create();
 
-    private static ResourceLocation getDimensionRegistryKey(Level world) {
+    private static ResourceLocation getDimensionRegistryKey(ServerLevel world) {
         return Objects.requireNonNull(world.getServer(), "server cannot be null")
             .registryAccess()
             .lookupOrThrow(Registries.DIMENSION_TYPE)
             .getKey(world.dimensionType());
     }
 
-    private final WeakReference<Level> worldRef;
-    private final FabricWorldNativeAccess worldNativeAccess;
+    private final WeakReference<ServerLevel> worldRef;
+    private final NeoForgeWorldNativeAccess nativeAccess;
 
     /**
      * Construct a new world.
      *
      * @param world the world
      */
-    FabricWorld(Level world) {
+    NeoForgeWorld(ServerLevel world) {
         checkNotNull(world);
         this.worldRef = new WeakReference<>(world);
-        this.worldNativeAccess = new FabricWorldNativeAccess(worldRef);
+        this.nativeAccess = new NeoForgeWorldNativeAccess(worldRef);
     }
 
     /**
@@ -170,8 +165,8 @@ public class FabricWorld extends AbstractWorld {
      * @return the world
      * @throws RuntimeException thrown if a reference to the world was lost (i.e. world was unloaded)
      */
-    public Level getWorld() {
-        Level world = worldRef.get();
+    public ServerLevel getWorld() {
+        ServerLevel world = worldRef.get();
         if (world != null) {
             return world;
         } else {
@@ -181,8 +176,7 @@ public class FabricWorld extends AbstractWorld {
 
     @Override
     public String getName() {
-        LevelData levelProperties = getWorld().getLevelData();
-        return ((ServerLevelData) levelProperties).getLevelName();
+        return ((ServerLevelData) getWorld().getLevelData()).getLevelName();
     }
 
     @Override
@@ -192,36 +186,34 @@ public class FabricWorld extends AbstractWorld {
 
     @Override
     public Path getStoragePath() {
-        final Level world = getWorld();
-        MinecraftServer server = world.getServer();
-        checkState(server instanceof ExtendedMinecraftServer, "Need a server world");
-        return ((ExtendedMinecraftServer) server).getStoragePath(world);
+        final ServerLevel world = getWorld();
+        return world.getServer().storageSource.getDimensionPath(world.dimension());
     }
 
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block, SideEffectSet sideEffects) throws WorldEditException {
         clearContainerBlockContents(position);
-        return worldNativeAccess.setBlock(position, block, sideEffects);
+        return nativeAccess.setBlock(position, block, sideEffects);
     }
 
     @Override
     public Set<SideEffect> applySideEffects(BlockVector3 position, BlockState previousType, SideEffectSet sideEffectSet) {
-        worldNativeAccess.applySideEffects(position, previousType, sideEffectSet);
-        return Sets.intersection(FabricWorldEdit.inst.getPlatform().getSupportedSideEffects(), sideEffectSet.getSideEffectsToApply());
+        nativeAccess.applySideEffects(position, previousType, sideEffectSet);
+        return Sets.intersection(NeoForgeWorldEdit.inst.getPlatform().getSupportedSideEffects(), sideEffectSet.getSideEffectsToApply());
     }
 
     @Override
     public int getBlockLightLevel(BlockVector3 position) {
         checkNotNull(position);
-        return getWorld().getMaxLocalRawBrightness(FabricAdapter.toBlockPos(position));
+        return getWorld().getLightEmission(NeoForgeAdapter.toBlockPos(position));
     }
 
     @Override
     public boolean clearContainerBlockContents(BlockVector3 position) {
         checkNotNull(position);
 
-        BlockEntity tile = getWorld().getBlockEntity(FabricAdapter.toBlockPos(position));
-        if ((tile instanceof Clearable)) {
+        BlockEntity tile = getWorld().getBlockEntity(NeoForgeAdapter.toBlockPos(position));
+        if (tile instanceof Clearable) {
             ((Clearable) tile).clearContent();
             return true;
         }
@@ -231,12 +223,13 @@ public class FabricWorld extends AbstractWorld {
     @Override
     public BiomeType getBiome(BlockVector3 position) {
         checkNotNull(position);
-        ChunkAccess chunk = getWorld().getChunk(position.x() >> 4, position.z() >> 4);
+
+        LevelChunk chunk = getWorld().getChunk(position.x() >> 4, position.z() >> 4);
         return getBiomeInChunk(position, chunk);
     }
 
     private BiomeType getBiomeInChunk(BlockVector3 position, ChunkAccess chunk) {
-        return FabricAdapter.adapt(
+        return NeoForgeAdapter.adapt(
             chunk.getNoiseBiome(position.x() >> 2, position.y() >> 2, position.z() >> 2).value()
         );
     }
@@ -246,27 +239,25 @@ public class FabricWorld extends AbstractWorld {
         checkNotNull(position);
         checkNotNull(biome);
 
-        ChunkAccess chunk = getWorld().getChunk(position.x() >> 4, position.z() >> 4);
-        // Screw it, we know it's really mutable...
-        var biomeArray = (PalettedContainer<Holder<Biome>>) chunk.getSection(chunk.getSectionIndex(position.y())).getBiomes();
-        biomeArray.getAndSetUnchecked(
+        LevelChunk chunk = getWorld().getChunk(position.x() >> 4, position.z() >> 4);
+        var biomes = (PalettedContainer<Holder<Biome>>) chunk.getSection(chunk.getSectionIndex(position.y())).getBiomes();
+        biomes.getAndSetUnchecked(
             position.x() & 3, position.y() & 3, position.z() & 3,
-            getWorld().registryAccess().lookup(Registries.BIOME)
-                .orElseThrow()
+            getWorld().registryAccess().lookupOrThrow(Registries.BIOME)
                 .getOrThrow(ResourceKey.create(Registries.BIOME, ResourceLocation.parse(biome.id())))
         );
         chunk.markUnsaved();
         return true;
     }
 
-    private static final LoadingCache<ServerLevel, FabricFakePlayer> fakePlayers
-            = CacheBuilder.newBuilder().weakKeys().softValues().build(CacheLoader.from(FabricFakePlayer::new));
+    private static final LoadingCache<ServerLevel, NeoForgeFakePlayer> fakePlayers
+            = CacheBuilder.newBuilder().weakKeys().softValues().build(CacheLoader.from(NeoForgeFakePlayer::new));
 
     @Override
     public boolean useItem(BlockVector3 position, BaseItem item, Direction face) {
-        ItemStack stack = FabricAdapter.adapt(new BaseItemStack(item.getType(), item.getNbtReference(), 1));
-        ServerLevel world = (ServerLevel) getWorld();
-        final FabricFakePlayer fakePlayer;
+        ItemStack stack = NeoForgeAdapter.adapt(new BaseItemStack(item.getType(), item.getNbtReference(), 1));
+        ServerLevel world = getWorld();
+        final NeoForgeFakePlayer fakePlayer;
         try {
             fakePlayer = fakePlayers.get(world);
         } catch (ExecutionException ignored) {
@@ -275,17 +266,19 @@ public class FabricWorld extends AbstractWorld {
         fakePlayer.setItemInHand(InteractionHand.MAIN_HAND, stack);
         fakePlayer.absSnapTo(position.x(), position.y(), position.z(),
                 (float) face.toVector().toYaw(), (float) face.toVector().toPitch());
-        final BlockPos blockPos = FabricAdapter.toBlockPos(position);
-        final BlockHitResult rayTraceResult = new BlockHitResult(FabricAdapter.toVec3(position),
-                FabricAdapter.adapt(face), blockPos, false);
+        final BlockPos blockPos = NeoForgeAdapter.toBlockPos(position);
+        final BlockHitResult rayTraceResult = new BlockHitResult(NeoForgeAdapter.toVec3(position),
+                NeoForgeAdapter.adapt(face), blockPos, false);
         UseOnContext itemUseContext = new UseOnContext(fakePlayer, InteractionHand.MAIN_HAND, rayTraceResult);
-        InteractionResult used = stack.useOn(itemUseContext);
+        InteractionResult used = stack.onItemUseFirst(itemUseContext);
         if (used != InteractionResult.SUCCESS) {
             // try activating the block
-            used = getWorld().getBlockState(blockPos).useItemOn(stack, world, fakePlayer, InteractionHand.MAIN_HAND, rayTraceResult);
-        }
-        if (used != InteractionResult.SUCCESS) {
-            used = stack.use(world, fakePlayer, InteractionHand.MAIN_HAND);
+            InteractionResult resultType = getWorld().getBlockState(blockPos).useItemOn(stack, world, fakePlayer, InteractionHand.MAIN_HAND, rayTraceResult);
+            if (resultType.consumesAction()) {
+                used = resultType;
+            } else {
+                used = stack.getItem().use(world, fakePlayer, InteractionHand.MAIN_HAND);
+            }
         }
         return used == InteractionResult.SUCCESS;
     }
@@ -299,30 +292,26 @@ public class FabricWorld extends AbstractWorld {
             return;
         }
 
-        ItemEntity entity = new ItemEntity(getWorld(), position.x(), position.y(), position.z(), FabricAdapter.adapt(item));
+        ItemEntity entity = new ItemEntity(getWorld(), position.x(), position.y(), position.z(), NeoForgeAdapter.adapt(item));
         entity.setPickUpDelay(10);
         getWorld().addFreshEntity(entity);
     }
 
     @Override
     public void simulateBlockMine(BlockVector3 position) {
-        BlockPos pos = FabricAdapter.toBlockPos(position);
+        BlockPos pos = NeoForgeAdapter.toBlockPos(position);
         getWorld().destroyBlock(pos, true);
     }
 
     @Override
     public boolean canPlaceAt(BlockVector3 position, BlockState blockState) {
-        return FabricAdapter.adapt(blockState).canSurvive(getWorld(), FabricAdapter.toBlockPos(position));
+        return NeoForgeAdapter.adapt(blockState).canSurvive(getWorld(), NeoForgeAdapter.toBlockPos(position));
     }
+
+    // For unmapped regen names, see Fabric!
 
     @Override
     public boolean regenerate(Region region, Extent extent, RegenOptions options) {
-        // Don't even try to regen if it's going to fail.
-        ChunkSource provider = getWorld().getChunkSource();
-        if (!(provider instanceof ServerChunkCache)) {
-            return false;
-        }
-
         try {
             doRegen(region, extent, options);
         } catch (Exception e) {
@@ -336,11 +325,13 @@ public class FabricWorld extends AbstractWorld {
         Path tempDir = Files.createTempDirectory("WorldEditWorldGen");
         LevelStorageSource levelStorage = LevelStorageSource.createDefault(tempDir);
         try (LevelStorageSource.LevelStorageAccess session = levelStorage.createAccess("WorldEditTempGen")) {
-            ServerLevel originalWorld = (ServerLevel) getWorld();
-            PrimaryLevelData levelProperties = getPrimaryLevelData(originalWorld.getLevelData());
+            ServerLevel originalWorld = getWorld();
+            PrimaryLevelData levelProperties = (PrimaryLevelData) originalWorld.getServer()
+                .getWorldData().overworldData();
             WorldOptions originalOpts = levelProperties.worldGenOptions();
 
             long seed = options.getSeed().orElse(originalWorld.getSeed());
+
             levelProperties.worldOptions = options.getSeed().isPresent()
                 ? originalOpts.withSeed(OptionalLong.of(seed))
                 : originalOpts;
@@ -376,31 +367,21 @@ public class FabricWorld extends AbstractWorld {
         }
     }
 
-    private static PrimaryLevelData getPrimaryLevelData(LevelData levelData) {
-        if (levelData instanceof DerivedLevelData derivedLevelData) {
-            return getPrimaryLevelData(derivedLevelData.wrapped);
-        } else if (levelData instanceof PrimaryLevelData primaryLevelData) {
-            return primaryLevelData;
-        } else {
-            throw new IllegalStateException("Unknown level data type: " + levelData.getClass());
-        }
-    }
-
     private void regenForWorld(Region region, Extent extent, ServerLevel serverWorld,
                                RegenOptions options) throws WorldEditException {
         List<CompletableFuture<ChunkAccess>> chunkLoadings = submitChunkLoadTasks(region, serverWorld);
 
         // drive executor until loading finishes
-        serverWorld.getChunkSource().mainThreadProcessor
-            .managedBlock(() -> {
-                // bail out early if a future fails
-                if (chunkLoadings.stream().anyMatch(ftr ->
-                    ftr.isDone() && Futures.getUnchecked(ftr) == null
-                )) {
-                    return false;
-                }
-                return chunkLoadings.stream().allMatch(CompletableFuture::isDone);
-            });
+        BlockableEventLoop<Runnable> executor = serverWorld.getChunkSource().mainThreadProcessor;
+        executor.managedBlock(() -> {
+            // bail out early if a future fails
+            if (chunkLoadings.stream().anyMatch(ftr ->
+                ftr.isDone() && Futures.getUnchecked(ftr) == null
+            )) {
+                return false;
+            }
+            return chunkLoadings.stream().allMatch(CompletableFuture::isDone);
+        });
 
         Map<ChunkPos, ChunkAccess> chunks = new HashMap<>();
         for (CompletableFuture<ChunkAccess> future : chunkLoadings) {
@@ -411,9 +392,9 @@ public class FabricWorld extends AbstractWorld {
         }
 
         for (BlockVector3 vec : region) {
-            BlockPos pos = FabricAdapter.toBlockPos(vec);
+            BlockPos pos = NeoForgeAdapter.toBlockPos(vec);
             ChunkAccess chunk = chunks.get(new ChunkPos(pos));
-            BlockStateHolder<?> state = FabricAdapter.adapt(chunk.getBlockState(pos));
+            BlockStateHolder<?> state = NeoForgeAdapter.adapt(chunk.getBlockState(pos));
             BlockEntity blockEntity = chunk.getBlockEntity(pos);
             if (blockEntity != null) {
                 var tagValueOutput = TagValueOutput.createWithContext(ProblemReporter.DISCARDING, getWorld().registryAccess());
@@ -477,45 +458,43 @@ public class FabricWorld extends AbstractWorld {
     @SuppressWarnings("deprecation")
     @Override
     public boolean generateTree(com.sk89q.worldedit.util.TreeGenerator.TreeType type, EditSession editSession, BlockVector3 position) throws MaxChangedBlocksException {
-        ServerLevel world = (ServerLevel) getWorld();
+        ServerLevel world = getWorld();
         PlacedFeature generator = Optional.ofNullable(createTreeFeatureGenerator(type))
-            .map(k -> world.registryAccess().lookupOrThrow(Registries.PLACED_FEATURE).getValue(k))
-            .orElse(null);
+                .map(k -> world.registryAccess().lookupOrThrow(Registries.PLACED_FEATURE).getValue(k))
+                .orElse(null);
         ServerChunkCache chunkManager = world.getChunkSource();
         if (type == com.sk89q.worldedit.util.TreeGenerator.TreeType.CHORUS_PLANT) {
             position = position.add(0, 1, 0);
         }
-        try (FabricServerLevelDelegateProxy.LevelAndProxy proxyLevel = FabricServerLevelDelegateProxy.newInstance(editSession, world)) {
+        try (NeoForgeServerLevelDelegateProxy.LevelAndProxy proxyLevel = NeoForgeServerLevelDelegateProxy.newInstance(editSession, world)) {
             return generator != null && generator.place(
-                proxyLevel.level(), chunkManager.getGenerator(), random,
-                FabricAdapter.toBlockPos(position)
+                    proxyLevel.level(), chunkManager.getGenerator(), random,
+                    NeoForgeAdapter.toBlockPos(position)
             );
         }
     }
 
     @Override
-    public boolean generateTree(TreeType type, EditSession editSession, BlockVector3 position) throws MaxChangedBlocksException {
-        ServerLevel world = (ServerLevel) getWorld();
+    public boolean generateTree(com.sk89q.worldedit.world.generation.TreeType type, EditSession editSession, BlockVector3 position) throws MaxChangedBlocksException {
+        ServerLevel world = getWorld();
         PlacedFeature generator = world.registryAccess().lookupOrThrow(Registries.PLACED_FEATURE).getValue(ResourceLocation.tryParse(type.id()));
         ServerChunkCache chunkManager = world.getChunkSource();
-        try (FabricServerLevelDelegateProxy.LevelAndProxy proxyLevel = FabricServerLevelDelegateProxy.newInstance(editSession, world)) {
+        try (NeoForgeServerLevelDelegateProxy.LevelAndProxy proxyLevel = NeoForgeServerLevelDelegateProxy.newInstance(editSession, world)) {
             return generator != null && generator.place(
                     proxyLevel.level(), chunkManager.getGenerator(), random,
-                    FabricAdapter.toBlockPos(position)
+                    NeoForgeAdapter.toBlockPos(position)
             );
         }
     }
 
     @Override
     public boolean generateFeature(ConfiguredFeatureType type, EditSession editSession, BlockVector3 position) {
-        ServerLevel world = (ServerLevel) getWorld();
+        ServerLevel world = getWorld();
         ConfiguredFeature<?, ?> feature = world.registryAccess().lookupOrThrow(Registries.CONFIGURED_FEATURE).getValue(ResourceLocation.tryParse(type.id()));
         ServerChunkCache chunkManager = world.getChunkSource();
-        try (FabricServerLevelDelegateProxy.LevelAndProxy proxyLevel = FabricServerLevelDelegateProxy.newInstance(editSession, world)) {
-            return feature != null && feature.place(
-                proxyLevel.level(), chunkManager.getGenerator(), random,
-                FabricAdapter.toBlockPos(position)
-            );
+        try (NeoForgeServerLevelDelegateProxy.LevelAndProxy levelProxy =
+                 NeoForgeServerLevelDelegateProxy.newInstance(editSession, world)) {
+            return feature != null && feature.place(levelProxy.level(), chunkManager.getGenerator(), random, NeoForgeAdapter.toBlockPos(position));
         } catch (MaxChangedBlocksException e) {
             throw new RuntimeException(e);
         }
@@ -523,7 +502,7 @@ public class FabricWorld extends AbstractWorld {
 
     @Override
     public boolean generateStructure(StructureType type, EditSession editSession, BlockVector3 position) {
-        ServerLevel world = (ServerLevel) getWorld();
+        ServerLevel world = getWorld();
         Registry<Structure> structureRegistry = world.registryAccess().lookupOrThrow(Registries.STRUCTURE);
         Structure structure = structureRegistry.getValue(ResourceLocation.tryParse(type.id()));
         if (structure == null) {
@@ -531,12 +510,13 @@ public class FabricWorld extends AbstractWorld {
         }
 
         ServerChunkCache chunkManager = world.getChunkSource();
-        try (FabricServerLevelDelegateProxy.LevelAndProxy proxyLevel = FabricServerLevelDelegateProxy.newInstance(editSession, world)) {
+        try (NeoForgeServerLevelDelegateProxy.LevelAndProxy levelProxy =
+                 NeoForgeServerLevelDelegateProxy.newInstance(editSession, world)) {
             ChunkPos chunkPos = new ChunkPos(new BlockPos(position.x(), position.y(), position.z()));
             StructureStart structureStart = structure.generate(
                 structureRegistry.wrapAsHolder(structure), world.dimension(), world.registryAccess(),
                 chunkManager.getGenerator(), chunkManager.getGenerator().getBiomeSource(), chunkManager.randomState(),
-                world.getStructureManager(), world.getSeed(), chunkPos, 0, proxyLevel.level(),
+                world.getStructureManager(), world.getSeed(), chunkPos, 0, levelProxy.level(),
                 biome -> true
             );
 
@@ -548,9 +528,11 @@ public class FabricWorld extends AbstractWorld {
                 ChunkPos max = new ChunkPos(SectionPos.blockToSectionCoord(boundingBox.maxX()), SectionPos.blockToSectionCoord(boundingBox.maxZ()));
                 ChunkPos.rangeClosed(min, max).forEach((chunkPosx) ->
                     structureStart.placeInChunk(
-                        proxyLevel.level(), world.structureManager(), chunkManager.getGenerator(), world.getRandom(),
-                        new BoundingBox(chunkPosx.getMinBlockX(), world.getMinY(), chunkPosx.getMinBlockZ(),
-                            chunkPosx.getMaxBlockX(), world.getMaxY(), chunkPosx.getMaxBlockZ()),
+                        levelProxy.level(), world.structureManager(), chunkManager.getGenerator(), world.getRandom(),
+                        new BoundingBox(
+                            chunkPosx.getMinBlockX(), world.getMinY(), chunkPosx.getMinBlockZ(),
+                            chunkPosx.getMaxBlockX(), world.getMaxY(), chunkPosx.getMaxBlockZ()
+                        ),
                         chunkPosx
                     )
                 );
@@ -563,7 +545,7 @@ public class FabricWorld extends AbstractWorld {
 
     @Override
     public void checkLoadedChunk(BlockVector3 pt) {
-        getWorld().getChunk(FabricAdapter.toBlockPos(pt));
+        getWorld().getChunk(NeoForgeAdapter.toBlockPos(pt));
     }
 
     @Override
@@ -577,16 +559,18 @@ public class FabricWorld extends AbstractWorld {
         for (BlockVector2 chunk : chunks) {
             nativeChunks.add(getWorld().getChunk(chunk.x(), chunk.z(), ChunkStatus.BIOMES, false));
         }
-        ((ServerLevel) getWorld()).getChunkSource().chunkMap.resendBiomesForChunks(nativeChunks);
+        getWorld().getChunkSource().chunkMap.resendBiomesForChunks(nativeChunks);
     }
 
     @Override
     public void fixLighting(Iterable<BlockVector2> chunks) {
-        Level world = getWorld();
+        ServerLevel world = getWorld();
         for (BlockVector2 chunk : chunks) {
-            world.getChunkSource().getLightEngine().setLightEnabled(
-                new ChunkPos(chunk.x(), chunk.z()), true
-            );
+            // Fetch the chunk after light initialization at least
+            // We'll be doing a full relight anyways, so we don't need to be LIGHT yet
+            world.getChunkSource().getLightEngine().lightChunk(world.getChunk(
+                chunk.x(), chunk.z(), ChunkStatus.INITIALIZE_LIGHT
+            ), false);
         }
     }
 
@@ -649,29 +633,30 @@ public class FabricWorld extends AbstractWorld {
 
     @Override
     public BlockVector3 getSpawnPosition() {
-        return FabricAdapter.adapt(getWorld().getLevelData().getRespawnData().pos());
+        return NeoForgeAdapter.adapt(getWorld().getLevelData().getRespawnData().pos());
     }
 
     @Override
     public BlockState getBlock(BlockVector3 position) {
         net.minecraft.world.level.block.state.BlockState mcState = getWorld()
                 .getChunk(position.x() >> 4, position.z() >> 4)
-                .getBlockState(FabricAdapter.toBlockPos(position));
+                .getBlockState(NeoForgeAdapter.toBlockPos(position));
 
-        return FabricAdapter.adapt(mcState);
+        return NeoForgeAdapter.adapt(mcState);
     }
 
     @Override
     public BaseBlock getFullBlock(BlockVector3 position) {
         BlockPos pos = new BlockPos(position.x(), position.y(), position.z());
-        // Avoid creation by using the CHECK mode -- if it's needed, it'll be re-created anyways
-        BlockEntity tile = ((LevelChunk) getWorld().getChunk(pos)).getBlockEntity(pos, LevelChunk.EntityCreationType.CHECK);
+        BlockEntity tile = getWorld().getChunk(pos).getBlockEntity(pos);
 
         if (tile != null) {
             var tagValueOutput = TagValueOutput.createWithContext(ProblemReporter.DISCARDING, getWorld().registryAccess());
             tile.saveWithId(tagValueOutput);
             net.minecraft.nbt.CompoundTag tag = tagValueOutput.buildResult();
-            return getBlock(position).toBaseBlock(LazyReference.from(() -> NBTConverter.fromNative(tag)));
+            return getBlock(position).toBaseBlock(
+                LazyReference.from(() -> NBTConverter.fromNative(tag))
+            );
         } else {
             return getBlock(position).toBaseBlock();
         }
@@ -684,7 +669,9 @@ public class FabricWorld extends AbstractWorld {
 
     @Override
     public boolean equals(Object o) {
-        if ((o instanceof FabricWorld other)) {
+        if (o == null) {
+            return false;
+        } else if ((o instanceof NeoForgeWorld other)) {
             Level otherWorld = other.worldRef.get();
             Level thisWorld = worldRef.get();
             return otherWorld != null && otherWorld.equals(thisWorld);
@@ -697,45 +684,40 @@ public class FabricWorld extends AbstractWorld {
 
     @Override
     public List<? extends Entity> getEntities(Region region) {
-        final Level world = getWorld();
+        final ServerLevel world = getWorld();
         AABB box = new AABB(
-            FabricAdapter.toVec3(region.getMinimumPoint()),
-            FabricAdapter.toVec3(region.getMaximumPoint().add(BlockVector3.ONE))
+            NeoForgeAdapter.toVec3(region.getMinimumPoint()),
+            NeoForgeAdapter.toVec3(region.getMaximumPoint().add(BlockVector3.ONE))
         );
         List<net.minecraft.world.entity.Entity> nmsEntities = world.getEntities(
             (net.minecraft.world.entity.Entity) null,
             box,
-            e -> region.contains(FabricAdapter.adapt(e.blockPosition()))
+            e -> region.contains(NeoForgeAdapter.adapt(e.blockPosition()))
         );
-        return nmsEntities.stream()
-            .map(FabricEntity::new)
-            .collect(ImmutableList.toImmutableList());
+        return nmsEntities.stream().map(NeoForgeEntity::new).collect(ImmutableList.toImmutableList());
     }
 
     @Override
     public List<? extends Entity> getEntities() {
-        final Level world = getWorld();
-        if (!(world instanceof ServerLevel)) {
-            return Collections.emptyList();
-        }
-        return Streams.stream(((ServerLevel) world).getAllEntities())
-            .map(FabricEntity::new)
+        final ServerLevel world = getWorld();
+        return Streams.stream(world.getAllEntities())
+            .map(NeoForgeEntity::new)
             .collect(ImmutableList.toImmutableList());
     }
 
     @Nullable
     @Override
     public Entity createEntity(Location location, BaseEntity entity) {
-        ServerLevel world = (ServerLevel) getWorld();
+        ServerLevel world = getWorld();
         String entityId = entity.getType().id();
         final Optional<EntityType<?>> entityType = EntityType.byString(entityId);
         if (entityType.isEmpty()) {
             return null;
         }
-        LinCompoundTag linTag = entity.getNbt();
+        LinCompoundTag nativeTag = entity.getNbt();
         net.minecraft.nbt.CompoundTag tag;
-        if (linTag != null) {
-            tag = NBTConverter.toNative(linTag);
+        if (nativeTag != null) {
+            tag = NBTConverter.toNative(nativeTag);
             removeUnwantedEntityTagsRecursively(tag);
         } else {
             tag = new net.minecraft.nbt.CompoundTag();
@@ -748,7 +730,7 @@ public class FabricWorld extends AbstractWorld {
         });
         if (createdEntity != null) {
             world.addFreshEntityWithPassengers(createdEntity);
-            return new FabricEntity(createdEntity);
+            return new NeoForgeEntity(createdEntity);
         }
         return null;
     }
@@ -771,7 +753,7 @@ public class FabricWorld extends AbstractWorld {
         return new AbstractExtentMask(this) {
             @Override
             public boolean test(BlockVector3 vector) {
-                return FabricAdapter.adapt(getExtent().getBlock(vector)).getBlock() instanceof LiquidBlock;
+                return NeoForgeAdapter.adapt(getExtent().getBlock(vector)).getBlock() instanceof LiquidBlock;
             }
         };
     }
