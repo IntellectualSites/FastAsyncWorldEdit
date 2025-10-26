@@ -12,7 +12,7 @@ dummypermscompat = "1.10"
 worldguard-bukkit = "7.0.14"
 griefprevention = "18.0.0"
 griefdefender = "2.1.0-SNAPSHOT"
-residence = "4.5._13.1"
+residence = "6.0.0.1"
 towny = "0.101.2.5"
 plotsquared = "7.5.8"
 
@@ -87,7 +87,7 @@ dummypermscompat = { group = "com.sk89q", name = "dummypermscompat", version.ref
 worldguard = { group = "com.sk89q.worldguard", name = "worldguard-bukkit", version.ref = "worldguard-bukkit" }
 griefprevention = { group = "com.github.TechFortress", name = "GriefPrevention", version.ref = "griefprevention" }
 griefdefender = { group = "com.griefdefender", name = "api", version.ref = "griefdefender" }
-residence = { group = "com.bekvon.bukkit.residence", name = "Residence", version.ref = "residence" }
+residence = { group = "com.github.Zrips", name = "Residence", version.ref = "residence" }
 towny = { group = "com.palmergames.bukkit.towny", name = "towny", version.ref = "towny" }
 plotsquared-core = { group = "com.intellectualsites.plotsquared", name = "plotsquared-core", version.ref = "plotsquared" }
 plotsquared-bukkit = { group = "com.intellectualsites.plotsquared", name = "plotsquared-bukkit", version.ref = "plotsquared" }

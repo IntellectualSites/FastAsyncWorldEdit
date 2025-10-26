@@ -33,6 +33,11 @@ repositories {
     maven {
         name = "JitPack"
         url = uri("https://jitpack.io")
+        content {
+            includeGroup("com.github.Zrips")
+            includeGroup("com.github.MilkBowl")
+            includeGroup("com.github.TechFortress")
+        }
     }
     maven {
         name = "GriefDefender"
@@ -45,11 +50,6 @@ repositories {
     maven {
         name = "Glaremasters"
         url = uri("https://repo.glaremasters.me/repository/towny/")
-    }
-    maven("https://s01.oss.sonatype.org/content/repositories/snapshots/") // TODO Remove when 4.17.0 is released
-    maven {
-        name = "Athion"
-        url = uri("https://ci.athion.net/plugin/repository/tools/")
     }
     flatDir { dir(File("src/main/resources")) }
 }
