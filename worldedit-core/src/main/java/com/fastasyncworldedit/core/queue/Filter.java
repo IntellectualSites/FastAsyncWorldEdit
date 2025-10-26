@@ -24,7 +24,7 @@ public interface Filter {
     /**
      * Do something with the IChunk<br>
      */
-    default @Nonnull <T extends IChunk> T applyChunk(T chunk, @Nullable Region region) {
+    default @Nonnull <U extends IChunk> U applyChunk(U chunk, @Nullable Region region) {
         return chunk;
     }
 
