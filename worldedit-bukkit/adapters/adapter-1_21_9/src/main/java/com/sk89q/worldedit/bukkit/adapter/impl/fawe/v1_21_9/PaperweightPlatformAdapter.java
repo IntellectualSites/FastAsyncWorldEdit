@@ -449,8 +449,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             }
 
             int bitsPerEntryNonZero = Math.max(bitsPerEntry, 1); // We do want to use zero sometimes
-            final int blocksPerLong = MathMan.floorZero((double) 64 / bitsPerEntryNonZero);
-            final int blockBitArrayEnd = MathMan.ceilZero((float) 4096 / blocksPerLong);
+            final int blockBitArrayEnd = MathMan.longArrayLength(bitsPerEntryNonZero, 4096);
 
             if (num_palette == 1) {
                 for (int i = 0; i < blockBitArrayEnd; i++) {
@@ -548,8 +547,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         }
 
         int bitsPerEntryNonZero = Math.max(bitsPerEntry, 1); // We do want to use zero sometimes
-        final int blocksPerLong = MathMan.floorZero((double) 64 / bitsPerEntryNonZero);
-        final int arrayLength = MathMan.ceilZero(64f / blocksPerLong);
+        final int arrayLength = MathMan.longArrayLength(bitsPerEntryNonZero, 64);
 
         var strategy = Strategy.createForBiomes(biomeRegistry);
         var packedData = new PalettedContainerRO.PackedData<>(
