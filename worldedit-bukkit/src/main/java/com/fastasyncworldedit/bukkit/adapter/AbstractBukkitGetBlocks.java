@@ -17,6 +17,7 @@ import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import org.apache.logging.log4j.Logger;
 
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
@@ -141,12 +142,12 @@ public abstract class AbstractBukkitGetBlocks<ServerLevel, LevelChunk> extends C
     }
 
     protected <T extends Future<T>> T handleCallFinalizer(
-            final Runnable[] syncTasks,
+            final List<Runnable> syncTasks,
             final Runnable callback,
             final Runnable finalizer
     ) throws
             Exception {
-        if (syncTasks != null) {
+        if (!syncTasks.isEmpty()) {
             QueueHandler queueHandler = Fawe.instance().getQueueHandler();
 
             // Chain the sync tasks and the callback
