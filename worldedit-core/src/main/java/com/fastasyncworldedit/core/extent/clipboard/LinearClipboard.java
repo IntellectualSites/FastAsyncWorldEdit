@@ -123,7 +123,7 @@ public abstract class LinearClipboard extends SimpleClipboard {
         Iterator<ClipboardEntity> iter = this.entities.iterator();
         while (iter.hasNext()) {
             ClipboardEntity entity = iter.next();
-            UUID entUUID = entity.getState().getNbtData().getUUID();
+            UUID entUUID = entity.getState().getUUID();
             if (uuid.equals(entUUID)) {
                 iter.remove();
                 return;
@@ -140,7 +140,7 @@ public abstract class LinearClipboard extends SimpleClipboard {
     public void removeEntity(Entity entity) {
         if (!(entity instanceof BlockArrayClipboard.ClipboardEntity)) {
             Location loc = entity.getLocation();
-            removeEntity(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ(), entity.getState().getNbtData().getUUID());
+            removeEntity(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ(), entity.getState().getUUID());
         } else {
             this.entities.remove(entity);
         }

@@ -38,7 +38,7 @@ public class NativeEntityFunctionSet<NativeEntity, Result> extends AbstractSet<R
         if (!(get instanceof com.sk89q.worldedit.entity.Entity e)) {
             return false;
         }
-        UUID getUUID = e.getState().getNbtData().getUUID();
+        UUID getUUID = e.getState().getUUID();
         for (NativeEntity entity : nativeEntities) {
             UUID uuid = uuidGetter.apply(entity);
             if (uuid.equals(getUUID)) {
