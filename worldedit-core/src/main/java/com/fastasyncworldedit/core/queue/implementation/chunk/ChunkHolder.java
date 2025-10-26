@@ -36,6 +36,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 @SuppressWarnings("rawtypes")
 public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
+
     private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     public static ChunkHolder newInstance() {
@@ -54,6 +55,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     private boolean createCopy = false;
     private long initTime = -1L;
     private SideEffectSet sideEffectSet;
+    private WrapperChunk<? extends IChunk> parentWrapper = null;
 
     private ChunkHolder() {
         this.delegate = NULL;
@@ -63,7 +65,26 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         this.delegate = delegate;
     }
 
+    @Override
+    public void setWrapper(WrapperChunk<? extends IChunk> parentWrapper) {
+        if (parentWrapper == this.parentWrapper) {
+            return;
+        }
+        if (this.parentWrapper != null) {
+            throw new IllegalStateException("Wrapper already set");
+        }
+        this.parentWrapper = parentWrapper;
+    }
+
+    @Override
+    public void invalidateWrapper() {
+        if (this.parentWrapper != null) {
+            this.parentWrapper.invalidate(this);
+        }
+    }
+
     private static final AtomicBoolean recycleWarning = new AtomicBoolean(false);
+
     @Override
     public void recycle() {
         if (!recycleWarning.getAndSet(true)) {
@@ -346,10 +367,12 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
 
         @Override
         public void flushLightToGet(ChunkHolder chunk) {
-            chunk.chunkExisting.setLightingToGet(chunk.chunkSet.getLight(), chunk.chunkSet.getMinSectionPosition(),
+            chunk.chunkExisting.setLightingToGet(
+                    chunk.chunkSet.getLight(), chunk.chunkSet.getMinSectionPosition(),
                     chunk.chunkSet.getMaxSectionPosition()
             );
-            chunk.chunkExisting.setSkyLightingToGet(chunk.chunkSet.getSkyLight(), chunk.chunkSet.getMinSectionPosition(),
+            chunk.chunkExisting.setSkyLightingToGet(
+                    chunk.chunkSet.getSkyLight(), chunk.chunkSet.getMinSectionPosition(),
                     chunk.chunkSet.getMaxSectionPosition()
             );
         }
@@ -892,10 +915,13 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     public synchronized void filterBlocks(Filter filter, ChunkFilterBlock block, @Nullable Region region, boolean full) {
         final IChunkGet get = getOrCreateGet();
         final IChunkSet set = getOrCreateSet();
+        if (parentWrapper == null) {
+            parentWrapper = new WrapperChunk<>(this, () -> this.extent.getOrCreateChunk(getX(), getZ()));
+        }
         try {
-            block.filter(this, get, set, filter, region, full);
+            block.filter(parentWrapper, get, set, filter, region, full);
         } finally {
-            filter.finishChunk(this);
+            filter.finishChunk(parentWrapper);
         }
     }
 
@@ -998,6 +1024,13 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         this.extent = extent;
         this.chunkX = chunkX;
         this.chunkZ = chunkZ;
+        if (this.parentWrapper != null) {
+            try {
+                this.parentWrapper.invalidate(this);
+            } catch (IllegalStateException ignored) {
+            }
+            this.parentWrapper = null;
+        }
         if (chunkSet != null) {
             chunkSet.reset();
             delegate = SET;
@@ -1013,9 +1046,11 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         if (chunkSet != null && !chunkSet.isEmpty()) {
             IChunkSet copy = chunkSet.createCopy();
 
-            return this.call(extent, copy, () -> {
-                // Do nothing
-            });
+            return this.call(
+                    extent, copy, () -> {
+                        // Do nothing
+                    }
+            );
         }
         return null;
     }
@@ -1027,12 +1062,21 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     @Override
     public <U extends Future<U>> U call(IQueueExtent<? extends IChunk> owner, IChunkSet set, Runnable finalize) {
         if (set != null) {
+            if (parentWrapper != null) {
+                try {
+                    parentWrapper.invalidate(this);
+                } catch (Exception e) {
+                    LOGGER.error(this.initTime + " : " + ((ChunkHolder) parentWrapper.get()).initTime);
+                    throw e;
+                }
+            }
             IChunkGet get = getOrCreateGet();
             try {
                 get.lockCall();
                 trackExtent();
                 boolean postProcess = !(getExtent().getPostProcessor() instanceof EmptyBatchProcessor);
                 final int copyKey = get.setCreateCopy(postProcess);
+                // We should always be performing processing/postprocessing with this instance (i.e. not with this.parentWrapper)
                 final IChunkSet iChunkSet = getExtent().processSet(this, get, set);
                 Runnable finalizer;
                 if (postProcess) {
