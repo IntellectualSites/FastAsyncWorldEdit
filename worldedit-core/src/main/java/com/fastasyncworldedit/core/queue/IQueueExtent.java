@@ -5,6 +5,7 @@ import com.fastasyncworldedit.core.extent.processor.IBatchProcessorHolder;
 import com.fastasyncworldedit.core.internal.simd.SimdSupport;
 import com.fastasyncworldedit.core.internal.simd.VectorizedCharFilterBlock;
 import com.fastasyncworldedit.core.internal.simd.VectorizedFilter;
+import com.fastasyncworldedit.core.queue.implementation.chunk.WrapperChunk;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.math.BlockVector2;
@@ -166,11 +167,16 @@ public interface IQueueExtent<T extends IChunk> extends Flushable, Trimable, ICh
 //        if (!filter.appliesChunk(chunkX, chunkZ)) {
 //            return block;
 //        }
-        T chunk = this.getOrCreateChunk(chunkX, chunkZ);
+        T initial = this.getOrCreateChunk(chunkX, chunkZ);
+        WrapperChunk<T> chunk = new WrapperChunk<>(initial, () -> this.getOrCreateChunk(chunkX, chunkZ));
 
-        T newChunk = filter.applyChunk(chunk, region);
+        IChunk newChunk = filter.applyChunk(chunk, region);
+        if (newChunk == chunk) {
+            newChunk = chunk.get();
+        } else {
+            chunk.setWrapped((T) newChunk);
+        }
         if (newChunk != null) {
-            chunk = newChunk;
             if (block == null) {
                 if (SimdSupport.useVectorApi() && filter instanceof VectorizedFilter) {
                     block = new VectorizedCharFilterBlock(this);
@@ -181,12 +187,16 @@ public interface IQueueExtent<T extends IChunk> extends Flushable, Trimable, ICh
             block.initChunk(chunkX, chunkZ);
             chunk.filterBlocks(filter, block, region, full);
         }
-        this.submit(chunk);
+        // If null, then assume it has already been submitted and the WrapperChunk has therefore been invalidated
+        T toSubmit = chunk.get();
+        if (toSubmit != null) {
+            this.submit(toSubmit);
+        }
         return block;
     }
 
     @Override
-    default <T extends Filter> T apply(Region region, T filter, boolean full) {
+    default <U extends Filter> U apply(Region region, U filter, boolean full) {
         final Set<BlockVector2> chunks = region.getChunks();
         ChunkFilterBlock block = null;
         for (BlockVector2 chunk : chunks) {
