@@ -391,4 +391,12 @@ public interface IBukkitAdapter {
         return TaskManager.taskManager().sync(world::getEntities);
     }
 
+    /**
+     * Import Minecraft internal features into FAWE. Should be executed after worlds loading (in order to capture datapacks)
+     *
+     * @since TODO
+     */
+    default void setupFeatures() {
+    }
+
 }

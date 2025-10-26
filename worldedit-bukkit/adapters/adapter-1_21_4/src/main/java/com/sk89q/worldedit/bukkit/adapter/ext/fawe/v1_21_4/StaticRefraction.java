@@ -53,6 +53,12 @@ public final class StaticRefraction {
      */
     public static final String ADD_FRESH_ENTITY = Refraction.pickName("addFreshEntity", "b");
     /**
+     * {@code addFreshEntity(Entity entity, CreatureSpawnEvent.SpawnReason reason)}.
+     */
+    public static final String ADD_FRESH_ENTITY_SPAWN_REASON = Refraction.pickName(
+        "addFreshEntity", "b"
+    );
+    /**
      * {@code getBlockEntity(BlockPos blockPos)}.
      */
     public static final String GET_BLOCK_ENTITY = Refraction.pickName("getBlockEntity", "c_");

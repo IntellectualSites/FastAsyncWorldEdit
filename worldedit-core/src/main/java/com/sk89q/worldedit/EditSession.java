@@ -148,6 +148,8 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import com.sk89q.worldedit.world.generation.ConfiguredFeatureType;
+import com.sk89q.worldedit.world.generation.StructureType;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 import org.apache.logging.log4j.Logger;
 
@@ -4258,6 +4260,34 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
                 }
             }
         }
+        return changes;
+    }
+
+    /**
+     * Generate a feature into this EditSession
+     *
+     * @param feature  feature to generate
+     * @param position position to generate at
+     * @return blocks affected
+     *
+     * @since TODO
+     */
+    public int generateFeature(ConfiguredFeatureType feature, BlockVector3 position) {
+        feature.place(this, position);
+        return changes;
+    }
+
+    /**
+     * Generate a structure into this EditSession
+     *
+     * @param structure structure to generate
+     * @param position  position to generate at
+     * @return blocks affected
+     *
+     * @since TODO
+     */
+    public int generateStructure(StructureType structure, BlockVector3 position) {
+        structure.place(this, position);
         return changes;
     }
     //FAWE end
