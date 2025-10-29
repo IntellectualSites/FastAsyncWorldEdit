@@ -175,7 +175,7 @@ public class FastSchematicReaderV3 implements ClipboardReader {
                 default -> this.nbtInputStream.readTagPayloadLazy(type, 0);
             }
             if (clipboard == null && this.areDimensionsAvailable()) {
-                clipboard = createOutput.apply(this.dimensions);
+                clipboard = createOutput.apply(this.dimensions.toImmutable());
             }
         }
 
