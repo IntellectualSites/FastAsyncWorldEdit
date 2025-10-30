@@ -26,6 +26,7 @@ import java.util.UUID;
 
 public abstract class FaweRegionExtent extends ResettableExtent implements IBatchProcessor {
 
+    @Nullable
     private final FaweLimit limit;
     private final boolean hasLimit;
 
@@ -34,7 +35,7 @@ public abstract class FaweRegionExtent extends ResettableExtent implements IBatc
      *
      * @param extent the extent
      */
-    public FaweRegionExtent(Extent extent, FaweLimit limit) {
+    public FaweRegionExtent(Extent extent, @Nullable FaweLimit limit) {
         super(extent);
         this.limit = limit;
         this.hasLimit = limit != null;
