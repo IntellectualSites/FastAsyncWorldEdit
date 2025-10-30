@@ -46,7 +46,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     private volatile IChunkGet chunkExisting; // The existing chunk (e.g. a clipboard, or the world, before changes)
     private volatile IChunkSet chunkSet; // The blocks to be set to the chunkExisting
     private IBlockDelegate delegate; // delegate handles the abstraction of the chunk layers
-    private IQueueExtent<? extends IChunk> extent; // the parent queue extent which has this chunk
+    private IQueueExtent<?> extent; // the parent queue extent which has this chunk
     private int chunkX;
     private int chunkZ;
     private boolean fastmode;
@@ -55,7 +55,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     private boolean createCopy = false;
     private long initTime = -1L;
     private SideEffectSet sideEffectSet;
-    private WrapperChunk<? extends IChunk> parentWrapper = null;
+    private WrapperChunk<?> parentWrapper = null;
 
     private ChunkHolder() {
         this.delegate = NULL;
@@ -66,7 +66,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     }
 
     @Override
-    public void setWrapper(WrapperChunk<? extends IChunk> parentWrapper) {
+    public void setWrapper(WrapperChunk<?> parentWrapper) {
         if (parentWrapper == this.parentWrapper) {
             return;
         }
@@ -79,7 +79,9 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     @Override
     public void invalidateWrapper() {
         if (this.parentWrapper != null) {
-            this.parentWrapper.invalidate(this);
+            if (!this.parentWrapper.invalidate(this)) {
+                throw new IllegalStateException("Existing chunk not equal to expected");
+            }
         }
     }
 
@@ -917,6 +919,8 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         final IChunkSet set = getOrCreateSet();
         if (parentWrapper == null) {
             parentWrapper = new WrapperChunk<>(this, () -> this.extent.getOrCreateChunk(getX(), getZ()));
+        } else if (parentWrapper.get() != this) {
+            throw new IllegalStateException("Parent WrapperChunk is not storing this chunk!?");
         }
         try {
             block.filter(parentWrapper, get, set, filter, region, full);
@@ -1025,9 +1029,8 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         this.chunkX = chunkX;
         this.chunkZ = chunkZ;
         if (this.parentWrapper != null) {
-            try {
-                this.parentWrapper.invalidate(this);
-            } catch (IllegalStateException ignored) {
+            if (!this.parentWrapper.invalidate(this)) {
+                throw new IllegalStateException("Existing chunk not equal to expected");
             }
             this.parentWrapper = null;
         }
@@ -1060,14 +1063,11 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
      */
 
     @Override
-    public <U extends Future<U>> U call(IQueueExtent<? extends IChunk> owner, IChunkSet set, Runnable finalize) {
+    public <U extends Future<U>> U call(IQueueExtent<?> owner, IChunkSet set, Runnable finalize) {
         if (set != null) {
             if (parentWrapper != null) {
-                try {
-                    parentWrapper.invalidate(this);
-                } catch (Exception e) {
-                    LOGGER.error(this.initTime + " : " + ((ChunkHolder) parentWrapper.get()).initTime);
-                    throw e;
+                if (!parentWrapper.invalidate(this)) {
+                    throw new IllegalStateException("Existing chunk not equal to expected");
                 }
             }
             IChunkGet get = getOrCreateGet();
@@ -1111,7 +1111,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     /**
      * Get the extent this chunk is in.
      */
-    public IQueueExtent<? extends IChunk> getExtent() {
+    public IQueueExtent<?> getExtent() {
         return extent;
     }
 
