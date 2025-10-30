@@ -59,13 +59,19 @@ public class WrapperChunk<T extends IChunk> implements IChunk {
     public WrapperChunk(T initialValue, Supplier<T> supplier) {
         this.chunk = initialValue;
         this.supplier = supplier;
-        if (chunk instanceof ChunkHolder<?> holder) {
-            holder.setWrapper(this);
-        }
     }
 
     private T getWrapped() {
-        return chunk != null ? chunk : (chunk = supplier.get());
+        T c = this.chunk;
+        if (c != null) {
+            return c;
+        }
+        synchronized (this) {
+            if (this.chunk == null) {
+                this.chunk = supplier.get();
+            }
+            return this.chunk;
+        }
     }
 
     /**
@@ -78,16 +84,20 @@ public class WrapperChunk<T extends IChunk> implements IChunk {
     }
 
     /**
-     * Invalidate the currently stored chunk (set to null).
+     * Invalidate the currently stored chunk (set to null) if the existing {@link ChunkHolder} matches the expected.
      *
      * @param expected The {@link ChunkHolder} instance we expect.
-     * @throws IllegalStateException if the expected {@link ChunkHolder} is not the currently wrapped chunk
+     * @return true if the expected {@link ChunkHolder} is the currently wrapped chunk, false otherwise (and does not invalidate).
      */
-    void invalidate(ChunkHolder<?> expected) {
-        if (this.chunk != null && expected != this.chunk) {
-            throw new IllegalStateException("Existing chunk not equal to expected");
+    boolean invalidate(ChunkHolder<?> expected) {
+        T c = this.chunk;
+        if (c != null && expected != c) {
+            return false;
         }
-        this.chunk = null;
+        synchronized (this) {
+            this.chunk = null;
+        }
+        return true;
     }
 
     /**
@@ -97,9 +107,8 @@ public class WrapperChunk<T extends IChunk> implements IChunk {
      * @param chunk chunk to wrap
      */
     public void setWrapped(T chunk) {
-        this.chunk = Objects.requireNonNull(chunk);
-        if (chunk instanceof ChunkHolder<?> holder) {
-            holder.setWrapper(this);
+        synchronized (this) {
+            this.chunk = Objects.requireNonNull(chunk);
         }
     }
 
@@ -481,7 +490,7 @@ public class WrapperChunk<T extends IChunk> implements IChunk {
 
     @Override
     public <T extends Future<T>> T call(
-            final IQueueExtent<? extends IChunk> owner,
+            final IQueueExtent<?> owner,
             final IChunkSet set,
             final Runnable finalize
     ) {

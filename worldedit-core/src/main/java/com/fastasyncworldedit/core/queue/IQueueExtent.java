@@ -5,6 +5,7 @@ import com.fastasyncworldedit.core.extent.processor.IBatchProcessorHolder;
 import com.fastasyncworldedit.core.internal.simd.SimdSupport;
 import com.fastasyncworldedit.core.internal.simd.VectorizedCharFilterBlock;
 import com.fastasyncworldedit.core.internal.simd.VectorizedFilter;
+import com.fastasyncworldedit.core.queue.implementation.chunk.ChunkHolder;
 import com.fastasyncworldedit.core.queue.implementation.chunk.WrapperChunk;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.operation.Operation;
@@ -169,12 +170,20 @@ public interface IQueueExtent<T extends IChunk> extends Flushable, Trimable, ICh
 //        }
         T initial = this.getOrCreateChunk(chunkX, chunkZ);
         WrapperChunk<T> chunk = new WrapperChunk<>(initial, () -> this.getOrCreateChunk(chunkX, chunkZ));
+        if (initial instanceof ChunkHolder<?> holder) {
+            holder.setWrapper(chunk);
+        }
 
         IChunk newChunk = filter.applyChunk(chunk, region);
         if (newChunk == chunk) {
             newChunk = chunk.get();
         } else {
-            chunk.setWrapped((T) newChunk);
+            T c = (T) newChunk;
+            chunk.setWrapped(c);
+            // The IDE lies, it is possible for it to be a ChunkHolder because we're a little loose with our generic types...
+            if (c instanceof ChunkHolder<?> holder) {
+                holder.setWrapper(chunk);
+            }
         }
         if (newChunk != null) {
             if (block == null) {
