@@ -8,6 +8,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+@ApiStatus.Internal
 public interface IQueueChunk<T extends Future<T>> extends IChunk, Callable<T> {
 
     /**
@@ -29,8 +30,7 @@ public interface IQueueChunk<T extends Future<T>> extends IChunk, Callable<T> {
      * @throws IllegalStateException if there is already a wrapper set and a new wrapper instance is attempted to be se
      * @since TODO
      */
-    @ApiStatus.Internal
-    void setWrapper(WrapperChunk<? extends IChunk> parentWrapper);
+    void setWrapper(WrapperChunk<?> parentWrapper);
 
     /**
      * Invalidate the {@link WrapperChunk} if present.
