@@ -600,7 +600,7 @@ public interface Extent extends InputExtent, OutputExtent {
      * @param rarity     percentage chance of generating a deposit per attempt
      * @param minY       min Y to consider generation from (important for triangular generation)
      * @param maxY       max Y to consider generation from (important for triangular generation)
-     * @param triangular if a triangular distribution of ores should be used (rather than
+     * @param triangular if a triangular distribution of ores should be used (rather than flat)
      * @throws WorldEditException on error
      * @since TODO
      */
