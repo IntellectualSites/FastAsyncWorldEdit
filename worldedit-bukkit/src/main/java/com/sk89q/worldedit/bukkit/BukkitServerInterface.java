@@ -19,7 +19,9 @@
 
 package com.sk89q.worldedit.bukkit;
 
+import com.fastasyncworldedit.bukkit.FaweBukkit;
 import com.fastasyncworldedit.bukkit.util.MinecraftVersion;
+import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.extent.processor.PlacementStateProcessor;
 import com.fastasyncworldedit.core.extent.processor.lighting.RelighterFactory;
@@ -135,6 +137,15 @@ public class BukkitServerInterface extends AbstractPlatform implements MultiUser
 
     @Override
     public int schedule(long delay, long period, Runnable task) {
+        try {
+            FaweBukkit faweBukkit = Fawe.platform();
+            if (faweBukkit != null && faweBukkit.getScheduler() != null) {
+                faweBukkit.getScheduler().runTaskTimer(plugin, task, delay, period);
+                return 0;
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         return Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, task, delay, period);
     }
 

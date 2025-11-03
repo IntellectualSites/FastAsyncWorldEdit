@@ -19,7 +19,7 @@ import com.plotsquared.core.plot.schematic.Schematic;
 import com.plotsquared.core.util.FileUtils;
 import com.plotsquared.core.util.SchematicHandler;
 import com.plotsquared.core.util.task.RunnableVal;
-import com.plotsquared.core.util.task.TaskManager;
+import com.fastasyncworldedit.core.util.TaskManager;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.NBTInputStream;
 import com.sk89q.jnbt.NBTOutputStream;
@@ -91,7 +91,7 @@ public class FaweDelegateSchematicHandler {
             }
             if (schematic == null) {
                 if (whenDone != null) {
-                    TaskManager.runTask(whenDone);
+                    TaskManager.taskManager().task(whenDone);
                 }
                 return;
             }
@@ -110,14 +110,16 @@ public class FaweDelegateSchematicHandler {
                 if (actor != null) {
                     actor.sendMessage(TranslatableCaption.of("schematics.schematic_size_mismatch"));
                 }
-                TaskManager.runTask(whenDone);
+                if (whenDone != null) {
+                    TaskManager.taskManager().task(whenDone);
+                }
                 return;
             }
             if (((region.getMaximumPoint().x() - region.getMinimumPoint().x() + xOffset + 1) < WIDTH) || (
                     (region.getMaximumPoint().z() - region.getMinimumPoint().z() + zOffset + 1) < LENGTH) || (HEIGHT
                     > worldHeight)) {
                 if (whenDone != null) {
-                    TaskManager.runTask(whenDone);
+                    TaskManager.taskManager().task(whenDone);
                 }
                 return;
             }
@@ -158,7 +160,7 @@ public class FaweDelegateSchematicHandler {
                 clipboard.paste(editSession, to, true, false, true);
                 if (whenDone != null) {
                     whenDone.value = true;
-                    TaskManager.runTask(whenDone);
+                    TaskManager.taskManager().task(whenDone);
                 }
             }
         };
@@ -213,7 +215,7 @@ public class FaweDelegateSchematicHandler {
         if (tag == null) {
             LOGGER.warn("Cannot save empty tag");
             if (whenDone != null) {
-                TaskManager.runTask(whenDone);
+                TaskManager.taskManager().task(whenDone);
             }
             return;
         }

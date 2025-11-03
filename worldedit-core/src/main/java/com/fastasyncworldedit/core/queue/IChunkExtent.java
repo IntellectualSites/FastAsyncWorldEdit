@@ -91,7 +91,7 @@ public interface IChunkExtent<T extends IChunk> extends Extent {
     @Override
     default void setBlockLight(int x, int y, int z, int value) {
         final IChunk chunk = getOrCreateChunk(x >> 4, z >> 4);
-        chunk.setSkyLight(x & 15, y, z & 15, value);
+        chunk.setBlockLight(x & 15, y, z & 15, value);
     }
 
     @Override

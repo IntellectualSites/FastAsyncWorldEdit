@@ -155,6 +155,7 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
         }
         if (mode == 1 || mode == 4) { // small
             posDel = new FaweStreamPositionDelegate() {
+                final byte[] buffer = new byte[4];
                 int lx;
                 int ly;
                 int lz;
@@ -178,8 +179,6 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
                     out.write(b3);
                     out.write(b4);
                 }
-
-                final byte[] buffer = new byte[4];
 
                 @Override
                 public int readX(FaweInputStream in) throws IOException {
@@ -562,7 +561,10 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
 
     public Iterator<MutableFullBlockChange> getFullBlockIterator(BlockBag blockBag, int inventory, final boolean dir) throws
             IOException {
-        final FaweInputStream is = new FaweInputStream(getBlockIS());
+        final FaweInputStream is = getBlockIS();
+        if (is == null) {
+            return Collections.emptyIterator();
+        }
         final MutableFullBlockChange change = new MutableFullBlockChange(blockBag, inventory, dir);
         return new Iterator<MutableFullBlockChange>() {
             private MutableFullBlockChange last = read();
@@ -576,7 +578,6 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
                     return change;
                 } catch (EOFException ignored) {
                 } catch (Exception e) {
-                    e.printStackTrace();
                     e.printStackTrace();
                 }
                 try {
@@ -850,7 +851,7 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
 
             @Override
             public boolean accepts(final Change change) {
-                return change instanceof MutableTileChange;
+                return change instanceof MutableEntityChange;
             }
 
         }
@@ -1071,7 +1072,7 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
                 for (int i = 0; i < amount; i++) {
                     int x = posDel.readX(fis) + ox;
                     int y = posDel.readY(fis);
-                    int z = posDel.readZ(fis) + ox;
+                    int z = posDel.readZ(fis) + oz;
                     idDel.readCombined(fis, change);
                     summary.add(x, z, change.to);
                 }

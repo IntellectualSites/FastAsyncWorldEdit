@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.bukkit;
 
+import com.fastasyncworldedit.core.util.FoliaUtil;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.entity.BaseEntity;
@@ -83,11 +84,18 @@ public class BukkitEntity implements Entity {
     @Override
     public boolean setLocation(Location location) {
         org.bukkit.entity.Entity entity = entityRef.get();
-        if (entity != null) {
-            return entity.teleport(BukkitAdapter.adapt(location));
-        } else {
+        if (entity == null) {
             return false;
         }
+        if (FoliaUtil.isFoliaServer()) {
+            try {
+                entity.teleportAsync(BukkitAdapter.adapt(location)).get();
+                return true;
+            } catch (Exception e) {
+                return false;
+            }
+        }
+        return entity.teleport(BukkitAdapter.adapt(location));
     }
 
     @Override
@@ -111,19 +119,34 @@ public class BukkitEntity implements Entity {
 
     @Override
     public boolean remove() {
-        // synchronize the whole method, not just the remove operation as we always need to synchronize and
-        // can make sure the entity reference was not invalidated in the few milliseconds between the next available tick (lol)
-        return TaskManager.taskManager().sync(() -> {
-            org.bukkit.entity.Entity entity = entityRef.get();
-            if (entity != null) {
+        if (FoliaUtil.isFoliaServer()) {
+            return TaskManager.taskManager().syncWhenFree(() -> {
+                org.bukkit.entity.Entity entity = entityRef.get();
+                if (entity == null) {
+                    return true;
+                }
                 try {
-                    entity.remove();
+                    entity.getScheduler().execute(WorldEditPlugin.getInstance(), entity::remove, null, 1);
+                    return true;
                 } catch (UnsupportedOperationException e) {
                     return false;
                 }
-                return entity.isDead();
-            } else {
+            });
+        }
+        return TaskManager.taskManager().sync(() -> {
+            org.bukkit.entity.Entity entity = entityRef.get();
+            if (entity == null) {
                 return true;
+            }
+            try {
+                entity.remove();
+            } catch (UnsupportedOperationException e) {
+                return false;
+            }
+            try {
+                return entity.isDead();
+            } catch (Throwable t) {
+                return !entity.isValid();
             }
         });
     }

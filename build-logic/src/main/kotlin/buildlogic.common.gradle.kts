@@ -11,9 +11,12 @@ configurations.all {
     }
 }
 
-plugins.withId("java") {
-    the<JavaPluginExtension>().toolchain {
-        languageVersion.set(JavaLanguageVersion.of(21))
+allprojects {
+    plugins.withId("java") {
+        the<JavaPluginExtension>().toolchain {
+            languageVersion.set(JavaLanguageVersion.of(21))
+            vendor.set(JvmVendorSpec.ADOPTIUM)
+        }
     }
 }
 

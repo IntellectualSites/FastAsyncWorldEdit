@@ -10,6 +10,7 @@ import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.fastasyncworldedit.core.queue.IBatchProcessor;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.implementation.packet.ChunkPacket;
+import com.fastasyncworldedit.core.util.FoliaUtil;
 import com.fastasyncworldedit.core.util.NbtUtils;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.google.common.base.Preconditions;
@@ -21,6 +22,7 @@ import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.bukkit.adapter.ext.fawe.v1_21_5.PaperweightAdapter;
 import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_21_5.regen.PaperweightRegen;
@@ -54,6 +56,7 @@ import com.sk89q.worldedit.world.generation.StructureType;
 import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 import io.papermc.lib.PaperLib;
+import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
@@ -129,6 +132,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.OptionalInt;
 import java.util.Set;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -342,24 +347,45 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
     public BaseEntity getEntity(org.bukkit.entity.Entity entity) {
         Preconditions.checkNotNull(entity);
 
-        CraftEntity craftEntity = ((CraftEntity) entity);
-        Entity mcEntity = craftEntity.getHandle();
-
-        String id = getEntityId(mcEntity);
+        String id = entity.getType().getKey().toString();
         EntityType type = com.sk89q.worldedit.world.entity.EntityTypes.get(id);
         Supplier<LinCompoundTag> saveTag = () -> {
-            final net.minecraft.nbt.CompoundTag minecraftTag = new net.minecraft.nbt.CompoundTag();
-            if (!readEntityIntoTag(mcEntity, minecraftTag)) {
+            net.minecraft.nbt.CompoundTag minecraftTag = new net.minecraft.nbt.CompoundTag();
+            Entity mcEntity;
+
+            if (FoliaUtil.isFoliaServer()) {
+                CompletableFuture<Entity> handleFuture = new CompletableFuture<>();
+                entity.getScheduler().run(
+                        WorldEditPlugin.getInstance(),
+                        (ScheduledTask task) -> {
+                            try {
+                                handleFuture.complete(((CraftEntity) entity).getHandle());
+                            } catch (Throwable t) {
+                                handleFuture.completeExceptionally(t);
+                            }
+                        },
+                        () -> handleFuture.completeExceptionally(new CancellationException("Entity scheduler task cancelled"))
+                );
+                try {
+                    mcEntity = handleFuture.join();
+                } catch (Throwable t) {
+                    LOGGER.error("Failed to safely get NMS handle for {}", id, t);
+                    return null;
+                }
+            } else {
+                mcEntity = ((CraftEntity) entity).getHandle();
+            }
+
+            if (mcEntity == null || !readEntityIntoTag(mcEntity, minecraftTag)) {
                 return null;
             }
-            //add Id for AbstractChangeSet to work
-            final LinCompoundTag tag = (LinCompoundTag) toNativeLin(minecraftTag);
-            final Map<String, LinTag<?>> tags = NbtUtils.getLinCompoundTagValues(tag);
+
+            LinCompoundTag tag = (LinCompoundTag) toNativeLin(minecraftTag);
+            Map<String, LinTag<?>> tags = NbtUtils.getLinCompoundTagValues(tag);
             tags.put("Id", LinStringTag.of(id));
             return LinCompoundTag.of(tags);
         };
         return new LazyBaseEntity(type, saveTag);
-
     }
 
     @Override
@@ -546,20 +572,62 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
 
     @Override
     protected void preCaptureStates(final ServerLevel serverLevel) {
-        serverLevel.captureTreeGeneration = true;
-        serverLevel.captureBlockStates = true;
+        try {
+            Field captureTreeField = ServerLevel.class.getDeclaredField("captureTreeGeneration");
+            captureTreeField.setAccessible(true);
+            captureTreeField.setBoolean(serverLevel, true);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            // Unable to read captureTreeGeneration field
+        }
+        try {
+            Field captureBlockField = ServerLevel.class.getDeclaredField("captureBlockStates");
+            captureBlockField.setAccessible(true);
+            captureBlockField.setBoolean(serverLevel, true);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            // Unable to read captureTreeGeneration field
+        }
     }
 
     @Override
     protected List<org.bukkit.block.BlockState> getCapturedBlockStatesCopy(final ServerLevel serverLevel) {
-        return new ArrayList<>(serverLevel.capturedBlockStates.values());
+        try {
+            Field capturedStatesField = ServerLevel.class.getDeclaredField("capturedBlockStates");
+            capturedStatesField.setAccessible(true);
+            @SuppressWarnings("unchecked")
+            Map<BlockPos, org.bukkit.block.BlockState> capturedStates = (Map<BlockPos, org.bukkit.block.BlockState>) capturedStatesField.get(serverLevel);
+            return capturedStates != null ? new ArrayList<>(capturedStates.values()) : new ArrayList<>();
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            return new ArrayList<>();
+        }
     }
 
     @Override
     protected void postCaptureBlockStates(final ServerLevel serverLevel) {
-        serverLevel.captureBlockStates = false;
-        serverLevel.captureTreeGeneration = false;
-        serverLevel.capturedBlockStates.clear();
+        try {
+            Field captureBlockField = ServerLevel.class.getDeclaredField("captureBlockStates");
+            captureBlockField.setAccessible(true);
+            captureBlockField.setBoolean(serverLevel, false);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            // Unable to read captureTreeGeneration field
+        }
+        try {
+            Field captureTreeField = ServerLevel.class.getDeclaredField("captureTreeGeneration");
+            captureTreeField.setAccessible(true);
+            captureTreeField.setBoolean(serverLevel, false);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            // Unable to read captureTreeGeneration field
+        }
+        try {
+            Field capturedStatesField = ServerLevel.class.getDeclaredField("capturedBlockStates");
+            capturedStatesField.setAccessible(true);
+            @SuppressWarnings("unchecked")
+            Map<BlockPos, org.bukkit.block.BlockState> capturedStates = (Map<BlockPos, org.bukkit.block.BlockState>) capturedStatesField.get(serverLevel);
+            if (capturedStates != null) {
+                capturedStates.clear();
+            }
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            // Unable to read captureTreeGeneration field
+        }
     }
 
     @Override

@@ -27,6 +27,7 @@ import com.fastasyncworldedit.core.internal.exception.FaweException;
 import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.implementation.packet.ChunkPacket;
+import com.fastasyncworldedit.core.util.FoliaUtil;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
@@ -70,6 +71,7 @@ import org.bukkit.block.Chest;
 import org.bukkit.entity.Entity;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.plugin.Plugin;
 
 import java.lang.ref.WeakReference;
 import java.nio.file.Path;
@@ -81,6 +83,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -147,8 +150,9 @@ public class BukkitWorld extends AbstractWorld {
     @Override
     public List<com.sk89q.worldedit.entity.Entity> getEntities(Region region) {
         World world = getWorld();
-
-        List<Entity> ents = TaskManager.taskManager().sync(world::getEntities);
+        List<Entity> ents = FoliaUtil.isFoliaServer()
+                ? TaskManager.taskManager().syncWhenFree(world::getEntities)
+                : TaskManager.taskManager().sync(world::getEntities);
         List<com.sk89q.worldedit.entity.Entity> entities = new ArrayList<>();
         for (Entity ent : ents) {
             if (region.contains(BukkitAdapter.asBlockVector(ent.getLocation()))) {
@@ -160,9 +164,11 @@ public class BukkitWorld extends AbstractWorld {
 
     @Override
     public List<com.sk89q.worldedit.entity.Entity> getEntities() {
+        World world = getWorld();
+        List<Entity> ents = FoliaUtil.isFoliaServer()
+                ? TaskManager.taskManager().syncWhenFree(world::getEntities)
+                : TaskManager.taskManager().sync(world::getEntities);
         List<com.sk89q.worldedit.entity.Entity> list = new ArrayList<>();
-
-        List<Entity> ents = TaskManager.taskManager().sync(getWorld()::getEntities);
         for (Entity entity : ents) {
             list.add(BukkitAdapter.adapt(entity));
         }
@@ -170,11 +176,47 @@ public class BukkitWorld extends AbstractWorld {
     }
 
     @Override
-    public int removeEntities(final Region region) {
-        List<com.sk89q.worldedit.entity.Entity> entities = getEntities(region);
-        return TaskManager.taskManager().sync(() -> entities.stream()
-                .mapToInt(entity -> entity.remove() ? 1 : 0).sum()
-        );
+    public int removeEntities(Region region) {
+        World world = getWorld();
+        if (FoliaUtil.isFoliaServer()) {
+            return TaskManager.taskManager().syncWhenFree(() -> {
+                Plugin plugin = WorldEditPlugin.getInstance();
+                AtomicInteger scheduled = new AtomicInteger(0);
+                for (Entity entity : world.getEntities()) {
+                    if (!region.contains(BukkitAdapter.asBlockVector(entity.getLocation()))) {
+                        continue;
+                    }
+                    try {
+                        entity.getScheduler().execute(plugin, entity::remove, null, 1);
+                        scheduled.incrementAndGet();
+                    } catch (UnsupportedOperationException ignored) {
+                    }
+                }
+                return scheduled.get();
+            });
+        }
+        return TaskManager.taskManager().sync(() -> {
+            int removed = 0;
+            for (Entity entity : world.getEntities()) {
+                if (!region.contains(BukkitAdapter.asBlockVector(entity.getLocation()))) {
+                    continue;
+                }
+                try {
+                    entity.remove();
+                    try {
+                        if (entity.isDead() || !entity.isValid()) {
+                            removed++;
+                        }
+                    } catch (Throwable t) {
+                        if (!entity.isValid()) {
+                            removed++;
+                        }
+                    }
+                } catch (UnsupportedOperationException ignored) {
+                }
+            }
+            return removed;
+        });
     }
 
     //FAWE: createEntity was moved to IChunkExtent to prevent issues with Async Entity Add.

@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.bukkit;
 
+import com.fastasyncworldedit.core.util.FoliaUtil;
 import com.sk89q.worldedit.entity.metadata.EntityProperties;
 import org.bukkit.entity.AbstractVillager;
 import org.bukkit.entity.Ambient;
@@ -148,12 +149,24 @@ class BukkitEntityProperties implements EntityProperties {
 
     @Override
     public boolean isTamed() {
-        return entity instanceof Tameable && ((Tameable) entity).isTamed();
+        if (!(entity instanceof Tameable)) {
+            return false;
+        }
+        if (FoliaUtil.isFoliaServer()) {
+            return false;
+        }
+        return ((Tameable) entity).isTamed();
     }
 
     @Override
     public boolean isTagged() {
-        return entity instanceof LivingEntity && entity.getCustomName() != null;
+        if (!(entity instanceof LivingEntity)) {
+            return false;
+        }
+        if (FoliaUtil.isFoliaServer()) {
+            return false;
+        }
+        return entity.customName() != null;
     }
 
     @Override

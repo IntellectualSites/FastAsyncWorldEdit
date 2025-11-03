@@ -11,6 +11,7 @@ import com.fastasyncworldedit.core.math.BitArrayUnstretched;
 import com.fastasyncworldedit.core.math.IntPair;
 import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.fastasyncworldedit.core.queue.IChunkSet;
+import com.fastasyncworldedit.core.util.FoliaUtil;
 import com.fastasyncworldedit.core.util.MathMan;
 import com.fastasyncworldedit.core.util.NbtUtils;
 import com.fastasyncworldedit.core.util.collection.AdaptedMap;
@@ -23,6 +24,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.util.SideEffect;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import io.papermc.lib.PaperLib;
 import io.papermc.paper.event.block.BeaconDeactivatedEvent;
@@ -58,6 +60,8 @@ import net.minecraft.world.level.lighting.LevelLightEngine;
 import net.minecraft.world.level.storage.TagValueOutput;
 import net.minecraft.world.level.storage.ValueInput;
 import org.apache.logging.log4j.Logger;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.block.CraftBlock;
@@ -198,23 +202,30 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
 
     @Override
     public FaweCompoundTag tile(final int x, final int y, final int z) {
-        BlockEntity blockEntity = getChunk().getBlockEntity(new BlockPos((x & 15) + (
-                chunkX << 4), y, (z & 15) + (
-                chunkZ << 4)));
-        if (blockEntity == null) {
+        try {
+            BlockEntity blockEntity = getChunk().getBlockEntity(new BlockPos((x & 15) + (
+                    chunkX << 4), y, (z & 15) + (
+                    chunkZ << 4)));
+            if (blockEntity == null) {
+                return null;
+            }
+            return NMS_TO_TILE.apply(blockEntity);
+        } catch (NullPointerException e) {
             return null;
         }
-        return NMS_TO_TILE.apply(blockEntity);
-
     }
 
     @Override
     public Map<BlockVector3, FaweCompoundTag> tiles() {
-        Map<BlockPos, BlockEntity> nmsTiles = getChunk().getBlockEntities();
-        if (nmsTiles.isEmpty()) {
+        try {
+            Map<BlockPos, BlockEntity> nmsTiles = getChunk().getBlockEntities();
+            if (nmsTiles.isEmpty()) {
+                return Collections.emptyMap();
+            }
+            return AdaptedMap.immutable(nmsTiles, posNms2We, NMS_TO_TILE);
+        } catch (NullPointerException e) {
             return Collections.emptyMap();
         }
-        return AdaptedMap.immutable(nmsTiles, posNms2We, NMS_TO_TILE);
     }
 
     @Override
@@ -322,7 +333,20 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
     }
 
     private void removeEntity(Entity entity) {
-        entity.discard();
+        if (FoliaUtil.isFoliaServer()) {
+            entity.getBukkitEntity().getScheduler().execute(
+                WorldEditPlugin.getInstance(),
+                () -> {
+                    if (!entity.isRemoved()) {
+                        entity.discard();
+                    }
+                },
+                null,
+                1L
+            );
+        } else if (!entity.isRemoved()) {
+            entity.discard();
+        }
     }
 
     @Override
@@ -350,11 +374,11 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
         List<BlockEntity> beacons = null;
         if (!chunkTiles.isEmpty()) {
             for (Map.Entry<BlockPos, BlockEntity> entry : chunkTiles.entrySet()) {
-                final BlockPos pos = entry.getKey();
-                final int lx = pos.getX() & 15;
-                final int ly = pos.getY();
-                final int lz = pos.getZ() & 15;
-                final int layer = ly >> 4;
+                BlockPos pos = entry.getKey();
+                int lx = pos.getX() & 15;
+                int ly = pos.getY();
+                int lz = pos.getZ() & 15;
+                int layer = ly >> 4;
                 if (!set.hasSection(layer)) {
                     continue;
                 }
@@ -362,12 +386,26 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
                 int ordinal = set.getBlock(lx, ly, lz).getOrdinal();
                 if (ordinal != BlockTypesCache.ReservedIDs.__RESERVED__) {
                     BlockEntity tile = entry.getValue();
-                    if (PaperLib.isPaper() && tile instanceof BeaconBlockEntity) {
+                    if (PaperLib.isPaper() && tile instanceof BeaconBlockEntity beacon) {
                         if (beacons == null) {
                             beacons = new ArrayList<>();
                         }
-                        beacons.add(tile);
-                        PaperweightPlatformAdapter.removeBeacon(tile, nmsChunk);
+                        beacons.add(beacon);
+                        Location location = new Location(
+                                nmsWorld.getWorld(),
+                                beacon.getBlockPos().getX(),
+                                beacon.getBlockPos().getY(),
+                                beacon.getBlockPos().getZ()
+                        );
+                        if (FoliaUtil.isFoliaServer()) {
+                            Bukkit.getServer().getRegionScheduler().execute(
+                                    WorldEditPlugin.getInstance(),
+                                    location,
+                                    () -> PaperweightPlatformAdapter.removeBeacon(beacon, nmsChunk)
+                            );
+                        } else {
+                            PaperweightPlatformAdapter.removeBeacon(beacon, nmsChunk);
+                        }
                         continue;
                     }
                     nmsChunk.removeBlockEntity(tile.getBlockPos());
@@ -377,7 +415,7 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
                 }
             }
         }
-        final BiomeType[][] biomes = set.getBiomes();
+        BiomeType[][] biomes = set.getBiomes();
 
         int bitMask = 0;
         synchronized (nmsChunk) {
@@ -595,8 +633,7 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
             // Call beacon deactivate events here synchronously
             // list will be null on spigot, so this is an implicit isPaper check
             if (beacons != null && !beacons.isEmpty()) {
-                final List<BlockEntity> finalBeacons = beacons;
-
+                List<BlockEntity> finalBeacons = beacons;
                 syncTasks.add(() -> {
                     for (BlockEntity beacon : finalBeacons) {
                         BeaconBlockEntity.playSound(beacon.getLevel(), beacon.getBlockPos(), SoundEvents.BEACON_DEACTIVATE);
@@ -607,10 +644,9 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
 
             Set<UUID> entityRemoves = set.getEntityRemoves();
             if (entityRemoves != null && !entityRemoves.isEmpty()) {
-
                 syncTasks.add(() -> {
                     Set<UUID> entitiesRemoved = new HashSet<>();
-                    final List<Entity> entities = PaperweightPlatformAdapter.getEntities(nmsChunk);
+                    List<Entity> entities = PaperweightPlatformAdapter.getEntities(nmsChunk);
 
                     for (Entity entity : entities) {
                         UUID uuid = entity.getUUID();
@@ -639,32 +675,31 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
 
             Collection<FaweCompoundTag> entities = set.entities();
             if (entities != null && !entities.isEmpty()) {
-
                 syncTasks.add(() -> {
                     Iterator<FaweCompoundTag> iterator = entities.iterator();
                     while (iterator.hasNext()) {
-                        final FaweCompoundTag nativeTag = iterator.next();
-                        final LinCompoundTag linTag = nativeTag.linTag();
-                        final LinStringTag idTag = linTag.findTag("Id", LinTagType.stringTag());
-                        final LinListTag<LinDoubleTag> posTag = linTag.findListTag("Pos", LinTagType.doubleTag());
-                        final LinListTag<LinFloatTag> rotTag = linTag.findListTag("Rotation", LinTagType.floatTag());
+                        FaweCompoundTag nativeTag = iterator.next();
+                        LinCompoundTag linTag = nativeTag.linTag();
+                        LinStringTag idTag = linTag.findTag("Id", LinTagType.stringTag());
+                        LinListTag<LinDoubleTag> posTag = linTag.findListTag("Pos", LinTagType.doubleTag());
+                        LinListTag<LinFloatTag> rotTag = linTag.findListTag("Rotation", LinTagType.floatTag());
                         if (idTag == null || posTag == null || rotTag == null) {
                             LOGGER.error("Unknown entity tag: {}", nativeTag);
                             continue;
                         }
-                        final double x = posTag.get(0).valueAsDouble();
-                        final double y = posTag.get(1).valueAsDouble();
-                        final double z = posTag.get(2).valueAsDouble();
-                        final float yaw = rotTag.get(0).valueAsFloat();
-                        final float pitch = rotTag.get(1).valueAsFloat();
-                        final String id = idTag.value();
+                        double x = posTag.get(0).valueAsDouble();
+                        double y = posTag.get(1).valueAsDouble();
+                        double z = posTag.get(2).valueAsDouble();
+                        float yaw = rotTag.get(0).valueAsFloat();
+                        float pitch = rotTag.get(1).valueAsFloat();
+                        String id = idTag.value();
 
                         EntityType<?> type = EntityType.byString(id).orElse(null);
                         if (type != null) {
                             Entity entity = type.create(nmsWorld, EntitySpawnReason.COMMAND);
                             if (entity != null) {
-                                final CompoundTag tag = (CompoundTag) adapter.fromNativeLin(linTag);
-                                for (final String name : Constants.NO_COPY_ENTITY_NBT_FIELDS) {
+                                CompoundTag tag = (CompoundTag) adapter.fromNativeLin(linTag);
+                                for (String name : Constants.NO_COPY_ENTITY_NBT_FIELDS) {
                                     tag.remove(name);
                                 }
                                 // TODO (VI/O)
@@ -672,17 +707,33 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
                                 entity.load(input);
                                 entity.absSnapTo(x, y, z, yaw, pitch);
                                 entity.setUUID(NbtUtils.uuid(nativeTag));
-                                if (!nmsWorld.addFreshEntity(entity, CreatureSpawnEvent.SpawnReason.CUSTOM)) {
-                                    LOGGER.warn(
-                                            "Error creating entity of type `{}` in world `{}` at location `{},{},{}`",
-                                            id,
-                                            nmsWorld.getWorld().getName(),
-                                            x,
-                                            y,
-                                            z
-                                    );
-                                    // Unsuccessful create should not be saved to history
-                                    iterator.remove();
+                                Location location = new Location(nmsWorld.getWorld(), x, y, z);
+                                if (FoliaUtil.isFoliaServer()) {
+                                    Bukkit.getServer().getRegionScheduler().execute(WorldEditPlugin.getInstance(), location, () -> {
+                                        if (!nmsWorld.addFreshEntity(entity, CreatureSpawnEvent.SpawnReason.CUSTOM)) {
+                                            LOGGER.warn(
+                                                    "Error creating entity of type `{}` in world `{}` at location `{},{},{}`",
+                                                    id,
+                                                    nmsWorld.getWorld().getName(),
+                                                    x,
+                                                    y,
+                                                    z
+                                            );
+                                            iterator.remove();
+                                        }
+                                    });
+                                } else {
+                                    if (!nmsWorld.addFreshEntity(entity, CreatureSpawnEvent.SpawnReason.CUSTOM)) {
+                                        LOGGER.warn(
+                                                "Error creating entity of type `{}` in world `{}` at location `{},{},{}`",
+                                                id,
+                                                nmsWorld.getWorld().getName(),
+                                                x,
+                                                y,
+                                                z
+                                        );
+                                        iterator.remove();
+                                    }
                                 }
                             }
                         }
@@ -693,31 +744,39 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
             // set tiles
             Map<BlockVector3, FaweCompoundTag> tiles = set.tiles();
             if (tiles != null && !tiles.isEmpty()) {
-
                 syncTasks.add(() -> {
-                    for (final Map.Entry<BlockVector3, FaweCompoundTag> entry : tiles.entrySet()) {
-                        final FaweCompoundTag nativeTag = entry.getValue();
-                        final BlockVector3 blockHash = entry.getKey();
-                        final int x = blockHash.x() + bx;
-                        final int y = blockHash.y();
-                        final int z = blockHash.z() + bz;
-                        final BlockPos pos = new BlockPos(x, y, z);
+                    World world = nmsWorld.getWorld();
+                    for (Map.Entry<BlockVector3, FaweCompoundTag> entry : tiles.entrySet()) {
+                        FaweCompoundTag nativeTag = entry.getValue();
+                        BlockVector3 blockHash = entry.getKey();
+                        int x = blockHash.x() + bx;
+                        int y = blockHash.y();
+                        int z = blockHash.z() + bz;
+                        BlockPos pos = new BlockPos(x, y, z);
+                        Location location = new Location(world, x, y, z);
 
-                        synchronized (nmsWorld) {
-                            BlockEntity tileEntity = nmsWorld.getBlockEntity(pos);
-                            if (tileEntity == null || tileEntity.isRemoved()) {
-                                nmsWorld.removeBlockEntity(pos);
-                                tileEntity = nmsWorld.getBlockEntity(pos);
+                        Runnable setTile = () -> {
+                            synchronized (nmsChunk) {
+                                BlockEntity tileEntity = nmsChunk.getBlockEntity(pos);
+                                if (tileEntity == null || tileEntity.isRemoved()) {
+                                    nmsChunk.removeBlockEntity(pos);
+                                    tileEntity = nmsChunk.getBlockEntity(pos);
+                                }
+                                if (tileEntity != null) {
+                                    CompoundTag tag = (CompoundTag) adapter.fromNativeLin(nativeTag.linTag());
+                                    tag.put("x", IntTag.valueOf(x));
+                                    tag.put("y", IntTag.valueOf(y));
+                                    tag.put("z", IntTag.valueOf(z));
+                                    ValueInput input = createInput(tag);
+                                    tileEntity.loadWithComponents(input);
+                                }
                             }
-                            if (tileEntity != null) {
-                                final CompoundTag tag = (CompoundTag) adapter.fromNativeLin(nativeTag.linTag());
-                                tag.put("x", IntTag.valueOf(x));
-                                tag.put("y", IntTag.valueOf(y));
-                                tag.put("z", IntTag.valueOf(z));
-                                // TODO (VI/O)
-                                ValueInput input = createInput(tag);
-                                tileEntity.loadWithComponents(input);
-                            }
+                        };
+
+                        if (FoliaUtil.isFoliaServer()) {
+                            Bukkit.getServer().getRegionScheduler().execute(WorldEditPlugin.getInstance(), location, setTile);
+                        } else {
+                            setTile.run();
                         }
                     }
                 });
@@ -729,15 +788,13 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
             } else {
                 int finalMask = bitMask != 0 ? bitMask : lightUpdate ? set.getBitMask() : 0;
                 syncTasks.add(() -> {
-                    // Set Modified
                     nmsChunk.setLightCorrect(true);
                     nmsChunk.mustNotSave = false;
                 });
                 callback = () -> {
-                    // send to player
-                    if (!set
-                            .getSideEffectSet()
-                            .shouldApply(SideEffect.LIGHTING) || !Settings.settings().LIGHTING.DELAY_PACKET_SENDING || finalMask == 0 && biomes != null) {
+                    if (!set.getSideEffectSet().shouldApply(SideEffect.LIGHTING)
+                            || !Settings.settings().LIGHTING.DELAY_PACKET_SENDING
+                            || finalMask == 0 && biomes != null) {
                         this.send();
                     }
                     if (finalizer != null) {
