@@ -89,6 +89,12 @@ public final class EditSessionBuilder {
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
 
+    // Keep heightmaps to maintain behavior and use configured lighting mode
+    private static final SideEffectSet FAST_SIDE_EFFECTS = SideEffectSet.none()
+            .with(SideEffect.HEIGHTMAPS)
+            // apply default value to respect config setting `lighting.mode`
+            .with(SideEffect.LIGHTING, SideEffect.LIGHTING.getDefaultValue());
+
     private final EventBus eventBus;
     private FaweLimit limit;
     private AbstractChangeSet changeSet;
@@ -460,8 +466,7 @@ public final class EditSessionBuilder {
             }
         }
         if (sideEffectSet == null) {
-            // Keep heightmaps to maintain behaviour
-            sideEffectSet = fastMode ? SideEffectSet.none().with(SideEffect.HEIGHTMAPS) : SideEffectSet.defaults();
+            sideEffectSet = fastMode ? FAST_SIDE_EFFECTS : SideEffectSet.defaults();
         }
         if (checkMemory == null) {
             checkMemory = actor != null && !this.fastMode;
@@ -515,7 +520,7 @@ public final class EditSessionBuilder {
             }
             extent = this.bypassAll = wrapExtent(extent, eventBus, event, EditSession.Stage.BEFORE_CHANGE);
             this.bypassHistory = this.extent = wrapExtent(bypassAll, eventBus, event, EditSession.Stage.BEFORE_REORDER);
-            if (!this.fastMode  || this.sideEffectSet.shouldApply(SideEffect.HISTORY) || changeSet != null) {
+            if (!this.fastMode || this.sideEffectSet.shouldApply(SideEffect.HISTORY) || changeSet != null) {
                 if (changeSet == null) {
                     if (Settings.settings().HISTORY.USE_DISK) {
                         UUID uuid = actor == null ? Identifiable.CONSOLE : actor.getUniqueId();
