@@ -1065,16 +1065,10 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
         if (region != null && !region.contains(ox, oz)) {
             return summary;
         }
-        FaweInputStream fis;
-        try {
-            fis = getBlockIS();
-        } catch (IOException e) {
-            return summary;
-        }
-        if (fis == null) {
-            return summary;
-        }
-        try (fis) {
+        try (FaweInputStream fis = getBlockIS()) {
+            if (fis == null) {
+                return summary;
+            }
             if (!shallow) {
                 int amount = (Settings.settings().HISTORY.BUFFER_SIZE - HEADER_SIZE) / 9;
                 MutableFullBlockChange change = new MutableFullBlockChange(null, 0, false);
