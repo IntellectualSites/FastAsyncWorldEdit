@@ -62,6 +62,7 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.bukkit.block.Biome;
+import org.bukkit.block.TileState;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -191,8 +192,23 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
      * @param player  The player
      * @param pos     The position
      * @param nbtData The NBT Data
+     *
+     * @deprecated Only works for structure blocks
      */
+    @Deprecated
     void sendFakeNBT(Player player, BlockVector3 pos, LinCompoundTag nbtData);
+
+    /**
+     * Send the given NBT data to the player.
+     *
+     * @param player    The player
+     * @param pos       The position
+     * @param tileState The bukkit tile state
+     * @param nbtData   The NBT Data
+     *
+     * @implNote If the {@code nbtData} is null the nbt of the {@code tileEntity} will be used instead
+     */
+    void sendFakeNBT(Player player, BlockVector3 pos, TileState tileState, @Nullable LinCompoundTag nbtData);
 
     /**
      * Make the client think it has operator status.
