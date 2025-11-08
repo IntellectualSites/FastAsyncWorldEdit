@@ -52,10 +52,16 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.gamemode.GameMode;
 import com.sk89q.worldedit.world.gamemode.GameModes;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
+import org.bukkit.block.TileState;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerDropItemEvent;
@@ -436,21 +442,28 @@ public class BukkitPlayer extends AbstractPlayerActor {
     @Override
     public <B extends BlockStateHolder<B>> void sendFakeBlock(BlockVector3 pos, B block) {
         Location loc = new Location(player.getWorld(), pos.x(), pos.y(), pos.z());
+        BlockData data;
+        BlockState state;
+
         if (block == null) {
-            player.sendBlockChange(loc, player.getWorld().getBlockAt(loc).getBlockData());
+            Pair<BlockData, BlockState> worldBlock = TaskManager.taskManager().sync(() -> {
+                Block bukkitBlock = player.getWorld().getBlockAt(loc);
+                return ImmutablePair.of(bukkitBlock.getBlockData(), bukkitBlock.getState(true));
+            });
+
+            data = worldBlock.getLeft();
+            state = worldBlock.getRight();
         } else {
-            player.sendBlockChange(loc, BukkitAdapter.adapt(block));
-            BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
-            if (adapter != null) {
-                if (block.getBlockType() == BlockTypes.STRUCTURE_BLOCK && block instanceof BaseBlock) {
-                    LinCompoundTag nbt = ((BaseBlock) block).getNbt();
-                    if (nbt != null) {
-                        adapter.sendFakeNBT(player, pos, nbt);
-                        adapter.sendFakeOP(player);
-                    }
-                }
-            }
+            data = BukkitAdapter.adapt(block);
+            state = data.createBlockState();
         }
+
+        player.sendBlockChange(loc, data);
+        BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
+        if (adapter == null || !(state instanceof TileState tileState)) {
+            return;
+        }
+        adapter.sendFakeNBT(player, pos, tileState, block == null ? null : block.getNbt());
     }
 
     //FAWE start

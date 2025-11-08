@@ -76,6 +76,8 @@ import net.minecraft.core.HolderSet;
 import net.minecraft.core.Registry;
 import net.minecraft.core.SectionPos;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.network.protocol.game.ClientboundEntityEventPacket;
 import net.minecraft.resources.ResourceKey;
@@ -104,6 +106,7 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.entity.StructureBlockEntity;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
@@ -124,9 +127,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.World.Environment;
+import org.bukkit.block.TileState;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.craftbukkit.v1_20_R2.CraftServer;
 import org.bukkit.craftbukkit.v1_20_R2.CraftWorld;
+import org.bukkit.craftbukkit.v1_20_R2.block.CraftBlockEntityState;
 import org.bukkit.craftbukkit.v1_20_R2.block.data.CraftBlockData;
 import org.bukkit.craftbukkit.v1_20_R2.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_20_R2.entity.CraftPlayer;
@@ -156,6 +161,7 @@ import org.spigotmc.WatchdogThread;
 
 import javax.annotation.Nullable;
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -188,6 +194,7 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
     private final Field serverWorldsField;
     private final Method getChunkFutureMethod;
     private final Field chunkProviderExecutorField;
+    private final Constructor<?> blockEntityDataPacketConstructor;
     private final Watchdog watchdog;
 
     private static final RandomSource random = RandomSource.create();
@@ -218,6 +225,11 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
             Refraction.pickName("mainThreadProcessor", "g")
         );
         chunkProviderExecutorField.setAccessible(true);
+
+        blockEntityDataPacketConstructor = ClientboundBlockEntityDataPacket.class.getDeclaredConstructor(
+                BlockPos.class, BlockEntityType.class, net.minecraft.nbt.CompoundTag.class
+        );
+        blockEntityDataPacketConstructor.setAccessible(true);
 
         new PaperweightDataConverters(CraftMagicNumbers.INSTANCE.getDataVersion(), this).buildUnoptimized();
 
@@ -622,6 +634,30 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
                 ),
                 __ -> (net.minecraft.nbt.CompoundTag) fromNativeLin(nbtData)
         ));
+    }
+
+    @Override
+    public void sendFakeNBT(Player player, BlockVector3 pos, TileState tileState, @Nullable LinCompoundTag nbtData) {
+        try {
+            CraftBlockEntityState<?> craftState = (CraftBlockEntityState<?>) tileState;
+
+            CompoundTag vanillaNBT;
+            if (nbtData == null) {
+                vanillaNBT = craftState.getSnapshotNBT();
+            } else {
+                vanillaNBT = (net.minecraft.nbt.CompoundTag) fromNativeLin(nbtData);
+            }
+
+            ((CraftPlayer) player).getHandle().connection.send((Packet<?>)
+                blockEntityDataPacketConstructor.newInstance(
+                    new BlockPos(pos.x(), pos.y(), pos.z()),
+                    craftState.getTileEntity().getType(),
+                    vanillaNBT
+                )
+            );
+        } catch (ReflectiveOperationException e) {
+            logger.log(Level.WARNING, "Failed to construct ClientboundBlockEntityDataPacket", e);
+        }
     }
 
     @Override
