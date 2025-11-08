@@ -26,6 +26,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.bukkit.block.Biome;
+import org.bukkit.block.TileState;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -84,6 +85,11 @@ public interface IDelegateBukkitImplAdapter<T> extends BukkitImplAdapter<T> {
     @Override
     default void sendFakeNBT(Player player, BlockVector3 pos, LinCompoundTag nbtData) {
         getParent().sendFakeNBT(player, pos, nbtData);
+    }
+
+    @Override
+    default void sendFakeNBT(Player player, BlockVector3 pos, TileState tileState, @Nullable LinCompoundTag nbtData) {
+        getParent().sendFakeNBT(player, pos, tileState, nbtData);
     }
 
     @Override
