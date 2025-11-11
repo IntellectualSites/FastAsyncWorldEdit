@@ -1753,7 +1753,9 @@ public class LocalSession implements TextureHolder {
         //FAWE start
         builder.command(command);
         builder.fastMode(this.fastMode);
-        builder.setSideEffectSet(this.sideEffectSet);
+        if (!this.fastMode) {
+            builder.setSideEffectSet(this.sideEffectSet);
+        }
 
         EditSession editSession = builder.build();
 
