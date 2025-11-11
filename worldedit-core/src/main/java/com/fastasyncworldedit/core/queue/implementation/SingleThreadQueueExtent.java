@@ -36,6 +36,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -53,6 +54,7 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
     private final Long2ObjectLinkedOpenHashMap<IQueueChunk<?>> chunks = new Long2ObjectLinkedOpenHashMap<>();
     private final ConcurrentLinkedQueue<Future<?>> submissions = new ConcurrentLinkedQueue<>();
     private final ReentrantLock getChunkLock = new ReentrantLock();
+    private final AtomicReference<IQueueChunk> lastChunk = new AtomicReference<>();
     private World world = null;
     private int minY = 0;
     private int maxY = 255;
@@ -61,7 +63,6 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
     private boolean initialized;
     private Thread currentThread;
     // Last access pointers
-    private volatile IQueueChunk lastChunk;
     private boolean enabledQueue = true;
     private boolean fastmode = false;
     // Array for lazy avoidance of concurrent modification exceptions and needless overcomplication of code (synchronisation is
@@ -161,13 +162,13 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
             return;
         }
         getChunkLock.lock();
+        this.lastChunk.set(null);
         try {
             this.chunks.clear();
         } finally {
             getChunkLock.unlock();
         }
         this.enabledQueue = true;
-        this.lastChunk = null;
         this.currentThread = null;
         this.initialized = false;
         this.setProcessor(EmptyBatchProcessor.getInstance());
@@ -221,9 +222,7 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
 
     @Override
     public <V extends Future<V>> V submit(IQueueChunk chunk) {
-        if (lastChunk == chunk) {
-            lastChunk = null;
-        }
+        this.lastChunk.compareAndExchange(chunk, null);
         final long index = MathMan.pairInt(chunk.getX(), chunk.getZ());
         getChunkLock.lock();
         chunks.remove(index, chunk);
@@ -254,6 +253,8 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
             }
         }
 
+        chunk.invalidateWrapper();
+
         if (Fawe.isMainThread()) {
             V result = (V) chunk.call();
             if (result == null) {
@@ -277,8 +278,9 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
     public synchronized boolean trim(boolean aggressive) {
         cacheGet.trim(aggressive);
         cacheSet.trim(aggressive);
+        LOGGER.info("trim");
         if (Thread.currentThread() == currentThread) {
-            lastChunk = null;
+            lastChunk.set(null);
             return chunks.isEmpty();
         }
         if (!submissions.isEmpty()) {
@@ -316,7 +318,7 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
 
     @Override
     public final IQueueChunk getOrCreateChunk(int x, int z) {
-        final IQueueChunk lastChunk = this.lastChunk;
+        final IQueueChunk lastChunk = this.lastChunk.get();
         if (lastChunk != null && lastChunk.getX() == x && lastChunk.getZ() == z) {
             return lastChunk;
         }
@@ -330,7 +332,7 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
         try {
             IQueueChunk chunk = chunks.get(pair);
             if (chunk != null) {
-                this.lastChunk = chunk;
+                this.lastChunk.set(chunk);
                 return chunk;
             }
             final int size = chunks.size();
@@ -340,8 +342,9 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
             //  - queue size > target size and primary queue has less than num threads submissions
             int targetSize = lowMem ? Settings.settings().QUEUE.PARALLEL_THREADS + 8 : this.targetSize;
             if (enabledQueue && size > targetSize && (lowMem || Fawe.instance().getQueueHandler().isUnderutilized())) {
-                chunk = chunks.removeFirst();
-                final Future future = submitUnchecked(chunk);
+                IQueueChunk toSubmit = chunks.removeFirst();
+                this.lastChunk.compareAndExchange(toSubmit, null);
+                final Future future = submitUnchecked(toSubmit);
                 if (future != null && !future.isDone()) {
                     pollSubmissions(targetSize, lowMem);
                     submissions.add(future);
@@ -351,7 +354,7 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
             chunk = wrap(chunk);
 
             chunks.put(pair, chunk);
-            this.lastChunk = chunk;
+            this.lastChunk.set(chunk);
 
             return chunk;
         } finally {
@@ -481,6 +484,7 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
             if (MemUtil.isMemoryLimited()) {
                 while (!chunks.isEmpty()) {
                     IQueueChunk chunk = chunks.removeFirst();
+                    this.lastChunk.compareAndExchange(chunk, null);
                     final Future future = submitUnchecked(chunk);
                     if (future != null && !future.isDone()) {
                         pollSubmissions(Settings.settings().QUEUE.PARALLEL_THREADS, true);
@@ -490,6 +494,7 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
             } else {
                 while (!chunks.isEmpty()) {
                     IQueueChunk chunk = chunks.removeFirst();
+                    this.lastChunk.compareAndExchange(chunk, null);
                     final Future future = submitUnchecked(chunk);
                     if (future != null && !future.isDone()) {
                         submissions.add(future);
