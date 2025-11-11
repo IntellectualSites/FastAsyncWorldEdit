@@ -671,10 +671,12 @@ public class GenerationCommands {
             LocalSession session,
             EditSession editSession,
             @Selection Region region,
-            @Arg(desc = "Mask") Mask mask
+            @Arg(desc = "Mask") Mask mask,
+            @Switch(name = 'b', desc = "Make all ores deepslate equivalent for y<0") boolean deepslateBelowZero,
+            @Switch(name = 'd', desc = "Make all ores deepslate equivalent when placed into deepslate, tuff, etc.") boolean deepslateWhereDeepslate
     ) throws WorldEditException {
         new MaskTraverser(mask).setNewExtent(editSession);
-        editSession.addOres(region, mask);
+        editSession.addOres(region, mask, deepslateBelowZero, deepslateWhereDeepslate);
         actor.print(Caption.of("fawe.worldedit.visitor.visitor.block", editSession.getBlockChangeCount()));
     }
 
