@@ -54,7 +54,7 @@ junit = "6.0.1"
 pluginyml = "0.6.0"
 mod-publish-plugin = "1.1.0"
 grgit = "5.3.3"
-shadow = "9.0.2"
+shadow = "9.2.2"
 paperweight = "2.0.0-SNAPSHOT"
 codecov = "0.2.0"
 
