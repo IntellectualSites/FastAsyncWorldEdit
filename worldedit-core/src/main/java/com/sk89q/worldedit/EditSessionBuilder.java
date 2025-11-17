@@ -468,13 +468,21 @@ public final class EditSessionBuilder {
         if (sideEffectSet == null) {
             sideEffectSet = fastMode ? FAST_SIDE_EFFECTS : SideEffectSet.defaults();
         }
+        if (!fastMode && actor != null) {
+            sideEffectSet = sideEffectSet.with(
+                    SideEffect.ENTITY_EVENTS,
+                    limit.SKIP_ENTITY_SPAWN_EVENTS ? SideEffect.State.OFF : SideEffect.State.ON
+            );
+        }
         if (checkMemory == null) {
             checkMemory = actor != null && !this.fastMode;
         }
         if (checkMemory) {
             if (MemUtil.isMemoryLimitedSlow()) {
-                if (Permission.hasPermission(actor, "worldedit.fast")) {
+                if (actor != null && Permission.hasPermission(actor, "worldedit.fast")) {
                     actor.print(Caption.of("fawe.info.worldedit.oom.admin"));
+                } else {
+                    LOGGER.warn("Low memory");
                 }
                 throw FaweCache.LOW_MEMORY;
             }
