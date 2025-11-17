@@ -47,6 +47,14 @@ public final class NullChunk implements IQueueChunk {
         return true;
     }
 
+    @Override
+    public void setWrapper(final WrapperChunk parentWrapper) {
+    }
+
+    @Override
+    public void invalidateWrapper() {
+    }
+
     public Future call() {
         return null;
     }
