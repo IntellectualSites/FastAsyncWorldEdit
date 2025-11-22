@@ -11,6 +11,10 @@ val platform = extensions.create<buildlogic.PlatformExtension>("platform")
 platform.includeClasspath.convention(false)
 platform.extraAttributes.convention(mapOf())
 
+shadow {
+    addShadowVariantIntoJavaComponent = false
+}
+
 tasks.named<ShadowJar>("shadowJar") {
     archiveClassifier.set("dist")
     relocate("com.sk89q.jchronic", "com.sk89q.worldedit.jchronic")
@@ -31,11 +35,6 @@ tasks.named<ShadowJar>("shadowJar") {
         exclude(dependency(jchronic))
         exclude(dependency(stringyLibs.getLibrary("lz4Java").get()))
     }
-}
-val javaComponent = components["java"] as AdhocComponentWithVariants
-// I don't think we want this published (it's the shadow jar)
-javaComponent.withVariantsFromConfiguration(configurations["shadowRuntimeElements"]) {
-    skip()
 }
 
 tasks.named<Jar>("jar") {
