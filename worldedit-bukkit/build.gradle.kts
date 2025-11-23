@@ -1,11 +1,7 @@
-import buildlogic.getLibrary
 import buildlogic.sourceSets
-import buildlogic.stringyLibs
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.shadowJar
 import io.papermc.paperweight.userdev.attribute.Obfuscation
 import me.modmuss50.mpp.ReleaseType
-import kotlin.getOrElse
 
 plugins {
     `java-library`
@@ -256,9 +252,9 @@ publishMods {
             "FastAsyncWorldEdit/releases/tag/${project.version}")
 
     val common = modrinthOptions {
-        accessToken.set(System.getenv("MODRINTH_TOKEN"))
-        projectId.set("z4HZZnLr")
-        projectDescription.set(providers.fileContents { layout.projectDirectory.file("README.md") as File }.asText)
+        accessToken = providers.environmentVariable("MODRINTH_TOKEN")
+        projectId = "z4HZZnLr"
+        projectDescription = providers.fileContents(layout.projectDirectory.file("README.md")).asText
     }
 
     // We publish the reobfJar twice to ensure that the modrinth download menu picks the right jar for the platform regardless
