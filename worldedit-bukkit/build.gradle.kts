@@ -1,11 +1,7 @@
-import buildlogic.getLibrary
 import buildlogic.sourceSets
-import buildlogic.stringyLibs
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.shadowJar
 import io.papermc.paperweight.userdev.attribute.Obfuscation
 import me.modmuss50.mpp.ReleaseType
-import kotlin.getOrElse
 
 plugins {
     `java-library`
@@ -256,39 +252,38 @@ publishMods {
             "FastAsyncWorldEdit/releases/tag/${project.version}")
 
     val common = modrinthOptions {
-        accessToken.set(System.getenv("MODRINTH_TOKEN"))
-        projectId.set("z4HZZnLr")
-        projectDescription.set(providers.fileContents { layout.projectDirectory.file("README.md") as File }.asText)
+        accessToken = providers.environmentVariable("MODRINTH_TOKEN")
+        projectId = "z4HZZnLr"
+        projectDescription = providers.fileContents(layout.projectDirectory.file("README.md")).asText
     }
 
     // We publish the reobfJar twice to ensure that the modrinth download menu picks the right jar for the platform regardless
     // of minecraft version.
-
-    val mojmapPaperVersions = listOf("1.20.6", "1.21.7", "1.21.8", "1.21.9", "1.21.10")
+    val mojmapPaperVersions = listOf("1.20.6", "1.21.1", "1.21.4", "1.21.5", "1.21.6", "1.21.7", "1.21.8", "1.21.9", "1.21.10")
     val spigotMappedPaperVersions = listOf("1.20.2", "1.20.4")
 
     // Mark reobfJar as spigot only for 1.20.5+
     modrinth("spigot") {
         from(common)
-        file.set(tasks.named<ShadowJar>("reobfShadowJar").flatMap { it.archiveFile })
-        minecraftVersions.set(mojmapPaperVersions)
-        modLoaders.set(listOf("spigot"))
+        file = tasks.named<ShadowJar>("reobfShadowJar").flatMap { it.archiveFile }
+        minecraftVersions = mojmapPaperVersions
+        modLoaders = listOf("spigot")
     }
 
     // Mark reobfJar as spigot & paper for <1.20.5
     modrinth("spigotAndOldPaper") {
         from(common)
-        file.set(tasks.named<ShadowJar>("reobfShadowJar").flatMap { it.archiveFile })
-        minecraftVersions.set(spigotMappedPaperVersions)
-        modLoaders.set(listOf("paper", "spigot"))
+        file = tasks.named<ShadowJar>("reobfShadowJar").flatMap { it.archiveFile }
+        minecraftVersions = spigotMappedPaperVersions
+        modLoaders = listOf("paper", "spigot")
     }
 
     // Mark mojang mapped jar as paper 1.20.5+ only
     modrinth {
         from(common)
-        file.set(tasks.named<ShadowJar>("shadowJar").flatMap { it.archiveFile })
-        minecraftVersions.set(mojmapPaperVersions)
-        modLoaders.set(listOf("paper"))
+        file = tasks.named<ShadowJar>("shadowJar").flatMap { it.archiveFile }
+        minecraftVersions = mojmapPaperVersions
+        modLoaders = listOf("paper")
     }
 
     // dryRun.set(true) // For testing
