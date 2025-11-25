@@ -130,7 +130,7 @@ public class BaseEntity implements NbtValued {
      * Attempt to retrieve the entity's UUID from its NBT tag
      *
      * @return entity UUID if possible to retrieve
-     * @since TODO
+     * @since 2.14.1
      */
     @Nullable
     public UUID getUUID() {

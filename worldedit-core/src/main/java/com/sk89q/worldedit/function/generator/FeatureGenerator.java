@@ -28,7 +28,7 @@ import com.sk89q.worldedit.world.generation.ConfiguredFeatureType;
 /**
  * Generate a feature at the given location
  *
- * @since TODO
+ * @since 2.14.1
  */
 public class FeatureGenerator implements RegionFunction {
 
@@ -41,7 +41,7 @@ public class FeatureGenerator implements RegionFunction {
      * @param editSession the edit session
      * @param featureType the feature type
      *
-     * @since TODO
+     * @since 2.14.1
      */
     public FeatureGenerator(EditSession editSession, ConfiguredFeatureType featureType) {
         this.editSession = editSession;

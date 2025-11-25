@@ -4270,7 +4270,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * @param position position to generate at
      * @return blocks affected
      *
-     * @since TODO
+     * @since 2.14.1
      */
     public int generateFeature(ConfiguredFeatureType feature, BlockVector3 position) {
         feature.place(this, position);
@@ -4284,7 +4284,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * @param position  position to generate at
      * @return blocks affected
      *
-     * @since TODO
+     * @since 2.14.1
      */
     public int generateStructure(StructureType structure, BlockVector3 position) {
         structure.place(this, position);

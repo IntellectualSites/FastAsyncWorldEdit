@@ -20,7 +20,7 @@ import javax.annotation.Nullable;
 /**
  * Places a feature
  *
- * @since TODO
+ * @since 2.14.1
  */
 public class FeaturePlacer implements BlockTool {
 
@@ -29,7 +29,7 @@ public class FeaturePlacer implements BlockTool {
     /**
      * New instance
      *
-     * @since TODO
+     * @since 2.14.1
      */
     public FeaturePlacer(ConfiguredFeatureType feature) {
         this.feature = feature;

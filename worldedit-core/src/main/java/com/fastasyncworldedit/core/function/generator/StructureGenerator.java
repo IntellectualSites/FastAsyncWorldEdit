@@ -9,7 +9,7 @@ import com.sk89q.worldedit.world.generation.StructureType;
 /**
  * Generate a structure at the given location
  *
- * @since TODO
+ * @since 2.14.1
  */
 public class StructureGenerator implements RegionFunction {
 
@@ -22,7 +22,7 @@ public class StructureGenerator implements RegionFunction {
      * @param editSession   the edit session
      * @param structureType the structure type
      *
-     * @since TODO
+     * @since 2.14.1
      */
     public StructureGenerator(EditSession editSession, StructureType structureType) {
         this.editSession = editSession;

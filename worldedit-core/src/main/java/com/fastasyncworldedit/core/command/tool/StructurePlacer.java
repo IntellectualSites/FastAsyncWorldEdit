@@ -20,7 +20,7 @@ import javax.annotation.Nullable;
 /**
  * Places a structure
  *
- * @since TODO
+ * @since 2.14.1
  */
 public class StructurePlacer implements BlockTool {
 
@@ -29,7 +29,7 @@ public class StructurePlacer implements BlockTool {
     /**
      * New instance
      *
-     * @since TODO
+     * @since 2.14.1
      */
     public StructurePlacer(StructureType structure) {
         this.structure = structure;
