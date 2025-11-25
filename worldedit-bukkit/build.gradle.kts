@@ -166,14 +166,14 @@ tasks.register<ShadowJar>("reobfShadowJar") {
 
     // as is done by shadow for the default shadowJar
     from(sourceSets.main.map { it.output })
-    manifest.inheritFrom(tasks.jar.get().manifest)
-    exclude("META-INF/INDEX.LIST", "META-INF/*.SF", "META-INF/*.DSA", "META-INF/*.RSA", "module-info.class")
-
-    manifest {
-        attributes(
-            "FAWE-Plugin-Jar-Type" to "spigot"
-        )
+    manifest.from(tasks.jar.get().manifest) {
+     eachEntry {
+         if (key == "FAWE-Plugin-Jar-Type") {
+             value = "spigot"
+         }
+     }
     }
+    exclude("META-INF/INDEX.LIST", "META-INF/*.SF", "META-INF/*.DSA", "META-INF/*.RSA", "module-info.class")
 }
 
 tasks.named<ShadowJar>("shadowJar") {
