@@ -9,7 +9,7 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - name: Validate Gradle Wrapper
         uses: gradle/actions/wrapper-validation@v5
       - name: Setup Java
