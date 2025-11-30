@@ -52,8 +52,6 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.gamemode.GameMode;
 import com.sk89q.worldedit.world.gamemode.GameModes;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -446,13 +444,13 @@ public class BukkitPlayer extends AbstractPlayerActor {
         BlockState state;
 
         if (block == null) {
-            Pair<BlockData, BlockState> worldBlock = TaskManager.taskManager().sync(() -> {
+            Map.Entry<BlockData, BlockState> worldBlock = TaskManager.taskManager().sync(() -> {
                 Block bukkitBlock = player.getWorld().getBlockAt(loc);
-                return ImmutablePair.of(bukkitBlock.getBlockData(), bukkitBlock.getState(true));
+                return Map.entry(bukkitBlock.getBlockData(), bukkitBlock.getState(true));
             });
 
-            data = worldBlock.getLeft();
-            state = worldBlock.getRight();
+            data = worldBlock.getKey();
+            state = worldBlock.getValue();
         } else {
             data = BukkitAdapter.adapt(block);
             state = data.createBlockState();
