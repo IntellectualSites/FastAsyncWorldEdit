@@ -62,7 +62,7 @@ public class UpdateNotification {
                     "This is not an official build distributed via https://ci.athion.net/job/FastAsyncWorldEdit/");
             return;
         }
-        if (Settings.settings().ENABLED_COMPONENTS.SNAPSHOT_UPDATE_NOTIFICATIONS) {
+        if (Settings.settings().ENABLED_COMPONENTS.SNAPSHOT_UPDATE_NOTIFICATIONS && installedVersion.build > 0) {
             checkLatestBuild().orTimeout(10, TimeUnit.SECONDS).whenComplete((build, throwable) -> {
                 if (throwable != null) {
                     LOGGER.error("Failed to check for latest build", throwable);
@@ -76,14 +76,14 @@ public class UpdateNotification {
                 LOGGER.warn(CONSOLE_NOTIFICATION_OUTDATED_BUILD, difference, installedVersion.build, lastBuild, LINK_DOWNLOAD_JENKINS);
             });
         }
-        if (Settings.settings().ENABLED_COMPONENTS.RELEASE_UPDATE_NOTIFICATIONS) {
+        if (Settings.settings().ENABLED_COMPONENTS.RELEASE_UPDATE_NOTIFICATIONS && installedVersion.semver != null) {
             checkLatestRelease().orTimeout(10, TimeUnit.SECONDS).whenComplete((version, throwable) -> {
                 if (throwable != null) {
                     LOGGER.error("Failed to check for latest release", throwable);
                     return;
                 }
                 lastRelease = version;
-                if (installedVersion.semver != null && hasUpdateSemver(installedVersion.semver, version)) {
+                if (hasUpdateSemver(installedVersion.semver, version)) {
                     LOGGER.warn(CONSOLE_NOTIFICATION_OUTDATED_RELEASE,
                             StringUtil.joinString(lastRelease, ".", 0),
                             StringUtil.joinString(installedVersion.semver, ".", 0),
