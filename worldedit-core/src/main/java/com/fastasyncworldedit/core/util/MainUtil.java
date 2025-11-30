@@ -33,6 +33,7 @@ import net.jpountz.lz4.LZ4BlockOutputStream;
 import net.jpountz.lz4.LZ4Compressor;
 import net.jpountz.lz4.LZ4Factory;
 import net.jpountz.lz4.LZ4FastDecompressor;
+import net.jpountz.xxhash.XXHashFactory;
 import org.apache.logging.log4j.Logger;
 import org.enginehub.linbus.tree.LinCompoundTag;
 
@@ -103,6 +104,7 @@ public class MainUtil {
     private static final HttpClient HTTP_CLIENT = HttpClient.newBuilder()
             .followRedirects(HttpClient.Redirect.NORMAL)
             .build();
+    private static final int LZ4_DEFAULT_SEED = 0x9747b28c;
 
     public static List<String> filter(String prefix, List<String> suggestions) {
         if (prefix.isEmpty()) {
@@ -299,14 +301,27 @@ public class MainUtil {
         LZ4Factory factory = LZ4Factory.fastestInstance();
         int fastAmount = 1 + ((amount - 1) % 3);
         for (int i = 0; i < fastAmount; i++) {
-            os = new LZ4BlockOutputStream(os, buffer, factory.fastCompressor());
+            // (syncFlush can't be provided without providing explicit Checksum instance)
+            //noinspection resource - default LZ4 implementation doesn't close Checksum
+            os = new LZ4BlockOutputStream(
+                    os, buffer, factory.fastCompressor(),
+                    XXHashFactory.fastestInstance().newStreamingHash32(LZ4_DEFAULT_SEED).asChecksum(), true
+            );
         }
         int highAmount = amount > 3 ? 1 : 0;
         for (int i = 0; i < highAmount; i++) {
             if (amount == 9) {
-                os = new LZ4BlockOutputStream(os, buffer, factory.highCompressor(17));
+                //noinspection resource - default LZ4 implementation doesn't close Checksum
+                os = new LZ4BlockOutputStream(
+                        os, buffer, factory.highCompressor(17),
+                        XXHashFactory.fastestInstance().newStreamingHash32(LZ4_DEFAULT_SEED).asChecksum(), true
+                );
             } else {
-                os = new LZ4BlockOutputStream(os, buffer, factory.highCompressor());
+                //noinspection resource - default LZ4 implementation doesn't close Checksum
+                os = new LZ4BlockOutputStream(
+                        os, buffer, factory.highCompressor(),
+                        XXHashFactory.fastestInstance().newStreamingHash32(LZ4_DEFAULT_SEED).asChecksum(), true
+                );
             }
         }
         os = new FastBufferedOutputStream(os, buffer);
