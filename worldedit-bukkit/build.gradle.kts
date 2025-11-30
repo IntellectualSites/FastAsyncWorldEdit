@@ -171,6 +171,9 @@ tasks.register<ShadowJar>("reobfShadowJar") {
          if (key == "FAWE-Plugin-Jar-Type") {
              value = "spigot"
          }
+         if (key == "paperweight-mappings-namespace") {
+             exclude()
+         }
      }
     }
     exclude("META-INF/INDEX.LIST", "META-INF/*.SF", "META-INF/*.DSA", "META-INF/*.RSA", "module-info.class")
