@@ -135,7 +135,7 @@ public interface IChunkExtent<T extends IChunk> extends Extent {
         posList.add(LinDoubleTag.of(location.y()));
         posList.add(LinDoubleTag.of(location.z()));
         map.put("Pos", LinListTag.of(LinTagType.doubleTag(), posList));
-
+        // Todo: Add again rotation
         NbtUtils.addUUIDToMap(map, uuid);
 
         chunk.entity(FaweCompoundTag.of(LinCompoundTag.of(map)));
