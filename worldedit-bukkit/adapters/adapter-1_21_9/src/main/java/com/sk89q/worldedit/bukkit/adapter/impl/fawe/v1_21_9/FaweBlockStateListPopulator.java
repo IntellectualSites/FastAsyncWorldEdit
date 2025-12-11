@@ -6,11 +6,15 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
 import net.minecraft.core.SectionPos;
+import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeManager;
@@ -22,9 +26,11 @@ import net.minecraft.world.level.chunk.status.ChunkStatus;
 import net.minecraft.world.level.lighting.LevelLightEngine;
 import net.minecraft.world.level.material.FluidState;
 import org.bukkit.craftbukkit.util.BlockStateListPopulator;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.List;
 
 public class FaweBlockStateListPopulator extends BlockStateListPopulator {
 
@@ -68,6 +74,36 @@ public class FaweBlockStateListPopulator extends BlockStateListPopulator {
     @Nonnull
     public RandomSource getRandom() {
         return world.getRandom();
+    }
+
+    @Override
+    public void playSound(
+            final Entity source,
+            final BlockPos pos,
+            final SoundEvent sound,
+            final SoundSource category,
+            final float volume,
+            final float pitch
+    ) {
+        // don't for now
+    }
+
+    @Override
+    public void addParticle(
+            final ParticleOptions parameters,
+            final double x,
+            final double y,
+            final double z,
+            final double velocityX,
+            final double velocityY,
+            final double velocityZ
+    ) {
+        // definitely don't
+    }
+
+    @Override
+    public @NotNull List<? extends Player> players() {
+        return world.players();
     }
 
     @Override
