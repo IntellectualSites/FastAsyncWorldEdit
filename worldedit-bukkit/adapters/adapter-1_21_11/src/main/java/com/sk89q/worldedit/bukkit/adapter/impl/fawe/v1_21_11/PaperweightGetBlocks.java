@@ -55,7 +55,6 @@ import net.minecraft.world.level.chunk.PalettedContainer;
 import net.minecraft.world.level.chunk.PalettedContainerRO;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.lighting.LevelLightEngine;
-import net.minecraft.world.level.storage.TagValueOutput;
 import net.minecraft.world.level.storage.ValueInput;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.World;
@@ -305,10 +304,9 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
             return Collections.emptyList();
         }
         return new NativeEntityFunctionSet<>(entities, Entity::getUUID, e -> {
-            // TODO (VI/O)
-            TagValueOutput output = createOutput();
+            LinValueOutput output = createOutput();
             e.save(output);
-            return FaweCompoundTag.of(() -> (LinCompoundTag) adapter.toNativeLin(output.buildResult()));
+            return FaweCompoundTag.of(output::buildResult);
         });
     }
 

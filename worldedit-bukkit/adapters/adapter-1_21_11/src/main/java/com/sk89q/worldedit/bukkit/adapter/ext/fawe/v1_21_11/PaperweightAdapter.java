@@ -38,6 +38,7 @@ import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
+import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_21_11.LinValueOutput;
 import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_21_11.PaperweightFaweAdapter;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.extension.platform.Watchdog;
@@ -134,7 +135,6 @@ import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureStart;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.PrimaryLevelData;
-import net.minecraft.world.level.storage.TagValueOutput;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.BlockHitResult;
@@ -299,18 +299,6 @@ public final class PaperweightAdapter implements BukkitImplAdapter<Tag> {
         return EntityType.getKey(entity.getType()).toString();
     }
 
-    /**
-     * Write the entity's NBT data to the given tag.
-     *
-     * @param entity the entity
-     * @param tag the tag
-     */
-    private static boolean readEntityIntoTag(Entity entity, CompoundTag tag) {
-        // TODO (VI/O)
-        ValueOutput output = createOutput(tag);
-        return entity.save(output);
-    }
-
     private static Block getBlockFromType(BlockType blockType) {
         return DedicatedServer.getServer().registryAccess().lookupOrThrow(Registries.BLOCK).getValue(Identifier.tryParse(blockType.id()));
     }
@@ -391,10 +379,9 @@ public final class PaperweightAdapter implements BukkitImplAdapter<Tag> {
         // Read the NBT data
         BlockEntity te = chunk.getBlockEntity(blockPos);
         if (te != null) {
-            // TODO (VI/O)
-            TagValueOutput output = createOutput();
+            LinValueOutput output = createOutput();
             te.saveWithId(output);
-            return state.toBaseBlock(LazyReference.from(() -> (LinCompoundTag) toNativeLin(output.buildResult())));
+            return state.toBaseBlock(LazyReference.from(output::buildResult));
         }
 
         return state.toBaseBlock();
@@ -492,14 +479,11 @@ public final class PaperweightAdapter implements BukkitImplAdapter<Tag> {
 
         String id = getEntityId(mcEntity);
 
-        CompoundTag tag = new CompoundTag();
-        if (!readEntityIntoTag(mcEntity, tag)) {
+        LinValueOutput output = createOutput();
+        if (!mcEntity.save(output)) {
             return null;
         }
-        return new BaseEntity(
-            EntityTypes.get(id),
-            LazyReference.from(() -> (LinCompoundTag) toNativeLin(tag))
-        );
+        return new BaseEntity(EntityTypes.get(id), LazyReference.from(output::buildResult));
     }
 
     @Nullable
@@ -826,10 +810,9 @@ public final class PaperweightAdapter implements BukkitImplAdapter<Tag> {
             Objects.requireNonNull(state);
             BlockEntity blockEntity = chunk.getBlockEntity(pos);
             if (blockEntity != null) {
-                // TODO (VI/O)
-                TagValueOutput output = createOutput();
+                LinValueOutput output = createOutput();
                 blockEntity.saveWithId(output);
-                state = state.toBaseBlock(LazyReference.from(() -> (LinCompoundTag) toNativeLin(output.buildResult())));
+                state = state.toBaseBlock(LazyReference.from(output::buildResult));
             }
             extent.setBlock(vec, state.toBaseBlock());
             if (options.shouldRegenBiomes()) {

@@ -52,7 +52,6 @@ import net.minecraft.world.level.chunk.Strategy;
 import net.minecraft.world.level.chunk.status.ChunkStatus;
 import net.minecraft.world.level.entity.PersistentEntitySectionManager;
 import net.minecraft.world.level.storage.TagValueInput;
-import net.minecraft.world.level.storage.TagValueOutput;
 import net.minecraft.world.level.storage.ValueInput;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Chunk;
@@ -205,18 +204,10 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         }
     }
 
-    public static TagValueOutput createOutput() {
-        return TagValueOutput.createWithContext(
+    public static LinValueOutput createOutput() {
+        return LinValueOutput.createWithContext(
                 ProblemReporter.DISCARDING,
                 DedicatedServer.getServer().registryAccess()
-        );
-    }
-
-    public static TagValueOutput createOutput(CompoundTag compoundTag) {
-        return TagValueOutput.createWrappingWithContext(
-                ProblemReporter.DISCARDING,
-                DedicatedServer.getServer().registryAccess(),
-                compoundTag
         );
     }
 

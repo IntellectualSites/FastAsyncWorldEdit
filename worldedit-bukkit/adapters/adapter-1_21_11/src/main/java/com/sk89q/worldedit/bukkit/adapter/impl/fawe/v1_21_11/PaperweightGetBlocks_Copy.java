@@ -26,9 +26,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.PalettedContainer;
 import net.minecraft.world.level.chunk.PalettedContainerRO;
-import net.minecraft.world.level.storage.TagValueOutput;
 import org.apache.logging.log4j.Logger;
-import org.enginehub.linbus.tree.LinCompoundTag;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
@@ -68,10 +66,7 @@ public class PaperweightGetBlocks_Copy implements IChunkGet {
     }
 
     protected void storeTile(BlockEntity blockEntity) {
-        @SuppressWarnings("unchecked")
-        BukkitImplAdapter<Tag> adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
-        // TODO (VI/O)
-        TagValueOutput output = createOutput();
+        LinValueOutput output = createOutput();
         blockEntity.saveWithId(output);
         tiles.put(
                 BlockVector3.at(
@@ -79,17 +74,14 @@ public class PaperweightGetBlocks_Copy implements IChunkGet {
                         blockEntity.getBlockPos().getY(),
                         blockEntity.getBlockPos().getZ()
                 ),
-                FaweCompoundTag.of((LinCompoundTag) adapter.toNativeLin(output.buildResult()))
+                FaweCompoundTag.of(output::buildResult)
         );
     }
 
     protected void storeEntity(Entity entity) {
-        @SuppressWarnings("unchecked")
-        BukkitImplAdapter<Tag> adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
-        // TODO (VI/O)
-        TagValueOutput output = createOutput();
+        LinValueOutput output = createOutput();
         entity.save(output);
-        entities.add(FaweCompoundTag.of((LinCompoundTag) adapter.toNativeLin(output.buildResult())));
+        entities.add(FaweCompoundTag.of(output::buildResult));
     }
 
     @Override

@@ -10,7 +10,6 @@ import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.fastasyncworldedit.core.queue.IBatchProcessor;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.implementation.packet.ChunkPacket;
-import com.fastasyncworldedit.core.util.NbtUtils;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
@@ -94,7 +93,6 @@ import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureStart;
-import net.minecraft.world.level.storage.TagValueOutput;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -112,8 +110,6 @@ import org.bukkit.craftbukkit.util.CraftNamespacedKey;
 import org.bukkit.craftbukkit.util.TransformerGeneratorAccess;
 import org.bukkit.entity.Player;
 import org.enginehub.linbus.tree.LinCompoundTag;
-import org.enginehub.linbus.tree.LinStringTag;
-import org.enginehub.linbus.tree.LinTag;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
@@ -163,11 +159,9 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
     public Function<BlockEntity, FaweCompoundTag> blockEntityToCompoundTag() {
         return blockEntity -> FaweCompoundTag.of(
                 () -> {
-                    // TODO (VI/O) it might be possible to have a custom ValueOutput that writes into a LinCompoundTag.Builder
-                    //  directly
-                    TagValueOutput output = createOutput();
+                    LinValueOutput output = createOutput();
                     blockEntity.saveWithId(output);
-                    return (LinCompoundTag) toNativeLin(output.buildResult());
+                    return output.buildResult();
                 }
         );
     }
@@ -196,10 +190,6 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
 
     private static String getEntityId(Entity entity) {
         return net.minecraft.world.entity.EntityType.getKey(entity.getType()).toString();
-    }
-
-    private static boolean readEntityIntoTag(Entity entity, CompoundTag compoundTag) {
-        return entity.save(createOutput(compoundTag));
     }
 
     @Override
@@ -318,14 +308,12 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
             state = BukkitAdapter.adapt(bukkitBlock.getBlockData());
         }
         if (state.getBlockType().getMaterial().hasContainer()) {
-
             // Read the NBT data
             BlockEntity blockEntity = chunk.getBlockEntity(blockPos, LevelChunk.EntityCreationType.CHECK);
             if (blockEntity != null) {
-                // TODO (VI/O)
-                TagValueOutput output = createOutput();
+                LinValueOutput output = createOutput();
                 blockEntity.saveWithId(output);
-                return state.toBaseBlock((LinCompoundTag) toNativeLin(output.buildResult()));
+                return state.toBaseBlock(output.buildResult());
             }
         }
 
@@ -359,18 +347,14 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
         String id = getEntityId(mcEntity);
         EntityType type = com.sk89q.worldedit.world.entity.EntityTypes.get(id);
         Supplier<LinCompoundTag> saveTag = () -> {
-            final CompoundTag minecraftTag = new CompoundTag();
-            if (!readEntityIntoTag(mcEntity, minecraftTag)) {
+            final LinValueOutput output = createOutput();
+            if (!mcEntity.save(output)) {
                 return null;
             }
             //add Id for AbstractChangeSet to work
-            final LinCompoundTag tag = (LinCompoundTag) toNativeLin(minecraftTag);
-            final Map<String, LinTag<?>> tags = NbtUtils.getLinCompoundTagValues(tag);
-            tags.put("Id", LinStringTag.of(id));
-            return LinCompoundTag.of(tags);
+            return output.toBuilder().putString("Id", id).build();
         };
         return new LazyBaseEntity(type, saveTag);
-
     }
 
     @Override
@@ -691,10 +675,9 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
             editSession.setBlock(pos.getX(), pos.getY(), pos.getZ(), BukkitAdapter.adapt(craftBlockState.getBlockData()));
             BlockEntity blockEntity = populator.getBlockEntity(pos);
             if (blockEntity != null) {
-                // TODO (VI/O)
-                TagValueOutput output = createOutput();
+                LinValueOutput output = createOutput();
                 blockEntity.saveWithId(output);
-                editSession.setTile(pos.getX(), pos.getY(), pos.getZ(), (com.sk89q.jnbt.CompoundTag) toNative(output.buildResult()));
+                editSession.tile(pos.getX(), pos.getY(), pos.getZ(), FaweCompoundTag.of(output::buildResult));
             }
         }
         return true;

@@ -24,6 +24,7 @@ import com.google.common.collect.Table;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_21_11.LinValueOutput;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.util.Location;
@@ -39,10 +40,8 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.storage.TagValueOutput;
 import net.minecraft.world.phys.Vec3;
 import org.bukkit.event.entity.CreatureSpawnEvent;
-import org.enginehub.linbus.tree.LinCompoundTag;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.invoke.MethodHandle;
@@ -150,11 +149,9 @@ public class PaperweightServerLevelDelegateProxy implements InvocationHandler, A
         Location location = new Location(BukkitAdapter.adapt(serverLevel.getWorld()), pos.x(), pos.y(), pos.z());
 
         Identifier id = serverLevel.registryAccess().lookupOrThrow(Registries.ENTITY_TYPE).getKey(entity.getType());
-        // TODO (VI/O)
-        TagValueOutput output = createOutput();
+        LinValueOutput output = createOutput();
         entity.saveWithoutId(output);
-        BaseEntity baseEntity = new BaseEntity(EntityTypes.get(id.toString()),
-                LazyReference.from(() -> (LinCompoundTag) adapter.toNativeLin(output.buildResult())));
+        BaseEntity baseEntity = new BaseEntity(EntityTypes.get(id.toString()), LazyReference.from(output::buildResult));
 
         return editSession.createEntity(location, baseEntity) != null;
     }
@@ -164,12 +161,11 @@ public class PaperweightServerLevelDelegateProxy implements InvocationHandler, A
         for (Map.Entry<BlockVector3, BlockEntity> entry : createdBlockEntities.entrySet()) {
             BlockVector3 blockPos = entry.getKey();
             BlockEntity blockEntity = entry.getValue();
-            TagValueOutput output = createOutput();
+            LinValueOutput output = createOutput();
             blockEntity.saveWithId(output);
             editSession.setBlock(
                 blockPos,
-                adapter.adapt(blockEntity.getBlockState())
-                    .toBaseBlock(LazyReference.from(() -> (LinCompoundTag) adapter.toNativeLin(output.buildResult())))
+                adapter.adapt(blockEntity.getBlockState()).toBaseBlock(LazyReference.from(output::buildResult))
             );
         }
     }
