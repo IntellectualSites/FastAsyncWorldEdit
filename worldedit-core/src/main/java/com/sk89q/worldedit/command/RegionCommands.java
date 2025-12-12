@@ -136,6 +136,7 @@ public class RegionCommands {
     @CommandPermissions("worldedit.region.set")
     @Logging(REGION)
     @Preload(Preload.PreloadCheck.PRELOAD)
+    @Confirm(Confirm.Processor.REGION)
     public void air(Actor actor, EditSession editSession, @Selection Region region) throws WorldEditException {
         set(actor, editSession, region, BlockTypes.AIR);
     }
@@ -161,6 +162,7 @@ public class RegionCommands {
             desc = "Get the light at a position"
     )
     @CommandPermissions("worldedit.light.fix")
+    @Confirm(Confirm.Processor.REGION)
     public void fixLighting(Actor actor, LocalSession session, @Selection Region selection) throws WorldEditException {
         int count = FaweAPI.fixLighting(session.getSelectionWorld(), selection, null, RelightMode.ALL);
         actor.print(Caption.of("fawe.info.lighting.propagate.selection", count));
@@ -172,6 +174,7 @@ public class RegionCommands {
             desc = "Removing lighting in a selection"
     )
     @CommandPermissions("worldedit.light.remove")
+    @Confirm(Confirm.Processor.REGION)
     public void removeLighting(Actor actor, LocalSession session, @Selection Region selection) {
         int count = FaweAPI.fixLighting(session.getSelectionWorld(), selection, null, RelightMode.NONE);
         actor.print(Caption.of("fawe.info.updated.lighting.selection", count));
@@ -207,6 +210,7 @@ public class RegionCommands {
             desc = "Set block lighting in a selection"
     )
     @CommandPermissions("worldedit.light.set")
+    @Confirm(Confirm.Processor.REGION)
     public void setlighting(Actor actor, EditSession editSession, @Selection Region region) {
         actor.print(Caption.of("fawe.info.light-blocks"));
     }
@@ -217,6 +221,7 @@ public class RegionCommands {
             desc = "Set sky lighting in a selection"
     )
     @CommandPermissions("worldedit.light.set")
+    @Confirm(Confirm.Processor.REGION)
     public void setskylighting(Actor actor, @Selection Region region) {
         actor.print(Caption.of("fawe.info.light-blocks"));
     }
@@ -228,6 +233,7 @@ public class RegionCommands {
     )
     @CommandPermissions("worldedit.region.line")
     @Logging(REGION)
+    @Confirm(Confirm.Processor.REGION)
     @SynchronousSettingExpected
     public int line(
             Actor actor, EditSession editSession,
@@ -376,6 +382,7 @@ public class RegionCommands {
     )
     @Logging(REGION)
     @CommandPermissions("worldedit.region.center")
+    @Confirm(Confirm.Processor.REGION)
     @SynchronousSettingExpected
     public int center(
             Actor actor, EditSession editSession, @Selection Region region,
@@ -632,6 +639,7 @@ public class RegionCommands {
     )
     @CommandPermissions("worldedit.region.stack")
     @Preload(Preload.PreloadCheck.PRELOAD)
+    @Confirm(Confirm.Processor.REGION)
     @SynchronousSettingExpected
     @Logging(ORIENTATION_REGION)
     public int stack(
