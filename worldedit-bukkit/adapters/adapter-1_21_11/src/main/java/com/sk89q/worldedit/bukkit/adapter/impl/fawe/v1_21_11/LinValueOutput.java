@@ -40,20 +40,13 @@ public class LinValueOutput implements ValueOutput {
     private final ProblemReporter problemReporter;
     private final DynamicOps<LinTag<?>> ops;
     private final LinCompoundTag.Builder builder;
-    private final Map<String, PendingTagEntry> collector;
+    private final Map<String, PendingEntry> collector;
 
     LinValueOutput(final ProblemReporter reporter, final DynamicOps<LinTag<?>> ops, final LinCompoundTag.Builder output) {
         this.problemReporter = reporter;
         this.ops = ops;
         this.builder = output;
         this.collector = new LinkedHashMap<>();
-    }
-
-    public static LinValueOutput createWrappingWithContext(
-            ProblemReporter problemReporter,
-            HolderLookup.Provider lookup
-    ) {
-        return new LinValueOutput(problemReporter, lookup.createSerializationContext(LinOps.INSTANCE), LinCompoundTag.builder());
     }
 
     public static LinValueOutput createWithContext(ProblemReporter reporter, HolderLookup.Provider lookup) {
@@ -64,10 +57,10 @@ public class LinValueOutput implements ValueOutput {
     public <T> void store(final @NotNull String key, final @NotNull Codec<T> codec, final @NotNull T value) {
         DataResult<LinTag<?>> result = codec.encodeStart(this.ops, value);
         switch (result) {
-            case DataResult.Success<LinTag<?>> success -> this.collector.put(key, PendingTagEntry.ofTag(success.value()));
+            case DataResult.Success<LinTag<?>> success -> this.collector.put(key, PendingEntry.ofTag(success.value()));
             case DataResult.Error<LinTag<?>> error -> {
                 this.problemReporter.report(() -> "Failed to encode value '" + value + "' to field '" + key + "': " + error.message());
-                error.partialValue().ifPresent(tag -> this.collector.put(key, PendingTagEntry.ofTag(tag)));
+                error.partialValue().ifPresent(tag -> this.collector.put(key, PendingEntry.ofTag(tag)));
             }
         }
     }
@@ -99,72 +92,72 @@ public class LinValueOutput implements ValueOutput {
     private void merge(LinCompoundTag other) {
         other.value().forEach((key, tag) -> {
             if (tag instanceof LinCompoundTag compoundTag && this.collector.containsKey(key)) {
-                PendingTagEntry entry = this.collector.get(key);
-                if (entry.isCompoundBuilder()) {
-                    entry.compoundBuilder().put(key, compoundTag);
-                    return;
-                }
-                if (entry.isTag() && entry.tag instanceof LinCompoundTag storedCompound) {
-                    this.collector.put(
-                            key,
-                            PendingTagEntry.ofCompoundBuilder(storedCompound.toBuilder().put(key, compoundTag))
-                    );
-                    return;
+                switch (this.collector.get(key)) {
+                    case PendingCompoundBuilderEntry entry -> entry.compoundBuilder().put(key, compoundTag);
+                    case PendingTagEntry entry -> {
+                        if (entry.tag() instanceof LinCompoundTag storedCompound) {
+                            this.collector.put(
+                                    key, PendingEntry.ofCompoundBuilder(storedCompound.toBuilder().put(key, compoundTag))
+                            );
+                        }
+                    }
+                    default -> {
+                    }
                 }
             }
-            this.collector.put(key, PendingTagEntry.ofTag(tag));
+            this.collector.put(key, PendingEntry.ofTag(tag));
         });
     }
 
     @Override
     public void putBoolean(final @NotNull String key, final boolean value) {
-        this.collector.put(key, PendingTagEntry.ofTag(LinByteTag.of(value ? (byte) 1 : 0)));
+        this.collector.put(key, PendingEntry.ofTag(LinByteTag.of(value ? (byte) 1 : 0)));
     }
 
     @Override
     public void putByte(final @NotNull String key, final byte value) {
-        this.collector.put(key, PendingTagEntry.ofTag(LinByteTag.of(value)));
+        this.collector.put(key, PendingEntry.ofTag(LinByteTag.of(value)));
     }
 
     @Override
     public void putShort(final @NotNull String key, final short value) {
-        this.collector.put(key, PendingTagEntry.ofTag(LinShortTag.of(value)));
+        this.collector.put(key, PendingEntry.ofTag(LinShortTag.of(value)));
     }
 
     @Override
     public void putInt(final @NotNull String key, final int value) {
-        this.collector.put(key, PendingTagEntry.ofTag(LinIntTag.of(value)));
+        this.collector.put(key, PendingEntry.ofTag(LinIntTag.of(value)));
     }
 
     @Override
     public void putLong(final @NotNull String key, final long value) {
-        this.collector.put(key, PendingTagEntry.ofTag(LinLongTag.of(value)));
+        this.collector.put(key, PendingEntry.ofTag(LinLongTag.of(value)));
     }
 
     @Override
     public void putFloat(final @NotNull String key, final float value) {
-        this.collector.put(key, PendingTagEntry.ofTag(LinFloatTag.of(value)));
+        this.collector.put(key, PendingEntry.ofTag(LinFloatTag.of(value)));
     }
 
     @Override
     public void putDouble(final @NotNull String key, final double value) {
-        this.collector.put(key, PendingTagEntry.ofTag(LinDoubleTag.of(value)));
+        this.collector.put(key, PendingEntry.ofTag(LinDoubleTag.of(value)));
     }
 
     @Override
     public void putString(final @NotNull String key, final @NotNull String value) {
-        this.collector.put(key, PendingTagEntry.ofTag(LinStringTag.of(value)));
+        this.collector.put(key, PendingEntry.ofTag(LinStringTag.of(value)));
     }
 
     @Override
     public void putIntArray(final @NotNull String key, final int @NotNull [] value) {
-        this.collector.put(key, PendingTagEntry.ofTag(LinIntArrayTag.of(value)));
+        this.collector.put(key, PendingEntry.ofTag(LinIntArrayTag.of(value)));
     }
 
     @Override
     public @NotNull ValueOutput child(final @NotNull String key) {
         LinCompoundTag.Builder builder = LinCompoundTag.builder();
-        this.collector.put(key, PendingTagEntry.ofCompoundBuilder(builder));
+        this.collector.put(key, PendingEntry.ofCompoundBuilder(builder));
         return new LinValueOutput(
                 this.problemReporter.forChild(new ProblemReporter.FieldPathElement(key)),
                 this.ops,
@@ -174,15 +167,15 @@ public class LinValueOutput implements ValueOutput {
 
     @Override
     public @NotNull ValueOutputList childrenList(final @NotNull String key) {
-        List<PendingTagEntry> list = new LinkedList<>();
-        this.collector.put(key, PendingTagEntry.ofList(list));
+        List<PendingEntry> list = new LinkedList<>();
+        this.collector.put(key, PendingEntry.ofList(list));
         return new ListWrapper(key, this.problemReporter, this.ops, list);
     }
 
     @Override
     public <T> @NotNull TypedOutputList<T> list(final @NotNull String key, final @NotNull Codec<T> codec) {
-        final List<PendingTagEntry> list = new LinkedList<>();
-        this.collector.put(key, PendingTagEntry.ofList(list));
+        final List<PendingEntry> list = new LinkedList<>();
+        this.collector.put(key, PendingEntry.ofList(list));
         return new TypedListWrapper<>(this.problemReporter, key, this.ops, codec, list);
     }
 
@@ -205,27 +198,23 @@ public class LinValueOutput implements ValueOutput {
         return this.builder;
     }
 
-    private LinTag<?> unwrapPendingEntry(final PendingTagEntry entry) {
-        if (entry.isTag()) {
-            return entry.tag();
-        }
-        if (entry.isCompoundBuilder()) {
-            return entry.compoundBuilder().build();
-        }
-        if (entry.isList()) {
-            return LinOps.rawTagListToLinList(entry.list().stream()
-                    .map(this::unwrapPendingEntry).collect(Collectors.toUnmodifiableList()));
-        }
-        throw new IllegalStateException();
+    private LinTag<?> unwrapPendingEntry(final PendingEntry entry) {
+        return switch (entry) {
+            case PendingTagEntry e -> e.tag();
+            case PendingCompoundBuilderEntry e -> e.compoundBuilder().build();
+            case PendingListEntry e -> LinOps.rawTagListToLinList(
+                    e.entries().stream().map(this::unwrapPendingEntry).collect(Collectors.toList())
+            );
+        };
     }
 
     private record ListWrapper(String fieldName, ProblemReporter problemReporter, DynamicOps<LinTag<?>> ops,
-                               List<PendingTagEntry> list) implements ValueOutputList {
+                               List<PendingEntry> list) implements ValueOutputList {
 
         @Override
         public @NotNull ValueOutput addChild() {
             LinCompoundTag.Builder tag = LinCompoundTag.builder();
-            this.list.add(PendingTagEntry.ofCompoundBuilder(tag));
+            this.list.add(PendingEntry.ofCompoundBuilder(tag));
             return new LinValueOutput(
                     this.problemReporter.forChild(
                             new ProblemReporter.IndexedFieldPathElement(this.fieldName, this.list.size() - 1)
@@ -248,16 +237,16 @@ public class LinValueOutput implements ValueOutput {
     }
 
     private record TypedListWrapper<T>(ProblemReporter problemReporter, String name, DynamicOps<LinTag<?>> ops, Codec<T> codec,
-                                       List<PendingTagEntry> list) implements TypedOutputList<T> {
+                                       List<PendingEntry> list) implements TypedOutputList<T> {
 
         @Override
         public void add(final T value) {
             DataResult<LinTag<?>> dataResult = this.codec.encodeStart(this.ops, value);
             switch (dataResult) {
-                case DataResult.Success<LinTag<?>> success -> this.list.add(PendingTagEntry.ofTag(success.value()));
+                case DataResult.Success<LinTag<?>> success -> this.list.add(PendingEntry.ofTag(success.value()));
                 case DataResult.Error<LinTag<?>> error -> {
                     this.problemReporter.report(() -> "Failed to append value '" + value + "' to list '" + this.name + "':" + error.message());
-                    error.partialValue().map(PendingTagEntry::ofTag).ifPresent(list::add);
+                    error.partialValue().map(PendingEntry::ofTag).ifPresent(list::add);
                 }
             }
         }
@@ -269,31 +258,31 @@ public class LinValueOutput implements ValueOutput {
 
     }
 
-    private record PendingTagEntry(LinTag<?> tag, List<PendingTagEntry> list, LinCompoundTag.Builder compoundBuilder) {
+    private sealed interface PendingEntry permits PendingTagEntry, PendingListEntry, PendingCompoundBuilderEntry {
 
-        public static PendingTagEntry ofTag(LinTag<?> tag) {
-            return new PendingTagEntry(tag, null, null);
+        static PendingEntry ofTag(LinTag<?> tag) {
+            return new PendingTagEntry(tag);
         }
 
-        public static PendingTagEntry ofList(List<PendingTagEntry> list) {
-            return new PendingTagEntry(null, list, null);
+        static PendingEntry ofList(List<PendingEntry> list) {
+            return new PendingListEntry(list);
         }
 
-        public static PendingTagEntry ofCompoundBuilder(LinCompoundTag.Builder compoundBuilder) {
-            return new PendingTagEntry(null, null, compoundBuilder);
+        static PendingEntry ofCompoundBuilder(LinCompoundTag.Builder builder) {
+            return new PendingCompoundBuilderEntry(builder);
         }
 
-        public boolean isTag() {
-            return this.tag != null;
-        }
+    }
 
-        public boolean isList() {
-            return this.list != null;
-        }
+    private record PendingTagEntry(LinTag<?> tag) implements PendingEntry {
 
-        public boolean isCompoundBuilder() {
-            return this.compoundBuilder != null;
-        }
+    }
+
+    private record PendingListEntry(List<PendingEntry> entries) implements PendingEntry {
+
+    }
+
+    private record PendingCompoundBuilderEntry(LinCompoundTag.Builder compoundBuilder) implements PendingEntry {
 
     }
 
