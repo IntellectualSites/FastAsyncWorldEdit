@@ -282,8 +282,7 @@ public final class PaperweightAdapter implements BukkitImplAdapter<Tag> {
      * @param tileEntity the tile entity
      * @param tag the tag
      */
-    static void readTagIntoTileEntity(CompoundTag tag, BlockEntity tileEntity) {
-        // TODO (VI/O)
+    static void readTagIntoTileEntity(LinCompoundTag tag, BlockEntity tileEntity) {
         ValueInput input = createInput(tag);
         tileEntity.loadWithComponents(input);
         tileEntity.setChanged();

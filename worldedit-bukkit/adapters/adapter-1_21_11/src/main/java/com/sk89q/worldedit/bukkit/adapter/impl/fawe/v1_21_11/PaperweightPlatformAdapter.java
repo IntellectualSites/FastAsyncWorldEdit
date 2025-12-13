@@ -26,7 +26,6 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.IdMap;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.dedicated.DedicatedServer;
@@ -51,11 +50,10 @@ import net.minecraft.world.level.chunk.PalettedContainerRO;
 import net.minecraft.world.level.chunk.Strategy;
 import net.minecraft.world.level.chunk.status.ChunkStatus;
 import net.minecraft.world.level.entity.PersistentEntitySectionManager;
-import net.minecraft.world.level.storage.TagValueInput;
-import net.minecraft.world.level.storage.ValueInput;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Chunk;
 import org.bukkit.craftbukkit.CraftChunk;
+import org.enginehub.linbus.tree.LinCompoundTag;
 
 import javax.annotation.Nullable;
 import java.lang.invoke.MethodHandle;
@@ -211,11 +209,11 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         );
     }
 
-    public static ValueInput createInput(CompoundTag nativeTag) {
-        return TagValueInput.create(
+    public static LinValueInput createInput(LinCompoundTag input) {
+        return LinValueInput.create(
                 ProblemReporter.DISCARDING,
                 DedicatedServer.getServer().registryAccess(),
-                nativeTag
+                input
         );
     }
 

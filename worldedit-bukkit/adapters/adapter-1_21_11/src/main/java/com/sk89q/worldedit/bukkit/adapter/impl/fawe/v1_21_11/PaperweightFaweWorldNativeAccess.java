@@ -143,9 +143,7 @@ public class PaperweightFaweWorldNativeAccess implements WorldNativeAccess<Level
         if (blockEntity == null) {
             return false;
         }
-        // TODO (VI/O)
-        net.minecraft.nbt.Tag nativeTag = paperweightFaweAdapter.fromNativeLin(tag);
-        ValueInput input = createInput((CompoundTag) nativeTag);
+        ValueInput input = createInput(tag);
         blockEntity.loadWithComponents(input);
         return true;
     }

@@ -110,8 +110,7 @@ public class PaperweightWorldNativeAccess implements WorldNativeAccess<LevelChun
         if (tileEntity == null) {
             return false;
         }
-        Tag nativeTag = adapter.fromNative(tag);
-        PaperweightAdapter.readTagIntoTileEntity((net.minecraft.nbt.CompoundTag) nativeTag, tileEntity);
+        PaperweightAdapter.readTagIntoTileEntity(tag, tileEntity);
         return true;
     }
 

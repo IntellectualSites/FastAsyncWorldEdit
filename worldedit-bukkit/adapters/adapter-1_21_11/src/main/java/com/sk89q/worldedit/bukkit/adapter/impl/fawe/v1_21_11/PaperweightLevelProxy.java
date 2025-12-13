@@ -3,7 +3,6 @@ package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_21_11;
 import com.fastasyncworldedit.core.util.ReflectionUtils;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.world.level.block.Blocks;
@@ -64,8 +63,7 @@ public class PaperweightLevelProxy extends ServerLevel {
             return null;
         }
         BlockEntity tileEntity = entityBlock.newBlockEntity(blockPos, state);
-        // TODO (VI/O)
-        ValueInput input = createInput((CompoundTag) adapter.fromNativeLin(tag));
+        ValueInput input = createInput(tag);
         tileEntity.loadWithComponents(input);
         return tileEntity;
     }
