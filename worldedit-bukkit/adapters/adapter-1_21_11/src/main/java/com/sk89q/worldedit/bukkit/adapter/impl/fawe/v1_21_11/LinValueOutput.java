@@ -19,6 +19,7 @@ import org.enginehub.linbus.tree.LinStringTag;
 import org.enginehub.linbus.tree.LinTag;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.VisibleForTesting;
 
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -39,18 +40,16 @@ public class LinValueOutput implements ValueOutput {
 
     private final ProblemReporter problemReporter;
     private final DynamicOps<LinTag<?>> ops;
-    private final LinCompoundTag.Builder builder;
     private final Map<String, PendingEntry> collector;
 
-    LinValueOutput(final ProblemReporter reporter, final DynamicOps<LinTag<?>> ops, final LinCompoundTag.Builder output) {
+    LinValueOutput(final ProblemReporter reporter, final DynamicOps<LinTag<?>> ops) {
         this.problemReporter = reporter;
         this.ops = ops;
-        this.builder = output;
         this.collector = new LinkedHashMap<>();
     }
 
     public static LinValueOutput createWithContext(ProblemReporter reporter, HolderLookup.Provider lookup) {
-        return new LinValueOutput(reporter, lookup.createSerializationContext(LinOps.INSTANCE), LinCompoundTag.builder());
+        return new LinValueOutput(reporter, lookup.createSerializationContext(LinOps.INSTANCE));
     }
 
     @Override
@@ -89,24 +88,34 @@ public class LinValueOutput implements ValueOutput {
         }
     }
 
-    private void merge(LinCompoundTag other) {
+    @VisibleForTesting
+    void merge(LinCompoundTag other) {
         other.value().forEach((key, tag) -> {
             if (tag instanceof LinCompoundTag compoundTag && this.collector.containsKey(key)) {
-                switch (this.collector.get(key)) {
-                    case PendingCompoundBuilderEntry entry -> entry.compoundBuilder().put(key, compoundTag);
-                    case PendingTagEntry entry -> {
-                        if (entry.tag() instanceof LinCompoundTag storedCompound) {
-                            this.collector.put(
-                                    key, PendingEntry.ofCompoundBuilder(storedCompound.toBuilder().put(key, compoundTag))
-                            );
-                        }
-                    }
-                    default -> {
-                    }
+                PendingEntry entry = this.collector.get(key);
+                if (entry instanceof PendingTagEntry(LinTag<?> value) && value instanceof LinCompoundTag storedCompound) {
+                    this.collector.put(key, PendingEntry.ofTag(merge(compoundTag, storedCompound)));
+                    return;
+                }
+                if (entry instanceof PendingLinValueOutputEntry(LinValueOutput valueOutput)) {
+                    this.collector.put(key, PendingEntry.ofTag(merge(compoundTag, valueOutput.buildResult())));
+                    return;
                 }
             }
             this.collector.put(key, PendingEntry.ofTag(tag));
         });
+    }
+
+    private static LinCompoundTag merge(LinCompoundTag source, LinCompoundTag target) {
+        LinCompoundTag.Builder builder = target.toBuilder();
+        source.value().forEach((key, tag) -> {
+            if (target.value().get(key) instanceof LinCompoundTag targetCompoundTag && tag instanceof LinCompoundTag sourceCompoundTag) {
+                builder.put(key, merge(sourceCompoundTag, targetCompoundTag));
+                return;
+            }
+            builder.put(key, tag);
+        });
+        return builder.build();
     }
 
     @Override
@@ -156,13 +165,12 @@ public class LinValueOutput implements ValueOutput {
 
     @Override
     public @NotNull ValueOutput child(final @NotNull String key) {
-        LinCompoundTag.Builder builder = LinCompoundTag.builder();
-        this.collector.put(key, PendingEntry.ofCompoundBuilder(builder));
-        return new LinValueOutput(
+        LinValueOutput output = new LinValueOutput(
                 this.problemReporter.forChild(new ProblemReporter.FieldPathElement(key)),
-                this.ops,
-                builder
+                this.ops
         );
+        this.collector.put(key, PendingEntry.ofLinValueOutputEntry(output));
+        return output;
     }
 
     @Override
@@ -194,16 +202,17 @@ public class LinValueOutput implements ValueOutput {
     }
 
     public LinCompoundTag.Builder toBuilder() {
+        LinCompoundTag.Builder builder = LinCompoundTag.builder();
         this.collector.forEach((key, value) -> builder.put(key, unwrapPendingEntry(value)));
-        return this.builder;
+        return builder;
     }
 
-    private LinTag<?> unwrapPendingEntry(final PendingEntry entry) {
+    private static LinTag<?> unwrapPendingEntry(final PendingEntry entry) {
         return switch (entry) {
             case PendingTagEntry e -> e.tag();
-            case PendingCompoundBuilderEntry e -> e.compoundBuilder().build();
+            case PendingLinValueOutputEntry e -> e.valueOutput().buildResult();
             case PendingListEntry e -> LinOps.rawTagListToLinList(
-                    e.entries().stream().map(this::unwrapPendingEntry).collect(Collectors.toList())
+                    e.entries().stream().map(LinValueOutput::unwrapPendingEntry).collect(Collectors.toList())
             );
         };
     }
@@ -213,15 +222,14 @@ public class LinValueOutput implements ValueOutput {
 
         @Override
         public @NotNull ValueOutput addChild() {
-            LinCompoundTag.Builder tag = LinCompoundTag.builder();
-            this.list.add(PendingEntry.ofCompoundBuilder(tag));
-            return new LinValueOutput(
+            LinValueOutput valueOutput = new LinValueOutput(
                     this.problemReporter.forChild(
                             new ProblemReporter.IndexedFieldPathElement(this.fieldName, this.list.size() - 1)
                     ),
-                    this.ops,
-                    tag
+                    this.ops
             );
+            this.list.add(PendingEntry.ofLinValueOutputEntry(valueOutput));
+            return valueOutput;
         }
 
         @Override
@@ -258,7 +266,7 @@ public class LinValueOutput implements ValueOutput {
 
     }
 
-    private sealed interface PendingEntry permits PendingTagEntry, PendingListEntry, PendingCompoundBuilderEntry {
+    private sealed interface PendingEntry permits PendingTagEntry, PendingListEntry, PendingLinValueOutputEntry {
 
         static PendingEntry ofTag(LinTag<?> tag) {
             return new PendingTagEntry(tag);
@@ -268,8 +276,8 @@ public class LinValueOutput implements ValueOutput {
             return new PendingListEntry(list);
         }
 
-        static PendingEntry ofCompoundBuilder(LinCompoundTag.Builder builder) {
-            return new PendingCompoundBuilderEntry(builder);
+        static PendingEntry ofLinValueOutputEntry(LinValueOutput valueOutput) {
+            return new PendingLinValueOutputEntry(valueOutput);
         }
 
     }
@@ -282,7 +290,7 @@ public class LinValueOutput implements ValueOutput {
 
     }
 
-    private record PendingCompoundBuilderEntry(LinCompoundTag.Builder compoundBuilder) implements PendingEntry {
+    private record PendingLinValueOutputEntry(LinValueOutput valueOutput) implements PendingEntry {
 
     }
 
