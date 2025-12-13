@@ -23,6 +23,7 @@ import org.enginehub.linbus.tree.LinIntTag;
 import org.enginehub.linbus.tree.LinListTag;
 import org.enginehub.linbus.tree.LinLongArrayTag;
 import org.enginehub.linbus.tree.LinLongTag;
+import org.enginehub.linbus.tree.LinNumberTag;
 import org.enginehub.linbus.tree.LinShortTag;
 import org.enginehub.linbus.tree.LinStringTag;
 import org.enginehub.linbus.tree.LinTag;
@@ -83,15 +84,10 @@ public class LinOps implements DynamicOps<LinTag<?>> {
 
     @Override
     public DataResult<Number> getNumberValue(final LinTag<?> input) {
-        return switch (input) {
-            case LinByteTag tag -> DataResult.success(tag.value());
-            case LinDoubleTag tag -> DataResult.success(tag.value());
-            case LinFloatTag tag -> DataResult.success(tag.value());
-            case LinIntTag tag -> DataResult.success(tag.value());
-            case LinLongTag tag -> DataResult.success(tag.value());
-            case LinShortTag tag -> DataResult.success(tag.value());
-            default -> DataResult.error(() -> "Not a number");
-        };
+        if (input instanceof LinNumberTag<? extends Number> tag) {
+            return DataResult.success(tag.value());
+        }
+        return DataResult.error(() -> "Not a number");
     }
 
     @Override
