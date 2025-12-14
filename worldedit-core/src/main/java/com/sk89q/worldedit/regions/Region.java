@@ -502,7 +502,7 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
         if (isGlobal()) {
             return child;
         }
-        return new SingleRegionExtent(child, FaweLimit.MAX, this);
+        return new SingleRegionExtent(child, null, this);
     }
 
     @Override
