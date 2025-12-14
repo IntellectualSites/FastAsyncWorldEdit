@@ -64,6 +64,16 @@ public class LinOps implements DynamicOps<LinTag<?>> {
     }
 
     @Override
+    public LinTag<?> emptyList() {
+        return LinListTag.empty(LinTagType.endTag());
+    }
+
+    @Override
+    public LinTag<?> emptyMap() {
+        return LinCompoundTag.builder().build();
+    }
+
+    @Override
     public <U> U convertTo(final DynamicOps<U> outOps, final LinTag<?> input) {
         return switch (input) {
             case LinEndTag ignored -> outOps.empty();
@@ -180,7 +190,7 @@ public class LinOps implements DynamicOps<LinTag<?>> {
                     .stream()
                     .map(entry -> Pair.of(this.createString(entry.getKey()), entry.getValue())));
         }
-        return DataResult.error(() -> "Not a map");
+        return DataResult.error(() -> "Not a map: " + input);
     }
 
     @Override
@@ -189,7 +199,7 @@ public class LinOps implements DynamicOps<LinTag<?>> {
             return DataResult.success(consumer ->
                     tag.value().forEach((s, linTag) -> consumer.accept(this.createString(s), linTag)));
         }
-        return DataResult.error(() -> "Not a map");
+        return DataResult.error(() -> "Not a map: " + input);
     }
 
     @Override
@@ -321,7 +331,7 @@ public class LinOps implements DynamicOps<LinTag<?>> {
                 }
             });
         }
-        throw new UnsupportedOperationException("Not a list: " + input);
+        return DataResult.error(() -> "Not a list: " + input);
     }
 
     @Override

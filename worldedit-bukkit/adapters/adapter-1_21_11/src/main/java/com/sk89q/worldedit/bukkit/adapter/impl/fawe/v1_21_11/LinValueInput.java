@@ -307,21 +307,23 @@ public class LinValueInput implements ValueInput {
             return new AbstractIterator<>() {
                 @Override
                 protected @Nullable T computeNext() {
-                    while (iterator.hasNext()) {
-                        int index = iterator.nextIndex();
-                        LinTag<?> tag = iterator.next();
-                        switch (codec.parse(context.ops(), tag)) {
-                            case DataResult.Success<T> success:
-                                return success.value();
-                            case DataResult.Error<T> error:
-                                problemReporter.report(() -> "Failed to decode value '" + tag + "' from field '" + name + "' at index " + index + ":" + " " + error);
-                                if (error.partialValue().isEmpty()) {
-                                    continue;
-                                }
-                                return error.partialValue().get();
+                    while (true) {
+                        if (iterator.hasNext()) {
+                            int index = iterator.nextIndex();
+                            LinTag<?> tag = iterator.next();
+                            switch (codec.parse(context.ops(), tag)) {
+                                case DataResult.Success<T> success:
+                                    return success.value();
+                                case DataResult.Error<T> error:
+                                    problemReporter.report(() -> "Failed to decode value '" + tag + "' from field '" + name + "' at index " + index + ":" + " " + error);
+                                    if (error.partialValue().isEmpty()) {
+                                        continue;
+                                    }
+                                    return error.partialValue().get();
+                            }
                         }
+                        return this.endOfData();
                     }
-                    return this.endOfData();
                 }
             };
         }
@@ -366,21 +368,8 @@ public class LinValueInput implements ValueInput {
 
     }
 
-    private static final class EmptyValueInput implements ValueInput {
-
-        private final HolderLookup.Provider lookup;
-        private final ValueInputList emptyChildList;
-        private final TypedInputList<Object> emptyTypedList;
-
-        private EmptyValueInput(
-                final HolderLookup.Provider lookup,
-                final ValueInputList list,
-                final TypedInputList<Object> typedList
-        ) {
-            this.lookup = lookup;
-            this.emptyChildList = list;
-            this.emptyTypedList = typedList;
-        }
+    private record EmptyValueInput(HolderLookup.Provider lookup, ValueInputList emptyChildList,
+                                   TypedInputList<Object> emptyTypedList) implements ValueInput {
 
         @Override
         public <T> @NonNull Optional<T> read(final @NonNull String key, final @NonNull Codec<T> codec) {
@@ -481,11 +470,6 @@ public class LinValueInput implements ValueInput {
         @Override
         public @NonNull Optional<int[]> getIntArray(final @NonNull String s) {
             return Optional.empty();
-        }
-
-        @Override
-        public HolderLookup.@NonNull Provider lookup() {
-            return this.lookup;
         }
 
     }
