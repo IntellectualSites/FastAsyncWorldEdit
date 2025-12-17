@@ -54,13 +54,14 @@ import java.util.stream.StreamSupport;
 public class LinOps implements DynamicOps<LinTag<?>> {
 
     static final DynamicOps<LinTag<?>> INSTANCE = new LinOps();
+    private static final LinTag<?> EMPTY_TAG = LinCompoundTag.of(Map.of());
 
     private LinOps() {
     }
 
     @Override
     public LinTag<?> empty() {
-        return LinEndTag.instance();
+        return EMPTY_TAG;
     }
 
     @Override
@@ -70,7 +71,7 @@ public class LinOps implements DynamicOps<LinTag<?>> {
 
     @Override
     public LinTag<?> emptyMap() {
-        return LinCompoundTag.builder().build();
+        return EMPTY_TAG;
     }
 
     @Override
