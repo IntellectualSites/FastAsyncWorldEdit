@@ -1,4 +1,4 @@
-package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_21_9;
+package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_21_11;
 
 import com.fastasyncworldedit.core.util.MathMan;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;

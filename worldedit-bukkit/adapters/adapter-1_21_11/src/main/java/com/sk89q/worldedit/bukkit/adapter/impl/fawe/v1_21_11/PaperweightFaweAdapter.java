@@ -1,4 +1,4 @@
-package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_21_9;
+package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_21_11;
 
 import com.fastasyncworldedit.bukkit.adapter.FaweAdapter;
 import com.fastasyncworldedit.bukkit.adapter.NMSRelighterFactory;
@@ -10,7 +10,6 @@ import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.fastasyncworldedit.core.queue.IBatchProcessor;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.implementation.packet.ChunkPacket;
-import com.fastasyncworldedit.core.util.NbtUtils;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
@@ -22,8 +21,8 @@ import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
-import com.sk89q.worldedit.bukkit.adapter.ext.fawe.v1_21_9.PaperweightAdapter;
-import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_21_9.regen.PaperweightRegen;
+import com.sk89q.worldedit.bukkit.adapter.ext.fawe.v1_21_11.PaperweightAdapter;
+import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_21_11.regen.PaperweightRegen;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.BlockTypeMask;
@@ -72,8 +71,8 @@ import net.minecraft.data.worldgen.features.VegetationFeatures;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.server.level.ChunkHolder;
@@ -94,7 +93,6 @@ import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureStart;
-import net.minecraft.world.level.storage.TagValueOutput;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -112,8 +110,6 @@ import org.bukkit.craftbukkit.util.CraftNamespacedKey;
 import org.bukkit.craftbukkit.util.TransformerGeneratorAccess;
 import org.bukkit.entity.Player;
 import org.enginehub.linbus.tree.LinCompoundTag;
-import org.enginehub.linbus.tree.LinStringTag;
-import org.enginehub.linbus.tree.LinTag;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
@@ -136,7 +132,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_21_9.PaperweightPlatformAdapter.createOutput;
+import static com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_21_11.PaperweightPlatformAdapter.createOutput;
 import static net.minecraft.core.registries.Registries.BIOME;
 
 public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.Tag, ServerLevel> {
@@ -163,11 +159,9 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
     public Function<BlockEntity, FaweCompoundTag> blockEntityToCompoundTag() {
         return blockEntity -> FaweCompoundTag.of(
                 () -> {
-                    // TODO (VI/O) it might be possible to have a custom ValueOutput that writes into a LinCompoundTag.Builder
-                    //  directly
-                    TagValueOutput output = createOutput();
+                    LinValueOutput output = createOutput();
                     blockEntity.saveWithId(output);
-                    return (LinCompoundTag) toNativeLin(output.buildResult());
+                    return output.buildResult();
                 }
         );
     }
@@ -196,10 +190,6 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
 
     private static String getEntityId(Entity entity) {
         return net.minecraft.world.entity.EntityType.getKey(entity.getType()).toString();
-    }
-
-    private static boolean readEntityIntoTag(Entity entity, net.minecraft.nbt.CompoundTag compoundTag) {
-        return entity.save(createOutput(compoundTag));
     }
 
     @Override
@@ -277,7 +267,7 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
 
     public Block getBlock(BlockType blockType) {
         return DedicatedServer.getServer().registryAccess().lookupOrThrow(Registries.BLOCK)
-                .getValue(ResourceLocation.fromNamespaceAndPath(blockType.getNamespace(), blockType.getResource()));
+                .getValue(Identifier.fromNamespaceAndPath(blockType.getNamespace(), blockType.getResource()));
     }
 
     @Deprecated
@@ -318,14 +308,12 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
             state = BukkitAdapter.adapt(bukkitBlock.getBlockData());
         }
         if (state.getBlockType().getMaterial().hasContainer()) {
-
             // Read the NBT data
             BlockEntity blockEntity = chunk.getBlockEntity(blockPos, LevelChunk.EntityCreationType.CHECK);
             if (blockEntity != null) {
-                // TODO (VI/O)
-                TagValueOutput output = createOutput();
+                LinValueOutput output = createOutput();
                 blockEntity.saveWithId(output);
-                return state.toBaseBlock((LinCompoundTag) toNativeLin(output.buildResult()));
+                return state.toBaseBlock(output.buildResult());
             }
         }
 
@@ -345,7 +333,7 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
     }
 
     @Override
-    public WorldNativeAccess<?, ?, ?> createWorldNativeAccess(org.bukkit.World world) {
+    public WorldNativeAccess<?, ?, ?> createWorldNativeAccess(World world) {
         return new PaperweightFaweWorldNativeAccess(this, new WeakReference<>(getServerLevel(world)));
     }
 
@@ -359,18 +347,14 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
         String id = getEntityId(mcEntity);
         EntityType type = com.sk89q.worldedit.world.entity.EntityTypes.get(id);
         Supplier<LinCompoundTag> saveTag = () -> {
-            final net.minecraft.nbt.CompoundTag minecraftTag = new net.minecraft.nbt.CompoundTag();
-            if (!readEntityIntoTag(mcEntity, minecraftTag)) {
+            final LinValueOutput output = createOutput();
+            if (!mcEntity.save(output)) {
                 return null;
             }
             //add Id for AbstractChangeSet to work
-            final LinCompoundTag tag = (LinCompoundTag) toNativeLin(minecraftTag);
-            final Map<String, LinTag<?>> tags = NbtUtils.getLinCompoundTagValues(tag);
-            tags.put("Id", LinStringTag.of(id));
-            return LinCompoundTag.of(tags);
+            return output.toBuilder().putString("Id", id).build();
         };
         return new LazyBaseEntity(type, saveTag);
-
     }
 
     @Override
@@ -492,7 +476,7 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
     }
 
     @Override
-    public void sendFakeChunk(org.bukkit.World world, Player player, ChunkPacket chunkPacket) {
+    public void sendFakeChunk(World world, Player player, ChunkPacket chunkPacket) {
         ServerLevel nmsWorld = getServerLevel(world);
         ChunkHolder map = PaperweightPlatformAdapter.getPlayerChunk(nmsWorld, chunkPacket.getChunkX(), chunkPacket.getChunkZ());
         if (map != null && wasAccessibleSinceLastSave(map)) {
@@ -527,7 +511,7 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
     }
 
     @Override
-    public boolean canPlaceAt(org.bukkit.World world, BlockVector3 blockVector3, BlockState blockState) {
+    public boolean canPlaceAt(World world, BlockVector3 blockVector3, BlockState blockState) {
         int internalId = BlockStateIdAccess.getBlockStateId(blockState);
         net.minecraft.world.level.block.state.BlockState blockState1 = Block.stateById(internalId);
         return blockState1.hasPostProcess(
@@ -541,11 +525,11 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
         final RegistryAccess.Frozen registryAccess = DedicatedServer.getServer().registryAccess();
         ItemStack stack = new ItemStack(
                 registryAccess.lookupOrThrow(Registries.ITEM).getValueOrThrow(ResourceKey.create(
-                        Registries.ITEM, ResourceLocation.parse(baseItemStack.getType().id())
+                        Registries.ITEM, Identifier.parse(baseItemStack.getType().id())
                 )),
                 baseItemStack.getAmount()
         );
-        final CompoundTag nbt = (net.minecraft.nbt.CompoundTag) fromNativeLin(baseItemStack.getNbt());
+        final CompoundTag nbt = (CompoundTag) fromNativeLin(baseItemStack.getNbt());
         if (nbt != null) {
             final DataComponentPatch patch = COMPONENTS_CODEC
                     .parse(registryAccess.createSerializationContext(NbtOps.INSTANCE), nbt)
@@ -580,7 +564,7 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
         ConfiguredFeature<?, ?> configuredFeature = serverLevel
                 .registryAccess()
                 .lookupOrThrow(Registries.CONFIGURED_FEATURE)
-                .getValue(ResourceLocation.tryParse(feature.id()));
+                .getValue(Identifier.tryParse(feature.id()));
 
         FaweBlockStateListPopulator populator = new FaweBlockStateListPopulator(serverLevel);
         List<CraftBlockState> placed = TaskManager.taskManager().sync(() -> {
@@ -609,7 +593,7 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
     public boolean generateStructure(StructureType type, World world, EditSession editSession, BlockVector3 pt) {
         ServerLevel serverLevel = getServerLevel(world);
         Registry<Structure> structureRegistry = serverLevel.registryAccess().lookupOrThrow(Registries.STRUCTURE);
-        Structure structure = structureRegistry.getValue(ResourceLocation.tryParse(type.id()));
+        Structure structure = structureRegistry.getValue(Identifier.tryParse(type.id()));
         if (structure == null) {
             return false;
         }
@@ -691,10 +675,9 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
             editSession.setBlock(pos.getX(), pos.getY(), pos.getZ(), BukkitAdapter.adapt(craftBlockState.getBlockData()));
             BlockEntity blockEntity = populator.getBlockEntity(pos);
             if (blockEntity != null) {
-                // TODO (VI/O)
-                TagValueOutput output = createOutput();
+                LinValueOutput output = createOutput();
                 blockEntity.saveWithId(output);
-                editSession.setTile(pos.getX(), pos.getY(), pos.getZ(), (com.sk89q.jnbt.CompoundTag) toNative(output.buildResult()));
+                editSession.tile(pos.getX(), pos.getY(), pos.getZ(), FaweCompoundTag.of(output::buildResult));
             }
         }
         return true;
@@ -724,24 +707,24 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
                 })
                 .filter(Objects::nonNull)
                 .map(o -> (ResourceKey) o)
-                .map(k -> k.location().toString())
+                .map(k -> k.identifier().toString())
                 .collect(Collectors.toCollection(java.util.HashSet::new));
-        face_features.add(CaveFeatures.DRIPSTONE_CLUSTER.location().toString());
-        face_features.add(CaveFeatures.LARGE_DRIPSTONE.location().toString());
-        face_features.add(CaveFeatures.POINTED_DRIPSTONE.location().toString());
-        face_features.add(CaveFeatures.GLOW_LICHEN.location().toString());
-        face_features.add(CaveFeatures.CAVE_VINE.location().toString());
-        face_features.add(CaveFeatures.CAVE_VINE_IN_MOSS.location().toString());
-        face_features.add(CaveFeatures.MOSS_VEGETATION.location().toString());
-        face_features.add(CaveFeatures.DRIPLEAF.location().toString());
-        face_features.add(EndFeatures.CHORUS_PLANT.location().toString());
-        face_features.add(EndFeatures.END_PLATFORM.location().toString());
-        face_features.add(NetherFeatures.SMALL_BASALT_COLUMNS.location().toString());
-        face_features.add(NetherFeatures.LARGE_BASALT_COLUMNS.location().toString());
-        face_features.add(NetherFeatures.GLOWSTONE_EXTRA.location().toString());
+        face_features.add(CaveFeatures.DRIPSTONE_CLUSTER.identifier().toString());
+        face_features.add(CaveFeatures.LARGE_DRIPSTONE.identifier().toString());
+        face_features.add(CaveFeatures.POINTED_DRIPSTONE.identifier().toString());
+        face_features.add(CaveFeatures.GLOW_LICHEN.identifier().toString());
+        face_features.add(CaveFeatures.CAVE_VINE.identifier().toString());
+        face_features.add(CaveFeatures.CAVE_VINE_IN_MOSS.identifier().toString());
+        face_features.add(CaveFeatures.MOSS_VEGETATION.identifier().toString());
+        face_features.add(CaveFeatures.DRIPLEAF.identifier().toString());
+        face_features.add(EndFeatures.CHORUS_PLANT.identifier().toString());
+        face_features.add(EndFeatures.END_PLATFORM.identifier().toString());
+        face_features.add(NetherFeatures.SMALL_BASALT_COLUMNS.identifier().toString());
+        face_features.add(NetherFeatures.LARGE_BASALT_COLUMNS.identifier().toString());
+        face_features.add(NetherFeatures.GLOWSTONE_EXTRA.identifier().toString());
 
         // Features
-        for (ResourceLocation name : server.registryAccess().lookupOrThrow(Registries.CONFIGURED_FEATURE).keySet()) {
+        for (Identifier name : server.registryAccess().lookupOrThrow(Registries.CONFIGURED_FEATURE).keySet()) {
             String id = name.toString();
             if (ConfiguredFeatureType.REGISTRY.get(id) == null) {
                 ConfiguredFeatureType.REGISTRY.register(id, new ConfiguredFeatureType(id, face_features.contains(id)));
@@ -749,7 +732,7 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
         }
 
         // Structures
-        for (ResourceLocation name : server.registryAccess().lookupOrThrow(Registries.STRUCTURE).keySet()) {
+        for (Identifier name : server.registryAccess().lookupOrThrow(Registries.STRUCTURE).keySet()) {
             if (StructureType.REGISTRY.get(name.toString()) == null) {
                 StructureType.REGISTRY.register(name.toString(), new StructureType(name.toString()));
             }
@@ -788,12 +771,12 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
     }
 
     @Override
-    public boolean regenerate(org.bukkit.World bukkitWorld, Region region, Extent target, RegenOptions options) throws Exception {
+    public boolean regenerate(World bukkitWorld, Region region, Extent target, RegenOptions options) throws Exception {
         return new PaperweightRegen(bukkitWorld, region, target, options).regenerate();
     }
 
     @Override
-    public IChunkGet get(org.bukkit.World world, int chunkX, int chunkZ) {
+    public IChunkGet get(World world, int chunkX, int chunkZ) {
         return new PaperweightGetBlocks(world, chunkX, chunkZ);
     }
 
@@ -803,7 +786,7 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
                 .getServer()
                 .registryAccess()
                 .lookupOrThrow(BIOME);
-        ResourceLocation resourceLocation = ResourceLocation.tryParse(biomeType.id());
+        Identifier resourceLocation = Identifier.tryParse(biomeType.id());
         Biome biome = registry.getValue(resourceLocation);
         return registry.getId(biome);
     }
@@ -814,10 +797,10 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
                 .getServer()
                 .registryAccess()
                 .lookupOrThrow(BIOME);
-        List<ResourceLocation> keys = biomeRegistry.stream()
+        List<Identifier> keys = biomeRegistry.stream()
                 .map(biomeRegistry::getKey).filter(Objects::nonNull).toList();
         List<NamespacedKey> namespacedKeys = new ArrayList<>();
-        for (ResourceLocation key : keys) {
+        for (Identifier key : keys) {
             try {
                 namespacedKeys.add(CraftNamespacedKey.fromMinecraft(key));
             } catch (IllegalArgumentException e) {
