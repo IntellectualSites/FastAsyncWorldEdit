@@ -602,7 +602,7 @@ public interface Extent extends InputExtent, OutputExtent {
      * @param maxY       max Y to consider generation from (important for triangular generation)
      * @param triangular if a triangular distribution of ores should be used (rather than flat)
      * @throws WorldEditException on error
-     * @since TODO
+     * @since 2.14.3
      */
     default void addOre(
             Region region,
@@ -635,7 +635,7 @@ public interface Extent extends InputExtent, OutputExtent {
      * @param deepslateBelowZero      if ores should be their deepslate equivalent below zero (overrides deepslateWhereDeepslate)
      * @param deepslateWhereDeepslate if ores should be their deepslate equivalent if the existing block is deepslate
      * @throws WorldEditException on error
-     * @since TODO
+     * @since 2.14.3
      */
     default void addOres(Region region, Mask mask, boolean deepslateBelowZero, boolean deepslateWhereDeepslate) throws
             WorldEditException {

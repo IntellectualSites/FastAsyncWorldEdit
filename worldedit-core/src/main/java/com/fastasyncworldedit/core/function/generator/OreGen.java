@@ -42,7 +42,7 @@ public class OreGen implements Resource {
      * @param maxY               max Y to consider generation from (important for triangular generation)
      * @param triangular         if a triangular distribution of ores should be used (rather than flat)
      * @throws WorldEditException on error
-     * @since TODO
+     * @since 2.14.3
      */
     public OreGen(
             Extent extent,
