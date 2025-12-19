@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.bukkit;
 
+import com.fastasyncworldedit.bukkit.util.FoliaLibHolder;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.entity.BaseEntity;
@@ -28,24 +29,26 @@ import com.sk89q.worldedit.entity.metadata.EntityProperties;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.NullWorld;
+import io.papermc.lib.PaperLib;
 import org.bukkit.entity.EntityType;
 
 import javax.annotation.Nullable;
 import java.lang.ref.WeakReference;
+import java.util.concurrent.CompletableFuture;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * An adapter to adapt a Bukkit entity into a WorldEdit one.
  */
-//FAWE start - made class public
+// FAWE start - made class public
 public class BukkitEntity implements Entity {
-//FAWE end
+    // FAWE end
 
     private final WeakReference<org.bukkit.entity.Entity> entityRef;
-    //FAWE start
+    // FAWE start
     private final EntityType type;
-    //FAWE end
+    // FAWE end
 
     /**
      * Create a new instance.
@@ -54,9 +57,9 @@ public class BukkitEntity implements Entity {
      */
     public BukkitEntity(org.bukkit.entity.Entity entity) {
         checkNotNull(entity);
-        //FAWE start
+        // FAWE start
         this.type = entity.getType();
-        //FAWE end
+        // FAWE end
         this.entityRef = new WeakReference<>(entity);
     }
 
@@ -84,6 +87,9 @@ public class BukkitEntity implements Entity {
     public boolean setLocation(Location location) {
         org.bukkit.entity.Entity entity = entityRef.get();
         if (entity != null) {
+            if (PaperLib.isPaper()) {
+                return entity.teleportAsync(BukkitAdapter.adapt(location)).join();
+            }
             return entity.teleport(BukkitAdapter.adapt(location));
         } else {
             return false;
@@ -100,6 +106,14 @@ public class BukkitEntity implements Entity {
 
             BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
             if (adapter != null) {
+                if (FoliaLibHolder.isFolia()) {
+                    org.bukkit.Location location = entity.getLocation();
+                    CompletableFuture<BaseEntity> future = new CompletableFuture<>();
+                    FoliaLibHolder.getScheduler().runAtLocation(
+                            location,
+                            scheduledTask -> future.complete(adapter.getEntity(entity)));
+                    return future.join();
+                }
                 return adapter.getEntity(entity);
             } else {
                 return null;
@@ -111,8 +125,25 @@ public class BukkitEntity implements Entity {
 
     @Override
     public boolean remove() {
-        // synchronize the whole method, not just the remove operation as we always need to synchronize and
-        // can make sure the entity reference was not invalidated in the few milliseconds between the next available tick (lol)
+        if (FoliaLibHolder.isFolia()) {
+            return TaskManager.taskManager().syncWhenFree(() -> {
+                org.bukkit.entity.Entity entity = entityRef.get();
+                if (entity != null) {
+                    try {
+                        FoliaLibHolder.getScheduler().runAtEntity(entity, scheduledTask -> entity.remove());
+                        return true;
+                    } catch (UnsupportedOperationException e) {
+                        return false;
+                    }
+                } else {
+                    return true;
+                }
+            });
+        }
+        // synchronize the whole method, not just the remove operation as we always need
+        // to synchronize and
+        // can make sure the entity reference was not invalidated in the few
+        // milliseconds between the next available tick (lol)
         return TaskManager.taskManager().sync(() -> {
             org.bukkit.entity.Entity entity = entityRef.get();
             if (entity != null) {

@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.extent.world;
 
+import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.fastasyncworldedit.core.util.task.RunnableVal;
 import com.sk89q.worldedit.WorldEditException;
@@ -37,10 +38,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Makes changes to the world as if a player had done so during survival mode.
  *
- * <p>Note that this extent may choose to not call the underlying
+ * <p>
+ * Note that this extent may choose to not call the underlying
  * extent and may instead call methods on the {@link World} that is passed
  * in the constructor. For that reason, if you wish to "catch" changes, you
- * should catch them before the changes reach this extent.</p>
+ * should catch them before the changes reach this extent.
+ * </p>
  */
 public class SurvivalModeExtent extends AbstractDelegateExtent {
 
@@ -64,9 +67,11 @@ public class SurvivalModeExtent extends AbstractDelegateExtent {
      * Return whether changes to the world should be simulated with the
      * use of game tools (such as pickaxes) whenever possible and reasonable.
      *
-     * <p>For example, we could pretend that the act of setting a coal ore block
+     * <p>
+     * For example, we could pretend that the act of setting a coal ore block
      * to air (nothing) was the act of a player mining that coal ore block
-     * with a pickaxe, which would mean that a coal item would be dropped.</p>
+     * with a pickaxe, which would mean that a coal item would be dropped.
+     * </p>
      *
      * @return true if tool use is to be simulated
      */
@@ -99,6 +104,12 @@ public class SurvivalModeExtent extends AbstractDelegateExtent {
             Collection<BaseItemStack> drops = world.getBlockDrops(location);
             boolean canSet = super.setBlock(location, block);
             if (canSet) {
+                if (Fawe.isFoliaServer()) {
+                    for (BaseItemStack stack : drops) {
+                        world.dropItem(location.toVector3(), stack);
+                    }
+                    return true;
+                }
                 TaskManager.taskManager().sync(new RunnableVal<>() {
                     @Override
                     public void run(Object value) {

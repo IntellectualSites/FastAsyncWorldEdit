@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.bukkit;
 
+import com.fastasyncworldedit.bukkit.util.FoliaLibHolder;
 import com.fastasyncworldedit.bukkit.util.MinecraftVersion;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.extent.processor.PlacementStateProcessor;
@@ -75,9 +76,9 @@ public class BukkitServerInterface extends AbstractPlatform implements MultiUser
     public final WorldEditPlugin plugin;
     private final CommandRegistration dynamicCommands;
     private final Lifecycled<Watchdog> watchdog;
-    //FAWE start
+    // FAWE start
     private RelighterFactory relighterFactory;
-    //FAWE end
+    // FAWE end
     private boolean hookingEvents;
 
     public BukkitServerInterface(WorldEditPlugin plugin, Server server) {
@@ -124,7 +125,8 @@ public class BukkitServerInterface extends AbstractPlatform implements MultiUser
         if (!type.startsWith("minecraft:")) {
             return false;
         }
-        @SuppressWarnings("deprecation") final EntityType entityType = EntityType.fromName(type.substring(10));
+        @SuppressWarnings("deprecation")
+        final EntityType entityType = EntityType.fromName(type.substring(10));
         return entityType != null && entityType.isAlive();
     }
 
@@ -135,6 +137,9 @@ public class BukkitServerInterface extends AbstractPlatform implements MultiUser
 
     @Override
     public int schedule(long delay, long period, Runnable task) {
+        if (FoliaLibHolder.isFolia()) {
+            return 0;
+        }
         return Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, task, delay, period);
     }
 
@@ -191,19 +196,17 @@ public class BukkitServerInterface extends AbstractPlatform implements MultiUser
 
                     String[] aliases = Stream.concat(
                             Stream.of(command.getName()),
-                            command.getAliases().stream()
-                    ).toArray(String[]::new);
+                            command.getAliases().stream()).toArray(String[]::new);
                     // TODO Handle localisation correctly
                     return new CommandInfo(
                             reduceToText(
                                     command.getUsage(),
-                                    WorldEdit.getInstance().getConfiguration().defaultLocale
-                            ),
-                            reduceToText(command.getDescription(), WorldEdit.getInstance().getConfiguration().defaultLocale),
+                                    WorldEdit.getInstance().getConfiguration().defaultLocale),
+                            reduceToText(command.getDescription(),
+                                    WorldEdit.getInstance().getConfiguration().defaultLocale),
                             aliases,
                             inspector,
-                            permissionsArray
-                    );
+                            permissionsArray);
                 }).collect(Collectors.toList()));
     }
 
@@ -232,12 +235,12 @@ public class BukkitServerInterface extends AbstractPlatform implements MultiUser
         return plugin.getDescription().getVersion();
     }
 
-    //FAWE start
+    // FAWE start
     @Override
     public String id() {
         return "intellectualsites:bukkit";
     }
-    //FAWE end
+    // FAWE end
 
     @Override
     public Map<Capability, Preference> getCapabilities() {
@@ -252,8 +255,7 @@ public class BukkitServerInterface extends AbstractPlatform implements MultiUser
     }
 
     private static final Set<SideEffect> SUPPORTED_SIDE_EFFECTS = Sets.immutableEnumSet(
-            SideEffect.NEIGHBORS
-    );
+            SideEffect.NEIGHBORS);
 
     @Override
     public Set<SideEffect> getSupportedSideEffects() {
@@ -284,10 +286,9 @@ public class BukkitServerInterface extends AbstractPlatform implements MultiUser
         return users;
     }
 
-    //FAWE start
+    // FAWE start
     @Override
-    public @Nonnull
-    RelighterFactory getRelighterFactory() {
+    public @Nonnull RelighterFactory getRelighterFactory() {
         if (this.relighterFactory == null) {
             this.relighterFactory = this.plugin.getBukkitImplAdapter().getRelighterFactory();
             LOGGER.info("Using {} as relighter factory.", this.relighterFactory.getClass().getCanonicalName());
@@ -318,5 +319,5 @@ public class BukkitServerInterface extends AbstractPlatform implements MultiUser
     public PlacementStateProcessor getPlatformPlacementProcessor(Extent extent, BlockTypeMask mask, Region region) {
         return this.plugin.getBukkitImplAdapter().getPlatformPlacementProcessor(extent, mask, region);
     }
-    //FAWE end
+    // FAWE end
 }

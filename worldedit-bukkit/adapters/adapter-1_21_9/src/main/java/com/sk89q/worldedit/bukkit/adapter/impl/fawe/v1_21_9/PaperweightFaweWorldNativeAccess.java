@@ -22,6 +22,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.redstone.ExperimentalRedstoneUtils;
 import net.minecraft.world.level.storage.ValueInput;
+import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.block.data.CraftBlockData;
 import org.bukkit.event.block.BlockPhysicsEvent;
@@ -62,7 +63,7 @@ public class PaperweightFaweWorldNativeAccess implements WorldNativeAccess<Level
         this.level = level;
         // Use the actual tick as minecraft-defined so we don't try to force blocks into the world when the server's already lagging.
         //  - With the caveat that we don't want to have too many cached changed (1024) so we'd flush those at 1024 anyway.
-        this.lastTick = new AtomicInteger(MinecraftServer.currentTick);
+        this.lastTick = new AtomicInteger(getCurrentTick());
     }
 
     private Level getLevel() {
@@ -98,7 +99,7 @@ public class PaperweightFaweWorldNativeAccess implements WorldNativeAccess<Level
             LevelChunk levelChunk, BlockPos blockPos,
             net.minecraft.world.level.block.state.BlockState blockState
     ) {
-        int currentTick = MinecraftServer.currentTick;
+        int currentTick = getCurrentTick();
         if (Fawe.isMainThread()) {
             return levelChunk.setBlockState(blockPos, blockState,
                     this.sideEffectSet.shouldApply(SideEffect.UPDATE) ? 0 : 512
@@ -294,6 +295,18 @@ public class PaperweightFaweWorldNativeAccess implements WorldNativeAccess<Level
             net.minecraft.world.level.block.state.BlockState blockState
     ) {
 
+    }
+
+    private int getCurrentTick() {
+        try {
+            return MinecraftServer.currentTick;
+        } catch (NoSuchFieldError e) {
+            try {
+                return Bukkit.getCurrentTick();
+            } catch (Exception ex) {
+                return 0;
+            }
+        }
     }
 
 }

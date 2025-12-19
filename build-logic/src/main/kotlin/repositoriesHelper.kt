@@ -11,6 +11,7 @@ private val ALLOWED_PREFIXES = listOf(
     "https://repo.maven.apache.org/maven2/",
     "https://s01.oss.sonatype.org/content/repositories/snapshots/",
     "https://plugins.gradle.org",
+    "https://repo.tcoded.com",
     "file:"
 )
 private val LOGGER = Logging.getLogger("repositoriesHelper")

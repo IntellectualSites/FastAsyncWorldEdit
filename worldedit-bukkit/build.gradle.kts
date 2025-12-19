@@ -27,6 +27,10 @@ repositories {
     }
     mavenCentral()
     maven {
+        name = "TCodedReleases"
+        url = uri("https://repo.tcoded.com/releases")
+    }
+    maven {
         name = "JitPack"
         url = uri("https://jitpack.io")
         content {
@@ -93,6 +97,7 @@ dependencies {
     localImplementation(libs.log4j.api)
 
     implementation(libs.paperLib)
+    implementation(libs.foliaLib)
     compileOnly(libs.vault) { isTransitive = false }
     compileOnly(libs.dummypermscompat) {
         exclude("com.github.MilkBowl", "VaultAPI")
@@ -214,6 +219,9 @@ tasks.withType<ShadowJar>().configureEach {
         }
         relocate("io.papermc.lib", "com.sk89q.worldedit.bukkit.paperlib") {
             include(dependency("io.papermc:paperlib"))
+        }
+        relocate("com.tcoded.folialib", "com.fastasyncworldedit.bukkit.folialib") {
+            include(dependency("com.tcoded:FoliaLib"))
         }
         relocate("net.royawesome.jlibnoise", "com.sk89q.worldedit.jlibnoise") {
             include(dependency("com.sk89q.lib:jlibnoise"))

@@ -1,6 +1,7 @@
 package com.fastasyncworldedit.bukkit.adapter;
 
 import com.fastasyncworldedit.bukkit.util.BukkitItemStack;
+import com.fastasyncworldedit.bukkit.util.FoliaLibHolder;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.NotABlockException;
@@ -49,8 +50,10 @@ public interface IBukkitAdapter {
     /**
      * Convert any WorldEdit world into an equivalent wrapped Bukkit world.
      *
-     * <p>If a matching world cannot be found, a {@link RuntimeException}
-     * will be thrown.</p>
+     * <p>
+     * If a matching world cannot be found, a {@link RuntimeException}
+     * will be thrown.
+     * </p>
      *
      * @param world the world
      * @return a wrapped Bukkit world
@@ -99,8 +102,7 @@ public interface IBukkitAdapter {
         checkNotNull(position);
         return new org.bukkit.Location(
                 world,
-                position.x(), position.y(), position.z()
-        );
+                position.x(), position.y(), position.z());
     }
 
     default org.bukkit.Location adapt(org.bukkit.World world, BlockVector3 position) {
@@ -121,8 +123,7 @@ public interface IBukkitAdapter {
                 world,
                 location.x(), location.y(), location.z(),
                 location.getYaw(),
-                location.getPitch()
-        );
+                location.getPitch());
     }
 
     /**
@@ -209,7 +210,6 @@ public interface IBukkitAdapter {
         }
         return BlockTypes.get(material.getKey().toString());
     }
-
 
     /**
      * Converts a Material to a ItemType
@@ -369,30 +369,35 @@ public interface IBukkitAdapter {
      * @param world       World to "generate" tree from (seed-wise)
      * @return If successsful
      */
-    default boolean generateTree(TreeGenerator.TreeType type, EditSession editSession, BlockVector3 pt, org.bukkit.World world) {
+    default boolean generateTree(TreeGenerator.TreeType type, EditSession editSession, BlockVector3 pt,
+            org.bukkit.World world) {
         TreeType bukkitType = BukkitWorld.toBukkitTreeType(type);
         if (bukkitType == TreeType.CHORUS_PLANT) {
-            pt = pt.add(0, 1, 0); // bukkit skips the feature gen which does this offset normally, so we have to add it back
+            pt = pt.add(0, 1, 0); // bukkit skips the feature gen which does this offset normally, so we have to
+                                  // add it back
         }
         return type != null && world.generateTree(
                 BukkitAdapter.adapt(world, pt), bukkitType,
-                new EditSessionBlockChangeDelegate(editSession)
-        );
+                new EditSessionBlockChangeDelegate(editSession));
     }
 
     /**
-     * Retrieve the list of Bukkit entities ({@link org.bukkit.entity.Entity}) in the given world. If overridden by adapters
+     * Retrieve the list of Bukkit entities ({@link org.bukkit.entity.Entity}) in
+     * the given world. If overridden by adapters
      * will attempt retrieval asynchronously.
      *
      * @param world world to retrieve entities in
      * @return list of {@link org.bukkit.entity.Entity}
      */
     default List<org.bukkit.entity.Entity> getEntities(org.bukkit.World world) {
-        return TaskManager.taskManager().sync(world::getEntities);
+        return FoliaLibHolder.isFolia()
+                ? TaskManager.taskManager().syncWhenFree(world::getEntities)
+                : TaskManager.taskManager().sync(world::getEntities);
     }
 
     /**
-     * Import Minecraft internal features into FAWE. Should be executed after worlds loading (in order to capture datapacks)
+     * Import Minecraft internal features into FAWE. Should be executed after worlds
+     * loading (in order to capture datapacks)
      *
      * @since 2.14.1
      */

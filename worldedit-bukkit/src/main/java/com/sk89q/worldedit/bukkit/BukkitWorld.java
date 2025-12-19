@@ -27,6 +27,7 @@ import com.fastasyncworldedit.core.internal.exception.FaweException;
 import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.implementation.packet.ChunkPacket;
+import com.fastasyncworldedit.bukkit.util.FoliaLibHolder;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
@@ -66,12 +67,14 @@ import org.bukkit.TreeType;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
+import org.bukkit.Location;
 import org.bukkit.block.Chest;
 import org.bukkit.entity.Entity;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 
 import java.lang.ref.WeakReference;
+import java.util.concurrent.CompletableFuture;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -90,9 +93,9 @@ public class BukkitWorld extends AbstractWorld {
     private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     private static final boolean HAS_3D_BIOMES;
-    //FAWE start - allow access for easy checking if World#getMin/MaxHeight exists
+    // FAWE start - allow access for easy checking if World#getMin/MaxHeight exists
     public static final boolean HAS_MIN_Y;
-    //FAWE end
+    // FAWE end
 
     private static final Map<Integer, Effect> effects = new HashMap<>();
 
@@ -121,9 +124,9 @@ public class BukkitWorld extends AbstractWorld {
     }
 
     protected WeakReference<World> worldRef;
-    //FAWE start
+    // FAWE start
     protected final String worldNameRef;
-    //FAWE end
+    // FAWE end
     private final WorldNativeAccess<?, ?, ?> worldNativeAccess;
 
     /**
@@ -133,9 +136,9 @@ public class BukkitWorld extends AbstractWorld {
      */
     public BukkitWorld(World world) {
         this.worldRef = new WeakReference<>(world);
-        //FAWE start
+        // FAWE start
         this.worldNameRef = world.getName();
-        //FAWE end
+        // FAWE end
         BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
         if (adapter != null) {
             this.worldNativeAccess = adapter.createWorldNativeAccess(world);
@@ -144,11 +147,24 @@ public class BukkitWorld extends AbstractWorld {
         }
     }
 
+    private <T> T syncRegion(BlockVector3 position, java.util.function.Supplier<T> supplier) {
+        if (FoliaLibHolder.isFolia()) {
+            World world = getWorld();
+            Location location = new Location(world, position.x(), position.y(), position.z());
+            CompletableFuture<T> future = new CompletableFuture<>();
+            FoliaLibHolder.getScheduler().runAtLocation(
+                    location,
+                    scheduledTask -> future.complete(supplier.get()));
+            return future.join();
+        }
+        return TaskManager.taskManager().sync(supplier);
+    }
+
     @Override
     public List<com.sk89q.worldedit.entity.Entity> getEntities(Region region) {
         World world = getWorld();
 
-        List<Entity> ents = TaskManager.taskManager().sync(world::getEntities);
+        List<Entity> ents = syncRegion(region.getMinimumPoint(), world::getEntities);
         List<com.sk89q.worldedit.entity.Entity> entities = new ArrayList<>();
         for (Entity ent : ents) {
             if (region.contains(BukkitAdapter.asBlockVector(ent.getLocation()))) {
@@ -162,7 +178,7 @@ public class BukkitWorld extends AbstractWorld {
     public List<com.sk89q.worldedit.entity.Entity> getEntities() {
         List<com.sk89q.worldedit.entity.Entity> list = new ArrayList<>();
 
-        List<Entity> ents = TaskManager.taskManager().sync(getWorld()::getEntities);
+        List<Entity> ents = syncRegion(BlockVector3.ZERO, getWorld()::getEntities);
         for (Entity entity : ents) {
             list.add(BukkitAdapter.adapt(entity));
         }
@@ -172,12 +188,12 @@ public class BukkitWorld extends AbstractWorld {
     @Override
     public int removeEntities(final Region region) {
         List<com.sk89q.worldedit.entity.Entity> entities = getEntities(region);
-        return TaskManager.taskManager().sync(() -> entities.stream()
-                .mapToInt(entity -> entity.remove() ? 1 : 0).sum()
-        );
+        return syncRegion(region.getMinimumPoint(), () -> entities.stream()
+                .mapToInt(entity -> entity.remove() ? 1 : 0).sum());
     }
 
-    //FAWE: createEntity was moved to IChunkExtent to prevent issues with Async Entity Add.
+    // FAWE: createEntity was moved to IChunkExtent to prevent issues with Async
+    // Entity Add.
 
     /**
      * Get the world handle.
@@ -185,7 +201,7 @@ public class BukkitWorld extends AbstractWorld {
      * @return the world
      */
     public World getWorld() {
-        //FAWE start
+        // FAWE start
         World tmp = worldRef.get();
         if (tmp == null) {
             tmp = Bukkit.getWorld(worldNameRef);
@@ -193,11 +209,11 @@ public class BukkitWorld extends AbstractWorld {
                 worldRef = new WeakReference<>(tmp);
             }
         }
-        //FAWE end
+        // FAWE end
         return checkNotNull(tmp, "The world was unloaded and the reference is unavailable");
     }
 
-    //FAWE start
+    // FAWE start
 
     /**
      * Get the world handle.
@@ -217,21 +233,22 @@ public class BukkitWorld extends AbstractWorld {
         }
         return tmp;
     }
-    //FAWE end
+    // FAWE end
 
     @Override
     public String getName() {
-        //FAWE start - Throw WorldUnloadedException rather than NPE when world unloaded and attempted to be accessed
+        // FAWE start - Throw WorldUnloadedException rather than NPE when world unloaded
+        // and attempted to be accessed
         return getWorldChecked().getName();
-        //FAWE end
+        // FAWE end
     }
 
-    //FAWE start - allow history to read an unloaded world's name
+    // FAWE start - allow history to read an unloaded world's name
     @Override
     public String getNameUnsafe() {
         return worldNameRef;
     }
-    //FAWE end
+    // FAWE end
 
     @Override
     public String id() {
@@ -254,9 +271,9 @@ public class BukkitWorld extends AbstractWorld {
 
     @Override
     public int getBlockLightLevel(BlockVector3 pt) {
-        //FAWE start - safe edit region
+        // FAWE start - safe edit region
         testCoords(pt);
-        //FAWE end
+        // FAWE end
         return getWorld().getBlockAt(pt.x(), pt.y(), pt.z()).getLightLevel();
     }
 
@@ -280,9 +297,9 @@ public class BukkitWorld extends AbstractWorld {
     @Override
     public boolean clearContainerBlockContents(BlockVector3 pt) {
         checkNotNull(pt);
-        //FAWE start - safe edit region
+        // FAWE start - safe edit region
         testCoords(pt);
-        //FAWE end
+        // FAWE end
         BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
         if (adapter != null) {
             try {
@@ -313,10 +330,11 @@ public class BukkitWorld extends AbstractWorld {
     }
 
     /**
-     * An EnumMap that stores which WorldEdit TreeTypes apply to which Bukkit TreeTypes.
+     * An EnumMap that stores which WorldEdit TreeTypes apply to which Bukkit
+     * TreeTypes.
      */
-    private static final EnumMap<TreeGenerator.TreeType, TreeType> treeTypeMapping =
-            new EnumMap<>(TreeGenerator.TreeType.class);
+    private static final EnumMap<TreeGenerator.TreeType, TreeType> treeTypeMapping = new EnumMap<>(
+            TreeGenerator.TreeType.class);
 
     static {
         for (TreeGenerator.TreeType type : TreeGenerator.TreeType.values()) {
@@ -337,13 +355,16 @@ public class BukkitWorld extends AbstractWorld {
         treeTypeMapping.put(TreeGenerator.TreeType.RANDOM_MUSHROOM, TreeType.BROWN_MUSHROOM);
         for (TreeGenerator.TreeType type : TreeGenerator.TreeType.values()) {
             if (treeTypeMapping.get(type) == null) {
-                //FAWE start
+                // FAWE start
                 LOGGER.info("No TreeType mapping for TreeGenerator.TreeType." + type);
                 LOGGER.info("The above message is displayed because your FAWE version is newer than {}" +
-                        " and contains features of future minecraft versions which do not exist in {} hence the tree type" +
-                        " {} is not available. This is not an error. This version of FAWE will work on your version of " +
-                        " Minecraft. This is an informative message only.", Bukkit.getVersion(), Bukkit.getVersion(), type);
-                //FAWE end
+                        " and contains features of future minecraft versions which do not exist in {} hence the tree type"
+                        +
+                        " {} is not available. This is not an error. This version of FAWE will work on your version of "
+                        +
+                        " Minecraft. This is an informative message only.", Bukkit.getVersion(), Bukkit.getVersion(),
+                        type);
+                // FAWE end
             }
         }
     }
@@ -354,10 +375,10 @@ public class BukkitWorld extends AbstractWorld {
 
     @Override
     public boolean generateTree(TreeGenerator.TreeType type, EditSession editSession, BlockVector3 pt) {
-        //FAWE start - allow tree commands to be undone and obey region restrictions
+        // FAWE start - allow tree commands to be undone and obey region restrictions
         testCoords(pt);
         return WorldEditPlugin.getInstance().getBukkitImplAdapter().generateTree(type, editSession, pt, getWorld());
-        //FAWE end
+        // FAWE end
     }
 
     @Override
@@ -368,11 +389,11 @@ public class BukkitWorld extends AbstractWorld {
 
     @Override
     public void checkLoadedChunk(BlockVector3 pt) {
-        //FAWE start - safe edit region
+        // FAWE start - safe edit region
         testCoords(pt);
-        //FAWE end
+        // FAWE end
         World world = getWorld();
-        //FAWE start
+        // FAWE start
         int X = pt.x() >> 4;
         int Z = pt.z() >> 4;
         if (Fawe.isMainThread()) {
@@ -380,7 +401,7 @@ public class BukkitWorld extends AbstractWorld {
         } else if (PaperLib.isPaper()) {
             PaperLib.getChunkAtAsync(world, X, Z, true);
         }
-        //FAWE end
+        // FAWE end
     }
 
     @Override
@@ -441,14 +462,14 @@ public class BukkitWorld extends AbstractWorld {
         return true;
     }
 
-    //FAWE start - allow block break effect of non-legacy blocks
+    // FAWE start - allow block break effect of non-legacy blocks
     @Override
     public boolean playBlockBreakEffect(Vector3 position, BlockType type) {
         World world = getWorld();
         world.playEffect(BukkitAdapter.adapt(world, position), Effect.STEP_SOUND, BukkitAdapter.adapt(type));
         return true;
     }
-    //FAWE end
+    // FAWE end
 
     @Override
     public WeatherType getWeather() {
@@ -502,25 +523,25 @@ public class BukkitWorld extends AbstractWorld {
 
     @Override
     public void simulateBlockMine(BlockVector3 pt) {
-        //FAWE start - safe edit region
+        // FAWE start - safe edit region
         testCoords(pt);
-        //FAWE end
+        // FAWE end
         getWorld().getBlockAt(pt.x(), pt.y(), pt.z()).breakNaturally();
     }
 
-    //FAWE start
+    // FAWE start
     @Override
     public Collection<BaseItemStack> getBlockDrops(BlockVector3 position) {
         return getWorld().getBlockAt(position.x(), position.y(), position.z()).getDrops().stream()
                 .map(BukkitAdapter::adapt).collect(Collectors.toList());
     }
-    //FAWE end
+    // FAWE end
 
     @Override
     public boolean canPlaceAt(BlockVector3 position, com.sk89q.worldedit.world.block.BlockState blockState) {
-        //FAWE start - safe edit region
+        // FAWE start - safe edit region
         testCoords(position);
-        //FAWE end
+        // FAWE end
         BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
         if (adapter != null) {
             return adapter.canPlaceAt(getWorld(), position, blockState);
@@ -553,9 +574,9 @@ public class BukkitWorld extends AbstractWorld {
 
     @Override
     public com.sk89q.worldedit.world.block.BlockState getBlock(BlockVector3 position) {
-        //FAWE start - safe edit region
+        // FAWE start - safe edit region
         testCoords(position);
-        //FAWE end
+        // FAWE end
         BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
         if (adapter != null) {
             try {
@@ -577,9 +598,9 @@ public class BukkitWorld extends AbstractWorld {
 
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block, SideEffectSet sideEffects) {
-        //FAWE start - safe edit region
+        // FAWE start - safe edit region
         testCoords(position);
-        //FAWE end
+        // FAWE end
         if (worldNativeAccess != null) {
             try {
                 return worldNativeAccess.setBlock(position, block, sideEffects);
@@ -599,9 +620,9 @@ public class BukkitWorld extends AbstractWorld {
 
     @Override
     public BaseBlock getFullBlock(BlockVector3 position) {
-        //FAWE start - safe edit region
+        // FAWE start - safe edit region
         testCoords(position);
-        //FAWE end
+        // FAWE end
         BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
         if (adapter != null) {
             return adapter.getFullBlock(BukkitAdapter.adapt(getWorld(), position));
@@ -624,17 +645,15 @@ public class BukkitWorld extends AbstractWorld {
     @Override
     public Set<SideEffect> applySideEffects(
             BlockVector3 position, com.sk89q.worldedit.world.block.BlockState previousType,
-            SideEffectSet sideEffectSet
-    ) {
-        //FAWE start - safe edit region
+            SideEffectSet sideEffectSet) {
+        // FAWE start - safe edit region
         testCoords(position);
-        //FAWE end
+        // FAWE end
         if (worldNativeAccess != null) {
             worldNativeAccess.applySideEffects(position, previousType, sideEffectSet);
             return Sets.intersection(
                     WorldEditPlugin.getInstance().getInternalPlatform().getSupportedSideEffects(),
-                    sideEffectSet.getSideEffectsToApply()
-            );
+                    sideEffectSet.getSideEffectsToApply());
         }
 
         return ImmutableSet.of();
@@ -642,9 +661,9 @@ public class BukkitWorld extends AbstractWorld {
 
     @Override
     public boolean useItem(BlockVector3 position, BaseItem item, Direction face) {
-        //FAWE start - safe edit region
+        // FAWE start - safe edit region
         testCoords(position);
-        //FAWE end
+        // FAWE end
         BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
         if (adapter != null) {
             return adapter.simulateItemUse(getWorld(), position, item, face);
@@ -662,9 +681,9 @@ public class BukkitWorld extends AbstractWorld {
     @SuppressWarnings("deprecation")
     @Override
     public BiomeType getBiome(BlockVector3 position) {
-        //FAWE start - safe edit region
+        // FAWE start - safe edit region
         testCoords(position);
-        //FAWE end
+        // FAWE end
         if (HAS_3D_BIOMES) {
             return BukkitAdapter.adapt(getWorld().getBiome(position.x(), position.y(), position.z()));
         } else {
@@ -675,9 +694,9 @@ public class BukkitWorld extends AbstractWorld {
     @SuppressWarnings("deprecation")
     @Override
     public boolean setBiome(BlockVector3 position, BiomeType biome) {
-        //FAWE start - safe edit region
+        // FAWE start - safe edit region
         testCoords(position);
-        //FAWE end
+        // FAWE end
         if (HAS_3D_BIOMES) {
             getWorld().setBiome(position.x(), position.y(), position.z(), BukkitAdapter.adapt(biome));
         } else {
@@ -686,7 +705,7 @@ public class BukkitWorld extends AbstractWorld {
         return true;
     }
 
-    //FAWE start
+    // FAWE start
 
     @Override
     public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block)
@@ -728,5 +747,5 @@ public class BukkitWorld extends AbstractWorld {
             worldNativeAccess.flush();
         }
     }
-    //FAWE end
+    // FAWE end
 }

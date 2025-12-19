@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.bukkit;
 
+import com.fastasyncworldedit.bukkit.util.FoliaLibHolder;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.platform.AbstractCommandBlockActor;
@@ -65,63 +66,63 @@ public class BukkitBlockCommandSender extends AbstractCommandBlockActor {
     @Override
     @Deprecated
     public void printRaw(String msg) {
-        //FAWE start - ensure executed on main thread
+        // FAWE start - ensure executed on main thread
         TaskManager.taskManager().sync(() -> {
             for (String part : msg.split("\n")) {
                 sender.sendMessage(part);
             }
             return null;
         });
-        //FAWE end
+        // FAWE end
     }
 
     @Override
     @Deprecated
     public void print(String msg) {
-        //FAWE start - ensure executed on main thread
+        // FAWE start - ensure executed on main thread
         TaskManager.taskManager().sync(() -> {
             for (String part : msg.split("\n")) {
                 print(TextComponent.of(part, TextColor.LIGHT_PURPLE));
             }
             return null;
         });
-        //FAWE end
+        // FAWE end
     }
 
     @Override
     @Deprecated
     public void printDebug(String msg) {
-        //FAWE start - ensure executed on main thread
+        // FAWE start - ensure executed on main thread
         TaskManager.taskManager().sync(() -> {
             for (String part : msg.split("\n")) {
                 print(TextComponent.of(part, TextColor.GRAY));
             }
             return null;
         });
-        //FAWE end
+        // FAWE end
     }
 
     @Override
     @Deprecated
     public void printError(String msg) {
-        //FAWE start - ensure executed on main thread
+        // FAWE start - ensure executed on main thread
         TaskManager.taskManager().sync(() -> {
             for (String part : msg.split("\n")) {
                 print(TextComponent.of(part, TextColor.RED));
             }
             return null;
         });
-        //FAWE end
+        // FAWE end
     }
 
     @Override
     public void print(Component component) {
-        //FAWE start - ensure executed on main thread
+        // FAWE start - ensure executed on main thread
         TaskManager.taskManager().sync(() -> {
             TextAdapter.sendMessage(sender, WorldEditText.format(component, getLocale()));
             return null;
         });
-        //FAWE end
+        // FAWE end
     }
 
     @Override
@@ -151,12 +152,12 @@ public class BukkitBlockCommandSender extends AbstractCommandBlockActor {
         return sender.hasPermission(permission);
     }
 
-    //FAWE start
+    // FAWE start
     @Override
     public boolean togglePermission(String permission) {
         return true;
     }
-    //FAWE end
+    // FAWE end
 
     @Override
     public void setPermission(String permission, boolean value) {
@@ -195,14 +196,16 @@ public class BukkitBlockCommandSender extends AbstractCommandBlockActor {
                     // we can update eagerly
                     updateActive();
                 } else {
+                    if (FoliaLibHolder.isFolia()) {
+                        return active;
+                    }
                     // we should update it eventually
                     Bukkit.getScheduler().callSyncMethod(
                             plugin,
                             () -> {
                                 updateActive();
                                 return null;
-                            }
-                    );
+                            });
                 }
                 return active;
             }

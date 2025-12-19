@@ -40,11 +40,12 @@ import java.util.function.Supplier;
 /**
  * Class which handles all the queues {@link IQueueExtent}
  */
-@SuppressWarnings({"unchecked", "rawtypes"})
+@SuppressWarnings({ "unchecked", "rawtypes" })
 public abstract class QueueHandler implements Trimable, Runnable {
 
     /**
-     * Primary queue should be used for tasks that are unlikely to wait on other tasks, IO, etc. (i.e. spend most of their
+     * Primary queue should be used for tasks that are unlikely to wait on other
+     * tasks, IO, etc. (i.e. spend most of their
      * time utilising CPU.
      */
     private final ForkJoinPool forkJoinPoolPrimary = new ForkJoinPool(
@@ -57,39 +58,43 @@ public abstract class QueueHandler implements Trimable, Runnable {
             0,
             pool -> true,
             60,
-            TimeUnit.SECONDS
-    );
+            TimeUnit.SECONDS);
 
     /**
-     * Secondary queue should be used for "cleanup" tasks that are likely to be shorter in life than those submitted to the
+     * Secondary queue should be used for "cleanup" tasks that are likely to be
+     * shorter in life than those submitted to the
      * primary queue. They may be IO-bound tasks.
      */
     private final ForkJoinPool forkJoinPoolSecondary = new ForkJoinPool(
             Settings.settings().QUEUE.PARALLEL_THREADS,
             new FaweForkJoinWorkerThreadFactory("FAWE Fork Join Pool Secondary - %s"),
             null,
-            false
-    );
+            false);
     /**
-     * Main "work-horse" queue for FAWE. Handles chunk submission (and chunk submission alone). Blocking in order to forcibly
+     * Main "work-horse" queue for FAWE. Handles chunk submission (and chunk
+     * submission alone). Blocking in order to forcibly
      * prevent overworking/over-submission of chunk process tasks.
      */
     private final ThreadPoolExecutor blockingExecutor = FaweCache.INSTANCE.newBlockingExecutor(
             "FAWE QueueHandler Blocking Executor - %d");
     /**
-     * Queue for tasks to be completed on the main thread. These take priority of tasks submitted to syncWhenFree queue
+     * Queue for tasks to be completed on the main thread. These take priority of
+     * tasks submitted to syncWhenFree queue
      */
     private final ConcurrentLinkedQueue<FutureTask> syncTasks = new ConcurrentLinkedQueue<>();
     /**
-     * Queue for tasks to be completed on the main thread. These are completed only if and when there is time left in a tick
+     * Queue for tasks to be completed on the main thread. These are completed only
+     * if and when there is time left in a tick
      * after completing all tasks in the syncTasks queue
      */
     private final ConcurrentLinkedQueue<FutureTask> syncWhenFree = new ConcurrentLinkedQueue<>();
 
     private final Map<World, WeakReference<IChunkCache<IChunkGet>>> chunkGetCache = new HashMap<>();
-    private final CleanableThreadLocal<IQueueExtent<IQueueChunk>> queuePool = new CleanableThreadLocal<>(QueueHandler.this::create);
+    private final CleanableThreadLocal<IQueueExtent<IQueueChunk>> queuePool = new CleanableThreadLocal<>(
+            QueueHandler.this::create);
     /**
-     * Used to calculate elapsed time in milliseconds and ensure block placement doesn't lag the
+     * Used to calculate elapsed time in milliseconds and ensure block placement
+     * doesn't lag the
      * server
      */
     private long last;
@@ -106,7 +111,7 @@ public abstract class QueueHandler implements Trimable, Runnable {
 
     @Override
     public void run() {
-        if (!Fawe.isMainThread()) {
+        if (!Fawe.isMainThread() && !Fawe.isFoliaServer()) {
             throw new IllegalStateException("Not main thread");
         }
         if (!syncTasks.isEmpty()) {
@@ -127,7 +132,8 @@ public abstract class QueueHandler implements Trimable, Runnable {
     }
 
     /**
-     * Get if the {@code blockingExecutor} is saturated with tasks or not. Under-utilisation implies the queue has space for
+     * Get if the {@code blockingExecutor} is saturated with tasks or not.
+     * Under-utilisation implies the queue has space for
      * more submissions.
      *
      * @return true if {@code blockingExecutor} is not saturated with tasks
@@ -192,8 +198,10 @@ public abstract class QueueHandler implements Trimable, Runnable {
     }
 
     /**
-     * Complete a task in the {@code forkJoinPoolSecondary} queue. Secondary queue should be used for "cleanup" tasks that are
-     * likely to be shorter in life than those submitted to the primary queue. They may be IO-bound tasks.
+     * Complete a task in the {@code forkJoinPoolSecondary} queue. Secondary queue
+     * should be used for "cleanup" tasks that are
+     * likely to be shorter in life than those submitted to the primary queue. They
+     * may be IO-bound tasks.
      *
      * @param run   Runnable to run
      * @param value Value to return when done
@@ -205,8 +213,10 @@ public abstract class QueueHandler implements Trimable, Runnable {
     }
 
     /**
-     * Complete a task in the {@code forkJoinPoolSecondary} queue. Secondary queue should be used for "cleanup" tasks that are
-     * likely to be shorter in life than those submitted to the primary queue. They may be IO-bound tasks.
+     * Complete a task in the {@code forkJoinPoolSecondary} queue. Secondary queue
+     * should be used for "cleanup" tasks that are
+     * likely to be shorter in life than those submitted to the primary queue. They
+     * may be IO-bound tasks.
      *
      * @param run Runnable to run
      * @return Future for submitted task
@@ -216,8 +226,10 @@ public abstract class QueueHandler implements Trimable, Runnable {
     }
 
     /**
-     * Complete a task in the {@code forkJoinPoolSecondary} queue. Secondary queue should be used for "cleanup" tasks that are
-     * likely to be shorter in life than those submitted to the primary queue. They may be IO-bound tasks.
+     * Complete a task in the {@code forkJoinPoolSecondary} queue. Secondary queue
+     * should be used for "cleanup" tasks that are
+     * likely to be shorter in life than those submitted to the primary queue. They
+     * may be IO-bound tasks.
      *
      * @param call Callable to run
      * @param <T>  Return value type
@@ -228,7 +240,8 @@ public abstract class QueueHandler implements Trimable, Runnable {
     }
 
     /**
-     * Complete a task in the {@code forkJoinPoolPrimary} queue. Primary queue should be used for tasks that are unlikely to
+     * Complete a task in the {@code forkJoinPoolPrimary} queue. Primary queue
+     * should be used for tasks that are unlikely to
      * wait on other tasks, IO, etc. (i.e. spend most of their time utilising CPU.
      *
      * @param run Task to run
@@ -239,7 +252,8 @@ public abstract class QueueHandler implements Trimable, Runnable {
     }
 
     /**
-     * Submit a task to be run on the main thread. Does not guarantee to be run on the next tick as FAWE will only operate to
+     * Submit a task to be run on the main thread. Does not guarantee to be run on
+     * the next tick as FAWE will only operate to
      * maintain approx. 18 tps.
      *
      * @param run Task to run
@@ -251,7 +265,8 @@ public abstract class QueueHandler implements Trimable, Runnable {
     }
 
     /**
-     * Submit a task to be run on the main thread. Does not guarantee to be run on the next tick as FAWE will only operate to
+     * Submit a task to be run on the main thread. Does not guarantee to be run on
+     * the next tick as FAWE will only operate to
      * maintain approx. 18 tps.
      *
      * @param call Task to run
@@ -263,7 +278,8 @@ public abstract class QueueHandler implements Trimable, Runnable {
     }
 
     /**
-     * Submit a task to be run on the main thread. Does not guarantee to be run on the next tick as FAWE will only operate to
+     * Submit a task to be run on the main thread. Does not guarantee to be run on
+     * the next tick as FAWE will only operate to
      * maintain approx. 18 tps.
      *
      * @param supplier Task to run
@@ -275,9 +291,12 @@ public abstract class QueueHandler implements Trimable, Runnable {
     }
 
     /**
-     * Submit a task to be run on the main thread. Does not guarantee to be run on the next tick as FAWE will only operate to
-     * maintain approx. 18 tps. Takes lower priority than tasks submitted via any {@code QueueHandler#sync} method. Completed
-     * only if and when there is time left in a tick after completing all sync tasks submitted using the aforementioned methods.
+     * Submit a task to be run on the main thread. Does not guarantee to be run on
+     * the next tick as FAWE will only operate to
+     * maintain approx. 18 tps. Takes lower priority than tasks submitted via any
+     * {@code QueueHandler#sync} method. Completed
+     * only if and when there is time left in a tick after completing all sync tasks
+     * submitted using the aforementioned methods.
      *
      * @param run   Task to run
      * @param value Value to return when done
@@ -289,9 +308,12 @@ public abstract class QueueHandler implements Trimable, Runnable {
     }
 
     /**
-     * Submit a task to be run on the main thread. Does not guarantee to be run on the next tick as FAWE will only operate to
-     * maintain approx. 18 tps. Takes lower priority than tasks submitted via any {@code QueueHandler#sync} method. Completed
-     * only if and when there is time left in a tick after completing all sync tasks submitted using the aforementioned methods.
+     * Submit a task to be run on the main thread. Does not guarantee to be run on
+     * the next tick as FAWE will only operate to
+     * maintain approx. 18 tps. Takes lower priority than tasks submitted via any
+     * {@code QueueHandler#sync} method. Completed
+     * only if and when there is time left in a tick after completing all sync tasks
+     * submitted using the aforementioned methods.
      *
      * @param run Task to run
      * @param <T> Value type
@@ -302,9 +324,12 @@ public abstract class QueueHandler implements Trimable, Runnable {
     }
 
     /**
-     * Submit a task to be run on the main thread. Does not guarantee to be run on the next tick as FAWE will only operate to
-     * maintain approx. 18 tps. Takes lower priority than tasks submitted via any {@code QueueHandler#sync} method. Completed
-     * only if and when there is time left in a tick after completing all sync tasks submitted using the aforementioned methods.
+     * Submit a task to be run on the main thread. Does not guarantee to be run on
+     * the next tick as FAWE will only operate to
+     * maintain approx. 18 tps. Takes lower priority than tasks submitted via any
+     * {@code QueueHandler#sync} method. Completed
+     * only if and when there is time left in a tick after completing all sync tasks
+     * submitted using the aforementioned methods.
      *
      * @param call Task to run
      * @param <T>  Value type
@@ -315,9 +340,12 @@ public abstract class QueueHandler implements Trimable, Runnable {
     }
 
     /**
-     * Submit a task to be run on the main thread. Does not guarantee to be run on the next tick as FAWE will only operate to
-     * maintain approx. 18 tps. Takes lower priority than tasks submitted via any {@code QueueHandler#sync} method. Completed
-     * only if and when there is time left in a tick after completing all sync tasks submitted using the aforementioned methods.
+     * Submit a task to be run on the main thread. Does not guarantee to be run on
+     * the next tick as FAWE will only operate to
+     * maintain approx. 18 tps. Takes lower priority than tasks submitted via any
+     * {@code QueueHandler#sync} method. Completed
+     * only if and when there is time left in a tick after completing all sync tasks
+     * submitted using the aforementioned methods.
      *
      * @param supplier Task to run
      * @param <T>      Value type
@@ -328,7 +356,7 @@ public abstract class QueueHandler implements Trimable, Runnable {
     }
 
     private <T> Future<T> sync(Runnable run, T value, Queue<FutureTask> queue) {
-        if (Fawe.isMainThread()) {
+        if (Fawe.isMainThread() && !Fawe.isFoliaServer()) {
             run.run();
             return Futures.immediateFuture(value);
         }
@@ -339,7 +367,7 @@ public abstract class QueueHandler implements Trimable, Runnable {
     }
 
     private <T> Future<T> sync(Runnable run, Queue<FutureTask> queue) {
-        if (Fawe.isMainThread()) {
+        if (Fawe.isMainThread() && !Fawe.isFoliaServer()) {
             run.run();
             return Futures.immediateCancelledFuture();
         }
@@ -350,7 +378,7 @@ public abstract class QueueHandler implements Trimable, Runnable {
     }
 
     private <T> Future<T> sync(Callable<T> call, Queue<FutureTask> queue) throws Exception {
-        if (Fawe.isMainThread()) {
+        if (Fawe.isMainThread() && !Fawe.isFoliaServer()) {
             return Futures.immediateFuture(call.call());
         }
         final FutureTask<T> result = new FutureTask<>(call);
@@ -360,7 +388,7 @@ public abstract class QueueHandler implements Trimable, Runnable {
     }
 
     private <T> Future<T> sync(Supplier<T> call, Queue<FutureTask> queue) {
-        if (Fawe.isMainThread()) {
+        if (Fawe.isMainThread() && !Fawe.isFoliaServer()) {
             return Futures.immediateFuture(call.get());
         }
         final FutureTask<T> result = new FutureTask<>(call::get);
@@ -376,8 +404,10 @@ public abstract class QueueHandler implements Trimable, Runnable {
     }
 
     /**
-     * Internal use only. Specifically for submitting {@link IQueueChunk} for "processing" an edit. Submits to the blocking
-     * executor, the main "work-horse" queue for FAWE. Handles chunk submission (and chunk submission alone). Blocking in order
+     * Internal use only. Specifically for submitting {@link IQueueChunk} for
+     * "processing" an edit. Submits to the blocking
+     * executor, the main "work-horse" queue for FAWE. Handles chunk submission (and
+     * chunk submission alone). Blocking in order
      * to forcibly prevent overworking/over-submission of chunk process tasks.
      *
      * @param chunk chunk
@@ -385,9 +415,9 @@ public abstract class QueueHandler implements Trimable, Runnable {
      * @return Future representing task
      */
     public <T extends Future<T>> T submit(IQueueChunk<T> chunk) {
-//        if (MemUtil.isMemoryFree()) { TODO NOT IMPLEMENTED - optimize this
-//            return (T) forkJoinPoolSecondary.submit(chunk);
-//        }
+        // if (MemUtil.isMemoryFree()) { TODO NOT IMPLEMENTED - optimize this
+        // return (T) forkJoinPoolSecondary.submit(chunk);
+        // }
         return (T) blockingExecutor.submit(chunk);
     }
 
@@ -421,7 +451,8 @@ public abstract class QueueHandler implements Trimable, Runnable {
     }
 
     /**
-     * Sets the current thread's {@link IQueueExtent} instance in the queue pool to null.
+     * Sets the current thread's {@link IQueueExtent} instance in the queue pool to
+     * null.
      */
     public void unCache() {
         queuePool.remove();
@@ -439,19 +470,20 @@ public abstract class QueueHandler implements Trimable, Runnable {
      * Indicate a "set" task is being started.
      *
      * @param parallel if the "set" being started is parallel/async
-     * @deprecated To be replaced by better-named {@link QueueHandler#startUnsafe(boolean)} )}
+     * @deprecated To be replaced by better-named
+     *             {@link QueueHandler#startUnsafe(boolean)} )}
      */
     @Deprecated(forRemoval = true, since = "2.6.2")
     public void startSet(boolean parallel) {
         startUnsafe(parallel);
     }
 
-
     /**
      * Indicate a "set" task is ending.
      *
      * @param parallel if the "set" being started is parallel/async
-     * @deprecated To be replaced by better-named {@link QueueHandler#endUnsafe(boolean)} )}
+     * @deprecated To be replaced by better-named
+     *             {@link QueueHandler#endUnsafe(boolean)} )}
      */
     @Deprecated(forRemoval = true, since = "2.6.2")
     public void endSet(boolean parallel) {
@@ -459,14 +491,16 @@ public abstract class QueueHandler implements Trimable, Runnable {
     }
 
     /**
-     * Indicate an unsafe task is starting. Physics are frozen, async catchers disabled, etc. for the duration of the task
+     * Indicate an unsafe task is starting. Physics are frozen, async catchers
+     * disabled, etc. for the duration of the task
      *
      * @param parallel If the task is being run async and/or in parallel
      */
     public abstract void startUnsafe(boolean parallel);
 
     /**
-     * Indicate a/the unsafe task submitted after a {@link QueueHandler#startUnsafe(boolean)} call has ended.
+     * Indicate a/the unsafe task submitted after a
+     * {@link QueueHandler#startUnsafe(boolean)} call has ended.
      *
      * @param parallel If the task was being run async and/or in parallel
      */
@@ -528,7 +562,8 @@ public abstract class QueueHandler implements Trimable, Runnable {
     }
 
     /**
-     * Primary queue should be used for tasks that are unlikely to wait on other tasks, IO, etc. (i.e. spend most of their
+     * Primary queue should be used for tasks that are unlikely to wait on other
+     * tasks, IO, etc. (i.e. spend most of their
      * time utilising CPU.
      * <p>
      * Internal API usage only.
@@ -540,7 +575,8 @@ public abstract class QueueHandler implements Trimable, Runnable {
     }
 
     /**
-     * Secondary queue should be used for "cleanup" tasks that are likely to be shorter in life than those submitted to the
+     * Secondary queue should be used for "cleanup" tasks that are likely to be
+     * shorter in life than those submitted to the
      * primary queue. They may be IO-bound tasks.
      * <p>
      * Internal API usage only.

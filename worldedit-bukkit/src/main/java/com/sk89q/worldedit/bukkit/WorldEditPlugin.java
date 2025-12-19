@@ -21,6 +21,7 @@ package com.sk89q.worldedit.bukkit;
 
 import com.fastasyncworldedit.bukkit.BukkitPermissionAttachmentManager;
 import com.fastasyncworldedit.bukkit.FaweBukkit;
+import com.fastasyncworldedit.bukkit.util.FoliaLibHolder;
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.util.UpdateNotification;
 import com.fastasyncworldedit.core.util.WEManager;
@@ -102,17 +103,17 @@ import static com.sk89q.worldedit.internal.anvil.ChunkDeleter.DELCHUNKS_FILE_NAM
 /**
  * Plugin for Bukkit.
  */
-//FAWE start - Don't implement TabCompleter, we use Paper's AsyncTabCompleteListener
+// FAWE start - Don't implement TabCompleter, we use Paper's
+// AsyncTabCompleteListener
 public class WorldEditPlugin extends JavaPlugin {
-//FAWE end
+    // FAWE end
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
     public static final String CUI_PLUGIN_CHANNEL = "worldedit:cui";
     private static WorldEditPlugin INSTANCE;
     private static final int BSTATS_ID = 1403;
 
-    private final SimpleLifecycled<BukkitImplAdapter> adapter =
-            SimpleLifecycled.invalid();
+    private final SimpleLifecycled<BukkitImplAdapter> adapter = SimpleLifecycled.invalid();
     private BukkitServerInterface platform;
     private BukkitConfiguration config;
     private BukkitPermissionAttachmentManager permissionAttachmentManager;
@@ -123,79 +124,83 @@ public class WorldEditPlugin extends JavaPlugin {
     @Override
     public void onLoad() {
 
-        //FAWE start
-        // This is already covered by Spigot, however, a more pesky warning with a proper explanation over "Ambiguous plugin name..." can't hurt.
+        // FAWE start
+        // This is already covered by Spigot, however, a more pesky warning with a
+        // proper explanation over "Ambiguous plugin name..." can't hurt.
         Plugin[] plugins = Bukkit.getServer().getPluginManager().getPlugins();
         for (Plugin p : plugins) {
             if (p.getName().equals("WorldEdit")) {
                 LOGGER.warn(
-                        "You installed WorldEdit alongside FastAsyncWorldEdit. That is unneeded and will cause unforeseen issues, " +
+                        "You installed WorldEdit alongside FastAsyncWorldEdit. That is unneeded and will cause unforeseen issues, "
+                                +
                                 "because FastAsyncWorldEdit already provides WorldEdit. " +
                                 "Stop your server and delete the 'worldedit-bukkit' jar from your plugins folder.");
             }
         }
-        //FAWE end
-        //FAWE start
+        // FAWE end
+        // FAWE start
         final Attributes attributes = WorldEditManifest.readAttributes();
         Objects.requireNonNull(attributes, "Could not retrieve manifest attributes");
         final String type = attributes.getValue("FAWE-Plugin-Jar-Type");
         Objects.requireNonNull(type, "Could not determine plugin jar type");
         if (PaperLib.isPaper()) {
-            if (PaperLib.getMinecraftVersion() < 20 || (PaperLib.getMinecraftVersion() == 20 && PaperLib.getMinecraftPatchVersion() < 5)) {
+            if (PaperLib.getMinecraftVersion() < 20
+                    || (PaperLib.getMinecraftVersion() == 20 && PaperLib.getMinecraftPatchVersion() < 5)) {
                 if (type.equals("mojang") && !Refraction.isMojangMapped()) {
                     throw new IllegalStateException(
-                        """
-                        
-                        **********************************************
-                        ** You are using the wrong FAWE jar for your Minecraft version.
-                        ** Download the correct FAWE jar from Modrinth: https://modrinth.com/plugin/fastasyncworldedit/
-                        **********************************************"""
-                    );
+                            """
+
+                                    **********************************************
+                                    ** You are using the wrong FAWE jar for your Minecraft version.
+                                    ** Download the correct FAWE jar from Modrinth: https://modrinth.com/plugin/fastasyncworldedit/
+                                    **********************************************""");
                 }
-            } else if (PaperLib.getMinecraftVersion() > 20 || (PaperLib.getMinecraftVersion() == 20 && PaperLib.getMinecraftPatchVersion() >= 5)) {
+            } else if (PaperLib.getMinecraftVersion() > 20
+                    || (PaperLib.getMinecraftVersion() == 20 && PaperLib.getMinecraftPatchVersion() >= 5)) {
                 if (type.equals("spigot")) {
                     LOGGER.warn(
-                        """
-                        
-                        **********************************************
-                        ** You are using the Spigot-mapped FAWE jar on a modern Paper version.
-                        ** This will result in slower first-run times and wasted disk space from plugin remapping.
-                        ** Download the Paper FAWE jar from Modrinth to avoid this: https://modrinth.com/plugin/fastasyncworldedit/
-                        **********************************************"""
-                    );
+                            """
+
+                                    **********************************************
+                                    ** You are using the Spigot-mapped FAWE jar on a modern Paper version.
+                                    ** This will result in slower first-run times and wasted disk space from plugin remapping.
+                                    ** Download the Paper FAWE jar from Modrinth to avoid this: https://modrinth.com/plugin/fastasyncworldedit/
+                                    **********************************************""");
                 }
             }
         } else {
             if (type.equals("mojang")) {
                 throw new IllegalStateException(
-                    """
-                    
-                    **********************************************
-                    ** You are attempting to run the Paper FAWE jar on a Spigot server.
-                    ** Either switch to Paper (https://papermc.io), or download the correct FAWE jar for your platform
-                    ** from Modrinth: https://modrinth.com/plugin/fastasyncworldedit/
-                    **********************************************"""
-                );
+                        """
+
+                                **********************************************
+                                ** You are attempting to run the Paper FAWE jar on a Spigot server.
+                                ** Either switch to Paper (https://papermc.io), or download the correct FAWE jar for your platform
+                                ** from Modrinth: https://modrinth.com/plugin/fastasyncworldedit/
+                                **********************************************""");
             }
         }
-        //FAWE end
+        // FAWE end
 
         INSTANCE = this;
 
-        //noinspection ResultOfMethodCallIgnored
+        // noinspection ResultOfMethodCallIgnored
         getDataFolder().mkdirs();
 
-        //FAWE start - Migrate from config-legacy to worldedit-config
+        // FAWE start - Migrate from config-legacy to worldedit-config
         migrateLegacyConfig();
-        //FAWE end
+        // FAWE end
 
-        //FAWE start - Modify WorldEdit config name
-        config = new BukkitConfiguration(new YAMLProcessor(new File(getDataFolder(), "worldedit-config.yml"), true), this);
-        // Load config before we say we've loaded platforms as it is used in listeners of the event
-        // Load config in onLoad to ensure it is loaded before FAWE settings to allow (inelegant) copying of values across
+        // FAWE start - Modify WorldEdit config name
+        config = new BukkitConfiguration(new YAMLProcessor(new File(getDataFolder(), "worldedit-config.yml"), true),
+                this);
+        // Load config before we say we've loaded platforms as it is used in listeners
+        // of the event
+        // Load config in onLoad to ensure it is loaded before FAWE settings to allow
+        // (inelegant) copying of values across
         // where needed
         config.load();
-        //FAWE end
+        // FAWE end
 
         WorldEdit worldEdit = WorldEdit.getInstance();
 
@@ -203,20 +208,20 @@ public class WorldEditPlugin extends JavaPlugin {
         platform = new BukkitServerInterface(this, getServer());
         worldEdit.getPlatformManager().register(platform);
 
-        //FAWE start - Setup permission attachments
+        // FAWE start - Setup permission attachments
         permissionAttachmentManager = new BukkitPermissionAttachmentManager(this);
-        //FAWE end
+        // FAWE end
 
-        //FAWE start - initialise bukkitConsoleCommandSender later
+        // FAWE start - initialise bukkitConsoleCommandSender later
         this.bukkitConsoleCommandSender = new BukkitCommandSender(this, Bukkit.getConsoleSender());
-        //FAWE end
+        // FAWE end
 
         Path delChunks = Paths.get(getDataFolder().getPath(), DELCHUNKS_FILE_NAME);
         if (Files.exists(delChunks)) {
             ChunkDeleter.runFromFile(delChunks, true);
         }
 
-        //FAWE start - Delete obsolete DummyFawe from pre 1.14 days
+        // FAWE start - Delete obsolete DummyFawe from pre 1.14 days
         if (this.getDataFolder().getParentFile().listFiles(file -> {
             if (file.getName().equals("DummyFawe.jar")) {
                 file.delete();
@@ -226,7 +231,7 @@ public class WorldEditPlugin extends JavaPlugin {
         }).length > 0) {
             LOGGER.warn("DummyFawe detected and automatically deleted! This file is no longer necessary.");
         }
-        //FAWE end
+        // FAWE end
     }
 
     /**
@@ -235,21 +240,25 @@ public class WorldEditPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
 
+        // Initialize FoliaLib for cross-platform scheduler support
+        FoliaLibHolder.init(this);
+
         // Catch bad things being done by naughty plugins that include
         // WorldEdit's classes
         ClassSourceValidator verifier = new ClassSourceValidator(this);
         verifier.reportMismatches(ImmutableList.of(World.class, CommandManager.class, EditSession.class, Actor.class));
 
-        //FAWE start
+        // FAWE start
         new FaweBukkit(this);
-        //FAWE end
+        // FAWE end
 
         WorldEdit.getInstance().getEventBus().post(new PlatformsRegisteredEvent());
 
         PermissionsResolverManager.initialize(this); // Setup permission resolver
 
         // Register CUI
-        getServer().getMessenger().registerIncomingPluginChannel(this, CUI_PLUGIN_CHANNEL, new CUIChannelListener(this));
+        getServer().getMessenger().registerIncomingPluginChannel(this, CUI_PLUGIN_CHANNEL,
+                new CUIChannelListener(this));
         getServer().getMessenger().registerOutgoingPluginChannel(this, CUI_PLUGIN_CHANNEL);
 
         // Now we can register events
@@ -259,17 +268,20 @@ public class WorldEditPlugin extends JavaPlugin {
             getServer().getPluginManager().registerEvents(new AsyncTabCompleteListener(), this);
         }
 
-        initializeRegistries(); // this creates the objects matching Bukkit's enums - but doesn't fill them with data yet
+        initializeRegistries(); // this creates the objects matching Bukkit's enums - but doesn't fill them with
+                                // data yet
         if (Bukkit.getWorlds().isEmpty()) {
             setupPreWorldData();
-            // register this so we can load world-dependent data right as the first world is loading
+            // register this so we can load world-dependent data right as the first world is
+            // loading
             getServer().getPluginManager().registerEvents(new WorldInitListener(), this);
         } else {
-            //FAWE start
+            // FAWE start
             LOGGER.warn(
                     "Server reload detected. This may cause various issues with FastAsyncWorldEdit and dependent plugins. Reloading the server is not advised.");
-            LOGGER.warn("For more information why reloading is bad, see https://madelinemiller.dev/blog/problem-with-reload/");
-            //FAWE end
+            LOGGER.warn(
+                    "For more information why reloading is bad, see https://madelinemiller.dev/blog/problem-with-reload/");
+            // FAWE end
             try {
                 setupPreWorldData();
                 // since worlds are loaded already, we can do this now
@@ -281,8 +293,8 @@ public class WorldEditPlugin extends JavaPlugin {
         // Enable metrics
         Metrics m = new Metrics(this, BSTATS_ID);
         // First introduced in build 349, release 2.5.2
-        m.addCustomChart(new SimplePie("residence", ()
-                -> WEManager.weManager().getManagers().toString().contains("residence") ? "Yes" : "No"));
+        m.addCustomChart(new SimplePie("residence",
+                () -> WEManager.weManager().getManagers().toString().contains("residence") ? "Yes" : "No"));
         // Check if we are in a safe environment
         ServerLib.checkUnsafeForks();
         // Check if a new build is available
@@ -295,61 +307,71 @@ public class WorldEditPlugin extends JavaPlugin {
     }
 
     private void setupWorldData() {
-        // datapacks aren't loaded until just before the world is, and bukkit has no event for this
+        // datapacks aren't loaded until just before the world is, and bukkit has no
+        // event for this
         // so the earliest we can do this is in WorldInit
         setupTags();
-        setupBiomes(false); // FAWE - load biomes later. Initialize biomes twice to allow for the registry to be present for
-        // plugins requiring WE biomes during startup, as well as allowing custom biomes loaded later on to be present in WE.
+        setupBiomes(false); // FAWE - load biomes later. Initialize biomes twice to allow for the registry
+                            // to be present for
+        // plugins requiring WE biomes during startup, as well as allowing custom biomes
+        // loaded later on to be present in WE.
         ((BukkitImplAdapter<?>) adapter.value().get()).setupFeatures();
         WorldEdit.getInstance().getEventBus().post(new PlatformReadyEvent(platform));
     }
 
-    @SuppressWarnings({"deprecation", "unchecked"})
+    @SuppressWarnings({ "deprecation", "unchecked" })
     private void initializeRegistries() {
-        // FAWE start - move Biomes to their own method. Initialize biomes twice to allow for the registry to be present for
-        // plugins requiring WE biomes during startup, as well as allowing custom biomes loaded later on to be present in WE.
+        // FAWE start - move Biomes to their own method. Initialize biomes twice to
+        // allow for the registry to be present for
+        // plugins requiring WE biomes during startup, as well as allowing custom biomes
+        // loaded later on to be present in WE.
         setupBiomes(true);
         // FAWE end
         /*
-
-        // Block & Item
-        Registry.MATERIAL.forEach(material -> {
-            String key = material.getKey().toString();
-            if (material.isBlock()) {
-                BlockType.REGISTRY.register(key, new BlockType(key, blockState -> {
-                    // TODO Use something way less hacky than this.
-                    ParserContext context = new ParserContext();
-                    context.setPreferringWildcard(true);
-                    context.setTryLegacy(false);
-                    context.setRestricted(false);
-                    try {
-                        FuzzyBlockState state = (FuzzyBlockState) WorldEdit.getInstance().getBlockFactory().parseFromInput(
-                                BukkitAdapter.adapt(blockState.getBlockType()).createBlockData().getAsString(), context
-                        ).toImmutableState();
-                        BlockState defaultState = blockState.getBlockType().getAllStates().get(0);
-                        for (Map.Entry<Property<?>, Object> propertyObjectEntry : state.getStates().entrySet()) {
-                            //noinspection unchecked
-                            defaultState = defaultState.with((Property<Object>) propertyObjectEntry.getKey(), propertyObjectEntry.getValue());
-                        }
-                        return defaultState;
-                    } catch (InputParseException e) {
-                        LOGGER.warn("Error loading block state for " + key, e);
-                        return blockState;
-                    }
-                }));
-            }
-            if (material.isItem()) {
-                ItemType.REGISTRY.register(key, new ItemType(key));
-            }
-        }
-*/
+         * 
+         * // Block & Item
+         * Registry.MATERIAL.forEach(material -> {
+         * String key = material.getKey().toString();
+         * if (material.isBlock()) {
+         * BlockType.REGISTRY.register(key, new BlockType(key, blockState -> {
+         * // TODO Use something way less hacky than this.
+         * ParserContext context = new ParserContext();
+         * context.setPreferringWildcard(true);
+         * context.setTryLegacy(false);
+         * context.setRestricted(false);
+         * try {
+         * FuzzyBlockState state = (FuzzyBlockState)
+         * WorldEdit.getInstance().getBlockFactory().parseFromInput(
+         * BukkitAdapter.adapt(blockState.getBlockType()).createBlockData().getAsString(
+         * ), context
+         * ).toImmutableState();
+         * BlockState defaultState = blockState.getBlockType().getAllStates().get(0);
+         * for (Map.Entry<Property<?>, Object> propertyObjectEntry :
+         * state.getStates().entrySet()) {
+         * //noinspection unchecked
+         * defaultState = defaultState.with((Property<Object>)
+         * propertyObjectEntry.getKey(), propertyObjectEntry.getValue());
+         * }
+         * return defaultState;
+         * } catch (InputParseException e) {
+         * LOGGER.warn("Error loading block state for " + key, e);
+         * return blockState;
+         * }
+         * }));
+         * }
+         * if (material.isItem()) {
+         * ItemType.REGISTRY.register(key, new ItemType(key));
+         * }
+         * }
+         */
 
         // Entity
         for (org.bukkit.entity.EntityType entityType : org.bukkit.entity.EntityType.values()) {
             String mcid = entityType.getName();
             if (mcid != null) {
                 String lowerCaseMcId = mcid.toLowerCase(Locale.ROOT);
-                EntityType.REGISTRY.register("minecraft:" + lowerCaseMcId, new EntityType("minecraft:" + lowerCaseMcId));
+                EntityType.REGISTRY.register("minecraft:" + lowerCaseMcId,
+                        new EntityType("minecraft:" + lowerCaseMcId));
             }
         }
         // ... :|
@@ -377,8 +399,10 @@ public class WorldEditPlugin extends JavaPlugin {
     // FAWE start
     private void setupBiomes(boolean expectFail) {
         if (this.adapter.value().isPresent()) {
-            // Biomes are stored globally in the server. Registries are not kept per-world in Minecraft.
-            // The WorldServer get-registries method simply delegates to the MinecraftServer method.
+            // Biomes are stored globally in the server. Registries are not kept per-world
+            // in Minecraft.
+            // The WorldServer get-registries method simply delegates to the MinecraftServer
+            // method.
             for (final NamespacedKey biome : ((BukkitImplAdapter<?>) adapter.value().get()).getRegisteredBiomes()) {
                 BiomeType biomeType;
                 if ((biomeType = BiomeType.REGISTRY.get(biome.toString())) == null) { // only register once
@@ -431,11 +455,11 @@ public class WorldEditPlugin extends JavaPlugin {
             if (platform instanceof BukkitServerInterface) {
                 LOGGER.warn(e.getMessage());
             } else {
-                //FAWE start - Identify as FAWE
+                // FAWE start - Identify as FAWE
                 LOGGER.info("FastAsyncWorldEdit could not find a Bukkit adapter for this MC version, "
                         + "but it seems that you have another implementation of FastAsyncWorldEdit installed ({}) "
                         + "that handles the world editing.", platform.getPlatformName());
-                //FAWE end
+                // FAWE end
             }
             this.adapter.invalidate();
         }
@@ -457,7 +481,8 @@ public class WorldEditPlugin extends JavaPlugin {
         if (config != null) {
             config.unload();
         }
-        this.getServer().getScheduler().cancelTasks(this);
+        // Shutdown FoliaLib and cancel all tasks
+        FoliaLibHolder.shutdown();
     }
 
     /**
@@ -521,8 +546,8 @@ public class WorldEditPlugin extends JavaPlugin {
         // code of WorldEdit expects it
         String[] split = new String[args.length + 1];
         System.arraycopy(args, 0, split, 1, args.length);
-        split[0] = commandLabel.startsWith("fastasyncworldedit:") ? commandLabel.replace("fastasyncworldedit:", "") :
-                commandLabel;
+        split[0] = commandLabel.startsWith("fastasyncworldedit:") ? commandLabel.replace("fastasyncworldedit:", "")
+                : commandLabel;
 
         CommandEvent event = new CommandEvent(wrapCommandSender(sender), Joiner.on(" ").join(split));
         getWorldEdit().getEventBus().post(event);
@@ -595,7 +620,7 @@ public class WorldEditPlugin extends JavaPlugin {
         return PermissionsResolverManager.getInstance();
     }
 
-    //FAWE start
+    // FAWE start
 
     /**
      * Get the permissions attachment manager in use
@@ -605,7 +630,7 @@ public class WorldEditPlugin extends JavaPlugin {
     public BukkitPermissionAttachmentManager getPermissionAttachmentManager() {
         return permissionAttachmentManager;
     }
-    //FAWE end
+    // FAWE end
 
     /**
      * Used to wrap a Bukkit Player as a WorldEdit Player.
@@ -614,7 +639,7 @@ public class WorldEditPlugin extends JavaPlugin {
      * @return a wrapped player
      */
     public BukkitPlayer wrapPlayer(Player player) {
-        //FAWE start - Use cache over returning a direct BukkitPlayer
+        // FAWE start - Use cache over returning a direct BukkitPlayer
         BukkitPlayer wePlayer = getCachedPlayer(player);
         if (wePlayer != null) {
             return wePlayer;
@@ -627,10 +652,10 @@ public class WorldEditPlugin extends JavaPlugin {
             }
             return bukkitPlayer;
         }
-        //FAWE end
+        // FAWE end
     }
 
-    //FAWE start
+    // FAWE start
     BukkitPlayer getCachedPlayer(Player player) {
         List<MetadataValue> meta = player.getMetadata("WE");
         if (meta.isEmpty()) {
@@ -646,7 +671,7 @@ public class WorldEditPlugin extends JavaPlugin {
             return wePlayer;
         }
     }
-    //FAWE end
+    // FAWE end
 
     public Actor wrapCommandSender(CommandSender sender) {
         if (sender instanceof Player) {
@@ -736,14 +761,15 @@ public class WorldEditPlugin extends JavaPlugin {
                 return;
             }
 
-            final Optional<org.enginehub.piston.Command> command
-                    = WorldEdit.getInstance().getPlatformManager().getPlatformCommandManager().getCommandManager().getCommand(
-                    label);
+            final Optional<org.enginehub.piston.Command> command = WorldEdit.getInstance().getPlatformManager()
+                    .getPlatformCommandManager().getCommandManager().getCommand(
+                            label);
             if (!command.isPresent()) {
                 return;
             }
 
-            CommandSuggestionEvent suggestEvent = new CommandSuggestionEvent(wrapCommandSender(event.getSender()), buffer);
+            CommandSuggestionEvent suggestEvent = new CommandSuggestionEvent(wrapCommandSender(event.getSender()),
+                    buffer);
             getWorldEdit().getEventBus().post(suggestEvent);
 
             event.setCompletions(CommandUtil.fixSuggestions(buffer, suggestEvent.getSuggestions()));

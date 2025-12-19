@@ -1,5 +1,6 @@
 package com.fastasyncworldedit.core.wrappers;
 
+import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.implementation.packet.ChunkPacket;
@@ -213,14 +214,14 @@ public class WorldWrapper extends AbstractWorld {
     }
 
     @Override
-    public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block, boolean notifyAndLight) throws
-            WorldEditException {
+    public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block, boolean notifyAndLight)
+            throws WorldEditException {
         return parent.setBlock(position, block, notifyAndLight);
     }
 
     @Override
-    public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block, SideEffectSet sideEffects) throws
-            WorldEditException {
+    public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block, SideEffectSet sideEffects)
+            throws WorldEditException {
         return parent.setBlock(position, block, sideEffects);
     }
 
@@ -262,6 +263,9 @@ public class WorldWrapper extends AbstractWorld {
 
     @Override
     public Collection<BaseItemStack> getBlockDrops(final BlockVector3 position) {
+        if (Fawe.isFoliaServer()) {
+            return parent.getBlockDrops(position);
+        }
         return TaskManager.taskManager().sync(() -> parent.getBlockDrops(position));
     }
 
@@ -281,8 +285,8 @@ public class WorldWrapper extends AbstractWorld {
     }
 
     @Override
-    public boolean generateTree(TreeGenerator.TreeType type, EditSession editSession, BlockVector3 position) throws
-            MaxChangedBlocksException {
+    public boolean generateTree(TreeGenerator.TreeType type, EditSession editSession, BlockVector3 position)
+            throws MaxChangedBlocksException {
         try {
             return parent.generateTree(type, editSession, position);
         } catch (MaxChangedBlocksException e) {
@@ -291,12 +295,14 @@ public class WorldWrapper extends AbstractWorld {
     }
 
     @Override
-    public boolean generateStructure(final StructureType type, final EditSession editSession, final BlockVector3 position) {
+    public boolean generateStructure(final StructureType type, final EditSession editSession,
+            final BlockVector3 position) {
         return parent.generateStructure(type, editSession, position);
     }
 
     @Override
-    public boolean generateFeature(final ConfiguredFeatureType type, final EditSession editSession, final BlockVector3 position) {
+    public boolean generateFeature(final ConfiguredFeatureType type, final EditSession editSession,
+            final BlockVector3 position) {
         return parent.generateFeature(type, editSession, position);
     }
 

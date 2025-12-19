@@ -35,6 +35,10 @@ repositories {
             includeModule("io.papermc.paper", "dev-bundle")
         }
     }
+    maven {
+        name = "TCodedReleases"
+        url = uri("https://repo.tcoded.com/releases")
+    }
     mavenCentral()
     afterEvaluate {
         killNonEngineHubRepositories()
@@ -43,6 +47,7 @@ repositories {
 
 dependencies {
     implementation(project(":worldedit-bukkit"))
+    compileOnly("com.tcoded:FoliaLib:0.5.1")
     constraints {
         //Reduces the amount of libraries Gradle and IntelliJ need to resolve
         implementation("net.kyori:adventure-bom") {
