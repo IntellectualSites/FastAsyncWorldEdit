@@ -4119,7 +4119,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     @Override
     public void generate(Region region, GenBase gen) throws WorldEditException {
         for (BlockVector2 chunkPos : region.getChunks()) {
-            gen.generate(chunkPos, new SingleRegionExtent(this, getLimit(), region));
+            gen.generate(chunkPos, new SingleRegionExtent(this, null, region));
         }
     }
 

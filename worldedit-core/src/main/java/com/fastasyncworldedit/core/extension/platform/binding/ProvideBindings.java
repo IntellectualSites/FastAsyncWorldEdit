@@ -11,7 +11,6 @@ import com.fastasyncworldedit.core.util.ExtentTraverser;
 import com.fastasyncworldedit.core.util.TextureUtil;
 import com.fastasyncworldedit.core.util.image.ImageUtil;
 import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.command.argument.Arguments;
@@ -21,7 +20,6 @@ import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.internal.annotation.Selection;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.session.request.Request;
 import com.sk89q.worldedit.world.World;
@@ -87,16 +85,6 @@ public class ProvideBindings extends Bindings {
         }
         Request.request().setEditSession(editSession);
         return editSession;
-    }
-
-    @Selection
-    @Binding
-    public Region selection(LocalSession localSession) {
-        try {
-            return localSession.getSelection();
-        } catch (IncompleteRegionException ignore) {
-            return null;
-        }
     }
 
     @Binding
