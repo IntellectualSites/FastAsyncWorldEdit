@@ -214,7 +214,7 @@ public class LinValueInput implements ValueInput {
         ValueInputContext(HolderLookup.Provider lookup) {
             this(
                     lookup,
-                    LinOps.INSTANCE,
+                    lookup.createSerializationContext(LinOps.INSTANCE),
                     new EmptyValueInput(lookup, new EmptyValueInputList(), new EmptyTypedInputList()),
                     new EmptyValueInputList(),
                     new EmptyTypedInputList()
