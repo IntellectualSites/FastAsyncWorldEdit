@@ -10,6 +10,7 @@ import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.fastasyncworldedit.core.queue.IBatchProcessor;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.implementation.packet.ChunkPacket;
+import com.fastasyncworldedit.bukkit.util.FoliaLibHolder;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
@@ -96,6 +97,7 @@ import net.minecraft.world.level.levelgen.structure.StructureStart;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import java.util.concurrent.CompletableFuture;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.block.data.BlockData;
@@ -140,12 +142,12 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
     private static final Logger LOGGER = LogManagerCompat.getLogger();
     private static Method CHUNK_HOLDER_WAS_ACCESSIBLE_SINCE_LAST_SAVE;
     private static final Codec<DataComponentPatch> COMPONENTS_CODEC = DataComponentPatch.CODEC.optionalFieldOf(
-            "components", DataComponentPatch.EMPTY
-    ).codec();
+            "components", DataComponentPatch.EMPTY).codec();
 
     static {
         try {
-            CHUNK_HOLDER_WAS_ACCESSIBLE_SINCE_LAST_SAVE = ChunkHolder.class.getDeclaredMethod("wasAccessibleSinceLastSave");
+            CHUNK_HOLDER_WAS_ACCESSIBLE_SINCE_LAST_SAVE = ChunkHolder.class
+                    .getDeclaredMethod("wasAccessibleSinceLastSave");
         } catch (NoSuchMethodException ignored) { // may not be present in newer paper versions
         }
     }
@@ -162,29 +164,30 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
                     LinValueOutput output = createOutput();
                     blockEntity.saveWithId(output);
                     return output.buildResult();
-                }
-        );
+                });
     }
 
     public static Property<?> adaptProperty(net.minecraft.world.level.block.state.properties.Property<?> property) {
         return switch (property) {
             case net.minecraft.world.level.block.state.properties.BooleanProperty booleanProperty ->
-                    new BooleanProperty(booleanProperty.getName(), ImmutableList.copyOf(booleanProperty.getPossibleValues()));
+                new BooleanProperty(booleanProperty.getName(),
+                        ImmutableList.copyOf(booleanProperty.getPossibleValues()));
             case net.minecraft.world.level.block.state.properties.IntegerProperty integerProperty ->
-                    new IntegerProperty(integerProperty.getName(), ImmutableList.copyOf(integerProperty.getPossibleValues()));
+                new IntegerProperty(integerProperty.getName(),
+                        ImmutableList.copyOf(integerProperty.getPossibleValues()));
             case net.minecraft.world.level.block.state.properties.EnumProperty<?> enumProperty -> {
                 if (enumProperty.getValueClass() == net.minecraft.core.Direction.class) {
                     yield new DirectionalProperty(enumProperty.getName(), enumProperty.getPossibleValues().stream()
                             .map(StringRepresentable::getSerializedName)
                             .map(s -> s.toUpperCase(Locale.ROOT))
                             .map(Direction::valueOf)
-                            .toList()
-                    );
+                            .toList());
                 }
                 yield new EnumProperty(enumProperty.getName(), enumProperty.getPossibleValues().stream()
                         .map(StringRepresentable::getSerializedName).collect(Collectors.toCollection(ArrayList::new)));
             }
-            default -> throw new IllegalArgumentException("FastAsyncWorldEdit needs an update to support " + property.getClass().getSimpleName());
+            default -> throw new IllegalArgumentException(
+                    "FastAsyncWorldEdit needs an update to support " + property.getClass().getSimpleName());
         };
     }
 
@@ -261,7 +264,8 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
 
     @Override
     public synchronized BlockMaterial getMaterial(BlockState state) {
-        net.minecraft.world.level.block.state.BlockState blockState = ((CraftBlockData) Bukkit.createBlockData(state.getAsString())).getState();
+        net.minecraft.world.level.block.state.BlockState blockState = ((CraftBlockData) Bukkit
+                .createBlockData(state.getAsString())).getState();
         return new PaperweightBlockMaterial(blockState.getBlock(), blockState);
     }
 
@@ -324,8 +328,7 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
             SideEffect.HISTORY,
             SideEffect.HEIGHTMAPS,
             SideEffect.LIGHTING,
-            SideEffect.NEIGHBORS
-    );
+            SideEffect.NEIGHBORS);
 
     @Override
     public Set<SideEffect> getSupportedSideEffects() {
@@ -351,7 +354,7 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
             if (!mcEntity.save(output)) {
                 return null;
             }
-            //add Id for AbstractChangeSet to work
+            // add Id for AbstractChangeSet to work
             return output.toBuilder().putString("Id", id).build();
         };
         return new LazyBaseEntity(type, saveTag);
@@ -404,8 +407,7 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
                 return (char) ibdToOrdinal[id];
             } catch (ArrayIndexOutOfBoundsException e1) {
                 LOGGER.error("Attempted to convert {} with ID {} to char. ibdToOrdinal length: {}. Defaulting to air!",
-                        blockState.getBlock(), Block.BLOCK_STATE_REGISTRY.getId(blockState), ibdToOrdinal.length, e1
-                );
+                        blockState.getBlock(), Block.BLOCK_STATE_REGISTRY.getId(blockState), ibdToOrdinal.length, e1);
                 return BlockTypesCache.ReservedIDs.AIR;
             }
         }
@@ -478,18 +480,22 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
     @Override
     public void sendFakeChunk(World world, Player player, ChunkPacket chunkPacket) {
         ServerLevel nmsWorld = getServerLevel(world);
-        ChunkHolder map = PaperweightPlatformAdapter.getPlayerChunk(nmsWorld, chunkPacket.getChunkX(), chunkPacket.getChunkZ());
+        ChunkHolder map = PaperweightPlatformAdapter.getPlayerChunk(nmsWorld, chunkPacket.getChunkX(),
+                chunkPacket.getChunkZ());
         if (map != null && wasAccessibleSinceLastSave(map)) {
             boolean flag = false;
             // PlayerChunk.d players = map.players;
-            Stream<ServerPlayer> stream = /*players.a(new ChunkCoordIntPair(packet.getChunkX(), packet.getChunkZ()), flag)
-             */ Stream.empty();
+            Stream<ServerPlayer> stream = /*
+                                           * players.a(new ChunkCoordIntPair(packet.getChunkX(), packet.getChunkZ()),
+                                           * flag)
+                                           */ Stream.empty();
 
             ServerPlayer checkPlayer = player == null ? null : ((CraftPlayer) player).getHandle();
             stream.filter(entityPlayer -> checkPlayer == null || entityPlayer == checkPlayer)
                     .forEach(entityPlayer -> {
                         synchronized (chunkPacket) {
-                            ClientboundLevelChunkWithLightPacket nmsPacket = (ClientboundLevelChunkWithLightPacket) chunkPacket.getNativePacket();
+                            ClientboundLevelChunkWithLightPacket nmsPacket = (ClientboundLevelChunkWithLightPacket) chunkPacket
+                                    .getNativePacket();
                             if (nmsPacket == null) {
                                 nmsPacket = mapUtil.create(this, chunkPacket);
                                 chunkPacket.setNativePacket(nmsPacket);
@@ -516,8 +522,7 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
         net.minecraft.world.level.block.state.BlockState blockState1 = Block.stateById(internalId);
         return blockState1.hasPostProcess(
                 getServerLevel(world),
-                new BlockPos(blockVector3.x(), blockVector3.y(), blockVector3.z())
-        );
+                new BlockPos(blockVector3.x(), blockVector3.y(), blockVector3.z()));
     }
 
     @Override
@@ -525,10 +530,8 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
         final RegistryAccess.Frozen registryAccess = DedicatedServer.getServer().registryAccess();
         ItemStack stack = new ItemStack(
                 registryAccess.lookupOrThrow(Registries.ITEM).getValueOrThrow(ResourceKey.create(
-                        Registries.ITEM, Identifier.parse(baseItemStack.getType().id())
-                )),
-                baseItemStack.getAmount()
-        );
+                        Registries.ITEM, Identifier.parse(baseItemStack.getType().id()))),
+                baseItemStack.getAmount());
         final CompoundTag nbt = (CompoundTag) fromNativeLin(baseItemStack.getNbt());
         if (nbt != null) {
             final DataComponentPatch patch = COMPONENTS_CODEC
@@ -556,8 +559,22 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
         serverLevel.captureTreeGeneration = false;
         serverLevel.capturedBlockStates.clear();
     }
+
+    private <T> T syncRegion(World world, BlockVector3 pt, java.util.function.Supplier<T> supplier) {
+        if (FoliaLibHolder.isFolia()) {
+            Location location = new Location(world, pt.x(), pt.y(), pt.z());
+            CompletableFuture<T> future = new CompletableFuture<>();
+            FoliaLibHolder.getScheduler().runAtLocation(
+                    location,
+                    scheduledTask -> future.complete(supplier.get()));
+            return future.join();
+        }
+        return TaskManager.taskManager().sync(supplier);
+    }
+
     @Override
-    public boolean generateFeature(ConfiguredFeatureType feature, World world, EditSession editSession, BlockVector3 pt) {
+    public boolean generateFeature(ConfiguredFeatureType feature, World world, EditSession editSession,
+            BlockVector3 pt) {
         ServerLevel serverLevel = getServerLevel(world);
         ChunkGenerator generator = serverLevel.getMinecraftWorld().getChunkSource().getGenerator();
 
@@ -567,15 +584,14 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
                 .getValue(Identifier.tryParse(feature.id()));
 
         FaweBlockStateListPopulator populator = new FaweBlockStateListPopulator(serverLevel);
-        List<CraftBlockState> placed = TaskManager.taskManager().sync(() -> {
+        List<CraftBlockState> placed = syncRegion(world, pt, () -> {
             preCaptureStates(serverLevel);
             try {
                 if (!configuredFeature.place(
                         populator,
                         generator,
                         serverLevel.random,
-                        new BlockPos(pt.x(), pt.y(), pt.z())
-                )) {
+                        new BlockPos(pt.x(), pt.y(), pt.z()))) {
                     return null;
                 }
                 List<CraftBlockState> placedBlocks = new ArrayList<>(populator.getSnapshotBlocks());
@@ -604,7 +620,7 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
         TransformerGeneratorAccess access = new TransformerGeneratorAccess();
         FaweBlockStateListPopulator populator = new FaweBlockStateListPopulator(serverLevel);
         access.setDelegate(populator);
-        List<CraftBlockState> placed = TaskManager.taskManager().sync(() -> {
+        List<CraftBlockState> placed = syncRegion(world, pt, () -> {
             preCaptureStates(serverLevel);
             try {
                 StructureStart structureStart = structure.generate(
@@ -619,20 +635,17 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
                         chunkPos,
                         0,
                         populator,
-                        biome -> true
-                );
+                        biome -> true);
                 if (!structureStart.isValid()) {
                     return null;
                 } else {
                     BoundingBox boundingBox = structureStart.getBoundingBox();
                     ChunkPos min = new ChunkPos(
                             SectionPos.blockToSectionCoord(boundingBox.minX()),
-                            SectionPos.blockToSectionCoord(boundingBox.minZ())
-                    );
+                            SectionPos.blockToSectionCoord(boundingBox.minZ()));
                     ChunkPos max = new ChunkPos(
                             SectionPos.blockToSectionCoord(boundingBox.maxX()),
-                            SectionPos.blockToSectionCoord(boundingBox.maxZ())
-                    );
+                            SectionPos.blockToSectionCoord(boundingBox.maxZ()));
                     ChunkPos.rangeClosed(min, max).forEach((chunkPosx) -> structureStart.placeInChunk(
                             access,
                             serverLevel.structureManager(),
@@ -643,9 +656,8 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
                                     serverLevel.getMinY(),
                                     chunkPosx.getMinBlockZ(),
                                     chunkPosx.getMaxBlockX(),
-                                    serverLevel.getMaxY(), chunkPosx.getMaxBlockZ()
-                            ), chunkPosx
-                    ));
+                                    serverLevel.getMaxY(), chunkPosx.getMaxBlockZ()),
+                            chunkPosx));
                     List<CraftBlockState> placedBlocks = new ArrayList<>(populator.getSnapshotBlocks());
                     placedBlocks.addAll(serverLevel.capturedBlockStates.values());
                     return placedBlocks;
@@ -661,8 +673,7 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
     private boolean placeFeatureIntoSession(
             final EditSession editSession,
             final FaweBlockStateListPopulator populator,
-            final List<CraftBlockState> placed
-    ) {
+            final List<CraftBlockState> placed) {
         if (placed == null || placed.isEmpty()) {
             return false;
         }
@@ -672,7 +683,8 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
                 continue;
             }
             BlockPos pos = craftBlockState.getPosition();
-            editSession.setBlock(pos.getX(), pos.getY(), pos.getZ(), BukkitAdapter.adapt(craftBlockState.getBlockData()));
+            editSession.setBlock(pos.getX(), pos.getY(), pos.getZ(),
+                    BukkitAdapter.adapt(craftBlockState.getBlockData()));
             BlockEntity blockEntity = populator.getBlockEntity(pos);
             if (blockEntity != null) {
                 LinValueOutput output = createOutput();
@@ -689,7 +701,8 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
 
         // All these features should be the "face" selected
         Set<String> face_features = Arrays
-                .stream(new Class[]{AquaticFeatures.class, PileFeatures.class, TreeFeatures.class, VegetationFeatures.class})
+                .stream(new Class[] { AquaticFeatures.class, PileFeatures.class, TreeFeatures.class,
+                        VegetationFeatures.class })
                 .flatMap(c -> Arrays.stream(c.getFields()))
                 .filter(f -> {
                     int modifiers = f.getModifiers();
@@ -748,16 +761,15 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
     public BaseItemStack adapt(org.bukkit.inventory.ItemStack itemStack) {
         final RegistryAccess.Frozen registryAccess = DedicatedServer.getServer().registryAccess();
         final ItemStack nmsStack = CraftItemStack.asNMSCopy(itemStack);
-        // We should be fine to perform this later as we're using a deep-copied itemstack (above)
+        // We should be fine to perform this later as we're using a deep-copied
+        // itemstack (above)
         final Supplier<net.minecraft.nbt.Tag> tag = () -> COMPONENTS_CODEC.encodeStart(
                 registryAccess.createSerializationContext(NbtOps.INSTANCE),
-                nmsStack.getComponentsPatch()
-        ).getOrThrow();
+                nmsStack.getComponentsPatch()).getOrThrow();
         return new BaseItemStack(
                 BukkitAdapter.asItemType(itemStack.getType()),
                 LazyReference.from(() -> (LinCompoundTag) toNativeLin(tag.get())),
-                itemStack.getAmount()
-        );
+                itemStack.getAmount());
     }
 
     @Override
