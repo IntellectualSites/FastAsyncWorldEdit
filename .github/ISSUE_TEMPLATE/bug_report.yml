@@ -72,7 +72,7 @@ body:
       label: Screenshots / Videos
       description: If applicable, add screenshots to help explain your problem.
 
-  - type: input
+  - type: textarea
     attributes:
       label: Error log (if applicable)
       description: If you are reporting a console error, upload any relevant log excerpts here.
