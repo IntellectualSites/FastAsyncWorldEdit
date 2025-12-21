@@ -84,25 +84,13 @@ body:
     validations:
       required: true
 
-  - type: input
+  - type: dropdown
     attributes:
-      label: Fawe Version
-      description: What version of Fawe are you running? (`/version FastAsyncWorldEdit`)
-      placeholder: "For example: FastAsyncWorldEdit version 2.0.0-SNAPSHOT-1"
+      label: Are you interested in contributing a fix?
+      description: Indicate if this is something you would like to work on. Contributions speed up the resolution of issues.
+      multiple: false
+      options:
+        - "Yes"
+        - "No"
     validations:
       required: true
-      
-  - type: checkboxes
-    attributes:
-      label: Checklist
-      description: Make sure you have followed each of the steps outlined here.
-      options:
-        - label: I have included a Fawe debugpaste.
-          required: true
-        - label: I am using the newest build from https://ci.athion.net/job/FastAsyncWorldEdit/ and the issue still persists.
-          required: true
-
-  - type: textarea
-    attributes:
-      label: Anything else?
-      description: You can provide additional context below.
