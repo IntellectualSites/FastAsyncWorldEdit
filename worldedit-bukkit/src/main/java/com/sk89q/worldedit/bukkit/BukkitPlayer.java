@@ -49,15 +49,12 @@ import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
-import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.gamemode.GameMode;
 import com.sk89q.worldedit.world.gamemode.GameModes;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockState;
 import org.bukkit.block.TileState;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Item;
@@ -438,30 +435,29 @@ public class BukkitPlayer extends AbstractPlayerActor {
     }
 
     @Override
-    public <B extends BlockStateHolder<B>> void sendFakeBlock(BlockVector3 pos, B block) {
+    public <B extends BlockStateHolder<B>> void sendFakeBlock(BlockVector3 pos, @Nullable B block) {
         Location loc = new Location(player.getWorld(), pos.x(), pos.y(), pos.z());
-        BlockData data;
-        BlockState state;
 
-        if (block == null) {
-            Map.Entry<BlockData, BlockState> worldBlock = TaskManager.taskManager().sync(() -> {
-                Block bukkitBlock = player.getWorld().getBlockAt(loc);
-                return Map.entry(bukkitBlock.getBlockData(), bukkitBlock.getState(true));
-            });
-
-            data = worldBlock.getKey();
-            state = worldBlock.getValue();
+        BaseBlock baseBlock;
+        if (block != null) {
+            baseBlock = block.toBaseBlock();
         } else {
-            data = BukkitAdapter.adapt(block);
-            state = data.createBlockState();
+            baseBlock = getExtent().getFullBlock(pos);
         }
+
+        BlockData data = BukkitAdapter.adapt(baseBlock);
 
         player.sendBlockChange(loc, data);
+
         BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
-        if (adapter == null || !(state instanceof TileState tileState)) {
+        if (adapter == null) {
             return;
         }
-        adapter.sendFakeNBT(player, pos, tileState, block == null ? null : block.getNbt());
+        LinCompoundTag nbtData = baseBlock.getNbt();
+        if (nbtData == null || !(data.createBlockState() instanceof TileState tileState)) {
+            return;
+        }
+        adapter.sendFakeNBT(player, pos, tileState, nbtData);
     }
 
     //FAWE start

@@ -88,7 +88,7 @@ public interface IDelegateBukkitImplAdapter<T> extends BukkitImplAdapter<T> {
     }
 
     @Override
-    default void sendFakeNBT(Player player, BlockVector3 pos, TileState tileState, @Nullable LinCompoundTag nbtData) {
+    default void sendFakeNBT(Player player, BlockVector3 pos, TileState tileState, LinCompoundTag nbtData) {
         getParent().sendFakeNBT(player, pos, tileState, nbtData);
     }
 
