@@ -636,16 +636,11 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
     }
 
     @Override
-    public void sendFakeNBT(Player player, BlockVector3 pos, TileState tileState, @Nullable LinCompoundTag nbtData) {
+    public void sendFakeNBT(Player player, BlockVector3 pos, TileState tileState, LinCompoundTag nbtData) {
         try {
             CraftBlockEntityState<?> craftState = (CraftBlockEntityState<?>) tileState;
 
-            CompoundTag vanillaNBT;
-            if (nbtData == null) {
-                vanillaNBT = craftState.getSnapshotNBT();
-            } else {
-                vanillaNBT = (net.minecraft.nbt.CompoundTag) fromNativeLin(nbtData);
-            }
+            CompoundTag vanillaNBT = (net.minecraft.nbt.CompoundTag) fromNativeLin(nbtData);
 
             ((CraftPlayer) player).getHandle().connection.send((Packet<?>)
                 blockEntityDataPacketConstructor.newInstance(
