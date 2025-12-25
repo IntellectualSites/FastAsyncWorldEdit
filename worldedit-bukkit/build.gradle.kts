@@ -244,8 +244,7 @@ tasks.withType<ShadowJar>().configureEach {
 
 tasks.named("assemble").configure {
     dependsOn("shadowJar")
-    // TODO: re-enable when paper releases mappings
-    // dependsOn("reobfShadowJar")
+    dependsOn("reobfShadowJar")
 }
 
 publishMods {

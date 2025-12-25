@@ -10,8 +10,7 @@ plugins {
 
 paperweight {
     injectPaperRepository = false
-    // TODO: switch back to REOBF when paper releases mappings
-    reobfArtifactConfiguration = io.papermc.paperweight.userdev.ReobfArtifactConfiguration.MOJANG_PRODUCTION
+    reobfArtifactConfiguration = io.papermc.paperweight.userdev.ReobfArtifactConfiguration.REOBF_PRODUCTION
 }
 
 repositories {
@@ -53,10 +52,9 @@ dependencies {
     }
 }
 
-// TODO: re-enable when paper releases mappings
-/* tasks.named("assemble") {
+tasks.named("assemble") {
     dependsOn("reobfJar")
-} */
+}
 
 tasks.named<Javadoc>("javadoc") {
     enabled = false
