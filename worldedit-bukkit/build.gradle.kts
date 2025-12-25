@@ -93,7 +93,6 @@ allprojects {
     }
 }
 
-
 dependencies {
     api(project(":worldedit-core"))
     api(project(":worldedit-libs:bukkit"))
