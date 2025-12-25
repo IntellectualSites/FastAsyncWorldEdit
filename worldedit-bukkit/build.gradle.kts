@@ -79,6 +79,21 @@ val adaptersReobf = configurations.create("adaptersReobf") {
     extendsFrom(adapters)
 }
 
+allprojects {
+    configurations.configureEach {
+        resolutionStrategy {
+            capabilitiesResolution {
+                withCapability("org.lz4:lz4-java") {
+                    select(candidates.first {
+                        (it.id as org.gradle.api.artifacts.component.ModuleComponentIdentifier).group == "at.yawk.lz4"
+                    })
+                }
+            }
+        }
+    }
+}
+
+
 dependencies {
     api(project(":worldedit-core"))
     api(project(":worldedit-libs:bukkit"))
