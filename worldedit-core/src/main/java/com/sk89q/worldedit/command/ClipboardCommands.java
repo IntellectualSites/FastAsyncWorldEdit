@@ -58,6 +58,7 @@ import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardWriter;
 import com.sk89q.worldedit.function.block.BlockReplace;
+import com.sk89q.worldedit.function.mask.InverseSingleBlockTypeMask;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.MaskIntersection;
 import com.sk89q.worldedit.function.mask.Masks;
@@ -85,6 +86,7 @@ import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
 import com.sk89q.worldedit.world.World;
+import com.sk89q.worldedit.world.block.BlockTypes;
 import org.enginehub.piston.annotation.Command;
 import org.enginehub.piston.annotation.CommandContainer;
 import org.enginehub.piston.annotation.param.Arg;
@@ -526,14 +528,15 @@ public class ClipboardCommands {
                     Mask sourceMask,
             //FAWE start - entity removal
             @Switch(name = 'x', desc = "Remove existing entities in the affected region")
-                    boolean removeEntities
+                    boolean removeEntities,
+            @Switch(name = 'v', desc = "Don't paste structure void blocks and keep the target block state")
+                    boolean ignoreStructureVoidBlocks
             //FAWE end
-
     ) throws WorldEditException {
 
         ClipboardHolder holder = session.getClipboard();
         //FAWE start - use place
-        if (holder.getTransform().isIdentity() && sourceMask == null) {
+        if (holder.getTransform().isIdentity() && sourceMask == null && !ignoreStructureVoidBlocks) {
             place(actor, world, session, editSession, ignoreAirBlocks, atOrigin, selectPasted, onlySelect,
                     pasteEntities, pasteBiomes, removeEntities
             );
@@ -550,13 +553,16 @@ public class ClipboardCommands {
         //FAWE end
 
         if (!onlySelect) {
+            final Mask finalSourceMask = ignoreStructureVoidBlocks ?
+                    MaskIntersection.of(sourceMask, new InverseSingleBlockTypeMask(clipboard, BlockTypes.STRUCTURE_VOID)) :
+                    sourceMask;
             Operation operation = holder
                     .createPaste(editSession)
                     .to(to)
                     .ignoreAirBlocks(ignoreAirBlocks)
                     .copyBiomes(pasteBiomes)
                     .copyEntities(pasteEntities)
-                    .maskSource(sourceMask)
+                    .maskSource(finalSourceMask)
                     .build();
             Operations.completeLegacy(operation);
             messages.addAll(Lists.newArrayList(operation.getStatusMessages()));
