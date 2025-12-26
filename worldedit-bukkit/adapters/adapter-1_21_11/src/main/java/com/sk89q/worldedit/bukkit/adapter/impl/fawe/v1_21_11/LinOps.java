@@ -54,14 +54,13 @@ import java.util.stream.StreamSupport;
 public class LinOps implements DynamicOps<LinTag<?>> {
 
     static final DynamicOps<LinTag<?>> INSTANCE = new LinOps();
-    private static final LinTag<?> EMPTY_TAG = LinCompoundTag.of(Map.of());
 
     private LinOps() {
     }
 
     @Override
     public LinTag<?> empty() {
-        return EMPTY_TAG;
+        return LinEndTag.instance();
     }
 
     @Override
@@ -71,7 +70,7 @@ public class LinOps implements DynamicOps<LinTag<?>> {
 
     @Override
     public LinTag<?> emptyMap() {
-        return EMPTY_TAG;
+        return LinCompoundTag.builder().build();
     }
 
     @Override
@@ -177,9 +176,66 @@ public class LinOps implements DynamicOps<LinTag<?>> {
             return DataResult.error(() -> "key is not a string: " + key, map);
         }
         if (map instanceof LinCompoundTag mapCompoundTag) {
+            if (value == empty()) {
+                return DataResult.success(mapCompoundTag);
+            }
             return DataResult.success(mapCompoundTag.toBuilder().put(keyStringTag.value(), value).build());
         }
+        if (value == empty()) {
+            return DataResult.success(emptyMap());
+        }
         return DataResult.success(LinCompoundTag.builder().put(keyStringTag.value(), value).build());
+    }
+
+    @Override
+    public DataResult<LinTag<?>> mergeToMap(final LinTag<?> map, final MapLike<LinTag<?>> values) {
+        if (!(map instanceof LinCompoundTag) && !(map instanceof LinEndTag)) {
+            return DataResult.error(() -> "mergeToMap called with not a map: " + map, map);
+        }
+        final Iterator<Pair<LinTag<?>, LinTag<?>>> iterator = values.entries().iterator();
+        if (!iterator.hasNext()) {
+            // if map is LinEndTag (returned by empty()) return a functional empty map
+            return map == empty() ? DataResult.success(this.emptyMap()) : DataResult.success(map);
+        }
+        LinCompoundTag.Builder resultBuilder = map instanceof LinCompoundTag compoundTag ?
+                compoundTag.toBuilder() : LinCompoundTag.builder();
+        List<LinTag<?>> nonStringKeys = new ArrayList<>();
+        iterator.forEachRemaining(entry -> {
+            LinTag<?> key = entry.getFirst();
+            if (key instanceof LinStringTag keyStringTag) {
+                if (entry.getSecond() != empty()) {
+                    resultBuilder.put(keyStringTag.value(), entry.getSecond());
+                }
+            } else {
+                nonStringKeys.add(key);
+            }
+        });
+        return nonStringKeys.isEmpty() ? DataResult.success(resultBuilder.build()) :
+                DataResult.error(() -> "some keys are not strings: " + nonStringKeys);
+    }
+
+    @Override
+    public DataResult<LinTag<?>> mergeToMap(final LinTag<?> map, final Map<LinTag<?>, LinTag<?>> values) {
+        if (!(map instanceof LinCompoundTag) && !(map instanceof LinEndTag)) {
+            return DataResult.error(() -> "mergeToMap called with not a map: " + map, map);
+        }
+        if (values.isEmpty()) {
+            return map == empty() ? DataResult.success(this.emptyMap()) : DataResult.success(map);
+        }
+        LinCompoundTag.Builder resultBuilder = map instanceof LinCompoundTag compoundTag ?
+                compoundTag.toBuilder() : LinCompoundTag.builder();
+        List<LinTag<?>> nonStringKeys = new ArrayList<>();
+        values.forEach((key, value) -> {
+            if (key instanceof LinStringTag keyStringTag) {
+                if (value != empty()) {
+                    resultBuilder.put(keyStringTag.value(), value);
+                }
+            } else {
+                nonStringKeys.add(key);
+            }
+        });
+        return nonStringKeys.isEmpty() ? DataResult.success(resultBuilder.build()) :
+                DataResult.error(() -> "some keys are not strings: " + nonStringKeys);
     }
 
     @Override
@@ -241,7 +297,7 @@ public class LinOps implements DynamicOps<LinTag<?>> {
     @Override
     public LinTag<?> createMap(final Stream<Pair<LinTag<?>, LinTag<?>>> map) {
         LinCompoundTag.Builder builder = LinCompoundTag.builder();
-        map.forEach(pair -> {
+        map.filter(pair -> pair.getSecond() != empty()).forEach(pair -> {
             if (pair.getFirst() instanceof LinStringTag key) {
                 builder.put(key.value(), pair.getSecond());
                 return;
@@ -570,7 +626,10 @@ public class LinOps implements DynamicOps<LinTag<?>> {
 
         @Override
         protected LinCompoundTag.Builder append(final String key, final LinTag<?> value, final LinCompoundTag.Builder builder) {
-            return builder.put(key, value);
+            if (value != ops().empty()) {
+                return builder.put(key, value);
+            }
+            return builder;
         }
 
         @Override
