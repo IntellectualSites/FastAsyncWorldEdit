@@ -103,6 +103,9 @@ public class MinecraftStructure implements ClipboardReader, ClipboardWriter {
                 size.get(0).valueAsInt(), size.get(1).valueAsInt(), size.get(2).value()
         ).subtract(BlockVector3.ONE));
         final Clipboard clipboard = new BlockArrayClipboard(region, clipboardId);
+        // fill clipboard with structure void blocks to represent empty entries.
+        // known block data will be overridden with palette data.
+        clipboard.setBlocks((Region) region, BlockTypes.STRUCTURE_VOID.getDefaultState());
 
         // Palette
         final List<LinCompoundTag> paletteEntry = parent.getListTag("palette", LinTagType.compoundTag()).value();
@@ -204,6 +207,7 @@ public class MinecraftStructure implements ClipboardReader, ClipboardWriter {
         Int2ObjectMap<BlockState> paletteIndexes = new Int2ObjectArrayMap<>();
         for (final BlockVector3 pos : clipboard) {
             final BlockState block = clipboard.getBlock(pos);
+            // Structure Void Blocks are not part of the structure file and therefor not part of the palette
             if (block.getBlockType() == BlockTypes.STRUCTURE_VOID || ordinals.containsKey(block.getOrdinalChar())) {
                 continue;
             }
@@ -225,7 +229,11 @@ public class MinecraftStructure implements ClipboardReader, ClipboardWriter {
         // Blocks
         LinListTag.Builder<@org.jetbrains.annotations.NotNull LinCompoundTag> blocks = LinListTag.builder(LinTagType.compoundTag());
         for (final BlockVector3 pos : clipboard) {
-            final BlockState block = clipboard.getBlock(pos);
+            final BaseBlock block = clipboard.getFullBlock(pos);
+            // Structure Void Blocks are not part of the structure file
+            if (block.getBlockType() == BlockTypes.STRUCTURE_VOID) {
+                continue;
+            }
             LinCompoundTag.Builder entry = LinCompoundTag.builder()
                     .putInt("state", ordinals.get(block.getOrdinalChar()))
                     .put("pos", LinListTag.of(LinTagType.intTag(), List.of(
@@ -233,12 +241,9 @@ public class MinecraftStructure implements ClipboardReader, ClipboardWriter {
                             LinIntTag.of(pos.y() - min.y()),
                             LinIntTag.of(pos.z() - min.z())
                     )));
-            final BaseBlock baseBlock = clipboard.getFullBlock(pos);
-            if (baseBlock != null) {
-                final LinCompoundTag nbt = baseBlock.getNbt();
-                if (nbt != null) {
-                    entry.put("nbt", nbt.toBuilder().remove("x").remove("y").remove("z").build());
-                }
+            final LinCompoundTag nbt = block.getNbt();
+            if (nbt != null) {
+                entry.put("nbt", nbt.toBuilder().remove("x").remove("y").remove("z").build());
             }
             blocks.add(entry.build());
         }
