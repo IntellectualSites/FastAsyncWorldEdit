@@ -21,7 +21,6 @@ bstats = "3.1.0"
 sparsebitset = "1.3"
 parallelgzip = "1.0.5"
 adventure = "4.26.1"
-adventure-bukkit = "4.4.1"
 checkerqual = "3.52.1"
 truezip = "6.8.4"
 auto-value = "1.11.1"
@@ -33,7 +32,6 @@ json-simple = "1.1.1"
 jlibnoise = "1.0.0"
 jchronic = "0.2.4a"
 lz4-java = "1.10.2"
-lz4-stream = "1.0.0"
 commons-cli = "1.11.0"
 paperLib = "1.0.8"
 paster = "1.1.7"
@@ -41,6 +39,7 @@ vault = "1.7.1"
 serverlib = "2.3.7"
 linbus = "0.2.0"
 autoService = "1.1.1"
+
 ## Internal
 text-adapter = "3.0.6"
 text = "3.0.4"
@@ -109,12 +108,10 @@ json-simple = { group = "com.googlecode.json-simple", name = "json-simple", vers
 jlibnoise = { group = "com.sk89q.lib", name = "jlibnoise", version.ref = "jlibnoise" }
 jchronic = { group = "com.sk89q", name = "jchronic", version.ref = "jchronic" }
 lz4Java = { group = "at.yawk.lz4", name = "lz4-java", version.ref = "lz4-java" }
-lz4JavaStream = { group = "net.jpountz", name = "lz4-java-stream", version.ref = "lz4-stream" }
 commonsCli = { group = "commons-cli", name = "commons-cli", version.ref = "commons-cli" }
 paperLib = { group = "io.papermc", name = "paperlib", version.ref = "paperLib" }
 adventureApi = { group = "net.kyori", name = "adventure-api", version.ref = "adventure" }
 adventureMiniMessage = { group = "net.kyori", name = "adventure-text-minimessage", version.ref = "adventure" }
-adventureBukkit = { group = "net.kyori", name = "adventure-platform-bukkit", version.ref = "adventure-bukkit" }
 paster = { group = "com.intellectualsites.paster", name = "Paster", version.ref = "paster" }
 vault = { group = "com.github.MilkBowl", name = "VaultAPI", version.ref = "vault" }
 serverlib = { group = "dev.notmyfault.serverlib", name = "ServerLib", version.ref = "serverlib" }
@@ -170,7 +167,6 @@ version.ref = "piston"
 [libraries.piston-coreAp-runtime]
 module = "org.enginehub.piston.core-ap:runtime"
 version.ref = "piston"
-
 
 [plugins]
 pluginyml = { id = "net.minecrell.plugin-yml.bukkit", version.ref = "pluginyml" }
