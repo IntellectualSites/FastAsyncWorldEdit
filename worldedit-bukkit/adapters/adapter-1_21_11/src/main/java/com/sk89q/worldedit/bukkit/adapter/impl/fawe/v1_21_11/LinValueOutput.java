@@ -198,6 +198,9 @@ public class LinValueOutput implements ValueOutput {
     }
 
     public LinCompoundTag buildResult() {
+        if (this.isEmpty()) {
+            return LinCompoundTag.builder().build();
+        }
         return LinCompoundTag.of(this.collector.entrySet().stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, entry -> unwrapPendingEntry(entry.getValue())))
         );
