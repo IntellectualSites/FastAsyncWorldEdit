@@ -365,7 +365,16 @@ public class LinOps implements DynamicOps<LinTag<?>> {
     @Override
     public DataResult<Consumer<Consumer<LinTag<?>>>> getList(final LinTag<?> input) {
         if (input instanceof LinListTag<?> tag) {
-            return DataResult.success(consumer -> tag.value().forEach(consumer));
+            return DataResult.success(consumer -> tag.value().forEach(entry -> {
+                // Handling of mixed lists: NbtOps doesn't need to do that here given the net.minecraft.nbt.ListTag unwraps the
+                // entries on insertion. LinListTag doesn't allow mixed list content, so we unwrap on read.
+                // the only location this is used currently should be components (i.e. sign text)
+                if (entry instanceof LinCompoundTag compoundTag && compoundTag.value().size() == 1 && compoundTag.value().containsKey("")) {
+                    consumer.accept(compoundTag.value().get(""));
+                    return;
+                }
+                consumer.accept(entry);
+            }));
         }
         if (input instanceof LinByteArrayTag tag) {
             return DataResult.success(consumer -> {
