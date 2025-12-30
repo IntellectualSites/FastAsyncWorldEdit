@@ -336,7 +336,8 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
             SideEffect.HISTORY,
             SideEffect.HEIGHTMAPS,
             SideEffect.LIGHTING,
-            SideEffect.NEIGHBORS
+            SideEffect.NEIGHBORS,
+            SideEffect.ENTITY_EVENTS
     );
 
     @Override

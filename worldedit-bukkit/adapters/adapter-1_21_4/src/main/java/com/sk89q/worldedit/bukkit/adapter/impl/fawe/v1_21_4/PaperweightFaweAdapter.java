@@ -325,7 +325,8 @@ public final class PaperweightFaweAdapter extends FaweAdapter<Tag, ServerLevel> 
             SideEffect.HISTORY,
             SideEffect.HEIGHTMAPS,
             SideEffect.LIGHTING,
-            SideEffect.NEIGHBORS
+            SideEffect.NEIGHBORS,
+            SideEffect.ENTITY_EVENTS
     );
 
     @Override
