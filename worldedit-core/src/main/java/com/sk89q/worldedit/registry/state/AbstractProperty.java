@@ -28,6 +28,13 @@ import java.util.List;
 
 import static com.google.common.base.Preconditions.checkState;
 
+/**
+ * An abstract implementation of a property.
+ *
+ * @param <T> the value type
+ * @deprecated Use the {@link Property} interface or a concrete implementation instead.
+ */
+@Deprecated(forRemoval = true)
 public abstract class AbstractProperty<T> implements Property<T> {
 
     //FAWE start
@@ -100,6 +107,18 @@ public abstract class AbstractProperty<T> implements Property<T> {
 
     public int getIndex(int state) {
         return (state & bitMask) >> bitOffset;
+    }
+    //FAWE end
+
+    //FAWE start - Retain indexed properties while supporting record-style accessors
+    @Override
+    public String name() {
+        return this.name;
+    }
+
+    @Override
+    public List<T> values() {
+        return this.values;
     }
     //FAWE end
 

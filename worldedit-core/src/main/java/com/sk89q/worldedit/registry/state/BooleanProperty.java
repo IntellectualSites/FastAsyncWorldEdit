@@ -22,7 +22,9 @@ package com.sk89q.worldedit.registry.state;
 import javax.annotation.Nullable;
 import java.util.List;
 
+//FAWE start - Retain indexed property implementation for packed block states
 public class BooleanProperty extends AbstractProperty<Boolean> {
+//FAWE end
 
     //FAWE start
     private final int defaultIndex;

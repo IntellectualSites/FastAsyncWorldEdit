@@ -25,7 +25,9 @@ import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 
+//FAWE start - Retain indexed property implementation for packed block states
 public class IntegerProperty extends AbstractProperty<Integer> {
+//FAWE end
 
     //FAWE start
     private final int[] map;
