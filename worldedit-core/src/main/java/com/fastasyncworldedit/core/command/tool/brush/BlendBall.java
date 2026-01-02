@@ -74,27 +74,27 @@ public class BlendBall implements Brush {
         private final int[] frequency = new int[BlockTypes.size()];
         private final MutableBlockVector3 mutable = new MutableBlockVector3();
         private final int brushSizeSquared;
-        private final int xo;
-        private final int yo;
-        private final int zo;
+        private final int centerX;
+        private final int centerY;
+        private final int centerZ;
 
-        private BlendBallFilter(final int brushSizeSquared, final int xo, final int yo, final int zo) {
+        private BlendBallFilter(final int brushSizeSquared, final int centerX, final int centerY, final int centerZ) {
             this.brushSizeSquared = brushSizeSquared;
-            this.xo = xo;
-            this.yo = yo;
-            this.zo = zo;
+            this.centerX = centerX;
+            this.centerY = centerY;
+            this.centerZ = centerZ;
         }
 
         @Override
         public void applyBlock(final FilterBlock block) {
             final Extent extent = block.getExtent();
-            final int xr = block.x();
-            final int yr = block.y();
-            final int zr = block.z();
-            int x = xr - this.xo;
-            int y = yr - this.yo;
-            int z = zr - this.zo;
-            if (x * x + y * y + z * z >= brushSizeSquared || maskFails(extent, block)) {
+            final int gx = block.x();
+            final int gy = block.y();
+            final int gz = block.z();
+            int dx = gx - this.centerX;
+            int dy = gy - this.centerY;
+            int dz = gz - this.centerZ;
+            if (dx * dx + dy * dy + dz * dz >= brushSizeSquared || maskFails(extent, block)) {
                 return;
             }
             int maxY = extent.getMaxY();
@@ -112,12 +112,12 @@ public class BlendBall implements Brush {
                     for (int oy = -1; oy <= 1; oy++) {
                         if (ox == 0 && oy == 0 && oz == 0) {
                             continue;
-                        } else if (oy + yr < minY || oy + yr > maxY) {
+                        } else if (oy + gy < minY || oy + gy > maxY) {
                             total--;
                             continue;
                         }
-                        boolean masked = maskFails(extent, mutable.setComponents(xr + ox, yr + oy, zr + oz));
-                        BlockState state = masked ? AIR : block.getBlock(xr + ox, yr + oy, zr + oz);
+                        boolean masked = maskFails(extent, mutable.setComponents(gx + ox, gy + oy, gz + oz));
+                        BlockState state = masked ? AIR : block.getBlock(gx + ox, gy + oy, gz + oz);
                         if (state.getBlockType().getMaterial().isAir()) {
                             air++;
                         }
@@ -155,7 +155,7 @@ public class BlendBall implements Brush {
 
         @Override
         public Filter fork() {
-            return new BlendBallFilter(brushSizeSquared, xo, yo, zo);
+            return new BlendBallFilter(brushSizeSquared, centerX, centerY, centerZ);
         }
 
     }
