@@ -1,40 +1,31 @@
 {
-    "schemaVersion": 1,
-    "id": "worldedit",
-    "version": "${version}",
-
-    "name": "WorldEdit",
-    "description": "WorldEdit is an easy-to-use in-game world editor for Minecraft, supporting both single- and multi-player.",
-    "authors": [
-        "sk89q",
-        "wizjany",
-        "TomyLobo",
-        "kenzierocks",
-        "Me4502"
-    ],
-    "contact": {
-        "homepage": "https://enginehub.org/worldedit/",
-        "sources": "https://github.com/EngineHub/WorldEdit"
-    },
-
-    "license": "GPL3",
-    "icon": "assets/worldedit/icon.png",
-
-    "environment": "*",
-    "entrypoints": {
-        "main": [
-            "com.sk89q.worldedit.fabric.FabricWorldEdit"
-        ]
-    },
-
-    "depends": {
-        "fabricloader": ">=0.4.0",
-        "fabric-api-base": "*",
-        "fabric-events-lifecycle-v0": "*",
-        "fabric-events-interaction-v0": "*",
-        "fabric-networking-api-v1": "*"
-    },
-    "mixins": [
-        "worldedit.mixins.json"
-    ]
+	"schemaVersion": 1,
+	"id": "fawe",
+	"version": "${version}",
+	"name": "FastAsyncWorldEdit",
+	"description": "FAWE for Fabric",
+	"authors": [
+		"IntellectualSites"
+	],
+	"contact": {
+		"homepage": "https://fabricmc.net/",
+		"sources": "https://github.com/IntellectualSites/FastAsyncWorldEdit"
+	},
+	"license": "GNU GENERAL PUBLIC LICENSE",
+	"icon": "assets/fawe/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"com.fastasyncworldedit.fabric.Fawe"
+		]
+	},
+	"mixins": [
+		"fawe.mixins.json"
+	],
+	"depends": {
+    "fabricloader": ">=0.18.2",
+    "minecraft": ">=1.20.4 <=1.21.11",
+    "java": ">=21",
+    "fabric-api": "*"
+	}
 }

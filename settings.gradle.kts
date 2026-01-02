@@ -7,6 +7,10 @@ pluginManagement {
             name = "EngineHub Repository"
             url = uri("https://maven.enginehub.org/repo/")
         }
+        maven {
+            name = "Fabric"
+            url = uri("https://maven.fabricmc.net/")
+        }
     }
 }
 plugins {
@@ -64,6 +68,7 @@ listOf("bukkit", "core", "cli").forEach {
     include("worldedit-$it")
 }
 include("worldedit-libs:core:ap")
+include("worldedit-fabric")
 
 
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
