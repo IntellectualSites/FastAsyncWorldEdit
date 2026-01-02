@@ -1,3 +1,5 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.shadowJar
+
 plugins {
     id("net.fabricmc.fabric-loom-remap") version "1.14-SNAPSHOT"
 }
@@ -16,7 +18,8 @@ repositories {
 
 }
 dependencies {
-    // Being totally honest i had no clue how to get the version that should be supported so I just put it in manually
+    implementation(project(":worldedit-core"));
+
     minecraft("com.mojang:minecraft:${project.findProperty("minecraft_version")}")
     mappings(loom.officialMojangMappings())
 
