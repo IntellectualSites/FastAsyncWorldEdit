@@ -86,12 +86,14 @@ public class NMSAdapter implements FAWEPlatformAdapterImpl {
             System.arraycopy(adapter.getIbdToOrdinal(), 0, paletteToBlock, 0, adapter.getIbdToOrdinal().length);
             System.arraycopy(adapter.getOrdinalToIbdID(), 0, blockToPalette, 0, adapter.getOrdinalToIbdID().length);
         }
+        int oldVal = blockToPalette[BlockTypesCache.ReservedIDs.__RESERVED__];
+        blockToPalette[BlockTypesCache.ReservedIDs.__RESERVED__] = blockToPalette[BlockTypesCache.ReservedIDs.AIR];
         for (int i = 0; i < 4096; i++) {
             int ordinal = set[i];
-            ordinal = Math.max(ordinal, BlockTypesCache.ReservedIDs.AIR);
             int palette = blockToPalette[ordinal];
             blocksCopy[i] = palette;
         }
+        blockToPalette[BlockTypesCache.ReservedIDs.__RESERVED__] = oldVal;
     }
 
     @Override
