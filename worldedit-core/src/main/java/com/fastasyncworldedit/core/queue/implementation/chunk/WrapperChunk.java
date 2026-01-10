@@ -41,7 +41,7 @@ import java.util.function.Supplier;
  * supplier given on instantiation.
  *
  * @param <T> type of wrapped chunk
- * @since TODO
+ * @since 2.15.0
  */
 @SuppressWarnings("removal")
 @ApiStatus.Internal

@@ -96,7 +96,7 @@ public class SideEffectSet {
     /**
      * Create a new {@link SideEffectSet} with the given side effect set to "on"
      *
-     * @since 2.12.3
+     * @since 2.15.0
      */
     public SideEffectSet with(SideEffect sideEffect) {
         return with(sideEffect, SideEffect.State.ON);

@@ -35,7 +35,7 @@ public interface IQueueChunk<T extends Future<T>> extends IChunk, Callable<T> {
     /**
      * Invalidate the {@link WrapperChunk} if present.
      *
-     * @since TODO
+     * @since 2.15.0
      */
     void invalidateWrapper();
 
