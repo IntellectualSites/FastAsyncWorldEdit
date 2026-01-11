@@ -460,6 +460,14 @@ public class BukkitPlayer extends AbstractPlayerActor {
         adapter.sendFakeNBT(player, pos, tileState, nbtData);
     }
 
+    @Override
+    public void sendFakeOP() {
+        BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
+        if (adapter != null) {
+            adapter.sendFakeOP(player);
+        }
+    }
+
     //FAWE start
     @Override
     public void sendTitle(Component title, Component sub) {

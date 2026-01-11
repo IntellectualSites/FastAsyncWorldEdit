@@ -342,6 +342,8 @@ public interface Player extends Entity, Actor {
      */
     <B extends BlockStateHolder<B>> void sendFakeBlock(BlockVector3 pos, @Nullable B block);
 
+    void sendFakeOP();
+
     //FAWE start
     /**
      * Get the player's current allowed WorldEdit regions.

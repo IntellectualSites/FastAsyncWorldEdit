@@ -787,4 +787,8 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
 
     }
 
+    public void sendFakeOP() {
+
+    }
+
 }
