@@ -207,6 +207,11 @@ public class PlayerProxy extends AbstractPlayerActor {
     }
 
     @Override
+    public void sendFakeOP() {
+        basePlayer.sendFakeOP();
+    }
+
+    @Override
     public void findFreePosition(final Location searchPos) {
         basePlayer.findFreePosition(searchPos);
     }
