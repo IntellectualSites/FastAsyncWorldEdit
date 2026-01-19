@@ -13,7 +13,7 @@ worldguard-bukkit = "7.0.14"
 griefprevention = "18.0.0"
 griefdefender = "2.1.0-SNAPSHOT"
 residence = "6.0.0.1"
-towny = "0.102.0.3"
+towny = "0.102.0.5"
 plotsquared = "7.5.11"
 
 # Third party
