@@ -41,7 +41,6 @@ import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.LevelChunkSection;
@@ -460,35 +459,35 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                 bitArray.fromRaw(blocksCopy);
             }
 
-            final long[] bits = Arrays.copyOfRange(blockStates, 0, blockBitArrayEnd);
-            List<net.minecraft.world.level.block.state.BlockState> palette;
-            if (bitsPerEntry < 9) {
-                palette = new ArrayList<>();
-                for (int i = 0; i < num_palette; i++) {
-                    int ordinal = paletteToBlock[i];
-                    blockToPalette[ordinal] = Integer.MAX_VALUE;
-                    final BlockState state = BlockTypesCache.states[ordinal];
-                    palette.add(((PaperweightBlockMaterial) state.getMaterial()).getState());
-                }
-            } else {
-                palette = List.of();
+            // Create empty container and populate it manually
+            // This avoids unpack() validation issues with global palettes
+            PalettedContainerFactory factory = PalettedContainerFactory.create(registryAccess);
+            final PalettedContainer<net.minecraft.world.level.block.state.BlockState> blockStatePalettedContainer =
+                    factory.createForBlockStates();
+
+            // Populate the container by setting each block position
+            for (int i = 0; i < 4096; i++) {
+                int x = i & 15;
+                int y = i >> 8;
+                int z = (i >> 4) & 15;
+
+                char ordinal = set[i];
+                ordinal = (char) Math.max(ordinal, BlockTypesCache.ReservedIDs.AIR);
+                final BlockState state = BlockTypesCache.states[ordinal];
+                net.minecraft.world.level.block.state.BlockState nmsState =
+                        ((PaperweightBlockMaterial) state.getMaterial()).getState();
+
+                blockStatePalettedContainer.set(x, y, z, nmsState);
             }
 
-            // Create palette with data
-            var strategy = Strategy.createForBlockStates(Block.BLOCK_STATE_REGISTRY);
-            var packedData = new PalettedContainerRO.PackedData<>(palette, Optional.of(LongStream.of(bits)), bitsPerEntry);
-            DataResult<PalettedContainer<net.minecraft.world.level.block.state.BlockState>> result;
-            if (PaperLib.isPaper()) {
-                result = PalettedContainer.unpack(strategy, packedData, Blocks.AIR.defaultBlockState(), null);
-            } else {
-                //noinspection unchecked
-                result = (DataResult<PalettedContainer<net.minecraft.world.level.block.state.BlockState>>)
-                        palettedContainerUnpackSpigot.invokeExact(strategy, packedData);
+            for (int i = 0; i < num_palette; i++) {
+                blockToPalette[paletteToBlock[i]] = Integer.MAX_VALUE;
             }
+
             if (biomes == null) {
                 biomes = PalettedContainerFactory.create(registryAccess).createForBiomes();
             }
-            return new LevelChunkSection(result.getOrThrow(), biomes);
+            return new LevelChunkSection(blockStatePalettedContainer, biomes);
         } catch (Throwable e) {
             throw new RuntimeException("Failed to create block palette", e);
         } finally {
