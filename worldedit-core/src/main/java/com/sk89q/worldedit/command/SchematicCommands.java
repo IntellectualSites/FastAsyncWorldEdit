@@ -26,6 +26,7 @@ import com.fastasyncworldedit.core.extent.clipboard.MultiClipboardHolder;
 import com.fastasyncworldedit.core.extent.clipboard.URIClipboardHolder;
 import com.fastasyncworldedit.core.math.transform.MutatingOperationTransformHolder;
 import com.fastasyncworldedit.core.util.MainUtil;
+import com.fastasyncworldedit.core.util.StringMan;
 import com.google.common.collect.Multimap;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
@@ -143,23 +144,6 @@ public class SchematicCommands {
             }
         }
         return fileList;
-    }
-
-    public static String quoteCmd(String value) {
-        if (value.isEmpty()) {
-            return "\"\"";
-        }
-
-        boolean quote = value.indexOf(' ') >= 0 || value.indexOf('\t') >= 0;
-        if (!quote) {
-            return value;
-        }
-
-        String escaped = value
-                .replace("\\", "\\\\")
-                .replace("\"", "\\\"");
-
-        return "\"" + escaped + "\"";
     }
 
     @Command(
@@ -787,7 +771,7 @@ public class SchematicCommands {
         List<Component> components = UtilityCommands.entryToComponent(dir, entries, isLoaded,
                 (name, path, type, loaded) -> {
                     TextComponentProducer msg = new TextComponentProducer();
-                    String pathArg = quoteCmd(path);
+                    String pathArg = StringMan.escape(path);
 
                     msg.append(Caption.of("worldedit.schematic.dash.symbol"));
 

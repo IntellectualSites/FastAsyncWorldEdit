@@ -542,4 +542,21 @@ public class StringMan {
         return UUID_PATTERN.matcher(str).find();
     }
 
+    public static String escape(String value) {
+        if (value.isEmpty()) {
+            return "\"\"";
+        }
+
+        boolean quote = value.indexOf(' ') >= 0 || value.indexOf('\t') >= 0;
+        if (!quote) {
+            return value;
+        }
+
+        String escaped = value
+                .replace("\\", "\\\\")
+                .replace("\"", "\\\"");
+
+        return "\"" + escaped + "\"";
+    }
+
 }
