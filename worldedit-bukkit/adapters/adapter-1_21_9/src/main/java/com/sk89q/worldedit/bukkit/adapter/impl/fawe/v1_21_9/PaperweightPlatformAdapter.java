@@ -108,12 +108,11 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
     private static final Field fieldRemove;
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
-    private static final boolean GLOBAL_KINDA_DOES_NOT_EXIST = MinecraftVersion.getCurrent().getRelease() == 10;
+    private static final boolean IS_1_21_10 = MinecraftVersion.getCurrent().getRelease() == 10;
 
     private static Field SERVER_LEVEL_ENTITY_MANAGER;
 
     static final MethodHandle PALETTED_CONTAINER_GET;
-
 
     static {
         final MethodHandles.Lookup lookup = MethodHandles.lookup();
@@ -417,9 +416,10 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             final char[] blocks,
             CachedBukkitAdapter adapter,
             RegistryAccess registryAccess,
+            Strategy<net.minecraft.world.level.block.state.BlockState> strategy,
             @Nullable PalettedContainer<Holder<Biome>> biomes
     ) {
-        return newChunkSection(layer, null, blocks, adapter, registryAccess, biomes);
+        return newChunkSection(layer, null, blocks, adapter, registryAccess, strategy, biomes);
     }
 
     public static LevelChunkSection newChunkSection(
@@ -428,10 +428,14 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             char[] set,
             CachedBukkitAdapter adapter,
             RegistryAccess registryAccess,
+            Strategy<net.minecraft.world.level.block.state.BlockState> strategy,
             @Nullable PalettedContainer<Holder<Biome>> biomes
     ) {
         if (set == null) {
             return newChunkSection(registryAccess, biomes);
+        }
+        if (IS_1_21_10) {
+            return newChunkSection1_21_10(layer, get, set, adapter, registryAccess, strategy, biomes);
         }
         final int[] blockToPalette = FaweCache.INSTANCE.BLOCK_TO_PALETTE.get();
         final int[] paletteToBlock = FaweCache.INSTANCE.PALETTE_TO_BLOCK.get();
@@ -440,49 +444,9 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         try {
             int num_palette;
             if (get == null) {
-                num_palette = createPalette(
-                        blockToPalette,
-                        paletteToBlock,
-                        blocksCopy,
-                        set,
-                        adapter,
-                        GLOBAL_KINDA_DOES_NOT_EXIST
-                );
+                num_palette = createPalette(blockToPalette, paletteToBlock, blocksCopy, set, adapter, false);
             } else {
-                num_palette = createPalette(
-                        layer,
-                        blockToPalette,
-                        paletteToBlock,
-                        blocksCopy,
-                        get,
-                        set,
-                        adapter,
-                        GLOBAL_KINDA_DOES_NOT_EXIST
-                );
-            }
-            boolean singleValue = num_palette == 1;
-            LongStream bits;
-            if (GLOBAL_KINDA_DOES_NOT_EXIST && singleValue) {
-                bits = null;
-            } else {
-                int bitsPerEntry = Mth.ceillog2(num_palette);
-                if (bitsPerEntry > 0 && bitsPerEntry < 4) {
-                    bitsPerEntry = 4;
-                } else if (!GLOBAL_KINDA_DOES_NOT_EXIST && bitsPerEntry > 8) {
-                    bitsPerEntry = MathMan.log2nlz(Block.BLOCK_STATE_REGISTRY.size() - 1);
-                }
-                int bitsPerEntryNonZero = Math.max(bitsPerEntry, 1); // We do want to use zero sometimes
-                final int blockBitArrayEnd = MathMan.longArrayLength(bitsPerEntryNonZero, 4096);
-                if (num_palette == 1) {
-                    for (int i = 0; i < blockBitArrayEnd; i++) {
-                        blockStates[i] = 0;
-                    }
-                } else {
-                    final BitArrayUnstretched bitArray = new BitArrayUnstretched(bitsPerEntryNonZero, 4096, blockStates);
-                    bitArray.fromRaw(blocksCopy);
-                }
-
-                bits = LongStream.of(Arrays.copyOfRange(blockStates, 0, blockBitArrayEnd));
+                num_palette = createPalette(layer, blockToPalette, paletteToBlock, blocksCopy, get, set, adapter, false);
             }
 
             int bitsPerEntry = MathMan.log2nlz(num_palette - 1);
@@ -492,6 +456,19 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                 bitsPerEntry = MathMan.log2nlz(Block.BLOCK_STATE_REGISTRY.size() - 1);
             }
 
+            int bitsPerEntryNonZero = Math.max(bitsPerEntry, 1); // We do want to use zero sometimes
+            final int blockBitArrayEnd = MathMan.longArrayLength(bitsPerEntryNonZero, 4096);
+
+            if (num_palette == 1) {
+                for (int i = 0; i < blockBitArrayEnd; i++) {
+                    blockStates[i] = 0;
+                }
+            } else {
+                final BitArrayUnstretched bitArray = new BitArrayUnstretched(bitsPerEntryNonZero, 4096, blockStates);
+                bitArray.fromRaw(blocksCopy);
+            }
+
+            final long[] bits = Arrays.copyOfRange(blockStates, 0, blockBitArrayEnd);
             List<net.minecraft.world.level.block.state.BlockState> palette;
             if (bitsPerEntry < 9) {
                 palette = new ArrayList<>();
@@ -506,10 +483,75 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             }
 
             // Create palette with data
-            var strategy = Strategy.createForBlockStates(Block.BLOCK_STATE_REGISTRY);
-            var packedData = GLOBAL_KINDA_DOES_NOT_EXIST ?
-                    new PalettedContainerRO.PackedData<>(palette, Optional.ofNullable(bits)) :
-                    new PalettedContainerRO.PackedData<>(palette, Optional.of(bits), bitsPerEntry);
+            var packedData = new PalettedContainerRO.PackedData<>(palette, Optional.of(LongStream.of(bits)), bitsPerEntry);
+            DataResult<PalettedContainer<net.minecraft.world.level.block.state.BlockState>> result;
+            if (PaperLib.isPaper()) {
+                result = PalettedContainer.unpack(strategy, packedData, Blocks.AIR.defaultBlockState(), null);
+            } else {
+                //noinspection unchecked
+                result = (DataResult<PalettedContainer<net.minecraft.world.level.block.state.BlockState>>)
+                        palettedContainerUnpackSpigot.invokeExact(strategy, packedData);
+            }
+            if (biomes == null) {
+                biomes = PalettedContainerFactory.create(registryAccess).createForBiomes();
+            }
+            return new LevelChunkSection(result.getOrThrow(), biomes);
+        } catch (Throwable e) {
+            throw new RuntimeException("Failed to create block palette", e);
+        } finally {
+            Arrays.fill(blockToPalette, Integer.MAX_VALUE);
+            Arrays.fill(paletteToBlock, Integer.MAX_VALUE);
+            Arrays.fill(blockStates, 0);
+            Arrays.fill(blocksCopy, 0);
+        }
+    }
+
+        public static LevelChunkSection newChunkSection1_21_10(
+            final int layer,
+            final IntFunction<char[]> get,
+            char[] set,
+            CachedBukkitAdapter adapter,
+            RegistryAccess registryAccess,
+            Strategy<net.minecraft.world.level.block.state.BlockState> strategy,
+            @Nullable PalettedContainer<Holder<Biome>> biomes
+    ) {
+        final int[] blockToPalette = FaweCache.INSTANCE.BLOCK_TO_PALETTE.get();
+        final int[] paletteToBlock = FaweCache.INSTANCE.PALETTE_TO_BLOCK.get();
+        final long[] blockStates = FaweCache.INSTANCE.BLOCK_STATES.get();
+        final int[] blocksCopy = FaweCache.INSTANCE.SECTION_BLOCKS.get();
+        try {
+            int num_palette;
+            if (get == null) {
+                num_palette = createPalette(blockToPalette, paletteToBlock, blocksCopy, set, adapter, true);
+            } else {
+                num_palette = createPalette(layer, blockToPalette, paletteToBlock, blocksCopy, get, set, adapter, true);
+            }
+
+            boolean singleValue = num_palette == 1;
+            LongStream bits;
+            if (singleValue) {
+                bits = null;
+            } else {
+                int bitsPerEntry = Mth.ceillog2(num_palette);
+                if (bitsPerEntry < 4) {
+                    bitsPerEntry = 4;
+                }
+                final int blockBitArrayEnd = MathMan.longArrayLength(bitsPerEntry, 4096);
+                final BitArrayUnstretched bitArray = new BitArrayUnstretched(bitsPerEntry, 4096, blockStates);
+
+                bitArray.fromRaw(blocksCopy);
+                bits = LongStream.of(Arrays.copyOfRange(blockStates, 0, blockBitArrayEnd));
+            }
+
+            List<net.minecraft.world.level.block.state.BlockState> palette = new ArrayList<>();
+            for (int i = 0; i < num_palette; i++) {
+                int ordinal = paletteToBlock[i];
+                PaperweightBlockMaterial material = (PaperweightBlockMaterial) BlockTypesCache.states[ordinal].getMaterial();
+                palette.add(material.getState());
+            }
+
+            // Create palette with data
+            var packedData = new PalettedContainerRO.PackedData<>(palette, Optional.ofNullable(bits));
             DataResult<PalettedContainer<net.minecraft.world.level.block.state.BlockState>> result;
             if (PaperLib.isPaper()) {
                 result = PalettedContainer.unpack(strategy, packedData, Blocks.AIR.defaultBlockState(), null);
