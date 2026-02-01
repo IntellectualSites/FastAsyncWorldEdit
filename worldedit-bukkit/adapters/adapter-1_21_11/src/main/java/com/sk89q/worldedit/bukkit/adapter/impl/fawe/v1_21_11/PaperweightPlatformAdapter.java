@@ -431,35 +431,31 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                 num_palette = createPalette(layer, blockToPalette, paletteToBlock, blocksCopy, get, set, adapter, true);
             }
 
-            int bitsPerEntry = Mth.ceillog2(num_palette);
-
-            int bitsPerEntryNonZero = Math.max(bitsPerEntry, 1); // We do want to use zero sometimes
-            final int blockBitArrayEnd = MathMan.longArrayLength(bitsPerEntryNonZero, 4096);
-
-            if (num_palette == 1) {
-                for (int i = 0; i < blockBitArrayEnd; i++) {
-                    blockStates[i] = 0;
-                }
+            boolean singleValue = num_palette == 1;
+            LongStream bits;
+            if (singleValue) {
+                bits = null;
             } else {
-                final BitArrayUnstretched bitArray = new BitArrayUnstretched(bitsPerEntryNonZero, 4096, blockStates);
+                int bitsPerEntry = Mth.ceillog2(num_palette);
+                if (bitsPerEntry < 4) {
+                    bitsPerEntry = 4;
+                }
+                final int blockBitArrayEnd = MathMan.longArrayLength(bitsPerEntry, 4096);
+                final BitArrayUnstretched bitArray = new BitArrayUnstretched(bitsPerEntry, 4096, blockStates);
+
                 bitArray.fromRaw(blocksCopy);
+                bits = LongStream.of(Arrays.copyOfRange(blockStates, 0, blockBitArrayEnd));
             }
 
-            final long[] bits = Arrays.copyOfRange(blockStates, 0, blockBitArrayEnd);
-            List<net.minecraft.world.level.block.state.BlockState> palette;
-            if (bitsPerEntry == 0) {
-                palette = List.of();
-            } else {
-                palette = new ArrayList<>();
-                for (int i = 0; i < num_palette; i++) {
-                    int ordinal = paletteToBlock[i];
-                    PaperweightBlockMaterial material = (PaperweightBlockMaterial)BlockTypesCache.states[ordinal].getMaterial();
-                    palette.add(material.getState());
-                }
+            List<net.minecraft.world.level.block.state.BlockState> palette = new ArrayList<>();
+            for (int i = 0; i < num_palette; i++) {
+                int ordinal = paletteToBlock[i];
+                PaperweightBlockMaterial material = (PaperweightBlockMaterial) BlockTypesCache.states[ordinal].getMaterial();
+                palette.add(material.getState());
             }
 
             // Create palette with data
-            var packedData = new PalettedContainerRO.PackedData<>(palette, Optional.of(LongStream.of(bits)));
+            var packedData = new PalettedContainerRO.PackedData<>(palette, Optional.ofNullable(bits));
             DataResult<PalettedContainer<net.minecraft.world.level.block.state.BlockState>> result;
             if (PaperLib.isPaper()) {
                 result = PalettedContainer.unpack(strategy, packedData, Blocks.AIR.defaultBlockState(), null);

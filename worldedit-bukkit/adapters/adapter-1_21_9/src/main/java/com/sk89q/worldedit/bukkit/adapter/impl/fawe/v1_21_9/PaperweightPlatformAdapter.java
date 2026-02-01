@@ -35,6 +35,7 @@ import net.minecraft.server.level.ChunkHolder;
 import net.minecraft.server.level.ChunkMap;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Mth;
 import net.minecraft.util.ProblemReporter;
 import net.minecraft.util.ThreadingDetector;
 import net.minecraft.world.entity.Entity;
@@ -439,11 +440,49 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         try {
             int num_palette;
             if (get == null) {
-                num_palette = createPalette(blockToPalette, paletteToBlock, blocksCopy, set, adapter, GLOBAL_KINDA_DOES_NOT_EXIST);
-            } else {
-                num_palette = createPalette(layer, blockToPalette, paletteToBlock, blocksCopy, get, set, adapter,
+                num_palette = createPalette(
+                        blockToPalette,
+                        paletteToBlock,
+                        blocksCopy,
+                        set,
+                        adapter,
                         GLOBAL_KINDA_DOES_NOT_EXIST
                 );
+            } else {
+                num_palette = createPalette(
+                        layer,
+                        blockToPalette,
+                        paletteToBlock,
+                        blocksCopy,
+                        get,
+                        set,
+                        adapter,
+                        GLOBAL_KINDA_DOES_NOT_EXIST
+                );
+            }
+            boolean singleValue = num_palette == 1;
+            LongStream bits;
+            if (GLOBAL_KINDA_DOES_NOT_EXIST && singleValue) {
+                bits = null;
+            } else {
+                int bitsPerEntry = Mth.ceillog2(num_palette);
+                if (bitsPerEntry > 0 && bitsPerEntry < 4) {
+                    bitsPerEntry = 4;
+                } else if (!GLOBAL_KINDA_DOES_NOT_EXIST && bitsPerEntry > 8) {
+                    bitsPerEntry = MathMan.log2nlz(Block.BLOCK_STATE_REGISTRY.size() - 1);
+                }
+                int bitsPerEntryNonZero = Math.max(bitsPerEntry, 1); // We do want to use zero sometimes
+                final int blockBitArrayEnd = MathMan.longArrayLength(bitsPerEntryNonZero, 4096);
+                if (num_palette == 1) {
+                    for (int i = 0; i < blockBitArrayEnd; i++) {
+                        blockStates[i] = 0;
+                    }
+                } else {
+                    final BitArrayUnstretched bitArray = new BitArrayUnstretched(bitsPerEntryNonZero, 4096, blockStates);
+                    bitArray.fromRaw(blocksCopy);
+                }
+
+                bits = LongStream.of(Arrays.copyOfRange(blockStates, 0, blockBitArrayEnd));
             }
 
             int bitsPerEntry = MathMan.log2nlz(num_palette - 1);
@@ -453,19 +492,6 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                 bitsPerEntry = MathMan.log2nlz(Block.BLOCK_STATE_REGISTRY.size() - 1);
             }
 
-            int bitsPerEntryNonZero = Math.max(bitsPerEntry, 1); // We do want to use zero sometimes
-            final int blockBitArrayEnd = MathMan.longArrayLength(bitsPerEntryNonZero, 4096);
-
-            if (num_palette == 1) {
-                for (int i = 0; i < blockBitArrayEnd; i++) {
-                    blockStates[i] = 0;
-                }
-            } else {
-                final BitArrayUnstretched bitArray = new BitArrayUnstretched(bitsPerEntryNonZero, 4096, blockStates);
-                bitArray.fromRaw(blocksCopy);
-            }
-
-            final long[] bits = Arrays.copyOfRange(blockStates, 0, blockBitArrayEnd);
             List<net.minecraft.world.level.block.state.BlockState> palette;
             if (bitsPerEntry < 9) {
                 palette = new ArrayList<>();
@@ -482,8 +508,8 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             // Create palette with data
             var strategy = Strategy.createForBlockStates(Block.BLOCK_STATE_REGISTRY);
             var packedData = GLOBAL_KINDA_DOES_NOT_EXIST ?
-                    new PalettedContainerRO.PackedData<>(palette, Optional.of(LongStream.of(bits))) :
-                    new PalettedContainerRO.PackedData<>(palette, Optional.of(LongStream.of(bits)), bitsPerEntry);
+                    new PalettedContainerRO.PackedData<>(palette, Optional.ofNullable(bits)) :
+                    new PalettedContainerRO.PackedData<>(palette, Optional.of(bits), bitsPerEntry);
             DataResult<PalettedContainer<net.minecraft.world.level.block.state.BlockState>> result;
             if (PaperLib.isPaper()) {
                 result = PalettedContainer.unpack(strategy, packedData, Blocks.AIR.defaultBlockState(), null);
