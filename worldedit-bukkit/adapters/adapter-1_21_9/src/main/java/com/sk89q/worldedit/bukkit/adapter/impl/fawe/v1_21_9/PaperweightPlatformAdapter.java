@@ -5,6 +5,7 @@ import ca.spottedleaf.moonrise.patches.chunk_system.scheduling.ChunkHolderManage
 import com.fastasyncworldedit.bukkit.adapter.CachedBukkitAdapter;
 import com.fastasyncworldedit.bukkit.adapter.DelegateSemaphore;
 import com.fastasyncworldedit.bukkit.adapter.NMSAdapter;
+import com.fastasyncworldedit.bukkit.util.MinecraftVersion;
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.math.BitArrayUnstretched;
@@ -106,10 +107,12 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
     private static final Field fieldRemove;
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
+    private static final boolean GLOBAL_KINDA_DOES_NOT_EXIST = MinecraftVersion.getCurrent().getRelease() == 10;
 
     private static Field SERVER_LEVEL_ENTITY_MANAGER;
 
     static final MethodHandle PALETTED_CONTAINER_GET;
+
 
     static {
         final MethodHandles.Lookup lookup = MethodHandles.lookup();
@@ -436,9 +439,11 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         try {
             int num_palette;
             if (get == null) {
-                num_palette = createPalette(blockToPalette, paletteToBlock, blocksCopy, set, adapter);
+                num_palette = createPalette(blockToPalette, paletteToBlock, blocksCopy, set, adapter, GLOBAL_KINDA_DOES_NOT_EXIST);
             } else {
-                num_palette = createPalette(layer, blockToPalette, paletteToBlock, blocksCopy, get, set, adapter);
+                num_palette = createPalette(layer, blockToPalette, paletteToBlock, blocksCopy, get, set, adapter,
+                        GLOBAL_KINDA_DOES_NOT_EXIST
+                );
             }
 
             int bitsPerEntry = MathMan.log2nlz(num_palette - 1);
@@ -476,7 +481,9 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
 
             // Create palette with data
             var strategy = Strategy.createForBlockStates(Block.BLOCK_STATE_REGISTRY);
-            var packedData = new PalettedContainerRO.PackedData<>(palette, Optional.of(LongStream.of(bits)), bitsPerEntry);
+            var packedData = GLOBAL_KINDA_DOES_NOT_EXIST ?
+                    new PalettedContainerRO.PackedData<>(palette, Optional.of(LongStream.of(bits))) :
+                    new PalettedContainerRO.PackedData<>(palette, Optional.of(LongStream.of(bits)), bitsPerEntry);
             DataResult<PalettedContainer<net.minecraft.world.level.block.state.BlockState>> result;
             if (PaperLib.isPaper()) {
                 result = PalettedContainer.unpack(strategy, packedData, Blocks.AIR.defaultBlockState(), null);

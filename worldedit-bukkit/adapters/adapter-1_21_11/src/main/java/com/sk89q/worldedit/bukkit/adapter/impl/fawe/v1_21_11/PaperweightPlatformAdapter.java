@@ -18,7 +18,6 @@ import com.sk89q.worldedit.bukkit.adapter.Refraction;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import io.papermc.lib.PaperLib;
 import net.minecraft.core.BlockPos;
@@ -33,13 +32,13 @@ import net.minecraft.server.level.ChunkHolder;
 import net.minecraft.server.level.ChunkMap;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Mth;
 import net.minecraft.util.ProblemReporter;
 import net.minecraft.util.ThreadingDetector;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.chunk.LevelChunk;
@@ -402,9 +401,10 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             final char[] blocks,
             CachedBukkitAdapter adapter,
             RegistryAccess registryAccess,
+            Strategy<net.minecraft.world.level.block.state.BlockState> strategy,
             @Nullable PalettedContainer<Holder<Biome>> biomes
     ) {
-        return newChunkSection(layer, null, blocks, adapter, registryAccess, biomes);
+        return newChunkSection(layer, null, blocks, adapter, registryAccess, strategy, biomes);
     }
 
     public static LevelChunkSection newChunkSection(
@@ -413,6 +413,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             char[] set,
             CachedBukkitAdapter adapter,
             RegistryAccess registryAccess,
+            Strategy<net.minecraft.world.level.block.state.BlockState> strategy,
             @Nullable PalettedContainer<Holder<Biome>> biomes
     ) {
         if (set == null) {
@@ -425,17 +426,12 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         try {
             int num_palette;
             if (get == null) {
-                num_palette = createPalette(blockToPalette, paletteToBlock, blocksCopy, set, adapter);
+                num_palette = createPalette(blockToPalette, paletteToBlock, blocksCopy, set, adapter, true);
             } else {
-                num_palette = createPalette(layer, blockToPalette, paletteToBlock, blocksCopy, get, set, adapter);
+                num_palette = createPalette(layer, blockToPalette, paletteToBlock, blocksCopy, get, set, adapter, true);
             }
 
-            int bitsPerEntry = MathMan.log2nlz(num_palette - 1);
-            if (bitsPerEntry > 0 && bitsPerEntry < 5) {
-                bitsPerEntry = 4;
-            } else if (bitsPerEntry > 8) {
-                bitsPerEntry = MathMan.log2nlz(Block.BLOCK_STATE_REGISTRY.size() - 1);
-            }
+            int bitsPerEntry = Mth.ceillog2(num_palette);
 
             int bitsPerEntryNonZero = Math.max(bitsPerEntry, 1); // We do want to use zero sometimes
             final int blockBitArrayEnd = MathMan.longArrayLength(bitsPerEntryNonZero, 4096);
@@ -451,21 +447,19 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
 
             final long[] bits = Arrays.copyOfRange(blockStates, 0, blockBitArrayEnd);
             List<net.minecraft.world.level.block.state.BlockState> palette;
-            if (bitsPerEntry < 9) {
+            if (bitsPerEntry == 0) {
+                palette = List.of();
+            } else {
                 palette = new ArrayList<>();
                 for (int i = 0; i < num_palette; i++) {
                     int ordinal = paletteToBlock[i];
-                    blockToPalette[ordinal] = Integer.MAX_VALUE;
-                    final BlockState state = BlockTypesCache.states[ordinal];
-                    palette.add(((PaperweightBlockMaterial) state.getMaterial()).getState());
+                    PaperweightBlockMaterial material = (PaperweightBlockMaterial)BlockTypesCache.states[ordinal].getMaterial();
+                    palette.add(material.getState());
                 }
-            } else {
-                palette = List.of();
             }
 
             // Create palette with data
-            var strategy = Strategy.createForBlockStates(Block.BLOCK_STATE_REGISTRY);
-            var packedData = new PalettedContainerRO.PackedData<>(palette, Optional.of(LongStream.of(bits)), bitsPerEntry);
+            var packedData = new PalettedContainerRO.PackedData<>(palette, Optional.of(LongStream.of(bits)));
             DataResult<PalettedContainer<net.minecraft.world.level.block.state.BlockState>> result;
             if (PaperLib.isPaper()) {
                 result = PalettedContainer.unpack(strategy, packedData, Blocks.AIR.defaultBlockState(), null);
