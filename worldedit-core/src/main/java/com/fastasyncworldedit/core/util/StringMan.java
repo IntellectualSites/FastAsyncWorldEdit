@@ -552,9 +552,7 @@ public class StringMan {
             return value;
         }
 
-        String escaped = value
-                .replace("\\", "\\\\")
-                .replace("\"", "\\\"");
+        String escaped = value.replace("\\", "\\\\").replace("\"", "\\\"");
 
         return "\"" + escaped + "\"";
     }
