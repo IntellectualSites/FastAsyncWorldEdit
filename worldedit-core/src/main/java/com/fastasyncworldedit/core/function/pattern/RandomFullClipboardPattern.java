@@ -66,7 +66,7 @@ public class RandomFullClipboardPattern extends AbstractPattern {
         Clipboard clipboard = holder.getClipboard();
         Transform newTransform = holder.getTransform();
         if (newTransform.isIdentity()) {
-            clipboard.paste(extent, set, false);
+            clipboard.paste(extent, set, false, true, false);
         } else {
             newTransform = MutatingOperationTransformHolder.transform(newTransform, true);
             clipboard.paste(extent, set, false, newTransform);
