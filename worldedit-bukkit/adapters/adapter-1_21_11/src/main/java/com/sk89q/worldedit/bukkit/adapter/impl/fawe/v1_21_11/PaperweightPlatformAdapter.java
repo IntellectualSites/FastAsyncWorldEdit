@@ -444,7 +444,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                 final BitArrayUnstretched bitArray = new BitArrayUnstretched(bitsPerEntry, 4096, blockStates);
 
                 bitArray.fromRaw(blocksCopy);
-                bits = LongStream.of(Arrays.copyOfRange(blockStates, 0, blockBitArrayEnd));
+                bits = Arrays.stream(blockStates, 0, blockBitArrayEnd);
             }
 
             List<net.minecraft.world.level.block.state.BlockState> palette = new ArrayList<>();
