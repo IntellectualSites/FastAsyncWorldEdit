@@ -5,6 +5,7 @@ import ca.spottedleaf.moonrise.patches.chunk_system.scheduling.ChunkHolderManage
 import com.fastasyncworldedit.bukkit.adapter.CachedBukkitAdapter;
 import com.fastasyncworldedit.bukkit.adapter.DelegateSemaphore;
 import com.fastasyncworldedit.bukkit.adapter.NMSAdapter;
+import com.fastasyncworldedit.bukkit.util.MinecraftVersion;
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.math.BitArrayUnstretched;
@@ -34,6 +35,7 @@ import net.minecraft.server.level.ChunkHolder;
 import net.minecraft.server.level.ChunkMap;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Mth;
 import net.minecraft.util.ProblemReporter;
 import net.minecraft.util.ThreadingDetector;
 import net.minecraft.world.entity.Entity;
@@ -106,6 +108,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
     private static final Field fieldRemove;
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
+    private static final boolean IS_1_21_10 = MinecraftVersion.getCurrent().getRelease() == 10;
 
     private static Field SERVER_LEVEL_ENTITY_MANAGER;
 
@@ -413,9 +416,10 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             final char[] blocks,
             CachedBukkitAdapter adapter,
             RegistryAccess registryAccess,
+            Strategy<net.minecraft.world.level.block.state.BlockState> strategy,
             @Nullable PalettedContainer<Holder<Biome>> biomes
     ) {
-        return newChunkSection(layer, null, blocks, adapter, registryAccess, biomes);
+        return newChunkSection(layer, null, blocks, adapter, registryAccess, strategy, biomes);
     }
 
     public static LevelChunkSection newChunkSection(
@@ -424,10 +428,14 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             char[] set,
             CachedBukkitAdapter adapter,
             RegistryAccess registryAccess,
+            Strategy<net.minecraft.world.level.block.state.BlockState> strategy,
             @Nullable PalettedContainer<Holder<Biome>> biomes
     ) {
         if (set == null) {
             return newChunkSection(registryAccess, biomes);
+        }
+        if (IS_1_21_10) {
+            return newChunkSection1_21_10(layer, get, set, adapter, registryAccess, strategy, biomes);
         }
         final int[] blockToPalette = FaweCache.INSTANCE.BLOCK_TO_PALETTE.get();
         final int[] paletteToBlock = FaweCache.INSTANCE.PALETTE_TO_BLOCK.get();
@@ -436,9 +444,9 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         try {
             int num_palette;
             if (get == null) {
-                num_palette = createPalette(blockToPalette, paletteToBlock, blocksCopy, set, adapter);
+                num_palette = createPalette(blockToPalette, paletteToBlock, blocksCopy, set, adapter, false);
             } else {
-                num_palette = createPalette(layer, blockToPalette, paletteToBlock, blocksCopy, get, set, adapter);
+                num_palette = createPalette(layer, blockToPalette, paletteToBlock, blocksCopy, get, set, adapter, false);
             }
 
             int bitsPerEntry = MathMan.log2nlz(num_palette - 1);
@@ -475,8 +483,75 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             }
 
             // Create palette with data
-            var strategy = Strategy.createForBlockStates(Block.BLOCK_STATE_REGISTRY);
             var packedData = new PalettedContainerRO.PackedData<>(palette, Optional.of(LongStream.of(bits)), bitsPerEntry);
+            DataResult<PalettedContainer<net.minecraft.world.level.block.state.BlockState>> result;
+            if (PaperLib.isPaper()) {
+                result = PalettedContainer.unpack(strategy, packedData, Blocks.AIR.defaultBlockState(), null);
+            } else {
+                //noinspection unchecked
+                result = (DataResult<PalettedContainer<net.minecraft.world.level.block.state.BlockState>>)
+                        palettedContainerUnpackSpigot.invokeExact(strategy, packedData);
+            }
+            if (biomes == null) {
+                biomes = PalettedContainerFactory.create(registryAccess).createForBiomes();
+            }
+            return new LevelChunkSection(result.getOrThrow(), biomes);
+        } catch (Throwable e) {
+            throw new RuntimeException("Failed to create block palette", e);
+        } finally {
+            Arrays.fill(blockToPalette, Integer.MAX_VALUE);
+            Arrays.fill(paletteToBlock, Integer.MAX_VALUE);
+            Arrays.fill(blockStates, 0);
+            Arrays.fill(blocksCopy, 0);
+        }
+    }
+
+        public static LevelChunkSection newChunkSection1_21_10(
+            final int layer,
+            final IntFunction<char[]> get,
+            char[] set,
+            CachedBukkitAdapter adapter,
+            RegistryAccess registryAccess,
+            Strategy<net.minecraft.world.level.block.state.BlockState> strategy,
+            @Nullable PalettedContainer<Holder<Biome>> biomes
+    ) {
+        final int[] blockToPalette = FaweCache.INSTANCE.BLOCK_TO_PALETTE.get();
+        final int[] paletteToBlock = FaweCache.INSTANCE.PALETTE_TO_BLOCK.get();
+        final long[] blockStates = FaweCache.INSTANCE.BLOCK_STATES.get();
+        final int[] blocksCopy = FaweCache.INSTANCE.SECTION_BLOCKS.get();
+        try {
+            int num_palette;
+            if (get == null) {
+                num_palette = createPalette(blockToPalette, paletteToBlock, blocksCopy, set, adapter, true);
+            } else {
+                num_palette = createPalette(layer, blockToPalette, paletteToBlock, blocksCopy, get, set, adapter, true);
+            }
+
+            boolean singleValue = num_palette == 1;
+            LongStream bits;
+            if (singleValue) {
+                bits = null;
+            } else {
+                int bitsPerEntry = Mth.ceillog2(num_palette);
+                if (bitsPerEntry < 4) {
+                    bitsPerEntry = 4;
+                }
+                final int blockBitArrayEnd = MathMan.longArrayLength(bitsPerEntry, 4096);
+                final BitArrayUnstretched bitArray = new BitArrayUnstretched(bitsPerEntry, 4096, blockStates);
+
+                bitArray.fromRaw(blocksCopy);
+                bits = Arrays.stream(blockStates, 0, blockBitArrayEnd);
+            }
+
+            List<net.minecraft.world.level.block.state.BlockState> palette = new ArrayList<>();
+            for (int i = 0; i < num_palette; i++) {
+                int ordinal = paletteToBlock[i];
+                PaperweightBlockMaterial material = (PaperweightBlockMaterial) BlockTypesCache.states[ordinal].getMaterial();
+                palette.add(material.getState());
+            }
+
+            // Create palette with data
+            var packedData = new PalettedContainerRO.PackedData<>(palette, Optional.ofNullable(bits));
             DataResult<PalettedContainer<net.minecraft.world.level.block.state.BlockState>> result;
             if (PaperLib.isPaper()) {
                 result = PalettedContainer.unpack(strategy, packedData, Blocks.AIR.defaultBlockState(), null);
