@@ -3,10 +3,10 @@ on: [pull_request]
 jobs:
   build_pr:
     if: github.repository_owner == 'IntellectualSites'
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        java: [21, 25]
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v6
@@ -17,12 +17,12 @@ jobs:
         with:
           distribution: temurin
           cache: gradle
-          java-version: 21
-      - name: Build on ${{ matrix.os }}
+          java-version: ${{ matrix.java }}
+      - name: Build on Java ${{ matrix.java }}
         run: ./gradlew build -s
       - name: Archive artifacts
+        if: ${{ matrix.java == 21 }}
         uses: actions/upload-artifact@v6
-        if: ${{ matrix.os == 'ubuntu-latest' }} # only upload once, use linux builds
         with:
             name: FastAsyncWorldEdit-SNAPSHOT
             path: worldedit-bukkit/build/libs/FastAsyncWorldEdit-*.jar
