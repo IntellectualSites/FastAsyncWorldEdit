@@ -72,7 +72,7 @@ public class SimdSupport {
 
     private static VectorizedMask vectorizedTargetMaskNonAir() {
         // everything > VOID_AIR is not air
-        return (set, get, species) -> get.get(species).compare(VectorOperators.UNSIGNED_GT, BlockTypesCache.ReservedIDs.VOID_AIR);
+        return (set, get, species) -> get.get(species).compare(VectorOperators.UGT, BlockTypesCache.ReservedIDs.VOID_AIR);
     }
 
     private static VectorizedMask vectorizedTargetMask(char ordinal) {

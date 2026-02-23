@@ -17,7 +17,7 @@ jobs:
         with:
           distribution: temurin
           cache: gradle
-          java-version: 21
+          java-version: 25
       - name: Build
         run: ./gradlew build
       - name: Determine release status
