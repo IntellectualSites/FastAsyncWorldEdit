@@ -24,6 +24,7 @@ public class SimdSupport {
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
     private static final boolean VECTOR_API_PRESENT;
+    private static final boolean JAVA_25_OR_NEWER = Runtime.version().feature() >= 25;
 
     static {
         boolean vectorApiPresent = false;
@@ -36,7 +37,7 @@ public class SimdSupport {
         if (!VECTOR_API_PRESENT && Settings.settings().EXPERIMENTAL.USE_VECTOR_API) {
             LOGGER.warn("""
                     FAWE use-vector-api is enabled but --add-modules=jdk.incubator.vector is not set.
-                    Vector instructions will not be used.
+                    Vector instructions will not be used.\
                     """);
         } else if (VECTOR_API_PRESENT && !Settings.settings().EXPERIMENTAL.USE_VECTOR_API) {
             LOGGER.warn("""
@@ -44,11 +45,17 @@ public class SimdSupport {
                     FAWE can use vector instructions, but it is disabled in the config.
                     Enable use-vector-api to benefit from vector instructions with FAWE.\
                     """);
+        } else if (VECTOR_API_PRESENT && !JAVA_25_OR_NEWER) {
+            LOGGER.warn("""
+                    The server is running with the --add-modules=jdk.incubator.vector option.
+                    However, Java 25+ is required due to compatibility problems.
+                    Update to Java 25 to make use of this feature.\
+                    """);
         }
     }
 
     public static boolean useVectorApi() {
-        return VECTOR_API_PRESENT && Settings.settings().EXPERIMENTAL.USE_VECTOR_API;
+        return VECTOR_API_PRESENT && JAVA_25_OR_NEWER && Settings.settings().EXPERIMENTAL.USE_VECTOR_API;
     }
 
     public static @Nullable VectorizedMask vectorizedTargetMask(Mask mask) {
