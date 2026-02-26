@@ -9,6 +9,7 @@ import com.fastasyncworldedit.core.queue.IChunk;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.IChunkSet;
 import com.fastasyncworldedit.core.queue.IQueueExtent;
+import com.fastasyncworldedit.core.queue.implementation.blocks.DataArray;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.Entity;
@@ -184,7 +185,7 @@ public class WrapperChunk<T extends IChunk> implements IChunk {
     }
 
     @Override
-    public void setBlocks(final int layer, final char[] data) {
+    public void setBlocks(final int layer, final DataArray data) {
         getWrapped().setBlocks(layer, data);
     }
 
@@ -409,12 +410,12 @@ public class WrapperChunk<T extends IChunk> implements IChunk {
     }
 
     @Override
-    public char[] load(final int layer) {
+    public DataArray load(final int layer) {
         return getWrapped().load(layer);
     }
 
     @Override
-    public @Nullable char[] loadIfPresent(final int layer) {
+    public @Nullable DataArray loadIfPresent(final int layer) {
         return getWrapped().loadIfPresent(layer);
     }
 

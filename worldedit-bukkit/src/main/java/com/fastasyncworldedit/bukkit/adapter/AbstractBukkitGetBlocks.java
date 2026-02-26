@@ -9,7 +9,7 @@ import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.IChunkSet;
 import com.fastasyncworldedit.core.queue.IQueueExtent;
 import com.fastasyncworldedit.core.queue.implementation.QueueHandler;
-import com.fastasyncworldedit.core.queue.implementation.blocks.CharGetBlocks;
+import com.fastasyncworldedit.core.queue.implementation.blocks.DataArrayGetBlocks;
 import com.fastasyncworldedit.core.util.MemUtil;
 import com.fastasyncworldedit.core.util.task.FaweThreadUtil;
 import com.sk89q.worldedit.extent.Extent;
@@ -25,7 +25,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.locks.ReentrantLock;
 
-public abstract class AbstractBukkitGetBlocks<ServerLevel, LevelChunk> extends CharGetBlocks {
+public abstract class AbstractBukkitGetBlocks<ServerLevel, LevelChunk> extends DataArrayGetBlocks {
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
 

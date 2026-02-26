@@ -2,6 +2,7 @@ package com.fastasyncworldedit.core.queue;
 
 import com.fastasyncworldedit.core.extent.processor.heightmap.HeightMapType;
 import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
+import com.fastasyncworldedit.core.queue.implementation.blocks.DataArray;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.OutputExtent;
@@ -34,7 +35,7 @@ public interface IChunkSet extends IBlocks, OutputExtent {
     @Override
     <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T holder);
 
-    void setBlocks(int layer, char[] data);
+    void setBlocks(int layer, DataArray data);
 
     boolean isEmpty();
 

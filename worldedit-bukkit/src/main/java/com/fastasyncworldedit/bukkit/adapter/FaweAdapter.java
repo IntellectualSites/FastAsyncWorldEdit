@@ -1,5 +1,6 @@
 package com.fastasyncworldedit.bukkit.adapter;
 
+import com.fastasyncworldedit.core.queue.implementation.blocks.DataArray;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
@@ -75,20 +76,19 @@ public abstract class FaweAdapter<TAG, SERVER_LEVEL> extends CachedBukkitAdapter
         return true;
     }
 
-    public void mapFromGlobalPalette(char[] data) {
-        assert data.length == 4096;
+    public void mapFromGlobalPalette(DataArray data) {
         ensureInit();
-        for (int i = 0; i < 4096; i++) {
-            data[i] = (char) this.ibdToOrdinal[data[i]];
+        for (int i = 0; i < DataArray.CHUNK_SECTION_SIZE; i++) {
+            data.setAt(i, this.ibdToOrdinal[data.getAt(i)]);
         }
     }
 
-    public void mapWithPalette(char[] data, char[] paletteToOrdinal) {
-        for (int i = 0; i < 4096; i++) {
-            char paletteVal = data[i];
-            char val = paletteToOrdinal[paletteVal];
-            assert val != Character.MAX_VALUE; // paletteToOrdinal should prevent that
-            data[i] = val;
+    public void mapWithPalette(DataArray data, int[] paletteToOrdinal) {
+        for (int i = 0; i < DataArray.CHUNK_SECTION_SIZE; i++) {
+            int paletteVal = data.getAt(i);
+            int val = paletteToOrdinal[paletteVal];
+            assert val != -1; // paletteToOrdinal should prevent that
+            data.setAt(i, val);
         }
     }
 

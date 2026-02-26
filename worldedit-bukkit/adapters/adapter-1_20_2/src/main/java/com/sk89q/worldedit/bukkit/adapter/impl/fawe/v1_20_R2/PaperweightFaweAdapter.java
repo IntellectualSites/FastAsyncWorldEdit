@@ -405,21 +405,21 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
     }
 
     public BlockState adapt(net.minecraft.world.level.block.state.BlockState blockState) {
-        return BlockTypesCache.states[adaptToChar(blockState)];
+        return BlockTypesCache.states[adaptToOrdinal(blockState)];
     }
 
-    public char adaptToChar(net.minecraft.world.level.block.state.BlockState blockState) {
+    public int adaptToOrdinal(net.minecraft.world.level.block.state.BlockState blockState) {
         int id = Block.BLOCK_STATE_REGISTRY.getId(blockState);
         if (initialised) {
-            return (char) ibdToOrdinal[id];
+            return ibdToOrdinal[id];
         }
         synchronized (this) {
             if (initialised) {
-                return (char) ibdToOrdinal[id];
+                return ibdToOrdinal[id];
             }
             try {
                 init();
-                return (char) ibdToOrdinal[id];
+                return ibdToOrdinal[id];
             } catch (ArrayIndexOutOfBoundsException e1) {
                 LOGGER.error("Attempted to convert {} with ID {} to char. ibdToOrdinal length: {}. Defaulting to air!",
                         blockState.getBlock(), Block.BLOCK_STATE_REGISTRY.getId(blockState), ibdToOrdinal.length, e1
@@ -429,16 +429,16 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
         }
     }
 
-    public char ibdIDToOrdinal(int id) {
+    public int ibdIDToOrdinal(int id) {
         if (initialised) {
-            return (char) ibdToOrdinal[id];
+            return ibdToOrdinal[id];
         }
         synchronized (this) {
             if (initialised) {
-                return (char) ibdToOrdinal[id];
+                return ibdToOrdinal[id];
             }
             init();
-            return (char) ibdToOrdinal[id];
+            return ibdToOrdinal[id];
         }
     }
 

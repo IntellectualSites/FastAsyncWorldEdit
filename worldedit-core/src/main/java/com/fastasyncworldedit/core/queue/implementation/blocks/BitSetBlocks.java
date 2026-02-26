@@ -67,14 +67,14 @@ public class BitSetBlocks implements IChunkSet {
     }
 
     @Override
-    public void setBlocks(int layer, char[] data) {
+    public void setBlocks(int layer, final DataArray data) {
         layer -= minSectionPosition;
         row.reset(layer);
         int by = layer << 4;
         for (int y = 0, index = 0; y < 16; y++) {
             for (int z = 0; z < 16; z++) {
                 for (int x = 0; x < 16; x++, index++) {
-                    if (data[index] != BlockTypesCache.ReservedIDs.__RESERVED__) {
+                    if (data.getAt(index) != BlockTypesCache.ReservedIDs.__RESERVED__) {
                         row.set(null, x, by + y, z, minSectionPosition, maxSectionPosition);
                     }
                 }
@@ -137,9 +137,9 @@ public class BitSetBlocks implements IChunkSet {
     }
 
     @Override
-    public char[] load(int layer) {
+    public DataArray load(int layer) {
         layer -= minSectionPosition;
-        char[] arr = FaweCache.INSTANCE.SECTION_BITS_TO_CHAR.get();
+        DataArray array = DataArray.createEmpty();
         MemBlockSet.IRow nullRowY = row.getRow(layer);
         if (nullRowY instanceof MemBlockSet.RowY rowY) {
             char value = blockState.getOrdinalChar();
@@ -149,14 +149,14 @@ public class BitSetBlocks implements IChunkSet {
                     long bitBuffer = bits[longIndex];
                     if (bitBuffer != 0) {
                         if (bitBuffer == -1L) {
-                            Arrays.fill(arr, blockIndex, blockIndex + 64, value);
+                            array.setRange(blockIndex, blockIndex + 64, value);
                             continue;
                         }
-                        Arrays.fill(arr, Character.MIN_VALUE);
+                        array.setAll(Character.MIN_VALUE);
                         do {
                             final long lowBit = Long.lowestOneBit(bitBuffer);
                             final int bitIndex = Long.bitCount(lowBit - 1);
-                            arr[blockIndex + bitIndex] = value;
+                            array.setAt(blockIndex + bitIndex, value);
                             bitBuffer = bitBuffer ^ lowBit;
                         } while (bitBuffer != 0);
                     }
@@ -164,13 +164,13 @@ public class BitSetBlocks implements IChunkSet {
                 }
             }
         }
-        return arr;
+        return array;
     }
 
     // No need to do anything different
     @Nullable
     @Override
-    public char[] loadIfPresent(final int layer) {
+    public DataArray loadIfPresent(final int layer) {
         return load(layer);
     }
 

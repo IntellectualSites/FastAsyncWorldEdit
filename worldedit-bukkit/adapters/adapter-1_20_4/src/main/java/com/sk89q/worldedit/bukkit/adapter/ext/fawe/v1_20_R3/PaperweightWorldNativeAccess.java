@@ -38,9 +38,9 @@ import org.bukkit.craftbukkit.v1_20_R3.block.data.CraftBlockData;
 import org.bukkit.event.block.BlockPhysicsEvent;
 import org.enginehub.linbus.tree.LinCompoundTag;
 
-import javax.annotation.Nullable;
 import java.lang.ref.WeakReference;
 import java.util.Objects;
+import javax.annotation.Nullable;
 
 public class PaperweightWorldNativeAccess implements WorldNativeAccess<LevelChunk, net.minecraft.world.level.block.state.BlockState, BlockPos> {
     private static final int UPDATE = 1;

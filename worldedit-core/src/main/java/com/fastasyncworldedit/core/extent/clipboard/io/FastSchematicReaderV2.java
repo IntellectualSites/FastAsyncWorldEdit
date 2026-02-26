@@ -76,8 +76,8 @@ public class FastSchematicReaderV2 extends NBTSchematicReader {
     private int offsetX;
     private int offsetY;
     private int offsetZ;
-    private char[] palette;
-    private char[] biomePalette;
+    private int[] palette;
+    private int[] biomePalette;
     private BlockVector3 min = BlockVector3.ZERO;
     private boolean brokenEntities = false;
     private boolean isWorldEdit = false;
@@ -167,7 +167,7 @@ public class FastSchematicReaderV2 extends NBTSchematicReader {
 
         StreamDelegate paletteDelegate = schematic.add("Palette");
         paletteDelegate.withValue((ValueReader<Map<String, Object>>) (ignore, v) -> {
-            palette = new char[v.size()];
+            palette = new int[v.size()];
             for (Entry<String, Object> entry : v.entrySet()) {
                 BlockState state;
                 String palettePart = fix(entry.getKey());
@@ -178,7 +178,7 @@ public class FastSchematicReaderV2 extends NBTSchematicReader {
                     state = BlockTypes.AIR.getDefaultState();
                 }
                 int index = (int) entry.getValue();
-                palette[index] = (char) state.getOrdinal();
+                palette[index] = state.getOrdinal();
             }
         });
         StreamDelegate blockData = schematic.add("BlockData");
@@ -203,7 +203,7 @@ public class FastSchematicReaderV2 extends NBTSchematicReader {
 
         StreamDelegate biomePaletteDelegate = schematic.add("BiomePalette");
         biomePaletteDelegate.withValue((ValueReader<Map<String, Object>>) (ignore, v) -> {
-            biomePalette = new char[v.size()];
+            biomePalette = new int[v.size()];
             for (Entry<String, Object> entry : v.entrySet()) {
                 BiomeType biome = null;
                 try {
@@ -230,7 +230,7 @@ public class FastSchematicReaderV2 extends NBTSchematicReader {
     }
 
     private BiomeType getBiomeType(FaweInputStream fis) throws IOException {
-        char biomeId = biomePalette[fis.readVarInt()];
+        int biomeId = biomePalette[fis.readVarInt()];
         return BiomeTypes.get(biomeId);
     }
 

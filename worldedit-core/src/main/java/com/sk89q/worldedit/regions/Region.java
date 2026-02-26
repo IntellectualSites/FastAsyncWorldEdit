@@ -29,6 +29,7 @@ import com.fastasyncworldedit.core.queue.IBatchProcessor;
 import com.fastasyncworldedit.core.queue.IChunk;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.IChunkSet;
+import com.fastasyncworldedit.core.queue.implementation.blocks.DataArray;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extent.Extent;
@@ -416,20 +417,11 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
                 int ty = by + 15;
                 if (!containsEntireCuboid(bx, tx, by, ty, bz, tz)) {
                     processExtra = true;
-                    char[] arr = set.loadIfPresent(layer);
+                    DataArray arr = set.loadIfPresent(layer);
                     if (arr == null) {
                         continue;
                     }
-                    for (int y = 0, index = 0; y < 16; y++) {
-                        for (int z = 0; z < 16; z++) {
-                            for (int x = 0; x < 16; x++, index++) {
-                                if (arr[index] != BlockTypesCache.ReservedIDs.__RESERVED__ && !contains(bx + x, by + y, bz + z)) {
-                                    arr[index] = BlockTypesCache.ReservedIDs.__RESERVED__;
-                                }
-                            }
-                        }
-                    }
-                    set.setBlocks(layer, arr);
+                    processCuboid(set, layer, arr);
                 }
             }
             if (processExtra) {
@@ -440,6 +432,19 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
         } else {
             return null;
         }
+    }
+
+    private void processCuboid(IChunkSet set, int layer, DataArray dataArray) {
+        for (int y = 0, index = 0; y < 16; y++) {
+            for (int z = 0; z < 16; z++) {
+                for (int x = 0; x < 16; x++, index++) {
+                    if (dataArray.getAt(index) != BlockTypesCache.ReservedIDs.__RESERVED__ && !contains(x, y, z)) {
+                        dataArray.setAt(index, BlockTypesCache.ReservedIDs.__RESERVED__);
+                    }
+                }
+            }
+        }
+        set.setBlocks(layer, dataArray);
     }
 
     /**
@@ -468,24 +473,11 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
                 int by = layer << 4;
                 int ty = by + 15;
                 if (containsEntireCuboid(bx, tx, by, ty, bz, tz)) {
-                    set.setBlocks(layer, FaweCache.INSTANCE.EMPTY_CHAR_4096);
+                    set.setBlocks(layer, FaweCache.INSTANCE.EMPTY_DATA);
                     processExtra = true;
                     continue;
                 }
-                char[] arr = set.load(layer);
-                for (int y = 0, index = 0; y < 16; y++) {
-                    for (int z = 0; z < 16; z++) {
-                        for (int x = 0; x < 16; x++, index++) {
-                            if (arr[index] != BlockTypesCache.ReservedIDs.__RESERVED__ && contains(x, y, z)) {
-                                arr[index] = BlockTypesCache.ReservedIDs.__RESERVED__;
-                                processExtra = true;
-                            }
-                        }
-                    }
-                }
-                if (processExtra) {
-                    set.setBlocks(layer, arr);
-                }
+                processExtra = processPartial(set, processExtra, layer, set.load(layer));
             }
             if (processExtra) {
                 BlockVector3 chunkPos = chunk.getChunkBlockCoord().withY(0);
@@ -495,6 +487,23 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
         } else {
             return set;
         }
+    }
+
+    private boolean processPartial(IChunkSet set, boolean processExtra, int layer, DataArray arr) {
+        for (int y = 0, index = 0; y < 16; y++) {
+            for (int z = 0; z < 16; z++) {
+                for (int x = 0; x < 16; x++, index++) {
+                    if (arr.getAt(index) != BlockTypesCache.ReservedIDs.__RESERVED__ && contains(x, y, z)) {
+                        arr.setAt(index, BlockTypesCache.ReservedIDs.__RESERVED__);
+                        processExtra = true;
+                    }
+                }
+            }
+        }
+        if (processExtra) {
+            set.setBlocks(layer, arr);
+        }
+        return processExtra;
     }
 
     @Override

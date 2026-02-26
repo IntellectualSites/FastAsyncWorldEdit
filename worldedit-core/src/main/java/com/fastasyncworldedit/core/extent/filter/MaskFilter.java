@@ -9,10 +9,9 @@ import com.fastasyncworldedit.core.internal.simd.VectorizedMask;
 import com.fastasyncworldedit.core.queue.Filter;
 import com.sk89q.worldedit.function.mask.AbstractExtentMask;
 import com.sk89q.worldedit.function.mask.Mask;
-import jdk.incubator.vector.ShortVector;
+import jdk.incubator.vector.IntVector;
 import jdk.incubator.vector.VectorMask;
 import jdk.incubator.vector.VectorOperators;
-import jdk.incubator.vector.VectorSpecies;
 
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -69,7 +68,7 @@ public class MaskFilter<T extends Filter> extends DelegateFilter<T> {
         return new MaskFilter<>(getParent().fork(), mask.copy(), changes);
     }
 
-    public static class VectorizedMaskFilter<T extends VectorizedFilter> extends MaskFilter<T> implements VectorizedFilter {
+    public static class VectorizedMaskFilter<T extends VectorizedFilter, V> extends MaskFilter<T> implements VectorizedFilter {
 
         private final VectorizedMask vectorizedMask;
 
@@ -84,14 +83,14 @@ public class MaskFilter<T extends Filter> extends DelegateFilter<T> {
         }
 
         @Override
-        public void applyVector(final VectorFacade get, final VectorFacade set, final VectorMask<Short> mask) {
-            final T parent = getParent();
-            final VectorSpecies<Short> species = mask.vectorSpecies();
-            VectorMask<Short> masked = this.vectorizedMask.compareVector(set, get, species);
-            ShortVector before = set.getOrZero(masked.vectorSpecies());
+        public void applyVector(final VectorFacade get, final VectorFacade set, final VectorMask<Integer> mask) {
+            T parent = getParent();
+            var species = mask.vectorSpecies();
+            var masked = this.vectorizedMask.compareVector(set, get, species);
+            IntVector before = set.getOrZero(masked.vectorSpecies());
             parent.applyVector(get, set, mask.and(masked));
-            ShortVector after = set.getOrZero(masked.vectorSpecies());
-            VectorMask<Short> changed = after.compare(VectorOperators.NE, before);
+            IntVector after = set.getOrZero(masked.vectorSpecies());
+            var changed = after.compare(VectorOperators.NE, before);
             this.changes.getAndAdd(changed.trueCount());
         }
 

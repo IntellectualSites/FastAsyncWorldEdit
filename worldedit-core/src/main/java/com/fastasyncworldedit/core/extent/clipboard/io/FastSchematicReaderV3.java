@@ -8,7 +8,6 @@ import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.fastasyncworldedit.core.util.IOUtil;
 import com.fastasyncworldedit.core.util.MathMan;
-import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.NBTConstants;
 import com.sk89q.jnbt.NBTInputStream;
 import com.sk89q.jnbt.NBTOutputStream;
@@ -553,12 +552,12 @@ public class FastSchematicReaderV3 implements ClipboardReader {
         int i = 0;
         if (needsVarIntReading(length)) {
             for (var iter = new VarIntStreamIterator(stream, length); iter.hasNext(); i++) {
-                applier.apply(i, (char) iter.nextInt());
+                applier.apply(i, iter.nextInt());
             }
             return;
         }
         while (i < length) {
-            applier.apply(i++, (char) stream.readUnsignedByte());
+            applier.apply(i++, stream.readUnsignedByte());
         }
     }
 
@@ -819,7 +818,7 @@ public class FastSchematicReaderV3 implements ClipboardReader {
          * @param index   The index of this data entry (due to var-int behaviour not necessarily the index in the data byte array).
          * @param ordinal The ordinal of this entry as defined in the palette mapping.
          */
-        void apply(int index, char ordinal);
+        void apply(int index, int ordinal);
 
     }
 

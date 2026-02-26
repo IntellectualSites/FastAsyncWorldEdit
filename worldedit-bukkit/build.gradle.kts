@@ -129,7 +129,7 @@ dependencies {
     compileOnly(libs.residence) { isTransitive = false }
     compileOnly(libs.towny) { isTransitive = false }
     compileOnly(libs.plotsquared.bukkit) { isTransitive = false }
-    compileOnly(libs.plotsquared.core) { isTransitive = false }
+    compileOnly(libs.plotsquared.core)
 
     // Third party
     implementation(libs.serverlib)
@@ -138,7 +138,7 @@ dependencies {
     api(libs.sparsebitset) { isTransitive = false }
     api(libs.parallelgzip) { isTransitive = false }
     compileOnly(libs.adventureApi)
-    compileOnlyApi(libs.checkerqual)
+    compileOnly(libs.checkerqual)
 
     // Tests
     testImplementation(libs.mockito.core)

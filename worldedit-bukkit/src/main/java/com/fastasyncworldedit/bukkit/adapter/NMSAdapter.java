@@ -5,6 +5,7 @@ import com.fastasyncworldedit.core.FAWEPlatformAdapterImpl;
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.math.IntPair;
 import com.fastasyncworldedit.core.queue.IChunkGet;
+import com.fastasyncworldedit.core.queue.implementation.blocks.DataArray;
 import com.fastasyncworldedit.core.util.MathMan;
 import com.fastasyncworldedit.core.util.ReflectionUtils;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
@@ -19,12 +20,12 @@ public class NMSAdapter implements FAWEPlatformAdapterImpl {
             int[] blockToPalette,
             int[] paletteToBlock,
             int[] blocksCopy,
-            char[] set,
+            DataArray set,
             CachedBukkitAdapter adapter
     ) {
         int numPaletteEntries = 0;
         for (int i = 0; i < 4096; i++) {
-            int ordinal = set[i];
+            int ordinal = set.getAt(i);
             ordinal = Math.max(ordinal, BlockTypesCache.ReservedIDs.AIR);
             int palette = blockToPalette[ordinal];
             if (palette == Integer.MAX_VALUE) {
@@ -43,22 +44,22 @@ public class NMSAdapter implements FAWEPlatformAdapterImpl {
             int[] blockToPalette,
             int[] paletteToBlock,
             int[] blocksCopy,
-            IntFunction<char[]> get,
-            char[] set,
+            IntFunction<DataArray> get,
+            DataArray set,
             CachedBukkitAdapter adapter
     ) {
         int numPaletteEntries = 0;
-        char[] getArr = null;
+        DataArray getArr = null;
         for (int i = 0; i < 4096; i++) {
-            char ordinal = set[i];
+            int ordinal = set.getAt(i);
             if (ordinal == BlockTypesCache.ReservedIDs.__RESERVED__) {
                 if (getArr == null) {
                     getArr = get.apply(layer);
                 }
-                ordinal = getArr[i];
+                ordinal = getArr.getAt(i);
                 // write to set array as this should be a copied array, and will be important when the changes are written
                 // to the GET chunk cached by FAWE. Future dords, actually read this comment please.
-                set[i] = (char) Math.max(ordinal, BlockTypesCache.ReservedIDs.AIR);
+                set.setAt(i, Math.max(ordinal, BlockTypesCache.ReservedIDs.AIR));
             }
             int palette = blockToPalette[ordinal];
             if (palette == Integer.MAX_VALUE) {
@@ -76,7 +77,7 @@ public class NMSAdapter implements FAWEPlatformAdapterImpl {
             int[] blockToPalette,
             int[] paletteToBlock,
             int[] blocksCopy,
-            char[] set,
+            DataArray set,
             CachedBukkitAdapter adapter,
             int numPaletteEntries
     ) {
@@ -89,7 +90,7 @@ public class NMSAdapter implements FAWEPlatformAdapterImpl {
         int oldVal = blockToPalette[BlockTypesCache.ReservedIDs.__RESERVED__];
         blockToPalette[BlockTypesCache.ReservedIDs.__RESERVED__] = blockToPalette[BlockTypesCache.ReservedIDs.AIR];
         for (int i = 0; i < 4096; i++) {
-            int ordinal = set[i];
+            int ordinal = set.getAt(i);
             int palette = blockToPalette[ordinal];
             blocksCopy[i] = palette;
         }

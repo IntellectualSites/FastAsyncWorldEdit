@@ -2,6 +2,7 @@ package com.fastasyncworldedit.core;
 
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.configuration.Settings;
+import com.fastasyncworldedit.core.extent.filter.block.DataArrayFilterBlock;
 import com.fastasyncworldedit.core.internal.exception.FaweBlockBagException;
 import com.fastasyncworldedit.core.internal.exception.FaweException;
 import com.fastasyncworldedit.core.internal.exception.FaweException.Type;
@@ -13,6 +14,7 @@ import com.fastasyncworldedit.core.queue.IChunkSet;
 import com.fastasyncworldedit.core.queue.Pool;
 import com.fastasyncworldedit.core.queue.Trimable;
 import com.fastasyncworldedit.core.queue.implementation.QueuePool;
+import com.fastasyncworldedit.core.queue.implementation.blocks.DataArray;
 import com.fastasyncworldedit.core.util.MathMan;
 import com.fastasyncworldedit.core.util.collection.CleanableThreadLocal;
 import com.fastasyncworldedit.core.util.task.FaweBasicThreadFactory;
@@ -75,7 +77,10 @@ public enum FaweCache implements Trimable {
 
     public final int BLOCKS_PER_LAYER = 4096;
 
-    public final char[] EMPTY_CHAR_4096 = new char[4096];
+    /**
+     * @since TODO
+     */
+    public final DataArray EMPTY_DATA = DataArray.EMPTY;
 
     private final IdentityHashMap<Class<? extends IChunkSet>, Pool<? extends IChunkSet>> REGISTERED_POOLS = new IdentityHashMap<>();
 
@@ -93,6 +98,7 @@ public enum FaweCache implements Trimable {
         SECTION_BLOCKS.clean();
         PALETTE_CACHE.clean();
         PALETTE_TO_BLOCK_CHAR.clean();
+        PALETTE_TO_BLOCK_INT.clean();
         INDEX_STORE.clean();
 
         MUTABLE_VECTOR3.clean();
@@ -144,9 +150,9 @@ public enum FaweCache implements Trimable {
      * from the main thread, it will return a {@link Function} referencing the {@link LoadingCache} returned by
      * {@link FaweCache#createCache(Supplier)}. If it is called from the main thread, it will return a {@link Function} that
      * will always return the result of the given {@link Supplier}. It is designed to prevent issues caused by
-     * internally-mutable and resettable classes such as {@link com.fastasyncworldedit.core.extent.filter.block.CharFilterBlock}
+     * internally-mutable and resettable classes such as {@link DataArrayFilterBlock}
      * from causing issues when used in edits on the main thread.
-     *
+     * <p>
      * This method is designed for specific internal use.
      *
      * @param withInitial The supplier used to determine the initial value if a thread cache is created, else to provide a new
@@ -262,8 +268,12 @@ public enum FaweCache implements Trimable {
     public final CleanableThreadLocal<char[]> PALETTE_TO_BLOCK_CHAR = new CleanableThreadLocal<>(
             () -> new char[Character.MAX_VALUE + 1], a -> {
         Arrays.fill(a, Character.MAX_VALUE);
-    }
-    );
+    });
+
+    public final CleanableThreadLocal<int[]> PALETTE_TO_BLOCK_INT = new CleanableThreadLocal<>(
+            () -> new int[Character.MAX_VALUE + 1], a -> {
+        Arrays.fill(a, Integer.MAX_VALUE);
+    });
 
     public final CleanableThreadLocal<long[]> BLOCK_STATES = new CleanableThreadLocal<>(() -> new long[2048]);
 
@@ -296,21 +306,10 @@ public enum FaweCache implements Trimable {
 
     /**
      * Convert raw char array to palette
+     *
      * @return palette
      */
-    public Palette toPalette(int layerOffset, char[] blocks) {
-        return toPalette(layerOffset, null, blocks);
-    }
-
-    /**
-     * Convert raw int array to palette
-     * @return palette
-     */
-    public Palette toPalette(int layerOffset, int[] blocks) {
-        return toPalette(layerOffset, blocks, null);
-    }
-
-    private Palette toPalette(int layerOffset, int[] blocksInts, char[] blocksChars) {
+    public Palette toPalette(int layerOffset, DataArray blocks) {
         int[] blockToPalette = BLOCK_TO_PALETTE.get();
         int[] paletteToBlock = PALETTE_TO_BLOCK.get();
         long[] blockStates = BLOCK_STATES.get();
@@ -320,31 +319,15 @@ public enum FaweCache implements Trimable {
             int num_palette = 0;
             int blockIndexStart = layerOffset << 12;
             int blockIndexEnd = blockIndexStart + 4096;
-            if (blocksChars != null) {
-                for (int i = blockIndexStart, j = 0; i < blockIndexEnd; i++, j++) {
-                    int ordinal = blocksChars[i];
-                    int palette = blockToPalette[ordinal];
-                    if (palette == Integer.MAX_VALUE) {
-                        blockToPalette[ordinal] = palette = num_palette;
-                        paletteToBlock[num_palette] = ordinal;
-                        num_palette++;
-                    }
-                    blocksCopy[j] = palette;
+            for (int i = blockIndexStart, j = 0; i < blockIndexEnd; i++, j++) {
+                int ordinal = blocks.getAt(i);
+                int palette = blockToPalette[ordinal];
+                if (palette == Integer.MAX_VALUE) {
+                    blockToPalette[ordinal] = palette = num_palette;
+                    paletteToBlock[num_palette] = ordinal;
+                    num_palette++;
                 }
-            } else if (blocksInts != null) {
-                for (int i = blockIndexStart, j = 0; i < blockIndexEnd; i++, j++) {
-                    int ordinal = blocksInts[i];
-                    int palette = blockToPalette[ordinal];
-                    if (palette == Integer.MAX_VALUE) {
-//                        BlockState state = BlockTypesCache.states[ordinal];
-                        blockToPalette[ordinal] = palette = num_palette;
-                        paletteToBlock[num_palette] = ordinal;
-                        num_palette++;
-                    }
-                    blocksCopy[j] = palette;
-                }
-            } else {
-                throw new IllegalArgumentException();
+                blocksCopy[j] = palette;
             }
 
             for (int i = 0; i < num_palette; i++) {
@@ -390,11 +373,7 @@ public enum FaweCache implements Trimable {
      *
      * @return palette
      */
-    public Palette toPaletteUnstretched(int layerOffset, char[] blocks) {
-        return toPaletteUnstretched(layerOffset, null, blocks);
-    }
-
-    private Palette toPaletteUnstretched(int layerOffset, int[] blocksInts, char[] blocksChars) {
+    public Palette toPaletteUnstretched(int layerOffset, DataArray blocks) {
         int[] blockToPalette = BLOCK_TO_PALETTE.get();
         int[] paletteToBlock = PALETTE_TO_BLOCK.get();
         long[] blockStates = BLOCK_STATES.get();
@@ -404,31 +383,15 @@ public enum FaweCache implements Trimable {
             int num_palette = 0;
             int blockIndexStart = layerOffset << 12;
             int blockIndexEnd = blockIndexStart + 4096;
-            if (blocksChars != null) {
-                for (int i = blockIndexStart, j = 0; i < blockIndexEnd; i++, j++) {
-                    int ordinal = blocksChars[i];
-                    int palette = blockToPalette[ordinal];
-                    if (palette == Integer.MAX_VALUE) {
-                        blockToPalette[ordinal] = palette = num_palette;
-                        paletteToBlock[num_palette] = ordinal;
-                        num_palette++;
-                    }
-                    blocksCopy[j] = palette;
+            for (int i = blockIndexStart, j = 0; i < blockIndexEnd; i++, j++) {
+                int ordinal = blocks.getAt(i);
+                int palette = blockToPalette[ordinal];
+                if (palette == Integer.MAX_VALUE) {
+                    blockToPalette[ordinal] = palette = num_palette;
+                    paletteToBlock[num_palette] = ordinal;
+                    num_palette++;
                 }
-            } else if (blocksInts != null) {
-                for (int i = blockIndexStart, j = 0; i < blockIndexEnd; i++, j++) {
-                    int ordinal = blocksInts[i];
-                    int palette = blockToPalette[ordinal];
-                    if (palette == Integer.MAX_VALUE) {
-                        //                        BlockState state = BlockTypesCache.states[ordinal];
-                        blockToPalette[ordinal] = palette = num_palette;
-                        paletteToBlock[num_palette] = ordinal;
-                        num_palette++;
-                    }
-                    blocksCopy[j] = palette;
-                }
-            } else {
-                throw new IllegalArgumentException();
+                blocksCopy[j] = palette;
             }
 
             for (int i = 0; i < num_palette; i++) {
