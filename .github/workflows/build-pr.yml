@@ -17,7 +17,7 @@ jobs:
         with:
           distribution: temurin
           cache: gradle
-          java-version: 21
+          java-version: 25
       - name: Build on ${{ matrix.os }}
         run: ./gradlew build -s
       - name: Archive artifacts

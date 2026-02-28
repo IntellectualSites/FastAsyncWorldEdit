@@ -39,6 +39,7 @@ vault = "1.7.1"
 serverlib = "2.3.7"
 linbus = "0.2.0"
 autoService = "1.1.1"
+guice = "7.0.0"
 
 ## Internal
 text-adapter = "3.0.6"
@@ -124,6 +125,8 @@ linBus-common = { group = "org.enginehub.lin-bus", name = "lin-bus-common" }
 linBus-stream = { group = "org.enginehub.lin-bus", name = "lin-bus-stream" }
 linBus-tree = { group = "org.enginehub.lin-bus", name = "lin-bus-tree" }
 linBus-format-snbt = { group = "org.enginehub.lin-bus.format", name = "lin-bus-format-snbt" }
+
+guice = { group = "com.google.inject", name = "guice", version.ref = "guice" }
 
 # Internal
 ## Text
