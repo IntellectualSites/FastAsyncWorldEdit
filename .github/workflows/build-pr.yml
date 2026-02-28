@@ -21,7 +21,7 @@ jobs:
       - name: Build on ${{ matrix.os }}
         run: ./gradlew build -s
       - name: Archive artifacts
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         if: ${{ matrix.os == 'ubuntu-latest' }} # only upload once, use linux builds
         with:
             name: FastAsyncWorldEdit-SNAPSHOT
