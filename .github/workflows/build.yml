@@ -67,7 +67,7 @@ jobs:
           target-branch: main
           target-directory: worldedit-bukkit
       - name: Archive Artifacts
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: FastAsyncWorldEdit-Bukkit-SNAPSHOT
           path: worldedit-bukkit/build/libs/FastAsyncWorldEdit-*.jar
