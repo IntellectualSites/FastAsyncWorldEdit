@@ -3,7 +3,6 @@ package com.sk89q.worldedit.nukkitmot;
 import cn.nukkit.block.Block;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.level.Level;
-import cn.nukkit.level.format.ChunkSection;
 import cn.nukkit.level.format.generic.BaseFullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 import com.fastasyncworldedit.core.extent.processor.heightmap.HeightMapType;
@@ -22,14 +21,18 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
+import org.enginehub.linbus.tree.LinCompoundTag;
+import org.enginehub.linbus.tree.LinStringTag;
+import org.enginehub.linbus.tree.LinTagType;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -43,24 +46,26 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class NukkitGetBlocks extends CharGetBlocks {
 
-    private static final int MIN_Y = -64;
-    private static final int MAX_Y = 319;
     private static final int WATER_ID = 8;
     private static final int STILL_WATER_ID = 9;
 
     private final Level level;
     private final int chunkX;
     private final int chunkZ;
+    private final int minY;
+    private final int maxY;
     private final ReentrantLock callLock = new ReentrantLock();
     private final ConcurrentHashMap<Integer, IChunkGet> copies = new ConcurrentHashMap<>();
     private boolean createCopy = false;
     private int copyKey = 0;
 
     public NukkitGetBlocks(Level level, int chunkX, int chunkZ) {
-        super(MIN_Y >> 4, MAX_Y >> 4);
+        super(level.getMinBlockY() >> 4, level.getMaxBlockY() >> 4);
         this.level = level;
         this.chunkX = chunkX;
         this.chunkZ = chunkZ;
+        this.minY = level.getMinBlockY();
+        this.maxY = level.getMaxBlockY();
     }
 
     @Override
@@ -158,7 +163,7 @@ public class NukkitGetBlocks extends CharGetBlocks {
         // Create snapshot copy for undo if requested
         NukkitGetBlocks_Copy copy = null;
         if (createCopy) {
-            copy = new NukkitGetBlocks_Copy(chunkX, chunkZ);
+            copy = new NukkitGetBlocks_Copy(chunkX, chunkZ, minY, maxY);
             for (int layer = set.getMinSectionPosition(); layer <= set.getMaxSectionPosition(); layer++) {
                 if (!set.hasSection(layer)) {
                     continue;
@@ -277,6 +282,49 @@ public class NukkitGetBlocks extends CharGetBlocks {
             }
         }
 
+        // Apply entity removals
+        Set<UUID> entityRemoves = set.getEntityRemoves();
+        if (entityRemoves != null && !entityRemoves.isEmpty()) {
+            Map<Long, cn.nukkit.entity.Entity> chunkEntities = level.getChunkEntities(chunkX, chunkZ);
+            Set<UUID> entitiesRemoved = new HashSet<>();
+            for (cn.nukkit.entity.Entity entity : chunkEntities.values()) {
+                if (entity instanceof cn.nukkit.Player) {
+                    continue;
+                }
+                if (entityRemoves.contains(entity.getUniqueId())) {
+                    if (copy != null) {
+                        copy.storeEntity(entity);
+                    }
+                    entity.close();
+                    entitiesRemoved.add(entity.getUniqueId());
+                }
+            }
+            set.getEntityRemoves().clear();
+            set.getEntityRemoves().addAll(entitiesRemoved);
+        }
+
+        // Apply entity creations
+        Collection<FaweCompoundTag> setEntities = set.entities();
+        if (setEntities != null && !setEntities.isEmpty()) {
+            for (FaweCompoundTag nativeTag : setEntities) {
+                LinCompoundTag linTag = nativeTag.linTag();
+                LinStringTag idTag = linTag.findTag("Id", LinTagType.stringTag());
+                if (idTag == null) {
+                    idTag = linTag.findTag("id", LinTagType.stringTag());
+                }
+                if (idTag == null) {
+                    continue;
+                }
+                CompoundTag nukkitNbt = NukkitNbtConverter.toNukkit(nativeTag);
+                cn.nukkit.entity.Entity created = cn.nukkit.entity.Entity.createEntity(
+                        idTag.value(), chunk, nukkitNbt
+                );
+                if (created != null) {
+                    created.spawnToAll();
+                }
+            }
+        }
+
         // Store copy for undo
         if (copy != null) {
             copies.put(copyKey, copy);
@@ -350,17 +398,50 @@ public class NukkitGetBlocks extends CharGetBlocks {
 
     @Override
     public Collection<FaweCompoundTag> entities() {
-        return Collections.emptyList();
+        Map<Long, cn.nukkit.entity.Entity> chunkEntities = level.getChunkEntities(chunkX, chunkZ);
+        if (chunkEntities.isEmpty()) {
+            return Collections.emptyList();
+        }
+        List<FaweCompoundTag> result = new ArrayList<>();
+        for (cn.nukkit.entity.Entity entity : chunkEntities.values()) {
+            if (entity instanceof cn.nukkit.Player) {
+                continue;
+            }
+            entity.saveNBT();
+            result.add(NukkitNbtConverter.toFawe(entity.namedTag));
+        }
+        return result;
     }
 
     @Override
     public Set<Entity> getFullEntities() {
-        return Collections.emptySet();
+        Map<Long, cn.nukkit.entity.Entity> chunkEntities = level.getChunkEntities(chunkX, chunkZ);
+        if (chunkEntities.isEmpty()) {
+            return Collections.emptySet();
+        }
+        Set<Entity> result = new HashSet<>();
+        for (cn.nukkit.entity.Entity entity : chunkEntities.values()) {
+            if (entity instanceof cn.nukkit.Player) {
+                continue;
+            }
+            result.add(new NukkitEntity(entity));
+        }
+        return result;
     }
 
     @Nullable
     @Override
     public FaweCompoundTag entity(UUID uuid) {
+        Map<Long, cn.nukkit.entity.Entity> chunkEntities = level.getChunkEntities(chunkX, chunkZ);
+        for (cn.nukkit.entity.Entity entity : chunkEntities.values()) {
+            if (entity instanceof cn.nukkit.Player) {
+                continue;
+            }
+            if (uuid.equals(entity.getUniqueId())) {
+                entity.saveNBT();
+                return NukkitNbtConverter.toFawe(entity.namedTag);
+            }
+        }
         return null;
     }
 
@@ -415,12 +496,12 @@ public class NukkitGetBlocks extends CharGetBlocks {
 
     @Override
     public int getMaxY() {
-        return MAX_Y;
+        return maxY;
     }
 
     @Override
     public int getMinY() {
-        return MIN_Y;
+        return minY;
     }
 
 }

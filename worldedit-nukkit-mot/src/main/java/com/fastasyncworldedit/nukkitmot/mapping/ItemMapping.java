@@ -5,8 +5,7 @@ import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.sk89q.worldedit.nukkitmot.WorldEditNukkitPlugin;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,7 +22,6 @@ import java.util.Set;
  */
 public final class ItemMapping {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ItemMapping.class);
     private static final Gson GSON = new Gson();
 
     private static final Map<String, NukkitItemData> JE_TO_BE = new HashMap<>();
@@ -54,7 +52,7 @@ public final class ItemMapping {
             );
 
             JE_ITEM_IDS.addAll(mappings.keySet());
-            LOGGER.info("Loaded {} JE item IDs", JE_ITEM_IDS.size());
+            WorldEditNukkitPlugin.getInstance().getLogger().info("Loaded " + JE_ITEM_IDS.size() + " JE item IDs");
         } catch (IOException e) {
             throw new RuntimeException("Failed to load item IDs", e);
         }
@@ -89,7 +87,7 @@ public final class ItemMapping {
                 }
             });
 
-            LOGGER.info("Loaded {} item mappings", JE_TO_BE.size());
+            WorldEditNukkitPlugin.getInstance().getLogger().info("Loaded " + JE_TO_BE.size() + " item mappings");
         } catch (IOException e) {
             throw new RuntimeException("Failed to load item mapping", e);
         }

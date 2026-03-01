@@ -6,6 +6,7 @@ import com.fastasyncworldedit.core.queue.IChunk;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.IChunkSet;
 import com.fastasyncworldedit.core.queue.IQueueExtent;
+import com.fastasyncworldedit.nukkitmot.NukkitNbtConverter;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
@@ -14,11 +15,14 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import org.enginehub.linbus.tree.LinCompoundTag;
+import org.enginehub.linbus.tree.LinStringTag;
+import org.enginehub.linbus.tree.LinTagType;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -29,32 +33,37 @@ import java.util.concurrent.Future;
  */
 public class NukkitGetBlocks_Copy implements IChunkGet {
 
-    private static final int MIN_Y = -64;
-    private static final int MAX_Y = 319;
-    private static final int SECTION_COUNT = (MAX_Y >> 4) - (MIN_Y >> 4) + 1;
-
     private final int chunkX;
     private final int chunkZ;
+    private final int minY;
+    private final int maxY;
+    private final int minSectionPosition;
+    private final int sectionCount;
     private final char[][] blocks;
     private BiomeType[][] biomes;
     private final Map<BlockVector3, FaweCompoundTag> tiles = new HashMap<>();
+    private final Set<FaweCompoundTag> entities = new HashSet<>();
 
-    public NukkitGetBlocks_Copy(int chunkX, int chunkZ) {
+    public NukkitGetBlocks_Copy(int chunkX, int chunkZ, int minY, int maxY) {
         this.chunkX = chunkX;
         this.chunkZ = chunkZ;
-        this.blocks = new char[SECTION_COUNT][];
+        this.minY = minY;
+        this.maxY = maxY;
+        this.minSectionPosition = minY >> 4;
+        this.sectionCount = (maxY >> 4) - minSectionPosition + 1;
+        this.blocks = new char[sectionCount][];
     }
 
     protected void storeSection(int layer, char[] data) {
-        int index = layer - (MIN_Y >> 4);
+        int index = layer - minSectionPosition;
         blocks[index] = data;
     }
 
     protected void storeBiome(int x, int y, int z, BiomeType biome) {
         if (biomes == null) {
-            biomes = new BiomeType[SECTION_COUNT][];
+            biomes = new BiomeType[sectionCount][];
         }
-        int layer = (y >> 4) - (MIN_Y >> 4);
+        int layer = (y >> 4) - minSectionPosition;
         if (biomes[layer] == null) {
             biomes[layer] = new BiomeType[4096];
         }
@@ -66,8 +75,13 @@ public class NukkitGetBlocks_Copy implements IChunkGet {
         tiles.put(pos, tag);
     }
 
+    protected void storeEntity(cn.nukkit.entity.Entity entity) {
+        entity.saveNBT();
+        entities.add(NukkitNbtConverter.toFawe(entity.namedTag));
+    }
+
     private int layerIndex(int layer) {
-        return layer - (MIN_Y >> 4);
+        return layer - minSectionPosition;
     }
 
     @Override
@@ -96,8 +110,8 @@ public class NukkitGetBlocks_Copy implements IChunkGet {
         if (biomes == null) {
             return BiomeTypes.PLAINS;
         }
-        int layer = (y >> 4) - (MIN_Y >> 4);
-        if (layer < 0 || layer >= SECTION_COUNT || biomes[layer] == null) {
+        int layer = (y >> 4) - minSectionPosition;
+        if (layer < 0 || layer >= sectionCount || biomes[layer] == null) {
             return BiomeTypes.PLAINS;
         }
         int localY = y & 0xF;
@@ -109,7 +123,7 @@ public class NukkitGetBlocks_Copy implements IChunkGet {
     public BlockState getBlock(int x, int y, int z) {
         int layer = y >> 4;
         int index = layerIndex(layer);
-        if (index < 0 || index >= SECTION_COUNT || blocks[index] == null) {
+        if (index < 0 || index >= sectionCount || blocks[index] == null) {
             return BlockTypesCache.states[BlockTypesCache.ReservedIDs.AIR];
         }
         int localY = y & 0xF;
@@ -148,30 +162,41 @@ public class NukkitGetBlocks_Copy implements IChunkGet {
 
     @Override
     public Collection<FaweCompoundTag> entities() {
-        return Collections.emptyList();
+        return this.entities;
     }
 
     @Override
     public Set<Entity> getFullEntities() {
-        return Collections.emptySet();
+        throw new UnsupportedOperationException("Cannot get full entities from GET copy.");
     }
 
     @Nullable
     @Override
     public FaweCompoundTag entity(UUID uuid) {
+        for (FaweCompoundTag tag : entities) {
+            LinStringTag uuidTag = tag.linTag().findTag("uuid", LinTagType.stringTag());
+            if (uuidTag != null) {
+                try {
+                    if (uuid.equals(UUID.fromString(uuidTag.value()))) {
+                        return tag;
+                    }
+                } catch (IllegalArgumentException ignored) {
+                }
+            }
+        }
         return null;
     }
 
     @Override
     public boolean hasSection(int layer) {
         int index = layerIndex(layer);
-        return index >= 0 && index < SECTION_COUNT && blocks[index] != null;
+        return index >= 0 && index < sectionCount && blocks[index] != null;
     }
 
     @Override
     public char[] load(int layer) {
         int index = layerIndex(layer);
-        if (index < 0 || index >= SECTION_COUNT) {
+        if (index < 0 || index >= sectionCount) {
             return new char[4096];
         }
         if (blocks[index] == null) {
@@ -184,7 +209,7 @@ public class NukkitGetBlocks_Copy implements IChunkGet {
     @Override
     public char[] loadIfPresent(int layer) {
         int index = layerIndex(layer);
-        if (index < 0 || index >= SECTION_COUNT) {
+        if (index < 0 || index >= sectionCount) {
             return null;
         }
         return blocks[index];
@@ -218,27 +243,27 @@ public class NukkitGetBlocks_Copy implements IChunkGet {
 
     @Override
     public int getSectionCount() {
-        return SECTION_COUNT;
+        return sectionCount;
     }
 
     @Override
     public int getMinSectionPosition() {
-        return MIN_Y >> 4;
+        return minSectionPosition;
     }
 
     @Override
     public int getMaxSectionPosition() {
-        return MAX_Y >> 4;
+        return maxY >> 4;
     }
 
     @Override
     public int getMaxY() {
-        return MAX_Y;
+        return maxY;
     }
 
     @Override
     public int getMinY() {
-        return MIN_Y;
+        return minY;
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})

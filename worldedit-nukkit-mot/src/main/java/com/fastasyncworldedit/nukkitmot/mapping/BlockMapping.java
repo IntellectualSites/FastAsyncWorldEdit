@@ -1,6 +1,5 @@
 package com.fastasyncworldedit.nukkitmot.mapping;
 
-import cn.nukkit.block.Block;
 import cn.nukkit.level.format.leveldb.BlockStateMapping;
 import cn.nukkit.level.format.leveldb.NukkitLegacyMapper;
 import cn.nukkit.level.format.leveldb.structure.BlockStateSnapshot;
@@ -12,14 +11,13 @@ import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
+import com.sk89q.worldedit.nukkitmot.WorldEditNukkitPlugin;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import it.unimi.dsi.fastutil.ints.Int2CharOpenHashMap;
 import org.cloudburstmc.nbt.NbtMap;
 import org.cloudburstmc.nbt.NbtMapBuilder;
 import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,8 +37,6 @@ import java.util.TreeMap;
  * BlockStateMapping to convert BE identifier+state to legacy fullId.
  */
 public final class BlockMapping {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(BlockMapping.class);
 
     private static final Gson GSON = new GsonBuilder()
             .registerTypeAdapterFactory(new IgnoreFailureTypeAdapterFactory())
@@ -130,8 +126,7 @@ public final class BlockMapping {
             }
         }
 
-        LOGGER.info("Ordinal mappings built: {} mapped, {} unmapped out of {} total states",
-                mapped, unmapped, states.length);
+        WorldEditNukkitPlugin.getInstance().getLogger().info("Ordinal mappings built: " + mapped + " mapped, " + unmapped + " unmapped out of " + states.length + " total states");
     }
 
     /**
@@ -211,7 +206,7 @@ public final class BlockMapping {
     private static boolean initJeBlockDefaultProperties() {
         try (InputStream stream = BlockMapping.class.getClassLoader().getResourceAsStream("je_blocks.json")) {
             if (stream == null) {
-                LOGGER.error("je_blocks.json not found");
+                WorldEditNukkitPlugin.getInstance().getLogger().error("je_blocks.json not found");
                 return false;
             }
 
@@ -223,9 +218,9 @@ public final class BlockMapping {
                         (Map<String, String>) entry.getValue().get(1)
                 );
             }
-            LOGGER.info("Loaded {} JE block default properties", JE_BLOCK_DEFAULT_PROPERTIES.size());
+            WorldEditNukkitPlugin.getInstance().getLogger().info("Loaded " + JE_BLOCK_DEFAULT_PROPERTIES.size() + " JE block default properties");
         } catch (IOException e) {
-            LOGGER.error("Failed to load je_blocks.json", e);
+            WorldEditNukkitPlugin.getInstance().getLogger().error("Failed to load je_blocks.json: ", e);
             return false;
         }
         return true;
@@ -236,12 +231,12 @@ public final class BlockMapping {
         List<NbtMap> palette = NukkitLegacyMapper.loadBlockPalette();
         if (!palette.isEmpty()) {
             blockStateVersion = palette.getFirst().getInt("version");
-            LOGGER.info("Block state version: {}", blockStateVersion);
+            WorldEditNukkitPlugin.getInstance().getLogger().info("Block state version: " + blockStateVersion);
         }
 
         try (InputStream stream = BlockMapping.class.getClassLoader().getResourceAsStream("mapping/blocks.json")) {
             if (stream == null) {
-                LOGGER.error("blocks.json not found");
+                WorldEditNukkitPlugin.getInstance().getLogger().error("blocks.json not found");
                 return false;
             }
 
@@ -262,9 +257,9 @@ public final class BlockMapping {
                     failed++;
                 }
             }
-            LOGGER.info("Block state mapping loaded: {} mapped, {} failed", mapped, failed);
+            WorldEditNukkitPlugin.getInstance().getLogger().info("Block state mapping loaded: " + mapped + " mapped, " + failed + " failed");
         } catch (IOException e) {
-            LOGGER.error("Failed to load blocks.json", e);
+            WorldEditNukkitPlugin.getInstance().getLogger().error("Failed to load blocks.json: ", e);
             return false;
         }
         return true;

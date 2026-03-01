@@ -4,8 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.sk89q.worldedit.nukkitmot.WorldEditNukkitPlugin;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,7 +19,6 @@ import java.util.Objects;
  */
 public final class BiomeMapping {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(BiomeMapping.class);
     private static final Gson GSON = new Gson();
 
     private static final Map<String, Integer> JE_TO_BE = new HashMap<>();
@@ -46,7 +44,7 @@ public final class BiomeMapping {
                 BE_TO_JE.put(entry.bedrockId(), javaId);
             });
 
-            LOGGER.info("Loaded {} biome mappings", JE_TO_BE.size());
+            WorldEditNukkitPlugin.getInstance().getLogger().info("Loaded " + JE_TO_BE.size() + " biome mappings");
         } catch (IOException e) {
             throw new RuntimeException("Failed to load biome mapping", e);
         }
