@@ -24,6 +24,11 @@ limits:
   max-polygonal-points:
     default: -1
     maximum: 20
+  max-polyhedron-points:
+    default: -1
+    maximum: 20
+  vertical-height:
+    default: 256
   # radius, superpickaxe, brush radius are ignored, use FAWE config limits
   max-radius: -1
   max-super-pickaxe-size: 5
@@ -84,6 +89,7 @@ history:
 
 calculation:
   timeout: 100
+  max-timeout: 300
 
 debugging:
   trace-unflushed-sessions: false

@@ -17,11 +17,11 @@ jobs:
         with:
           distribution: temurin
           cache: gradle
-          java-version: 21
+          java-version: 25
       - name: Build on ${{ matrix.os }}
         run: ./gradlew build -s
       - name: Archive artifacts
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         if: ${{ matrix.os == 'ubuntu-latest' }} # only upload once, use linux builds
         with:
             name: FastAsyncWorldEdit-SNAPSHOT

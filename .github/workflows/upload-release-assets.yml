@@ -15,7 +15,7 @@ jobs:
         with:
           distribution: temurin
           cache: gradle
-          java-version: 21
+          java-version: 25
       - name: Clean Build
         run: ./gradlew clean build --no-daemon
       - name: Upload Release Assets

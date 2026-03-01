@@ -25,7 +25,7 @@ jobs:
         with:
           distribution: temurin
           cache: gradle
-          java-version: 21
+          java-version: 25
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v4
         with:

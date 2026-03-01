@@ -130,6 +130,7 @@ dependencies {
     compileOnly(libs.towny) { isTransitive = false }
     compileOnly(libs.plotsquared.bukkit) { isTransitive = false }
     compileOnly(libs.plotsquared.core) { isTransitive = false }
+    compileOnly(libs.guice)
 
     // Third party
     implementation(libs.serverlib)

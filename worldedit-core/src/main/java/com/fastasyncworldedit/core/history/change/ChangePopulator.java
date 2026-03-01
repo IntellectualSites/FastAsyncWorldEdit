@@ -14,7 +14,6 @@ public interface ChangePopulator<C extends Change> {
 
     static <C extends Change> ChangePopulator<C> empty() {
         class Empty implements ChangePopulator<C> {
-            private static final Empty EMPTY = new Empty();
 
             @Override
             public @NotNull C create() {
@@ -36,7 +35,7 @@ public interface ChangePopulator<C extends Change> {
                 return false;
             }
         }
-        return Empty.EMPTY;
+        return new Empty();
     }
 
     @SuppressWarnings("unchecked")
