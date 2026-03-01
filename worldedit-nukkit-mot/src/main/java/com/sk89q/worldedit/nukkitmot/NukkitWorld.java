@@ -16,13 +16,15 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.SideEffect;
 import com.sk89q.worldedit.util.SideEffectSet;
 import com.sk89q.worldedit.util.TreeGenerator;
+import com.sk89q.worldedit.util.concurrency.LazyReference;
 import com.sk89q.worldedit.world.AbstractWorld;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
-import com.sk89q.worldedit.world.block.BlockTypes;
+import com.sk89q.worldedit.world.weather.WeatherType;
+import com.sk89q.worldedit.world.weather.WeatherTypes;
 
 import javax.annotation.Nullable;
 import java.lang.ref.WeakReference;
@@ -84,7 +86,15 @@ public class NukkitWorld extends AbstractWorld {
 
     @Override
     public BaseBlock getFullBlock(BlockVector3 position) {
-        return getBlock(position).toBaseBlock();
+        BlockState state = getBlock(position);
+        Level level = getLevel();
+        cn.nukkit.blockentity.BlockEntity be = level.getBlockEntity(NukkitAdapter.adapt(position));
+        if (be != null && be.namedTag != null) {
+            return state.toBaseBlock(LazyReference.computed(
+                    com.fastasyncworldedit.nukkitmot.NukkitNbtConverter.toLinCompound(be.namedTag)
+            ));
+        }
+        return state.toBaseBlock();
     }
 
     @Override
@@ -133,7 +143,7 @@ public class NukkitWorld extends AbstractWorld {
     @Override
     public void simulateBlockMine(BlockVector3 position) {
         Level level = getLevel();
-        level.setBlock(position.x(), position.y(), position.z(), Block.get(Block.AIR), true, true);
+        level.useBreakOn(NukkitAdapter.adapt(position));
     }
 
     @Override
@@ -281,6 +291,60 @@ public class NukkitWorld extends AbstractWorld {
             cn.nukkit.blockentity.BlockEntity.createBlockEntity(id, chunk, nbt);
         }
         return true;
+    }
+
+    @Override
+    public WeatherType getWeather() {
+        Level level = getLevel();
+        if (level.isThundering()) {
+            return WeatherTypes.THUNDER_STORM;
+        } else if (level.isRaining()) {
+            return WeatherTypes.RAIN;
+        }
+        return WeatherTypes.CLEAR;
+    }
+
+    @Override
+    public long getRemainingWeatherDuration() {
+        Level level = getLevel();
+        if (level.isThundering()) {
+            return level.getThunderTime();
+        } else if (level.isRaining()) {
+            return level.getRainTime();
+        }
+        return 0;
+    }
+
+    @Override
+    public void setWeather(WeatherType weatherType) {
+        Level level = getLevel();
+        if (weatherType == WeatherTypes.THUNDER_STORM) {
+            level.setRaining(true);
+            level.setThundering(true);
+        } else if (weatherType == WeatherTypes.RAIN) {
+            level.setRaining(true);
+            level.setThundering(false);
+        } else {
+            level.setRaining(false);
+            level.setThundering(false);
+        }
+    }
+
+    @Override
+    public void setWeather(WeatherType weatherType, long duration) {
+        setWeather(weatherType);
+        Level level = getLevel();
+        if (weatherType == WeatherTypes.THUNDER_STORM) {
+            level.setRainTime((int) duration);
+            level.setThunderTime((int) duration);
+        } else if (weatherType == WeatherTypes.RAIN) {
+            level.setRainTime((int) duration);
+        }
+    }
+
+    @Override
+    public void checkLoadedChunk(BlockVector3 pt) {
+        getLevel().loadChunk(pt.x() >> 4, pt.z() >> 4, false);
     }
 
     @Override

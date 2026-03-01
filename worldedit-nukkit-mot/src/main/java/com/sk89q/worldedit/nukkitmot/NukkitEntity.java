@@ -10,7 +10,6 @@ import com.sk89q.worldedit.util.concurrency.LazyReference;
 import com.sk89q.worldedit.world.NullWorld;
 import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.entity.EntityTypes;
-import org.enginehub.linbus.tree.LinCompoundTag;
 
 import javax.annotation.Nullable;
 import java.lang.ref.WeakReference;
@@ -76,6 +75,7 @@ public class NukkitEntity implements Entity {
             return null;
         }
 
+        entity.saveNBT();
         cn.nukkit.nbt.tag.CompoundTag namedTag = entity.namedTag;
         if (namedTag != null) {
             return new BaseEntity(type, LazyReference.computed(

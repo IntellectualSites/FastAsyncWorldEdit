@@ -1,7 +1,11 @@
 package com.sk89q.worldedit.nukkitmot;
 
+import cn.nukkit.AdventureSettings;
 import cn.nukkit.Player;
 import cn.nukkit.Server;
+import cn.nukkit.level.Level;
+import cn.nukkit.network.protocol.UpdateBlockPacket;
+import com.fastasyncworldedit.nukkitmot.NukkitPlayerBlockBag;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.extension.platform.AbstractPlayerActor;
@@ -21,7 +25,6 @@ import com.sk89q.worldedit.world.gamemode.GameMode;
 import com.sk89q.worldedit.world.gamemode.GameModes;
 
 import javax.annotation.Nullable;
-import java.io.File;
 import java.util.Locale;
 import java.util.UUID;
 
@@ -113,7 +116,7 @@ public class NukkitPlayer extends AbstractPlayerActor {
 
     @Override
     public BlockBag getInventoryBlockBag() {
-        return null;
+        return new NukkitPlayerBlockBag(player);
     }
 
     @Override
@@ -164,7 +167,9 @@ public class NukkitPlayer extends AbstractPlayerActor {
 
     @Override
     public void setFlying(boolean flying) {
-        player.setAllowFlight(flying);
+        player.getAdventureSettings().set(AdventureSettings.Type.ALLOW_FLIGHT, true);
+        player.getAdventureSettings().set(AdventureSettings.Type.FLYING, flying);
+        player.getAdventureSettings().update();
     }
 
     @Override
@@ -184,17 +189,12 @@ public class NukkitPlayer extends AbstractPlayerActor {
 
     @Override
     public Locale getLocale() {
-        return Locale.getDefault();
-    }
-
-    @Override
-    public File openFileOpenDialog(String[] extensions) {
-        return null;
-    }
-
-    @Override
-    public File openFileSaveDialog(String[] extensions) {
-        return null;
+        try {
+            String code = player.getLanguageCode().name(); // e.g. "zh_CN"
+            return Locale.forLanguageTag(code.replace('_', '-'));
+        } catch (Exception e) {
+            return Locale.getDefault();
+        }
     }
 
     @Nullable
@@ -210,7 +210,27 @@ public class NukkitPlayer extends AbstractPlayerActor {
 
     @Override
     public <B extends BlockStateHolder<B>> void sendFakeBlock(BlockVector3 pos, B block) {
-        // TODO: Implement fake block sending via UpdateBlockPacket
+        Level level = player.getLevel();
+        if (block == null) {
+            // Restore real block
+            cn.nukkit.math.Vector3 vec = NukkitAdapter.adapt(pos);
+            level.sendBlocks(new Player[]{player}, new cn.nukkit.math.Vector3[]{vec},
+                    UpdateBlockPacket.FLAG_ALL);
+        } else {
+            int fullId = NukkitAdapter.adaptFullId(block.toImmutableState());
+            int blockId = fullId >> cn.nukkit.block.Block.DATA_BITS;
+            int meta = fullId & cn.nukkit.block.Block.DATA_MASK;
+
+            UpdateBlockPacket pk = new UpdateBlockPacket();
+            pk.x = pos.x();
+            pk.y = pos.y();
+            pk.z = pos.z();
+            pk.flags = UpdateBlockPacket.FLAG_ALL;
+            pk.blockRuntimeId = cn.nukkit.level.GlobalBlockPalette.getOrCreateRuntimeId(
+                    player.getGameVersion(), blockId, meta
+            );
+            player.dataPacket(pk);
+        }
     }
 
     @Override

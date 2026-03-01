@@ -7,6 +7,7 @@ import com.fastasyncworldedit.core.FAWEPlatformAdapterImpl;
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.IFawe;
 import com.fastasyncworldedit.core.queue.implementation.QueueHandler;
+import com.fastasyncworldedit.core.queue.implementation.preloader.AsyncPreloader;
 import com.fastasyncworldedit.core.queue.implementation.preloader.Preloader;
 import com.fastasyncworldedit.core.regions.FaweMaskManager;
 import com.fastasyncworldedit.core.util.TaskManager;
@@ -22,6 +23,7 @@ public class FaweNukkit implements IFawe {
     private final NukkitTaskManager taskManager;
     private final NukkitPlatformAdapter platformAdapter;
     private NukkitQueueHandler queueHandler;
+    private Preloader preloader;
 
     public FaweNukkit(Plugin plugin) {
         this.plugin = plugin;
@@ -89,7 +91,10 @@ public class FaweNukkit implements IFawe {
 
     @Override
     public Preloader getPreloader(boolean initialise) {
-        return null;
+        if (preloader == null && initialise) {
+            preloader = new AsyncPreloader();
+        }
+        return preloader;
     }
 
     @Override
