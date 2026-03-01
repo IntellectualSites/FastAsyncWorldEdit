@@ -75,7 +75,7 @@ public class NukkitPlayer extends AbstractPlayerActor {
     @Override
     public void print(String msg) {
         for (String part : msg.split("\n")) {
-            player.sendMessage("\u00A7d" + part);
+            player.sendMessage("§d" + part);
         }
     }
 
@@ -83,7 +83,7 @@ public class NukkitPlayer extends AbstractPlayerActor {
     @Override
     public void printDebug(String msg) {
         for (String part : msg.split("\n")) {
-            player.sendMessage("\u00A77" + part);
+            player.sendMessage("§7" + part);
         }
     }
 
@@ -91,7 +91,7 @@ public class NukkitPlayer extends AbstractPlayerActor {
     @Override
     public void printError(String msg) {
         for (String part : msg.split("\n")) {
-            player.sendMessage("\u00A7c" + part);
+            player.sendMessage("§c" + part);
         }
     }
 
