@@ -13,6 +13,7 @@ import com.fastasyncworldedit.core.queue.IChunkSet;
 import com.fastasyncworldedit.core.queue.IQueueExtent;
 import com.fastasyncworldedit.core.queue.implementation.blocks.CharGetBlocks;
 import com.fastasyncworldedit.core.registry.state.PropertyKey;
+import com.sk89q.worldedit.registry.state.Property;
 import com.fastasyncworldedit.nukkitmot.NukkitNbtConverter;
 import com.fastasyncworldedit.nukkitmot.mapping.BiomeMapping;
 import com.fastasyncworldedit.nukkitmot.mapping.BlockMapping;
@@ -218,10 +219,10 @@ public class NukkitGetBlocks extends CharGetBlocks {
                         BlockState state = BlockTypesCache.states[ordinal];
                         boolean waterlogged = false;
                         if (state != null && state.getBlockType().hasProperty(PropertyKey.WATERLOGGED)) {
-                            Object wl = state.getState(PropertyKey.WATERLOGGED);
-                            if (wl == Boolean.TRUE) {
+                            Property<Boolean> waterloggedProp = state.getBlockType().getProperty(PropertyKey.WATERLOGGED);
+                            if (waterloggedProp != null && state.getState(waterloggedProp) == Boolean.TRUE) {
                                 waterlogged = true;
-                                state = state.with(PropertyKey.WATERLOGGED, false);
+                                state = state.with(waterloggedProp, false);
                                 ordinal = state.getOrdinalChar();
                             }
                         }
