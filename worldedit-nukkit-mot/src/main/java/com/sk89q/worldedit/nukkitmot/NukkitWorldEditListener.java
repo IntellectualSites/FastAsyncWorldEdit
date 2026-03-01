@@ -37,6 +37,10 @@ public class NukkitWorldEditListener implements Listener {
 
     @EventHandler(priority = EventPriority.NORMAL)
     public void onPlayerInteract(PlayerInteractEvent event) {
+        if (!plugin.getInternalPlatform().isHookingEvents()) {
+            return;
+        }
+
         Player nukkitPlayer = event.getPlayer();
         NukkitPlayer player = NukkitAdapter.adapt(nukkitPlayer);
         WorldEdit we = WorldEdit.getInstance();
@@ -93,6 +97,10 @@ public class NukkitWorldEditListener implements Listener {
      */
     @EventHandler(priority = EventPriority.LOW)
     public void onBlockBreak(BlockBreakEvent event) {
+        if (!plugin.getInternalPlatform().isHookingEvents()) {
+            return;
+        }
+
         Player nukkitPlayer = event.getPlayer();
 
         // Skip if already handled by PlayerInteractEvent(LEFT_CLICK_BLOCK)
@@ -118,7 +126,13 @@ public class NukkitWorldEditListener implements Listener {
 
     @EventHandler(priority = EventPriority.NORMAL)
     public void onPlayerQuit(PlayerQuitEvent event) {
+        if (!plugin.getInternalPlatform().isHookingEvents()) {
+            return;
+        }
+
         Player nukkitPlayer = event.getPlayer();
+        NukkitPlayer wePlayer = NukkitAdapter.adapt(nukkitPlayer);
+        wePlayer.removePermissionAttachment();
         WorldEdit.getInstance().getEventBus().post(
                 new SessionIdleEvent(new NukkitPlayer.SessionKeyImpl(nukkitPlayer))
         );

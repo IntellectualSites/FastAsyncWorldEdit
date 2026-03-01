@@ -5,6 +5,7 @@ import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.level.Level;
 import cn.nukkit.network.protocol.UpdateBlockPacket;
+import cn.nukkit.permission.PermissionAttachment;
 import com.fastasyncworldedit.nukkitmot.NukkitPlayerBlockBag;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.entity.BaseEntity;
@@ -31,6 +32,7 @@ import java.util.UUID;
 public class NukkitPlayer extends AbstractPlayerActor {
 
     private final Player player;
+    private PermissionAttachment permAttachment;
 
     public NukkitPlayer(Player player) {
         this.player = player;
@@ -147,7 +149,17 @@ public class NukkitPlayer extends AbstractPlayerActor {
 
     @Override
     public void setPermission(String permission, boolean value) {
-        // Nukkit doesn't have a simple runtime permission attachment API like Bukkit
+        if (permAttachment == null) {
+            permAttachment = player.addAttachment(WorldEditNukkitPlugin.getInstance());
+        }
+        permAttachment.setPermission(permission, value);
+    }
+
+    void removePermissionAttachment() {
+        if (permAttachment != null) {
+            permAttachment.remove();
+            permAttachment = null;
+        }
     }
 
     @Override
