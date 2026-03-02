@@ -15,8 +15,8 @@ import com.sk89q.worldedit.extent.clipboard.io.ClipboardWriter;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import net.jpountz.lz4.LZ4BlockInputStream;
 import net.jpountz.lz4.LZ4BlockOutputStream;
@@ -145,7 +145,7 @@ public class FastSchematicWriterV3 implements ClipboardWriter {
                         }
                         return ordinal;
                     },
-                    BlockStateHolder::getAsString,
+                    ordinal -> BlockTypesCache.states[ordinal].getAsString(),
                     clipboard
             );
             lz4Stream.finish();
@@ -168,7 +168,7 @@ public class FastSchematicWriterV3 implements ClipboardWriter {
                 biomes, BiomeType.REGISTRY.size(),
                 pos -> pos.getBiome(clipboard),
                 biome -> (char) biome.getInternalId(),
-                BiomeType::id,
+                ordinal -> BiomeTypes.get(ordinal).id(),
                 clipboard
         );
     }
@@ -218,7 +218,7 @@ public class FastSchematicWriterV3 implements ClipboardWriter {
             NBTOutputStream out, int capacity,
             Function<BlockVector3, T> objectResolver,
             Function<T, Character> ordinalResolver,
-            Function<T, String> paletteEntryResolver,
+            Function<Character, String> paletteEntryResolver,
             Clipboard clipboard
     ) throws IOException {
         int dataBytesUsed = 0;
@@ -240,7 +240,7 @@ public class FastSchematicWriterV3 implements ClipboardWriter {
                     if (index >= palette.length) {
                         throw new IOException("insufficient palette capacity: " + palette.length + ", index: " + index);
                     }
-                    out.writeNamedTag(paletteEntryResolver.apply(obj), value);
+                    out.writeNamedTag(paletteEntryResolver.apply(ordinal), value);
                 }
                 if ((value & -128) != 0) {
                     dataBytesUsed++;
