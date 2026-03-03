@@ -106,7 +106,7 @@ public class NukkitGetBlocks extends CharGetBlocks {
         BlockState state = BlockTypesCache.states[ordinal];
         // Check layer 1 for waterlogged
         if (state.getBlockType().hasProperty(PropertyKey.WATERLOGGED)) {
-            int layer1Id = chunk.getBlockId(x & 0xF, y, z & 0xF, 1);
+            int layer1Id = NukkitImplLoader.get().getBlockId(chunk, x & 0xF, y, z & 0xF, 1);
             if (layer1Id == WATER_ID || layer1Id == STILL_WATER_ID) {
                 state = state.with(PropertyKey.WATERLOGGED, true);
             }
@@ -137,7 +137,7 @@ public class NukkitGetBlocks extends CharGetBlocks {
                         // Apply waterlogged state from layer 1
                         BlockState state = BlockTypesCache.states[ordinal];
                         if (state != null && state.getBlockType().hasProperty(PropertyKey.WATERLOGGED)) {
-                            int layer1Id = chunk.getBlockId(x, baseY + y, z, 1);
+                            int layer1Id = NukkitImplLoader.get().getBlockId(chunk, x, baseY + y, z, 1);
                             if (layer1Id == WATER_ID || layer1Id == STILL_WATER_ID) {
                                 state = state.with(PropertyKey.WATERLOGGED, true);
                                 ordinal = state.getOrdinalChar();
@@ -185,7 +185,7 @@ public class NukkitGetBlocks extends CharGetBlocks {
                                 // Apply waterlogged state from layer 1
                                 BlockState state = BlockTypesCache.states[ordinal];
                                 if (state != null && state.getBlockType().hasProperty(PropertyKey.WATERLOGGED)) {
-                                    int layer1Id = chunk.getBlockId(x, baseY + y, z, 1);
+                                    int layer1Id = NukkitImplLoader.get().getBlockId(chunk, x, baseY + y, z, 1);
                                     if (layer1Id == WATER_ID || layer1Id == STILL_WATER_ID) {
                                         state = state.with(PropertyKey.WATERLOGGED, true);
                                         ordinal = state.getOrdinalChar();
@@ -260,15 +260,15 @@ public class NukkitGetBlocks extends CharGetBlocks {
                         int fullId = BlockMapping.jeOrdinalToFullId(ordinal);
                         int blockId = fullId >> dataBits;
                         int meta = fullId & dataMask;
-                        chunk.setFullBlockId(x, baseY + y, z, 0,
+                        adapter.setFullBlockId(chunk, x, baseY + y, z, 0,
                                 (blockId << dataBits) | meta);
                         // Set or clear layer 1 water
                         if (waterlogged) {
-                            chunk.setFullBlockId(x, baseY + y, z, 1,
+                            adapter.setFullBlockId(chunk, x, baseY + y, z, 1,
                                     STILL_WATER_ID << dataBits);
                         } else if (state != null && state.getBlockType().hasProperty(PropertyKey.WATERLOGGED)) {
                             // Clear water from layer 1 if block supports waterlogged but isn't
-                            chunk.setFullBlockId(x, baseY + y, z, 1, 0);
+                            adapter.setFullBlockId(chunk, x, baseY + y, z, 1, 0);
                         }
                     }
                 }
@@ -319,16 +319,18 @@ public class NukkitGetBlocks extends CharGetBlocks {
         if (entityRemoves != null && !entityRemoves.isEmpty()) {
             Map<Long, cn.nukkit.entity.Entity> chunkEntities = level.getChunkEntities(chunkX, chunkZ);
             Set<UUID> entitiesRemoved = new HashSet<>();
+            NukkitImplAdapter uuidAdapter = NukkitImplLoader.get();
             for (cn.nukkit.entity.Entity entity : chunkEntities.values()) {
                 if (entity instanceof cn.nukkit.Player) {
                     continue;
                 }
-                if (entityRemoves.contains(entity.getUniqueId())) {
+                UUID entityUUID = uuidAdapter.getEntityUUID(entity);
+                if (entityRemoves.contains(entityUUID)) {
                     if (copy != null) {
-                        copy.storeEntity(entity);
+                        copy.storeEntity(entity, entityUUID);
                     }
                     entity.close();
-                    entitiesRemoved.add(entity.getUniqueId());
+                    entitiesRemoved.add(entityUUID);
                 }
             }
             set.getEntityRemoves().clear();
@@ -434,12 +436,17 @@ public class NukkitGetBlocks extends CharGetBlocks {
         if (chunkEntities.isEmpty()) {
             return Collections.emptyList();
         }
+        NukkitImplAdapter adapter = NukkitImplLoader.get();
         List<FaweCompoundTag> result = new ArrayList<>();
         for (cn.nukkit.entity.Entity entity : chunkEntities.values()) {
             if (entity instanceof cn.nukkit.Player) {
                 continue;
             }
             entity.saveNBT();
+            // Ensure UUID is stored in NBT (NKX entities don't save it by default)
+            if (!entity.namedTag.contains("uuid")) {
+                entity.namedTag.putString("uuid", adapter.getEntityUUID(entity).toString());
+            }
             result.add(NukkitNbtConverter.toFawe(entity.namedTag));
         }
         return result;
@@ -465,12 +472,16 @@ public class NukkitGetBlocks extends CharGetBlocks {
     @Override
     public FaweCompoundTag entity(UUID uuid) {
         Map<Long, cn.nukkit.entity.Entity> chunkEntities = level.getChunkEntities(chunkX, chunkZ);
+        NukkitImplAdapter adapter = NukkitImplLoader.get();
         for (cn.nukkit.entity.Entity entity : chunkEntities.values()) {
             if (entity instanceof cn.nukkit.Player) {
                 continue;
             }
-            if (uuid.equals(entity.getUniqueId())) {
+            if (uuid.equals(adapter.getEntityUUID(entity))) {
                 entity.saveNBT();
+                if (!entity.namedTag.contains("uuid")) {
+                    entity.namedTag.putString("uuid", uuid.toString());
+                }
                 return NukkitNbtConverter.toFawe(entity.namedTag);
             }
         }

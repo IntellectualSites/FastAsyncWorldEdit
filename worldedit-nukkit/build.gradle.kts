@@ -60,7 +60,7 @@ dependencies {
     api(project(":worldedit-core"))
     api(project(":worldedit-libs:nukkit"))
 
-    compileOnly("cn.nukkit:Nukkit:MOT-SNAPSHOT")
+    compileOnly("cn.nukkit:nukkit:1.0-SNAPSHOT")
 
     implementation(libs.fastutil)
     implementation(libs.gson)

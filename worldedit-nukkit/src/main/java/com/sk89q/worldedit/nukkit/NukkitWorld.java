@@ -189,13 +189,21 @@ public class NukkitWorld extends AbstractWorld {
             case SWAMP -> new cn.nukkit.level.generator.object.tree.ObjectSwampTree();
             case ACACIA -> new cn.nukkit.level.generator.object.tree.ObjectSavannaTree();
             case DARK_OAK -> new cn.nukkit.level.generator.object.tree.ObjectDarkOakTree();
-            case MANGROVE, TALL_MANGROVE -> new cn.nukkit.level.generator.object.tree.ObjectMangroveTree();
-            case CHERRY -> new cn.nukkit.level.generator.object.tree.ObjectCherryTree();
-            case PALE_OAK, PALE_OAK_CREAKING -> new cn.nukkit.level.generator.object.tree.ObjectPaleOakTree();
             default -> null;
         };
         if (treeGen != null) {
             return treeGen.generate(level, random, pos);
+        }
+
+        // Trees with divergent class hierarchies between MOT and NKX — delegate to adapter
+        String adapterType = switch (type) {
+            case MANGROVE, TALL_MANGROVE -> "MANGROVE";
+            case CHERRY -> "CHERRY";
+            case PALE_OAK, PALE_OAK_CREAKING -> "PALE_OAK";
+            default -> null;
+        };
+        if (adapterType != null) {
+            return NukkitImplLoader.get().generateTree(adapterType, level, x, y, z, random, pos);
         }
 
         return false;

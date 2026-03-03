@@ -75,8 +75,12 @@ public class NukkitGetBlocks_Copy implements IChunkGet {
         tiles.put(pos, tag);
     }
 
-    protected void storeEntity(cn.nukkit.entity.Entity entity) {
+    protected void storeEntity(cn.nukkit.entity.Entity entity, java.util.UUID entityUUID) {
         entity.saveNBT();
+        // Ensure UUID is stored in NBT (NKX entities don't save it by default)
+        if (!entity.namedTag.contains("uuid")) {
+            entity.namedTag.putString("uuid", entityUUID.toString());
+        }
         entities.add(NukkitNbtConverter.toFawe(entity.namedTag));
     }
 
