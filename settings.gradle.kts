@@ -59,10 +59,15 @@ listOf("1_20_2", "1_20_4", "1_20_5", "1_21", "1_21_4", "1_21_5", "1_21_6", "1_21
     include("worldedit-bukkit:adapters:adapter-$it")
 }
 
-listOf("bukkit", "core", "cli", "nukkit-mot").forEach {
+listOf("bukkit", "core", "cli", "nukkit").forEach {
     include("worldedit-libs:$it")
     include("worldedit-$it")
 }
+
+listOf("mot", "nkx").forEach {
+    include("worldedit-nukkit:nk-adapters:adapter-$it")
+}
+
 include("worldedit-libs:core:ap")
 
 
