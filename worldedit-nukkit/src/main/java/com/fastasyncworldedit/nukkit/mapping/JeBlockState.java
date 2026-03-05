@@ -52,6 +52,15 @@ public class JeBlockState {
         return new JeBlockState(identifier, properties);
     }
 
+    private static int fnv1a32(byte[] data) {
+        int hash = 0x811c9dc5;
+        for (byte b : data) {
+            hash ^= (b & 0xff);
+            hash *= 0x01000193;
+        }
+        return hash;
+    }
+
     public String getIdentifier() {
         return identifier;
     }
@@ -111,15 +120,6 @@ public class JeBlockState {
             first = false;
         }
         return sb.append("]").toString();
-    }
-
-    private static int fnv1a32(byte[] data) {
-        int hash = 0x811c9dc5;
-        for (byte b : data) {
-            hash ^= (b & 0xff);
-            hash *= 0x01000193;
-        }
-        return hash;
     }
 
 }

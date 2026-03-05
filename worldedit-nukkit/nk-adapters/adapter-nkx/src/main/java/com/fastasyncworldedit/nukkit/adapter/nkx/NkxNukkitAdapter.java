@@ -20,12 +20,15 @@ import org.cloudburstmc.nbt.NbtMap;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 /**
  * Adapter implementation for the NKX (upstream Nukkit) platform.
  */
 public class NkxNukkitAdapter implements NukkitImplAdapter {
+
+    private static final BlockLayer[] LAYERS = {BlockLayer.NORMAL, BlockLayer.WATERLOGGED};
 
     @Override
     public String getPlatformName() {
@@ -40,7 +43,7 @@ public class NkxNukkitAdapter implements NukkitImplAdapter {
     @Override
     @Nullable
     public String getPlayerLanguageCode(Player player) {
-        java.util.Locale locale = player.getLocale();
+        Locale locale = player.getLocale();
         if (locale == null) {
             return null;
         }
@@ -89,8 +92,6 @@ public class NkxNukkitAdapter implements NukkitImplAdapter {
         }
         return true;
     }
-
-    private static final BlockLayer[] LAYERS = {BlockLayer.NORMAL, BlockLayer.WATERLOGGED};
 
     @Override
     public int getBlockId(FullChunk chunk, int x, int y, int z, int layer) {

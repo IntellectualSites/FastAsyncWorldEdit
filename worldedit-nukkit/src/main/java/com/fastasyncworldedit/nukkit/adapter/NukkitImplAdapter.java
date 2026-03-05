@@ -99,4 +99,5 @@ public interface NukkitImplAdapter {
      * NKX: only {@code EntityHuman} has it; for other entities, derive from {@code Entity.getId()}.
      */
     UUID getEntityUUID(Entity entity);
+
 }

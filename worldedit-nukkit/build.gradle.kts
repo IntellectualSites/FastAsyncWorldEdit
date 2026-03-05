@@ -100,8 +100,8 @@ tasks.named<Copy>("processResources") {
 tasks.named<ShadowJar>("shadowJar") {
     archiveFileName.set("${rootProject.name}-Nukkit-${project.version}.${archiveExtension.getOrElse("jar")}")
     configurations = listOf(
-        project.configurations.getByName("runtimeClasspath"),
-        adapters
+            project.configurations.getByName("runtimeClasspath"),
+            adapters
     )
     dependencies {
         include(dependency(":worldedit-core"))

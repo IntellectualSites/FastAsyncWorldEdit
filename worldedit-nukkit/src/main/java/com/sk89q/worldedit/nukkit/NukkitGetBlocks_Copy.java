@@ -40,9 +40,9 @@ public class NukkitGetBlocks_Copy implements IChunkGet {
     private final int minSectionPosition;
     private final int sectionCount;
     private final char[][] blocks;
-    private BiomeType[][] biomes;
     private final Map<BlockVector3, FaweCompoundTag> tiles = new HashMap<>();
     private final Set<FaweCompoundTag> entities = new HashSet<>();
+    private BiomeType[][] biomes;
 
     public NukkitGetBlocks_Copy(int chunkX, int chunkZ, int minY, int maxY) {
         this.chunkX = chunkX;
@@ -75,7 +75,7 @@ public class NukkitGetBlocks_Copy implements IChunkGet {
         tiles.put(pos, tag);
     }
 
-    protected void storeEntity(cn.nukkit.entity.Entity entity, java.util.UUID entityUUID) {
+    protected void storeEntity(cn.nukkit.entity.Entity entity, UUID entityUUID) {
         entity.saveNBT();
         // Ensure UUID is stored in NBT (NKX entities don't save it by default)
         if (!entity.namedTag.contains("uuid")) {

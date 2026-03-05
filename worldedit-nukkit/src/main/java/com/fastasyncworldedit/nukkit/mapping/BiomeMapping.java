@@ -83,6 +83,7 @@ public final class BiomeMapping {
             @SerializedName("bedrock_id")
             int bedrockId
     ) {
+
     }
 
 }

@@ -27,6 +27,10 @@ public class WorldEditNukkitPlugin extends PluginBase {
     private NukkitConfiguration configuration;
     private NukkitServerInterface platform;
 
+    public static WorldEditNukkitPlugin getInstance() {
+        return instance;
+    }
+
     @Override
     public void onLoad() {
         instance = this;
@@ -156,10 +160,6 @@ public class WorldEditNukkitPlugin extends PluginBase {
 
     NukkitServerInterface getInternalPlatform() {
         return platform;
-    }
-
-    public static WorldEditNukkitPlugin getInstance() {
-        return instance;
     }
 
 }

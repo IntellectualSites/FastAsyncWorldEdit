@@ -39,6 +39,20 @@ public class NukkitWorldEditListener implements Listener {
         this.plugin = plugin;
     }
 
+    private static Direction adaptFace(BlockFace face) {
+        if (face == null) {
+            return Direction.UP;
+        }
+        return switch (face) {
+            case DOWN -> Direction.DOWN;
+            case UP -> Direction.UP;
+            case NORTH -> Direction.NORTH;
+            case SOUTH -> Direction.SOUTH;
+            case WEST -> Direction.WEST;
+            case EAST -> Direction.EAST;
+        };
+    }
+
     @EventHandler(priority = EventPriority.NORMAL)
     public void onPlayerInteract(PlayerInteractEvent event) {
         if (!plugin.getInternalPlatform().isHookingEvents()) {
@@ -140,20 +154,6 @@ public class NukkitWorldEditListener implements Listener {
                 new SessionIdleEvent(new NukkitPlayer.SessionKeyImpl(nukkitPlayer))
         );
         NukkitAdapter.uncachePlayer(nukkitPlayer);
-    }
-
-    private static Direction adaptFace(BlockFace face) {
-        if (face == null) {
-            return Direction.UP;
-        }
-        return switch (face) {
-            case DOWN -> Direction.DOWN;
-            case UP -> Direction.UP;
-            case NORTH -> Direction.NORTH;
-            case SOUTH -> Direction.SOUTH;
-            case WEST -> Direction.WEST;
-            case EAST -> Direction.EAST;
-        };
     }
 
 }

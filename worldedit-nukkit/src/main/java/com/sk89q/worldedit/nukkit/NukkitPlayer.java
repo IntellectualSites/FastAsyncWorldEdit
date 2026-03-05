@@ -231,8 +231,10 @@ public class NukkitPlayer extends AbstractPlayerActor {
         if (block == null) {
             // Restore real block
             cn.nukkit.math.Vector3 vec = NukkitAdapter.adapt(pos);
-            level.sendBlocks(new Player[]{player}, new cn.nukkit.math.Vector3[]{vec},
-                    UpdateBlockPacket.FLAG_ALL);
+            level.sendBlocks(
+                    new Player[]{player}, new cn.nukkit.math.Vector3[]{vec},
+                    UpdateBlockPacket.FLAG_ALL
+            );
         } else {
             NukkitImplAdapter adapter = NukkitImplLoader.get();
             int fullId = NukkitAdapter.adaptFullId(block.toImmutableState());

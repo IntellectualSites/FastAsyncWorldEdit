@@ -126,6 +126,7 @@ public final class ItemMapping {
     }
 
     public record NukkitItemData(int itemId, int metadata) {
+
     }
 
     private record ItemEntry(
@@ -134,6 +135,7 @@ public final class ItemMapping {
             @SerializedName("bedrock_data")
             int bedrockData
     ) {
+
     }
 
 }

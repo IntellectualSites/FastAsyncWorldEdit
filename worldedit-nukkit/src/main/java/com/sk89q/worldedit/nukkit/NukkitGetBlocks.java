@@ -260,12 +260,16 @@ public class NukkitGetBlocks extends CharGetBlocks {
                         int fullId = BlockMapping.jeOrdinalToFullId(ordinal);
                         int blockId = fullId >> dataBits;
                         int meta = fullId & dataMask;
-                        adapter.setFullBlockId(chunk, x, baseY + y, z, 0,
-                                (blockId << dataBits) | meta);
+                        adapter.setFullBlockId(
+                                chunk, x, baseY + y, z, 0,
+                                (blockId << dataBits) | meta
+                        );
                         // Set or clear layer 1 water
                         if (waterlogged) {
-                            adapter.setFullBlockId(chunk, x, baseY + y, z, 1,
-                                    STILL_WATER_ID << dataBits);
+                            adapter.setFullBlockId(
+                                    chunk, x, baseY + y, z, 1,
+                                    STILL_WATER_ID << dataBits
+                            );
                         } else if (state != null && state.getBlockType().hasProperty(PropertyKey.WATERLOGGED)) {
                             // Clear water from layer 1 if block supports waterlogged but isn't
                             adapter.setFullBlockId(chunk, x, baseY + y, z, 1, 0);

@@ -11,6 +11,7 @@ import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.command.util.PermissionCondition;
 import com.sk89q.worldedit.entity.Player;
+import com.sk89q.worldedit.event.platform.CommandEvent;
 import com.sk89q.worldedit.extension.platform.AbstractPlatform;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Capability;
@@ -25,6 +26,7 @@ import org.enginehub.piston.CommandManager;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.EnumMap;
 import java.util.List;
@@ -208,7 +210,7 @@ public class NukkitServerInterface extends AbstractPlatform implements MultiUser
         NukkitCommand(String name, String[] aliases, String[] permissions) {
             super(name);
             if (aliases.length > 1) {
-                setAliases(java.util.Arrays.copyOfRange(aliases, 1, aliases.length));
+                setAliases(Arrays.copyOfRange(aliases, 1, aliases.length));
             }
             if (permissions.length > 0) {
                 setPermission(String.join(";", permissions));
@@ -232,7 +234,7 @@ public class NukkitServerInterface extends AbstractPlatform implements MultiUser
             }
 
             WorldEdit.getInstance().getEventBus().post(
-                    new com.sk89q.worldedit.event.platform.CommandEvent(actor, commandLine)
+                    new CommandEvent(actor, commandLine)
             );
             return true;
         }

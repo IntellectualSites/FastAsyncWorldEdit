@@ -78,9 +78,11 @@ public class NukkitEntity implements Entity {
         entity.saveNBT();
         cn.nukkit.nbt.tag.CompoundTag namedTag = entity.namedTag;
         if (namedTag != null) {
-            return new BaseEntity(type, LazyReference.computed(
+            return new BaseEntity(
+                    type, LazyReference.computed(
                     NukkitNbtConverter.toLinCompound(namedTag)
-            ));
+            )
+            );
         }
         return new BaseEntity(type);
     }

@@ -16,6 +16,10 @@ class NukkitRegistries extends BundledRegistries {
     NukkitRegistries() {
     }
 
+    public static NukkitRegistries getInstance() {
+        return INSTANCE;
+    }
+
     @Override
     public BlockRegistry getBlockRegistry() {
         return blockRegistry;
@@ -24,10 +28,6 @@ class NukkitRegistries extends BundledRegistries {
     @Override
     public ItemRegistry getItemRegistry() {
         return itemRegistry;
-    }
-
-    public static NukkitRegistries getInstance() {
-        return INSTANCE;
     }
 
 }

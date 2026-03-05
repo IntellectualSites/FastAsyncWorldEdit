@@ -322,17 +322,6 @@ public class NukkitWorld extends AbstractWorld {
     }
 
     @Override
-    public long getRemainingWeatherDuration() {
-        Level level = getLevel();
-        if (level.isThundering()) {
-            return level.getThunderTime();
-        } else if (level.isRaining()) {
-            return level.getRainTime();
-        }
-        return 0;
-    }
-
-    @Override
     public void setWeather(WeatherType weatherType) {
         Level level = getLevel();
         if (weatherType == WeatherTypes.THUNDER_STORM) {
@@ -345,6 +334,17 @@ public class NukkitWorld extends AbstractWorld {
             level.setRaining(false);
             level.setThundering(false);
         }
+    }
+
+    @Override
+    public long getRemainingWeatherDuration() {
+        Level level = getLevel();
+        if (level.isThundering()) {
+            return level.getThunderTime();
+        } else if (level.isRaining()) {
+            return level.getRainTime();
+        }
+        return 0;
     }
 
     @Override

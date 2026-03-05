@@ -125,7 +125,8 @@ public final class BlockMapping {
             }
         }
 
-        WorldEditNukkitPlugin.getInstance().getLogger().info("Ordinal mappings built: " + mapped + " mapped, " + unmapped + " unmapped out of " + states.length + " total states");
+        WorldEditNukkitPlugin.getInstance().getLogger().info(
+                "Ordinal mappings built: " + mapped + " mapped, " + unmapped + " unmapped out of " + states.length + " total states");
     }
 
     /**
@@ -209,15 +210,18 @@ public final class BlockMapping {
                 return false;
             }
 
-            Map<String, List<Map<String, ?>>> data = from(stream, new TypeToken<>() {
-            });
+            Map<String, List<Map<String, ?>>> data = from(
+                    stream, new TypeToken<>() {
+                    }
+            );
             for (var entry : data.entrySet()) {
                 JE_BLOCK_DEFAULT_PROPERTIES.put(
                         "minecraft:" + entry.getKey(),
                         (Map<String, String>) entry.getValue().get(1)
                 );
             }
-            WorldEditNukkitPlugin.getInstance().getLogger().info("Loaded " + JE_BLOCK_DEFAULT_PROPERTIES.size() + " JE block default properties");
+            WorldEditNukkitPlugin.getInstance().getLogger().info(
+                    "Loaded " + JE_BLOCK_DEFAULT_PROPERTIES.size() + " JE block default properties");
         } catch (IOException e) {
             WorldEditNukkitPlugin.getInstance().getLogger().error("Failed to load je_blocks.json: ", e);
             return false;
@@ -239,8 +243,10 @@ public final class BlockMapping {
                 return false;
             }
 
-            Map<String, List<BlockMappingEntry>> root = from(stream, new TypeToken<>() {
-            });
+            Map<String, List<BlockMappingEntry>> root = from(
+                    stream, new TypeToken<>() {
+                    }
+            );
             List<BlockMappingEntry> mappings = root.get("mappings");
             int mapped = 0;
             int failed = 0;
@@ -256,7 +262,8 @@ public final class BlockMapping {
                     failed++;
                 }
             }
-            WorldEditNukkitPlugin.getInstance().getLogger().info("Block state mapping loaded: " + mapped + " mapped, " + failed + " failed");
+            WorldEditNukkitPlugin.getInstance().getLogger().info(
+                    "Block state mapping loaded: " + mapped + " mapped, " + failed + " failed");
         } catch (IOException e) {
             WorldEditNukkitPlugin.getInstance().getLogger().error("Failed to load blocks.json: ", e);
             return false;
@@ -324,6 +331,7 @@ public final class BlockMapping {
             @SerializedName("bedrock_state")
             BedrockState bedrockState
     ) {
+
         public record JavaState(
                 @SerializedName("Name")
                 String name,
@@ -331,6 +339,7 @@ public final class BlockMapping {
                 @SerializedName("Properties")
                 Map<String, String> properties
         ) {
+
         }
 
         public record BedrockState(
@@ -339,7 +348,9 @@ public final class BlockMapping {
                 @Nullable
                 Map<String, Object> state
         ) {
+
         }
+
     }
 
     public static class IgnoreFailureTypeAdapterFactory implements TypeAdapterFactory {
