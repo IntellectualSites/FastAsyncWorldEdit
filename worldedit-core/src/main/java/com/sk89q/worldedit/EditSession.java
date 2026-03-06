@@ -2397,10 +2397,9 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
 
         final int ceilRadiusX = (int) Math.ceil(radiusX);
         final int ceilRadiusZ = (int) Math.ceil(radiusZ);
-
-        final double rx2 = Math.pow(radiusX, 2);
-        final double ry2 = Math.pow(radiusZ, 2);
-        final double rz2 = Math.pow(height, 2);
+        final double radiusXPow = Math.pow(radiusX, 2);
+        final double radiusZPow = Math.pow(radiusZ, 2);
+        final double heightPow = Math.pow(height, 2);
         final int layers = Math.abs(height);
 
         int cx = pos.x();
@@ -2408,45 +2407,45 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         int cz = pos.z();
 
         for (int y = 0; y < layers; ++y) {
-            double ySquaredMinusHeightOverHeightSquared = Math.pow(y - layers, 2) / ry2;
+            double ySquaredMinusHeightOverHeightSquared = Math.pow(y - layers, 2) / heightPow;
             int yy = height < 0 ? cy - y : cy + y;
+
             forX:
             for (int x = 0; x <= ceilRadiusX; ++x) {
-                double xSquaredOverRadiusX = Math.pow(x, 2) / rx2;
-                int xx = cx + x;
-                forZ:
+                double xSquaredOverRadiusX = Math.pow(x, 2) / radiusXPow;
+
                 for (int z = 0; z <= ceilRadiusZ; ++z) {
-                    int zz = cz + z;
-                    double zSquaredOverRadiusZ = Math.pow(z, 2) / rz2;
+                    double zSquaredOverRadiusZ = Math.pow(z, 2) / radiusZPow;
                     double distanceFromOriginMinusHeightSquared = xSquaredOverRadiusX + zSquaredOverRadiusZ - ySquaredMinusHeightOverHeightSquared;
 
                     if (distanceFromOriginMinusHeightSquared > 1) {
                         if (z == 0) {
                             break forX;
                         }
-                        break forZ;
+                        break;
                     }
 
                     if (!filled) {
-                        double xNext = Math.pow(x + thickness, 2) / rx2 + zSquaredOverRadiusZ - ySquaredMinusHeightOverHeightSquared;
-                        double yNext = xSquaredOverRadiusX + zSquaredOverRadiusZ - Math.pow(y + thickness - height, 2) / ry2;
-                        double zNext = xSquaredOverRadiusX + Math.pow(z + thickness, 2) / rz2 - ySquaredMinusHeightOverHeightSquared;
+                        double xNext = Math.pow(x + thickness, 2) / radiusXPow + zSquaredOverRadiusZ - ySquaredMinusHeightOverHeightSquared;
+                        double yNext =
+                                xSquaredOverRadiusX + zSquaredOverRadiusZ - Math.pow(y + thickness - layers, 2) / radiusZPow;
+                        double zNext = xSquaredOverRadiusX + Math.pow(z + thickness, 2) / heightPow - ySquaredMinusHeightOverHeightSquared;
                         if (xNext <= 0 && zNext <= 0 && (yNext <= 0 && y + thickness != layers)) {
                             continue;
                         }
                     }
 
                     if (distanceFromOriginMinusHeightSquared <= 0) {
-                        if (setBlock(xx, yy, zz, block)) {
+                        if (setBlock(cx + x, yy, cz + z, block)) {
                             ++affected;
                         }
-                        if (setBlock(xx, yy, zz, block)) {
+                        if (setBlock(cx - x, yy, cz + z, block)) {
                             ++affected;
                         }
-                        if (setBlock(xx, yy, zz, block)) {
+                        if (setBlock(cx + x, yy, cz - z, block)) {
                             ++affected;
                         }
-                        if (setBlock(xx, yy, zz, block)) {
+                        if (setBlock(cx - x, yy, cz - z, block)) {
                             ++affected;
                         }
                     }
