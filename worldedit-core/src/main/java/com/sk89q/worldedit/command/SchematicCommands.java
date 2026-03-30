@@ -26,6 +26,7 @@ import com.fastasyncworldedit.core.extent.clipboard.MultiClipboardHolder;
 import com.fastasyncworldedit.core.extent.clipboard.URIClipboardHolder;
 import com.fastasyncworldedit.core.math.transform.MutatingOperationTransformHolder;
 import com.fastasyncworldedit.core.util.MainUtil;
+import com.fastasyncworldedit.core.util.StringMan;
 import com.google.common.collect.Multimap;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
@@ -770,19 +771,20 @@ public class SchematicCommands {
         List<Component> components = UtilityCommands.entryToComponent(dir, entries, isLoaded,
                 (name, path, type, loaded) -> {
                     TextComponentProducer msg = new TextComponentProducer();
+                    String pathArg = StringMan.escape(path);
 
                     msg.append(Caption.of("worldedit.schematic.dash.symbol"));
 
                     if (loaded) {
                         msg.append(Caption.of("worldedit.schematic.minus.symbol")
-                                .clickEvent(ClickEvent.of(ClickEvent.Action.SUGGEST_COMMAND, unload + " " + path))
+                                .clickEvent(ClickEvent.of(ClickEvent.Action.SUGGEST_COMMAND, unload + " " + pathArg))
                                 .hoverEvent(HoverEvent.of(
                                         HoverEvent.Action.SHOW_TEXT,
                                         Caption.of("worldedit.schematic.unload")
                                 )));
                     } else {
                         msg.append(Caption.of("worldedit.schematic.plus.symbol")
-                                .clickEvent(ClickEvent.of(ClickEvent.Action.SUGGEST_COMMAND, loadMulti + " " + path))
+                                .clickEvent(ClickEvent.of(ClickEvent.Action.SUGGEST_COMMAND, loadMulti + " " + pathArg))
                                 .hoverEvent(HoverEvent.of(
                                         HoverEvent.Action.SHOW_TEXT,
                                         Caption.of("worldedit.schematic.clipboard")
@@ -790,12 +792,12 @@ public class SchematicCommands {
                     }
                     if (type != UtilityCommands.URIType.DIRECTORY) {
                         msg.append(Caption.of("worldedit.schematic.x.symbol")
-                                .clickEvent(ClickEvent.of(ClickEvent.Action.SUGGEST_COMMAND, delete + " " + path))
+                                .clickEvent(ClickEvent.of(ClickEvent.Action.SUGGEST_COMMAND, delete + " " + pathArg))
                                 .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, Caption.of("worldedit.schematic.delete")))
                         );
                     } else if (hasShow) {
                         msg.append(Caption.of("worldedit.schematic.0.symbol")
-                                .clickEvent(ClickEvent.of(ClickEvent.Action.SUGGEST_COMMAND, showCmd + " " + path))
+                                .clickEvent(ClickEvent.of(ClickEvent.Action.SUGGEST_COMMAND, showCmd + " " + pathArg))
                                 .hoverEvent(HoverEvent.of(
                                         HoverEvent.Action.SHOW_TEXT,
                                         Caption.of("worldedit.schematic.visualize")
@@ -804,13 +806,13 @@ public class SchematicCommands {
                     }
                     TextComponent msgElem = TextComponent.of(name);
                     if (type != UtilityCommands.URIType.DIRECTORY) {
-                        msgElem = msgElem.clickEvent(ClickEvent.of(ClickEvent.Action.SUGGEST_COMMAND, loadSingle + " " + path));
+                        msgElem = msgElem.clickEvent(ClickEvent.of(ClickEvent.Action.SUGGEST_COMMAND, loadSingle + " " + pathArg));
                         msgElem = msgElem.hoverEvent(HoverEvent.of(
                                 HoverEvent.Action.SHOW_TEXT,
                                 Caption.of("worldedit.schematic.load")
                         ));
                     } else {
-                        msgElem = msgElem.clickEvent(ClickEvent.of(ClickEvent.Action.SUGGEST_COMMAND, list + " " + path));
+                        msgElem = msgElem.clickEvent(ClickEvent.of(ClickEvent.Action.SUGGEST_COMMAND, list + " " + pathArg));
                         msgElem = msgElem.hoverEvent(HoverEvent.of(
                                 HoverEvent.Action.SHOW_TEXT,
                                 Caption.of("worldedit.schematic.list")
