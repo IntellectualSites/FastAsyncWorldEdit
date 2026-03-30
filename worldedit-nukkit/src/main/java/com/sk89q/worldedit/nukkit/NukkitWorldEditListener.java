@@ -1,0 +1,159 @@
+package com.sk89q.worldedit.nukkit;
+
+import cn.nukkit.Player;
+import cn.nukkit.block.Block;
+import cn.nukkit.event.EventHandler;
+import cn.nukkit.event.EventPriority;
+import cn.nukkit.event.Listener;
+import cn.nukkit.event.block.BlockBreakEvent;
+import cn.nukkit.event.player.PlayerInteractEvent;
+import cn.nukkit.event.player.PlayerQuitEvent;
+import cn.nukkit.math.BlockFace;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.event.platform.SessionIdleEvent;
+import com.sk89q.worldedit.math.Vector3;
+import com.sk89q.worldedit.util.Direction;
+import com.sk89q.worldedit.util.Location;
+
+import java.util.concurrent.TimeUnit;
+
+/**
+ * Nukkit event listener for WorldEdit interactions.
+ */
+public class NukkitWorldEditListener implements Listener {
+
+    private final WorldEditNukkitPlugin plugin;
+    /**
+     * Tracks players whose LEFT_CLICK_BLOCK was already handled by {@link #onPlayerInteract},
+     * so that duplicate {@code PlayerInteractEvent} and {@link #onBlockBreak} can be skipped.
+     * Entries expire after 1 seconds in case {@code BlockBreakEvent} is never fired.
+     */
+    private final Cache<Player, Boolean> handledLeftClick = CacheBuilder.newBuilder()
+            .expireAfterWrite(1, TimeUnit.SECONDS)
+            .weakKeys()
+            .build();
+
+    public NukkitWorldEditListener(WorldEditNukkitPlugin plugin) {
+        this.plugin = plugin;
+    }
+
+    private static Direction adaptFace(BlockFace face) {
+        if (face == null) {
+            return Direction.UP;
+        }
+        return switch (face) {
+            case DOWN -> Direction.DOWN;
+            case UP -> Direction.UP;
+            case NORTH -> Direction.NORTH;
+            case SOUTH -> Direction.SOUTH;
+            case WEST -> Direction.WEST;
+            case EAST -> Direction.EAST;
+        };
+    }
+
+    @EventHandler(priority = EventPriority.NORMAL)
+    public void onPlayerInteract(PlayerInteractEvent event) {
+        if (!plugin.getInternalPlatform().isHookingEvents()) {
+            return;
+        }
+
+        Player nukkitPlayer = event.getPlayer();
+        NukkitPlayer player = NukkitAdapter.adapt(nukkitPlayer);
+        WorldEdit we = WorldEdit.getInstance();
+
+        switch (event.getAction()) {
+            case LEFT_CLICK_BLOCK -> {
+                if (handledLeftClick.getIfPresent(nukkitPlayer) != null) {
+                    event.setCancelled(true);
+                    return;
+                }
+                Block block = event.getBlock();
+                Location loc = new Location(
+                        player.getWorld(),
+                        Vector3.at(block.getFloorX(), block.getFloorY(), block.getFloorZ())
+                );
+                Direction direction = adaptFace(event.getFace());
+                if (we.handleBlockLeftClick(player, loc, direction)) {
+                    handledLeftClick.put(nukkitPlayer, Boolean.TRUE);
+                    event.setCancelled(true);
+                }
+            }
+            case LEFT_CLICK_AIR -> {
+                if (we.handleArmSwing(player)) {
+                    event.setCancelled(true);
+                }
+            }
+            case RIGHT_CLICK_BLOCK -> {
+                Block block = event.getBlock();
+                Location loc = new Location(
+                        player.getWorld(),
+                        Vector3.at(block.getFloorX(), block.getFloorY(), block.getFloorZ())
+                );
+                Direction direction = adaptFace(event.getFace());
+                if (we.handleBlockRightClick(player, loc, direction)) {
+                    event.setCancelled(true);
+                }
+            }
+            case RIGHT_CLICK_AIR -> {
+                if (we.handleRightClick(player)) {
+                    event.setCancelled(true);
+                }
+            }
+            default -> {
+                // PHYSICAL and other actions are not handled
+            }
+        }
+    }
+
+    /**
+     * Handle block break events for left-click tool interaction.
+     * <p>
+     * When server authoritative block breaking is enabled (e.g. creative mode),
+     * {@code PlayerInteractEvent(LEFT_CLICK_BLOCK)} is not fired — only {@code BlockBreakEvent} is.
+     * This handler delegates to {@code handleBlockLeftClick} to follow the standard FAWE async path.
+     */
+    @EventHandler(priority = EventPriority.LOW)
+    public void onBlockBreak(BlockBreakEvent event) {
+        if (!plugin.getInternalPlatform().isHookingEvents()) {
+            return;
+        }
+
+        Player nukkitPlayer = event.getPlayer();
+
+        // Skip if already handled by PlayerInteractEvent(LEFT_CLICK_BLOCK)
+        if (handledLeftClick.getIfPresent(nukkitPlayer) != null) {
+            event.setCancelled(true);
+            return;
+        }
+
+        NukkitPlayer player = NukkitAdapter.adapt(nukkitPlayer);
+        Block block = event.getBlock();
+        Location loc = new Location(
+                player.getWorld(),
+                Vector3.at(block.getFloorX(), block.getFloorY(), block.getFloorZ())
+        );
+        Direction direction = adaptFace(event.getFace());
+        if (WorldEdit.getInstance().handleBlockLeftClick(player, loc, direction)) {
+            handledLeftClick.put(nukkitPlayer, Boolean.TRUE);
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.NORMAL)
+    public void onPlayerQuit(PlayerQuitEvent event) {
+        if (!plugin.getInternalPlatform().isHookingEvents()) {
+            return;
+        }
+
+        Player nukkitPlayer = event.getPlayer();
+        NukkitPlayer wePlayer = NukkitAdapter.adapt(nukkitPlayer);
+        wePlayer.removePermissionAttachment();
+        WorldEdit.getInstance().getEventBus().post(
+                new SessionIdleEvent(new NukkitPlayer.SessionKeyImpl(nukkitPlayer))
+        );
+        NukkitAdapter.uncachePlayer(nukkitPlayer);
+    }
+
+}
