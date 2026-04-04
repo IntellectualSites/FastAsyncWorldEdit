@@ -1,7 +1,7 @@
 import io.papermc.paperweight.userdev.PaperweightUserDependenciesExtension
 
 plugins {
-    id("buildlogic.adapter-mojmap")
+    id("buildlogic.adapter")
 }
 
 dependencies {

@@ -18,23 +18,23 @@ repositories {
         name = "PaperMC"
         url = uri("https://repo.papermc.io/repository/maven-public/")
         content {
-            excludeModule("io.papermc.paper", "dev-bundle")
+            // excludeModule("io.papermc.paper", "dev-bundle")
         }
     }
     maven {
         name = "EngineHub Repository"
         url = uri("https://maven.enginehub.org/repo/")
         content {
-            excludeModule("io.papermc.paper", "dev-bundle")
+            // excludeModule("io.papermc.paper", "dev-bundle")
         }
     }
-    maven {
+/*    maven {
         name = "IntellectualSites"
         url = uri("https://repo.intellectualsites.dev/repository/paper-dev-bundles/")
         content {
-            includeModule("io.papermc.paper", "dev-bundle")
+            // includeModule("io.papermc.paper", "dev-bundle")
         }
-    }
+    }*/
     mavenCentral()
     afterEvaluate {
         killNonEngineHubRepositories()
@@ -50,6 +50,11 @@ dependencies {
             because("Ensure a consistent version of adventure is used.")
         }
     }
+}
+
+java {
+    // Required when we de-sync release option and declared Java versions.
+    disableAutoTargetJvm()
 }
 
 tasks.named("assemble") {
