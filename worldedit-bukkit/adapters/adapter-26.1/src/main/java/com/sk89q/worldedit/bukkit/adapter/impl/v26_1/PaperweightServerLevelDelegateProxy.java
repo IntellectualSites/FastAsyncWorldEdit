@@ -102,7 +102,7 @@ public class PaperweightServerLevelDelegateProxy implements InvocationHandler, A
     }
 
     private BlockState getBlockState(BlockPos blockPos) {
-        return adapter.adapt(this.editSession.getBlockWithBuffer(adapt(blockPos)));
+        return adapter.adapt(this.editSession.getBlock(blockPos.getX(), blockPos.getY(), blockPos.getZ()));
     }
 
     @Keep
@@ -163,7 +163,8 @@ public class PaperweightServerLevelDelegateProxy implements InvocationHandler, A
             }
         );
 
-        BaseEntity baseEntity = new BaseEntity(EntityTypes.get(id.toString()), LazyReference.from(() -> (LinCompoundTag) adapter.toNative(tag)));
+        BaseEntity baseEntity = new BaseEntity(EntityTypes.get(id.toString()),
+                LazyReference.from(() -> (LinCompoundTag) adapter.toNativeLin(tag)));
 
         return editSession.createEntity(location, baseEntity) != null;
     }
@@ -185,7 +186,7 @@ public class PaperweightServerLevelDelegateProxy implements InvocationHandler, A
             editSession.setBlock(
                     blockPos,
                     adapter.adapt(blockEntity.getBlockState())
-                            .toBaseBlock(LazyReference.from(() -> (LinCompoundTag) adapter.toNative(tag)))
+                            .toBaseBlock(LazyReference.from(() -> (LinCompoundTag) adapter.toNativeLin(tag)))
             );
         }
     }

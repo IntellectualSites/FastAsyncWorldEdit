@@ -19,120 +19,124 @@
 
 package com.sk89q.worldedit.bukkit.adapter.impl.v26_1;
 
-import com.sk89q.worldedit.world.registry.BlockMaterial;
+import com.fastasyncworldedit.bukkit.adapter.BukkitBlockMaterial;
+import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
+import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v26_1.PaperweightGetBlocks;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.Clearable;
 import net.minecraft.world.level.EmptyBlockGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.material.PushReaction;
 
-public class PaperweightBlockMaterial implements BlockMaterial {
+public class PaperweightBlockMaterial extends BukkitBlockMaterial<Block, BlockState> {
 
-    private final BlockState block;
+    public PaperweightBlockMaterial(Block block) {
+        this(block, block.defaultBlockState());
+    }
 
-    public PaperweightBlockMaterial(BlockState block) {
-        this.block = block;
+    public PaperweightBlockMaterial(Block block, BlockState blockState) {
+        super(block, blockState, blockState.asBlockData());
+    }
+
+    @Override
+    protected FaweCompoundTag tileForBlock(final Block block) {
+        BlockEntity tileEntity = !(block instanceof EntityBlock eb) ? null : eb.newBlockEntity(BlockPos.ZERO, this.blockState);
+        return tileEntity == null ? null : PaperweightGetBlocks.NMS_TO_TILE.apply(tileEntity);
     }
 
     @Override
     public boolean isAir() {
-        return block.isAir();
+        return this.blockState.isAir();
     }
 
     @Override
     public boolean isFullCube() {
-        return Block.isShapeFullBlock(block.getShape(EmptyBlockGetter.INSTANCE, BlockPos.ZERO));
+        return Block.isShapeFullBlock(this.blockState.getShape(EmptyBlockGetter.INSTANCE, BlockPos.ZERO));
     }
 
     @Override
     public boolean isOpaque() {
-        return block.canOcclude();
+        return this.blockState.canOcclude();
     }
 
     @Override
     public boolean isPowerSource() {
-        return block.isSignalSource();
+        return this.blockState.isSignalSource();
     }
 
     @Override
-    @SuppressWarnings("deprecation")
     public boolean isLiquid() {
-        return block.liquid();
+        return !this.blockState.getFluidState().is(Fluids.EMPTY);
     }
 
     @Override
-    @SuppressWarnings("deprecation")
     public boolean isSolid() {
-        return block.isSolid();
+        return this.blockState.isSolidRender();
     }
 
     @Override
     public float getHardness() {
-        return block.getDestroySpeed(EmptyBlockGetter.INSTANCE, BlockPos.ZERO);
+        return this.blockState.destroySpeed;
     }
 
     @Override
     public float getResistance() {
-        return block.getBlock().getExplosionResistance();
+        return this.block.getExplosionResistance();
     }
 
     @Override
     public float getSlipperiness() {
-        return block.getBlock().getFriction();
+        return this.block.getFriction();
     }
 
     @Override
     public int getLightValue() {
-        return block.getLightEmission();
+        return this.blockState.getLightEmission();
+    }
+
+    @Override
+    public int getLightOpacity() {
+        return this.blockState.getLightDampening();
     }
 
     @Override
     public boolean isFragileWhenPushed() {
-        return block.getPistonPushReaction() == PushReaction.DESTROY;
+        return this.blockState.getPistonPushReaction() == PushReaction.DESTROY;
     }
 
     @Override
     public boolean isUnpushable() {
-        return block.getPistonPushReaction() == PushReaction.BLOCK;
+        return this.blockState.getPistonPushReaction() == PushReaction.BLOCK;
     }
 
     @Override
     public boolean isTicksRandomly() {
-        return block.isRandomlyTicking();
+        return this.blockState.isRandomlyTicking();
     }
 
-    @Override
     @SuppressWarnings("deprecation")
+    @Override
     public boolean isMovementBlocker() {
-        return block.blocksMotion();
-    }
-
-    @Override
-    public boolean isBurnable() {
-        return block.ignitedByLava();
-    }
-
-    @Override
-    public boolean isToolRequired() {
-        return block.requiresCorrectToolForDrops();
+        return this.blockState.blocksMotion();
     }
 
     @Override
     public boolean isReplacedDuringPlacement() {
-        return block.canBeReplaced();
+        return this.blockState.canBeReplaced();
     }
 
     @Override
     public boolean isTranslucent() {
-        return !block.canOcclude();
+        return !this.blockState.canOcclude();
     }
 
     @Override
-    public boolean hasContainer() {
-        return block.getBlock() instanceof EntityBlock entityBlock
-                && entityBlock.newBlockEntity(BlockPos.ZERO, block) instanceof Clearable;
+    public int getMapColor() {
+        // rgb field
+        return this.block.defaultMapColor().col;
     }
 
 }

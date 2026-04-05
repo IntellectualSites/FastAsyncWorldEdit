@@ -122,19 +122,19 @@ class PaperweightDataConverters implements com.sk89q.worldedit.world.DataFixer {
     private LinCompoundTag fixChunk(LinCompoundTag originalChunk, int srcVer) {
         CompoundTag tag = (CompoundTag) adapter.fromNative(originalChunk);
         CompoundTag fixed = convert(LegacyType.CHUNK, tag, srcVer);
-        return (LinCompoundTag) adapter.toNative(fixed);
+        return (LinCompoundTag) adapter.toNativeLin(fixed);
     }
 
     private LinCompoundTag fixBlockEntity(LinCompoundTag origTileEnt, int srcVer) {
         CompoundTag tag = (CompoundTag) adapter.fromNative(origTileEnt);
         CompoundTag fixed = convert(LegacyType.BLOCK_ENTITY, tag, srcVer);
-        return (LinCompoundTag) adapter.toNative(fixed);
+        return (LinCompoundTag) adapter.toNativeLin(fixed);
     }
 
     private LinCompoundTag fixEntity(LinCompoundTag origEnt, int srcVer) {
         CompoundTag tag = (CompoundTag) adapter.fromNative(origEnt);
         CompoundTag fixed = convert(LegacyType.ENTITY, tag, srcVer);
-        return (LinCompoundTag) adapter.toNative(fixed);
+        return (LinCompoundTag) adapter.toNativeLin(fixed);
     }
 
     private String fixBlockState(String blockState, int srcVer) {
