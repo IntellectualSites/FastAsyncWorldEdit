@@ -76,7 +76,6 @@ val adaptersReobf = configurations.create("adaptersReobf") {
     attributes {
         attribute(Obfuscation.OBFUSCATION_ATTRIBUTE, objects.named(Obfuscation.OBFUSCATED))
     }
-    extendsFrom(adapters)
 }
 
 allprojects {
@@ -117,6 +116,9 @@ dependencies {
 
     project.project(":worldedit-bukkit:adapters").subprojects.forEach {
         "adapters"(project(it.path))
+        if (it.name.startsWith("adapter-1_")) {
+            "adaptersReobf"(project(it.path))
+        }
     }
     compileOnly(libs.worldguard) {
         exclude("com.sk89q.worldedit", "worldedit-bukkit")
