@@ -10,3 +10,9 @@ dependencies {
     the<PaperweightUserDependenciesExtension>().paperDevBundle("1.21.4-R0.1-20250609.101859-227")
     compileOnly(libs.paperLib)
 }
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(21))
+    }
+}
