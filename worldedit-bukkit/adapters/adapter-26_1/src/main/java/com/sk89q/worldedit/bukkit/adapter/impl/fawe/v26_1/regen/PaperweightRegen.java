@@ -25,6 +25,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
+import net.minecraft.world.level.levelgen.WorldGenSettings;
+import net.minecraft.world.level.levelgen.WorldOptions;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -37,6 +39,7 @@ import javax.annotation.Nonnull;
 import java.lang.reflect.Field;
 import java.nio.file.Path;
 import java.util.Map;
+import java.util.OptionalLong;
 import java.util.UUID;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
@@ -117,6 +120,15 @@ public class PaperweightRegen extends Regenerator {
         session = levelStorageSource.createAccess("faweregentempworld");
 
         MinecraftServer server = originalServerWorld.getCraftServer().getServer();
+        WorldOptions originalOpts = originalServerWorld.worldGenSettings.options();
+        WorldOptions newOpts = options.getSeed().isPresent()
+                ? originalOpts.withSeed(OptionalLong.of(seed))
+                : originalOpts;
+        WorldGenSettings newWorldGenSettings = new WorldGenSettings(
+                newOpts,
+                originalServerWorld.worldGenSettings.dimensions()
+        );
+
         PaperWorldLoader.LoadedWorldData loadedWorldData = new PaperWorldLoader.LoadedWorldData(
                 "faweregentempworld",
                 UUID.randomUUID(),
@@ -132,7 +144,7 @@ public class PaperweightRegen extends Regenerator {
                 server,
                 server.executor,
                 session,
-                originalServerWorld.worldGenSettings,
+                newWorldGenSettings,
                 originalServerWorld.dimension(),
                 new LevelStem(
                         originalServerWorld.dimensionTypeRegistration(),
