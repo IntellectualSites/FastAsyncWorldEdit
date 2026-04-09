@@ -13,6 +13,7 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.io.file.SafeFiles;
 import com.sk89q.worldedit.world.RegenOptions;
+import io.papermc.lib.PaperLib;
 import io.papermc.paper.world.PaperWorldLoader;
 import io.papermc.paper.world.saveddata.PaperWorldPDC;
 import net.minecraft.core.Holder;
@@ -109,6 +110,10 @@ public class PaperweightRegen extends Regenerator {
 
     @Override
     protected boolean initNewWorld() throws Exception {
+        if (!PaperLib.isPaper()) {
+            throw new UnsupportedOperationException("Regen requires Paper");
+        }
+
         //world folder
         tempDir = java.nio.file.Files.createTempDirectory("FastAsyncWorldEditWorldGen");
 
