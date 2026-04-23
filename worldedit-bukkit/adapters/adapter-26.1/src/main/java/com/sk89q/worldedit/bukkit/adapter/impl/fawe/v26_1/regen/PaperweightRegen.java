@@ -49,6 +49,8 @@ import static net.minecraft.core.registries.Registries.BIOME;
 
 public class PaperweightRegen extends Regenerator {
 
+    private static final String REGEN_WORLD_NAME = "faweregentempworld";
+
     private static final Field serverWorldsField;
     private static final Field paperConfigField;
     private static final Field generatorSettingBaseSupplierField;
@@ -122,7 +124,7 @@ public class PaperweightRegen extends Regenerator {
         org.bukkit.generator.ChunkGenerator generator = originalBukkitWorld.getGenerator();
         LevelStorageSource levelStorageSource = LevelStorageSource.createDefault(tempDir);
         ResourceKey<LevelStem> levelStemResourceKey = getWorldDimKey(environment);
-        session = levelStorageSource.createAccess("faweregentempworld");
+        session = levelStorageSource.createAccess(REGEN_WORLD_NAME);
 
         MinecraftServer server = originalServerWorld.getCraftServer().getServer();
         WorldOptions originalOpts = originalServerWorld.worldGenSettings.options();
@@ -135,14 +137,13 @@ public class PaperweightRegen extends Regenerator {
         );
 
         PaperWorldLoader.LoadedWorldData loadedWorldData = new PaperWorldLoader.LoadedWorldData(
-                "faweregentempworld",
+                REGEN_WORLD_NAME,
                 UUID.randomUUID(),
                 new PaperWorldPDC((CraftPersistentDataContainer) originalBukkitWorld.getPersistentDataContainer()),
                 originalServerWorld.serverLevelData
         );
 
         BiomeProvider biomeProvider = getBiomeProvider();
-
 
         //init world
         freshWorld = Fawe.instance().getQueueHandler().sync((Supplier<ServerLevel>) () -> new ServerLevel(
@@ -218,8 +219,11 @@ public class PaperweightRegen extends Regenerator {
         try {
             Fawe.instance().getQueueHandler().sync(() -> {
                 try {
-                    freshWorld.getChunkSource().getDataStorage().cache.clear();
-                    freshWorld.getChunkSource().close(false);
+                    // 26.1+ may share data storage with the live world; never close it in that case.
+                    if (freshWorld.getChunkSource().getDataStorage() != originalServerWorld.getChunkSource().getDataStorage()) {
+                        freshWorld.getChunkSource().getDataStorage().cache.clear();
+                        freshWorld.getChunkSource().close(false);
+                    }
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
@@ -250,7 +254,7 @@ public class PaperweightRegen extends Regenerator {
     private void removeWorldFromWorldsMap() {
         try {
             Map<String, World> map = (Map<String, World>) serverWorldsField.get(Bukkit.getServer());
-            map.remove("faweregentempworld");
+            map.remove(REGEN_WORLD_NAME);
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
