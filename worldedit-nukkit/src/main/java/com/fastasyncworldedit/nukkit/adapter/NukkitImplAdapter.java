@@ -2,11 +2,8 @@ package com.fastasyncworldedit.nukkit.adapter;
 
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
-import cn.nukkit.level.Level;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.format.leveldb.structure.BlockStateSnapshot;
-import cn.nukkit.math.NukkitRandom;
-import cn.nukkit.math.Vector3;
 import org.cloudburstmc.nbt.NbtMap;
 
 import javax.annotation.Nullable;
@@ -150,14 +147,6 @@ public interface NukkitImplAdapter {
      */
     @Nullable
     BlockStateSnapshot getBlockStateSnapshot(NbtMap nbtState);
-
-    /**
-     * Generate a tree whose class hierarchy differs between MOT and NKX.
-     * Handles: Mangrove, Cherry, PaleOak.
-     *
-     * @return {@code true} if the tree was generated, {@code false} if the type is unsupported
-     */
-    boolean generateTree(String treeType, Level level, int x, int y, int z, NukkitRandom random, Vector3 pos);
 
     /**
      * Get block ID at the given layer.

@@ -99,7 +99,7 @@ public final class ItemMapping {
     public static NukkitItemData jeToBe(String jeItemId) {
         NukkitItemData result = JE_TO_BE.get(jeItemId);
         if (result == null) {
-            return new NukkitItemData(0, 0);
+            throw new UnsupportedOperationException("No Nukkit item mapping for Java item: " + jeItemId);
         }
         return result;
     }
@@ -118,7 +118,9 @@ public final class ItemMapping {
         if (result != null) {
             return result;
         }
-        return "minecraft:air";
+        throw new UnsupportedOperationException(
+                "No Java item mapping for Nukkit item: " + beItemId + ":" + metadata
+        );
     }
 
     private static long beKey(int itemId, int metadata) {

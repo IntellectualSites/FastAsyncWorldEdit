@@ -6,15 +6,10 @@ import cn.nukkit.block.BlockLayer;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityHuman;
 import cn.nukkit.level.GlobalBlockPalette;
-import cn.nukkit.level.Level;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.format.leveldb.BlockStateMapping;
 import cn.nukkit.level.format.leveldb.NukkitLegacyMapper;
 import cn.nukkit.level.format.leveldb.structure.BlockStateSnapshot;
-import cn.nukkit.level.generator.object.tree.ObjectCherryTree;
-import cn.nukkit.level.generator.object.tree.ObjectMangroveTree;
-import cn.nukkit.math.NukkitRandom;
-import cn.nukkit.math.Vector3;
 import com.fastasyncworldedit.nukkit.adapter.NukkitImplAdapter;
 import com.fastasyncworldedit.nukkit.adapter.NukkitPlatformCapabilities;
 import org.cloudburstmc.nbt.NbtMap;
@@ -40,9 +35,8 @@ import java.util.UUID;
  * <p>
  * Key differences from MOT:
  * <ul>
- *   <li>Does not support PaleOak trees; MOT does</li>
  *   <li>Uses BlockLayer enum for layer access; MOT uses int</li>
- *   <li>Limited capabilities reported; MOT advertises ALL_TREE_TYPES</li>
+ *   <li>Reports no optional FAWE capabilities until they have history-safe implementations</li>
  * </ul>
  *
  * @see com.fastasyncworldedit.nukkit.adapter.mot.MotNukkitAdapter
@@ -111,19 +105,6 @@ public class NkxNukkitAdapter implements NukkitImplAdapter {
     @Nullable
     public BlockStateSnapshot getBlockStateSnapshot(NbtMap nbtState) {
         return BlockStateMapping.get().getStateUnsafe(nbtState);
-    }
-
-    @Override
-    public boolean generateTree(String treeType, Level level, int x, int y, int z, NukkitRandom random, Vector3 pos) {
-        // NKX: Mangrove and Cherry extend ObjectTree; PaleOak does not exist
-        switch (treeType) {
-            case "MANGROVE" -> new ObjectMangroveTree().placeObject(level, x, y, z, random);
-            case "CHERRY" -> new ObjectCherryTree().placeObject(level, x, y, z, random);
-            default -> {
-                return false;
-            }
-        }
-        return true;
     }
 
     @Override

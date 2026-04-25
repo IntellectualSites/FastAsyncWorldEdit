@@ -13,7 +13,6 @@ import com.sk89q.worldedit.nukkit.NukkitPlayer;
 import com.sk89q.worldedit.nukkit.NukkitWorld;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.item.ItemTypes;
 
@@ -134,10 +133,13 @@ public final class NukkitAdapter {
     public static BlockState adaptBlockState(int fullId) {
         char ordinal = BlockMapping.fullIdToJeOrdinal(fullId);
         if (ordinal == Character.MAX_VALUE) {
-            return BlockTypes.AIR.getDefaultState();
+            throw new UnsupportedOperationException("No Java block mapping for Nukkit full block id: " + fullId);
         }
         BlockState state = com.sk89q.worldedit.world.block.BlockTypesCache.states[ordinal];
-        return state != null ? state : BlockTypes.AIR.getDefaultState();
+        if (state == null) {
+            throw new UnsupportedOperationException("No Java block state for ordinal mapped from Nukkit full block id: " + fullId);
+        }
+        return state;
     }
 
     /**

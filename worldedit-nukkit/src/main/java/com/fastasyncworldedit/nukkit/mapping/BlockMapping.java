@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -36,6 +37,10 @@ import java.util.TreeMap;
  * BlockStateMapping to convert BE identifier+state to legacy fullId.
  */
 public final class BlockMapping {
+
+    private static final int AIR_FULL_ID = 0;
+    private static final int UNMAPPED_FULL_ID = -1;
+    private static final int MAX_UNMAPPED_EXAMPLES = 20;
 
     private static final Gson GSON = new GsonBuilder()
             .registerTypeAdapterFactory(new IgnoreFailureTypeAdapterFactory())
@@ -95,16 +100,18 @@ public final class BlockMapping {
     public static void buildOrdinalMappings() {
         BlockState[] states = BlockTypesCache.states;
         jeOrdinalToBeFullId = new int[states.length];
+        Arrays.fill(jeOrdinalToBeFullId, UNMAPPED_FULL_ID);
         beFullIdToJeOrdinal = new Int2CharOpenHashMap(states.length);
         beFullIdToJeOrdinal.defaultReturnValue(Character.MAX_VALUE);
 
         int mapped = 0;
         int unmapped = 0;
+        List<String> unmappedExamples = new ArrayList<>(MAX_UNMAPPED_EXAMPLES);
 
         for (int ordinal = 0; ordinal < states.length; ordinal++) {
             BlockState state = states[ordinal];
             if (state == null) {
-                jeOrdinalToBeFullId[ordinal] = 0; // air
+                jeOrdinalToBeFullId[ordinal] = AIR_FULL_ID;
                 continue;
             }
 
@@ -120,13 +127,21 @@ public final class BlockMapping {
                 beFullIdToJeOrdinal.putIfAbsent(fullId, (char) ordinal);
                 mapped++;
             } else {
-                jeOrdinalToBeFullId[ordinal] = 0; // air as fallback
+                jeOrdinalToBeFullId[ordinal] = UNMAPPED_FULL_ID;
                 unmapped++;
+                if (unmappedExamples.size() < MAX_UNMAPPED_EXAMPLES) {
+                    unmappedExamples.add(jeState.toString());
+                }
             }
         }
 
         WorldEditNukkitPlugin.getInstance().getLogger().info(
                 "Ordinal mappings built: " + mapped + " mapped, " + unmapped + " unmapped out of " + states.length + " total states");
+        if (unmapped > 0) {
+            WorldEditNukkitPlugin.getInstance().getLogger().warning(
+                    "Unmapped Nukkit block states will throw when written instead of being converted to air. Examples: "
+                            + String.join(", ", unmappedExamples));
+        }
     }
 
     /**
@@ -135,7 +150,7 @@ public final class BlockMapping {
     public static NukkitBlockData jeToBe(JeBlockState state) {
         NukkitBlockData result = JE_HASH_TO_BE.get(state.getHash());
         if (result == null) {
-            return NukkitBlockData.AIR;
+            throw new UnsupportedOperationException("No Nukkit block mapping for Java block state: " + state);
         }
         return result;
     }
@@ -152,7 +167,19 @@ public final class BlockMapping {
      * Hot path: convert JE ordinal to BE fullId.
      */
     public static int jeOrdinalToFullId(char ordinal) {
-        return jeOrdinalToBeFullId[ordinal];
+        if (jeOrdinalToBeFullId == null) {
+            throw new IllegalStateException("Nukkit block ordinal mappings have not been built yet");
+        }
+        if (ordinal >= jeOrdinalToBeFullId.length) {
+            throw new UnsupportedOperationException("No Nukkit block mapping for Java block ordinal: " + (int) ordinal);
+        }
+        int fullId = jeOrdinalToBeFullId[ordinal];
+        if (fullId == UNMAPPED_FULL_ID) {
+            BlockState state = ordinal < BlockTypesCache.states.length ? BlockTypesCache.states[ordinal] : null;
+            String stateDescription = state != null ? state.getAsString() : "ordinal " + (int) ordinal;
+            throw new UnsupportedOperationException("No Nukkit block mapping for Java block state: " + stateDescription);
+        }
+        return fullId;
     }
 
     /**
@@ -160,6 +187,9 @@ public final class BlockMapping {
      * Returns Character.MAX_VALUE if no mapping exists.
      */
     public static char fullIdToJeOrdinal(int fullId) {
+        if (beFullIdToJeOrdinal == null) {
+            throw new IllegalStateException("Nukkit block full-id mappings have not been built yet");
+        }
         return beFullIdToJeOrdinal.get(fullId);
     }
 

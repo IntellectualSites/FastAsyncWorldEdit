@@ -56,7 +56,7 @@ public final class BiomeMapping {
     public static int jeToBe(String jeBiomeId) {
         Integer result = JE_TO_BE.get(jeBiomeId);
         if (result == null) {
-            return 1; // plains as fallback
+            throw new UnsupportedOperationException("No Nukkit biome mapping for Java biome: " + jeBiomeId);
         }
         return result;
     }
@@ -67,7 +67,7 @@ public final class BiomeMapping {
     public static String beToJe(int beBiomeId) {
         String result = BE_TO_JE.get(beBiomeId);
         if (result == null) {
-            return "minecraft:plains";
+            throw new UnsupportedOperationException("No Java biome mapping for Nukkit biome id: " + beBiomeId);
         }
         return result;
     }

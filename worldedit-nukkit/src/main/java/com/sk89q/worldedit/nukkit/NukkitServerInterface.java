@@ -192,7 +192,6 @@ public class NukkitServerInterface extends AbstractPlatform implements MultiUser
     public Map<Capability, Preference> getCapabilities() {
         Map<Capability, Preference> capabilities = new EnumMap<>(Capability.class);
         capabilities.put(Capability.CONFIGURATION, Preference.NORMAL);
-        capabilities.put(Capability.WORLDEDIT_CUI, Preference.NORMAL);
         capabilities.put(Capability.GAME_HOOKS, Preference.PREFERRED);
         capabilities.put(Capability.PERMISSIONS, Preference.PREFERRED);
         capabilities.put(Capability.USER_COMMANDS, Preference.PREFERRED);
@@ -202,7 +201,7 @@ public class NukkitServerInterface extends AbstractPlatform implements MultiUser
 
     @Override
     public Set<SideEffect> getSupportedSideEffects() {
-        return Set.of(SideEffect.HEIGHTMAPS, SideEffect.LIGHTING);
+        return Set.of();
     }
 
     @Override

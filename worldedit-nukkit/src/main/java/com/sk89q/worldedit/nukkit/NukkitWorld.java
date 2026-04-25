@@ -8,7 +8,6 @@ import com.fastasyncworldedit.core.queue.implementation.packet.ChunkPacket;
 import com.fastasyncworldedit.nukkit.adapter.NukkitAdapter;
 import com.fastasyncworldedit.nukkit.adapter.NukkitImplAdapter;
 import com.fastasyncworldedit.nukkit.adapter.NukkitImplLoader;
-import com.fastasyncworldedit.nukkit.adapter.NukkitPlatformCapabilities;
 import com.fastasyncworldedit.nukkit.blocks.NukkitGetBlocks;
 import com.fastasyncworldedit.nukkit.mapping.BiomeMapping;
 import com.sk89q.worldedit.EditSession;
@@ -30,6 +29,7 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.weather.WeatherType;
 import com.sk89q.worldedit.world.weather.WeatherTypes;
+import org.enginehub.linbus.tree.LinTagType;
 
 import javax.annotation.Nullable;
 import java.lang.ref.WeakReference;
@@ -50,8 +50,7 @@ import java.util.Set;
  * Nukkit's {@code ObjectTree} / {@code TreeGenerator} APIs mutate the
  * world directly without providing a block capture mechanism. FAWE's
  * history and undo system requires capturing all block changes, which
- * is impossible with Nukkit's tree API. The capability flag
- * TREE_HISTORY_CAPTURE is never advertised for this reason.
+ * is impossible with Nukkit's tree API.
  * <p>
  * {@link #sendFakeChunk} is unsupported because converting Java Edition
  * block states to Bedrock runtime IDs and serializing into Nukkit's
@@ -63,6 +62,7 @@ import java.util.Set;
  *   <li>setBlock uses Nukkit's public API instead of direct NMS writes</li>
  *   <li>Tree generation cannot participate in history/undo</li>
  *   <li>Fake chunk packets for clipboard previews are unsupported</li>
+ *   <li>Biomes are stored as 2D columns, not Java Edition 3D biome sections</li>
  *   <li>Side effects are applied atomically in setBlock</li>
  * </ul>
  *
@@ -165,6 +165,11 @@ public class NukkitWorld extends AbstractWorld {
     }
 
     @Override
+    public boolean fullySupports3DBiomes() {
+        return false;
+    }
+
+    @Override
     public boolean clearContainerBlockContents(BlockVector3 position) {
         cn.nukkit.blockentity.BlockEntity be = getLevel().getBlockEntity(NukkitAdapter.adapt(position));
         if (be instanceof cn.nukkit.inventory.InventoryHolder holder) {
@@ -190,18 +195,11 @@ public class NukkitWorld extends AbstractWorld {
 
     @Override
     public boolean generateTree(TreeGenerator.TreeType type, EditSession editSession, BlockVector3 position) {
-        if (!NukkitImplLoader.supports(NukkitPlatformCapabilities.TREE_HISTORY_CAPTURE)) {
-            throw new UnsupportedOperationException(
-                    "Tree generation on Nukkit cannot participate in FAWE history/undo because "
-                            + "the Nukkit API (ObjectTree/TreeGenerator) mutates the world directly "
-                            + "without providing a block capture mechanism. "
-                            + "Use manual block placement or consider using a Bukkit-based server for full tree history support."
-            );
-        }
-
         throw new UnsupportedOperationException(
-                "Tree generation history capture is advertised by the active Nukkit adapter, "
-                        + "but NukkitWorld has no history-aware tree generation implementation."
+                "Tree generation on Nukkit cannot participate in FAWE history/undo because "
+                        + "the Nukkit API (ObjectTree/TreeGenerator) mutates the world directly "
+                        + "without providing a block capture mechanism. "
+                        + "Use manual block placement or consider using a Bukkit-based server for full tree history support."
         );
     }
 
@@ -227,22 +225,12 @@ public class NukkitWorld extends AbstractWorld {
 
     @Override
     public void sendFakeChunk(@Nullable Player player, ChunkPacket packet) {
-        if (!supports(NukkitPlatformCapabilities.FAKE_CHUNKS)) {
-            throw new UnsupportedOperationException(
-                    "Fake chunk packets are not supported on Nukkit. "
-                            + "This feature requires converting JE block states to BE runtime ID palettes "
-                            + "and serializing into Nukkit's LevelChunkPacket format (PalettedBlockStorage + 3D biomes). "
-                            + "Nukkit does not expose the necessary APIs for clipboard visualization previews."
-            );
-        }
-    }
-
-    private static boolean supports(NukkitPlatformCapabilities capability) {
-        try {
-            return NukkitImplLoader.supports(capability);
-        } catch (IllegalStateException ignored) {
-            return false;
-        }
+        throw new UnsupportedOperationException(
+                "Fake chunk packets are not supported on Nukkit. "
+                        + "This feature requires converting JE block states to BE runtime ID palettes "
+                        + "and serializing into Nukkit's LevelChunkPacket format (PalettedBlockStorage + 3D biomes). "
+                        + "Nukkit does not expose the necessary APIs for clipboard visualization previews."
+        );
     }
 
     @Override
@@ -298,6 +286,9 @@ public class NukkitWorld extends AbstractWorld {
 
     @Override
     public boolean tile(int x, int y, int z, FaweCompoundTag tile) throws WorldEditException {
+        if (tile.linTag().findTag("id", LinTagType.stringTag()) == null) {
+            return false;
+        }
         Level level = getLevel();
         cn.nukkit.level.format.generic.BaseFullChunk chunk = level.getChunk(x >> 4, z >> 4, true);
         if (chunk == null) {
@@ -308,15 +299,13 @@ public class NukkitWorld extends AbstractWorld {
         nbt.putInt("y", y);
         nbt.putInt("z", z);
 
+        String id = nbt.getString("id").replaceFirst("BlockEntity", "");
+
         cn.nukkit.blockentity.BlockEntity existing = chunk.getTile(x & 0xF, y, z & 0xF);
         if (existing != null) {
             existing.close();
         }
-        if (nbt.contains("id")) {
-            String id = nbt.getString("id").replaceFirst("BlockEntity", "");
-            cn.nukkit.blockentity.BlockEntity.createBlockEntity(id, chunk, nbt);
-        }
-        return true;
+        return cn.nukkit.blockentity.BlockEntity.createBlockEntity(id, chunk, nbt) != null;
     }
 
     @Override

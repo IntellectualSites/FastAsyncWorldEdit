@@ -4,23 +4,16 @@ import cn.nukkit.Player;
 import cn.nukkit.block.Block;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.level.GlobalBlockPalette;
-import cn.nukkit.level.Level;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.format.leveldb.BlockStateMapping;
 import cn.nukkit.level.format.leveldb.NukkitLegacyMapper;
 import cn.nukkit.level.format.leveldb.structure.BlockStateSnapshot;
-import cn.nukkit.level.generator.object.tree.ObjectCherryTree;
-import cn.nukkit.level.generator.object.tree.ObjectMangroveTree;
-import cn.nukkit.level.generator.object.tree.ObjectPaleOakTree;
-import cn.nukkit.math.NukkitRandom;
-import cn.nukkit.math.Vector3;
 import cn.nukkit.utils.Identifier;
 import com.fastasyncworldedit.nukkit.adapter.NukkitImplAdapter;
 import com.fastasyncworldedit.nukkit.adapter.NukkitPlatformCapabilities;
 import org.cloudburstmc.nbt.NbtMap;
 
 import javax.annotation.Nullable;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -38,7 +31,6 @@ import java.util.UUID;
  * <p>
  * Key differences from NKX:
  * <ul>
- *   <li>Supports PaleOak trees; NKX does not</li>
  *   <li>Uses int layer parameter (0=normal, 1=waterlogged); NKX uses BlockLayer enum</li>
  *   <li>Player language returned as enum name; NKX returns Locale string</li>
  * </ul>
@@ -48,9 +40,7 @@ import java.util.UUID;
  */
 public class MotNukkitAdapter implements NukkitImplAdapter {
 
-    private static final Set<NukkitPlatformCapabilities> CAPABILITIES = Set.copyOf(EnumSet.of(
-            NukkitPlatformCapabilities.ALL_TREE_TYPES
-    ));
+    private static final Set<NukkitPlatformCapabilities> CAPABILITIES = Set.of();
 
     @Override
     public String getPlatformName() {
@@ -100,17 +90,6 @@ public class MotNukkitAdapter implements NukkitImplAdapter {
     @Nullable
     public BlockStateSnapshot getBlockStateSnapshot(NbtMap nbtState) {
         return BlockStateMapping.get().getStateUnsafe(nbtState);
-    }
-
-    @Override
-    public boolean generateTree(String treeType, Level level, int x, int y, int z, NukkitRandom random, Vector3 pos) {
-        // MOT: Mangrove, Cherry, PaleOak all extend TreeGenerator
-        return switch (treeType) {
-            case "MANGROVE" -> new ObjectMangroveTree().generate(level, random, pos);
-            case "CHERRY" -> new ObjectCherryTree().generate(level, random, pos);
-            case "PALE_OAK" -> new ObjectPaleOakTree().generate(level, random, pos);
-            default -> false;
-        };
     }
 
     @Override

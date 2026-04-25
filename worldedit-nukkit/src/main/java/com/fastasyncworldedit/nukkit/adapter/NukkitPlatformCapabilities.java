@@ -23,10 +23,8 @@ public enum NukkitPlatformCapabilities {
     FAKE_CHUNKS("Can send fake chunk packets for clipboard previews."),
     EXPLICIT_RELIGHTING("Can manually recalculate lighting instead of relying on Nukkit's internal lighting updates."),
     CUI_SUPPORT("Can communicate with the WorldEdit CUI protocol."),
-    TREE_HISTORY_CAPTURE("Can capture generated tree block changes for undo and history."),
     CHUNK_SECTIONS("Provides a real chunk section abstraction for direct section-level access."),
-    CHUNK_CACHING("Allows chunk references to be cached safely across queue operations."),
-    ALL_TREE_TYPES("Supports every TreeGenerator.TreeType handled by the Nukkit platform implementation.");
+    CHUNK_CACHING("Allows chunk references to be cached safely across queue operations.");
 
     private final String description;
 

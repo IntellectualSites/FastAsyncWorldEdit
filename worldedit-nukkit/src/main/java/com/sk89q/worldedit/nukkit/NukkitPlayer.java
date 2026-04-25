@@ -13,6 +13,7 @@ import com.fastasyncworldedit.nukkit.adapter.NukkitImplLoader;
 import com.fastasyncworldedit.nukkit.adapter.NukkitPlatformCapabilities;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.entity.BaseEntity;
+import com.sk89q.worldedit.entity.metadata.EntityProperties;
 import com.sk89q.worldedit.extension.platform.AbstractPlayerActor;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.internal.cui.CUIEvent;
@@ -259,6 +260,9 @@ public class NukkitPlayer extends AbstractPlayerActor {
     @Nullable
     @Override
     public <T> T getFacet(Class<? extends T> cls) {
+        if (EntityProperties.class.isAssignableFrom(cls)) {
+            return cls.cast(new NukkitEntityProperties(player));
+        }
         return null;
     }
 

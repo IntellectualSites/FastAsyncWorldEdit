@@ -107,6 +107,10 @@ public class NukkitGetBlocks_Copy implements IChunkGet {
         entities.add(NukkitNbtConverter.toFawe(entity.namedTag));
     }
 
+    private int normalizedHeight(int y) {
+        return y - (getMinSectionPosition() << 4) + 1;
+    }
+
     private int layerIndex(int layer) {
         return layer - minSectionPosition;
     }
@@ -173,13 +177,47 @@ public class NukkitGetBlocks_Copy implements IChunkGet {
 
     @Override
     public int[] getHeightMap(HeightMapType type) {
-        return new int[256];
+        int[] heightMap = new int[256];
+        int found = 0;
+        for (int y = maxY; y >= minY; y--) {
+            int layer = y >> 4;
+            int index = layerIndex(layer);
+            if (index < 0 || index >= sectionCount || blocks[index] == null) {
+                continue;
+            }
+            int localY = y & 0xF;
+            char[] section = blocks[index];
+            for (int z = 0; z < 16; z++) {
+                for (int x = 0; x < 16; x++) {
+                    int heightIndex = (z << 4) | x;
+                    if (heightMap[heightIndex] != 0) {
+                        continue;
+                    }
+                    char ordinal = section[(localY << 8) | (z << 4) | x];
+                    if (ordinal == BlockTypesCache.ReservedIDs.__RESERVED__) {
+                        continue;
+                    }
+                    BlockState state = BlockTypesCache.states[ordinal];
+                    if (state != null && type.includes(state)) {
+                        heightMap[heightIndex] = normalizedHeight(y);
+                        if (++found == 256) {
+                            return heightMap;
+                        }
+                    }
+                }
+            }
+        }
+        return heightMap;
     }
 
     @Nullable
     @Override
     public FaweCompoundTag tile(int x, int y, int z) {
-        return tiles.get(BlockVector3.at(x, y, z));
+        FaweCompoundTag tag = tiles.get(BlockVector3.at(x, y, z));
+        if (tag != null) {
+            return tag;
+        }
+        return tiles.get(BlockVector3.at((chunkX << 4) + (x & 0xF), y, (chunkZ << 4) + (z & 0xF)));
     }
 
     @Override
@@ -266,6 +304,7 @@ public class NukkitGetBlocks_Copy implements IChunkGet {
 
     @Override
     public void setHeightmapToGet(HeightMapType type, int[] data) {
+        // Nukkit recalculates heightmaps; snapshot copies only expose computed read data.
     }
 
     @Override

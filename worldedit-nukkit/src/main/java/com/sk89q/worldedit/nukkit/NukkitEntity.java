@@ -5,6 +5,7 @@ import com.fastasyncworldedit.nukkit.adapter.NukkitAdapter;
 import com.fastasyncworldedit.nukkit.adapter.NukkitImplLoader;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
+import com.sk89q.worldedit.entity.metadata.EntityProperties;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.concurrency.LazyReference;
@@ -101,6 +102,10 @@ public class NukkitEntity implements Entity {
     @Nullable
     @Override
     public <T> T getFacet(Class<? extends T> cls) {
+        cn.nukkit.entity.Entity entity = entityRef.get();
+        if (entity != null && EntityProperties.class.isAssignableFrom(cls)) {
+            return cls.cast(new NukkitEntityProperties(entity));
+        }
         return null;
     }
 

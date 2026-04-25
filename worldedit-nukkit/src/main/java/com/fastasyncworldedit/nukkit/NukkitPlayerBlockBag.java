@@ -76,8 +76,7 @@ public class NukkitPlayerBlockBag extends BlockBag {
         BlockType type = blockState.getBlockType();
         ItemMapping.NukkitItemData beData = ItemMapping.jeToBe(type.getItemType().id());
         if (beData.itemId() == 0) {
-            // Unmapped JE item — discard silently to avoid storing air
-            return;
+            throw new OutOfSpaceException(blockState.getBlockType());
         }
 
         // Merge into existing stacks first
