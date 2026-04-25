@@ -1,4 +1,4 @@
-package com.sk89q.worldedit.nukkit;
+package com.fastasyncworldedit.nukkit.registry;
 
 import com.fastasyncworldedit.nukkit.mapping.ItemMapping;
 import com.sk89q.worldedit.world.registry.BundledItemRegistry;

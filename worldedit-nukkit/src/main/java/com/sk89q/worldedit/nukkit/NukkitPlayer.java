@@ -7,8 +7,10 @@ import cn.nukkit.level.Level;
 import cn.nukkit.network.protocol.UpdateBlockPacket;
 import cn.nukkit.permission.PermissionAttachment;
 import com.fastasyncworldedit.nukkit.NukkitPlayerBlockBag;
+import com.fastasyncworldedit.nukkit.adapter.NukkitAdapter;
 import com.fastasyncworldedit.nukkit.adapter.NukkitImplAdapter;
 import com.fastasyncworldedit.nukkit.adapter.NukkitImplLoader;
+import com.fastasyncworldedit.nukkit.adapter.NukkitPlatformCapabilities;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.extension.platform.AbstractPlayerActor;
@@ -31,6 +33,33 @@ import javax.annotation.Nullable;
 import java.util.Locale;
 import java.util.UUID;
 
+/**
+ * Nukkit player wrapper for WorldEdit's actor system.
+ * <p>
+ * Bridges a Nukkit {@code Player} to WorldEdit's {@link AbstractPlayerActor}.
+ * Most operations delegate directly to the Nukkit player object. Some
+ * features available on Bukkit are limited or absent on Nukkit due to
+ * Bedrock client/protocol differences.
+ * <p>
+ * CUI (Client User Interface) protocol support is unavailable because CUI
+ * relies on modded Java Edition client features that do not exist on
+ * Bedrock clients. Calling {@link #dispatchCUIEvent} throws
+ * UnsupportedOperationException.
+ * <p>
+ * Fake blocks are sent via {@code UpdateBlockPacket} with runtime block IDs
+ * obtained from the active adapter. This works for simple preview blocks
+ * but lacks the full clipboard chunk preview available on Bukkit.
+ * <p>
+ * Key differences from Bukkit:
+ * <ul>
+ *   <li>No CUI support; Bedrock clients lack the modded CUI protocol</li>
+ *   <li>Fake blocks use UpdateBlockPacket rather than chunk packets</li>
+ *   <li>Language codes may be enum names (MOT) or Locale strings (NKX)</li>
+ * </ul>
+ *
+ * @see AbstractPlayerActor
+ * @see com.fastasyncworldedit.nukkit.adapter.NukkitImplAdapter#getPlayerLanguageCode
+ */
 public class NukkitPlayer extends AbstractPlayerActor {
 
     private final Player player;
@@ -157,7 +186,7 @@ public class NukkitPlayer extends AbstractPlayerActor {
         permAttachment.setPermission(permission, value);
     }
 
-    void removePermissionAttachment() {
+    public void removePermissionAttachment() {
         if (permAttachment != null) {
             permAttachment.remove();
             permAttachment = null;
@@ -171,7 +200,12 @@ public class NukkitPlayer extends AbstractPlayerActor {
 
     @Override
     public void dispatchCUIEvent(CUIEvent event) {
-        // CUI not supported on Bedrock clients
+        if (!supports(NukkitPlatformCapabilities.CUI_SUPPORT)) {
+            throw new UnsupportedOperationException(
+                    "WorldEdit CUI (Client User Interface) protocol is not supported on Nukkit. "
+                            + "CUI relies on modded Java Edition client features that are not available on Bedrock clients."
+            );
+        }
     }
 
     @Override
@@ -211,6 +245,14 @@ public class NukkitPlayer extends AbstractPlayerActor {
             return Locale.forLanguageTag(code.replace('_', '-'));
         } catch (Exception e) {
             return Locale.getDefault();
+        }
+    }
+
+    private static boolean supports(NukkitPlatformCapabilities capability) {
+        try {
+            return NukkitImplLoader.supports(capability);
+        } catch (IllegalStateException ignored) {
+            return false;
         }
     }
 
@@ -262,12 +304,12 @@ public class NukkitPlayer extends AbstractPlayerActor {
         return player;
     }
 
-    static class SessionKeyImpl implements SessionKey {
+    public static class SessionKeyImpl implements SessionKey {
 
         private final UUID uuid;
         private final String name;
 
-        SessionKeyImpl(Player player) {
+        public SessionKeyImpl(Player player) {
             this.uuid = player.getUniqueId();
             this.name = player.getName();
         }

@@ -5,6 +5,8 @@ import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.nukkit.FaweNukkit;
 import com.fastasyncworldedit.nukkit.adapter.NukkitImplAdapter;
 import com.fastasyncworldedit.nukkit.adapter.NukkitImplLoader;
+import com.fastasyncworldedit.nukkit.config.NukkitConfiguration;
+import com.fastasyncworldedit.nukkit.listener.NukkitWorldEditListener;
 import com.fastasyncworldedit.nukkit.mapping.BiomeMapping;
 import com.fastasyncworldedit.nukkit.mapping.BlockMapping;
 import com.fastasyncworldedit.nukkit.mapping.ItemMapping;
@@ -37,7 +39,7 @@ public class WorldEditNukkitPlugin extends PluginBase {
 
         // Detect and load platform adapter (MOT vs NKX)
         NukkitImplAdapter adapter = NukkitImplLoader.detect();
-        getLogger().info("Detected Nukkit platform: " + adapter.getPlatformName());
+        getLogger().info("Detected Nukkit platform: " + adapter.getPlatformName() + " " + adapter.getVersion());
 
         // Create data folder
         getDataFolder().mkdirs();
@@ -158,7 +160,7 @@ public class WorldEditNukkitPlugin extends PluginBase {
         return configuration;
     }
 
-    NukkitServerInterface getInternalPlatform() {
+    public NukkitServerInterface getInternalPlatform() {
         return platform;
     }
 

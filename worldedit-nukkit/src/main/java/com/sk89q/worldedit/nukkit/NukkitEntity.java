@@ -1,6 +1,7 @@
 package com.sk89q.worldedit.nukkit;
 
 import com.fastasyncworldedit.nukkit.NukkitNbtConverter;
+import com.fastasyncworldedit.nukkit.adapter.NukkitAdapter;
 import com.fastasyncworldedit.nukkit.adapter.NukkitImplLoader;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;

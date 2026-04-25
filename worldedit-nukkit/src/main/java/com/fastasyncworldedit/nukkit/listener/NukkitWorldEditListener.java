@@ -1,4 +1,4 @@
-package com.sk89q.worldedit.nukkit;
+package com.fastasyncworldedit.nukkit.listener;
 
 import cn.nukkit.Player;
 import cn.nukkit.block.Block;
@@ -9,11 +9,14 @@ import cn.nukkit.event.block.BlockBreakEvent;
 import cn.nukkit.event.player.PlayerInteractEvent;
 import cn.nukkit.event.player.PlayerQuitEvent;
 import cn.nukkit.math.BlockFace;
+import com.fastasyncworldedit.nukkit.adapter.NukkitAdapter;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.event.platform.SessionIdleEvent;
 import com.sk89q.worldedit.math.Vector3;
+import com.sk89q.worldedit.nukkit.NukkitPlayer;
+import com.sk89q.worldedit.nukkit.WorldEditNukkitPlugin;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.Location;
 

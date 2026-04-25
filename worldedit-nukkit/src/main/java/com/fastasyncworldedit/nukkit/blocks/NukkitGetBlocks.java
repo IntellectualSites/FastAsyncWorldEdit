@@ -1,4 +1,4 @@
-package com.sk89q.worldedit.nukkit;
+package com.fastasyncworldedit.nukkit.blocks;
 
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.level.Level;
@@ -19,6 +19,7 @@ import com.fastasyncworldedit.nukkit.mapping.BiomeMapping;
 import com.fastasyncworldedit.nukkit.mapping.BlockMapping;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.nukkit.NukkitEntity;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
@@ -45,6 +46,38 @@ import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Nukkit chunk data access for FAWE's async editing system.
+ * <p>
+ * This class bridges FAWE's section-based chunk model to Nukkit's flat
+ * {@code BaseFullChunk} representation. Unlike Bukkit, where chunks are
+ * composed of {@code LevelChunkSection} arrays that FAWE can cache and
+ * modify directly, Nukkit stores blocks in a flat structure with no real
+ * section abstraction. We therefore read and write blocks by iterating
+ * coordinates rather than copying whole sections.
+ * <p>
+ * Chunk caching is done lazily via {@link #getChunk()} rather than in the
+ * constructor because Nukkit chunks may load asynchronously or be null
+ * during world initialization. Caching eagerly could fail or stall the
+ * queue thread.
+ * <p>
+ * Waterlogging is handled via layer 1 block access. Blocks that support
+ * the WATERLOGGED property have their layer 1 checked; if water is present,
+ * the state is updated accordingly. On write, waterlogged blocks split
+ * the state into layer 0 (block) and layer 1 (water).
+ * <p>
+ * Lighting is fully delegated to Nukkit. All lighting methods are no-op
+ * because Nukkit recalculates light internally when blocks change. This
+ * differs from Bukkit, where FAWE must manually invoke NMS relighting.
+ * <p>
+ * Key differences from Bukkit:
+ * <ul>
+ *   <li>No chunk section abstraction; flat BaseFullChunk access</li>
+ *   <li>Lazy chunk caching via synchronized getter</li>
+ *   <li>Waterlogging via dual-layer block storage</li>
+ *   <li>Lighting managed by Nukkit; no manual relighting</li>
+ * </ul>
+ *
+ * @see NukkitGetBlocks_Copy
+ * @see com.fastasyncworldedit.core.queue.IChunkGet
  */
 public class NukkitGetBlocks extends CharGetBlocks {
 
@@ -58,6 +91,7 @@ public class NukkitGetBlocks extends CharGetBlocks {
     private final int maxY;
     private final ReentrantLock callLock = new ReentrantLock();
     private final ConcurrentHashMap<Integer, IChunkGet> copies = new ConcurrentHashMap<>();
+    private BaseFullChunk cachedChunk;
     private boolean createCopy = false;
     private int copyKey = 0;
 
@@ -80,9 +114,22 @@ public class NukkitGetBlocks extends CharGetBlocks {
         return chunkZ;
     }
 
+    private BaseFullChunk getChunk() {
+        BaseFullChunk chunk = this.cachedChunk;
+        if (chunk == null) {
+            synchronized (this) {
+                chunk = this.cachedChunk;
+                if (chunk == null) {
+                    this.cachedChunk = chunk = level.getChunk(chunkX, chunkZ, true);
+                }
+            }
+        }
+        return chunk;
+    }
+
     @Override
     public BiomeType getBiomeType(int x, int y, int z) {
-        BaseFullChunk chunk = level.getChunk(chunkX, chunkZ, true);
+        BaseFullChunk chunk = getChunk();
         if (chunk == null) {
             return BiomeTypes.PLAINS;
         }
@@ -94,7 +141,7 @@ public class NukkitGetBlocks extends CharGetBlocks {
 
     @Override
     public BlockState getBlock(int x, int y, int z) {
-        BaseFullChunk chunk = level.getChunk(chunkX, chunkZ, true);
+        BaseFullChunk chunk = getChunk();
         if (chunk == null) {
             return BlockTypesCache.states[BlockTypesCache.ReservedIDs.AIR];
         }
@@ -116,7 +163,7 @@ public class NukkitGetBlocks extends CharGetBlocks {
 
     @Override
     public char[] update(int layer, char[] data, boolean aggressive) {
-        BaseFullChunk chunk = level.getChunk(chunkX, chunkZ, true);
+        BaseFullChunk chunk = getChunk();
         if (chunk == null) {
             return data;
         }
@@ -154,7 +201,7 @@ public class NukkitGetBlocks extends CharGetBlocks {
     @Override
     @SuppressWarnings({"rawtypes", "unchecked"})
     public <T extends Future<T>> T call(IQueueExtent<? extends IChunk> owner, IChunkSet set, Runnable finalizer) {
-        BaseFullChunk chunk = level.getChunk(chunkX, chunkZ, true);
+        BaseFullChunk chunk = getChunk();
         if (chunk == null) {
             if (finalizer != null) {
                 finalizer.run();
@@ -381,7 +428,7 @@ public class NukkitGetBlocks extends CharGetBlocks {
 
     @Override
     public int getSkyLight(int x, int y, int z) {
-        BaseFullChunk chunk = level.getChunk(chunkX, chunkZ, true);
+        BaseFullChunk chunk = getChunk();
         if (chunk == null) {
             return 15;
         }
@@ -390,7 +437,7 @@ public class NukkitGetBlocks extends CharGetBlocks {
 
     @Override
     public int getEmittedLight(int x, int y, int z) {
-        BaseFullChunk chunk = level.getChunk(chunkX, chunkZ, true);
+        BaseFullChunk chunk = getChunk();
         if (chunk == null) {
             return 0;
         }
@@ -405,7 +452,7 @@ public class NukkitGetBlocks extends CharGetBlocks {
     @Nullable
     @Override
     public FaweCompoundTag tile(int x, int y, int z) {
-        BaseFullChunk chunk = level.getChunk(chunkX, chunkZ, true);
+        BaseFullChunk chunk = getChunk();
         if (chunk == null) {
             return null;
         }
@@ -418,7 +465,7 @@ public class NukkitGetBlocks extends CharGetBlocks {
 
     @Override
     public Map<BlockVector3, FaweCompoundTag> tiles() {
-        BaseFullChunk chunk = level.getChunk(chunkX, chunkZ, true);
+        BaseFullChunk chunk = getChunk();
         if (chunk == null) {
             return Collections.emptyMap();
         }

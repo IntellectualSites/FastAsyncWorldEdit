@@ -6,7 +6,9 @@ import cn.nukkit.command.CommandSender;
 import cn.nukkit.level.Level;
 import com.fastasyncworldedit.core.extent.processor.lighting.RelighterFactory;
 import com.fastasyncworldedit.nukkit.NukkitRelighter;
+import com.fastasyncworldedit.nukkit.adapter.NukkitAdapter;
 import com.fastasyncworldedit.nukkit.adapter.NukkitImplLoader;
+import com.fastasyncworldedit.nukkit.registry.NukkitRegistries;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.command.util.PermissionCondition;
@@ -34,6 +36,33 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
+/**
+ * Nukkit platform interface for WorldEdit's extension system.
+ * <p>
+ * Implements {@link AbstractPlatform} and {@link MultiUserPlatform} to
+ * integrate WorldEdit/FAWE with Nukkit's server, command, and world APIs.
+ * Commands are registered by wrapping WorldEdit's piston commands in
+ * Nukkit {@code Command} objects that dispatch via the event bus.
+ * <p>
+ * The relighter factory returns {@link NukkitRelighter}, a no-op
+ * implementation, because Nukkit handles lighting internally. Using
+ * NullRelighter would fail RelightProcessor's constructor validation.
+ * <p>
+ * Data version is fixed to the Java Edition block registry version
+ * (1.21.10) because FAWE's block mapping files are maintained against
+ * JE block states, even though Nukkit is a Bedrock server.
+ * <p>
+ * Key differences from Bukkit:
+ * <ul>
+ *   <li>Relighter is no-op; Bukkit requires active NMS relighting</li>
+ *   <li>Commands wrapped as Nukkit Command objects instead of Bukkit CommandExecutor</li>
+ *   <li>No WorldGuard/PlotSquared integration; mask managers are empty</li>
+ *   <li>Data version tracks JE registry, not Bedrock</li>
+ * </ul>
+ *
+ * @see com.sk89q.worldedit.extension.platform.AbstractPlatform
+ * @see com.fastasyncworldedit.nukkit.NukkitRelighter
+ */
 public class NukkitServerInterface extends AbstractPlatform implements MultiUserPlatform {
 
     private final WorldEditNukkitPlugin plugin;
@@ -130,7 +159,7 @@ public class NukkitServerInterface extends AbstractPlatform implements MultiUser
         this.hookingEvents = enabled;
     }
 
-    boolean isHookingEvents() {
+    public boolean isHookingEvents() {
         return hookingEvents;
     }
 
@@ -151,7 +180,7 @@ public class NukkitServerInterface extends AbstractPlatform implements MultiUser
 
     @Override
     public String getPlatformVersion() {
-        return plugin.getDescription().getVersion();
+        return NukkitImplLoader.getPlatformVersion();
     }
 
     @Override

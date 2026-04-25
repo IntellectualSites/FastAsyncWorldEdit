@@ -17,6 +17,30 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.UUID;
 
+/**
+ * Nukkit implementation of the FAWE platform contract ({@link IFawe}).
+ * <p>
+ * This class wires FAWE's core async engine to Nukkit's scheduler and
+ * chunk system. Compared to Bukkit, the Nukkit implementation is simpler:
+ * there is no region protection plugin integration (getMaskManagers returns
+ * an empty list), and the queue handler operates with fewer platform-specific
+ * optimizations because Nukkit's API surface is smaller.
+ * <p>
+ * Preloading uses the standard AsyncPreloader since Nukkit does not provide
+ * specialized chunk loading hooks. The platform adapter delegates chunk
+ * sending to Nukkit's internal mechanisms, which means some FAWE features
+ * like fake chunk packets are unavailable.
+ * <p>
+ * Key differences from Bukkit:
+ * <ul>
+ *   <li>No FaweMaskManager support; no region plugin integration</li>
+ *   <li>Simpler queue handler with fewer NMS optimizations</li>
+ *   <li>Chunk packet sending is internal to Nukkit</li>
+ * </ul>
+ *
+ * @see com.fastasyncworldedit.core.IFawe
+ * @see com.fastasyncworldedit.bukkit.FaweBukkit
+ */
 public class FaweNukkit implements IFawe {
 
     private final Plugin plugin;

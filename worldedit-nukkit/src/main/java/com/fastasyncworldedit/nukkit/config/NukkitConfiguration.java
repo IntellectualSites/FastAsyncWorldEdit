@@ -1,4 +1,4 @@
-package com.sk89q.worldedit.nukkit;
+package com.fastasyncworldedit.nukkit.config;
 
 import cn.nukkit.plugin.Plugin;
 import com.sk89q.worldedit.util.PropertiesConfiguration;

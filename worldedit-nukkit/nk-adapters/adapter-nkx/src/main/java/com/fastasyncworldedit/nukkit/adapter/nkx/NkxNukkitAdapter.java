@@ -16,23 +16,56 @@ import cn.nukkit.level.generator.object.tree.ObjectMangroveTree;
 import cn.nukkit.math.NukkitRandom;
 import cn.nukkit.math.Vector3;
 import com.fastasyncworldedit.nukkit.adapter.NukkitImplAdapter;
+import com.fastasyncworldedit.nukkit.adapter.NukkitPlatformCapabilities;
 import org.cloudburstmc.nbt.NbtMap;
 
 import javax.annotation.Nullable;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.UUID;
 
 /**
  * Adapter implementation for the NKX (upstream Nukkit) platform.
+ * <p>
+ * NKX is the original/community Nukkit fork with a smaller API surface
+ * than MOT. This adapter compiles against NKX-specific classes such as
+ * {@code cn.nukkit.block.BlockLayer}. It is loaded at runtime by
+ * {@link NukkitImplLoader} when MOT is not detected.
+ * <p>
+ * NKX uses 6-bit block data (vs MOT's 13-bit) and requires BlockLayer enum
+ * values for multi-layer access. Only EntityHuman (players) have UUIDs;
+ * other entities must derive synthetic UUIDs from their network ID.
+ * <p>
+ * Key differences from MOT:
+ * <ul>
+ *   <li>Does not support PaleOak trees; MOT does</li>
+ *   <li>Uses BlockLayer enum for layer access; MOT uses int</li>
+ *   <li>Limited capabilities reported; MOT advertises ALL_TREE_TYPES</li>
+ * </ul>
+ *
+ * @see com.fastasyncworldedit.nukkit.adapter.mot.MotNukkitAdapter
+ * @see NukkitImplLoader
  */
 public class NkxNukkitAdapter implements NukkitImplAdapter {
 
     private static final BlockLayer[] LAYERS = {BlockLayer.NORMAL, BlockLayer.WATERLOGGED};
+    private static final Set<NukkitPlatformCapabilities> CAPABILITIES = Collections.emptySet();
 
     @Override
     public String getPlatformName() {
         return "NKX";
+    }
+
+    @Override
+    public String getVersion() {
+        return NukkitImplAdapter.detectServerVersion(getPlatformName());
+    }
+
+    @Override
+    public Set<NukkitPlatformCapabilities> getCapabilities() {
+        return CAPABILITIES;
     }
 
     @Override

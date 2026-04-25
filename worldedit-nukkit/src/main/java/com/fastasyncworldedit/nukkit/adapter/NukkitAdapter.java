@@ -1,4 +1,4 @@
-package com.sk89q.worldedit.nukkit;
+package com.fastasyncworldedit.nukkit.adapter;
 
 import cn.nukkit.Player;
 import cn.nukkit.item.Item;
@@ -9,6 +9,8 @@ import com.fastasyncworldedit.nukkit.mapping.ItemMapping;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.nukkit.NukkitPlayer;
+import com.sk89q.worldedit.nukkit.NukkitWorld;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypes;
@@ -43,7 +45,7 @@ public final class NukkitAdapter {
     /**
      * Remove a player from the cache. Should be called on player quit.
      */
-    static void uncachePlayer(Player player) {
+    public static void uncachePlayer(Player player) {
         playerCache.remove(player);
     }
 

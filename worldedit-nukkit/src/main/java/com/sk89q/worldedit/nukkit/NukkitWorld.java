@@ -5,8 +5,11 @@ import cn.nukkit.level.Level;
 import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.implementation.packet.ChunkPacket;
+import com.fastasyncworldedit.nukkit.adapter.NukkitAdapter;
 import com.fastasyncworldedit.nukkit.adapter.NukkitImplAdapter;
 import com.fastasyncworldedit.nukkit.adapter.NukkitImplLoader;
+import com.fastasyncworldedit.nukkit.adapter.NukkitPlatformCapabilities;
+import com.fastasyncworldedit.nukkit.blocks.NukkitGetBlocks;
 import com.fastasyncworldedit.nukkit.mapping.BiomeMapping;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEditException;
@@ -34,6 +37,38 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Nukkit world implementation for WorldEdit's {@link com.sk89q.worldedit.world.World}.
+ * <p>
+ * This class delegates world operations to Nukkit's {@code Level} API.
+ * Unlike Bukkit, where FAWE bypasses the Bukkit API and writes directly to
+ * NMS chunk sections for performance, Nukkit operations go through the
+ * public Block and Level APIs. This is necessary because Nukkit does not
+ * expose an equivalent low-level chunk section API.
+ * <p>
+ * Tree generation throws {@link UnsupportedOperationException} because
+ * Nukkit's {@code ObjectTree} / {@code TreeGenerator} APIs mutate the
+ * world directly without providing a block capture mechanism. FAWE's
+ * history and undo system requires capturing all block changes, which
+ * is impossible with Nukkit's tree API. The capability flag
+ * TREE_HISTORY_CAPTURE is never advertised for this reason.
+ * <p>
+ * {@link #sendFakeChunk} is unsupported because converting Java Edition
+ * block states to Bedrock runtime IDs and serializing into Nukkit's
+ * LevelChunkPacket format is not exposed in the Nukkit API. Clipboard
+ * visualization previews therefore do not work on Nukkit.
+ * <p>
+ * Key differences from Bukkit:
+ * <ul>
+ *   <li>setBlock uses Nukkit's public API instead of direct NMS writes</li>
+ *   <li>Tree generation cannot participate in history/undo</li>
+ *   <li>Fake chunk packets for clipboard previews are unsupported</li>
+ *   <li>Side effects are applied atomically in setBlock</li>
+ * </ul>
+ *
+ * @see com.sk89q.worldedit.world.AbstractWorld
+ * @see com.fastasyncworldedit.nukkit.adapter.NukkitPlatformCapabilities
+ */
 public class NukkitWorld extends AbstractWorld {
 
     private final WeakReference<Level> levelRef;
@@ -155,58 +190,19 @@ public class NukkitWorld extends AbstractWorld {
 
     @Override
     public boolean generateTree(TreeGenerator.TreeType type, EditSession editSession, BlockVector3 position) {
-        Level level = getLevel();
-        cn.nukkit.math.NukkitRandom random = new cn.nukkit.math.NukkitRandom();
-        int x = position.x();
-        int y = position.y();
-        int z = position.z();
-        cn.nukkit.math.Vector3 pos = new cn.nukkit.math.Vector3(x, y, z);
-
-        // ObjectTree subclasses use placeObject(ChunkManager, x, y, z, NukkitRandom)
-        cn.nukkit.level.generator.object.tree.ObjectTree objectTree = switch (type) {
-            case TREE, BIG_TREE -> new cn.nukkit.level.generator.object.tree.ObjectOakTree();
-            case REDWOOD, TALL_REDWOOD -> new cn.nukkit.level.generator.object.tree.ObjectSpruceTree();
-            case MEGA_REDWOOD -> new cn.nukkit.level.generator.object.tree.ObjectBigSpruceTree(0.45f, 2);
-            case BIRCH -> new cn.nukkit.level.generator.object.tree.ObjectBirchTree();
-            case TALL_BIRCH -> new cn.nukkit.level.generator.object.tree.ObjectTallBirchTree();
-            case SMALL_JUNGLE, SHORT_JUNGLE -> new cn.nukkit.level.generator.object.tree.ObjectJungleTree();
-            case CRIMSON_FUNGUS -> new cn.nukkit.level.generator.object.tree.ObjectCrimsonTree();
-            case WARPED_FUNGUS -> new cn.nukkit.level.generator.object.tree.ObjectWarpedTree();
-            default -> null;
-        };
-        if (objectTree != null) {
-            objectTree.placeObject(level, x, y, z, random);
-            return true;
-        }
-
-        // TreeGenerator subclasses use generate(ChunkManager, NukkitRandom, Vector3)
-        cn.nukkit.level.generator.object.tree.TreeGenerator treeGen = switch (type) {
-            case JUNGLE -> new cn.nukkit.level.generator.object.tree.ObjectJungleBigTree(
-                    10, 20,
-                    Block.get(Block.WOOD, cn.nukkit.block.BlockWood.JUNGLE),
-                    Block.get(Block.LEAVES, cn.nukkit.block.BlockWood.JUNGLE)
+        if (!NukkitImplLoader.supports(NukkitPlatformCapabilities.TREE_HISTORY_CAPTURE)) {
+            throw new UnsupportedOperationException(
+                    "Tree generation on Nukkit cannot participate in FAWE history/undo because "
+                            + "the Nukkit API (ObjectTree/TreeGenerator) mutates the world directly "
+                            + "without providing a block capture mechanism. "
+                            + "Use manual block placement or consider using a Bukkit-based server for full tree history support."
             );
-            case SWAMP -> new cn.nukkit.level.generator.object.tree.ObjectSwampTree();
-            case ACACIA -> new cn.nukkit.level.generator.object.tree.ObjectSavannaTree();
-            case DARK_OAK -> new cn.nukkit.level.generator.object.tree.ObjectDarkOakTree();
-            default -> null;
-        };
-        if (treeGen != null) {
-            return treeGen.generate(level, random, pos);
         }
 
-        // Trees with divergent class hierarchies between MOT and NKX — delegate to adapter
-        String adapterType = switch (type) {
-            case MANGROVE, TALL_MANGROVE -> "MANGROVE";
-            case CHERRY -> "CHERRY";
-            case PALE_OAK, PALE_OAK_CREAKING -> "PALE_OAK";
-            default -> null;
-        };
-        if (adapterType != null) {
-            return NukkitImplLoader.get().generateTree(adapterType, level, x, y, z, random, pos);
-        }
-
-        return false;
+        throw new UnsupportedOperationException(
+                "Tree generation history capture is advertised by the active Nukkit adapter, "
+                        + "but NukkitWorld has no history-aware tree generation implementation."
+        );
     }
 
     @Override
@@ -231,9 +227,22 @@ public class NukkitWorld extends AbstractWorld {
 
     @Override
     public void sendFakeChunk(@Nullable Player player, ChunkPacket packet) {
-        // Not supported on Nukkit: requires converting JE block states to BE runtime ID palettes
-        // and serializing into Nukkit's LevelChunkPacket format (PalettedBlockStorage + 3D biomes).
-        // Affects non-critical features like clipboard visualization previews.
+        if (!supports(NukkitPlatformCapabilities.FAKE_CHUNKS)) {
+            throw new UnsupportedOperationException(
+                    "Fake chunk packets are not supported on Nukkit. "
+                            + "This feature requires converting JE block states to BE runtime ID palettes "
+                            + "and serializing into Nukkit's LevelChunkPacket format (PalettedBlockStorage + 3D biomes). "
+                            + "Nukkit does not expose the necessary APIs for clipboard visualization previews."
+            );
+        }
+    }
+
+    private static boolean supports(NukkitPlatformCapabilities capability) {
+        try {
+            return NukkitImplLoader.supports(capability);
+        } catch (IllegalStateException ignored) {
+            return false;
+        }
     }
 
     @Override

@@ -16,20 +16,55 @@ import cn.nukkit.math.NukkitRandom;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.utils.Identifier;
 import com.fastasyncworldedit.nukkit.adapter.NukkitImplAdapter;
+import com.fastasyncworldedit.nukkit.adapter.NukkitPlatformCapabilities;
 import org.cloudburstmc.nbt.NbtMap;
 
 import javax.annotation.Nullable;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 /**
  * Adapter implementation for the Nukkit-MOT platform.
+ * <p>
+ * MOT (Memory-Optimized-Terrain) extends Nukkit with modern Bedrock features
+ * and additional APIs. This adapter compiles against MOT-specific classes
+ * such as {@code cn.nukkit.GameVersion} and {@code Identifier}. It is loaded
+ * at runtime by {@link NukkitImplLoader} only when MOT is detected.
+ * <p>
+ * MOT uses 13-bit block data (vs NKX's 6-bit) and accepts int layer indices
+ * for multi-layer block access (waterlogging). All entities have UUIDs.
+ * <p>
+ * Key differences from NKX:
+ * <ul>
+ *   <li>Supports PaleOak trees; NKX does not</li>
+ *   <li>Uses int layer parameter (0=normal, 1=waterlogged); NKX uses BlockLayer enum</li>
+ *   <li>Player language returned as enum name; NKX returns Locale string</li>
+ * </ul>
+ *
+ * @see com.fastasyncworldedit.nukkit.adapter.nkx.NkxNukkitAdapter
+ * @see NukkitImplLoader
  */
 public class MotNukkitAdapter implements NukkitImplAdapter {
+
+    private static final Set<NukkitPlatformCapabilities> CAPABILITIES = Set.copyOf(EnumSet.of(
+            NukkitPlatformCapabilities.ALL_TREE_TYPES
+    ));
 
     @Override
     public String getPlatformName() {
         return "Nukkit-MOT";
+    }
+
+    @Override
+    public String getVersion() {
+        return NukkitImplAdapter.detectServerVersion(getPlatformName());
+    }
+
+    @Override
+    public Set<NukkitPlatformCapabilities> getCapabilities() {
+        return CAPABILITIES;
     }
 
     @Override

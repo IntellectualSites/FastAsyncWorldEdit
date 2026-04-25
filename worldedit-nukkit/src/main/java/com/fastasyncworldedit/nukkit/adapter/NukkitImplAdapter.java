@@ -10,14 +10,35 @@ import cn.nukkit.math.Vector3;
 import org.cloudburstmc.nbt.NbtMap;
 
 import javax.annotation.Nullable;
+import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 /**
  * Adapter interface abstracting API differences between Nukkit-MOT and NKX.
  * <p>
- * Each platform provides its own implementation compiled against its specific API,
- * loaded at runtime by {@link NukkitImplLoader}.
+ * Nukkit has two major active forks (MOT and NKX) with incompatible APIs.
+ * Unlike Bukkit, where FAWE compiles separate adapter modules per Minecraft
+ * version, Nukkit adapters must be detected and loaded at runtime because
+ * both forks share the same package names ({@code cn.nukkit}) but have different
+ * classes and methods. Compile-time separation is impossible without shading
+ * or renaming packages.
+ * <p>
+ * Reflection is used for version detection ({@link #detectServerVersion})
+ * to avoid hard dependencies on either fork's Server class internals.
+ * <p>
+ * Key differences from Bukkit:
+ * <ul>
+ *   <li>Bukkit uses Paperweight per-MC-version adapters; Nukkit uses runtime fork detection</li>
+ *   <li>Block state bit widths differ (MOT=13, NKX=6)</li>
+ *   <li>Layer access uses int (MOT) vs BlockLayer enum (NKX)</li>
+ * </ul>
+ *
+ * @see NukkitImplLoader
+ * @see com.fastasyncworldedit.nukkit.adapter.mot.MotNukkitAdapter
+ * @see com.fastasyncworldedit.nukkit.adapter.nkx.NkxNukkitAdapter
  */
 public interface NukkitImplAdapter {
 
@@ -25,6 +46,63 @@ public interface NukkitImplAdapter {
      * Platform name for display: "Nukkit-MOT" or "NKX".
      */
     String getPlatformName();
+
+    /**
+     * Runtime platform version or platform identifier if exact version metadata is unavailable.
+     */
+    default String getVersion() {
+        return getPlatformName();
+    }
+
+    /**
+     * Granular features supported by this runtime Nukkit platform.
+     */
+    default Set<NukkitPlatformCapabilities> getCapabilities() {
+        return Collections.emptySet();
+    }
+
+    /**
+     * Returns whether this runtime Nukkit platform supports the given capability.
+     */
+    default boolean supports(NukkitPlatformCapabilities capability) {
+        return getCapabilities().contains(capability);
+    }
+
+    /**
+     * Reflectively reads common Nukkit server version fields without binding adapters to a specific API fork.
+     */
+    static String detectServerVersion(String fallback) {
+        try {
+            Class<?> serverClass = Class.forName("cn.nukkit.Server");
+            Object server = serverClass.getMethod("getInstance").invoke(null);
+            if (server == null) {
+                return fallback;
+            }
+            String name = invokeString(serverClass, server, "getName");
+            String version = invokeString(serverClass, server, "getVersion");
+            String nukkitVersion = invokeString(serverClass, server, "getNukkitVersion");
+            StringBuilder builder = new StringBuilder(name != null && !name.isBlank() ? name : fallback);
+            if (version != null && !version.isBlank()) {
+                builder.append(' ').append(version);
+            }
+            if (nukkitVersion != null && !nukkitVersion.isBlank() && !nukkitVersion.equals(version)) {
+                builder.append(" (").append(nukkitVersion).append(')');
+            }
+            return builder.toString();
+        } catch (ReflectiveOperationException | LinkageError ignored) {
+            return fallback;
+        }
+    }
+
+    private static String invokeString(Class<?> type, Object instance, String methodName) {
+        try {
+            Method method = type.getMethod(methodName);
+            Object value = method.invoke(instance);
+            return value instanceof String string ? string : null;
+        } catch (ReflectiveOperationException | LinkageError ignored) {
+            return null;
+        }
+    }
 
     /**
      * Runtime value of {@code Block.DATA_BITS} (MOT=13, NKX=6).

@@ -1,4 +1,4 @@
-package com.sk89q.worldedit.nukkit;
+package com.fastasyncworldedit.nukkit.blocks;
 
 import com.fastasyncworldedit.core.extent.processor.heightmap.HeightMapType;
 import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
@@ -30,6 +30,29 @@ import java.util.concurrent.Future;
 
 /**
  * Immutable snapshot copy of a chunk for undo/history.
+ * <p>
+ * Because Nukkit does not expose chunk sections as first-class objects,
+ * this copy stores block data in char arrays indexed by section position.
+ * The snapshot is taken before modifications in
+ * {@link NukkitGetBlocks#call} and retrieved later for undo operations.
+ * <p>
+ * Unlike Bukkit's copy implementations, which can delegate to NMS chunk
+ * snapshot methods, this class must manually iterate and store every
+ * block, tile entity, biome, and entity because Nukkit's API does not
+ * provide a native snapshot mechanism.
+ * <p>
+ * Lighting and heightmap data are not stored because Nukkit recalculates
+ * them automatically on block changes. Tile entities and entities are
+ * stored as FAWE compound tags for cross-platform compatibility.
+ * <p>
+ * Key differences from Bukkit:
+ * <ul>
+ *   <li>Manual per-coordinate block storage instead of section snapshots</li>
+ *   <li>No lighting or heightmap capture; Nukkit handles these internally</li>
+ *   <li>Entity UUIDs must be injected into NBT because NKX does not save them</li>
+ * </ul>
+ *
+ * @see NukkitGetBlocks
  */
 public class NukkitGetBlocks_Copy implements IChunkGet {
 
