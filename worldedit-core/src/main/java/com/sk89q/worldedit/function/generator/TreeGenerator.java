@@ -17,30 +17,32 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldedit.command.factory;
+package com.sk89q.worldedit.function.generator;
 
 import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.function.Contextual;
-import com.sk89q.worldedit.function.EditContext;
-import com.sk89q.worldedit.function.generator.TreeGenerator;
+import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.function.RegionFunction;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.generation.TreeType;
 
-public final class TreeGeneratorFactory implements Contextual<TreeGenerator> {
+public final class TreeGenerator implements RegionFunction {
 
-    private final TreeType type;
+    private final TreeType treeType;
+    private final EditSession editSession;
 
-    public TreeGeneratorFactory(TreeType type) {
-        this.type = type;
+    /**
+     * Create a new instance.
+     *
+     * @param editSession the edit session
+     * @param treeType the tree type
+     */
+    public TreeGenerator(EditSession editSession, TreeType treeType) {
+        this.editSession = editSession;
+        this.treeType = treeType;
     }
 
     @Override
-    public TreeGenerator createFromContext(EditContext input) {
-        return new TreeGenerator((EditSession) input.getDestination(), type);
+    public boolean apply(BlockVector3 position) throws WorldEditException {
+        return editSession.getWorld().generateTree(treeType, editSession, position);
     }
-
-    @Override
-    public String toString() {
-        return "tree of type " + type;
-    }
-
 }

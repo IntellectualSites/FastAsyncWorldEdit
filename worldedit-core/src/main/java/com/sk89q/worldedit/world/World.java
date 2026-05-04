@@ -48,6 +48,7 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.generation.ConfiguredFeatureType;
 import com.sk89q.worldedit.world.generation.StructureType;
+import com.sk89q.worldedit.world.generation.TreeType;
 import com.sk89q.worldedit.world.weather.WeatherType;
 
 import javax.annotation.Nullable;
@@ -309,9 +310,24 @@ public interface World extends Extent, Keyed, IChunkCache<IChunkGet> {
      * @param position    the position
      * @return true if generation was successful
      * @throws MaxChangedBlocksException thrown if too many blocks were changed
+     * @deprecated Use {@link #generateTree(TreeType, EditSession, BlockVector3)} instead
      */
-    boolean generateTree(TreeGenerator.TreeType type, EditSession editSession, BlockVector3 position) throws
-            MaxChangedBlocksException;
+    @Deprecated
+    default boolean generateTree(TreeGenerator.TreeType type, EditSession editSession, BlockVector3 position) throws
+            MaxChangedBlocksException {
+        return false;
+    }
+
+    /**
+     * Generate a tree at the given position.
+     *
+     * @param type the tree type
+     * @param editSession the {@link EditSession}
+     * @param position the position
+     * @return true if generation was successful
+     * @throws MaxChangedBlocksException thrown if too many blocks were changed
+     */
+    boolean generateTree(TreeType type, EditSession editSession, BlockVector3 position) throws MaxChangedBlocksException;
 
     /**
      * Generate a structure at the given position

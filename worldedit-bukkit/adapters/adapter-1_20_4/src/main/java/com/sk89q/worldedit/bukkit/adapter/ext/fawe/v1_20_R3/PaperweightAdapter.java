@@ -68,10 +68,12 @@ import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.generation.ConfiguredFeatureType;
 import com.sk89q.worldedit.world.generation.StructureType;
+import com.sk89q.worldedit.world.generation.TreeType;
 import com.sk89q.worldedit.world.item.ItemType;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.Registry;
 import net.minecraft.core.SectionPos;
@@ -113,6 +115,9 @@ import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.WorldOptions;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
+import net.minecraft.world.level.levelgen.feature.CoralTreeFeature;
+import net.minecraft.world.level.levelgen.feature.TreeFeature;
+import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureStart;
@@ -916,6 +921,20 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
                 StructureType.REGISTRY.register(name.toString(), new StructureType(name.toString()));
             }
         }
+
+        // Trees
+        HolderLookup.RegistryLookup<PlacedFeature> placedFeatureRegistry = server.registryAccess().lookupOrThrow(Registries.PLACED_FEATURE);
+        placedFeatureRegistry.listElements()
+                .filter(feature -> {
+                    var underlyingFeature = feature.value().feature().value().feature();
+                    return underlyingFeature instanceof TreeFeature || underlyingFeature instanceof CoralTreeFeature;
+                })
+                .forEach(feature -> {
+                    String key = feature.key().toString();
+                    if (TreeType.REGISTRY.get(key) == null) {
+                        TreeType.REGISTRY.register(key, new TreeType(key));
+                    }
+                });
 
         // BiomeCategories
         Registry<Biome> biomeRegistry = server.registryAccess().registryOrThrow(Registries.BIOME);
