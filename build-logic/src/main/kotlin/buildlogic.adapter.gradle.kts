@@ -8,6 +8,8 @@ plugins {
     id("io.papermc.paperweight.userdev")
 }
 
+val requiresReobfJar = project.name.startsWith("adapter-1_")
+
 paperweight {
     injectPaperRepository = false
     reobfArtifactConfiguration = io.papermc.paperweight.userdev.ReobfArtifactConfiguration.REOBF_PRODUCTION
@@ -58,7 +60,9 @@ java {
 }
 
 tasks.named("assemble") {
-    dependsOn("reobfJar")
+    if (requiresReobfJar) {
+        dependsOn("reobfJar")
+    }
 }
 
 tasks.named<Javadoc>("javadoc") {

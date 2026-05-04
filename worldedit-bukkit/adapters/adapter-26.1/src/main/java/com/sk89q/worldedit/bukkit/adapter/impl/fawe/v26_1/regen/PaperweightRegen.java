@@ -6,7 +6,6 @@ import com.fastasyncworldedit.core.queue.IChunkCache;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.implementation.chunk.ChunkCache;
 import com.google.common.collect.ImmutableList;
-import com.mojang.serialization.Lifecycle;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.adapter.Refraction;
@@ -14,6 +13,9 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.io.file.SafeFiles;
 import com.sk89q.worldedit.world.RegenOptions;
+import io.papermc.lib.PaperLib;
+import io.papermc.paper.world.PaperWorldLoader;
+import io.papermc.paper.world.saveddata.PaperWorldPDC;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
@@ -21,18 +23,19 @@ import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.ProgressListener;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelSettings;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
+import net.minecraft.world.level.levelgen.WorldGenSettings;
 import net.minecraft.world.level.levelgen.WorldOptions;
-import net.minecraft.world.level.storage.LevelData;
+import net.minecraft.world.level.storage.LevelResource;
 import net.minecraft.world.level.storage.LevelStorageSource;
-import net.minecraft.world.level.storage.PrimaryLevelData;
+import net.minecraft.world.level.storage.SavedDataStorage;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.craftbukkit.CraftWorld;
+import org.bukkit.craftbukkit.persistence.CraftPersistentDataContainer;
 import org.bukkit.generator.BiomeProvider;
 
 import javax.annotation.Nonnull;
@@ -40,12 +43,15 @@ import java.lang.reflect.Field;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.OptionalLong;
+import java.util.UUID;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
 import static net.minecraft.core.registries.Registries.BIOME;
 
 public class PaperweightRegen extends Regenerator {
+
+    private static final String REGEN_WORLD_NAME = "faweregentempworld";
 
     private static final Field serverWorldsField;
     private static final Field paperConfigField;
@@ -108,6 +114,10 @@ public class PaperweightRegen extends Regenerator {
 
     @Override
     protected boolean initNewWorld() throws Exception {
+        if (!PaperLib.isPaper()) {
+            throw new UnsupportedOperationException("Regen requires Paper");
+        }
+
         //world folder
         tempDir = java.nio.file.Files.createTempDirectory("FastAsyncWorldEditWorldGen");
 
@@ -116,41 +126,36 @@ public class PaperweightRegen extends Regenerator {
         org.bukkit.generator.ChunkGenerator generator = originalBukkitWorld.getGenerator();
         LevelStorageSource levelStorageSource = LevelStorageSource.createDefault(tempDir);
         ResourceKey<LevelStem> levelStemResourceKey = getWorldDimKey(environment);
-        session = levelStorageSource.createAccess("faweregentempworld", levelStemResourceKey);
-        LevelData originalWorldData = originalServerWorld.serverLevelData;
+        session = levelStorageSource.createAccess(REGEN_WORLD_NAME);
 
         MinecraftServer server = originalServerWorld.getCraftServer().getServer();
-        WorldOptions originalOpts = originalWorldData.worldGenOptions();
+        WorldOptions originalOpts = originalServerWorld.worldGenSettings.options();
         WorldOptions newOpts = options.getSeed().isPresent()
                 ? originalOpts.withSeed(OptionalLong.of(seed))
                 : originalOpts;
-        LevelSettings newWorldSettings = new LevelSettings(
-                "faweregentempworld",
-                originalWorldData.settings.gameType(),
-                originalWorldData.settings.hardcore(),
-                originalWorldData.settings.difficulty(),
-                originalWorldData.settings.allowCommands(),
-                originalWorldData.settings.gameRules(),
-                originalWorldData.settings.getDataConfiguration()
+        WorldGenSettings newWorldGenSettings = new WorldGenSettings(
+                newOpts,
+                originalServerWorld.worldGenSettings.dimensions()
         );
 
-        PrimaryLevelData.SpecialWorldProperty specialWorldProperty =
-                originalWorldData.isFlatWorld()
-                        ? PrimaryLevelData.SpecialWorldProperty.FLAT
-                        : originalWorldData.isDebugWorld()
-                                ? PrimaryLevelData.SpecialWorldProperty.DEBUG
-                                : PrimaryLevelData.SpecialWorldProperty.NONE;
-        PrimaryLevelData newWorldData = new PrimaryLevelData(newWorldSettings, newOpts, specialWorldProperty, Lifecycle.stable());
+        PaperWorldLoader.LoadedWorldData loadedWorldData = new PaperWorldLoader.LoadedWorldData(
+                REGEN_WORLD_NAME,
+                UUID.randomUUID(),
+                new PaperWorldPDC((CraftPersistentDataContainer) originalBukkitWorld.getPersistentDataContainer()),
+                originalServerWorld.serverLevelData
+        );
 
         BiomeProvider biomeProvider = getBiomeProvider();
 
+        SavedDataStorage savedDataStorage = new SavedDataStorage(session.getDimensionPath(originalServerWorld.dimension())
+                .resolve(LevelResource.DATA.id()), server.getFixerUpper(), server.registryAccess());
 
         //init world
         freshWorld = Fawe.instance().getQueueHandler().sync((Supplier<ServerLevel>) () -> new ServerLevel(
                 server,
                 server.executor,
                 session,
-                newWorldData,
+                newWorldGenSettings,
                 originalServerWorld.dimension(),
                 new LevelStem(
                         originalServerWorld.dimensionTypeRegistration(),
@@ -160,10 +165,12 @@ public class PaperweightRegen extends Regenerator {
                 seed,
                 ImmutableList.of(),
                 false,
-                originalServerWorld.getRandomSequences(),
+                levelStemResourceKey,
                 environment,
                 generator,
-                biomeProvider
+                biomeProvider,
+                savedDataStorage,
+                loadedWorldData
         ) {
 
             private final Holder<Biome> singleBiome = options.hasBiomeType() ? DedicatedServer.getServer().registryAccess()
@@ -200,7 +207,6 @@ public class PaperweightRegen extends Regenerator {
         }).get();
         freshWorld.noSave = true;
         removeWorldFromWorldsMap();
-        newWorldData.checkName(originalServerWorld.serverLevelData.getLevelName()); //rename to original world name
         if (paperConfigField != null) {
             paperConfigField.set(freshWorld, originalServerWorld.paperConfig());
         }
@@ -250,7 +256,7 @@ public class PaperweightRegen extends Regenerator {
     private void removeWorldFromWorldsMap() {
         try {
             Map<String, World> map = (Map<String, World>) serverWorldsField.get(Bukkit.getServer());
-            map.remove("faweregentempworld");
+            map.remove(REGEN_WORLD_NAME);
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
