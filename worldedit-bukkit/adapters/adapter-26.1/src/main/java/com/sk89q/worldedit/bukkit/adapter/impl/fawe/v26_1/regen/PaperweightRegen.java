@@ -28,7 +28,9 @@ import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
 import net.minecraft.world.level.levelgen.WorldGenSettings;
 import net.minecraft.world.level.levelgen.WorldOptions;
+import net.minecraft.world.level.storage.LevelResource;
 import net.minecraft.world.level.storage.LevelStorageSource;
+import net.minecraft.world.level.storage.SavedDataStorage;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.CraftServer;
@@ -145,6 +147,9 @@ public class PaperweightRegen extends Regenerator {
 
         BiomeProvider biomeProvider = getBiomeProvider();
 
+        SavedDataStorage savedDataStorage = new SavedDataStorage(session.getDimensionPath(originalServerWorld.dimension())
+                .resolve(LevelResource.DATA.id()), server.getFixerUpper(), server.registryAccess());
+
         //init world
         freshWorld = Fawe.instance().getQueueHandler().sync((Supplier<ServerLevel>) () -> new ServerLevel(
                 server,
@@ -164,7 +169,7 @@ public class PaperweightRegen extends Regenerator {
                 environment,
                 generator,
                 biomeProvider,
-                originalServerWorld.getDataStorage(),
+                savedDataStorage,
                 loadedWorldData
         ) {
 
@@ -219,11 +224,8 @@ public class PaperweightRegen extends Regenerator {
         try {
             Fawe.instance().getQueueHandler().sync(() -> {
                 try {
-                    // 26.1+ may share data storage with the live world; never close it in that case.
-                    if (freshWorld.getChunkSource().getDataStorage() != originalServerWorld.getChunkSource().getDataStorage()) {
-                        freshWorld.getChunkSource().getDataStorage().cache.clear();
-                        freshWorld.getChunkSource().close(false);
-                    }
+                    freshWorld.getChunkSource().getDataStorage().cache.clear();
+                    freshWorld.getChunkSource().close(false);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }

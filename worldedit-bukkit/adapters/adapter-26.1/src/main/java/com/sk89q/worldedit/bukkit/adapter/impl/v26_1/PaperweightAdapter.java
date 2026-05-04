@@ -772,10 +772,7 @@ public final class PaperweightAdapter implements BukkitImplAdapter<Tag> {
             try {
                 regenForWorld(region, extent, freshWorld, options);
             } finally {
-                // 26.1+ may share data storage with the live world; never close it in that case.
-                if (freshWorld.getChunkSource().getDataStorage() != originalWorld.getChunkSource().getDataStorage()) {
-                    freshWorld.getChunkSource().close(false);
-                }
+                freshWorld.getChunkSource().close(false);
             }
         } finally {
             try {
