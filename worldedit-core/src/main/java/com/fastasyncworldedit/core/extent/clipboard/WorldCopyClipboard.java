@@ -1,5 +1,8 @@
 package com.fastasyncworldedit.core.extent.clipboard;
 
+import com.fastasyncworldedit.core.Fawe;
+import com.fastasyncworldedit.core.queue.implementation.SingleThreadQueueExtent;
+import com.fastasyncworldedit.core.util.ExtentTraverser;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.EditSessionBuilder;
 import com.sk89q.worldedit.WorldEdit;
@@ -39,10 +42,7 @@ public class WorldCopyClipboard extends ReadOnlyClipboard {
      */
     @Deprecated(forRemoval = true, since = "2.13.0")
     public WorldCopyClipboard(Supplier<Extent> supplier, Region region, boolean hasEntities, boolean hasBiomes) {
-        super(region);
-        this.hasBiomes = hasBiomes;
-        this.hasEntities = hasEntities;
-        this.extent = supplier.get();
+        this(supplier.get(), region, hasEntities, hasBiomes);
     }
 
     private WorldCopyClipboard(Extent extent, Region region, boolean hasEntities, boolean hasBiomes) {
@@ -50,6 +50,11 @@ public class WorldCopyClipboard extends ReadOnlyClipboard {
         this.hasBiomes = hasBiomes;
         this.hasEntities = hasEntities;
         this.extent = extent;
+        if (new ExtentTraverser<>(extent).find(SingleThreadQueueExtent.class) != null) {
+            // If we have a SingleThreadQueueExtent present, uncache so it cannot be used again for pasting (and therefore
+            // potentially resetting the world)
+            Fawe.instance().getQueueHandler().unCache();
+        }
     }
 
     public static WorldCopyClipboard of(Extent extent, Region region) {
@@ -62,6 +67,11 @@ public class WorldCopyClipboard extends ReadOnlyClipboard {
 
     public static WorldCopyClipboard of(Extent extent, Region region, boolean hasEntities, boolean hasBiomes) {
         return new WorldCopyClipboard(extent, region, hasEntities, hasBiomes);
+    }
+
+    @Override
+    public long getMaxSize() {
+        return -1;
     }
 
     public Extent getExtent() {
