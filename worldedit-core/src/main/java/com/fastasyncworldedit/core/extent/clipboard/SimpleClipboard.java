@@ -17,12 +17,22 @@ public abstract class SimpleClipboard implements Clipboard {
         this.size = dimensions;
         this.offset = offset;
         long longVolume = (long) getWidth() * (long) getHeight() * (long) getLength();
-        if (longVolume >= Integer.MAX_VALUE) {
+        long maxSize = getMaxSize();
+        if (maxSize != -1 && longVolume >= maxSize) {
             throw new IllegalArgumentException("Dimensions are too large for this clipboard format.");
         }
         this.area = getWidth() * getLength();
         this.volume = (int) longVolume;
         this.origin = BlockVector3.ZERO;
+    }
+
+    /**
+     * Get the maximum size allowed by this clipboard implementation
+     *
+     * @return maximum size in blocks of this clipboard implementation.
+     */
+    public long getMaxSize() {
+        return Integer.MAX_VALUE;
     }
 
     SimpleClipboard(Region region) {
