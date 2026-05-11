@@ -22,34 +22,22 @@ package com.sk89q.worldedit.fabric;
 import com.mojang.brigadier.CommandDispatcher;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.command.util.PermissionCondition;
 import com.sk89q.worldedit.event.platform.PlatformReadyEvent;
-import com.sk89q.worldedit.event.platform.PlatformUnreadyEvent;
-import com.sk89q.worldedit.event.platform.PlatformsRegisteredEvent;
 import com.sk89q.worldedit.event.platform.SessionIdleEvent;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.extension.platform.PlatformManager;
+import com.sk89q.worldedit.fabric.net.handler.WECUIPacketHandler;
 import com.sk89q.worldedit.internal.anvil.ChunkDeleter;
-import com.sk89q.worldedit.internal.event.InteractionDebouncer;
-import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.util.Location;
-import com.sk89q.worldedit.util.lifecycle.Lifecycled;
-import com.sk89q.worldedit.util.lifecycle.SimpleLifecycled;
-import com.sk89q.worldedit.world.biome.BiomeCategory;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockCategory;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.entity.EntityType;
-import com.sk89q.worldedit.world.gamemode.GameModes;
-import com.sk89q.worldedit.world.generation.ConfiguredFeatureType;
-import com.sk89q.worldedit.world.generation.StructureType;
-import com.sk89q.worldedit.world.generation.TreeType;
 import com.sk89q.worldedit.world.item.ItemCategory;
 import com.sk89q.worldedit.world.item.ItemType;
-import com.sk89q.worldedit.world.weather.WeatherTypes;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
@@ -58,48 +46,30 @@ import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
-import net.fabricmc.loader.api.Version;
-import net.fabricmc.loader.api.metadata.ModMetadata;
-import net.fabricmc.loader.api.metadata.version.VersionPredicate;
-import net.minecraft.commands.CommandBuildContext;
-import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.commands.Commands;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.core.Holder;
-import net.minecraft.core.HolderSet;
-import net.minecraft.core.Registry;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.network.ServerGamePacketListenerImpl;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.levelgen.feature.CoralTreeFeature;
-import net.minecraft.world.level.levelgen.feature.FallenTreeFeature;
-import net.minecraft.world.level.levelgen.feature.TreeFeature;
-import net.minecraft.world.level.levelgen.placement.PlacedFeature;
-import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.server.network.ServerPlayNetworkHandler;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.tag.BlockTags;
+import net.minecraft.tag.ItemTags;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.TypedActionResult;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.world.World;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.enginehub.piston.Command;
-import org.enginehub.worldeditcui.protocol.CUIPacket;
-import org.enginehub.worldeditcui.protocol.CUIPacketHandler;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.sk89q.worldedit.fabric.FabricAdapter.adaptPlayer;
@@ -110,39 +80,14 @@ import static com.sk89q.worldedit.internal.anvil.ChunkDeleter.DELCHUNKS_FILE_NAM
  */
 public class FabricWorldEdit implements ModInitializer {
 
-    private static final Logger LOGGER = LogManagerCompat.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
     public static final String MOD_ID = "worldedit";
-
-    public static final Lifecycled<MinecraftServer> LIFECYCLED_SERVER;
-
-    static {
-        SimpleLifecycled<MinecraftServer> lifecycledServer = SimpleLifecycled.invalid();
-        ServerLifecycleEvents.SERVER_STARTED.register(lifecycledServer::newValue);
-        ServerLifecycleEvents.SERVER_STOPPING.register(__ -> lifecycledServer.invalidate());
-        LIFECYCLED_SERVER = lifecycledServer;
-    }
-
-    /**
-     * {@return current server's registry access} Not for long-term storage.
-     */
-    public static RegistryAccess registryAccess() {
-        return LIFECYCLED_SERVER.valueOrThrow().registryAccess();
-    }
-
-    /**
-     * {@return current server's registry} Not for long-term storage.
-     *
-     * @param key the registry key
-     */
-    public static <T> Registry<T> getRegistry(ResourceKey<Registry<T>> key) {
-        return LIFECYCLED_SERVER.valueOrThrow().registryAccess().lookupOrThrow(key);
-    }
+    public static final String CUI_PLUGIN_CHANNEL = "cui";
 
     private FabricPermissionsProvider provider;
 
     public static FabricWorldEdit inst;
 
-    private InteractionDebouncer debouncer;
     private FabricPlatform platform;
     private FabricConfiguration config;
     private Path workingDir;
@@ -168,15 +113,8 @@ public class FabricWorldEdit implements ModInitializer {
                 throw new UncheckedIOException(e);
             }
         }
-        this.platform = new FabricPlatform(this);
-        debouncer = new InteractionDebouncer(platform);
 
-        WorldEdit.getInstance().getPlatformManager().register(platform);
-
-        config = new FabricConfiguration(this);
-        this.provider = getInitialPermissionsProvider();
-
-        CUIPacketHandler.instance().registerServerboundHandler(this::onCuiPacket);
+        WECUIPacketHandler.init();
 
         ServerTickEvents.END_SERVER_TICK.register(ThreadSafeCache.getInstance());
         CommandRegistrationCallback.EVENT.register(this::registerCommands);
@@ -186,143 +124,83 @@ public class FabricWorldEdit implements ModInitializer {
         ServerPlayConnectionEvents.DISCONNECT.register(this::onPlayerDisconnect);
         AttackBlockCallback.EVENT.register(this::onLeftClickBlock);
         UseBlockCallback.EVENT.register(this::onRightClickBlock);
-        UseItemCallback.EVENT.register(this::onRightClickItem);
+        UseItemCallback.EVENT.register(this::onRightClickAir);
         LOGGER.info("WorldEdit for Fabric (version " + getInternalVersion() + ") is loaded");
     }
 
-    private void registerCommands(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext registryAccess, Commands.CommandSelection environment) {
-        WorldEdit.getInstance().getEventBus().post(new PlatformsRegisteredEvent());
+    private void registerCommands(CommandDispatcher<ServerCommandSource> dispatcher, boolean dedicated) {
         PlatformManager manager = WorldEdit.getInstance().getPlatformManager();
-        Platform commandsPlatform = manager.queryCapability(Capability.USER_COMMANDS);
-        if (commandsPlatform != platform || !platform.isHookingEvents()) {
-            // We're not in control of commands/events -- do not register.
+        if (manager.getPlatforms().isEmpty()) {
+            // We'll register as part of our platform initialization later.
             return;
         }
 
-        List<Command> commands = manager.getPlatformCommandManager().getCommandManager()
-            .getAllCommands().toList();
-        for (Command command : commands) {
-            CommandWrapper.register(dispatcher, command);
-            Set<String> perms = command.getCondition().as(PermissionCondition.class)
-                .map(PermissionCondition::getPermissions)
-                .orElseGet(Collections::emptySet);
-            if (!perms.isEmpty()) {
-                perms.forEach(getPermissionsProvider()::registerPermission);
-            }
+        // This is a re-register (due to /reload), we must add our commands now
+
+        Platform commandsPlatform = manager.queryCapability(Capability.USER_COMMANDS);
+        if (commandsPlatform != platform || !platform.isHookingEvents()) {
+            // We're not in control of commands/events -- do not re-register.
+            return;
         }
+        platform.setNativeDispatcher(dispatcher);
+        platform.registerCommands(manager.getPlatformCommandManager().getCommandManager());
+    }
+
+    private void setupPlatform(MinecraftServer server) {
+        this.platform = new FabricPlatform(this, server);
+
+        WorldEdit.getInstance().getPlatformManager().register(platform);
+
+        this.provider = getInitialPermissionsProvider();
     }
 
     private FabricPermissionsProvider getInitialPermissionsProvider() {
         try {
             Class.forName("me.lucko.fabric.api.permissions.v0.Permissions", false, getClass().getClassLoader());
-            Optional<Version> version = FabricLoader.getInstance().getModContainer("fabric-permissions-api-v0")
-                    .map(ModContainer::getMetadata)
-                    .map(ModMetadata::getVersion);
-
-            if (version.isPresent() && !VersionPredicate.parse(">=0.5.0").test(version.get())) {
-                throw new RuntimeException("Fabric permissions version " + version.get() + " is not supported. Please update Fabric Permissions API");
-            }
-
             return new FabricPermissionsProvider.LuckoFabricPermissionsProvider(platform);
         } catch (ClassNotFoundException ignored) {
             // fallback to vanilla
-        } catch (Exception e) {
-            // catch any exception to prevent crashing the server, but still print a warning
-            LOGGER.warn("Failed to load Fabric permissions provider. Falling back to Minecraft", e);
         }
-
         return new FabricPermissionsProvider.VanillaPermissionsProvider(platform);
     }
 
     private void setupRegistries(MinecraftServer server) {
         // Blocks
-        for (ResourceLocation name : server.registryAccess().lookupOrThrow(Registries.BLOCK).keySet()) {
-            String key = name.toString();
-            if (BlockType.REGISTRY.get(key) == null) {
-                BlockType.REGISTRY.register(key, new BlockType(key,
-                    input -> FabricAdapter.adapt(FabricAdapter.adapt(input.getBlockType()).defaultBlockState())));
+        for (Identifier name : Registry.BLOCK.getIds()) {
+            if (BlockType.REGISTRY.get(name.toString()) == null) {
+                BlockType.REGISTRY.register(name.toString(), new BlockType(name.toString(),
+                    input -> FabricAdapter.adapt(FabricAdapter.adapt(input.getBlockType()).getDefaultState())));
             }
         }
         // Items
-        for (ResourceLocation name : server.registryAccess().lookupOrThrow(Registries.ITEM).keySet()) {
-            String key = name.toString();
-            if (ItemType.REGISTRY.get(key) == null) {
-                ItemType.REGISTRY.register(key, new ItemType(key));
+        for (Identifier name : Registry.ITEM.getIds()) {
+            if (ItemType.REGISTRY.get(name.toString()) == null) {
+                ItemType.REGISTRY.register(name.toString(), new ItemType(name.toString()));
             }
         }
         // Entities
-        for (ResourceLocation name : server.registryAccess().lookupOrThrow(Registries.ENTITY_TYPE).keySet()) {
-            String key = name.toString();
-            if (EntityType.REGISTRY.get(key) == null) {
-                EntityType.REGISTRY.register(key, new EntityType(key));
+        for (Identifier name : Registry.ENTITY_TYPE.getIds()) {
+            if (EntityType.REGISTRY.get(name.toString()) == null) {
+                EntityType.REGISTRY.register(name.toString(), new EntityType(name.toString()));
             }
         }
         // Biomes
-        for (ResourceLocation name : server.registryAccess().lookupOrThrow(Registries.BIOME).keySet()) {
-            String key = name.toString();
-            if (BiomeType.REGISTRY.get(key) == null) {
-                BiomeType.REGISTRY.register(key, new BiomeType(key));
+        for (Identifier name : server.getRegistryManager().get(Registry.BIOME_KEY).getIds()) {
+            if (BiomeType.REGISTRY.get(name.toString()) == null) {
+                BiomeType.REGISTRY.register(name.toString(), new BiomeType(name.toString()));
             }
         }
         // Tags
-        server.registryAccess().lookupOrThrow(Registries.BLOCK).getTags().map(t -> t.key().location()).forEach(name -> {
-            String key = name.toString();
-            if (BlockCategory.REGISTRY.get(key) == null) {
-                BlockCategory.REGISTRY.register(key, new BlockCategory(key));
-            }
-        });
-        server.registryAccess().lookupOrThrow(Registries.ITEM).getTags().map(t -> t.key().location()).forEach(name -> {
-            String key = name.toString();
-            if (ItemCategory.REGISTRY.get(key) == null) {
-                ItemCategory.REGISTRY.register(key, new ItemCategory(key));
-            }
-        });
-        Registry<Biome> biomeRegistry = server.registryAccess().lookupOrThrow(Registries.BIOME);
-        biomeRegistry.getTags().forEach(tag -> {
-            String key = tag.key().location().toString();
-            if (BiomeCategory.REGISTRY.get(key) == null) {
-                BiomeCategory.REGISTRY.register(key, new BiomeCategory(
-                    key,
-                    () -> biomeRegistry.get(tag.key())
-                        .stream()
-                        .flatMap(HolderSet.Named::stream)
-                        .map(Holder::value)
-                        .map(FabricAdapter::adapt)
-                        .collect(Collectors.toSet()))
-                );
-            }
-        });
-        // Features
-        for (ResourceLocation name : server.registryAccess().lookupOrThrow(Registries.CONFIGURED_FEATURE).keySet()) {
-            String key = name.toString();
-            if (ConfiguredFeatureType.REGISTRY.get(key) == null) {
-                ConfiguredFeatureType.REGISTRY.register(key, new ConfiguredFeatureType(key));
+        for (Identifier name : BlockTags.getTagGroup().getTagIds()) {
+            if (BlockCategory.REGISTRY.get(name.toString()) == null) {
+                BlockCategory.REGISTRY.register(name.toString(), new BlockCategory(name.toString()));
             }
         }
-        // Structures
-        for (ResourceLocation name : server.registryAccess().lookupOrThrow(Registries.STRUCTURE).keySet()) {
-            String key = name.toString();
-            if (StructureType.REGISTRY.get(key) == null) {
-                StructureType.REGISTRY.register(key, new StructureType(key));
+        for (Identifier name : ItemTags.getTagGroup().getTagIds()) {
+            if (ItemCategory.REGISTRY.get(name.toString()) == null) {
+                ItemCategory.REGISTRY.register(name.toString(), new ItemCategory(name.toString()));
             }
         }
-        // Trees
-        Registry<PlacedFeature> placedFeatureRegistry = server.registryAccess().lookupOrThrow(Registries.PLACED_FEATURE);
-        for (ResourceLocation name : placedFeatureRegistry.keySet()) {
-            // Do some hackery to make sure this is a tree
-            var underlyingFeature = placedFeatureRegistry.get(name).get().value().feature().value().feature();
-            if (underlyingFeature instanceof TreeFeature || underlyingFeature instanceof FallenTreeFeature || underlyingFeature instanceof CoralTreeFeature) {
-                String key = name.toString();
-                if (TreeType.REGISTRY.get(key) == null) {
-                    TreeType.REGISTRY.register(key, new TreeType(key));
-                }
-            }
-        }
-
-        // ... :|
-        GameModes.get("");
-        WeatherTypes.get("");
-        com.sk89q.worldedit.registry.Registries.get("");
     }
 
     private void onStartingServer(MinecraftServer minecraftServer) {
@@ -333,120 +211,105 @@ public class FabricWorldEdit implements ModInitializer {
     }
 
     private void onStartServer(MinecraftServer minecraftServer) {
+        FabricAdapter.setServer(minecraftServer);
+        setupPlatform(minecraftServer);
         setupRegistries(minecraftServer);
 
+        config = new FabricConfiguration(this);
         config.load();
-        WorldEdit.getInstance().getEventBus().post(new PlatformReadyEvent(platform));
+        WorldEdit.getInstance().getEventBus().post(new PlatformReadyEvent());
+        minecraftServer.reloadResources(
+            minecraftServer.getDataPackManager().getEnabledNames()
+        );
     }
 
     private void onStopServer(MinecraftServer minecraftServer) {
         WorldEdit worldEdit = WorldEdit.getInstance();
         worldEdit.getSessionManager().unload();
-        WorldEdit.getInstance().getEventBus().post(new PlatformUnreadyEvent(platform));
+        worldEdit.getPlatformManager().unregister(platform);
     }
 
-    private boolean skipEvents() {
-        return platform == null || !platform.isHookingEvents();
+    private boolean shouldSkip() {
+        if (platform == null) {
+            return true;
+        }
+
+        return !platform.isHookingEvents(); // We have to be told to catch these events
     }
 
-    private boolean skipInteractionEvent(Player player, InteractionHand hand) {
-        return skipEvents() || hand != InteractionHand.MAIN_HAND || player.level().isClientSide() || !(player instanceof ServerPlayer);
-    }
-
-    private InteractionResult onLeftClickBlock(Player playerEntity, Level world, InteractionHand hand, BlockPos blockPos, Direction direction) {
-        if (skipInteractionEvent(playerEntity, hand)) {
-            return InteractionResult.PASS;
+    private ActionResult onLeftClickBlock(PlayerEntity playerEntity, World world, Hand hand, BlockPos blockPos, Direction direction) {
+        if (shouldSkip() || hand == Hand.OFF_HAND || world.isClient) {
+            return ActionResult.PASS;
         }
 
         WorldEdit we = WorldEdit.getInstance();
-        FabricPlayer player = adaptPlayer((ServerPlayer) playerEntity);
+        FabricPlayer player = adaptPlayer((ServerPlayerEntity) playerEntity);
         FabricWorld localWorld = getWorld(world);
         Location pos = new Location(localWorld,
-            blockPos.getX(),
-            blockPos.getY(),
-            blockPos.getZ()
+                blockPos.getX(),
+                blockPos.getY(),
+                blockPos.getZ()
         );
         com.sk89q.worldedit.util.Direction weDirection = FabricAdapter.adaptEnumFacing(direction);
 
-        boolean result = we.handleBlockLeftClick(player, pos, weDirection) || we.handleArmSwing(player);
-        debouncer.setLastInteraction(player, result);
+        if (we.handleBlockLeftClick(player, pos, weDirection)) {
+            return ActionResult.SUCCESS;
+        }
 
-        return result ? InteractionResult.SUCCESS : InteractionResult.PASS;
+        if (we.handleArmSwing(player)) {
+            return ActionResult.SUCCESS;
+        }
+
+        return ActionResult.PASS;
     }
 
-    private InteractionResult onRightClickBlock(Player playerEntity, Level world, InteractionHand hand, BlockHitResult blockHitResult) {
-        if (skipInteractionEvent(playerEntity, hand)) {
-            return InteractionResult.PASS;
+    private ActionResult onRightClickBlock(PlayerEntity playerEntity, World world, Hand hand, BlockHitResult blockHitResult) {
+        if (shouldSkip() || hand == Hand.OFF_HAND || world.isClient) {
+            return ActionResult.PASS;
         }
 
         WorldEdit we = WorldEdit.getInstance();
-        FabricPlayer player = adaptPlayer((ServerPlayer) playerEntity);
+        FabricPlayer player = adaptPlayer((ServerPlayerEntity) playerEntity);
         FabricWorld localWorld = getWorld(world);
         Location pos = new Location(localWorld,
-            blockHitResult.getBlockPos().getX(),
-            blockHitResult.getBlockPos().getY(),
-            blockHitResult.getBlockPos().getZ()
+                blockHitResult.getBlockPos().getX(),
+                blockHitResult.getBlockPos().getY(),
+                blockHitResult.getBlockPos().getZ()
         );
-        com.sk89q.worldedit.util.Direction direction = FabricAdapter.adaptEnumFacing(blockHitResult.getDirection());
+        com.sk89q.worldedit.util.Direction direction = FabricAdapter.adaptEnumFacing(blockHitResult.getSide());
 
-        boolean result = we.handleBlockRightClick(player, pos, direction) || we.handleRightClick(player);
-        debouncer.setLastInteraction(player, result);
+        if (we.handleBlockRightClick(player, pos, direction)) {
+            return ActionResult.SUCCESS;
+        }
 
-        return result ? InteractionResult.SUCCESS : InteractionResult.PASS;
+        if (we.handleRightClick(player)) {
+            return ActionResult.SUCCESS;
+        }
+
+        return ActionResult.PASS;
     }
 
-    public void onLeftClickAir(ServerPlayer playerEntity, InteractionHand hand) {
-        if (skipInteractionEvent(playerEntity, hand)) {
-            return;
+    private TypedActionResult<ItemStack> onRightClickAir(PlayerEntity playerEntity, World world, Hand hand) {
+        ItemStack stackInHand = playerEntity.getStackInHand(hand);
+        if (shouldSkip() || hand == Hand.OFF_HAND || world.isClient) {
+            return TypedActionResult.pass(stackInHand);
         }
 
         WorldEdit we = WorldEdit.getInstance();
-        FabricPlayer player = adaptPlayer(playerEntity);
+        FabricPlayer player = adaptPlayer((ServerPlayerEntity) playerEntity);
 
-        Optional<Boolean> previousResult = debouncer.getDuplicateInteractionResult(player);
-        if (previousResult.isPresent()) {
-            return;
+        if (we.handleRightClick(player)) {
+            return TypedActionResult.success(stackInHand);
         }
 
-        boolean result = we.handleArmSwing(player);
-        debouncer.setLastInteraction(player, result);
+        return TypedActionResult.pass(stackInHand);
     }
 
-    private InteractionResult onRightClickItem(Player playerEntity, Level world, InteractionHand hand) {
-        if (skipInteractionEvent(playerEntity, hand)) {
-            return InteractionResult.PASS;
-        }
+    // TODO Pass empty left click to server
 
-        WorldEdit we = WorldEdit.getInstance();
-        FabricPlayer player = adaptPlayer((ServerPlayer) playerEntity);
-
-        Optional<Boolean> previousResult = debouncer.getDuplicateInteractionResult(player);
-        if (previousResult.isPresent()) {
-            return previousResult.get() ? InteractionResult.SUCCESS : InteractionResult.PASS;
-        }
-
-        boolean result = we.handleRightClick(player);
-        debouncer.setLastInteraction(player, result);
-
-        return result ? InteractionResult.SUCCESS : InteractionResult.PASS;
-    }
-
-    private void onPlayerDisconnect(ServerGamePacketListenerImpl handler, MinecraftServer server) {
-        debouncer.clearInteraction(adaptPlayer(handler.player));
-
+    private void onPlayerDisconnect(ServerPlayNetworkHandler handler, MinecraftServer server) {
         WorldEdit.getInstance().getEventBus()
-            .post(new SessionIdleEvent(new FabricPlayer.SessionKeyImpl(handler.player)));
-    }
-
-    private void onCuiPacket(CUIPacket payload, CUIPacketHandler.PacketContext context) {
-        if (!(context.player() instanceof ServerPlayer player)) {
-            // Ignore - this is not a server-bound packet
-            return;
-        }
-
-        FabricPlayer actor = FabricAdapter.adaptPlayer(player);
-        LocalSession session = WorldEdit.getInstance().getSessionManager().get(actor);
-        session.handleCUIInitializationMessage(payload.eventType(), payload.args(), actor);
+                .post(new SessionIdleEvent(new FabricPlayer.SessionKeyImpl(handler.player)));
     }
 
     /**
@@ -464,7 +327,7 @@ public class FabricWorldEdit implements ModInitializer {
      * @param player the player
      * @return the session
      */
-    public LocalSession getSession(ServerPlayer player) {
+    public LocalSession getSession(ServerPlayerEntity player) {
         checkNotNull(player);
         return WorldEdit.getInstance().getSessionManager().get(adaptPlayer(player));
     }
@@ -475,7 +338,7 @@ public class FabricWorldEdit implements ModInitializer {
      * @param world the world
      * @return the WorldEdit world
      */
-    public FabricWorld getWorld(Level world) {
+    public FabricWorld getWorld(World world) {
         checkNotNull(world);
         return new FabricWorld(world);
     }
