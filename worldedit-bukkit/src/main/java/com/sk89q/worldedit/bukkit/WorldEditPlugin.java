@@ -50,7 +50,6 @@ import com.sk89q.worldedit.internal.anvil.ChunkDeleter;
 import com.sk89q.worldedit.internal.command.CommandUtil;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.registry.Registries;
-import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.util.lifecycle.Lifecycled;
 import com.sk89q.worldedit.util.lifecycle.SimpleLifecycled;
 import com.sk89q.worldedit.world.World;
@@ -353,12 +352,6 @@ public class WorldEditPlugin extends JavaPlugin {
                 String lowerCaseMcId = mcid.toLowerCase(Locale.ROOT);
                 EntityType.REGISTRY.register("minecraft:" + lowerCaseMcId, new EntityType("minecraft:" + lowerCaseMcId));
             }
-        }
-
-        // Registries only available via NMS
-        BukkitImplAdapter adapter = getBukkitImplAdapter();
-        if (adapter != null) {
-            adapter.initializeRegistries();
         }
 
         // Registries only available via NMS

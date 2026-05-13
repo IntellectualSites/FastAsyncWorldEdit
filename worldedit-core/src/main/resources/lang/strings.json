@@ -560,9 +560,8 @@
   "worldedit.session.cant-find-session": "Unable to find session for {0}",
   "worldedit.platform.no-file-dialog": "File dialogs are not supported in your environment.",
   "worldedit.registry.error.invalid-key": "Invalid registry key: {0}",
-    "worldedit.registry.searching": "(Please wait... searching registry...)",
-
-    "worldedit.tool.max-block-changes": "Max blocks change limit reached.",
+  "worldedit.registry.searching": "(Please wait... searching registry...)",
+  "worldedit.tool.max-block-changes": "Max blocks change limit reached.",
   "worldedit.tool.no-block": "No block in sight!",
   "worldedit.tool.repl.equip": "Block replacer tool bound to {0}.",
   "worldedit.tool.repl.switched": "Replacer tool switched to: {0}",
