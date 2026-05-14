@@ -878,6 +878,8 @@ public final class BlockTypes {
     @Nullable
     public static final BlockType GOLD_ORE = init();
     @Nullable
+    public static final BlockType GOLDEN_DANDELION = get("minecraft:golden_dandelion");
+    @Nullable
     public static final BlockType GRANITE = init();
     @Nullable
     public static final BlockType GRANITE_SLAB = init();
@@ -1624,6 +1626,8 @@ public final class BlockTypes {
     public static final BlockType POTTED_FLOWERING_AZALEA_BUSH = init();
     @Nullable
     public static final BlockType POTTED_FLOWERING_AZALEA = init();
+    @Nullable
+    public static final BlockType POTTED_GOLDEN_DANDELION = get("minecraft:potted_golden_dandelion");
     @Nullable
     public static final BlockType POTTED_JUNGLE_SAPLING = init();
     @Nullable
