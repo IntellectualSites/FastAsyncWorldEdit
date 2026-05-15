@@ -13,30 +13,55 @@ public abstract class SimpleClipboard implements Clipboard {
     private final int volume;
     private BlockVector3 origin;
 
+    /**
+     * New {@link SimpleClipboard} instance for the given region with max volume of {@link Integer#MAX_VALUE}. Initial offset
+     * is the clipboard minimum point.
+     *
+     * @param region dimensions of this clipboard instance.
+     */
+    SimpleClipboard(Region region) {
+        this(region.getDimensions(), region.getMinimumPoint());
+    }
+
+    /**
+     * New {@link SimpleClipboard} instance with max volume of {@link Integer#MAX_VALUE}.
+     *
+     * @param dimensions dimensions of this clipboard instance.
+     * @param offset     initial offset of this clipboard.
+     */
     SimpleClipboard(BlockVector3 dimensions, BlockVector3 offset) {
+        this(dimensions, offset, Integer.MAX_VALUE);
+    }
+
+    /**
+     * New {@link SimpleClipboard} instance for the given region with the given maximum volume.
+     *
+     * @param region  dimensions of this clipboard instance.
+     * @param maxSize maximum allowable size of the clipboard implementation. A value of -1 implies infinite volume.
+     * @since TODO
+     */
+    SimpleClipboard(Region region, long maxSize) {
+        this(region.getDimensions(), region.getMinimumPoint(), maxSize);
+    }
+
+    /**
+     * New {@link SimpleClipboard} instance with given maximum volume.
+     *
+     * @param dimensions dimensions of this clipboard instance.
+     * @param offset     initial offset of this clipboard.
+     * @param maxSize    maximum allowable size of the clipboard implementation. A value of -1 implies infinite volume.
+     * @since TODO
+     */
+    SimpleClipboard(BlockVector3 dimensions, BlockVector3 offset, long maxSize) {
         this.size = dimensions;
         this.offset = offset;
         long longVolume = (long) getWidth() * (long) getHeight() * (long) getLength();
-        long maxSize = getMaxSize();
         if (maxSize != -1 && longVolume >= maxSize) {
             throw new IllegalArgumentException("Dimensions are too large for this clipboard format.");
         }
         this.area = getWidth() * getLength();
         this.volume = (int) longVolume;
         this.origin = BlockVector3.ZERO;
-    }
-
-    /**
-     * Get the maximum size allowed by this clipboard implementation
-     *
-     * @return maximum size in blocks of this clipboard implementation.
-     */
-    public long getMaxSize() {
-        return Integer.MAX_VALUE;
-    }
-
-    SimpleClipboard(Region region) {
-        this(region.getDimensions(), region.getMinimumPoint());
     }
 
     protected void setOffset(final BlockVector3 offset) {
