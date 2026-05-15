@@ -878,7 +878,7 @@ public final class BlockTypes {
     @Nullable
     public static final BlockType GOLD_ORE = init();
     @Nullable
-    public static final BlockType GOLDEN_DANDELION = get("minecraft:golden_dandelion");
+    public static final BlockType GOLDEN_DANDELION = init();
     @Nullable
     public static final BlockType GRANITE = init();
     @Nullable
@@ -1627,7 +1627,7 @@ public final class BlockTypes {
     @Nullable
     public static final BlockType POTTED_FLOWERING_AZALEA = init();
     @Nullable
-    public static final BlockType POTTED_GOLDEN_DANDELION = get("minecraft:potted_golden_dandelion");
+    public static final BlockType POTTED_GOLDEN_DANDELION = init();
     @Nullable
     public static final BlockType POTTED_JUNGLE_SAPLING = init();
     @Nullable
@@ -2400,7 +2400,7 @@ public final class BlockTypes {
     public static final BlockType ZOMBIE_WALL_HEAD = init();
 
     private static Field[] fieldsTmp;
-    private static int initIndex = 0;
+    private static int initIndex;
 
     // Init each field
     // The order is important
@@ -2415,6 +2415,10 @@ public final class BlockTypes {
 
     // Clears memory after initialization
     static {
+        // we should be at the first non-BlockType field now
+        if (!fieldsTmp[initIndex].getName().equals("fieldsTmp")) {
+            throw new IllegalStateException("improper initialization of block type fields");
+        }
         fieldsTmp = null;
     }
 
