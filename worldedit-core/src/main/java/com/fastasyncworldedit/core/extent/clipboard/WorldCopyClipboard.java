@@ -46,7 +46,7 @@ public class WorldCopyClipboard extends ReadOnlyClipboard {
     }
 
     private WorldCopyClipboard(Extent extent, Region region, boolean hasEntities, boolean hasBiomes) {
-        super(region);
+        super(region, -1);
         this.hasBiomes = hasBiomes;
         this.hasEntities = hasEntities;
         this.extent = extent;
@@ -67,11 +67,6 @@ public class WorldCopyClipboard extends ReadOnlyClipboard {
 
     public static WorldCopyClipboard of(Extent extent, Region region, boolean hasEntities, boolean hasBiomes) {
         return new WorldCopyClipboard(extent, region, hasEntities, hasBiomes);
-    }
-
-    @Override
-    public long getMaxSize() {
-        return -1;
     }
 
     public Extent getExtent() {
