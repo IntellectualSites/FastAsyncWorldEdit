@@ -49,6 +49,7 @@ import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.internal.anvil.ChunkDeleter;
 import com.sk89q.worldedit.internal.command.CommandUtil;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
+import com.sk89q.worldedit.registry.Registries;
 import com.sk89q.worldedit.util.lifecycle.Lifecycled;
 import com.sk89q.worldedit.util.lifecycle.SimpleLifecycled;
 import com.sk89q.worldedit.world.World;
@@ -362,6 +363,7 @@ public class WorldEditPlugin extends JavaPlugin {
         // ... :|
         GameModes.get("");
         WeatherTypes.get("");
+        Registries.get("");
     }
 
     private void setupTags() {
