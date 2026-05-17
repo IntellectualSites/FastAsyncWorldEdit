@@ -1,3 +1,5 @@
 tasks.register("build") {
-    dependsOn(subprojects.map { it.tasks.named("build") })
+    subprojects.forEach { subproject ->
+        dependsOn(subproject.tasks.matching { it.name == "build" })
+    }
 }

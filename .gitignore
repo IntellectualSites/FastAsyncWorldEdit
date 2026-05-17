@@ -29,6 +29,7 @@ mvn/*
 # i18n
 worldedit-core/src/main/resources/lang/*
 !worldedit-core/src/main/resources/lang/strings.json
+!worldedit-core/src/main/resources/lang/fawe_messages.json
 **/*.eml
 /worldedit-core/FastAsyncWorldEdit.worldedit-core.eml
 /worldedit-core/.factorypath

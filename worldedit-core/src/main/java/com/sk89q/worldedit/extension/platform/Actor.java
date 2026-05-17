@@ -33,6 +33,7 @@ import com.sk89q.worldedit.util.auth.Subject;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 
+import javax.annotation.Nonnull;
 import java.io.File;
 import java.util.Locale;
 
@@ -257,6 +258,27 @@ public interface Actor extends Identifiable, SessionOwner, Subject, MapMetadatab
             }
         }
         return cancelled;
+    }
+
+    /**
+     * Print a FAWE caption rendered via MiniMessage.
+     *
+     * <p>The default implementation serialises the rendered Adventure component to plain
+     * text using {@link net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer}
+     * and forwards it to {@link #printRaw(String)}.  Platform implementations that
+     * support the Adventure API natively (e.g. Paper/Bukkit) should override this method
+     * to send the rich component directly.</p>
+     *
+     * @param caption   the FAWE caption to print
+     * @param resolvers additional tag resolvers used for placeholder substitution
+     */
+    default void print(
+            @Nonnull com.fastasyncworldedit.core.configuration.caption.FaweCaption caption,
+            net.kyori.adventure.text.minimessage.tag.resolver.TagResolver... resolvers
+    ) {
+        net.kyori.adventure.text.Component component = caption.toComponent(getLocale(), resolvers);
+        printRaw(net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
+                .plainText().serialize(component));
     }
     //FAWE end
 }

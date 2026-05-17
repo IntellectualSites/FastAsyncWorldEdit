@@ -21,6 +21,8 @@ package com.sk89q.worldedit.bukkit;
 
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.configuration.Settings;
+import com.fastasyncworldedit.core.configuration.caption.FaweCaption;
+import com.fastasyncworldedit.core.configuration.caption.FaweCaptionMap;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.sk89q.util.StringUtil;
 import com.sk89q.wepif.VaultResolver;
@@ -68,6 +70,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
@@ -223,11 +226,40 @@ public class BukkitPlayer extends AbstractPlayerActor {
 
     @Override
     public void print(Component component) {
+        //FAWE start - MiniMessage intercept: TranslatableComponent keys present in FaweCaptionMap render via Adventure/MiniMessage
+        if (component instanceof TranslatableComponent tc) {
+            String key = tc.key();
+            if (FaweCaptionMap.getInstance().containsKey(key)) {
+                List<? extends Component> argComponents = tc.args();
+                net.kyori.adventure.text.minimessage.tag.resolver.TagResolver[] resolvers =
+                        new net.kyori.adventure.text.minimessage.tag.resolver.TagResolver[argComponents.size()];
+                for (int i = 0; i < argComponents.size(); i++) {
+                    Component arg = argComponents.get(i);
+                    String text = arg instanceof TextComponent textArg
+                            ? textArg.content()
+                            : Caption.toString(arg, getLocale());
+                    resolvers[i] = FaweCaption.arg(i, text);
+                }
+                player.sendMessage(FaweCaption.of(key).toComponent(getLocale(), resolvers));
+                return;
+            }
+        }
+        //FAWE end - MiniMessage intercept
         //FAWE start - Add FAWE prefix to all messages
         component = Caption.color(TranslatableComponent.of("prefix", component), getLocale());
         //FAWE end
         TextAdapter.sendMessage(player, WorldEditText.format(component, getLocale()));
     }
+
+    //FAWE start - MiniMessage / Adventure support
+    @Override
+    public void print(
+            @Nonnull FaweCaption caption,
+            net.kyori.adventure.text.minimessage.tag.resolver.TagResolver... resolvers
+    ) {
+        player.sendMessage(caption.toComponent(getLocale(), resolvers));
+    }
+    //FAWE end
 
     @Override
     public boolean trySetPosition(Vector3 pos, float pitch, float yaw) {

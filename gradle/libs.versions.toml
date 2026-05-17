@@ -113,6 +113,7 @@ commonsCli = { group = "commons-cli", name = "commons-cli", version.ref = "commo
 paperLib = { group = "io.papermc", name = "paperlib", version.ref = "paperLib" }
 adventureApi = { group = "net.kyori", name = "adventure-api", version.ref = "adventure" }
 adventureMiniMessage = { group = "net.kyori", name = "adventure-text-minimessage", version.ref = "adventure" }
+adventurePlainSerializer = { group = "net.kyori", name = "adventure-text-serializer-plain", version.ref = "adventure" }
 paster = { group = "com.intellectualsites.paster", name = "Paster", version.ref = "paster" }
 vault = { group = "com.github.MilkBowl", name = "VaultAPI", version.ref = "vault" }
 serverlib = { group = "dev.notmyfault.serverlib", name = "ServerLib", version.ref = "serverlib" }

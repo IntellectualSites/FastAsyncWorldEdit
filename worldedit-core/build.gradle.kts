@@ -52,6 +52,7 @@ dependencies {
 
     compileOnly(libs.adventureApi)
     compileOnlyApi(libs.adventureMiniMessage)
+    compileOnly(libs.adventurePlainSerializer)
     implementation(libs.zstd) { isTransitive = false }
     compileOnly(libs.paster)
     compileOnly(libs.lz4Java) { isTransitive = false }
