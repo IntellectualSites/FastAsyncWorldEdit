@@ -246,6 +246,9 @@ public class WorldEditPlugin extends JavaPlugin {
         //FAWE end
 
         WorldEdit.getInstance().getEventBus().post(new PlatformsRegisteredEvent());
+        //FAWE start - Ensure FaweCaptionMap is loaded after platforms are registered
+        com.fastasyncworldedit.core.configuration.caption.FaweCaptionMap.reload();
+        //FAWE end
 
         PermissionsResolverManager.initialize(this); // Setup permission resolver
 

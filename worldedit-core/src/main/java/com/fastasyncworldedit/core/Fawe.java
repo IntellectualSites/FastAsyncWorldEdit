@@ -331,6 +331,7 @@ public class Fawe {
 
     public void setupConfigs() {
         MainUtil.copyFile(MainUtil.getJarFile(), "lang/strings.json", null);
+        MainUtil.copyFile(MainUtil.getJarFile(), "lang/fawe_messages.json", null);
         // Setting up config.yml
         File file = new File(this.implementation.getDirectory(), "config.yml");
         Settings.settings().PLATFORM = implementation.getPlatform().replace("\"", "");
