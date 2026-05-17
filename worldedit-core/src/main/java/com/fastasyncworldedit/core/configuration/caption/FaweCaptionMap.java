@@ -74,6 +74,7 @@ public final class FaweCaptionMap {
      * Returns the singleton instance, loading it lazily on first call.
      *
      * @return the caption map instance
+     * @since TODO
      */
     public static FaweCaptionMap getInstance() {
         if (instance == null) {
@@ -88,6 +89,8 @@ public final class FaweCaptionMap {
 
     /**
      * Reload the caption map from disk (e.g. on {@code /worldedit reload}).
+     *
+     * @since TODO
      */
     public static void reload() {
         synchronized (FaweCaptionMap.class) {
@@ -160,6 +163,7 @@ public final class FaweCaptionMap {
      * @param key    the caption key, e.g. {@code "fawe.error.no-perm"}
      * @param locale the desired locale (reserved for future i18n support)
      * @return the raw MiniMessage template, or the key itself if not found
+     * @since TODO
      */
     public String getMessage(final String key, final Locale locale) {
         return messages.getOrDefault(key, key);
@@ -170,6 +174,7 @@ public final class FaweCaptionMap {
      *
      * @param key the caption key
      * @return the raw MiniMessage template, or the key itself if not found
+     * @since TODO
      */
     public String getMessage(final String key) {
         return messages.getOrDefault(key, key);
@@ -180,6 +185,7 @@ public final class FaweCaptionMap {
      *
      * @param key the caption key to check
      * @return {@code true} if present
+     * @since TODO
      */
     public boolean containsKey(final String key) {
         return messages.containsKey(key);

@@ -252,6 +252,11 @@ public class BukkitPlayer extends AbstractPlayerActor {
     }
 
     //FAWE start - MiniMessage / Adventure support
+    /**
+     * {@inheritDoc}
+     *
+     * @since TODO
+     */
     @Override
     public void print(
             @Nonnull FaweCaption caption,

@@ -54,7 +54,11 @@ import java.util.Locale;
  */
 public final class FaweCaption {
 
-    /** Message key used for the FAWE prefix. */
+    /**
+     * Message key used for the FAWE prefix.
+     *
+     * @since TODO
+     */
     public static final String PREFIX_KEY = "prefix";
 
     private static final MiniMessage MINI_MESSAGE = MiniMessage.miniMessage();
@@ -74,6 +78,7 @@ public final class FaweCaption {
      *
      * @param key the caption key, e.g. {@code "fawe.error.no-perm"}
      * @return a new caption instance
+     * @since TODO
      */
     public static @Nonnull FaweCaption of(final @Nonnull String key) {
         return new FaweCaption(key);
@@ -89,6 +94,7 @@ public final class FaweCaption {
      * @param index     zero-based position index
      * @param component the component value
      * @return a resolver for {@code <argN>}
+     * @since TODO
      */
     public static @Nonnull TagResolver arg(final int index, final @Nonnull Component component) {
         return TagResolver.resolver("arg" + index, Tag.inserting(component));
@@ -100,6 +106,7 @@ public final class FaweCaption {
      * @param index the zero-based position index
      * @param value the string value
      * @return a resolver for {@code <argN>}
+     * @since TODO
      */
     public static @Nonnull TagResolver arg(final int index, final @Nonnull Object value) {
         return arg(index, value instanceof Component c ? c : Component.text(String.valueOf(value)));
@@ -113,6 +120,7 @@ public final class FaweCaption {
      * Returns the message key.
      *
      * @return the caption key
+     * @since TODO
      */
     public @Nonnull String getKey() {
         return key;
@@ -131,6 +139,7 @@ public final class FaweCaption {
      * @param locale    the locale used to look up the message template
      * @param resolvers additional resolvers for placeholder substitution
      * @return the rendered Adventure component
+     * @since TODO
      */
     public @Nonnull Component toComponent(final @Nonnull Locale locale, final @Nonnull TagResolver... resolvers) {
         final String template = FaweCaptionMap.getInstance().getMessage(key, locale);
