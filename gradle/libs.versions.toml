@@ -1,6 +1,6 @@
 [versions]
 # Minecraft expectations
-paperApi = "1.21-R0.1-SNAPSHOT"
+paperApi = "26.1.2.build.64-stable"
 fastutil = "8.5.15"
 guava = "33.3.1-jre"
 log4j = "2.24.1"
