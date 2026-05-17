@@ -1,0 +1,8 @@
+name: FastAsyncWorldEdit
+main: com.sk89q.worldedit.nukkit.WorldEditNukkitPlugin
+version: "${internalVersion}"
+api: [ "1.0.0" ]
+load: STARTUP
+softdepend: [ "DbLib" ]
+website: https://github.com/IntellectualSites/FastAsyncWorldEdit
+description: Blazingly fast world manipulation for builders, large networks and developers.
