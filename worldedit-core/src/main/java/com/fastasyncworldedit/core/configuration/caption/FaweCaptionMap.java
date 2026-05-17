@@ -30,6 +30,7 @@ import org.apache.logging.log4j.Logger;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Writer;
 import java.lang.reflect.Type;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -114,11 +115,26 @@ public final class FaweCaptionMap {
         }
 
         // Apply user overrides from the FAWE/WorldEdit data folder
+        Path localFile = null;
         try {
             ResourceLoader resourceLoader = WorldEdit.getInstance().getPlatformManager()
                     .queryCapability(com.sk89q.worldedit.extension.platform.Capability.CONFIGURATION)
                     .getResourceLoader();
-            Path localFile = resourceLoader.getLocalResource(MESSAGES_FILE);
+            localFile = resourceLoader.getLocalResource(MESSAGES_FILE);
+
+            // Save bundled defaults if the local file does not yet exist
+            if (!Files.exists(localFile) && !messages.isEmpty()) {
+                try {
+                    Files.createDirectories(localFile.getParent());
+                    try (Writer writer = Files.newBufferedWriter(localFile, StandardCharsets.UTF_8)) {
+                        GSON.toJson(messages, STRING_MAP_TYPE, writer);
+                    }
+                    LOGGER.info("Saved default {} to {}", MESSAGES_FILE, localFile);
+                } catch (IOException e) {
+                    LOGGER.warn("Failed to save default {} to {}", MESSAGES_FILE, localFile, e);
+                }
+            }
+
             if (Files.exists(localFile)) {
                 try (InputStream stream = Files.newInputStream(localFile);
                      InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
