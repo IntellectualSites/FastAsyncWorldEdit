@@ -1156,7 +1156,7 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType GOLDEN_CHESTPLATE = init();
     @Nullable
-    public static final ItemType GOLDEN_DANDELION = get("minecraft:golden_dandelion");
+    public static final ItemType GOLDEN_DANDELION = init();
     @Nullable
     public static final ItemType GOLDEN_HELMET = init();
     @Nullable
