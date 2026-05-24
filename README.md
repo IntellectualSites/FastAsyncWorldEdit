@@ -15,6 +15,11 @@ FAWE is designed for efficient world editing.
 FastAsyncWorldEdit is a fork of WorldEdit that has huge speed and memory improvements and considerably more features.  
 If you use other plugins that depend on WorldEdit, simply having FAWE installed will boost their performance.
 
+## Support
+
+If you have any questions, or need help with something, please join our Discord server:
+[![](https://discordapp.com/api/guilds/268444645527126017/widget.png?style=banner2)](https://discord.gg/intellectualsites)
+
 ## Downloads
 
 Releases are available either on Modrinth or on CurseForge.
