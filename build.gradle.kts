@@ -8,11 +8,11 @@ plugins {
     alias(libs.plugins.codecov)
     jacoco
     id("buildlogic.common")
-    id("com.gradleup.nmcp.aggregation") version "1.4.4"
+    id("com.gradleup.nmcp.aggregation") version "1.5.0"
     id("xyz.jpenilla.run-paper") version "3.0.2"
 }
 
-var rootVersion by extra("2.15.1")
+var rootVersion by extra("2.15.2")
 var snapshot by extra("SNAPSHOT")
 var revision: String by extra("")
 var buildNumber by extra("")
@@ -93,8 +93,8 @@ allprojects {
     }
 }
 
-val supportedVersions: List<String> = listOf("1.20.4", "1.20.5", "1.20.6", "1.21", "1.21.1", "1.21.4", "1.21.5",
-        "1.21.8", "1.21.10", "1.21.11")
+val supportedVersions: List<String> = listOf("1.21", "1.21.1", "1.21.4", "1.21.5",
+        "1.21.8", "1.21.10", "1.21.11", "26.1.2")
 
 tasks {
     supportedVersions.forEach {

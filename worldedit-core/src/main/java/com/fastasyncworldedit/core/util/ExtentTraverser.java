@@ -12,6 +12,7 @@ import org.apache.logging.log4j.Logger;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.lang.reflect.Field;
+import java.util.Optional;
 
 public class ExtentTraverser<T extends Extent> {
 
@@ -45,7 +46,8 @@ public class ExtentTraverser<T extends Extent> {
         } else if (extent instanceof ParallelQueueExtent pqe) {
             return ((SingleThreadQueueExtent) pqe.getExtent()).getWorld();
         } else {
-            return new ExtentTraverser<>(extent).findAndGet(World.class);
+            return Optional.ofNullable(new ExtentTraverser<>(extent).findAndGet(World.class)).orElseGet(() -> Optional.ofNullable(
+                    new ExtentTraverser<>(extent).findAndGet(EditSession.class)).map(EditSession::getWorld).orElse(null));
         }
     }
 

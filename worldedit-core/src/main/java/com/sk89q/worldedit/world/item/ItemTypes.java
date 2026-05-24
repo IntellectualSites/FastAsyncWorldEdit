@@ -1156,6 +1156,8 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType GOLDEN_CHESTPLATE = init();
     @Nullable
+    public static final ItemType GOLDEN_DANDELION = init();
+    @Nullable
     public static final ItemType GOLDEN_HELMET = init();
     @Nullable
     public static final ItemType GOLDEN_HOE = init();

@@ -9,17 +9,17 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v6
       - name: Validate Gradle Wrapper
-        uses: gradle/actions/wrapper-validation@v5
+        uses: gradle/actions/wrapper-validation@v6
       - name: Setup Java
         uses: actions/setup-java@v5
         with:
           distribution: temurin
           cache: gradle
-          java-version: 21
+          java-version: 25
       - name: Clean Build
         run: ./gradlew clean build --no-daemon
       - name: Upload Release Assets
-        uses: AButler/upload-release-assets@v3.0
+        uses: AButler/upload-release-assets@v4.0.0
         with:
           files: 'worldedit-bukkit/build/libs/FastAsyncWorldEdit-*.jar'
           repo-token: ${{ secrets.GITHUB_TOKEN }}

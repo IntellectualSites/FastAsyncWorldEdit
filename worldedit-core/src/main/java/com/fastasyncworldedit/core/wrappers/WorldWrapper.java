@@ -39,6 +39,7 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.generation.ConfiguredFeatureType;
 import com.sk89q.worldedit.world.generation.StructureType;
+import com.sk89q.worldedit.world.generation.TreeType;
 import com.sk89q.worldedit.world.weather.WeatherType;
 
 import javax.annotation.Nullable;
@@ -288,6 +289,12 @@ public class WorldWrapper extends AbstractWorld {
         } catch (MaxChangedBlocksException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public boolean generateTree(final TreeType type, final EditSession editSession, final BlockVector3 position) throws
+            MaxChangedBlocksException {
+        return parent.generateTree(type, editSession, position);
     }
 
     @Override
