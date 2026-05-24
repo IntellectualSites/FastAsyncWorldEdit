@@ -150,6 +150,7 @@ import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.generation.ConfiguredFeatureType;
 import com.sk89q.worldedit.world.generation.StructureType;
+import com.sk89q.worldedit.world.generation.TreeType;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 import org.apache.logging.log4j.Logger;
 
@@ -2397,10 +2398,9 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
 
         final int ceilRadiusX = (int) Math.ceil(radiusX);
         final int ceilRadiusZ = (int) Math.ceil(radiusZ);
-
-        final double rx2 = Math.pow(radiusX, 2);
-        final double ry2 = Math.pow(radiusZ, 2);
-        final double rz2 = Math.pow(height, 2);
+        final double radiusXPow = Math.pow(radiusX, 2);
+        final double radiusZPow = Math.pow(radiusZ, 2);
+        final double heightPow = Math.pow(height, 2);
         final int layers = Math.abs(height);
 
         int cx = pos.x();
@@ -2408,45 +2408,45 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         int cz = pos.z();
 
         for (int y = 0; y < layers; ++y) {
-            double ySquaredMinusHeightOverHeightSquared = Math.pow(y - layers, 2) / ry2;
+            double ySquaredMinusHeightOverHeightSquared = Math.pow(y - layers, 2) / heightPow;
             int yy = height < 0 ? cy - y : cy + y;
+
             forX:
             for (int x = 0; x <= ceilRadiusX; ++x) {
-                double xSquaredOverRadiusX = Math.pow(x, 2) / rx2;
-                int xx = cx + x;
-                forZ:
+                double xSquaredOverRadiusX = Math.pow(x, 2) / radiusXPow;
+
                 for (int z = 0; z <= ceilRadiusZ; ++z) {
-                    int zz = cz + z;
-                    double zSquaredOverRadiusZ = Math.pow(z, 2) / rz2;
+                    double zSquaredOverRadiusZ = Math.pow(z, 2) / radiusZPow;
                     double distanceFromOriginMinusHeightSquared = xSquaredOverRadiusX + zSquaredOverRadiusZ - ySquaredMinusHeightOverHeightSquared;
 
                     if (distanceFromOriginMinusHeightSquared > 1) {
                         if (z == 0) {
                             break forX;
                         }
-                        break forZ;
+                        break;
                     }
 
                     if (!filled) {
-                        double xNext = Math.pow(x + thickness, 2) / rx2 + zSquaredOverRadiusZ - ySquaredMinusHeightOverHeightSquared;
-                        double yNext = xSquaredOverRadiusX + zSquaredOverRadiusZ - Math.pow(y + thickness - height, 2) / ry2;
-                        double zNext = xSquaredOverRadiusX + Math.pow(z + thickness, 2) / rz2 - ySquaredMinusHeightOverHeightSquared;
+                        double xNext = Math.pow(x + thickness, 2) / radiusXPow + zSquaredOverRadiusZ - ySquaredMinusHeightOverHeightSquared;
+                        double yNext =
+                                xSquaredOverRadiusX + zSquaredOverRadiusZ - Math.pow(y + thickness - layers, 2) / radiusZPow;
+                        double zNext = xSquaredOverRadiusX + Math.pow(z + thickness, 2) / heightPow - ySquaredMinusHeightOverHeightSquared;
                         if (xNext <= 0 && zNext <= 0 && (yNext <= 0 && y + thickness != layers)) {
                             continue;
                         }
                     }
 
                     if (distanceFromOriginMinusHeightSquared <= 0) {
-                        if (setBlock(xx, yy, zz, block)) {
+                        if (setBlock(cx + x, yy, cz + z, block)) {
                             ++affected;
                         }
-                        if (setBlock(xx, yy, zz, block)) {
+                        if (setBlock(cx - x, yy, cz + z, block)) {
                             ++affected;
                         }
-                        if (setBlock(xx, yy, zz, block)) {
+                        if (setBlock(cx + x, yy, cz - z, block)) {
                             ++affected;
                         }
-                        if (setBlock(xx, yy, zz, block)) {
+                        if (setBlock(cx - x, yy, cz - z, block)) {
                             ++affected;
                         }
                     }
@@ -3034,7 +3034,9 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * @param treeType     the tree type
      * @return number of trees created
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
+     * @deprecated Use {@link #makeForest(Region, double, TreeType)}.
      */
+    @Deprecated
     public int makeForest(BlockVector3 basePosition, int size, double density, TreeGenerator.TreeType treeType) throws
             MaxChangedBlocksException {
         return makeForest(CuboidRegion.fromCenter(basePosition, size), density, treeType);
@@ -3048,13 +3050,47 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * @param treeType the tree type
      * @return number of trees created
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
+     * @deprecated Use {@link #makeForest(Region, double, TreeType)}.
      */
+    @Deprecated
     public int makeForest(Region region, double density, TreeGenerator.TreeType treeType) throws MaxChangedBlocksException {
         ForestGenerator generator = new ForestGenerator(this, treeType);
         GroundFunction ground = new GroundFunction(new ExistingBlockMask(this), generator);
         //FAWE start - provide extent for preloading
         LayerVisitor visitor = new LayerVisitor(asFlatRegion(region), minimumBlockY(region), maximumBlockY(region), ground, this);
         //FAWE end
+        visitor.setMask(new NoiseFilter2D(new RandomNoise(), density));
+        Operations.completeLegacy(visitor);
+        return ground.getAffected();
+    }
+
+    /**
+     * Makes a forest.
+     *
+     * @param basePosition a position
+     * @param size a size
+     * @param density between 0 and 1, inclusive
+     * @param treeType the tree type
+     * @return number of trees created
+     * @throws MaxChangedBlocksException thrown if too many blocks are changed
+     */
+    public int makeForest(BlockVector3 basePosition, int size, double density, TreeType treeType) throws MaxChangedBlocksException {
+        return makeForest(CuboidRegion.fromCenter(basePosition, size), density, treeType);
+    }
+
+    /**
+     * Makes a forest.
+     *
+     * @param region the region to generate trees in
+     * @param density between 0 and 1, inclusive
+     * @param treeType the tree type
+     * @return number of trees created
+     * @throws MaxChangedBlocksException thrown if too many blocks are changed
+     */
+    public int makeForest(Region region, double density, TreeType treeType) throws MaxChangedBlocksException {
+        com.sk89q.worldedit.function.generator.TreeGenerator generator = new com.sk89q.worldedit.function.generator.TreeGenerator(this, treeType);
+        GroundFunction ground = new GroundFunction(new ExistingBlockMask(this), generator);
+        LayerVisitor visitor = new LayerVisitor(asFlatRegion(region), minimumBlockY(region), maximumBlockY(region), ground);
         visitor.setMask(new NoiseFilter2D(new RandomNoise(), density));
         Operations.completeLegacy(visitor);
         return ground.getAffected();

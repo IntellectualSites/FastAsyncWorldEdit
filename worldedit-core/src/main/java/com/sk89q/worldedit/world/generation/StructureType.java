@@ -26,7 +26,7 @@ import com.sk89q.worldedit.registry.NamespacedRegistry;
 
 public record StructureType(String id) implements Keyed {
 
-    public static final NamespacedRegistry<StructureType> REGISTRY = new NamespacedRegistry<>("structure type");
+    public static final NamespacedRegistry<StructureType> REGISTRY = new NamespacedRegistry<>("structure type", "structure_type", "minecraft");
 
     @Override
     public String toString() {

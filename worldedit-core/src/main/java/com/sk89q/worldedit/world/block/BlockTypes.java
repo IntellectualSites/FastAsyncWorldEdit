@@ -428,6 +428,8 @@ public final class BlockTypes {
     @Nullable
     public static final BlockType CHISELED_BOOKSHELF = init();
     @Nullable
+    public static final BlockType CHISELED_CINNABAR = init();
+    @Nullable
     public static final BlockType CHISELED_COPPER = init();
     @Nullable
     public static final BlockType CHISELED_DEEPSLATE = init();
@@ -446,6 +448,8 @@ public final class BlockTypes {
     @Nullable
     public static final BlockType CHISELED_STONE_BRICKS = init();
     @Nullable
+    public static final BlockType CHISELED_SULFUR = init();
+    @Nullable
     public static final BlockType CHISELED_TUFF = init();
     @Nullable
     public static final BlockType CHISELED_TUFF_BRICKS = init();
@@ -453,6 +457,22 @@ public final class BlockTypes {
     public static final BlockType CHORUS_FLOWER = init();
     @Nullable
     public static final BlockType CHORUS_PLANT = init();
+    @Nullable
+    public static final BlockType CINNABAR = init();
+    @Nullable
+    public static final BlockType CINNABAR_BRICK_SLAB = init();
+    @Nullable
+    public static final BlockType CINNABAR_BRICK_STAIRS = init();
+    @Nullable
+    public static final BlockType CINNABAR_BRICK_WALL = init();
+    @Nullable
+    public static final BlockType CINNABAR_BRICKS = init();
+    @Nullable
+    public static final BlockType CINNABAR_SLAB = init();
+    @Nullable
+    public static final BlockType CINNABAR_STAIRS = init();
+    @Nullable
+    public static final BlockType CINNABAR_WALL = init();
     @Nullable
     public static final BlockType CLAY = init();
     @Nullable
@@ -533,6 +553,8 @@ public final class BlockTypes {
     public static final BlockType CRAFTER = init();
     @Nullable
     public static final BlockType CRAFTING_TABLE = init();
+    @Nullable
+    public static final BlockType CREAKING_HEART = init();
     @Nullable
     public static final BlockType CREEPER_HEAD = init();
     @Nullable
@@ -877,6 +899,8 @@ public final class BlockTypes {
     public static final BlockType GOLD_BLOCK = init();
     @Nullable
     public static final BlockType GOLD_ORE = init();
+    @Nullable
+    public static final BlockType GOLDEN_DANDELION = init();
     @Nullable
     public static final BlockType GRANITE = init();
     @Nullable
@@ -1549,6 +1573,14 @@ public final class BlockTypes {
     @Nullable
     public static final BlockType POLISHED_BLACKSTONE_WALL = init();
     @Nullable
+    public static final BlockType POLISHED_CINNABAR = init();
+    @Nullable
+    public static final BlockType POLISHED_CINNABAR_SLAB = init();
+    @Nullable
+    public static final BlockType POLISHED_CINNABAR_STAIRS = init();
+    @Nullable
+    public static final BlockType POLISHED_CINNABAR_WALL = init();
+    @Nullable
     public static final BlockType POLISHED_DEEPSLATE = init();
     @Nullable
     public static final BlockType POLISHED_DEEPSLATE_SLAB = init();
@@ -1569,6 +1601,14 @@ public final class BlockTypes {
     @Nullable
     public static final BlockType POLISHED_GRANITE_STAIRS = init();
     @Nullable
+    public static final BlockType POLISHED_SULFUR = init();
+    @Nullable
+    public static final BlockType POLISHED_SULFUR_SLAB = init();
+    @Nullable
+    public static final BlockType POLISHED_SULFUR_STAIRS = init();
+    @Nullable
+    public static final BlockType POLISHED_SULFUR_WALL = init();
+    @Nullable
     public static final BlockType POLISHED_TUFF = init();
     @Nullable
     public static final BlockType POLISHED_TUFF_SLAB = init();
@@ -1580,6 +1620,8 @@ public final class BlockTypes {
     public static final BlockType POPPY = init();
     @Nullable
     public static final BlockType POTATOES = init();
+    @Nullable
+    public static final BlockType POTENT_SULFUR = init();
     @Nullable
     public static final BlockType POTTED_ACACIA_SAPLING = init();
     @Nullable
@@ -1624,6 +1666,8 @@ public final class BlockTypes {
     public static final BlockType POTTED_FLOWERING_AZALEA_BUSH = init();
     @Nullable
     public static final BlockType POTTED_FLOWERING_AZALEA = init();
+    @Nullable
+    public static final BlockType POTTED_GOLDEN_DANDELION = init();
     @Nullable
     public static final BlockType POTTED_JUNGLE_SAPLING = init();
     @Nullable
@@ -2040,6 +2084,24 @@ public final class BlockTypes {
     @Nullable
     public static final BlockType SUGAR_CANE = init();
     @Nullable
+    public static final BlockType SULFUR = init();
+    @Nullable
+    public static final BlockType SULFUR_BRICK_SLAB = init();
+    @Nullable
+    public static final BlockType SULFUR_BRICK_STAIRS = init();
+    @Nullable
+    public static final BlockType SULFUR_BRICK_WALL = init();
+    @Nullable
+    public static final BlockType SULFUR_BRICKS = init();
+    @Nullable
+    public static final BlockType SULFUR_SLAB = init();
+    @Nullable
+    public static final BlockType SULFUR_SPIKE = init();
+    @Nullable
+    public static final BlockType SULFUR_STAIRS = init();
+    @Nullable
+    public static final BlockType SULFUR_WALL = init();
+    @Nullable
     public static final BlockType SUNFLOWER = init();
     @Nullable
     public static final BlockType SUSPICIOUS_GRAVEL = init();
@@ -2396,7 +2458,7 @@ public final class BlockTypes {
     public static final BlockType ZOMBIE_WALL_HEAD = init();
 
     private static Field[] fieldsTmp;
-    private static int initIndex = 0;
+    private static int initIndex;
 
     // Init each field
     // The order is important
@@ -2411,6 +2473,10 @@ public final class BlockTypes {
 
     // Clears memory after initialization
     static {
+        // we should be at the first non-BlockType field now
+        if (!fieldsTmp[initIndex].getName().equals("fieldsTmp")) {
+            throw new IllegalStateException("improper initialization of block type fields");
+        }
         fieldsTmp = null;
     }
 

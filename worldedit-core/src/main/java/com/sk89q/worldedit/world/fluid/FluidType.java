@@ -30,7 +30,7 @@ import com.sk89q.worldedit.registry.NamespacedRegistry;
 public class FluidType implements RegistryItem, Keyed {
 //FAWE end
 
-    public static final NamespacedRegistry<FluidType> REGISTRY = new NamespacedRegistry<>("fluid type");
+    public static final NamespacedRegistry<FluidType> REGISTRY = new NamespacedRegistry<>("fluid type", "fluid_type", "minecraft");
 
     //FAWE start
     private final String id;

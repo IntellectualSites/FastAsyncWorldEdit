@@ -13,7 +13,6 @@ import org.bukkit.TreeType;
 import org.bukkit.World;
 import org.bukkit.block.BlockState;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -33,6 +32,11 @@ public abstract class FaweAdapter<TAG, SERVER_LEVEL> extends CachedBukkitAdapter
 
     protected FaweAdapter(final BukkitImplAdapter<TAG> parent) {
         this.parent = parent;
+    }
+
+    @Override
+    public void initializeRegistries() {
+        parent.initializeRegistries();
     }
 
     @Override
