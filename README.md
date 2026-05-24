@@ -34,7 +34,7 @@ Releases are available either on Modrinth or on CurseForge.
 * Over 200 Commands
 * Style and translate messages and commands
 * (No setup required) Clipboard web integration (Clipboard)
-* Unlimited //undo per world history, instant lookups/rollback, and cross-server clipboards
+* Unlimited `//undo`, per-world history, instant lookups/rollback, and cross-server clipboards
 * Advanced per-player limits (entity, tiles, memory, changes, iterations, regions, inventory)
 * Visualization, targeting modes/masks, and scroll actions
 * Adds lots of powerful new //brushes and //tools.
