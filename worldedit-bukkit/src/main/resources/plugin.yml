@@ -7,7 +7,7 @@ softdepend: [ Vault ]
 provides: [ WorldEdit ]
 website: https://modrinth.com/plugin/fastasyncworldedit/
 description: Blazingly fast world manipulation for builders, large networks and developers.
-authors: [ Empire92, MattBDev, IronApollo, dordsor21, NotMyFault ]
+authors: [ Empire92, MattBDev, IronApollo, dordsor21, NotMyFault, SirYwell ]
 loadbefore: [ WorldGuard, PlotSquared ]
 database: false
 permissions:
