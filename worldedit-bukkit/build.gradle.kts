@@ -279,11 +279,10 @@ publishMods {
 
     // We publish the reobfJar twice to ensure that the modrinth download menu picks the right jar for the platform regardless
     // of minecraft version.
-    val mojmapPaperVersions = listOf("1.20.6", "1.21.1", "1.21.4", "1.21.5", "1.21.6", "1.21.7", "1.21.8", "1.21.9", "1.21.10",
+    val mojmapPaperVersions = listOf("1.21.1", "1.21.4", "1.21.5", "1.21.6", "1.21.7", "1.21.8", "1.21.9", "1.21.10",
             "1.21.11", "26.1", "26.1.1", "26.1.2")
-    val spigotMappedPaperVersions = listOf("1.20.2", "1.20.4")
 
-    // Mark reobfJar as spigot only for 1.20.5+
+    // Mark reobfJar as spigot
     modrinth("spigot") {
         from(common)
         file = tasks.named<ShadowJar>("reobfShadowJar").flatMap { it.archiveFile }
@@ -291,15 +290,7 @@ publishMods {
         modLoaders = listOf("spigot")
     }
 
-    // Mark reobfJar as spigot & paper for <1.20.5
-    modrinth("spigotAndOldPaper") {
-        from(common)
-        file = tasks.named<ShadowJar>("reobfShadowJar").flatMap { it.archiveFile }
-        minecraftVersions = spigotMappedPaperVersions
-        modLoaders = listOf("paper", "spigot")
-    }
-
-    // Mark mojang mapped jar as paper 1.20.5+ only
+    // Mark mojang mapped jar as paper
     modrinth {
         from(common)
         file = tasks.named<ShadowJar>("shadowJar").flatMap { it.archiveFile }
