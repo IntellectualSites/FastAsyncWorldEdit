@@ -942,7 +942,7 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
                     return underlyingFeature instanceof TreeFeature || underlyingFeature instanceof CoralTreeFeature;
                 })
                 .forEach(feature -> {
-                    String key = feature.key().toString();
+                    String key = feature.key().location().toString();
                     if (TreeType.REGISTRY.get(key) == null) {
                         TreeType.REGISTRY.register(key, new TreeType(key));
                     }
