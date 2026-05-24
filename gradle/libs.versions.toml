@@ -1,9 +1,9 @@
 [versions]
 # Minecraft expectations
-paperApi = "1.21-R0.1-SNAPSHOT"
+paperApi = "1.21.1-R0.1-SNAPSHOT"
 fastutil = "8.5.15"
 guava = "33.3.1-jre"
-log4j = "2.24.1"
+log4j = "2.17.1"
 gson = "2.11.0"
 snakeyaml = "2.2"
 
@@ -57,15 +57,11 @@ grgit = "5.3.3"
 shadow = "9.4.1"
 paperweight = "2.0.0-SNAPSHOT"
 codecov = "0.2.0"
-
-
 jqwik = "1.9.3"
 
 # Minimum versions we apply to make dependencies support newer Java
 minimumAsm = "9.7"
 minimumJdependency = "2.10"
-#minimumTinyRemapper = "0.8.11"
-
 
 [libraries]
 # Gradle plugins
