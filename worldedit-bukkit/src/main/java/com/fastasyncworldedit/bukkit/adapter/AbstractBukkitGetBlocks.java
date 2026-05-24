@@ -38,7 +38,7 @@ public abstract class AbstractBukkitGetBlocks<ServerLevel, LevelChunk> extends C
     protected final int minHeight;
     protected final int maxHeight;
     protected boolean createCopy = false;
-    protected boolean forceLoadSections = true;
+    protected volatile boolean forceLoadSections = true;
     protected int copyKey = 0;
 
     protected AbstractBukkitGetBlocks(
@@ -67,7 +67,7 @@ public abstract class AbstractBukkitGetBlocks<ServerLevel, LevelChunk> extends C
 
     @Override
     @SuppressWarnings({"rawtypes", "unchecked"})
-    public synchronized <T extends Future<T>> T call(IQueueExtent<? extends IChunk> owner, IChunkSet set, Runnable finalizer) {
+    public <T extends Future<T>> T call(IQueueExtent<? extends IChunk> owner, IChunkSet set, Runnable finalizer) {
         if (!callLock.isHeldByCurrentThread()) {
             throw new IllegalStateException("Attempted to call chunk GET but chunk was not call-locked.");
         }
@@ -87,7 +87,7 @@ public abstract class AbstractBukkitGetBlocks<ServerLevel, LevelChunk> extends C
             }
         }
         final int finalCopyKey = copyKey;
-        // Run immediately if possible
+        // Run immediately if possible. If not fully generated, fall through to consequent
         if (chunk != null) {
             return tryInternalCall(set, finalizer, finalCopyKey, chunk, nmsWorld);
         }
