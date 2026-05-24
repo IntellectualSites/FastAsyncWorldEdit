@@ -1092,6 +1092,19 @@ public final class PaperweightAdapter implements BukkitImplAdapter<Tag> {
         }
     }
 
+    // FAWE start
+    /**
+     * Converts a WorldEdit-native NBT structure to a NMS structure.
+     *
+     * @param foreign structure to convert
+     * @return non-native structure
+     */
+    @Override
+    public Tag fromNativeLin(LinTag<?> foreign) {
+        return this.fromNative(foreign);
+    }
+    // FAWE end
+
     private static byte identifyRawElementType(net.minecraft.nbt.ListTag list) {
         byte b = 0;
 
