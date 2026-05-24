@@ -45,6 +45,7 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.minecraft.world.level.chunk.PalettedContainer;
@@ -70,8 +71,10 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -106,6 +109,8 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
     private static final MethodHandle methodremoveTickingBlockEntity;
 
     private static final Field fieldRemove;
+
+    private static final Field fieldPendingBlockEntities;
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
     private static final boolean IS_1_21_10 = MinecraftVersion.getCurrent().getRelease() == 10;
@@ -152,6 +157,13 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             }
             fieldBiomes = tmpFieldBiomes;
             fieldBiomes.setAccessible(true);
+
+            fieldPendingBlockEntities = ChunkAccess.class.getDeclaredField(Refraction.pickName(
+                            "pendingBlockEntities",
+                            "i"
+                    )
+            );
+            fieldPendingBlockEntities.setAccessible(true);
 
             Method getVisibleChunkIfPresent = ChunkMap.class.getDeclaredMethod(
                     Refraction.pickName(
@@ -722,6 +734,32 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
     static PersistentEntitySectionManager<Entity> getEntitySectionManager(ServerLevel level) throws IllegalAccessException {
         //noinspection unchecked
         return (PersistentEntitySectionManager<Entity>) (SERVER_LEVEL_ENTITY_MANAGER.get(level));
+    }
+
+    static Map<BlockPos, CompoundTag> clearPostProcessing(LevelChunk chunk, boolean force) {
+        if (!force && PaperLib.isPaper() && chunk.moonrise$isPostProcessingDone()) {
+            return Collections.emptyMap();
+        }
+        try {
+            //noinspection unchecked
+            Map<BlockPos, CompoundTag> pendingBlockEntities = (Map<BlockPos, CompoundTag>) fieldPendingBlockEntities.get(chunk);
+            Map<BlockPos, CompoundTag> toDo = new HashMap<>(pendingBlockEntities);
+            pendingBlockEntities.clear();
+            return toDo;
+        } catch (IllegalAccessException e) {
+            LOGGER.error("Error clearing pendingBlockEntities", e);
+        }
+        return Collections.emptyMap();
+    }
+
+    static void setPostProcessing(LevelChunk chunk, Map<BlockPos, CompoundTag> tiles) {
+        try {
+            //noinspection unchecked
+            Map<BlockPos, CompoundTag> pendingBlockEntities = (Map<BlockPos, CompoundTag>) fieldPendingBlockEntities.get(chunk);
+            pendingBlockEntities.putAll(tiles);
+        } catch (IllegalAccessException e) {
+            LOGGER.error("Error writing to pendingBlockEntities", e);
+        }
     }
 
 }
