@@ -4,10 +4,6 @@ on:
   push:
     branches:
       - main
-  pull_request:
-    types: [opened, reopened, synchronize]
-  pull_request_target:
-    types: [opened, reopened, synchronize]
 
 permissions:
   contents: read
@@ -17,7 +13,7 @@ jobs:
     permissions:
       contents: write # to create a GitHub release (release-drafter/release-drafter)
 
-    if: ${{ github.event_name != 'pull_request' || github.repository != github.event.pull_request.head.repo.full_name }}
+    if: ${{ github.repository_owner == 'IntellectualSites' }}
     runs-on: ubuntu-latest
     steps:
       - name: Generate GitHub Release Draft
