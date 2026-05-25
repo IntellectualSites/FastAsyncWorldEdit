@@ -17,7 +17,7 @@ If you use other plugins that depend on WorldEdit, simply having FAWE installed 
 
 ## Support
 
-If you have any questions, or need help with something, please join our Discord server:
+If you have any questions or need help with something, please join our Discord server:
 [![](https://discordapp.com/api/guilds/268444645527126017/widget.png?style=banner2)](https://discord.gg/intellectualsites)
 
 ## Downloads
