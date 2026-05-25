@@ -10,8 +10,8 @@ on:
 jobs:
   update_release_draft:
     if: ${{ github.event_name != 'pull_request' || github.repository != github.event.pull_request.head.repo.full_name }}
+    permissions:
+      contents: write # required for creating draft releases
     runs-on: ubuntu-latest
     steps:
       - uses: release-drafter/release-drafter@v7
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
