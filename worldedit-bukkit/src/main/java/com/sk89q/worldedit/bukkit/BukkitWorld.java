@@ -242,15 +242,11 @@ public class BukkitWorld extends AbstractWorld {
     @Override
     public Path getStoragePath() {
         Path worldFolder = getWorld().getWorldFolder().toPath();
-        switch (getWorld().getEnvironment()) {
-            case NETHER:
-                return worldFolder.resolve("DIM-1");
-            case THE_END:
-                return worldFolder.resolve("DIM1");
-            case NORMAL:
-            default:
-                return worldFolder;
-        }
+        return switch (getWorld().getEnvironment()) {
+            case NETHER -> worldFolder.resolve("DIM-1");
+            case THE_END -> worldFolder.resolve("DIM1");
+            default -> worldFolder;
+        };
     }
 
     @Override
