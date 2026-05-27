@@ -12,8 +12,7 @@ import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-
-import static com.google.gson.internal.$Gson$Preconditions.checkNotNull;
+import java.util.Objects;
 
 public class ItemUtil {
 
@@ -28,8 +27,7 @@ public class ItemUtil {
     private SoftReference<Int2ObjectOpenHashMap<WeakReference<Tag>>> hashToNMSTag = new SoftReference<>(new Int2ObjectOpenHashMap<>());
 
     public ItemUtil() throws Exception {
-        this.adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
-        checkNotNull(adapter);
+        this.adapter = Objects.requireNonNull(WorldEditPlugin.getInstance().getBukkitImplAdapter());
         Class<?> classCraftItemStack = BukkitReflectionUtils.getCbClass("inventory.CraftItemStack");
         Class<?> classNMSItem = BukkitReflectionUtils.getNmsClass("ItemStack");
         this.methodAsNMSCopy = ReflectionUtils.setAccessible(classCraftItemStack.getDeclaredMethod("asNMSCopy", ItemStack.class));
