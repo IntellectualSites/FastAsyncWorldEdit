@@ -57,7 +57,7 @@ grgit = "5.3.3"
 shadow = "9.4.1"
 paperweight = "2.0.0-SNAPSHOT"
 codecov = "0.2.0"
-jqwik = "1.9.3"
+jqwik = "1.10.1"
 
 # Minimum versions we apply to make dependencies support newer Java
 minimumAsm = "9.7"
