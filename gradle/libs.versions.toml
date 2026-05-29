@@ -48,7 +48,7 @@ piston = "0.5.11"
 
 # Tests
 mockito = "5.23.0"
-junit = "6.0.3"
+junit = "6.1.0"
 
 # Gradle plugins
 pluginyml = "0.6.0"
