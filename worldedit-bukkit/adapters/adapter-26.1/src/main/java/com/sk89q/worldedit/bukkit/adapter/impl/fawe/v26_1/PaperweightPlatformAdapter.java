@@ -153,11 +153,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             fieldBiomes = tmpFieldBiomes;
             fieldBiomes.setAccessible(true);
 
-            fieldPendingBlockEntities = ChunkAccess.class.getDeclaredField(Refraction.pickName(
-                            "pendingBlockEntities",
-                            "i"
-                    )
-            );
+            fieldPendingBlockEntities = ChunkAccess.class.getDeclaredField("pendingBlockEntities");
             fieldPendingBlockEntities.setAccessible(true);
 
             Method getVisibleChunkIfPresent = ChunkMap.class.getDeclaredMethod(
