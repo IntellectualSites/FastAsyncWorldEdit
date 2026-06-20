@@ -55,7 +55,7 @@ includeBuild("build-logic")
 
 include("worldedit-libs")
 
-listOf("1_21", "1_21_4", "1_21_5", "1_21_6", "1_21_9", "1_21_11", "26.1").forEach {
+listOf("1_21", "1_21_4", "1_21_5", "1_21_6", "1_21_9", "1_21_11", "26.1", "26.2").forEach {
     include("worldedit-bukkit:adapters:adapter-$it")
 }
 

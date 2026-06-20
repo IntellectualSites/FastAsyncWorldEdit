@@ -306,6 +306,8 @@ public final class EntityTypes {
     @Nullable
     public static final EntityType STRIDER = get("minecraft:strider");
     @Nullable
+    public static final EntityType SULFUR_CUBE = get("minecraft:sulfur_cube");
+    @Nullable
     public static final EntityType TADPOLE = get("minecraft:tadpole");
     @Nullable
     public static final EntityType TEXT_DISPLAY = get("minecraft:text_display");
