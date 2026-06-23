@@ -213,7 +213,7 @@ public final class PaperweightChunkAccessProxy extends ChunkAccess {
 
     @Override
     public @Nonnull SWMRNibbleArray[] starlight$getSkyNibbles() {
-        return parent.starlight$getBlockNibbles();
+        return parent.starlight$getSkyNibbles();
     }
 
     @Override

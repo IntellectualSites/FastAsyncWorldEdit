@@ -428,6 +428,8 @@ public final class BlockTypes {
     @Nullable
     public static final BlockType CHISELED_BOOKSHELF = init();
     @Nullable
+    public static final BlockType CHISELED_CINNABAR = init();
+    @Nullable
     public static final BlockType CHISELED_COPPER = init();
     @Nullable
     public static final BlockType CHISELED_DEEPSLATE = init();
@@ -446,6 +448,8 @@ public final class BlockTypes {
     @Nullable
     public static final BlockType CHISELED_STONE_BRICKS = init();
     @Nullable
+    public static final BlockType CHISELED_SULFUR = init();
+    @Nullable
     public static final BlockType CHISELED_TUFF = init();
     @Nullable
     public static final BlockType CHISELED_TUFF_BRICKS = init();
@@ -453,6 +457,22 @@ public final class BlockTypes {
     public static final BlockType CHORUS_FLOWER = init();
     @Nullable
     public static final BlockType CHORUS_PLANT = init();
+    @Nullable
+    public static final BlockType CINNABAR = init();
+    @Nullable
+    public static final BlockType CINNABAR_BRICK_SLAB = init();
+    @Nullable
+    public static final BlockType CINNABAR_BRICK_STAIRS = init();
+    @Nullable
+    public static final BlockType CINNABAR_BRICK_WALL = init();
+    @Nullable
+    public static final BlockType CINNABAR_BRICKS = init();
+    @Nullable
+    public static final BlockType CINNABAR_SLAB = init();
+    @Nullable
+    public static final BlockType CINNABAR_STAIRS = init();
+    @Nullable
+    public static final BlockType CINNABAR_WALL = init();
     @Nullable
     public static final BlockType CLAY = init();
     @Nullable
@@ -1551,6 +1571,14 @@ public final class BlockTypes {
     @Nullable
     public static final BlockType POLISHED_BLACKSTONE_WALL = init();
     @Nullable
+    public static final BlockType POLISHED_CINNABAR = init();
+    @Nullable
+    public static final BlockType POLISHED_CINNABAR_SLAB = init();
+    @Nullable
+    public static final BlockType POLISHED_CINNABAR_STAIRS = init();
+    @Nullable
+    public static final BlockType POLISHED_CINNABAR_WALL = init();
+    @Nullable
     public static final BlockType POLISHED_DEEPSLATE = init();
     @Nullable
     public static final BlockType POLISHED_DEEPSLATE_SLAB = init();
@@ -1571,6 +1599,14 @@ public final class BlockTypes {
     @Nullable
     public static final BlockType POLISHED_GRANITE_STAIRS = init();
     @Nullable
+    public static final BlockType POLISHED_SULFUR = init();
+    @Nullable
+    public static final BlockType POLISHED_SULFUR_SLAB = init();
+    @Nullable
+    public static final BlockType POLISHED_SULFUR_STAIRS = init();
+    @Nullable
+    public static final BlockType POLISHED_SULFUR_WALL = init();
+    @Nullable
     public static final BlockType POLISHED_TUFF = init();
     @Nullable
     public static final BlockType POLISHED_TUFF_SLAB = init();
@@ -1582,6 +1618,8 @@ public final class BlockTypes {
     public static final BlockType POPPY = init();
     @Nullable
     public static final BlockType POTATOES = init();
+    @Nullable
+    public static final BlockType POTENT_SULFUR = init();
     @Nullable
     public static final BlockType POTTED_ACACIA_SAPLING = init();
     @Nullable
@@ -2043,6 +2081,24 @@ public final class BlockTypes {
     public static final BlockType STRUCTURE_VOID = init();
     @Nullable
     public static final BlockType SUGAR_CANE = init();
+    @Nullable
+    public static final BlockType SULFUR = init();
+    @Nullable
+    public static final BlockType SULFUR_BRICK_SLAB = init();
+    @Nullable
+    public static final BlockType SULFUR_BRICK_STAIRS = init();
+    @Nullable
+    public static final BlockType SULFUR_BRICK_WALL = init();
+    @Nullable
+    public static final BlockType SULFUR_BRICKS = init();
+    @Nullable
+    public static final BlockType SULFUR_SLAB = init();
+    @Nullable
+    public static final BlockType SULFUR_SPIKE = init();
+    @Nullable
+    public static final BlockType SULFUR_STAIRS = init();
+    @Nullable
+    public static final BlockType SULFUR_WALL = init();
     @Nullable
     public static final BlockType SUNFLOWER = init();
     @Nullable

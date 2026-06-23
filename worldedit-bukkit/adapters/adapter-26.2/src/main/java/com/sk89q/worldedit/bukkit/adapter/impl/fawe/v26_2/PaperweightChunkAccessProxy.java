@@ -1,4 +1,4 @@
-package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_21_6;
+package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v26_2;
 
 import ca.spottedleaf.moonrise.patches.starlight.light.SWMRNibbleArray;
 import com.fastasyncworldedit.core.util.ReflectionUtils;
@@ -406,7 +406,7 @@ public final class PaperweightChunkAccessProxy extends ChunkAccess {
     }
 
     @Override
-    public void markPosForPostprocessing(final @Nonnull BlockPos pos) {
+    public void markPosForPostProcessing(final @Nonnull BlockPos pos) {
         //Do nothing. ALL THIS FOR THIS METHOD :)
     }
 
@@ -529,11 +529,6 @@ public final class PaperweightChunkAccessProxy extends ChunkAccess {
     @Override
     public @Nonnull Holder<Biome> getNoiseBiome(final int x, final int y, final int z) {
         return parent.getNoiseBiome(x, y, z);
-    }
-
-    @Override
-    public void setBiome(final int x, final int y, final int z, final @Nonnull Holder<Biome> biome) {
-        parent.setBiome(x, y, z, biome);
     }
 
     @Override
