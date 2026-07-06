@@ -507,6 +507,8 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType CHISELED_BOOKSHELF = init();
     @Nullable
+    public static final ItemType CHISELED_CINNABAR = init();
+    @Nullable
     public static final ItemType CHISELED_COPPER = init();
     @Nullable
     public static final ItemType CHISELED_DEEPSLATE = init();
@@ -525,6 +527,8 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType CHISELED_STONE_BRICKS = init();
     @Nullable
+    public static final ItemType CHISELED_SULFUR = init();
+    @Nullable
     public static final ItemType CHISELED_TUFF = init();
     @Nullable
     public static final ItemType CHISELED_TUFF_BRICKS = init();
@@ -534,6 +538,22 @@ public final class ItemTypes {
     public static final ItemType CHORUS_FRUIT = init();
     @Nullable
     public static final ItemType CHORUS_PLANT = init();
+    @Nullable
+    public static final ItemType CINNABAR = init();
+    @Nullable
+    public static final ItemType CINNABAR_BRICK_SLAB = init();
+    @Nullable
+    public static final ItemType CINNABAR_BRICK_STAIRS = init();
+    @Nullable
+    public static final ItemType CINNABAR_BRICK_WALL = init();
+    @Nullable
+    public static final ItemType CINNABAR_BRICKS = init();
+    @Nullable
+    public static final ItemType CINNABAR_SLAB = init();
+    @Nullable
+    public static final ItemType CINNABAR_STAIRS = init();
+    @Nullable
+    public static final ItemType CINNABAR_WALL = init();
     @Nullable
     public static final ItemType CLAY = init();
     @Nullable
@@ -1685,6 +1705,8 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType MUSIC_DISC_BLOCKS = init();
     @Nullable
+    public static final ItemType MUSIC_DISC_BOUNCE = init();
+    @Nullable
     public static final ItemType MUSIC_DISC_CAT = init();
     @Nullable
     public static final ItemType MUSIC_DISC_CHIRP = init();
@@ -2032,6 +2054,14 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType POLISHED_BLACKSTONE_WALL = init();
     @Nullable
+    public static final ItemType POLISHED_CINNABAR = init();
+    @Nullable
+    public static final ItemType POLISHED_CINNABAR_SLAB = init();
+    @Nullable
+    public static final ItemType POLISHED_CINNABAR_STAIRS = init();
+    @Nullable
+    public static final ItemType POLISHED_CINNABAR_WALL = init();
+    @Nullable
     public static final ItemType POLISHED_DEEPSLATE = init();
     @Nullable
     public static final ItemType POLISHED_DEEPSLATE_SLAB = init();
@@ -2052,6 +2082,14 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType POLISHED_GRANITE_STAIRS = init();
     @Nullable
+    public static final ItemType POLISHED_SULFUR = init();
+    @Nullable
+    public static final ItemType POLISHED_SULFUR_SLAB = init();
+    @Nullable
+    public static final ItemType POLISHED_SULFUR_STAIRS = init();
+    @Nullable
+    public static final ItemType POLISHED_SULFUR_WALL = init();
+    @Nullable
     public static final ItemType POLISHED_TUFF = init();
     @Nullable
     public static final ItemType POLISHED_TUFF_SLAB = init();
@@ -2067,6 +2105,8 @@ public final class ItemTypes {
     public static final ItemType PORKCHOP = init();
     @Nullable
     public static final ItemType POTATO = init();
+    @Nullable
+    public static final ItemType POTENT_SULFUR = init();
     @Nullable
     public static final ItemType POTION = init();
     @Nullable
@@ -2575,6 +2615,28 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType SUGAR_CANE = init();
     @Nullable
+    public static final ItemType SULFUR = init();
+    @Nullable
+    public static final ItemType SULFUR_BRICK_SLAB = init();
+    @Nullable
+    public static final ItemType SULFUR_BRICK_STAIRS = init();
+    @Nullable
+    public static final ItemType SULFUR_BRICK_WALL = init();
+    @Nullable
+    public static final ItemType SULFUR_BRICKS = init();
+    @Nullable
+    public static final ItemType SULFUR_CUBE_BUCKET = init();
+    @Nullable
+    public static final ItemType SULFUR_CUBE_SPAWN_EGG = init();
+    @Nullable
+    public static final ItemType SULFUR_SLAB = init();
+    @Nullable
+    public static final ItemType SULFUR_SPIKE = init();
+    @Nullable
+    public static final ItemType SULFUR_STAIRS = init();
+    @Nullable
+    public static final ItemType SULFUR_WALL = init();
+    @Nullable
     public static final ItemType SUNFLOWER = init();
     @Nullable
     public static final ItemType SUSPICIOUS_GRAVEL = init();
@@ -3002,7 +3064,7 @@ public final class ItemTypes {
     }
 
     private static Field[] fieldsTmp;
-    private static int initIndex = 0;
+    private static int initIndex;
 
     private static ItemType init() {
         try {
@@ -3019,6 +3081,10 @@ public final class ItemTypes {
     }
 
     static {
+        // we should be at the first non-ItemType field now
+        if (!fieldsTmp[initIndex].getName().equals("fieldsTmp")) {
+            throw new IllegalStateException("improper initialization of item type fields");
+        }
         fieldsTmp = null;
     }
 
