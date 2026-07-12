@@ -1,27 +1,27 @@
 [versions]
 # Minecraft expectations
-paperApi = "1.21-R0.1-SNAPSHOT"
+paperApi = "1.21.1-R0.1-SNAPSHOT"
 fastutil = "8.5.15"
 guava = "33.3.1-jre"
-log4j = "2.24.1"
+log4j = "2.17.1"
 gson = "2.11.0"
 snakeyaml = "2.2"
 
 # Plugins
 dummypermscompat = "1.10"
-worldguard-bukkit = "7.0.15"
+worldguard-bukkit = "7.0.17"
 griefprevention = "18.0.0"
 griefdefender = "2.1.0-SNAPSHOT"
 residence = "6.0.0.1"
-towny = "0.102.0.14"
-plotsquared = "7.5.12"
+towny = "0.103.0.5"
+plotsquared = "7.5.13"
 
 # Third party
 bstats = "3.2.1"
 sparsebitset = "1.3"
 parallelgzip = "1.0.5"
-adventure = "4.26.1"
-checkerqual = "4.0.0"
+adventure = "5.1.1"
+checkerqual = "4.2.0"
 truezip = "6.8.4"
 auto-value = "1.11.1"
 jsr305 = "3.0.2"
@@ -48,24 +48,20 @@ piston = "0.5.11"
 
 # Tests
 mockito = "5.23.0"
-junit = "6.0.3"
+junit = "6.1.0"
 
 # Gradle plugins
 pluginyml = "0.6.0"
-mod-publish-plugin = "1.1.0"
+mod-publish-plugin = "2.0.1"
 grgit = "5.3.3"
-shadow = "9.4.1"
+shadow = "9.4.3"
 paperweight = "2.0.0-SNAPSHOT"
 codecov = "0.2.0"
-
-
-jqwik = "1.9.3"
+jqwik = "1.10.1"
 
 # Minimum versions we apply to make dependencies support newer Java
 minimumAsm = "9.7"
 minimumJdependency = "2.10"
-#minimumTinyRemapper = "0.8.11"
-
 
 [libraries]
 # Gradle plugins

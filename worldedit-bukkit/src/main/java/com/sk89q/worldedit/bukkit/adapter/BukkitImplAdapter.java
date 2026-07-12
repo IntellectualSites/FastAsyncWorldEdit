@@ -31,6 +31,7 @@ import com.fastasyncworldedit.core.queue.implementation.packet.ChunkPacket;
 import com.sk89q.jnbt.LinBusConverter;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
@@ -53,6 +54,7 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.generation.ConfiguredFeatureType;
 import com.sk89q.worldedit.world.generation.StructureType;
+import com.sk89q.worldedit.world.generation.TreeType;
 import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 import org.bukkit.Keyed;
@@ -328,6 +330,19 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
      */
     default void sendBiomeUpdates(World world, Iterable<BlockVector2> chunks) {
 
+    }
+
+    /**
+     * Generates a Minecraft tree at the given location.
+     *
+     * @param treeType The tree
+     * @param world The world
+     * @param session The EditSession
+     * @param pt The location
+     * @return If it succeeded
+     */
+    default boolean generateTree(TreeType treeType, World world, EditSession session, BlockVector3 pt) throws MaxChangedBlocksException {
+        throw new UnsupportedOperationException("This adapter does not support generating features.");
     }
 
     /**

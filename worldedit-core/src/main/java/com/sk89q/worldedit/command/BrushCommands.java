@@ -117,7 +117,6 @@ import com.sk89q.worldedit.regions.factory.RegionFactory;
 import com.sk89q.worldedit.regions.factory.SphereRegionFactory;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.HandSide;
-import com.sk89q.worldedit.util.TreeGenerator;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
@@ -128,6 +127,7 @@ import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.generation.ConfiguredFeatureType;
 import com.sk89q.worldedit.world.generation.StructureType;
+import com.sk89q.worldedit.world.generation.TreeType;
 import org.anarres.parallelgzip.ParallelGZIPOutputStream;
 import org.enginehub.piston.annotation.Command;
 import org.enginehub.piston.annotation.CommandContainer;
@@ -1189,7 +1189,7 @@ public class BrushCommands {
             @Arg(desc = "The density of the brush", def = "20")
                     double density,
             @Arg(desc = "The type of tree to use")
-                    TreeGenerator.TreeType type
+                    TreeType type
     ) throws WorldEditException {
         setOperationBasedBrush(player, localSession, radius,
                 new Paint(new TreeGeneratorFactory(type), density / 100), shape, "worldedit.brush.forest"

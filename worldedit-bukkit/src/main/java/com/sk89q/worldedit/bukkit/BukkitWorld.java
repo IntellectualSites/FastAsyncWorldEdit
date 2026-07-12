@@ -31,6 +31,7 @@ import com.fastasyncworldedit.core.util.TaskManager;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.blocks.BaseItemStack;
@@ -241,15 +242,11 @@ public class BukkitWorld extends AbstractWorld {
     @Override
     public Path getStoragePath() {
         Path worldFolder = getWorld().getWorldFolder().toPath();
-        switch (getWorld().getEnvironment()) {
-            case NETHER:
-                return worldFolder.resolve("DIM-1");
-            case THE_END:
-                return worldFolder.resolve("DIM1");
-            case NORMAL:
-            default:
-                return worldFolder;
-        }
+        return switch (getWorld().getEnvironment()) {
+            case NETHER -> worldFolder.resolve("DIM-1");
+            case THE_END -> worldFolder.resolve("DIM1");
+            default -> worldFolder;
+        };
     }
 
     @Override
@@ -315,10 +312,16 @@ public class BukkitWorld extends AbstractWorld {
     /**
      * An EnumMap that stores which WorldEdit TreeTypes apply to which Bukkit TreeTypes.
      */
+    @Deprecated
     private static final EnumMap<TreeGenerator.TreeType, TreeType> treeTypeMapping =
             new EnumMap<>(TreeGenerator.TreeType.class);
 
     static {
+        generateTreeMap();
+    }
+
+    @SuppressWarnings("deprecation")
+    private static void generateTreeMap() {
         for (TreeGenerator.TreeType type : TreeGenerator.TreeType.values()) {
             try {
                 TreeType bukkitType = TreeType.valueOf(type.name());
@@ -348,16 +351,33 @@ public class BukkitWorld extends AbstractWorld {
         }
     }
 
+    @Deprecated
     public static TreeType toBukkitTreeType(TreeGenerator.TreeType type) {
         return treeTypeMapping.get(type);
     }
 
+    @SuppressWarnings("deprecation")
+    @Deprecated
     @Override
     public boolean generateTree(TreeGenerator.TreeType type, EditSession editSession, BlockVector3 pt) {
         //FAWE start - allow tree commands to be undone and obey region restrictions
         testCoords(pt);
         return WorldEditPlugin.getInstance().getBukkitImplAdapter().generateTree(type, editSession, pt, getWorld());
         //FAWE end
+    }
+
+    @Override
+    public boolean generateTree(
+            final com.sk89q.worldedit.world.generation.TreeType type,
+            final EditSession editSession,
+            final BlockVector3 position
+    ) throws MaxChangedBlocksException {
+        BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
+        if (adapter != null) {
+            return adapter.generateTree(type, getWorld(), editSession, position);
+        }
+        // No adapter, we can't generate this.
+        return false;
     }
 
     @Override

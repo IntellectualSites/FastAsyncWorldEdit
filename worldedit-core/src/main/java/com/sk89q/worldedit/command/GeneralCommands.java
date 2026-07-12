@@ -29,6 +29,7 @@ import com.fastasyncworldedit.core.util.RandomTextureUtil;
 import com.fastasyncworldedit.core.util.StringMan;
 import com.fastasyncworldedit.core.util.TextureUtil;
 import com.google.common.collect.ImmutableList;
+import com.sk89q.util.StringUtil;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
@@ -49,6 +50,11 @@ import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.internal.command.CommandRegistrationHandler;
 import com.sk89q.worldedit.internal.command.CommandUtil;
 import com.sk89q.worldedit.internal.cui.ServerCUIHandler;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.registry.Keyed;
+import com.sk89q.worldedit.registry.Registry;
+import com.sk89q.worldedit.session.Placement;
+import com.sk89q.worldedit.session.PlacementType;
 import com.sk89q.worldedit.util.SideEffect;
 import com.sk89q.worldedit.util.SideEffectSet;
 import com.sk89q.worldedit.util.auth.AuthorizationException;
@@ -57,7 +63,12 @@ import com.sk89q.worldedit.util.formatting.component.SideEffectBox;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
+import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
+import com.sk89q.worldedit.util.formatting.text.event.HoverEvent;
+import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldedit.world.World;
+import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.item.ItemType;
 import org.enginehub.piston.CommandManager;
 import org.enginehub.piston.CommandManagerService;
@@ -76,6 +87,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.Callable;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -658,4 +670,76 @@ public class GeneralCommands {
 
     }
     //FAWE end
+
+    private static final Pattern ALLOWED_KEY_CHARACTERS = Pattern.compile("[a-z0-9_:?*/]+");
+
+    @Command(
+        name = "/registry",
+        desc = "Search through the given registry"
+    )
+    @CommandPermissions("worldedit.registry")
+    public void registry(Actor actor,
+                         @Arg(desc = "The registry to search through")
+                            Registry<?> registry,
+                         @ArgFlag(name = 'p', desc = "Page of results to return", def = "1")
+                            int page,
+                         @Arg(desc = "Search query", variable = true, def = "*")
+                            List<String> queryBits) {
+        String query = String.join("_", queryBits);
+
+        if (!ALLOWED_KEY_CHARACTERS.matcher(query).matches()) {
+            actor.printError(TranslatableComponent.of("worldedit.registry.error.invalid-key"));
+        }
+
+        WorldEditAsyncCommandBuilder.createAndSendMessage(actor, new RegistrySearcher(registry, query, page),
+            TranslatableComponent.of("worldedit.registry.searching", TextComponent.of(query)));
+    }
+
+    private static class RegistrySearcher implements Callable<Component> {
+        private final Registry<?> registry;
+        private final String search;
+        private final int page;
+        private final Pattern matcher;
+
+        RegistrySearcher(Registry<?> registry, String search, int page) {
+            this.registry = registry;
+            this.search = search;
+            this.page = page;
+
+            String matcherQuery = search;
+            if (!matcherQuery.contains("*") && !matcherQuery.contains("?")) {
+                // If there are no wildcards, add them around the query
+                matcherQuery = "*" + matcherQuery + "*";
+            }
+
+            this.matcher = StringUtil.convertGlobToRegex(matcherQuery);
+        }
+
+        @Override
+        public Component call() throws Exception {
+            String command = "//registry " + registry.id() + " -p %page% " + search;
+            Map<String, Component> results = new TreeMap<>();
+            for (Keyed searchType : registry) {
+                final String id = searchType.id();
+                if (matcher.matcher(id).matches()) {
+                    var builder = TextComponent.builder()
+                        .append(searchType.id())
+                        .clickEvent(ClickEvent.copyToClipboard(searchType.id()));
+                    switch (searchType) {
+                        case ItemType itemType -> builder.hoverEvent(HoverEvent.showText(itemType.getRichName()));
+                        case BlockType blockType -> builder.hoverEvent(HoverEvent.showText(blockType.getRichName()));
+                        case BiomeType biomeType -> builder.hoverEvent(HoverEvent.showText(biomeType.getRichName()));
+                        default -> {
+                        }
+                    }
+                    results.put(id, builder.build());
+                }
+            }
+            List<Component> list = new ArrayList<>(results.values());
+            boolean isBlank = search.isBlank() || search.equals("*");
+            String title = isBlank ? "Registry contents" : "Search results for '" + search + "'";
+            return PaginationBox.fromComponents(title, command, list)
+                .create(page);
+        }
+    }
 }
