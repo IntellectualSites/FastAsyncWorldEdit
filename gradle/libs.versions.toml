@@ -12,7 +12,7 @@ dummypermscompat = "1.10"
 worldguard-bukkit = "7.0.17"
 griefprevention = "18.0.0"
 griefdefender = "2.1.0-SNAPSHOT"
-residence = "6.0.0.1"
+residence = "6.0.2.3"
 towny = "0.103.0.5"
 plotsquared = "7.5.13"
 
