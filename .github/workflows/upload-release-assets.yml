@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       - name: Validate Gradle Wrapper
         uses: gradle/actions/wrapper-validation@v6
       - name: Setup Java
