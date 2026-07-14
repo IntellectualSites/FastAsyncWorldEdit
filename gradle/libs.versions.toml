@@ -56,7 +56,7 @@ mod-publish-plugin = "2.0.1"
 grgit = "5.3.3"
 shadow = "9.4.3"
 paperweight = "2.0.0-SNAPSHOT"
-codecov = "0.2.0"
+codecov = "0.3.0"
 jqwik = "1.10.1"
 
 # Minimum versions we apply to make dependencies support newer Java
