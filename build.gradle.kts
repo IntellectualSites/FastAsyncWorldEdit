@@ -12,22 +12,22 @@ plugins {
     id("xyz.jpenilla.run-paper") version "3.0.2"
 }
 
-val rootVersion: String = extra["rootVersion"] as? String ?: "2.15.4"
-val snapshot: String = extra["snapshot"] as? String ?: "SNAPSHOT"
-var revision: String = extra["revision"] as? String ?: ""
-var buildNumber: String = extra["buildNumber"] as? String ?: ""
-var date: String = extra["date"] as? String ?: ""
+val rootVersion: String = (extra.properties["rootVersion"] as? String) ?: "2.15.4"
+val snapshot: String = (extra.properties["snapshot"] as? String) ?: "SNAPSHOT"
+var revision: String = (extra.properties["revision"] as? String) ?: ""
+var buildNumber: String = (extra.properties["buildNumber"] as? String) ?: ""
+var date: String = (extra.properties["date"] as? String) ?: ""
 
 val git: Grgit = Grgit.open {
     dir = File("$rootDir/.git")
 }
 date = git.head().dateTime.format(DateTimeFormatter.ofPattern("yy.MM.dd"))
 revision = "-${git.head().abbreviatedId}"
-buildNumber = if (project.hasProperty("buildnumber")) {
-    snapshot + "-" + project.property("buildnumber") as String
-} else {
-    project.property("snapshot") as String
-}
+    buildNumber = if (project.hasProperty("buildnumber")) {
+        snapshot + "-" + (project.findProperty("buildnumber") as? String ?: "")
+    } else {
+        (project.findProperty("snapshot") as? String) ?: snapshot
+    }
 
 extra.set("rootVersion", rootVersion)
 extra.set("snapshot", snapshot)
