@@ -1,6 +1,7 @@
 package com.fastasyncworldedit.core.history;
 
 import com.fastasyncworldedit.core.configuration.Settings;
+import com.fastasyncworldedit.core.internal.io.FaweOutputStream;
 import com.sk89q.worldedit.world.World;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,6 +11,7 @@ import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.Set;
@@ -23,8 +25,15 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 /**
@@ -160,9 +169,16 @@ class DiskStorageHistoryConcurrencyTest {
             });
         }
 
-        boolean completed = done.await(30, TimeUnit.SECONDS);
-        executor.shutdownNow();
-        boolean terminated = executor.awaitTermination(10, TimeUnit.SECONDS);
+        boolean completed;
+        boolean terminated;
+        try {
+            completed = done.await(30, TimeUnit.SECONDS);
+        } finally {
+            // Must run even if done.await() itself is interrupted, not just on the timeout path
+            // below - otherwise a stuck/interrupted wait leaks the pool's non-daemon threads.
+            executor.shutdownNow();
+            terminated = executor.awaitTermination(10, TimeUnit.SECONDS);
+        }
 
         if (!completed) {
             fail("Timed out waiting for racing threads to finish (possible barrier deadlock or hang)");
@@ -171,6 +187,42 @@ class DiskStorageHistoryConcurrencyTest {
             fail("Executor did not terminate after shutdownNow(); worker threads may still be running");
         }
         assertEquals(0, failures.get(), "no thread should have failed while racing to acquire the lazy stream");
+    }
+
+    /**
+     * Deterministic regression test for the cleanup-on-failure paths in {@code getBlockOS()}: if
+     * {@code writeHeader()} fails, the not-yet-published stream must be closed - but if that
+     * close attempt itself fails, the resulting exception must not replace (mask) the original
+     * header-write failure; it must be attached via {@link Throwable#addSuppressed}.
+     */
+    @Test
+    void getBlockOSCloseFailureIsSuppressedNotMasked() throws Exception {
+        DiskStorageHistory history = spy(new DiskStorageHistory(tempDir, world, UUID.randomUUID(), 0));
+
+        IOException closeFailure = new IOException("close failed");
+        // Let getCompressedOS() run for real (so the actual FileOutputStream is genuinely wrapped
+        // and can be genuinely closed, same as production), then spy just its close() so it
+        // releases the real handle - keeping @TempDir cleanup happy - before throwing the
+        // synthetic failure this test is targeting.
+        doAnswer(invocation -> {
+            FaweOutputStream real = (FaweOutputStream) invocation.callRealMethod();
+            FaweOutputStream streamSpy = spy(real);
+            doAnswer(closeInvocation -> {
+                real.close();
+                throw closeFailure;
+            }).when(streamSpy).close();
+            return streamSpy;
+        }).when(history).getCompressedOS(any());
+
+        IOException headerFailure = new IOException("header failed");
+        doThrow(headerFailure).when(history).writeHeader(any(), anyInt(), anyInt(), anyInt());
+
+        IOException thrown = assertThrows(IOException.class, () -> history.getBlockOS(0, 0, 0));
+
+        assertSame(headerFailure, thrown, "the original header-write failure must propagate, not be masked by a "
+                + "failure while closing the stream");
+        assertEquals(1, thrown.getSuppressed().length, "the close failure must be attached as a suppressed exception");
+        assertSame(closeFailure, thrown.getSuppressed()[0]);
     }
 
 }

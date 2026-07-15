@@ -298,6 +298,25 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
         return total;
     }
 
+    /**
+     * Closes {@code closeable} (if not null), suppressing rather than propagating or masking any
+     * failure from the close itself onto {@code primary} - the original failure that triggered
+     * the cleanup, and the one that must actually reach the caller. Used when a fallible resource
+     * has to be closed before rethrowing, without losing the real cause if the close itself
+     * fails too. No-op if {@code closeable} is null (e.g. construction failed before it was
+     * created).
+     */
+    private static void closeQuietly(AutoCloseable closeable, Throwable primary) {
+        if (closeable == null) {
+            return;
+        }
+        try {
+            closeable.close();
+        } catch (Exception suppressed) {
+            primary.addSuppressed(suppressed);
+        }
+    }
+
     @Override
     public FaweOutputStream getBlockOS(int x, int y, int z) throws IOException {
         if (osBD != null) {
@@ -317,20 +336,24 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
             //
             // The raw FileOutputStream is kept in a local so it can be closed directly if
             // getCompressedOS() itself throws before returning anything to close; once wrapped,
-            // closing the returned stream closes the FileOutputStream it wraps.
+            // closing the returned stream closes the FileOutputStream it wraps. Both catch
+            // clauses below also cover unchecked RuntimeException/Error, not just IOException:
+            // MainUtil.getCompressedOS()/writeHeader() can fail that way too (e.g. a linkage
+            // error constructing a compression stream), and an unchecked failure after fos is
+            // opened would otherwise leak the file descriptor since it's never published to osBD.
             FileOutputStream fos = new FileOutputStream(bdFile);
             FaweOutputStream stream;
             try {
                 stream = getCompressedOS(fos);
-            } catch (IOException e) {
-                fos.close();
+            } catch (IOException | RuntimeException | Error e) {
+                closeQuietly(fos, e);
                 throw e;
             }
             try {
                 writeHeader(stream, x, y, z);
-            } catch (IOException e) {
+            } catch (IOException | RuntimeException | Error e) {
                 // Not yet published to osBD, so close() would never close this otherwise.
-                stream.close();
+                closeQuietly(stream, e);
                 throw e;
             }
             osBD = stream;
@@ -352,8 +375,8 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
             FileOutputStream fos = new FileOutputStream(bioFile);
             try {
                 osBIO = getCompressedOS(fos);
-            } catch (IOException e) {
-                fos.close();
+            } catch (IOException | RuntimeException | Error e) {
+                closeQuietly(fos, e);
                 throw e;
             }
             return osBIO;
@@ -374,8 +397,8 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
             FileOutputStream fos = new FileOutputStream(enttFile);
             try {
                 osENTCT = new NBTOutputStream(getCompressedOS(fos));
-            } catch (IOException e) {
-                fos.close();
+            } catch (IOException | RuntimeException | Error e) {
+                closeQuietly(fos, e);
                 throw e;
             }
             return osENTCT;
@@ -396,8 +419,8 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
             FileOutputStream fos = new FileOutputStream(entfFile);
             try {
                 osENTCF = new NBTOutputStream(getCompressedOS(fos));
-            } catch (IOException e) {
-                fos.close();
+            } catch (IOException | RuntimeException | Error e) {
+                closeQuietly(fos, e);
                 throw e;
             }
             return osENTCF;
@@ -418,8 +441,8 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
             FileOutputStream fos = new FileOutputStream(nbttFile);
             try {
                 osNBTT = new NBTOutputStream(getCompressedOS(fos));
-            } catch (IOException e) {
-                fos.close();
+            } catch (IOException | RuntimeException | Error e) {
+                closeQuietly(fos, e);
                 throw e;
             }
             return osNBTT;
@@ -440,8 +463,8 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
             FileOutputStream fos = new FileOutputStream(nbtfFile);
             try {
                 osNBTF = new NBTOutputStream(getCompressedOS(fos));
-            } catch (IOException e) {
-                fos.close();
+            } catch (IOException | RuntimeException | Error e) {
+                closeQuietly(fos, e);
                 throw e;
             }
             return osNBTF;
