@@ -120,12 +120,14 @@ public final class HistoryWriteBenchmark {
     private static void closeAndCleanup(FaweStreamChangeSet changeSet) {
         try {
             changeSet.close();
-        } catch (Throwable e) {
+        } catch (Exception e) {
             // The contended benchmark deliberately hammers the pre-fix DCL race in getBlockOS(),
             // which can leave the underlying (non-thread-safe) compression stream corrupted.
             // close()/flush() can then throw unchecked exceptions (e.g. AIOOBE from LZ4). That is
             // itself a data point (see the error count printed by report()), not a benchmark bug -
-            // swallow it here so remaining trials still run.
+            // swallow it here so remaining trials still run. Only Exception, not Throwable: a
+            // real Error (OutOfMemoryError, StackOverflowError) must still propagate and stop the
+            // run rather than being treated as expected race noise.
             System.err.println("  (close() threw " + e + ")");
         }
         if (changeSet instanceof DiskStorageHistory dsh) {
@@ -188,7 +190,9 @@ public final class HistoryWriteBenchmark {
                     for (int j = 0; j < opsPerThread; j++) {
                         try {
                             doAdd(changeSet, base + j);
-                        } catch (Throwable t2) {
+                        } catch (Exception t2) {
+                            // Only Exception: a real Error must propagate rather than being
+                            // counted as expected race noise (see closeAndCleanup above).
                             errorCount.incrementAndGet();
                         }
                     }
