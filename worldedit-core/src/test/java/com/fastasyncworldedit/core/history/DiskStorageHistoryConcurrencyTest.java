@@ -225,4 +225,38 @@ class DiskStorageHistoryConcurrencyTest {
         assertSame(closeFailure, thrown.getSuppressed()[0]);
     }
 
+    /**
+     * Same as {@link #getBlockOSCloseFailureIsSuppressedNotMasked()}, but the cleanup close()
+     * itself fails with an {@link Error} rather than an {@code IOException}. {@code
+     * closeQuietly()} must catch {@link Throwable}, not just {@link Exception} - {@link
+     * RuntimeException} would not distinguish the two, since it is itself an {@code Exception} -
+     * or an {@code Error} from close() would propagate in place of the original and mask it
+     * exactly like the checked-exception case does.
+     */
+    @Test
+    void getBlockOSErrorFromCloseIsSuppressedNotMasked() throws Exception {
+        DiskStorageHistory history = spy(new DiskStorageHistory(tempDir, world, UUID.randomUUID(), 0));
+
+        Error closeFailure = new AssertionError("close failed with an Error");
+        doAnswer(invocation -> {
+            FaweOutputStream real = (FaweOutputStream) invocation.callRealMethod();
+            FaweOutputStream streamSpy = spy(real);
+            doAnswer(closeInvocation -> {
+                real.close();
+                throw closeFailure;
+            }).when(streamSpy).close();
+            return streamSpy;
+        }).when(history).getCompressedOS(any());
+
+        IOException headerFailure = new IOException("header failed");
+        doThrow(headerFailure).when(history).writeHeader(any(), anyInt(), anyInt(), anyInt());
+
+        IOException thrown = assertThrows(IOException.class, () -> history.getBlockOS(0, 0, 0));
+
+        assertSame(headerFailure, thrown, "the original header-write failure must propagate, not be masked by an "
+                + "unchecked failure while closing the stream");
+        assertEquals(1, thrown.getSuppressed().length, "the close failure must be attached as a suppressed exception");
+        assertSame(closeFailure, thrown.getSuppressed()[0]);
+    }
+
 }

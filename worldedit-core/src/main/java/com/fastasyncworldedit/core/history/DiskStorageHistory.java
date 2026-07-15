@@ -312,7 +312,12 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
         }
         try {
             closeable.close();
-        } catch (Exception suppressed) {
+        } catch (Throwable suppressed) {
+            // Throwable, not just Exception: a RuntimeException or Error from close() itself
+            // must not propagate in place of primary either, or it would mask the original
+            // failure exactly like the checked-exception case this method exists to prevent.
+            // This still doesn't swallow anything - it's attached to primary, which callers
+            // always rethrow.
             primary.addSuppressed(suppressed);
         }
     }
