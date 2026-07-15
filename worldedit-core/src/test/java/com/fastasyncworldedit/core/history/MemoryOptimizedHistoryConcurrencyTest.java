@@ -11,9 +11,11 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -57,7 +59,7 @@ class MemoryOptimizedHistoryConcurrencyTest {
         for (int i = 0; i < THREADS; i++) {
             Thread thread = new Thread(() -> {
                 try {
-                    barrier.await();
+                    barrier.await(10, TimeUnit.SECONDS);
                     Object stream = getter.call();
                     synchronized (distinctInstances) {
                         distinctInstances.add(stream);
@@ -73,7 +75,11 @@ class MemoryOptimizedHistoryConcurrencyTest {
             thread.start();
         }
 
-        done.await();
+        boolean completed = done.await(30, TimeUnit.SECONDS);
+        if (!completed) {
+            fail("Timed out waiting for racing threads to finish (possible barrier deadlock or hang - "
+                    + (THREADS - done.getCount()) + "/" + THREADS + " threads finished)");
+        }
         assertTrue(failures.isEmpty(), () -> "Threads failed unexpectedly: " + failures);
         assertEquals(
                 1,
