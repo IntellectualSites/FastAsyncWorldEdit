@@ -152,12 +152,18 @@ public class MemoryOptimizedHistory extends FaweStreamChangeSet {
                 return idsStreamZip;
             }
             setOrigin(x, z);
-            idsStream = new FastByteArrayOutputStream(Settings.settings().HISTORY.BUFFER_SIZE);
-            // Fully initialise (including the header) before publishing to the volatile field:
-            // callers on the fast path read idsStreamZip without holding the lock, so publishing
-            // early would let them write block data before writeHeader has run.
-            FaweOutputStream stream = getCompressedOS(idsStream);
+            // Build the buffer and its wrapper into locals and only publish both fields together
+            // once construction has fully succeeded. Two things this guards against:
+            //  1. If getCompressedOS()/writeHeader() throws, idsStream must not be left non-null
+            //     while idsStreamZip stays null - flush()/close() gate on idsStream != null and
+            //     then dereference idsStreamZip, which would NPE.
+            //  2. Callers on the fast path read the volatile idsStreamZip without holding the
+            //     lock, so publishing it before writeHeader has run would let them write block
+            //     data ahead of the header.
+            FastByteArrayOutputStream buffer = new FastByteArrayOutputStream(Settings.settings().HISTORY.BUFFER_SIZE);
+            FaweOutputStream stream = getCompressedOS(buffer);
             writeHeader(stream, x, y, z);
+            idsStream = buffer;
             idsStreamZip = stream;
             return stream;
         }
@@ -180,9 +186,13 @@ public class MemoryOptimizedHistory extends FaweStreamChangeSet {
             if (biomeStreamZip != null) {
                 return biomeStreamZip;
             }
-            biomeStream = new FastByteArrayOutputStream(Settings.settings().HISTORY.BUFFER_SIZE);
-            biomeStreamZip = getCompressedOS(biomeStream);
-            return biomeStreamZip;
+            // See getBlockOS() for why buffer/wrapper must be published together: an exception
+            // from getCompressedOS() must not leave biomeStream non-null with biomeStreamZip null.
+            FastByteArrayOutputStream buffer = new FastByteArrayOutputStream(Settings.settings().HISTORY.BUFFER_SIZE);
+            FaweOutputStream stream = getCompressedOS(buffer);
+            biomeStream = buffer;
+            biomeStreamZip = stream;
+            return stream;
         }
     }
 
@@ -205,8 +215,12 @@ public class MemoryOptimizedHistory extends FaweStreamChangeSet {
             if (entCStreamZip != null) {
                 return entCStreamZip;
             }
-            entCStream = new FastByteArrayOutputStream(Settings.settings().HISTORY.BUFFER_SIZE);
-            return entCStreamZip = new NBTOutputStream(getCompressedOS(entCStream));
+            // See getBlockOS() for why buffer/wrapper must be published together.
+            FastByteArrayOutputStream buffer = new FastByteArrayOutputStream(Settings.settings().HISTORY.BUFFER_SIZE);
+            NBTOutputStream stream = new NBTOutputStream(getCompressedOS(buffer));
+            entCStream = buffer;
+            entCStreamZip = stream;
+            return stream;
         }
     }
 
@@ -219,8 +233,12 @@ public class MemoryOptimizedHistory extends FaweStreamChangeSet {
             if (entRStreamZip != null) {
                 return entRStreamZip;
             }
-            entRStream = new FastByteArrayOutputStream(Settings.settings().HISTORY.BUFFER_SIZE);
-            return entRStreamZip = new NBTOutputStream(getCompressedOS(entRStream));
+            // See getBlockOS() for why buffer/wrapper must be published together.
+            FastByteArrayOutputStream buffer = new FastByteArrayOutputStream(Settings.settings().HISTORY.BUFFER_SIZE);
+            NBTOutputStream stream = new NBTOutputStream(getCompressedOS(buffer));
+            entRStream = buffer;
+            entRStreamZip = stream;
+            return stream;
         }
     }
 
@@ -233,8 +251,12 @@ public class MemoryOptimizedHistory extends FaweStreamChangeSet {
             if (tileCStreamZip != null) {
                 return tileCStreamZip;
             }
-            tileCStream = new FastByteArrayOutputStream(Settings.settings().HISTORY.BUFFER_SIZE);
-            return tileCStreamZip = new NBTOutputStream(getCompressedOS(tileCStream));
+            // See getBlockOS() for why buffer/wrapper must be published together.
+            FastByteArrayOutputStream buffer = new FastByteArrayOutputStream(Settings.settings().HISTORY.BUFFER_SIZE);
+            NBTOutputStream stream = new NBTOutputStream(getCompressedOS(buffer));
+            tileCStream = buffer;
+            tileCStreamZip = stream;
+            return stream;
         }
     }
 
@@ -247,8 +269,12 @@ public class MemoryOptimizedHistory extends FaweStreamChangeSet {
             if (tileRStreamZip != null) {
                 return tileRStreamZip;
             }
-            tileRStream = new FastByteArrayOutputStream(Settings.settings().HISTORY.BUFFER_SIZE);
-            return tileRStreamZip = new NBTOutputStream(getCompressedOS(tileRStream));
+            // See getBlockOS() for why buffer/wrapper must be published together.
+            FastByteArrayOutputStream buffer = new FastByteArrayOutputStream(Settings.settings().HISTORY.BUFFER_SIZE);
+            NBTOutputStream stream = new NBTOutputStream(getCompressedOS(buffer));
+            tileRStream = buffer;
+            tileRStreamZip = stream;
+            return stream;
         }
     }
 
