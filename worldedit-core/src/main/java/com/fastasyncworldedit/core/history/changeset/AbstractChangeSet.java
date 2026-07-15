@@ -109,7 +109,7 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
      * <ul>
      *     <li>Synchronizing on {@code this} would let a losing caller correctly block until the
      *     winner finishes, but risks deadlock: {@link #flush()} can block in
-     *     {@link #drainQueue(boolean)}'s {@code workerSemaphore.acquire()} waiting for another
+     *     {@link #drainQueue(boolean)}'s {@code workerSemaphore.acquireUninterruptibly()} waiting for another
      *     thread's in-flight drain to finish, and that other thread may be running a queued write
      *     task that itself synchronizes on {@code this} (e.g. subclasses' lazy stream getters,
      *     such as {@code DiskStorageHistory#getBlockOS}). If this thread already held
