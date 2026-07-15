@@ -62,6 +62,7 @@ dependencies {
     // Tests
     testRuntimeOnly(libs.log4j.core)
     testImplementation(libs.parallelgzip)
+    testRuntimeOnly(libs.lz4Java) { isTransitive = false }
 }
 
 tasks.test {
