@@ -62,6 +62,22 @@ dependencies {
     // Tests
     testRuntimeOnly(libs.log4j.core)
     testImplementation(libs.parallelgzip)
+    // lz4-java is compileOnly for main (provided by the platform module at runtime); the
+    // history write-path benchmark needs it available on the test runtime classpath since it
+    // exercises MainUtil's compression stream directly. See HistoryWriteBenchmark. Runtime-only
+    // since no test source references lz4 types at compile time.
+    testRuntimeOnly(libs.lz4Java) { isTransitive = false }
+}
+
+tasks.register<JavaExec>("historyBenchmark") {
+    group = "benchmark"
+    description = "Runs the hand-rolled com.fastasyncworldedit.core.history write-path baseline benchmark."
+    dependsOn(tasks.named("testClasses"))
+    classpath = sourceSets["test"].runtimeClasspath
+    mainClass.set("com.fastasyncworldedit.core.history.HistoryWriteBenchmark")
+    // The benchmark is disk/CPU bound and prints its own report; stream output live.
+    standardOutput = System.out
+    errorOutput = System.err
 }
 
 tasks.test {

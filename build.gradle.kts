@@ -18,11 +18,28 @@ var revision: String by extra("")
 var buildNumber by extra("")
 var date: String by extra("")
 ext {
-    val git: Grgit = Grgit.open {
-        dir = File("$rootDir/.git")
+    // In a `git worktree` checkout (used e.g. by parallel agent sandboxes), `.git` is a pointer
+    // file rather than the git directory itself, and JGit (used by Grgit) does not resolve the
+    // worktree's `commondir` indirection the way native git does, so Grgit.open() throws even
+    // though `git` commands work fine in the same directory. Fall back to placeholder date/
+    // revision values in that case (these are informational only, used in fawe.properties/
+    // version string) - but only in the detected-worktree case, so a genuinely broken .git in a
+    // normal checkout still fails the build loudly instead of silently shipping "no.git.id".
+    val isWorktreeCheckout = File("$rootDir/.git").isFile
+    try {
+        val git: Grgit = Grgit.open {
+            dir = File("$rootDir/.git")
+        }
+        date = git.head().dateTime.format(DateTimeFormatter.ofPattern("yy.MM.dd"))
+        revision = "-${git.head().abbreviatedId}"
+    } catch (e: Exception) {
+        if (!isWorktreeCheckout) {
+            throw e
+        }
+        logger.warn("Error opening git repository for date/revision (worktree checkout); using placeholders", e)
+        date = DateTimeFormatter.ofPattern("yy.MM.dd").format(java.time.LocalDate.now())
+        revision = "-no.git.id"
     }
-    date = git.head().dateTime.format(DateTimeFormatter.ofPattern("yy.MM.dd"))
-    revision = "-${git.head().abbreviatedId}"
     buildNumber = if (project.hasProperty("buildnumber")) {
         snapshot + "-" + project.properties["buildnumber"] as String
     } else {
