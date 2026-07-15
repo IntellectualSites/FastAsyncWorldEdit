@@ -144,7 +144,11 @@ public final class HistoryWriteBenchmark {
             File dir = dsh.getBDFile().getParentFile();
             try {
                 SafeFiles.tryHardToDeleteDir(dir.toPath());
-            } catch (IOException ignored) {
+            } catch (IOException e) {
+                // Not fatal to the benchmark, but silently ignoring this let failed cleanups
+                // accumulate unnoticed across repeated runs (this benchmark can create sizeable
+                // on-disk histories). At least report it so it's diagnosable.
+                System.err.println("  (failed to clean up " + dir + ": " + e + ")");
             }
         }
     }
@@ -214,7 +218,10 @@ public final class HistoryWriteBenchmark {
                     }
                 }));
             }
-            ready.await();
+            if (!ready.await(1, TimeUnit.MINUTES)) {
+                pool.shutdownNow();
+                throw new IllegalStateException("Benchmark worker threads did not all start in time");
+            }
             long start = System.nanoTime();
             go.countDown();
             pool.shutdown();
