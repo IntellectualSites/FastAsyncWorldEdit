@@ -76,21 +76,27 @@ class DiskStorageHistoryConcurrencyTest {
             DiskStorageHistory history = new DiskStorageHistory(folder, world, UUID.randomUUID(), iteration);
 
             Set<Object> instances = Collections.newSetFromMap(new IdentityHashMap<>());
-            runConcurrently(THREADS, () -> {
-                try {
-                    return history.getBlockOS(0, 0, 0);
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            }, instances);
+            try {
+                runConcurrently(THREADS, () -> {
+                    try {
+                        return history.getBlockOS(0, 0, 0);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                }, instances);
 
-            assertEquals(
-                    1,
-                    instances.size(),
-                    "getBlockOS() must return exactly one distinct stream instance across racing threads (iteration "
-                            + iteration + ")"
-            );
-            history.close();
+                assertEquals(
+                        1,
+                        instances.size(),
+                        "getBlockOS() must return exactly one distinct stream instance across racing threads (iteration "
+                                + iteration + ")"
+                );
+            } finally {
+                // Must run even on assertion failure, or the open stream(s) from the racing
+                // getBlockOS() calls above leak - on Windows that can also make @TempDir cleanup
+                // fail with a confusing secondary error that masks the real assertion failure.
+                history.close();
+            }
         }
     }
 
@@ -101,21 +107,26 @@ class DiskStorageHistoryConcurrencyTest {
             DiskStorageHistory history = new DiskStorageHistory(folder, world, UUID.randomUUID(), iteration);
 
             Set<Object> instances = Collections.newSetFromMap(new IdentityHashMap<>());
-            runConcurrently(THREADS, () -> {
-                try {
-                    return history.getTileCreateOS();
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            }, instances);
+            try {
+                runConcurrently(THREADS, () -> {
+                    try {
+                        return history.getTileCreateOS();
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                }, instances);
 
-            assertEquals(
-                    1,
-                    instances.size(),
-                    "getTileCreateOS() must return exactly one distinct stream instance across racing threads (iteration "
-                            + iteration + ")"
-            );
-            history.close();
+                assertEquals(
+                        1,
+                        instances.size(),
+                        "getTileCreateOS() must return exactly one distinct stream instance across racing threads (iteration "
+                                + iteration + ")"
+                );
+            } finally {
+                // See getBlockOSReturnsSingleInstanceUnderConcurrentAccess for why this must run
+                // even on assertion failure.
+                history.close();
+            }
         }
     }
 
