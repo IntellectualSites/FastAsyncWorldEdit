@@ -37,10 +37,37 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Queue;
 import java.util.concurrent.Exchanger;
+import java.util.concurrent.atomic.LongAdder;
 import java.util.function.BiConsumer;
 
 /**
  * FAWE stream ChangeSet offering support for extended-height worlds
+ *
+ * <p><strong>Thread-safety / reentrancy warning:</strong> a single {@code FaweStreamChangeSet}
+ * instance is <em>not</em> safe for concurrent read traversals. The decoder state used while
+ * reading back changes - {@link #posDel}, {@link #idDel}, {@link #originX}, {@link #originZ} and
+ * {@link #version} - is stored directly on the instance rather than being scoped to a single
+ * traversal. These fields are (re)initialized by {@link #readHeader(InputStream)} /
+ * {@link #setupStreamDelegates(int)} and are then mutated as each iterator or
+ * {@link com.fastasyncworldedit.core.history.change.ChangePopulator} advances (e.g. the
+ * running {@code lx}/{@code ly}/{@code lz} delta-decoding state captured by the position
+ * delegate).</p>
+ *
+ * <p>As a result:</p>
+ * <ul>
+ *     <li>The same instance must never be read from more than one thread at the same time
+ *     (for example, two undos racing on the same changeset).</li>
+ *     <li>Even from a single thread, one traversal (an iterator obtained from
+ *     {@link #getIterator(boolean)}/{@link #getBlockIterator(boolean)}/etc., or a populator
+ *     obtained from {@link #getCoordinatedChanges}) must be fully drained/closed before a new
+ *     traversal is started on the same instance - starting a second traversal (or calling
+ *     {@link #readHeader(InputStream)} again) while another is still in progress will corrupt
+ *     the shared decoder state.</li>
+ * </ul>
+ *
+ * <p>This is documentation only for now: a proper fix that gives each traversal its own,
+ * independent decoder state is planned as a future, larger refactor. No runtime locking or
+ * guard has been added here to enforce the above.</p>
  */
 public abstract class FaweStreamChangeSet extends AbstractChangeSet {
 
@@ -52,7 +79,7 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
     private final int compression;
     private final int minY;
 
-    protected long blockSize;
+    protected final LongAdder blockSize = new LongAdder();
     private int originX;
     private int originZ;
     private int version;
@@ -292,21 +319,21 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
 
     @Override
     public boolean isEmpty() {
-        if (blockSize > 0) {
+        if (blockSize.sum() > 0) {
             return false;
         }
         if (!super.isEmpty()) {
             return false;
         }
         flush();
-        return blockSize == 0;
+        return blockSize.sum() == 0;
     }
 
     @Override
     public long longSize() {
         // Flush so we can accurately get the size
         flush();
-        return blockSize;
+        return blockSize.sum();
     }
 
     @Override
@@ -361,7 +388,7 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
 
     @Override
     public void add(int x, int y, int z, int combinedFrom, int combinedTo) {
-        blockSize++;
+        blockSize.increment();
         try {
             FaweOutputStream stream = getBlockOS(x, y, z);
             //x
@@ -374,7 +401,7 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
 
     @Override
     public void addBiomeChange(int bx, int by, int bz, BiomeType from, BiomeType to) {
-        blockSize++;
+        blockSize.increment();
         try {
             int x = bx >> 2;
             int y = by >> 2;
@@ -400,7 +427,7 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
 
     @Override
     public void addTileCreate(final FaweCompoundTag tag) {
-        blockSize++;
+        blockSize.increment();
         try {
             NBTOutputStream nbtos = getTileCreateOS();
             nbtos.writeTag(new CompoundTag(tag.linTag()));
@@ -411,7 +438,7 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
 
     @Override
     public void addTileRemove(final FaweCompoundTag tag) {
-        blockSize++;
+        blockSize.increment();
         try {
             NBTOutputStream nbtos = getTileRemoveOS();
             nbtos.writeTag(new CompoundTag(tag.linTag()));
@@ -422,7 +449,7 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
 
     @Override
     public void addEntityRemove(final FaweCompoundTag tag) {
-        blockSize++;
+        blockSize.increment();
         try {
             NBTOutputStream nbtos = getEntityRemoveOS();
             nbtos.writeTag(new CompoundTag(tag.linTag()));
@@ -433,7 +460,7 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
 
     @Override
     public void addEntityCreate(final FaweCompoundTag tag) {
-        blockSize++;
+        blockSize.increment();
         try {
             NBTOutputStream nbtos = getEntityCreateOS();
             nbtos.writeTag(new CompoundTag(tag.linTag()));

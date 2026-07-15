@@ -51,7 +51,12 @@ public class RollbackOptimizedHistory extends DiskStorageHistory {
         this.maxX = region.getMaximumX();
         this.maxY = region.getMaximumY();
         this.maxZ = region.getMaximumZ();
-        this.blockSize = (int) size;
+        // NOTE: this truncates `size` to an int before storing it, same as the historic
+        // `this.blockSize = (int) size;` assignment did. That truncation is a known, separate
+        // bug tracked elsewhere - it is preserved here intentionally and not fixed as part of
+        // the blockSize -> LongAdder migration.
+        this.blockSize.reset();
+        this.blockSize.add((int) size);
         this.command = command;
         this.closed = true;
     }
