@@ -41,7 +41,7 @@ class FaweStreamChangeSetBlockSizeTest {
     private static final int CALLS_PER_THREAD = 1000;
 
     @Test
-    void addIsAccurateUnderConcurrentWriters() throws InterruptedException {
+    void addIsAccurateUnderConcurrentWriters() throws InterruptedException, java.io.IOException {
         int previousCompressionLevel = Settings.settings().HISTORY.COMPRESSION_LEVEL;
         // Compression level 0 skips the LZ4/Zstd codecs entirely (see MainUtil#getCompressedOS),
         // which keeps this test independent of the compileOnly lz4-java dependency.
@@ -54,6 +54,15 @@ class FaweStreamChangeSetBlockSizeTest {
         MemoryOptimizedHistory changeSet = new MemoryOptimizedHistory(world);
         ExecutorService executor = Executors.newFixedThreadPool(THREADS);
         try {
+            // Pre-initialize the lazy block-output stream single-threaded, before any concurrent
+            // add() calls. getBlockOS()'s own double-checked-locking race is fixed independently
+            // in a sibling PR, not this one - on this branch it's still present, so without this
+            // warm-up the first wave of concurrent add() calls below would race on that unrelated
+            // lazy-init path too, rather than exercising only the blockSize counter this test
+            // targets. getBlockOS() itself doesn't touch blockSize, so this doesn't affect the
+            // expected total asserted below.
+            changeSet.getBlockOS(0, 0, 0);
+
             CountDownLatch startLatch = new CountDownLatch(1);
 
             List<Future<?>> futures = new ArrayList<>(THREADS);
