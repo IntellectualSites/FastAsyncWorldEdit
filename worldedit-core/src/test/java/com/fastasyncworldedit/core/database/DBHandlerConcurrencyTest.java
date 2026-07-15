@@ -58,7 +58,7 @@ class DBHandlerConcurrencyTest {
         try {
             List<Callable<DBHandler>> tasks = IntStream.range(0, THREADS)
                     .<Callable<DBHandler>>mapToObj(i -> () -> {
-                        barrier.await();
+                        barrier.await(10, TimeUnit.SECONDS);
                         return DBHandler.dbHandler();
                     })
                     .collect(Collectors.toList());
@@ -125,7 +125,7 @@ class DBHandlerConcurrencyTest {
 
     private static <T> T getUnchecked(Future<T> future) {
         try {
-            return future.get();
+            return future.get(10, TimeUnit.SECONDS);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

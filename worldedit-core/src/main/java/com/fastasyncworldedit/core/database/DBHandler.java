@@ -28,22 +28,34 @@ public class DBHandler {
     }
 
     public RollbackDatabase getDatabase(World world) {
-        RollbackDatabase database = databases.get(world);
-        if (database != null) {
-            return database;
-        }
+        // computeIfAbsent (not the earlier get-then-putIfAbsent) serializes construction itself:
+        // ConcurrentHashMap guarantees the mapping function runs at most once per key while
+        // racing callers for the same world block on it, so at most one RollbackDatabase (and
+        // one underlying SQLite connection) is ever constructed per world - putIfAbsent alone
+        // still let two threads each open a connection before one was discarded as the loser.
         try {
-            RollbackDatabase created = new RollbackDatabase(world);
-            RollbackDatabase existing = databases.putIfAbsent(world, created);
-            if (existing != null) {
-                created.close();
-                return existing;
-            }
-            return created;
-        } catch (Throwable e) {
-            LOGGER.error("No JDBC driver found!", e);
+            return databases.computeIfAbsent(world, w -> {
+                try {
+                    return new RollbackDatabase(w);
+                } catch (Throwable e) {
+                    // computeIfAbsent's mapping function can't declare checked exceptions, and no
+                    // value is stored if it throws - matching the previous behavior of not
+                    // caching a construction failure, so a later call can retry.
+                    throw new RollbackDatabaseConstructionException(e);
+                }
+            });
+        } catch (RollbackDatabaseConstructionException e) {
+            LOGGER.error("No JDBC driver found!", e.getCause());
             return null;
         }
+    }
+
+    private static final class RollbackDatabaseConstructionException extends RuntimeException {
+
+        RollbackDatabaseConstructionException(Throwable cause) {
+            super(cause);
+        }
+
     }
 
     /**
