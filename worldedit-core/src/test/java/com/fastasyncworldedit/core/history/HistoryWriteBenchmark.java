@@ -263,7 +263,15 @@ public final class HistoryWriteBenchmark {
         double avgOpsPerSec = totalOps / (totalElapsedNanos / 1_000_000_000.0);
         System.out.printf("  average: %,.0f ops/sec (%.1f ns/op)", avgOpsPerSec, 1_000_000_000.0 / avgOpsPerSec);
         if (totalErrors > 0) {
-            System.out.printf(" -- %d/%d ops threw (unsynchronized shared stream access)%n", totalErrors, totalOps);
+            // This only counts exceptions that escape FaweStreamChangeSet#add(...) into this
+            // benchmark's own catch block. add() itself catches IOException internally and
+            // prints a stack trace rather than throwing, so IO-related failures from the race
+            // aren't reflected here - this is a lower bound on "ops threw", not a full count.
+            System.out.printf(
+                    " -- %d/%d ops threw past add() (unsynchronized shared stream access; add() itself "
+                            + "swallows some IOExceptions, so this undercounts total failures)%n",
+                    totalErrors, totalOps
+            );
         } else {
             System.out.println();
         }
