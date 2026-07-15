@@ -314,7 +314,18 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
             // read (`if (osBD != null) return osBD;`) must never observe the stream until it is
             // fully initialized, or it could start writing block data concurrently with the
             // header write here and corrupt the file.
-            FaweOutputStream stream = getCompressedOS(new FileOutputStream(bdFile));
+            //
+            // The raw FileOutputStream is kept in a local so it can be closed directly if
+            // getCompressedOS() itself throws before returning anything to close; once wrapped,
+            // closing the returned stream closes the FileOutputStream it wraps.
+            FileOutputStream fos = new FileOutputStream(bdFile);
+            FaweOutputStream stream;
+            try {
+                stream = getCompressedOS(fos);
+            } catch (IOException e) {
+                fos.close();
+                throw e;
+            }
             try {
                 writeHeader(stream, x, y, z);
             } catch (IOException e) {
@@ -338,7 +349,13 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
             }
             bioFile.getParentFile().mkdirs();
             bioFile.createNewFile();
-            osBIO = getCompressedOS(new FileOutputStream(bioFile));
+            FileOutputStream fos = new FileOutputStream(bioFile);
+            try {
+                osBIO = getCompressedOS(fos);
+            } catch (IOException e) {
+                fos.close();
+                throw e;
+            }
             return osBIO;
         }
     }
@@ -354,7 +371,13 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
             }
             enttFile.getParentFile().mkdirs();
             enttFile.createNewFile();
-            osENTCT = new NBTOutputStream(getCompressedOS(new FileOutputStream(enttFile)));
+            FileOutputStream fos = new FileOutputStream(enttFile);
+            try {
+                osENTCT = new NBTOutputStream(getCompressedOS(fos));
+            } catch (IOException e) {
+                fos.close();
+                throw e;
+            }
             return osENTCT;
         }
     }
@@ -370,7 +393,13 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
             }
             entfFile.getParentFile().mkdirs();
             entfFile.createNewFile();
-            osENTCF = new NBTOutputStream(getCompressedOS(new FileOutputStream(entfFile)));
+            FileOutputStream fos = new FileOutputStream(entfFile);
+            try {
+                osENTCF = new NBTOutputStream(getCompressedOS(fos));
+            } catch (IOException e) {
+                fos.close();
+                throw e;
+            }
             return osENTCF;
         }
     }
@@ -386,7 +415,13 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
             }
             nbttFile.getParentFile().mkdirs();
             nbttFile.createNewFile();
-            osNBTT = new NBTOutputStream(getCompressedOS(new FileOutputStream(nbttFile)));
+            FileOutputStream fos = new FileOutputStream(nbttFile);
+            try {
+                osNBTT = new NBTOutputStream(getCompressedOS(fos));
+            } catch (IOException e) {
+                fos.close();
+                throw e;
+            }
             return osNBTT;
         }
     }
@@ -402,7 +437,13 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
             }
             nbtfFile.getParentFile().mkdirs();
             nbtfFile.createNewFile();
-            osNBTF = new NBTOutputStream(getCompressedOS(new FileOutputStream(nbtfFile)));
+            FileOutputStream fos = new FileOutputStream(nbtfFile);
+            try {
+                osNBTF = new NBTOutputStream(getCompressedOS(fos));
+            } catch (IOException e) {
+                fos.close();
+                throw e;
+            }
             return osNBTF;
         }
     }
