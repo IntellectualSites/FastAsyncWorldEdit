@@ -64,8 +64,9 @@ dependencies {
     testImplementation(libs.parallelgzip)
     // lz4-java is compileOnly for main (provided by the platform module at runtime); the
     // history write-path benchmark needs it available on the test runtime classpath since it
-    // exercises MainUtil's compression stream directly. See HistoryWriteBenchmark.
-    testImplementation(libs.lz4Java) { isTransitive = false }
+    // exercises MainUtil's compression stream directly. See HistoryWriteBenchmark. Runtime-only
+    // since no test source references lz4 types at compile time.
+    testRuntimeOnly(libs.lz4Java) { isTransitive = false }
 }
 
 tasks.register<JavaExec>("historyBenchmark") {

@@ -107,9 +107,12 @@ public final class HistoryWriteBenchmark {
     private static void doAdd(FaweStreamChangeSet changeSet, int i) {
         // Bitmasks rather than i % 256 / i % 384: 384 is not a power of two, so that modulo
         // compiles to an actual integer division, which would otherwise inflate the measured
-        // per-op cost with work that has nothing to do with add() itself.
+        // per-op cost with work that has nothing to do with add() itself. y needs the 384-value
+        // range of BenchWorld's height (-64..319), so fold the 9-bit 0..511 mask down to 0..383
+        // with a single conditional subtract (still no division), then offset by minY.
         int x = i & 0xFF;
-        int y = (i >>> 8) & 0x1FF;
+        int rawY = (i >>> 8) & 0x1FF;
+        int y = (rawY >= 384 ? rawY - 384 : rawY) - 64;
         int z = (i >>> 17) & 0xFF;
         changeSet.add(x, y, z, 1, 2);
     }
@@ -157,6 +160,16 @@ public final class HistoryWriteBenchmark {
         long[] elapsedNanos = new long[TRIALS];
         long totalErrors = 0;
         for (int trial = 0; trial < TRIALS; trial++) {
+            // Warm up JIT/class-loading on a throwaway instance rather than the measured one: the
+            // measured instance must still start with uninitialized lazy streams so this trial
+            // keeps exercising the lazy stream-init race under contention, which is the entire
+            // point of the contended variant.
+            FaweStreamChangeSet warmupChangeSet = factory.create();
+            for (int i = 0; i < WARMUP_OPS; i++) {
+                doAdd(warmupChangeSet, i);
+            }
+            closeAndCleanup(warmupChangeSet);
+
             FaweStreamChangeSet changeSet = factory.create();
             ExecutorService pool = Executors.newFixedThreadPool(THREADS);
             CountDownLatch ready = new CountDownLatch(THREADS);
