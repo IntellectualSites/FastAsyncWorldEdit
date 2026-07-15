@@ -6,6 +6,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 
 import java.io.File;
 import java.util.Collections;
@@ -21,6 +23,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -28,7 +31,13 @@ import static org.mockito.Mockito.when;
  * Regression test for the double-checked locking bug in {@link DiskStorageHistory}'s lazy
  * stream getters: racing threads must always observe the same, single, lazily-constructed
  * stream instance.
+ *
+ * <p>Runs its test methods on the same thread: {@code @BeforeEach}/{@code @AfterEach} save and
+ * restore the global {@code Settings.settings().HISTORY.COMPRESSION_LEVEL}, and this suite has
+ * method-level parallelism enabled by default, so two methods of this class racing on that field
+ * would corrupt each other's setting.</p>
  */
+@Execution(ExecutionMode.SAME_THREAD)
 class DiskStorageHistoryConcurrencyTest {
 
     private static final int THREADS = 16;
@@ -47,12 +56,10 @@ class DiskStorageHistoryConcurrencyTest {
         when(world.getMaxY()).thenReturn(319);
         when(world.getName()).thenReturn("concurrency-test-world");
 
-        // The LZ4/Zstd compression backends used at COMPRESSION_LEVEL > 0 are only
-        // `compileOnly` dependencies of worldedit-core (they're expected to be shaded in at
-        // runtime by the platform jars), so they aren't on the unit test classpath. Force
-        // uncompressed streams so getCompressedOS() doesn't throw NoClassDefFoundError - this
-        // test is only concerned with the identity of the lazily-constructed stream, not with
-        // compression behavior.
+        // MainUtil.getCompressedOS() returns a plain, uncompressed stream at COMPRESSION_LEVEL 0
+        // and otherwise builds an LZ4/Zstd stack. This test only cares about the identity of the
+        // lazily-constructed stream, not compression behavior, so force level 0 to keep it
+        // independent of the compression backend selection logic.
         originalCompressionLevel = Settings.settings().HISTORY.COMPRESSION_LEVEL;
         Settings.settings().HISTORY.COMPRESSION_LEVEL = 0;
     }
@@ -142,9 +149,16 @@ class DiskStorageHistoryConcurrencyTest {
             });
         }
 
-        done.await(30, TimeUnit.SECONDS);
+        boolean completed = done.await(30, TimeUnit.SECONDS);
         executor.shutdownNow();
+        boolean terminated = executor.awaitTermination(10, TimeUnit.SECONDS);
 
+        if (!completed) {
+            fail("Timed out waiting for racing threads to finish (possible barrier deadlock or hang)");
+        }
+        if (!terminated) {
+            fail("Executor did not terminate after shutdownNow(); worker threads may still be running");
+        }
         assertEquals(0, failures.get(), "no thread should have failed while racing to acquire the lazy stream");
     }
 

@@ -315,7 +315,13 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
             // fully initialized, or it could start writing block data concurrently with the
             // header write here and corrupt the file.
             FaweOutputStream stream = getCompressedOS(new FileOutputStream(bdFile));
-            writeHeader(stream, x, y, z);
+            try {
+                writeHeader(stream, x, y, z);
+            } catch (IOException e) {
+                // Not yet published to osBD, so close() would never close this otherwise.
+                stream.close();
+                throw e;
+            }
             osBD = stream;
             return osBD;
         }
