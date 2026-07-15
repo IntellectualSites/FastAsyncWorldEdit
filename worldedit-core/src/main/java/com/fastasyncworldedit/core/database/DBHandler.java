@@ -15,7 +15,6 @@ public class DBHandler {
     @Deprecated(forRemoval = true, since = "2.0.0")
     public static final DBHandler IMP = dbHandler();
     private static final Logger LOGGER = LogManagerCompat.getLogger();
-    private static DBHandler INSTANCE;
     private final Map<World, RollbackDatabase> databases = new ConcurrentHashMap<>(8, 0.9f, 1);
 
     /**
@@ -25,10 +24,7 @@ public class DBHandler {
      * @since 2.0.0
      */
     public static DBHandler dbHandler() {
-        if (INSTANCE == null) {
-            INSTANCE = new DBHandler();
-        }
-        return INSTANCE;
+        return Holder.INSTANCE;
     }
 
     public RollbackDatabase getDatabase(World world) {
@@ -37,13 +33,27 @@ public class DBHandler {
             return database;
         }
         try {
-            database = new RollbackDatabase(world);
-            databases.put(world, database);
-            return database;
+            RollbackDatabase created = new RollbackDatabase(world);
+            RollbackDatabase existing = databases.putIfAbsent(world, created);
+            if (existing != null) {
+                created.close();
+                return existing;
+            }
+            return created;
         } catch (Throwable e) {
             LOGGER.error("No JDBC driver found!", e);
             return null;
         }
+    }
+
+    /**
+     * Initialization-on-demand holder: guarantees thread-safe, lazy construction of the
+     * {@link DBHandler} singleton without needing explicit synchronization on every access.
+     */
+    private static final class Holder {
+
+        private static final DBHandler INSTANCE = new DBHandler();
+
     }
 
 }
