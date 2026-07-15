@@ -491,37 +491,51 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
     }
 
     private void drainQueue(boolean ignoreRunningState) {
-        if (!workerSemaphore.tryAcquire()) {
+        // A task may be enqueued in the window between a poll() returning null (queue observed
+        // empty) and this method's release() completing: a producer arriving in that window sees
+        // availablePermits() == 0 in triggerWorker() and skips scheduling a drain, so its task
+        // would otherwise sit in the queue with no worker to run it.
+        //
+        // ignoreRunningState callers (flush(), and therefore close()) loop here until a release()
+        // is immediately followed by an empty queue, so this method never returns to them with a
+        // straggler still pending. Returning early and merely re-scheduling an async worker (as a
+        // prior version of this method did) would let flush()/close() return - and the caller
+        // proceed to finalize or log the changeset - while that worker was still about to run on
+        // a different thread, against a resource the caller now considers closed.
+        //
+        // Non-blocking callers (an async worker triggered via triggerWorker()) don't need that
+        // guarantee: they just re-trigger another async worker for anything left behind and
+        // return promptly, exactly as before.
+        while (true) {
+            if (!workerSemaphore.tryAcquire()) {
+                if (!ignoreRunningState) {
+                    return; // another thread is draining the queue already, ignore
+                }
+                // The wait must be uninterruptible: an interruptible acquire that returns early
+                // on interrupt would let close() mark the changeset closed with tasks still
+                // queued, silently losing history (flush() swallows exceptions, so nothing would
+                // surface). acquireUninterruptibly() keeps waiting through interrupts and
+                // preserves the thread's interrupt status for callers to observe afterwards. The
+                // wait is bounded by the concurrent drainer's finite queue.
+                workerSemaphore.acquireUninterruptibly();
+            }
+            try {
+                Runnable next;
+                while ((next = queue.poll()) != null) { // process all tasks in the queue
+                    next.run();
+                }
+            } finally {
+                workerSemaphore.release();
+            }
+            if (queue.isEmpty()) {
+                return;
+            }
             if (!ignoreRunningState) {
-                return; // another thread is draining the queue already, ignore
+                triggerWorker();
+                return;
             }
-            // ignoreRunningState means we want to block even if another thread is already
-            // draining. The wait must be uninterruptible: this path is only reached from
-            // flush(), whose contract (and close()'s, which flushes before setting `closed`)
-            // is that pending write tasks have been drained when it returns. An interruptible
-            // acquire that returns early on interrupt would let close() mark the changeset
-            // closed with tasks still queued, silently losing history (flush() swallows
-            // exceptions, so nothing would surface). acquireUninterruptibly() keeps waiting
-            // through interrupts and preserves the thread's interrupt status for callers to
-            // observe afterwards. The wait is bounded by the concurrent drainer's finite
-            // queue, the same bound the previous blocking acquire() had.
-            workerSemaphore.acquireUninterruptibly();
-        }
-        try {
-            Runnable next;
-            while ((next = queue.poll()) != null) { // process all tasks in the queue
-                next.run();
-            }
-        } finally {
-            workerSemaphore.release();
-        }
-        // A task may have been enqueued in the window between the final poll() above returning
-        // null and the release() completing. A producer in that window saw availablePermits() == 0
-        // in triggerWorker() and skipped scheduling a drain, so its task would sit in the queue
-        // with no worker to run it and its future would never complete. Now that the permit is
-        // free again, re-check and schedule a worker for anything left behind.
-        if (!queue.isEmpty()) {
-            triggerWorker();
+            // ignoreRunningState: loop back and drain again rather than handing off to an async
+            // worker, so this method doesn't return until the queue is truly empty.
         }
     }
 

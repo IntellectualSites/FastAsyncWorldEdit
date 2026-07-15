@@ -155,6 +155,69 @@ class AbstractChangeSetConcurrencyTest {
     }
 
     /**
+     * Stress test for the specific completeness contract {@code close()} (via {@code flush()})
+     * must uphold: every task enqueued before {@code close()} is called must have finished
+     * running by the time {@code close()} <em>returns</em> - not merely "eventually", and not
+     * left to a background async worker scheduled after the fact. Prior to fixing
+     * {@code drainQueue()}'s post-release handling, a straggler task landing in the queue during
+     * the narrow (last {@code poll()} returned null … {@code release()} completes) window was
+     * handed off to an async re-trigger and could run on another thread after {@code close()} had
+     * already returned - and after a caller like {@code RollbackOptimizedHistory.close()} had
+     * already logged the (not-yet-fully-flushed) edit to the database.
+     *
+     * <p>Same honesty caveat as {@link #addWriteTaskFuturesAllCompleteUnderContention()}: hitting
+     * that exact window isn't forced deterministically here, but keeping producers and async
+     * drain workers both active up to the moment {@code close()} is called gives it a real,
+     * non-contrived opportunity to occur, and the assertion below - checking {@code isDone()}
+     * immediately, with no timeout tolerance for asynchronous completion - is the one that would
+     * actually fail if it did.</p>
+     */
+    @Test
+    void closeDoesNotReturnWithAnyPreviouslyEnqueuedTaskStillPending() throws Exception {
+        TestChangeSet changeSet = new TestChangeSet();
+
+        int producerThreads = 16;
+        int tasksPerThread = 200;
+        List<Future<?>> writeTaskFutures = Collections.synchronizedList(new ArrayList<>());
+
+        Fawe faweMock = newFaweMockWithAsyncPool(8);
+        ExecutorService producers = newFaweAwareFixedThreadPool(producerThreads, faweMock);
+        CountDownLatch startLatch = new CountDownLatch(1);
+        List<Future<?>> producerHandles = new ArrayList<>();
+
+        for (int t = 0; t < producerThreads; t++) {
+            producerHandles.add(producers.submit(() -> {
+                try {
+                    startLatch.await();
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    return;
+                }
+                for (int i = 0; i < tasksPerThread; i++) {
+                    Future<?> future = changeSet.addWriteTask(() -> {
+                    }, false);
+                    writeTaskFutures.add(future);
+                }
+            }));
+        }
+
+        startLatch.countDown();
+        // Wait for all producers to finish *submitting* (not necessarily executing) their tasks,
+        // so every future below was genuinely enqueued before close() is called - while async
+        // drain workers are very likely still actively processing the queue concurrently.
+        for (Future<?> handle : producerHandles) {
+            handle.get(15, TimeUnit.SECONDS);
+        }
+
+        changeSet.close();
+
+        for (Future<?> future : writeTaskFutures) {
+            assertTrue(future.isDone(), "a task enqueued before close() was called must have "
+                    + "finished by the time close() returns, not merely eventually");
+        }
+    }
+
+    /**
      * Concurrent close() calls must be safe: no exceptions, and the instance ends up closed.
      * Does not attempt to prove flush() only ran once (that's covered by close()'s
      * synchronized-on-closeLock guard), just that racing close() is safe and idempotent from
