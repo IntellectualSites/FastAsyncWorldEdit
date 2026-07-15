@@ -164,7 +164,11 @@ class DiskStorageHistoryConcurrencyTest {
                     failures.incrementAndGet();
                 } catch (BrokenBarrierException | java.util.concurrent.TimeoutException e) {
                     failures.incrementAndGet();
-                } catch (RuntimeException e) {
+                } catch (Throwable e) {
+                    // Throwable, not just RuntimeException: an Error (e.g. an AssertionError from
+                    // a failed assertion inside this worker) would otherwise complete this
+                    // submitted task's Future exceptionally with nothing checking it, and the
+                    // test could still pass since failures wouldn't be incremented.
                     failures.incrementAndGet();
                 } finally {
                     done.countDown();
