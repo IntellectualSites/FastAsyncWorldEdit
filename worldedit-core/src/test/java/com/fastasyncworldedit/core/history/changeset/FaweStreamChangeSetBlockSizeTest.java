@@ -28,10 +28,11 @@ import static org.mockito.Mockito.when;
  * real contention. It is now a {@link java.util.concurrent.atomic.LongAdder}, which this test
  * verifies is accurate under many concurrent writers.
  *
- * <p>Mutates the process-wide {@link Settings} singleton (to avoid needing the {@code lz4-java}
- * compression codec, which is {@code compileOnly} and not present on the unit test runtime
- * classpath), so this class is marked {@link Isolated} to avoid interference with other tests
- * that may run concurrently in the same JVM.</p>
+ * <p>Forces {@code Settings.settings().HISTORY.COMPRESSION_LEVEL} to 0, which bypasses the
+ * compression backend entirely (see {@code MainUtil#getCompressedOS}), so this test only measures
+ * counter accuracy and isn't coupled to compression behavior. Because {@link Settings} is
+ * process-global mutable state, this class is marked {@link Isolated} so no other test running
+ * concurrently in the same JVM observes the temporarily-changed level.</p>
  */
 @Isolated
 class FaweStreamChangeSetBlockSizeTest {
@@ -50,10 +51,9 @@ class FaweStreamChangeSetBlockSizeTest {
         when(world.getMinY()).thenReturn(-64);
         when(world.getMaxY()).thenReturn(319);
 
+        MemoryOptimizedHistory changeSet = new MemoryOptimizedHistory(world);
+        ExecutorService executor = Executors.newFixedThreadPool(THREADS);
         try {
-            MemoryOptimizedHistory changeSet = new MemoryOptimizedHistory(world);
-
-            ExecutorService executor = Executors.newFixedThreadPool(THREADS);
             CountDownLatch startLatch = new CountDownLatch(1);
 
             List<Future<?>> futures = new ArrayList<>(THREADS);
@@ -84,6 +84,10 @@ class FaweStreamChangeSetBlockSizeTest {
 
             assertEquals((long) THREADS * CALLS_PER_THREAD, changeSet.longSize());
         } finally {
+            // shutdownNow() runs even on the failure paths above (a worker throwing or timing
+            // out), so a stuck/failed worker never leaks non-daemon threads into the rest of the
+            // suite. It's a no-op once the graceful shutdown() above has already succeeded.
+            executor.shutdownNow();
             Settings.settings().HISTORY.COMPRESSION_LEVEL = previousCompressionLevel;
         }
     }
