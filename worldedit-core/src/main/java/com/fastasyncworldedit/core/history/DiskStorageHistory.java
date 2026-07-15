@@ -399,11 +399,25 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
             }
             enttFile.getParentFile().mkdirs();
             enttFile.createNewFile();
+            // Two-step, like getBlockOS(): if getCompressedOS() succeeds but the NBTOutputStream
+            // constructor then fails, closing only fos would leave the compression wrapper chain
+            // getCompressedOS() built (buffered/LZ4 streams) unclosed. Close whichever the
+            // innermost fully-constructed object is at the point of failure - closing the wrapper
+            // cascades down and closes fos too.
             FileOutputStream fos = new FileOutputStream(enttFile);
+            FaweOutputStream stream;
             try {
-                osENTCT = new NBTOutputStream(getCompressedOS(fos));
+                stream = getCompressedOS(fos);
             } catch (IOException | RuntimeException | Error e) {
                 closeQuietly(fos, e);
+                throw e;
+            }
+            try {
+                osENTCT = new NBTOutputStream(stream);
+            } catch (RuntimeException | Error e) {
+                // NBTOutputStream(OutputStream) doesn't declare IOException - only unchecked
+                // failures are possible here.
+                closeQuietly(stream, e);
                 throw e;
             }
             return osENTCT;
@@ -421,11 +435,19 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
             }
             entfFile.getParentFile().mkdirs();
             entfFile.createNewFile();
+            // See getEntityCreateOS() for why this is two steps.
             FileOutputStream fos = new FileOutputStream(entfFile);
+            FaweOutputStream stream;
             try {
-                osENTCF = new NBTOutputStream(getCompressedOS(fos));
+                stream = getCompressedOS(fos);
             } catch (IOException | RuntimeException | Error e) {
                 closeQuietly(fos, e);
+                throw e;
+            }
+            try {
+                osENTCF = new NBTOutputStream(stream);
+            } catch (RuntimeException | Error e) {
+                closeQuietly(stream, e);
                 throw e;
             }
             return osENTCF;
@@ -443,11 +465,19 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
             }
             nbttFile.getParentFile().mkdirs();
             nbttFile.createNewFile();
+            // See getEntityCreateOS() for why this is two steps.
             FileOutputStream fos = new FileOutputStream(nbttFile);
+            FaweOutputStream stream;
             try {
-                osNBTT = new NBTOutputStream(getCompressedOS(fos));
+                stream = getCompressedOS(fos);
             } catch (IOException | RuntimeException | Error e) {
                 closeQuietly(fos, e);
+                throw e;
+            }
+            try {
+                osNBTT = new NBTOutputStream(stream);
+            } catch (RuntimeException | Error e) {
+                closeQuietly(stream, e);
                 throw e;
             }
             return osNBTT;
@@ -465,11 +495,19 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
             }
             nbtfFile.getParentFile().mkdirs();
             nbtfFile.createNewFile();
+            // See getEntityCreateOS() for why this is two steps.
             FileOutputStream fos = new FileOutputStream(nbtfFile);
+            FaweOutputStream stream;
             try {
-                osNBTF = new NBTOutputStream(getCompressedOS(fos));
+                stream = getCompressedOS(fos);
             } catch (IOException | RuntimeException | Error e) {
                 closeQuietly(fos, e);
+                throw e;
+            }
+            try {
+                osNBTF = new NBTOutputStream(stream);
+            } catch (RuntimeException | Error e) {
+                closeQuietly(stream, e);
                 throw e;
             }
             return osNBTF;

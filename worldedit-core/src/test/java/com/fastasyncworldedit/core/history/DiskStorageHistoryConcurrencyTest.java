@@ -159,7 +159,10 @@ class DiskStorageHistoryConcurrencyTest {
                     synchronized (resultsOut) {
                         resultsOut.add(result);
                     }
-                } catch (InterruptedException | BrokenBarrierException | java.util.concurrent.TimeoutException e) {
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    failures.incrementAndGet();
+                } catch (BrokenBarrierException | java.util.concurrent.TimeoutException e) {
                     failures.incrementAndGet();
                 } catch (RuntimeException e) {
                     failures.incrementAndGet();
