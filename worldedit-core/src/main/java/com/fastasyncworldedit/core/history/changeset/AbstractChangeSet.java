@@ -495,17 +495,17 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
             if (!ignoreRunningState) {
                 return; // another thread is draining the queue already, ignore
             }
-            // ignoreRunningState means we want to block
-            // even if another thread is already draining
-            try {
-                workerSemaphore.acquire();
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                // The permit was never acquired, so this thread must neither drain (that would
-                // break the single-drainer guarantee processSet() relies on) nor fall through to
-                // the release() below, which would hand out a permit that was never held.
-                return;
-            }
+            // ignoreRunningState means we want to block even if another thread is already
+            // draining. The wait must be uninterruptible: this path is only reached from
+            // flush(), whose contract (and close()'s, which flushes before setting `closed`)
+            // is that pending write tasks have been drained when it returns. An interruptible
+            // acquire that returns early on interrupt would let close() mark the changeset
+            // closed with tasks still queued, silently losing history (flush() swallows
+            // exceptions, so nothing would surface). acquireUninterruptibly() keeps waiting
+            // through interrupts and preserves the thread's interrupt status for callers to
+            // observe afterwards. The wait is bounded by the concurrent drainer's finite
+            // queue, the same bound the previous blocking acquire() had.
+            workerSemaphore.acquireUninterruptibly();
         }
         try {
             Runnable next;

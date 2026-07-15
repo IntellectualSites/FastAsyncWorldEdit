@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -21,16 +22,26 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 /**
- * Regression tests for the write-worker queue lost-wakeup race and non-atomic {@code close()} in
- * {@link AbstractChangeSet}.
+ * Concurrency tests for the write-worker queue and {@code close()} in {@link AbstractChangeSet}.
+ *
+ * <p>Honesty note on what these tests prove: the lost-wakeup window in the pre-fix
+ * {@code drainQueue()} is a narrow interleaving that this stress test does <em>not</em> reliably
+ * hit — it passes against the unfixed code too. It is a contention smoke test guarding the
+ * queue/close paths against gross regressions (hangs, dropped tasks, exceptions), not a
+ * deterministic reproduction of the race. The lost-wakeup and close-atomicity fixes rest on the
+ * reasoning documented in {@code AbstractChangeSet} itself. The interrupt test below <em>is</em>
+ * deterministic for the behavior it checks.</p>
  */
 class AbstractChangeSetConcurrencyTest {
 
@@ -132,9 +143,10 @@ class AbstractChangeSetConcurrencyTest {
         int expected = producerThreads * tasksPerThread;
         assertEquals(expected, writeTaskFutures.size());
 
-        // The core assertion: none of these futures should hang. On the unfixed code this
-        // occasionally times out under enough contention because a task got stranded in the
-        // queue with no worker left to drain it.
+        // The core assertion: none of these futures should hang. On the unfixed code a task
+        // could in principle be stranded in the queue with no worker left to drain it (the
+        // lost-wakeup window), though in practice this test does not reliably hit that narrow
+        // interleaving - see the class javadoc. A timeout here still catches gross regressions.
         for (Future<?> future : writeTaskFutures) {
             future.get(10, TimeUnit.SECONDS);
         }
@@ -144,8 +156,9 @@ class AbstractChangeSetConcurrencyTest {
 
     /**
      * Concurrent close() calls must be safe: no exceptions, and the instance ends up closed.
-     * Does not attempt to prove flush() only ran once (that's covered by close()'s CAS guard),
-     * just that racing close() is safe and idempotent from the outside.
+     * Does not attempt to prove flush() only ran once (that's covered by close()'s
+     * synchronized-on-closeLock guard), just that racing close() is safe and idempotent from
+     * the outside.
      */
     @Test
     void concurrentCloseIsSafeAndIdempotent() throws Exception {
@@ -175,6 +188,76 @@ class AbstractChangeSetConcurrencyTest {
         }
 
         assertTrue(changeSet.closed);
+    }
+
+    /**
+     * Deterministic regression test for the interrupted-close hole: a thread that calls
+     * {@code close()} while another worker holds the drain permit, and that is interrupted,
+     * must still wait for the queue to be drained before {@code close()} returns — and must
+     * observe its interrupt flag afterwards. Prior to the {@code acquireUninterruptibly} fix,
+     * the interrupted closer returned from the semaphore wait early, {@code flush()} swallowed
+     * the situation, and {@code close()} marked the changeset closed with tasks still queued.
+     *
+     * <p>Both outcomes are checked deterministically: pre-fix, {@code close()} returns almost
+     * immediately (the interrupted acquire throws at once when the flag is already set), which
+     * the short-timeout {@code get} below converts into a test failure; post-fix, {@code close()}
+     * is still blocked at that point and completes only after the in-flight drainer is
+     * released.</p>
+     */
+    @Test
+    void interruptedCloseStillDrainsQueue() throws Exception {
+        TestChangeSet changeSet = new TestChangeSet();
+        Fawe faweMock = newFaweMockWithAsyncPool(2);
+
+        CountDownLatch drainerStarted = new CountDownLatch(1);
+        CountDownLatch releaseDrainer = new CountDownLatch(1);
+        AtomicInteger executed = new AtomicInteger();
+
+        ExecutorService submitter = newFaweAwareFixedThreadPool(1, faweMock);
+        // First task occupies the single drain permit until released.
+        submitter.submit(() -> changeSet.addWriteTask(() -> {
+            drainerStarted.countDown();
+            try {
+                releaseDrainer.await(20, TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+            executed.incrementAndGet();
+        }, false)).get(10, TimeUnit.SECONDS);
+        assertTrue(drainerStarted.await(10, TimeUnit.SECONDS), "drain worker never started");
+
+        // Second task sits in the queue behind the blocked drainer; triggerWorker skips
+        // scheduling because the permit is held.
+        submitter.submit(() -> changeSet.addWriteTask(executed::incrementAndGet, false))
+                .get(10, TimeUnit.SECONDS);
+
+        AtomicBoolean interruptFlagPreserved = new AtomicBoolean();
+        ExecutorService closer = newFaweAwareFixedThreadPool(1, faweMock);
+        Future<?> closeResult = closer.submit(() -> {
+            // Arrive at the semaphore wait with the interrupt flag already set: the pre-fix
+            // interruptible acquire() throws immediately in that state.
+            Thread.currentThread().interrupt();
+            try {
+                changeSet.close();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            interruptFlagPreserved.set(Thread.interrupted());
+        });
+
+        try {
+            closeResult.get(2, TimeUnit.SECONDS);
+            fail("close() returned before pending write tasks were drained (pre-fix behavior)");
+        } catch (TimeoutException expectedWhileDrainerHoldsPermit) {
+            // Correct: close() is waiting uninterruptibly for the in-flight drainer.
+        }
+
+        releaseDrainer.countDown();
+        closeResult.get(15, TimeUnit.SECONDS);
+
+        assertEquals(2, executed.get(), "close() must not return with queued tasks undrained");
+        assertTrue(changeSet.closed);
+        assertTrue(interruptFlagPreserved.get(), "the interrupt flag must survive close()");
     }
 
     /**
