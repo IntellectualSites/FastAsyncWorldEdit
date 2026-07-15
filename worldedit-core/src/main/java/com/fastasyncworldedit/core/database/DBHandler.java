@@ -37,7 +37,12 @@ public class DBHandler {
             return databases.computeIfAbsent(world, w -> {
                 try {
                     return new RollbackDatabase(w);
-                } catch (Throwable e) {
+                } catch (Exception e) {
+                    // Exception, not Throwable: RollbackDatabase's construction only needs
+                    // checked/unchecked failures translated into the retryable null result below.
+                    // A real Error (e.g. OutOfMemoryError) must still propagate rather than being
+                    // logged and swallowed as if it were an ordinary construction failure.
+                    //
                     // computeIfAbsent's mapping function can't declare checked exceptions, and no
                     // value is stored if it throws - matching the previous behavior of not
                     // caching a construction failure, so a later call can retry.
@@ -45,7 +50,7 @@ public class DBHandler {
                 }
             });
         } catch (RollbackDatabaseConstructionException e) {
-            LOGGER.error("No JDBC driver found!", e.getCause());
+            LOGGER.error("Failed to construct RollbackDatabase for world '{}'", world.getName(), e.getCause());
             return null;
         }
     }
@@ -59,8 +64,13 @@ public class DBHandler {
     }
 
     /**
-     * Initialization-on-demand holder: guarantees thread-safe, lazy construction of the
-     * {@link DBHandler} singleton without needing explicit synchronization on every access.
+     * Initialization-on-demand holder: guarantees thread-safe construction of the
+     * {@link DBHandler} singleton without needing explicit synchronization on every access. In
+     * isolation this class would also be genuinely <em>lazy</em> - {@code Holder} only loads (and
+     * so only constructs {@code INSTANCE}) on first reference from {@link #dbHandler()} - but the
+     * deprecated {@link #IMP} field's initializer calls {@code dbHandler()} during
+     * {@code DBHandler}'s own static initialization, so in practice {@code INSTANCE} is
+     * constructed eagerly, the first time anything touches {@code DBHandler} at all.
      */
     private static final class Holder {
 

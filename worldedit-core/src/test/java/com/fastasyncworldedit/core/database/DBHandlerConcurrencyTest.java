@@ -63,7 +63,7 @@ class DBHandlerConcurrencyTest {
                     })
                     .collect(Collectors.toList());
 
-            List<Future<DBHandler>> futures = executor.invokeAll(tasks);
+            List<Future<DBHandler>> futures = executor.invokeAll(tasks, 15, TimeUnit.SECONDS);
 
             Set<DBHandler> distinctInstances = futures.stream()
                     .map(DBHandlerConcurrencyTest::getUnchecked)
