@@ -48,6 +48,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Future;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -64,6 +65,10 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
     private final AtomicInteger lastException = new AtomicInteger();
     private final Semaphore workerSemaphore = new Semaphore(1, false);
     private final ConcurrentLinkedQueue<Runnable> queue = new ConcurrentLinkedQueue<>();
+    // Guards close() so that concurrent callers only trigger a single flush; deliberately
+    // separate from the `closed` field below, which is read/written directly by subclasses
+    // (e.g. RollbackOptimizedHistory) and must keep its existing type/visibility/semantics.
+    private final AtomicBoolean closing = new AtomicBoolean();
     protected volatile boolean closed;
 
     public AbstractChangeSet(World world) {
@@ -99,9 +104,19 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
 
     @Override
     public void close() throws IOException {
-        if (!closed) {
-            flush();
-            closed = true;
+        if (closed) {
+            return;
+        }
+        // Ensure only one concurrent caller runs the flush-and-mark-closed sequence; the CAS
+        // atomically decides a single "winner" thread, so no two threads can ever both pass the
+        // `!closed` check and both call flush() as could happen with the old check-then-act code.
+        // Callers that lose the race simply return; `closed` is still guaranteed to become true.
+        if (closing.compareAndSet(false, true)) {
+            try {
+                flush();
+            } finally {
+                closed = true;
+            }
         }
     }
 
@@ -455,16 +470,19 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
 
     private void drainQueue(boolean ignoreRunningState) {
         if (!workerSemaphore.tryAcquire()) {
-            if (ignoreRunningState) {
-                // ignoreRunningState means we want to block
-                // even if another thread is already draining
-                try {
-                    workerSemaphore.acquire();
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                }
-            } else {
+            if (!ignoreRunningState) {
                 return; // another thread is draining the queue already, ignore
+            }
+            // ignoreRunningState means we want to block
+            // even if another thread is already draining
+            try {
+                workerSemaphore.acquire();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                // The permit was never acquired, so this thread must neither drain (that would
+                // break the single-drainer guarantee processSet() relies on) nor fall through to
+                // the release() below, which would hand out a permit that was never held.
+                return;
             }
         }
         try {
@@ -474,6 +492,14 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
             }
         } finally {
             workerSemaphore.release();
+        }
+        // A task may have been enqueued in the window between the final poll() above returning
+        // null and the release() completing. A producer in that window saw availablePermits() == 0
+        // in triggerWorker() and skipped scheduling a drain, so its task would sit in the queue
+        // with no worker to run it and its future would never complete. Now that the permit is
+        // free again, re-check and schedule a worker for anything left behind.
+        if (!queue.isEmpty()) {
+            triggerWorker();
         }
     }
 
