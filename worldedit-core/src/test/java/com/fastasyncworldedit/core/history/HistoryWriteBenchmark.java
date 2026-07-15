@@ -9,10 +9,14 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -50,9 +54,15 @@ public final class HistoryWriteBenchmark {
 
     public static void main(String[] args) throws Exception {
         System.out.println("=== FAWE history write-path baseline benchmark ===");
+        // Contended trials split MEASURED_OPS across THREADS with integer division, so the actual
+        // op count they run can be slightly less than MEASURED_OPS when THREADS doesn't divide it
+        // evenly - report() itself always uses the real per-trial count for throughput, but print
+        // the two separately here so this header doesn't overclaim a single measuredOps for every
+        // benchmark variant.
+        int contendedMeasuredOps = (MEASURED_OPS / THREADS) * THREADS;
         System.out.printf(
-                "warmupOps=%d measuredOps=%d trials=%d contendedThreads=%d%n%n",
-                WARMUP_OPS, MEASURED_OPS, TRIALS, THREADS
+                "warmupOps=%d measuredOps=%d (contended runs: %d actual, %d threads) trials=%d%n%n",
+                WARMUP_OPS, MEASURED_OPS, contendedMeasuredOps, THREADS, TRIALS
         );
 
         runSingleThreaded("DiskStorageHistory (single-thread)", HistoryWriteBenchmark::newDiskStorageHistory);
@@ -177,9 +187,15 @@ public final class HistoryWriteBenchmark {
             CountDownLatch ready = new CountDownLatch(THREADS);
             CountDownLatch go = new CountDownLatch(1);
             AtomicLong errorCount = new AtomicLong();
+            // submit() discards its Future by default, and a FutureTask captures any Throwable
+            // (Exception or Error) rather than propagating it to the calling thread - so an
+            // Error escaping the loop below would previously vanish silently instead of actually
+            // propagating, contradicting the comment inside the loop. Keep the futures and check
+            // them after the pool finishes so a real Error is still surfaced.
+            List<Future<?>> futures = new ArrayList<>(THREADS);
             for (int t = 0; t < THREADS; t++) {
                 final int base = t * opsPerThread;
-                pool.submit(() -> {
+                futures.add(pool.submit(() -> {
                     ready.countDown();
                     try {
                         go.await();
@@ -196,7 +212,7 @@ public final class HistoryWriteBenchmark {
                             errorCount.incrementAndGet();
                         }
                     }
-                });
+                }));
             }
             ready.await();
             long start = System.nanoTime();
@@ -205,6 +221,13 @@ public final class HistoryWriteBenchmark {
             if (!pool.awaitTermination(5, TimeUnit.MINUTES)) {
                 pool.shutdownNow();
                 throw new IllegalStateException("Benchmark threads did not finish in time");
+            }
+            for (Future<?> future : futures) {
+                try {
+                    future.get();
+                } catch (ExecutionException e) {
+                    throw new IllegalStateException("Benchmark worker thread failed", e.getCause());
+                }
             }
             elapsedNanos[trial] = System.nanoTime() - start;
             totalErrors += errorCount.get();
