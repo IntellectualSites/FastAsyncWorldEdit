@@ -15,7 +15,9 @@ tasks
         val disabledLint = listOf(
             "processing", "path", "fallthrough", "serial", "overloads", "this-escape",
         )
-        sourceCompatibility = "21"
+        sourceCompatibility = "25"
+        targetCompatibility = "25"
+        options.release.set(25)
         options.compilerArgs.addAll(listOf("-Xlint:all") + disabledLint.map { "-Xlint:-$it" })
         options.isDeprecation = true
         options.encoding = "UTF-8"
@@ -68,4 +70,20 @@ tasks.withType<Javadoc>().configureEach {
 configure<JavaPluginExtension> {
     withJavadocJar()
     withSourcesJar()
+}
+
+// Generating javadoc for every module is a large, pure overhead on a regular
+// `build`/`assemble` (doclint is already off, so it validates almost nothing).
+// Only run it when the javadoc jar is actually needed - i.e. when publishing, signing,
+// or when the javadoc/javadocJar task is requested explicitly. Published artifacts
+// still contain full javadoc; only local build speed changes. `enabled` is set to
+// a plain boolean (no captured script reference) so it stays configuration-cache safe.
+val javadocRequested = gradle.startParameter.taskNames.any {
+    it.contains("publish", ignoreCase = true) || it.contains("sign", ignoreCase = true) || it.endsWith("javadoc") || it.endsWith("javadocJar")
+}
+tasks.withType<Javadoc>().configureEach {
+    enabled = javadocRequested
+}
+tasks.matching { it.name == "javadocJar" }.configureEach {
+    enabled = javadocRequested
 }
