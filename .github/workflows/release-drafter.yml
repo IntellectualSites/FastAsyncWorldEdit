@@ -1,17 +1,23 @@
 name: draft release
+
 on:
   push:
     branches:
       - main
-  pull_request:
-    types: [opened, reopened, synchronize]
-  pull_request_target:
-    types: [opened, reopened, synchronize]
+
+permissions:
+  contents: read
+
 jobs:
   update_release_draft:
-    if: ${{ github.event_name != 'pull_request' || github.repository != github.event.pull_request.head.repo.full_name }}
+    permissions:
+      contents: write # to create a GitHub release (release-drafter/release-drafter)
+
+    if: ${{ github.repository_owner == 'IntellectualSites' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: release-drafter/release-drafter@v7
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Generate GitHub Release Draft
+        id: release-drafter
+        uses: release-drafter/release-drafter@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
