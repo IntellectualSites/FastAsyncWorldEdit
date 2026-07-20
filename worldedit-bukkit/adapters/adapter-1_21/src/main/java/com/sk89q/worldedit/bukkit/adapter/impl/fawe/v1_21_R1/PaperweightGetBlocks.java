@@ -347,6 +347,7 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
         // Remove existing tiles. Create a copy so that we can remove blocks
         Map<BlockPos, BlockEntity> chunkTiles = new HashMap<>(nmsChunk.getBlockEntities());
         List<BlockEntity> beacons = null;
+        List<BlockEntity> tilesToRemove = new ArrayList<>();
         if (!chunkTiles.isEmpty()) {
             for (Map.Entry<BlockPos, BlockEntity> entry : chunkTiles.entrySet()) {
                 final BlockPos pos = entry.getKey();
@@ -366,13 +367,9 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
                             beacons = new ArrayList<>();
                         }
                         beacons.add(tile);
-                        PaperweightPlatformAdapter.removeBeacon(tile, nmsChunk);
                         continue;
                     }
-                    nmsChunk.removeBlockEntity(tile.getBlockPos());
-                    if (createCopy) {
-                        copy.storeTile(tile);
-                    }
+                    tilesToRemove.add(tile);
                 }
             }
         }
@@ -594,17 +591,33 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
             int bx = chunkX << 4;
             int bz = chunkZ << 4;
 
-            // Call beacon deactivate events here synchronously
+            // Remove tiles synchronously
+            if (!tilesToRemove.isEmpty()) {
+                syncTasks = new Runnable[5];
+                final List<BlockEntity> finalTilesToRemove = tilesToRemove;
+                syncTasks[4] = () -> {
+                    for (BlockEntity tile : finalTilesToRemove) {
+                        nmsChunk.removeBlockEntity(tile.getBlockPos());
+                        if (createCopy) {
+                            copy.storeTile(tile);
+                        }
+                    }
+                };
+            }
+
+            // Call beacon deactivate events and remove it here synchronously
             // list will be null on spigot, so this is an implicit isPaper check
             if (beacons != null && !beacons.isEmpty()) {
                 final List<BlockEntity> finalBeacons = beacons;
-
-                syncTasks = new Runnable[4];
+                if (syncTasks == null) {
+                    syncTasks = new Runnable[4];
+                }
 
                 syncTasks[3] = () -> {
                     for (BlockEntity beacon : finalBeacons) {
                         BeaconBlockEntity.playSound(beacon.getLevel(), beacon.getBlockPos(), SoundEvents.BEACON_DEACTIVATE);
                         new BeaconDeactivatedEvent(CraftBlock.at(beacon.getLevel(), beacon.getBlockPos())).callEvent();
+                        PaperweightPlatformAdapter.removeBeacon(beacon, nmsChunk);
                     }
                 };
             }
