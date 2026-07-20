@@ -57,17 +57,17 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
      * [contents]...
      * { short rel x, short rel z, unsigned byte y, short combinedFrom, short combinedTo }
      */
-    private FaweOutputStream osBD;
+    private volatile FaweOutputStream osBD;
     // biome
-    private FaweOutputStream osBIO;
+    private volatile FaweOutputStream osBIO;
     // NBT From
-    private NBTOutputStream osNBTF;
+    private volatile NBTOutputStream osNBTF;
     // NBT To
-    private NBTOutputStream osNBTT;
+    private volatile NBTOutputStream osNBTT;
     // Entity Create From
-    private NBTOutputStream osENTCF;
+    private volatile NBTOutputStream osENTCF;
     // Entity Create To
-    private NBTOutputStream osENTCT;
+    private volatile NBTOutputStream osENTCT;
 
     private int index;
 
@@ -298,16 +298,70 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
         return total;
     }
 
+    /**
+     * Closes {@code closeable} (if not null), suppressing rather than propagating or masking any
+     * failure from the close itself onto {@code primary} - the original failure that triggered
+     * the cleanup, and the one that must actually reach the caller. Used when a fallible resource
+     * has to be closed before rethrowing, without losing the real cause if the close itself
+     * fails too. No-op if {@code closeable} is null (e.g. construction failed before it was
+     * created).
+     */
+    private static void closeQuietly(AutoCloseable closeable, Throwable primary) {
+        if (closeable == null) {
+            return;
+        }
+        try {
+            closeable.close();
+        } catch (Throwable suppressed) {
+            // Throwable, not just Exception: a RuntimeException or Error from close() itself
+            // must not propagate in place of primary either, or it would mask the original
+            // failure exactly like the checked-exception case this method exists to prevent.
+            // This still doesn't swallow anything - it's attached to primary, which callers
+            // always rethrow.
+            primary.addSuppressed(suppressed);
+        }
+    }
+
     @Override
     public FaweOutputStream getBlockOS(int x, int y, int z) throws IOException {
         if (osBD != null) {
             return osBD;
         }
         synchronized (this) {
+            if (osBD != null) {
+                return osBD;
+            }
             bdFile.getParentFile().mkdirs();
             bdFile.createNewFile();
-            osBD = getCompressedOS(new FileOutputStream(bdFile));
-            writeHeader(osBD, x, y, z);
+            // Write the header before publishing to the volatile field: osBD is not thread-safe
+            // (see getCompressedOS()'s javadoc), so another thread's unsynchronized fast-path
+            // read (`if (osBD != null) return osBD;`) must never observe the stream until it is
+            // fully initialized, or it could start writing block data concurrently with the
+            // header write here and corrupt the file.
+            //
+            // The raw FileOutputStream is kept in a local so it can be closed directly if
+            // getCompressedOS() itself throws before returning anything to close; once wrapped,
+            // closing the returned stream closes the FileOutputStream it wraps. Both catch
+            // clauses below also cover unchecked RuntimeException/Error, not just IOException:
+            // MainUtil.getCompressedOS()/writeHeader() can fail that way too (e.g. a linkage
+            // error constructing a compression stream), and an unchecked failure after fos is
+            // opened would otherwise leak the file descriptor since it's never published to osBD.
+            FileOutputStream fos = new FileOutputStream(bdFile);
+            FaweOutputStream stream;
+            try {
+                stream = getCompressedOS(fos);
+            } catch (IOException | RuntimeException | Error e) {
+                closeQuietly(fos, e);
+                throw e;
+            }
+            try {
+                writeHeader(stream, x, y, z);
+            } catch (IOException | RuntimeException | Error e) {
+                // Not yet published to osBD, so close() would never close this otherwise.
+                closeQuietly(stream, e);
+                throw e;
+            }
+            osBD = stream;
             return osBD;
         }
     }
@@ -318,9 +372,18 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
             return osBIO;
         }
         synchronized (this) {
+            if (osBIO != null) {
+                return osBIO;
+            }
             bioFile.getParentFile().mkdirs();
             bioFile.createNewFile();
-            osBIO = getCompressedOS(new FileOutputStream(bioFile));
+            FileOutputStream fos = new FileOutputStream(bioFile);
+            try {
+                osBIO = getCompressedOS(fos);
+            } catch (IOException | RuntimeException | Error e) {
+                closeQuietly(fos, e);
+                throw e;
+            }
             return osBIO;
         }
     }
@@ -330,10 +393,35 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
         if (osENTCT != null) {
             return osENTCT;
         }
-        enttFile.getParentFile().mkdirs();
-        enttFile.createNewFile();
-        osENTCT = new NBTOutputStream(getCompressedOS(new FileOutputStream(enttFile)));
-        return osENTCT;
+        synchronized (this) {
+            if (osENTCT != null) {
+                return osENTCT;
+            }
+            enttFile.getParentFile().mkdirs();
+            enttFile.createNewFile();
+            // Two-step, like getBlockOS(): if getCompressedOS() succeeds but the NBTOutputStream
+            // constructor then fails, closing only fos would leave the compression wrapper chain
+            // getCompressedOS() built (buffered/LZ4 streams) unclosed. Close whichever the
+            // innermost fully-constructed object is at the point of failure - closing the wrapper
+            // cascades down and closes fos too.
+            FileOutputStream fos = new FileOutputStream(enttFile);
+            FaweOutputStream stream;
+            try {
+                stream = getCompressedOS(fos);
+            } catch (IOException | RuntimeException | Error e) {
+                closeQuietly(fos, e);
+                throw e;
+            }
+            try {
+                osENTCT = new NBTOutputStream(stream);
+            } catch (RuntimeException | Error e) {
+                // NBTOutputStream(OutputStream) doesn't declare IOException - only unchecked
+                // failures are possible here.
+                closeQuietly(stream, e);
+                throw e;
+            }
+            return osENTCT;
+        }
     }
 
     @Override
@@ -341,10 +429,29 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
         if (osENTCF != null) {
             return osENTCF;
         }
-        entfFile.getParentFile().mkdirs();
-        entfFile.createNewFile();
-        osENTCF = new NBTOutputStream(getCompressedOS(new FileOutputStream(entfFile)));
-        return osENTCF;
+        synchronized (this) {
+            if (osENTCF != null) {
+                return osENTCF;
+            }
+            entfFile.getParentFile().mkdirs();
+            entfFile.createNewFile();
+            // See getEntityCreateOS() for why this is two steps.
+            FileOutputStream fos = new FileOutputStream(entfFile);
+            FaweOutputStream stream;
+            try {
+                stream = getCompressedOS(fos);
+            } catch (IOException | RuntimeException | Error e) {
+                closeQuietly(fos, e);
+                throw e;
+            }
+            try {
+                osENTCF = new NBTOutputStream(stream);
+            } catch (RuntimeException | Error e) {
+                closeQuietly(stream, e);
+                throw e;
+            }
+            return osENTCF;
+        }
     }
 
     @Override
@@ -352,10 +459,29 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
         if (osNBTT != null) {
             return osNBTT;
         }
-        nbttFile.getParentFile().mkdirs();
-        nbttFile.createNewFile();
-        osNBTT = new NBTOutputStream(getCompressedOS(new FileOutputStream(nbttFile)));
-        return osNBTT;
+        synchronized (this) {
+            if (osNBTT != null) {
+                return osNBTT;
+            }
+            nbttFile.getParentFile().mkdirs();
+            nbttFile.createNewFile();
+            // See getEntityCreateOS() for why this is two steps.
+            FileOutputStream fos = new FileOutputStream(nbttFile);
+            FaweOutputStream stream;
+            try {
+                stream = getCompressedOS(fos);
+            } catch (IOException | RuntimeException | Error e) {
+                closeQuietly(fos, e);
+                throw e;
+            }
+            try {
+                osNBTT = new NBTOutputStream(stream);
+            } catch (RuntimeException | Error e) {
+                closeQuietly(stream, e);
+                throw e;
+            }
+            return osNBTT;
+        }
     }
 
     @Override
@@ -363,10 +489,29 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
         if (osNBTF != null) {
             return osNBTF;
         }
-        nbtfFile.getParentFile().mkdirs();
-        nbtfFile.createNewFile();
-        osNBTF = new NBTOutputStream(getCompressedOS(new FileOutputStream(nbtfFile)));
-        return osNBTF;
+        synchronized (this) {
+            if (osNBTF != null) {
+                return osNBTF;
+            }
+            nbtfFile.getParentFile().mkdirs();
+            nbtfFile.createNewFile();
+            // See getEntityCreateOS() for why this is two steps.
+            FileOutputStream fos = new FileOutputStream(nbtfFile);
+            FaweOutputStream stream;
+            try {
+                stream = getCompressedOS(fos);
+            } catch (IOException | RuntimeException | Error e) {
+                closeQuietly(fos, e);
+                throw e;
+            }
+            try {
+                osNBTF = new NBTOutputStream(stream);
+            } catch (RuntimeException | Error e) {
+                closeQuietly(stream, e);
+                throw e;
+            }
+            return osNBTF;
+        }
     }
 
     @Override
