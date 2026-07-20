@@ -554,6 +554,8 @@ public final class BlockTypes {
     @Nullable
     public static final BlockType CRAFTING_TABLE = init();
     @Nullable
+    public static final BlockType CREAKING_HEART = init();
+    @Nullable
     public static final BlockType CREEPER_HEAD = init();
     @Nullable
     public static final BlockType CREEPER_WALL_HEAD = init();
