@@ -44,7 +44,7 @@ guice = "7.0.0"
 ## Internal
 text-adapter = "3.0.6"
 text = "3.0.4"
-piston = "0.6.0"
+piston = "0.5.11"
 
 # Tests
 mockito = "5.23.0"
