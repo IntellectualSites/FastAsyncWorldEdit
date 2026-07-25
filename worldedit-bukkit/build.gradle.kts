@@ -27,25 +27,14 @@ repositories {
     }
     mavenCentral()
     maven {
-        name = "JitPack"
-        url = uri("https://jitpack.io")
-        content {
-            includeGroup("com.github.Zrips")
-            includeGroup("com.github.MilkBowl")
-            includeGroup("com.github.TechFortress")
-        }
-    }
-    maven {
-        name = "GriefDefender"
-        url = uri("https://repo.glaremasters.me/repository/bloodshot/")
+        // mirroring + caching from unstable third-party repositories for community plugins (partially limited by routing rules)
+        // (currently Residence, GriefPrevention, GriefDefender, Towny)
+        name = "IntellectualSites Repository"
+        url = uri("https://repo.intellectualsites.dev/repository/maven-all/")
     }
     maven {
         name = "OSS Sonatype Snapshots"
         url = uri("https://oss.sonatype.org/content/repositories/snapshots/")
-    }
-    maven {
-        name = "Glaremasters"
-        url = uri("https://repo.glaremasters.me/repository/towny/")
     }
     flatDir { dir(File("src/main/resources")) }
 }
