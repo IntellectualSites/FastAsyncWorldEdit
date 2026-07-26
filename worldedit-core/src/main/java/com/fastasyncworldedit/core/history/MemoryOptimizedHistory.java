@@ -18,6 +18,12 @@ import java.io.IOException;
  * - No disk usage
  * - High CPU usage
  * - Low memory usage
+ *
+ * <p>Threading: today every caller reaches the lazy {@code get*OS()} getters through
+ * {@link com.fastasyncworldedit.core.history.changeset.AbstractChangeSet#processSet}, which is
+ * {@code synchronized} on this same instance, so lazy initialisation is already mutually exclusive.
+ * The double-checked locking below does not rely on that: it keeps the getters correct in isolation
+ * so a future caller outside {@code processSet} cannot silently reintroduce a lost-update bug.</p>
  */
 public class MemoryOptimizedHistory extends FaweStreamChangeSet {
 
@@ -54,22 +60,24 @@ public class MemoryOptimizedHistory extends FaweStreamChangeSet {
         super.flush();
         synchronized (this) {
             try {
-                if (idsStream != null) {
+                // Gate on the wrapper field, not the buffer field: it is the one being dereferenced,
+                // so this cannot NPE regardless of how the pair was published.
+                if (idsStreamZip != null) {
                     idsStreamZip.flush();
                 }
-                if (biomeStream != null) {
+                if (biomeStreamZip != null) {
                     biomeStreamZip.flush();
                 }
-                if (entCStream != null) {
+                if (entCStreamZip != null) {
                     entCStreamZip.flush();
                 }
-                if (entRStream != null) {
+                if (entRStreamZip != null) {
                     entRStreamZip.flush();
                 }
-                if (tileCStream != null) {
+                if (tileCStreamZip != null) {
                     tileCStreamZip.flush();
                 }
-                if (tileRStream != null) {
+                if (tileRStreamZip != null) {
                     tileRStreamZip.flush();
                 }
             } catch (IOException e) {
@@ -83,37 +91,39 @@ public class MemoryOptimizedHistory extends FaweStreamChangeSet {
         super.close();
         synchronized (this) {
             try {
-                if (idsStream != null) {
+                // Gate on the wrapper field, not the buffer field: it is the one being dereferenced,
+                // so this cannot NPE regardless of how the pair was published.
+                if (idsStreamZip != null) {
                     idsStreamZip.close();
                     ids = idsStream.toByteArrays();
                     idsStream = null;
                     idsStreamZip = null;
                 }
-                if (biomeStream != null) {
+                if (biomeStreamZip != null) {
                     biomeStreamZip.close();
                     biomes = biomeStream.toByteArrays();
                     biomeStream = null;
                     biomeStreamZip = null;
                 }
-                if (entCStream != null) {
+                if (entCStreamZip != null) {
                     entCStreamZip.close();
                     entC = entCStream.toByteArrays();
                     entCStream = null;
                     entCStreamZip = null;
                 }
-                if (entRStream != null) {
+                if (entRStreamZip != null) {
                     entRStreamZip.close();
                     entR = entRStream.toByteArrays();
                     entRStream = null;
                     entRStreamZip = null;
                 }
-                if (tileCStream != null) {
+                if (tileCStreamZip != null) {
                     tileCStreamZip.close();
                     tileC = tileCStream.toByteArrays();
                     tileCStream = null;
                     tileCStreamZip = null;
                 }
-                if (tileRStream != null) {
+                if (tileRStreamZip != null) {
                     tileRStreamZip.close();
                     tileR = tileRStream.toByteArrays();
                     tileRStream = null;
@@ -151,18 +161,25 @@ public class MemoryOptimizedHistory extends FaweStreamChangeSet {
             if (idsStreamZip != null) {
                 return idsStreamZip;
             }
-            setOrigin(x, z);
             // Build the buffer and its wrapper into locals and only publish both fields together
-            // once construction has fully succeeded. Two things this guards against:
-            //  1. If getCompressedOS()/writeHeader() throws, idsStream must not be left non-null
-            //     while idsStreamZip stays null - flush()/close() gate on idsStream != null and
-            //     then dereference idsStreamZip, which would NPE.
-            //  2. Callers on the fast path read the volatile idsStreamZip without holding the
-            //     lock, so publishing it before writeHeader has run would let them write block
-            //     data ahead of the header.
+            // once construction has fully succeeded. getCompressedOS()/writeHeader() can throw, and
+            // flush()/close() must not then find a half-built stream pair. writeHeader() also calls
+            // setOrigin(x, z), so publishing after it means a failed construction leaves the origin
+            // untouched as well.
             FastByteArrayOutputStream buffer = new FastByteArrayOutputStream(Settings.settings().HISTORY.BUFFER_SIZE);
             FaweOutputStream stream = getCompressedOS(buffer);
-            writeHeader(stream, x, y, z);
+            try {
+                writeHeader(stream, x, y, z);
+            } catch (Throwable t) {
+                // The compressed stream is constructed but will never be published, so nothing else
+                // can ever close it. Release it here rather than leaking it plus its buffer.
+                try {
+                    stream.close();
+                } catch (Throwable suppressed) {
+                    t.addSuppressed(suppressed);
+                }
+                throw t;
+            }
             idsStream = buffer;
             idsStreamZip = stream;
             return stream;
