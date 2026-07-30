@@ -46,7 +46,7 @@ public class SignBlock extends LegacyBaseBlockWrapper {
 
     private String[] text;
 
-    private static final String EMPTY =  "{\"text\":\"\"}";
+    private static final String EMPTY_JSON = "{\"text\":\"\"}";
 
     /**
      * Construct the sign with text.
@@ -57,22 +57,36 @@ public class SignBlock extends LegacyBaseBlockWrapper {
     public SignBlock(BlockState blockState, String[] text) {
         super(blockState);
         if (text == null) {
-            this.text = new String[]{EMPTY, EMPTY, EMPTY, EMPTY};
+            String empty = emptyText();
+            this.text = new String[]{empty, empty, empty, empty};
             return;
         }
-        for (int i = 0; i < text.length; i++) {
-            if (text[i].isEmpty()) {
-                text[i] = EMPTY;
-            } else {
-                text[i] = "{\"text\":" + GsonUtil.stringValue(text[i]) + "}";
+        if (usesJsonText()) {
+            for (int i = 0; i < text.length; i++) {
+                if (text[i].isEmpty()) {
+                    text[i] = EMPTY_JSON;
+                } else {
+                    text[i] = "{\"text\":" + GsonUtil.stringValue(text[i]) + "}";
+                }
             }
         }
         this.text = text;
     }
 
     private boolean isLegacy() {
-        int dataVersion = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).getDataVersion();
-        return dataVersion < Constants.DATA_VERSION_MC_1_20;
+        return dataVersion() < Constants.DATA_VERSION_MC_1_20;
+    }
+
+    private boolean usesJsonText() {
+        return dataVersion() < Constants.DATA_VERSION_MC_1_21_5;
+    }
+
+    private int dataVersion() {
+        return WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).getDataVersion();
+    }
+
+    private String emptyText() {
+        return usesJsonText() ? EMPTY_JSON : "";
     }
 
     /**
@@ -136,7 +150,8 @@ public class SignBlock extends LegacyBaseBlockWrapper {
 
         Tag<?, ?> t;
 
-        text = new String[]{EMPTY, EMPTY, EMPTY, EMPTY};
+        String empty = emptyText();
+        text = new String[]{empty, empty, empty, empty};
 
         t = values.get("id");
         if (!(t instanceof StringTag) || !((StringTag) t).getValue().equals(getNbtId())) {
