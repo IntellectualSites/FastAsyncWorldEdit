@@ -58,7 +58,7 @@ class SignBlockTest {
 
     @BeforeEach
     void setUpPlatform() {
-        when(platform.getCapabilities()).thenReturn(Map.of(Capability.WORLD_EDITING, Preference.NORMAL));
+        when(platform.getCapabilities()).thenReturn(Map.of(Capability.WORLD_EDITING, Preference.PREFERRED));
         when(platform.getDataVersion()).thenAnswer(__ -> dataVersion.get());
         when(platform.getVersion()).thenReturn("test");
 

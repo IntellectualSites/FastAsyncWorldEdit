@@ -45,6 +45,7 @@ import java.util.stream.Collectors;
 public class SignBlock extends LegacyBaseBlockWrapper {
 
     private String[] text;
+    private final int dataVersion;
 
     private static final String EMPTY_JSON = "{\"text\":\"\"}";
 
@@ -56,6 +57,8 @@ public class SignBlock extends LegacyBaseBlockWrapper {
      */
     public SignBlock(BlockState blockState, String[] text) {
         super(blockState);
+        this.dataVersion = WorldEdit.getInstance().getPlatformManager()
+                .queryCapability(Capability.WORLD_EDITING).getDataVersion();
         if (text == null) {
             String empty = emptyText();
             this.text = new String[]{empty, empty, empty, empty};
@@ -74,15 +77,11 @@ public class SignBlock extends LegacyBaseBlockWrapper {
     }
 
     private boolean isLegacy() {
-        return dataVersion() < Constants.DATA_VERSION_MC_1_20;
+        return dataVersion < Constants.DATA_VERSION_MC_1_20;
     }
 
     private boolean usesJsonText() {
-        return dataVersion() < Constants.DATA_VERSION_MC_1_21_5;
-    }
-
-    private int dataVersion() {
-        return WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).getDataVersion();
+        return dataVersion < Constants.DATA_VERSION_MC_1_21_5;
     }
 
     private String emptyText() {
