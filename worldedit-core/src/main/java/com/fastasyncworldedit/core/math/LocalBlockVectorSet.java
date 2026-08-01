@@ -576,7 +576,7 @@ public class LocalBlockVectorSet implements BlockVector3Set {
 
         @Override
         public boolean add(BlockVector3 blockVector3) {
-            return set.add(blockVector3);
+            return add(blockVector3.x(), blockVector3.y(), blockVector3.z());
         }
 
         @Override
