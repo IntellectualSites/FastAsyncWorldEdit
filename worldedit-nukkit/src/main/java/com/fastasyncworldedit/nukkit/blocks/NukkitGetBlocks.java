@@ -3,12 +3,14 @@ package com.fastasyncworldedit.nukkit.blocks;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.level.Level;
 import cn.nukkit.nbt.tag.CompoundTag;
+import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.extent.processor.heightmap.HeightMapType;
 import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.fastasyncworldedit.core.queue.IChunk;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.IChunkSet;
 import com.fastasyncworldedit.core.queue.IQueueExtent;
+import com.fastasyncworldedit.core.queue.implementation.QueueHandler;
 import com.fastasyncworldedit.core.queue.implementation.blocks.CharGetBlocks;
 import com.fastasyncworldedit.core.registry.state.PropertyKey;
 import com.fastasyncworldedit.nukkit.NukkitEntity;
@@ -41,6 +43,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
@@ -443,6 +446,10 @@ public class NukkitGetBlocks extends CharGetBlocks {
             throw new IllegalStateException("Attempted to call chunk GET but chunk was not call-locked.");
         }
 
+        // Tracks whether handleCallFinalizer has taken ownership of the finalizer (only on the
+        // main-thread-dispatch path). In every other case the finally block below runs it, so the
+        // early-return and thrown-exception paths still observe the original behaviour.
+        boolean[] finalizerOwned = {false};
         try {
             Object chunk = getChunk();
             if (chunk == null) {
@@ -537,6 +544,10 @@ public class NukkitGetBlocks extends CharGetBlocks {
             if (copy != null) {
                 copies.put(copyKey, copy);
             }
+            final NukkitGetBlocks_Copy finalCopy = copy;
+
+            List<Runnable> syncTasks = new ArrayList<>();
+            List<BlockEntity> tilesToCloseFromWrites = new ArrayList<>();
 
             // Apply block changes
             for (int layer = set.getMinSectionPosition(); layer <= set.getMaxSectionPosition(); layer++) {
@@ -558,7 +569,7 @@ public class NukkitGetBlocks extends CharGetBlocks {
                             }
                             BlockEntity existingTile = adapter.getTile(chunk, x, baseY + y, z);
                             if (existingTile != null) {
-                                existingTile.close();
+                                tilesToCloseFromWrites.add(existingTile);
                             }
                             // Check for waterlogged and handle layer 1
                             BlockState state = BlockTypesCache.states[ordinal];
@@ -608,91 +619,187 @@ public class NukkitGetBlocks extends CharGetBlocks {
                 }
             }
 
-            // Apply block entity changes
+            if (!tilesToCloseFromWrites.isEmpty()) {
+                List<BlockEntity> finalTilesToClose = tilesToCloseFromWrites;
+                syncTasks.add(() -> {
+                    for (BlockEntity tile : finalTilesToClose) {
+                        tile.close();
+                    }
+                });
+            }
+
             if (!nukkitTiles.isEmpty()) {
-                for (Map.Entry<BlockVector3, CompoundTag> entry : nukkitTiles.entrySet()) {
-                    BlockVector3 localPos = entry.getKey();
-                    BlockVector3 worldPos = toWorldPosition(localPos);
-                    CompoundTag nbt = entry.getValue();
-                    String id = com.fastasyncworldedit.nukkit.mapping.BlockEntityIdMapping.normalize(
-                            nbt.getString("id"));
+                syncTasks.add(() -> {
+                    for (Map.Entry<BlockVector3, CompoundTag> entry : nukkitTiles.entrySet()) {
+                        BlockVector3 localPos = entry.getKey();
+                        BlockVector3 worldPos = toWorldPosition(localPos);
+                        CompoundTag nbt = entry.getValue();
+                        String id = com.fastasyncworldedit.nukkit.mapping.BlockEntityIdMapping.normalize(
+                                nbt.getString("id"));
 
-                    // Remove existing block entity at this position
-                    BlockEntity existing = adapter.getTile(chunk, localPos.x() & 0xF, localPos.y(), localPos.z() & 0xF);
-                    if (existing != null) {
-                        existing.close();
-                    }
-
-                    BlockEntity created = adapter.createBlockEntity(id, chunk, nbt);
-                    if (created == null) {
-                        throw new UnsupportedOperationException(
-                                "Nukkit failed to create block entity `" + id + "` at " + worldPos
-                                        + " in chunk " + chunkX + "," + chunkZ + "."
-                        );
-                    }
-                }
-            }
-
-            // Apply entity removals
-            if (entityRemoves != null && !entityRemoves.isEmpty()) {
-                Map<Long, cn.nukkit.entity.Entity> chunkEntities = adapter.getChunkEntities(level, chunkX, chunkZ);
-                Set<UUID> entitiesRemoved = new HashSet<>();
-                // Snapshot the entities before closing: entity.close() removes the entity from the
-                // live chunk entity map (returned by getChunkEntities), so iterating the map's
-                // values while closing would throw ConcurrentModificationException.
-                for (cn.nukkit.entity.Entity entity : new ArrayList<>(chunkEntities.values())) {
-                    if (entity instanceof cn.nukkit.Player) {
-                        continue;
-                    }
-                    UUID entityUUID = adapter.getEntityUUID(entity);
-                    if (entityRemoves.contains(entityUUID)) {
-                        if (copy != null) {
-                            copy.storeEntity(entity, entityUUID);
+                        BlockEntity existing = adapter.getTile(chunk, localPos.x() & 0xF, localPos.y(), localPos.z() & 0xF);
+                        if (existing != null) {
+                            existing.close();
                         }
-                        entity.close();
-                        entitiesRemoved.add(entityUUID);
+
+                        BlockEntity created = adapter.createBlockEntity(id, chunk, nbt);
+                        if (created == null) {
+                            throw new UnsupportedOperationException(
+                                    "Nukkit failed to create block entity `" + id + "` at " + worldPos
+                                            + " in chunk " + chunkX + "," + chunkZ + "."
+                            );
+                        }
                     }
-                }
-                entityRemoves.clear();
-                entityRemoves.addAll(entitiesRemoved);
+                });
             }
 
-            // Apply entity creations
+            if (entityRemoves != null && !entityRemoves.isEmpty()) {
+                Set<UUID> finalEntityRemoves = entityRemoves;
+                syncTasks.add(() -> {
+                    Map<Long, cn.nukkit.entity.Entity> chunkEntities = adapter.getChunkEntities(level, chunkX, chunkZ);
+                    Set<UUID> entitiesRemoved = new HashSet<>();
+                    for (cn.nukkit.entity.Entity entity : new ArrayList<>(chunkEntities.values())) {
+                        if (entity instanceof cn.nukkit.Player) {
+                            continue;
+                        }
+                        UUID entityUUID = adapter.getEntityUUID(entity);
+                        if (finalEntityRemoves.contains(entityUUID)) {
+                            if (finalCopy != null) {
+                                finalCopy.storeEntity(entity, entityUUID);
+                            }
+                            entity.close();
+                            entitiesRemoved.add(entityUUID);
+                        }
+                    }
+                    finalEntityRemoves.clear();
+                    finalEntityRemoves.addAll(entitiesRemoved);
+                });
+            }
+
             Collection<FaweCompoundTag> setEntities = set.entities();
             if (setEntities != null && !setEntities.isEmpty()) {
-                List<FaweCompoundTag> failedEntities = new ArrayList<>();
-                for (FaweCompoundTag nativeTag : setEntities) {
-                    LinCompoundTag linTag = nativeTag.linTag();
-                    LinStringTag idTag = linTag.findTag("Id", LinTagType.stringTag());
-                    if (idTag == null) {
-                        idTag = linTag.findTag("id", LinTagType.stringTag());
+                syncTasks.add(() -> {
+                    List<FaweCompoundTag> failedEntities = new ArrayList<>();
+                    for (FaweCompoundTag nativeTag : setEntities) {
+                        LinCompoundTag linTag = nativeTag.linTag();
+                        LinStringTag idTag = linTag.findTag("Id", LinTagType.stringTag());
+                        if (idTag == null) {
+                            idTag = linTag.findTag("id", LinTagType.stringTag());
+                        }
+                        if (idTag == null) {
+                            LOGGER.warn("Skipping Nukkit entity without Id tag in chunk {},{}: {}", chunkX, chunkZ, nativeTag);
+                            failedEntities.add(nativeTag);
+                            continue;
+                        }
+                        CompoundTag nukkitNbt = NukkitNbtConverter.toNukkit(nativeTag);
+                        cn.nukkit.entity.Entity created = adapter.createEntity(idTag.value(), chunk, nukkitNbt);
+                        if (created != null) {
+                            created.spawnToAll();
+                        } else {
+                            LOGGER.warn("Failed to create Nukkit entity `{}` in chunk {},{}", idTag.value(), chunkX, chunkZ);
+                            failedEntities.add(nativeTag);
+                        }
                     }
-                    if (idTag == null) {
-                        LOGGER.warn("Skipping Nukkit entity without Id tag in chunk {},{}: {}", chunkX, chunkZ, nativeTag);
-                        failedEntities.add(nativeTag);
-                        continue;
-                    }
-                    CompoundTag nukkitNbt = NukkitNbtConverter.toNukkit(nativeTag);
-                    cn.nukkit.entity.Entity created = adapter.createEntity(idTag.value(), chunk, nukkitNbt);
-                    if (created != null) {
-                        created.spawnToAll();
-                    } else {
-                        LOGGER.warn("Failed to create Nukkit entity `{}` in chunk {},{}", idTag.value(), chunkX, chunkZ);
-                        failedEntities.add(nativeTag);
-                    }
-                }
-                removeFailedEntities(setEntities, failedEntities);
+                    removeFailedEntities(setEntities, failedEntities);
+                });
             }
 
-            adapter.setChunkChanged(chunk, true);
-            for (cn.nukkit.Player player : level.getChunkPlayers(chunkX, chunkZ).values()) {
-                level.requestChunk(chunkX, chunkZ, player);
-            }
-            return (T) (Future) CompletableFuture.completedFuture(null);
+            Runnable callback = () -> {
+                adapter.setChunkChanged(chunk, true);
+                for (cn.nukkit.Player player : level.getChunkPlayers(chunkX, chunkZ).values()) {
+                    level.requestChunk(chunkX, chunkZ, player);
+                }
+            };
+            return handleCallFinalizer(syncTasks, callback, finalizer, finalizerOwned);
         } finally {
+            if (!finalizerOwned[0] && finalizer != null) {
+                finalizer.run();
+            }
+        }
+    }
+
+    /**
+     * Dispatch main-thread-only cleanup tasks, then the chunk-resend callback, mirroring
+     * {@code AbstractBukkitGetBlocks.handleCallFinalizer}.
+     * <ul>
+     *   <li>If there are no sync tasks, the callback (and finalizer) run inline on the current
+     *       thread and a completed future is returned — preserving the fast path for pure block
+     *       edits and the unit-test environment (no FAWE instance).</li>
+     *   <li>If the current thread is already the main thread, the sync tasks and callback run
+     *       inline and a completed future is returned — avoids self-deadlock when {@code flush()}
+     *       is driven from the main thread.</li>
+     *   <li>Otherwise the chain is submitted to the main thread via {@code QueueHandler.sync(...)};
+     *       the returned future's value is itself a future (from {@code async(...)}) so the FAWE
+     *       pipeline's chained {@code Future.get()} contract holds.</li>
+     * </ul>
+     * On return, {@code finalizerOwned[0]} is set to {@code true} so the caller's {@code finally}
+     * block does not double-run the finalizer; the early-return / exception paths in {@code call()}
+     * (which never reach this method) still let the caller's {@code finally} own the finalizer.
+     */
+    @SuppressWarnings("unchecked")
+    private <T extends Future<T>> T handleCallFinalizer(
+            final List<Runnable> syncTasks,
+            final Runnable callback,
+            final Runnable finalizer,
+            final boolean[] finalizerOwned
+    ) {
+        // This method owns the finalizer on every path it returns from.
+        finalizerOwned[0] = true;
+        if (syncTasks.isEmpty()) {
+            // Pure block edit: nothing is main-thread-only. Run the callback inline (it only
+            // marks the chunk changed and resends) and return a completed future.
+            callback.run();
             if (finalizer != null) {
                 finalizer.run();
             }
+            return (T) (Future) CompletableFuture.completedFuture(null);
+        }
+        if (Fawe.isMainThread()) {
+            // Already on the main thread (or no FAWE instance, e.g. unit tests): run everything
+            // inline to avoid scheduling on a scheduler that may not be ticking.
+            try {
+                for (Runnable task : syncTasks) {
+                    task.run();
+                }
+                callback.run();
+                if (finalizer != null) {
+                    finalizer.run();
+                }
+            } catch (Throwable e) {
+                LOGGER.error("Error performing main-thread chunk tasks at {},{}", chunkX, chunkZ, e);
+                throw e;
+            }
+            return (T) (Future) CompletableFuture.completedFuture(null);
+        }
+        // Off the main thread in production: hand the chain to the main-thread queue, then
+        // continue the callback/finalizer on the async secondary pool so the nested-future
+        // contract is preserved. sync(Callable) declares a checked Exception (raised when the
+        // main thread itself fails the chain); wrap it so call() keeps its unchecked signature
+        // while preserving the cause and stack trace for diagnosis.
+        QueueHandler queueHandler = Fawe.instance().getQueueHandler();
+        Callable<Future<?>> chain = () -> {
+            try {
+                for (Runnable task : syncTasks) {
+                    task.run();
+                }
+                Runnable afterSync = () -> {
+                    callback.run();
+                    if (finalizer != null) {
+                        finalizer.run();
+                    }
+                };
+                return queueHandler.async(afterSync, null);
+            } catch (Throwable e) {
+                LOGGER.error("Error performing main-thread chunk calling at {},{}", chunkX, chunkZ, e);
+                throw e;
+            }
+        };
+        try {
+            return (T) (Future) queueHandler.sync(chain);
+        } catch (Exception e) {
+            throw new RuntimeException(
+                    "Failed to commit chunk " + chunkX + "," + chunkZ + " on the main thread", e
+            );
         }
     }
 
