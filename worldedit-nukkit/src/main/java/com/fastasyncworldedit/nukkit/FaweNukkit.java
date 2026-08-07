@@ -56,8 +56,12 @@ public class FaweNukkit implements IFawe {
         try {
             Fawe.set(this);
             Fawe.setupInjector();
-        } catch (final Exception e) {
-            throw new RuntimeException("Failed to initialize FAWE", e);
+        } catch (final Throwable e) {
+            // A failed injector setup leaves FAWE in a state where downstream calls will NPE, so
+            // shut the server down (matching FaweBukkit) rather than continuing with a broken
+            // instance. Fawe.instance is already set by Fawe.set above, so we cannot recover.
+            e.printStackTrace();
+            plugin.getServer().shutdown();
         }
     }
 
@@ -71,6 +75,17 @@ public class FaweNukkit implements IFawe {
         return taskManager;
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Currently returns an empty collection: no Bedrock region-protection plugin (WorldGuard,
+     * GriefDefender, etc.) has a stable Nukkit API that FAWE can integrate against the way the
+     * Bukkit module does. As a result, FAWE edits are not constrained by third-party region
+     * plugins on Nukkit — operators must rely on FAWE's own permissions ({@code fawe.bypass.regions}
+     * has no effect here) and Nukkit's built-in spawn protection. A region-plugin integration can
+     * be added by registering additional {@link FaweMaskManager} instances here once a target
+     * plugin's API is identified.
+     */
     @Override
     public Collection<FaweMaskManager> getMaskManagers() {
         return Collections.emptyList();

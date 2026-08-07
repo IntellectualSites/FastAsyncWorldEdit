@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
-import com.sk89q.worldedit.nukkit.WorldEditNukkitPlugin;
+import com.fastasyncworldedit.nukkit.WorldEditNukkitPlugin;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,7 +41,10 @@ public final class BiomeMapping {
 
             mappings.forEach((javaId, entry) -> {
                 JE_TO_BE.put(javaId, entry.bedrockId());
-                BE_TO_JE.put(entry.bedrockId(), javaId);
+                // Multiple JE biomes may collapse to the same Bedrock numeric id; keep the first
+                // mapping stable so beToJe round-trips deterministically (matches the block/item
+                // mappers, which also use putIfAbsent for the reverse direction).
+                BE_TO_JE.putIfAbsent(entry.bedrockId(), javaId);
             });
 
             WorldEditNukkitPlugin.getInstance().getLogger().info("Loaded " + JE_TO_BE.size() + " biome mappings");

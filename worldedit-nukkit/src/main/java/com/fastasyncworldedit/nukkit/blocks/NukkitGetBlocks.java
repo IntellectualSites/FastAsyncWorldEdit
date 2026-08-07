@@ -2,7 +2,6 @@ package com.fastasyncworldedit.nukkit.blocks;
 
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.level.Level;
-import cn.nukkit.level.format.generic.BaseFullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 import com.fastasyncworldedit.core.extent.processor.heightmap.HeightMapType;
 import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
@@ -12,15 +11,16 @@ import com.fastasyncworldedit.core.queue.IChunkSet;
 import com.fastasyncworldedit.core.queue.IQueueExtent;
 import com.fastasyncworldedit.core.queue.implementation.blocks.CharGetBlocks;
 import com.fastasyncworldedit.core.registry.state.PropertyKey;
+import com.fastasyncworldedit.nukkit.NukkitEntity;
 import com.fastasyncworldedit.nukkit.NukkitNbtConverter;
 import com.fastasyncworldedit.nukkit.adapter.NukkitImplAdapter;
 import com.fastasyncworldedit.nukkit.adapter.NukkitImplLoader;
+import com.fastasyncworldedit.nukkit.adapter.NukkitPlatformCapabilities;
 import com.fastasyncworldedit.nukkit.mapping.BiomeMapping;
 import com.fastasyncworldedit.nukkit.mapping.BlockMapping;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.nukkit.NukkitEntity;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
@@ -50,7 +50,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * Nukkit chunk data access for FAWE's async editing system.
  * <p>
  * This class bridges FAWE's section-based chunk model to Nukkit's flat
- * {@code BaseFullChunk} representation. Unlike Bukkit, where chunks are
+ * runtime Nukkit chunk representation. Unlike Bukkit, where chunks are
  * composed of {@code LevelChunkSection} arrays that FAWE can cache and
  * modify directly, Nukkit stores blocks in a flat structure with no real
  * section abstraction. We therefore read and write blocks by iterating
@@ -72,7 +72,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * <p>
  * Key differences from Bukkit:
  * <ul>
- *   <li>No chunk section abstraction; flat BaseFullChunk access</li>
+ *   <li>No shared chunk section abstraction; flat adapter-mediated chunk access</li>
  *   <li>Lazy chunk caching via synchronized getter</li>
  *   <li>Waterlogging via dual-layer block storage</li>
  *   <li>Lighting managed by Nukkit; no manual relighting</li>
@@ -84,9 +84,6 @@ import java.util.concurrent.locks.ReentrantLock;
 public class NukkitGetBlocks extends CharGetBlocks {
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
-    private static final int WATER_ID = 8;
-    private static final int STILL_WATER_ID = 9;
-
     private final Level level;
     private final int chunkX;
     private final int chunkZ;
@@ -94,9 +91,12 @@ public class NukkitGetBlocks extends CharGetBlocks {
     private final int maxY;
     private final ReentrantLock callLock = new ReentrantLock();
     private final ConcurrentHashMap<Integer, IChunkGet> copies = new ConcurrentHashMap<>();
-    private BaseFullChunk cachedChunk;
+    private Object cachedChunk;
     private boolean createCopy = false;
     private int copyKey = 0;
+
+    private record BiomeUpdate(int x, int y, int z, int biomeId) {
+    }
 
     public NukkitGetBlocks(Level level, int chunkX, int chunkZ) {
         super(level.getMinBlockY() >> 4, level.getMaxBlockY() >> 4);
@@ -117,13 +117,13 @@ public class NukkitGetBlocks extends CharGetBlocks {
         return chunkZ;
     }
 
-    private BaseFullChunk getChunk() {
-        BaseFullChunk chunk = this.cachedChunk;
+    private Object getChunk() {
+        Object chunk = this.cachedChunk;
         if (chunk == null) {
             synchronized (this) {
                 chunk = this.cachedChunk;
                 if (chunk == null) {
-                    this.cachedChunk = chunk = level.getChunk(chunkX, chunkZ, true);
+                    this.cachedChunk = chunk = NukkitImplLoader.get().getChunk(level, chunkX, chunkZ);
                 }
             }
         }
@@ -146,12 +146,12 @@ public class NukkitGetBlocks extends CharGetBlocks {
         return y - (getMinSectionPosition() << 4) + 1;
     }
 
-    private char ordinalFor(BaseFullChunk chunk, int x, int y, int z) {
+    private char ordinalFor(Object chunk, int x, int y, int z) {
         return ordinalFor(chunk, NukkitImplLoader.get(), x, y, z);
     }
 
-    private char ordinalFor(BaseFullChunk chunk, NukkitImplAdapter adapter, int x, int y, int z) {
-        int fullId = chunk.getFullBlock(x & 0xF, y, z & 0xF);
+    private char ordinalFor(Object chunk, NukkitImplAdapter adapter, int x, int y, int z) {
+        int fullId = adapter.getFullBlockId(chunk, x & 0xF, y, z & 0xF, 0);
         char ordinal = BlockMapping.fullIdToJeOrdinal(fullId);
         if (ordinal == Character.MAX_VALUE) {
             throw new UnsupportedOperationException(
@@ -162,8 +162,8 @@ public class NukkitGetBlocks extends CharGetBlocks {
         }
         BlockState state = BlockTypesCache.states[ordinal];
         if (state != null && state.getBlockType().hasProperty(PropertyKey.WATERLOGGED)) {
-            int layer1Id = adapter.getBlockId(chunk, x & 0xF, y, z & 0xF, 1);
-            if (layer1Id == WATER_ID || layer1Id == STILL_WATER_ID) {
+            int layer1Id = adapter.getFullBlockId(chunk, x & 0xF, y, z & 0xF, 1);
+            if (adapter.isWaterFullId(layer1Id)) {
                 state = state.with(PropertyKey.WATERLOGGED, true);
                 ordinal = state.getOrdinalChar();
             }
@@ -171,7 +171,7 @@ public class NukkitGetBlocks extends CharGetBlocks {
         return ordinal;
     }
 
-    private int[] computeHeightMap(BaseFullChunk chunk, HeightMapType type) {
+    private int[] computeHeightMap(Object chunk, HeightMapType type) {
         int[] heightMap = new int[256];
         int found = 0;
         NukkitImplAdapter adapter = NukkitImplLoader.get();
@@ -195,13 +195,19 @@ public class NukkitGetBlocks extends CharGetBlocks {
         return heightMap;
     }
 
-    private void storeSectionSnapshot(NukkitGetBlocks_Copy copy, BaseFullChunk chunk, NukkitImplAdapter adapter, int layer) {
+    private void storeSectionSnapshot(NukkitGetBlocks_Copy copy, Object chunk, NukkitImplAdapter adapter, int layer) {
         int baseY = layer << 4;
         char[] sectionData = new char[4096];
         for (int y = 0; y < 16; y++) {
             for (int z = 0; z < 16; z++) {
                 for (int x = 0; x < 16; x++) {
-                    sectionData[blockIndex(x, y, z)] = ordinalFor(chunk, adapter, x, baseY + y, z);
+                    char ordinal = ordinalFor(chunk, adapter, x, baseY + y, z);
+                    // Character.MAX_VALUE means no JE mapping exists for this Bedrock block. Store
+                    // __RESERVED__ (0) so the copy's getBlock() degrades to AIR instead of throwing
+                    // ArrayIndexOutOfBoundsException when BlockTypesCache.states[0xFFFF] is accessed.
+                    sectionData[blockIndex(x, y, z)] = ordinal == Character.MAX_VALUE
+                            ? BlockTypesCache.ReservedIDs.__RESERVED__
+                            : ordinal;
                 }
             }
         }
@@ -275,13 +281,67 @@ public class NukkitGetBlocks extends CharGetBlocks {
         return entityRemoves;
     }
 
+    private int[] collect2DBiomeColumns(IChunkSet set) {
+        int[] biomeColumns = new int[256];
+        java.util.Arrays.fill(biomeColumns, -1);
+        for (int z = 0; z < 16; z++) {
+            for (int x = 0; x < 16; x++) {
+                BiomeType selected = null;
+                int selectedBiomeId = -1;
+                for (int layer = set.getMinSectionPosition(); layer <= set.getMaxSectionPosition(); layer++) {
+                    if (!set.hasBiomes(layer)) {
+                        continue;
+                    }
+                    int baseY = layer << 4;
+                    for (int y = 0; y < 16; y += 4) {
+                        BiomeType biome = set.getBiomeType(x, baseY + y, z);
+                        if (biome == null) {
+                            continue;
+                        }
+                        if (selected != null && !selected.equals(biome)) {
+                            throw new UnsupportedOperationException(
+                                    "Nukkit only supports 2D biome columns; received conflicting 3D biome updates "
+                                            + "in chunk " + chunkX + "," + chunkZ + " at local column " + x + "," + z
+                            );
+                        }
+                        selected = biome;
+                        selectedBiomeId = BiomeMapping.jeToBe(biome.id());
+                    }
+                }
+                biomeColumns[(z << 4) | x] = selectedBiomeId;
+            }
+        }
+        return biomeColumns;
+    }
+
+    private List<BiomeUpdate> collect3DBiomeUpdates(IChunkSet set) {
+        List<BiomeUpdate> biomeUpdates = new ArrayList<>();
+        for (int layer = set.getMinSectionPosition(); layer <= set.getMaxSectionPosition(); layer++) {
+            if (!set.hasBiomes(layer)) {
+                continue;
+            }
+            int baseY = layer << 4;
+            for (int y = 0; y < 16; y++) {
+                for (int z = 0; z < 16; z++) {
+                    for (int x = 0; x < 16; x++) {
+                        BiomeType biome = set.getBiomeType(x, baseY + y, z);
+                        if (biome != null) {
+                            biomeUpdates.add(new BiomeUpdate(x, baseY + y, z, BiomeMapping.jeToBe(biome.id())));
+                        }
+                    }
+                }
+            }
+        }
+        return biomeUpdates;
+    }
+
     @Override
     public BiomeType getBiomeType(int x, int y, int z) {
-        BaseFullChunk chunk = getChunk();
+        Object chunk = getChunk();
         if (chunk == null) {
             return BiomeTypes.PLAINS;
         }
-        int biomeId = chunk.getBiomeId(x & 0xF, z & 0xF);
+        int biomeId = NukkitImplLoader.get().getChunkBiomeId(chunk, x & 0xF, y, z & 0xF);
         String jeBiome = BiomeMapping.beToJe(biomeId);
         BiomeType type = BiomeTypes.get(jeBiome);
         return type != null ? type : BiomeTypes.PLAINS;
@@ -289,7 +349,7 @@ public class NukkitGetBlocks extends CharGetBlocks {
 
     @Override
     public BlockState getBlock(int x, int y, int z) {
-        BaseFullChunk chunk = getChunk();
+        Object chunk = getChunk();
         if (chunk == null) {
             return BlockTypesCache.states[BlockTypesCache.ReservedIDs.AIR];
         }
@@ -301,9 +361,62 @@ public class NukkitGetBlocks extends CharGetBlocks {
         return BlockTypesCache.states[ordinal];
     }
 
+    /**
+     * Override the {@code CharBlocks} default that reads the inherited (always-null here)
+     * {@code blocks[]} array. NukkitGetBlocks sources blocks live from the chunk via the adapter,
+     * so a section is "present" whenever the backing chunk exists and the layer is in range.
+     */
+    @Override
+    public boolean hasSection(int layer) {
+        if (layer < getMinSectionPosition() || layer > getMaxSectionPosition()) {
+            return false;
+        }
+        return getChunk() != null;
+    }
+
+    /**
+     * Override the {@code CharBlocks} default that reads the inherited {@code blocks[]} array
+     * (always null here). Load the section from the live chunk so callers querying presence before
+     * a full {@code load} receive real data.
+     */
+    @Override
+    public char[] loadIfPresent(int layer) {
+        if (!hasSection(layer)) {
+            return null;
+        }
+        return load(layer);
+    }
+
+    /**
+     * Override the {@code CharBlocks} char-returning accessor that would otherwise read the empty
+     * inherited array. Route through {@link #ordinalFor} to resolve the live block ordinal.
+     */
+    @Override
+    public char get(int x, int y, int z) {
+        Object chunk = getChunk();
+        if (chunk == null) {
+            return BlockTypesCache.ReservedIDs.__RESERVED__;
+        }
+        return ordinalFor(chunk, NukkitImplLoader.get(), x, y, z);
+    }
+
+    /**
+     * Override the {@code CharGetBlocks} default so the full block (state + tile entity) is read
+     * from the live Nukkit chunk rather than the empty inherited array.
+     */
+    @Override
+    public com.sk89q.worldedit.world.block.BaseBlock getFullBlock(int x, int y, int z) {
+        BlockState state = getBlock(x, y, z);
+        FaweCompoundTag tileTag = tile(x, y, z);
+        if (tileTag != null) {
+            return state.toBaseBlock(tileTag.linTag());
+        }
+        return state.toBaseBlock();
+    }
+
     @Override
     public char[] update(int layer, char[] data, boolean aggressive) {
-        BaseFullChunk chunk = getChunk();
+        Object chunk = getChunk();
         if (chunk == null) {
             return data;
         }
@@ -331,13 +444,11 @@ public class NukkitGetBlocks extends CharGetBlocks {
         }
 
         try {
-            BaseFullChunk chunk = getChunk();
+            Object chunk = getChunk();
             if (chunk == null) {
                 return (T) (Future) CompletableFuture.completedFuture(null);
             }
             NukkitImplAdapter adapter = NukkitImplLoader.get();
-            int dataBits = adapter.getBlockDataBits();
-            int dataMask = adapter.getBlockDataMask();
 
             // Create snapshot copy for undo if requested
             NukkitGetBlocks_Copy copy = null;
@@ -354,7 +465,7 @@ public class NukkitGetBlocks extends CharGetBlocks {
                     storeSectionSnapshot(copy, chunk, adapter, layer);
                 }
                 // Store existing block entities in affected block sections
-                for (BlockEntity be : chunk.getBlockEntities().values()) {
+                for (BlockEntity be : adapter.getBlockEntities(chunk).values()) {
                     int beY = be.getFloorY();
                     int layer = beY >> 4;
                     if (layer >= set.getMinSectionPosition() && layer <= set.getMaxSectionPosition()
@@ -365,7 +476,7 @@ public class NukkitGetBlocks extends CharGetBlocks {
                 }
                 // Store existing block entities for tile-only changes.
                 for (BlockVector3 localPos : set.tiles().keySet()) {
-                    BlockEntity existing = chunk.getTile(localPos.x() & 0xF, localPos.y(), localPos.z() & 0xF);
+                    BlockEntity existing = adapter.getTile(chunk, localPos.x() & 0xF, localPos.y(), localPos.z() & 0xF);
                     if (existing != null) {
                         copy.storeTile(toWorldPosition(localPos), NukkitNbtConverter.toFawe(existing.namedTag));
                     }
@@ -381,7 +492,7 @@ public class NukkitGetBlocks extends CharGetBlocks {
                             for (int z = 0; z < 16; z += 4) {
                                 for (int x = 0; x < 16; x += 4) {
                                     if (set.getBiomeType(x, baseY + y, z) != null) {
-                                        int biomeId = chunk.getBiomeId(x, z);
+                                        int biomeId = adapter.getChunkBiomeId(chunk, x, baseY + y, z);
                                         String jeBiome = BiomeMapping.beToJe(biomeId);
                                         BiomeType type = BiomeTypes.get(jeBiome);
                                         copy.storeBiome(x, baseY + y, z, type != null ? type : BiomeTypes.PLAINS);
@@ -412,33 +523,13 @@ public class NukkitGetBlocks extends CharGetBlocks {
                 nbt.putInt("z", worldPos.z());
                 nukkitTiles.put(localPos, nbt);
             }
-            BiomeType[] biomeColumns = null;
+            int[] biomeColumns = null;
+            List<BiomeUpdate> biomeUpdates = Collections.emptyList();
             if (set.hasBiomes()) {
-                biomeColumns = new BiomeType[256];
-                for (int z = 0; z < 16; z++) {
-                    for (int x = 0; x < 16; x++) {
-                        BiomeType selected = null;
-                        for (int layer = set.getMinSectionPosition(); layer <= set.getMaxSectionPosition(); layer++) {
-                            if (!set.hasBiomes(layer)) {
-                                continue;
-                            }
-                            int baseY = layer << 4;
-                            for (int y = 0; y < 16; y += 4) {
-                                BiomeType biome = set.getBiomeType(x, baseY + y, z);
-                                if (biome == null) {
-                                    continue;
-                                }
-                                if (selected != null && !selected.equals(biome)) {
-                                    throw new UnsupportedOperationException(
-                                            "Nukkit only supports 2D biome columns; received conflicting 3D biome updates "
-                                                    + "in chunk " + chunkX + "," + chunkZ + " at local column " + x + "," + z
-                                    );
-                                }
-                                selected = biome;
-                            }
-                        }
-                        biomeColumns[(z << 4) | x] = selected;
-                    }
+                if (adapter.supports(NukkitPlatformCapabilities.THREE_DIMENSIONAL_BIOMES)) {
+                    biomeUpdates = collect3DBiomeUpdates(set);
+                } else {
+                    biomeColumns = collect2DBiomeColumns(set);
                 }
             }
             validateBlockMappings(set);
@@ -465,7 +556,7 @@ public class NukkitGetBlocks extends CharGetBlocks {
                             if (ordinal == BlockTypesCache.ReservedIDs.__RESERVED__) {
                                 continue;
                             }
-                            BlockEntity existingTile = chunk.getTile(x, baseY + y, z);
+                            BlockEntity existingTile = adapter.getTile(chunk, x, baseY + y, z);
                             if (existingTile != null) {
                                 existingTile.close();
                             }
@@ -481,35 +572,37 @@ public class NukkitGetBlocks extends CharGetBlocks {
                                 }
                             }
                             int fullId = BlockMapping.jeOrdinalToFullId(ordinal);
-                            int blockId = fullId >> dataBits;
-                            int meta = fullId & dataMask;
-                            adapter.setFullBlockId(
-                                    chunk, x, baseY + y, z, 0,
-                                    (blockId << dataBits) | meta
-                            );
-                            // Set or clear layer 1 water
+                            adapter.setFullBlockId(chunk, x, baseY + y, z, 0, fullId);
+                            // Set or clear layer 1 water. The previous block may have been waterlogged
+                            // (water in Bedrock layer 1), so layer 1 must always be written: set it to
+                            // water if the new block is waterlogged, otherwise clear it to air. Skipping
+                            // the clear when the new block doesn't support WATERLOGGED would leave
+                            // orphaned water behind a solid block, silently corrupting the chunk.
                             if (waterlogged) {
                                 adapter.setFullBlockId(
                                         chunk, x, baseY + y, z, 1,
-                                        STILL_WATER_ID << dataBits
+                                        adapter.getStillWaterFullId()
                                 );
-                            } else if (state != null && state.getBlockType().hasProperty(PropertyKey.WATERLOGGED)) {
-                                // Clear water from layer 1 if block supports waterlogged but isn't
-                                adapter.setFullBlockId(chunk, x, baseY + y, z, 1, 0);
+                            } else {
+                                adapter.setFullBlockId(chunk, x, baseY + y, z, 1, adapter.getAirFullId());
                             }
                         }
                     }
                 }
             }
 
-            // Apply biome changes. Nukkit stores biomes in 2D columns.
+            // Apply biome changes.
+            if (!biomeUpdates.isEmpty()) {
+                for (BiomeUpdate update : biomeUpdates) {
+                    adapter.setChunkBiomeId(chunk, update.x(), update.y(), update.z(), update.biomeId());
+                }
+            }
             if (biomeColumns != null) {
                 for (int z = 0; z < 16; z++) {
                     for (int x = 0; x < 16; x++) {
-                        BiomeType selected = biomeColumns[(z << 4) | x];
-                        if (selected != null) {
-                            int beBiomeId = BiomeMapping.jeToBe(selected.id());
-                            chunk.setBiomeId(x, z, (byte) beBiomeId);
+                        int biomeId = biomeColumns[(z << 4) | x];
+                        if (biomeId != -1) {
+                            adapter.setChunkBiomeId(chunk, x, 0, z, biomeId);
                         }
                     }
                 }
@@ -521,15 +614,16 @@ public class NukkitGetBlocks extends CharGetBlocks {
                     BlockVector3 localPos = entry.getKey();
                     BlockVector3 worldPos = toWorldPosition(localPos);
                     CompoundTag nbt = entry.getValue();
-                    String id = nbt.getString("id").replaceFirst("BlockEntity", "");
+                    String id = com.fastasyncworldedit.nukkit.mapping.BlockEntityIdMapping.normalize(
+                            nbt.getString("id"));
 
                     // Remove existing block entity at this position
-                    BlockEntity existing = chunk.getTile(localPos.x() & 0xF, localPos.y(), localPos.z() & 0xF);
+                    BlockEntity existing = adapter.getTile(chunk, localPos.x() & 0xF, localPos.y(), localPos.z() & 0xF);
                     if (existing != null) {
                         existing.close();
                     }
 
-                    BlockEntity created = BlockEntity.createBlockEntity(id, chunk, nbt);
+                    BlockEntity created = adapter.createBlockEntity(id, chunk, nbt);
                     if (created == null) {
                         throw new UnsupportedOperationException(
                                 "Nukkit failed to create block entity `" + id + "` at " + worldPos
@@ -541,9 +635,12 @@ public class NukkitGetBlocks extends CharGetBlocks {
 
             // Apply entity removals
             if (entityRemoves != null && !entityRemoves.isEmpty()) {
-                Map<Long, cn.nukkit.entity.Entity> chunkEntities = level.getChunkEntities(chunkX, chunkZ);
+                Map<Long, cn.nukkit.entity.Entity> chunkEntities = adapter.getChunkEntities(level, chunkX, chunkZ);
                 Set<UUID> entitiesRemoved = new HashSet<>();
-                for (cn.nukkit.entity.Entity entity : chunkEntities.values()) {
+                // Snapshot the entities before closing: entity.close() removes the entity from the
+                // live chunk entity map (returned by getChunkEntities), so iterating the map's
+                // values while closing would throw ConcurrentModificationException.
+                for (cn.nukkit.entity.Entity entity : new ArrayList<>(chunkEntities.values())) {
                     if (entity instanceof cn.nukkit.Player) {
                         continue;
                     }
@@ -576,9 +673,7 @@ public class NukkitGetBlocks extends CharGetBlocks {
                         continue;
                     }
                     CompoundTag nukkitNbt = NukkitNbtConverter.toNukkit(nativeTag);
-                    cn.nukkit.entity.Entity created = cn.nukkit.entity.Entity.createEntity(
-                            idTag.value(), chunk, nukkitNbt
-                    );
+                    cn.nukkit.entity.Entity created = adapter.createEntity(idTag.value(), chunk, nukkitNbt);
                     if (created != null) {
                         created.spawnToAll();
                     } else {
@@ -589,7 +684,7 @@ public class NukkitGetBlocks extends CharGetBlocks {
                 removeFailedEntities(setEntities, failedEntities);
             }
 
-            chunk.setChanged(true);
+            adapter.setChunkChanged(chunk, true);
             for (cn.nukkit.Player player : level.getChunkPlayers(chunkX, chunkZ).values()) {
                 level.requestChunk(chunkX, chunkZ, player);
             }
@@ -603,25 +698,25 @@ public class NukkitGetBlocks extends CharGetBlocks {
 
     @Override
     public int getSkyLight(int x, int y, int z) {
-        BaseFullChunk chunk = getChunk();
+        Object chunk = getChunk();
         if (chunk == null) {
             return 15;
         }
-        return chunk.getBlockSkyLight(x & 0xF, y, z & 0xF);
+        return NukkitImplLoader.get().getBlockSkyLight(chunk, x & 0xF, y, z & 0xF);
     }
 
     @Override
     public int getEmittedLight(int x, int y, int z) {
-        BaseFullChunk chunk = getChunk();
+        Object chunk = getChunk();
         if (chunk == null) {
             return 0;
         }
-        return chunk.getBlockLight(x & 0xF, y, z & 0xF);
+        return NukkitImplLoader.get().getBlockLight(chunk, x & 0xF, y, z & 0xF);
     }
 
     @Override
     public int[] getHeightMap(HeightMapType type) {
-        BaseFullChunk chunk = getChunk();
+        Object chunk = getChunk();
         if (chunk == null) {
             return new int[256];
         }
@@ -631,11 +726,11 @@ public class NukkitGetBlocks extends CharGetBlocks {
     @Nullable
     @Override
     public FaweCompoundTag tile(int x, int y, int z) {
-        BaseFullChunk chunk = getChunk();
+        Object chunk = getChunk();
         if (chunk == null) {
             return null;
         }
-        BlockEntity blockEntity = chunk.getTile(x & 0xF, y, z & 0xF);
+        BlockEntity blockEntity = NukkitImplLoader.get().getTile(chunk, x & 0xF, y, z & 0xF);
         if (blockEntity == null) {
             return null;
         }
@@ -644,11 +739,11 @@ public class NukkitGetBlocks extends CharGetBlocks {
 
     @Override
     public Map<BlockVector3, FaweCompoundTag> tiles() {
-        BaseFullChunk chunk = getChunk();
+        Object chunk = getChunk();
         if (chunk == null) {
             return Collections.emptyMap();
         }
-        Map<Long, BlockEntity> blockEntities = chunk.getBlockEntities();
+        Map<Long, BlockEntity> blockEntities = NukkitImplLoader.get().getBlockEntities(chunk);
         if (blockEntities.isEmpty()) {
             return Collections.emptyMap();
         }
@@ -662,7 +757,7 @@ public class NukkitGetBlocks extends CharGetBlocks {
 
     @Override
     public Collection<FaweCompoundTag> entities() {
-        Map<Long, cn.nukkit.entity.Entity> chunkEntities = level.getChunkEntities(chunkX, chunkZ);
+        Map<Long, cn.nukkit.entity.Entity> chunkEntities = NukkitImplLoader.get().getChunkEntities(level, chunkX, chunkZ);
         if (chunkEntities.isEmpty()) {
             return Collections.emptyList();
         }
@@ -684,7 +779,7 @@ public class NukkitGetBlocks extends CharGetBlocks {
 
     @Override
     public Set<Entity> getFullEntities() {
-        Map<Long, cn.nukkit.entity.Entity> chunkEntities = level.getChunkEntities(chunkX, chunkZ);
+        Map<Long, cn.nukkit.entity.Entity> chunkEntities = NukkitImplLoader.get().getChunkEntities(level, chunkX, chunkZ);
         if (chunkEntities.isEmpty()) {
             return Collections.emptySet();
         }
@@ -701,8 +796,8 @@ public class NukkitGetBlocks extends CharGetBlocks {
     @Nullable
     @Override
     public FaweCompoundTag entity(UUID uuid) {
-        Map<Long, cn.nukkit.entity.Entity> chunkEntities = level.getChunkEntities(chunkX, chunkZ);
         NukkitImplAdapter adapter = NukkitImplLoader.get();
+        Map<Long, cn.nukkit.entity.Entity> chunkEntities = adapter.getChunkEntities(level, chunkX, chunkZ);
         for (cn.nukkit.entity.Entity entity : chunkEntities.values()) {
             if (entity instanceof cn.nukkit.Player) {
                 continue;

@@ -2,6 +2,8 @@ package com.fastasyncworldedit.nukkit;
 
 import cn.nukkit.Player;
 import cn.nukkit.item.Item;
+import com.fastasyncworldedit.nukkit.adapter.NukkitImplAdapter;
+import com.fastasyncworldedit.nukkit.adapter.NukkitImplLoader;
 import com.fastasyncworldedit.nukkit.mapping.ItemMapping;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.extent.inventory.BlockBagException;
@@ -41,18 +43,23 @@ public class NukkitPlayerBlockBag extends BlockBag {
         if (!type.hasItemType()) {
             throw new OutOfBlocksException();
         }
-        ItemMapping.NukkitItemData beData = ItemMapping.jeToBe(type.getItemType().id());
-        if (beData.itemId() == 0) {
+        NukkitImplAdapter adapter = NukkitImplLoader.get();
+        ItemMapping.NukkitItemData beData;
+        try {
+            beData = ItemMapping.jeToBe(type.getItemType().id());
+        } catch (UnsupportedOperationException e) {
+            // Unmapped item: no Bedrock form available, so the block cannot be supplied.
+            throw new OutOfBlocksException();
+        }
+        if (adapter.isAirItem(adapter.getItem(beData, 1))) {
             throw new OutOfBlocksException();
         }
 
         for (Map.Entry<Integer, Item> entry : items.entrySet()) {
             Item item = entry.getValue();
-            if (item.getId() == beData.itemId()
-                    && item.getDamage() == beData.metadata()
-                    && item.getCount() > 0) {
+            if (adapter.matchesItem(item, beData) && item.getCount() > 0) {
                 if (item.getCount() == 1) {
-                    items.put(entry.getKey(), Item.get(Item.AIR));
+                    items.put(entry.getKey(), adapter.getAirItem());
                 } else {
                     item.setCount(item.getCount() - 1);
                 }
@@ -74,8 +81,15 @@ public class NukkitPlayerBlockBag extends BlockBag {
         loadInventory();
 
         BlockType type = blockState.getBlockType();
-        ItemMapping.NukkitItemData beData = ItemMapping.jeToBe(type.getItemType().id());
-        if (beData.itemId() == 0) {
+        NukkitImplAdapter adapter = NukkitImplLoader.get();
+        ItemMapping.NukkitItemData beData;
+        try {
+            beData = ItemMapping.jeToBe(type.getItemType().id());
+        } catch (UnsupportedOperationException e) {
+            // Unmapped item: no Bedrock form available, so the block cannot be stored.
+            throw new OutOfSpaceException(blockState.getBlockType());
+        }
+        if (adapter.isAirItem(adapter.getItem(beData, 1))) {
             throw new OutOfSpaceException(blockState.getBlockType());
         }
 
@@ -85,9 +99,7 @@ public class NukkitPlayerBlockBag extends BlockBag {
                 return;
             }
             Item item = entry.getValue();
-            if (item.getId() == beData.itemId()
-                    && item.getDamage() == beData.metadata()
-                    && item.getCount() < item.getMaxStackSize()) {
+            if (adapter.matchesItem(item, beData) && item.getCount() < item.getMaxStackSize()) {
                 int space = item.getMaxStackSize() - item.getCount();
                 int add = Math.min(space, amount);
                 item.setCount(item.getCount() + add);
@@ -100,7 +112,7 @@ public class NukkitPlayerBlockBag extends BlockBag {
             Item item = items.get(slot);
             if (item == null || item.isNull()) {
                 int stackSize = Math.min(amount, 64);
-                items.put(slot, Item.get(beData.itemId(), beData.metadata(), stackSize));
+                items.put(slot, adapter.getItem(beData, stackSize));
                 amount -= stackSize;
             }
         }

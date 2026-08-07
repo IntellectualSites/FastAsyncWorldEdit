@@ -34,6 +34,11 @@ public class JeBlockState {
                     continue;
                 }
                 final int index = tmp.indexOf("=");
+                if (index < 0) {
+                    // Malformed property token (no '='); skip rather than throwing
+                    // StringIndexOutOfBoundsException from substring(0, -1).
+                    continue;
+                }
                 properties.put(tmp.substring(0, index), tmp.substring(index + 1));
             }
         }
@@ -77,7 +82,13 @@ public class JeBlockState {
      * Complete missing properties using the provided default properties.
      */
     public void completeMissingProperties(Map<String, String> defaultProperties) {
-        if (defaultProperties == null || properties.size() == defaultProperties.size()) {
+        if (defaultProperties == null) {
+            return;
+        }
+        // Only skip when every default key is already present. A plain size check is unsound: two
+        // maps can share a size yet differ in keys, which would skip needed completions and
+        // diverge the hash from the createJeBlockState path that always completes.
+        if (properties.keySet().containsAll(defaultProperties.keySet())) {
             return;
         }
         for (Map.Entry<String, String> entry : defaultProperties.entrySet()) {

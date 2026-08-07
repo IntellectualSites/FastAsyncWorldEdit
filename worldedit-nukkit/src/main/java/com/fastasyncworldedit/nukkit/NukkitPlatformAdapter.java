@@ -2,8 +2,6 @@ package com.fastasyncworldedit.nukkit;
 
 import com.fastasyncworldedit.core.FAWEPlatformAdapterImpl;
 import com.fastasyncworldedit.core.queue.IChunkGet;
-import com.fastasyncworldedit.nukkit.adapter.NukkitImplLoader;
-import com.fastasyncworldedit.nukkit.adapter.NukkitPlatformCapabilities;
 
 /**
  * Nukkit platform adapter for FAWE chunk sending.
@@ -16,9 +14,10 @@ import com.fastasyncworldedit.nukkit.adapter.NukkitPlatformCapabilities;
  * format (PalettedBlockStorage, 3D biomes, block state runtime IDs) is
  * complex and not public in Nukkit's API.
  * <p>
- * Consequently, {@link #sendChunk} throws UnsupportedOperationException.
- * Chunk updates are instead triggered through Nukkit's standard chunk
- * refresh mechanism in {@link com.sk89q.worldedit.nukkit.NukkitWorld#refreshChunk}.
+ * {@link #sendChunk} is therefore a no-op: chunk resends after an edit are driven by
+ * {@link NukkitWorld#refreshChunk}, which the edit flush path already invokes per-touched
+ * chunk via {@code level.requestChunk}. Re-sending through FAWE's packet layer would only
+ * duplicate that work, so this method intentionally does nothing rather than throwing.
  * <p>
  * Key differences from Bukkit:
  * <ul>
@@ -28,28 +27,16 @@ import com.fastasyncworldedit.nukkit.adapter.NukkitPlatformCapabilities;
  * </ul>
  *
  * @see com.fastasyncworldedit.core.FAWEPlatformAdapterImpl
- * @see com.sk89q.worldedit.nukkit.NukkitWorld#refreshChunk
+ * @see NukkitWorld#refreshChunk
  */
 public class NukkitPlatformAdapter implements FAWEPlatformAdapterImpl {
 
     @Override
     public void sendChunk(IChunkGet chunk, int mask, boolean lighting) {
-        if (!supports(NukkitPlatformCapabilities.FAKE_CHUNKS)) {
-            throw new UnsupportedOperationException(
-                    "Explicit chunk packet sending is not supported on Nukkit. "
-                            + "Nukkit handles chunk updates internally via level.requestChunk(). "
-                            + "This FAWE feature requires direct chunk packet serialization "
-                            + "which is not available in the Nukkit API."
-            );
-        }
-    }
-
-    private static boolean supports(NukkitPlatformCapabilities capability) {
-        try {
-            return NukkitImplLoader.supports(capability);
-        } catch (IllegalStateException ignored) {
-            return false;
-        }
+        // Intentional no-op. The edit flush path (NukkitGetBlocks) already resends each
+        // touched chunk to its viewers via level.requestChunk, so the FAWE relighter-driven
+        // re-send here would be redundant. Constructing a Bedrock LevelChunkPacket from FAWE's
+        // Java-internal chunk representation is not feasible without full palette serialization.
     }
 
 }

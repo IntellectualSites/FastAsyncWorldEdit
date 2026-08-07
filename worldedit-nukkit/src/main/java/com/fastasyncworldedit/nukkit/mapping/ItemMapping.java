@@ -1,11 +1,13 @@
 package com.fastasyncworldedit.nukkit.mapping;
 
 import cn.nukkit.item.Item;
+import com.fastasyncworldedit.nukkit.adapter.NukkitImplAdapter;
+import com.fastasyncworldedit.nukkit.adapter.NukkitImplLoader;
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
-import com.sk89q.worldedit.nukkit.WorldEditNukkitPlugin;
+import com.fastasyncworldedit.nukkit.WorldEditNukkitPlugin;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,7 +27,7 @@ public final class ItemMapping {
     private static final Gson GSON = new Gson();
 
     private static final Map<String, NukkitItemData> JE_TO_BE = new HashMap<>();
-    private static final Map<Long, String> BE_TO_JE = new HashMap<>();
+    private static final Map<String, String> BE_TO_JE = new HashMap<>();
     // All known JE item IDs from items.json (loaded early for ItemTypesCache)
     private static final Set<String> JE_ITEM_IDS = new HashSet<>();
 
@@ -78,12 +80,12 @@ public final class ItemMapping {
                     }.getType()
             );
 
+            NukkitImplAdapter adapter = NukkitImplLoader.get();
             mappings.forEach((javaId, entry) -> {
-                Item nukkitItem = Item.fromString(entry.bedrockId());
-                if (nukkitItem != null) {
-                    NukkitItemData data = new NukkitItemData(nukkitItem.getId(), entry.bedrockData());
+                NukkitItemData data = adapter.createItemData(entry.bedrockId(), entry.bedrockData());
+                if (data != null) {
                     JE_TO_BE.put(javaId, data);
-                    BE_TO_JE.putIfAbsent(beKey(nukkitItem.getId(), entry.bedrockData()), javaId);
+                    BE_TO_JE.putIfAbsent(adapter.getItemMappingKey(data), javaId);
                 }
             });
 
@@ -123,11 +125,36 @@ public final class ItemMapping {
         );
     }
 
-    private static long beKey(int itemId, int metadata) {
-        return ((long) itemId << 16) | (metadata & 0xFFFF);
+    /**
+     * Convert a live Nukkit item to JE item ID.
+     */
+    public static String beToJe(Item item) {
+        NukkitImplAdapter adapter = NukkitImplLoader.get();
+        String result = BE_TO_JE.get(adapter.getItemMappingKey(item));
+        if (result != null) {
+            return result;
+        }
+        // Air may map under a different key than the live item's key (e.g. PNX identifier-based
+        // keys), so resolve it explicitly when the item is air before falling through to throw.
+        if (adapter.isAirItem(item)) {
+            NukkitItemData airData = adapter.createItemData("minecraft:air", 0);
+            if (airData != null) {
+                String airResult = BE_TO_JE.get(adapter.getItemMappingKey(airData));
+                if (airResult != null) {
+                    return airResult;
+                }
+            }
+        }
+        throw new UnsupportedOperationException(
+                "No Java item mapping for Nukkit item: " + adapter.getItemMappingKey(item)
+        );
     }
 
-    public record NukkitItemData(int itemId, int metadata) {
+    private static String beKey(int itemId, int metadata) {
+        return itemId + ":" + metadata;
+    }
+
+    public record NukkitItemData(String identifier, int itemId, int metadata) {
 
     }
 

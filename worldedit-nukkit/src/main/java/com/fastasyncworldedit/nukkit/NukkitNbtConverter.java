@@ -142,15 +142,15 @@ public final class NukkitNbtConverter {
             case COMPOUND -> toNukkitCompound((LinCompoundTag) linTag);
             case INT_ARRAY -> new IntArrayTag("", ((LinIntArrayTag) linTag).value());
             case LONG_ARRAY -> {
-                // Nukkit doesn't have LongArrayTag; store as compound with metadata
+                // Nukkit has no LongArrayTag. Store the longs as a ListTag<LongTag> so the value
+                // survives the round-trip (a plain IntArrayTag would be misread as LinIntArrayTag
+                // on the way back, corrupting data like chunk heightmaps/blockstates).
                 long[] values = ((LinLongArrayTag) linTag).value();
-                // Best effort: convert to int array if values fit, otherwise skip
-                int[] intValues = new int[values.length * 2];
-                for (int i = 0; i < values.length; i++) {
-                    intValues[i * 2] = (int) (values[i] >> 32);
-                    intValues[i * 2 + 1] = (int) values[i];
+                ListTag<LongTag> longList = new ListTag<>();
+                for (long value : values) {
+                    longList.add(new LongTag("", value));
                 }
-                yield new IntArrayTag("", intValues);
+                yield longList;
             }
             default -> null;
         };

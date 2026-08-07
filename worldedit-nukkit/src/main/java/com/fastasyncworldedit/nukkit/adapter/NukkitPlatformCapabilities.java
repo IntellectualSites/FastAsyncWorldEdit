@@ -24,7 +24,8 @@ public enum NukkitPlatformCapabilities {
     EXPLICIT_RELIGHTING("Can manually recalculate lighting instead of relying on Nukkit's internal lighting updates."),
     CUI_SUPPORT("Can communicate with the WorldEdit CUI protocol."),
     CHUNK_SECTIONS("Provides a real chunk section abstraction for direct section-level access."),
-    CHUNK_CACHING("Allows chunk references to be cached safely across queue operations.");
+    CHUNK_CACHING("Allows chunk references to be cached safely across queue operations."),
+    THREE_DIMENSIONAL_BIOMES("Stores biomes with a vertical coordinate instead of legacy 2D x/z columns.");
 
     private final String description;
 

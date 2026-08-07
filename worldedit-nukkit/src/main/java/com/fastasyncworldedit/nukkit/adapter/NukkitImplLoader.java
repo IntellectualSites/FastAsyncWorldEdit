@@ -3,13 +3,12 @@ package com.fastasyncworldedit.nukkit.adapter;
 import java.util.Set;
 
 /**
- * Detects the running Nukkit platform (MOT vs NKX) and loads the appropriate adapter.
+ * Detects the running Nukkit platform (MOT, NKX, or PNX) and loads the appropriate adapter.
  * <p>
  * Nukkit does not have a clean versioned API like Bukkit's NMS packages
  * ({@code net.minecraft.server.v1_20_R3}). Both MOT and NKX use {@code cn.nukkit}, so
  * we cannot compile against both simultaneously. Instead, we detect the
- * active fork at runtime using {@code Class.forName("cn.nukkit.GameVersion")},
- * which only exists in MOT. The matching adapter class is then loaded
+ * active fork at runtime using fork-specific classes. The matching adapter class is then loaded
  * reflectively from its version-specific module.
  * <p>
  * This approach avoids classpath conflicts and allows a single FAWE JAR
@@ -18,7 +17,7 @@ import java.util.Set;
  * Key differences from Bukkit:
  * <ul>
  *   <li>Bukkit adapters are selected by MC version at compile time; Nukkit by fork at runtime</li>
- *   <li>Reflection is required for all fork-specific class access</li>
+ *   <li>Adapters are loaded reflectively, while fork-specific API calls stay inside adapter modules</li>
  * </ul>
  *
  * @see NukkitImplAdapter
@@ -81,7 +80,10 @@ public final class NukkitImplLoader {
     }
 
     private static NukkitImplAdapter doDetect() {
-        // Detect Nukkit-MOT by checking for a MOT-specific class
+        boolean isPnx = hasClass("cn.nukkit.block.BlockState")
+                && hasClass("cn.nukkit.level.format.IChunk");
+
+        // Detect Nukkit-MOT by checking for a MOT-specific class.
         boolean isMot;
         try {
             Class.forName("cn.nukkit.GameVersion");
@@ -90,9 +92,11 @@ public final class NukkitImplLoader {
             isMot = false;
         }
 
-        String className = isMot
-                ? "com.fastasyncworldedit.nukkit.adapter.mot.MotNukkitAdapter"
-                : "com.fastasyncworldedit.nukkit.adapter.nkx.NkxNukkitAdapter";
+        String className = isPnx
+                ? "com.fastasyncworldedit.nukkit.adapter.pnx.PowerNukkitXAdapter"
+                : isMot
+                        ? "com.fastasyncworldedit.nukkit.adapter.mot.NukkitMOTAdapter"
+                        : "com.fastasyncworldedit.nukkit.adapter.nkx.NukkitAdapter";
 
         try {
             Class<?> clazz = Class.forName(className);
@@ -105,6 +109,15 @@ public final class NukkitImplLoader {
     private static void cacheMetadata(NukkitImplAdapter adapter) {
         platformVersion = adapter.getVersion();
         capabilities = Set.copyOf(adapter.getCapabilities());
+    }
+
+    private static boolean hasClass(String className) {
+        try {
+            Class.forName(className);
+            return true;
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
     }
 
 }

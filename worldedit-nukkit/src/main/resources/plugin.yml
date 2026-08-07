@@ -1,5 +1,5 @@
 name: FastAsyncWorldEdit
-main: com.sk89q.worldedit.nukkit.WorldEditNukkitPlugin
+main: com.fastasyncworldedit.nukkit.WorldEditNukkitPlugin
 version: "${internalVersion}"
 api: [ "1.0.0" ]
 load: STARTUP

@@ -1,6 +1,5 @@
 package com.fastasyncworldedit.nukkit.mapping;
 
-import cn.nukkit.level.format.leveldb.structure.BlockStateSnapshot;
 import com.fastasyncworldedit.nukkit.adapter.NukkitImplLoader;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -10,7 +9,7 @@ import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
-import com.sk89q.worldedit.nukkit.WorldEditNukkitPlugin;
+import com.fastasyncworldedit.nukkit.WorldEditNukkitPlugin;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import it.unimi.dsi.fastutil.ints.Int2CharOpenHashMap;
@@ -245,9 +244,15 @@ public final class BlockMapping {
                     }
             );
             for (var entry : data.entrySet()) {
+                List<?> states = entry.getValue();
+                if (states == null || states.size() < 2) {
+                    // Index 1 holds the default-properties map; skip malformed entries rather than
+                    // throwing IndexOutOfBoundsException during plugin load.
+                    continue;
+                }
                 JE_BLOCK_DEFAULT_PROPERTIES.put(
                         "minecraft:" + entry.getKey(),
-                        (Map<String, String>) entry.getValue().get(1)
+                        (Map<String, String>) states.get(1)
                 );
             }
             WorldEditNukkitPlugin.getInstance().getLogger().info(
@@ -332,17 +337,7 @@ public final class BlockMapping {
                     .putInt("version", blockStateVersion)
                     .build();
 
-            BlockStateSnapshot snapshot = NukkitImplLoader.get().getBlockStateSnapshot(nbtState);
-            if (snapshot == null) {
-                return null;
-            }
-
-            int legacyId = snapshot.getLegacyId();
-            int legacyData = snapshot.getLegacyData();
-            if (legacyId == -1) {
-                return null;
-            }
-            return new NukkitBlockData(legacyId, legacyData);
+            return NukkitImplLoader.get().createBlockData(nbtState);
         } catch (Exception e) {
             return null;
         }

@@ -227,7 +227,7 @@ public class NukkitGetBlocks_Copy implements IChunkGet {
 
     @Override
     public Collection<FaweCompoundTag> entities() {
-        return this.entities;
+        return Collections.unmodifiableSet(entities);
     }
 
     @Override
@@ -335,7 +335,10 @@ public class NukkitGetBlocks_Copy implements IChunkGet {
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Override
     public <T extends Future<T>> T call(IQueueExtent<? extends IChunk> owner, IChunkSet set, Runnable finalizer) {
-        throw new UnsupportedOperationException("Copy does not support call()");
+        // A snapshot copy is never applied via call() (the primary GET handles that); this method
+        // is only reached if a caller treats the copy uniformly. Return null to match the Bukkit
+        // sibling convention rather than throwing, so uniform IChunkGet handling degrades gracefully.
+        return null;
     }
 
     @Override
