@@ -22,6 +22,7 @@ import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.extension.platform.Preference;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
@@ -31,8 +32,8 @@ import com.sk89q.worldedit.world.registry.BlockRegistry;
 import com.sk89q.worldedit.world.registry.Registries;
 import it.unimi.dsi.fastutil.ints.Int2CharOpenHashMap;
 import org.enginehub.linbus.tree.LinCompoundTag;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.ResourceLock;
@@ -53,10 +54,10 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyByte;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.CALLS_REAL_METHODS;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -235,16 +236,20 @@ class NukkitGetBlocksBehaviorTest {
     }
 
     @Test
-    void unmappedNukkitFullIdThrowsInsteadOfFallingBackToAir() {
+    void unmappedNukkitFullIdFallsBackToAir() {
+        // 12345 has no JE mapping (beFullIdToJeOrdinal default return is MAX_VALUE). Reads must not
+        // throw — otherwise //copy / //paste abort on any unmapped Bedrock block. Instead the block
+        // degrades to AIR (__RESERVED__), matching Bukkit's PaperweightGetBlocks behaviour.
         when(chunk.getFullBlock(1, 64, 2)).thenReturn(12345);
         NukkitGetBlocks getBlocks = new NukkitGetBlocks(level, 3, 5);
 
-        UnsupportedOperationException exception = assertThrows(
-                UnsupportedOperationException.class,
-                () -> getBlocks.getBlock(1, 64, 2)
-        );
+        BlockState block = getBlocks.getBlock(1, 64, 2);
 
-        assertTrue(exception.getMessage().contains("No Java block mapping"), exception::getMessage);
+        assertEquals(
+                BlockTypesCache.states[BlockTypesCache.ReservedIDs.__RESERVED__],
+                block,
+                "Unmapped Nukkit block should degrade to AIR instead of throwing"
+        );
     }
 
     @Test

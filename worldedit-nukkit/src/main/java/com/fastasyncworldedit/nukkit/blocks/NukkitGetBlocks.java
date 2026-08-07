@@ -154,11 +154,11 @@ public class NukkitGetBlocks extends CharGetBlocks {
         int fullId = adapter.getFullBlockId(chunk, x & 0xF, y, z & 0xF, 0);
         char ordinal = BlockMapping.fullIdToJeOrdinal(fullId);
         if (ordinal == Character.MAX_VALUE) {
-            throw new UnsupportedOperationException(
-                    "No Java block mapping for Nukkit full block id " + fullId
-                            + " at " + toWorldPosition(x, y, z)
-                            + " in chunk " + chunkX + "," + chunkZ + "."
+            LOGGER.warn(
+                    "No Java block mapping for Nukkit full block id {} at {} in chunk {},{}; replacing with AIR.",
+                    fullId, toWorldPosition(x, y, z), chunkX, chunkZ
             );
+            return BlockTypesCache.ReservedIDs.__RESERVED__;
         }
         BlockState state = BlockTypesCache.states[ordinal];
         if (state != null && state.getBlockType().hasProperty(PropertyKey.WATERLOGGED)) {
