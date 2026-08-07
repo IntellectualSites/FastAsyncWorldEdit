@@ -7,8 +7,8 @@ import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityHuman;
 import cn.nukkit.item.Item;
-import cn.nukkit.level.Level;
 import cn.nukkit.level.GlobalBlockPalette;
+import cn.nukkit.level.Level;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.format.leveldb.BlockStateMapping;
 import cn.nukkit.level.format.leveldb.NukkitLegacyMapper;
@@ -22,8 +22,8 @@ import org.cloudburstmc.nbt.NbtMap;
 
 import javax.annotation.Nullable;
 import java.util.List;
-import java.util.Map;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -237,7 +237,10 @@ public class NukkitAdapter implements NukkitImplAdapter {
     @Nullable
     public NukkitItemData createItemData(String bedrockId, int metadata) {
         Item item = Item.fromString(bedrockId);
-        return item != null ? new NukkitItemData(bedrockId, item.getId(), metadata) : null;
+        if (item == null || item.getId() == Item.AIR) {
+            return null;
+        }
+        return new NukkitItemData(bedrockId, item.getId(), item.getDamage());
     }
 
     @Override

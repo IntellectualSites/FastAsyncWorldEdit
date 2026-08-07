@@ -74,6 +74,7 @@ dependencies {
     geyserMappings("GeyserMC.mappings", "biomes", "15398c1", ext = "json")
     geyserMappings("GeyserMC.mappings-generator", "generator_blocks", "8fa6058", ext = "json")
     mcmeta("misode.mcmeta", "blocks/data", "cb195b9", ext = "json")
+
 }
 
 project.project(":worldedit-nukkit:nk-adapters").subprojects.forEach {

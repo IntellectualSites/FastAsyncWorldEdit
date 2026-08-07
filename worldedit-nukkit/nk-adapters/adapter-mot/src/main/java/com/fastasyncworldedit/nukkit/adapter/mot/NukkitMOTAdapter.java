@@ -5,8 +5,8 @@ import cn.nukkit.block.Block;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.item.Item;
-import cn.nukkit.level.Level;
 import cn.nukkit.level.GlobalBlockPalette;
+import cn.nukkit.level.Level;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.format.leveldb.BlockStateMapping;
 import cn.nukkit.level.format.leveldb.NukkitLegacyMapper;
@@ -223,17 +223,20 @@ public class NukkitMOTAdapter implements NukkitImplAdapter {
     @Nullable
     public NukkitItemData createItemData(String bedrockId, int metadata) {
         Item item = Item.fromString(bedrockId);
-        return item != null ? new NukkitItemData(bedrockId, item.getId(), metadata) : null;
+        if (item == null || item.isNull()) {
+            return null;
+        }
+        return new NukkitItemData(bedrockId, item.getId(), item.getDamage());
     }
 
     @Override
     public String getItemMappingKey(Item item) {
-        return item.getId() + ":" + item.getDamage();
+        return item.getNamespaceId();
     }
 
     @Override
     public String getItemMappingKey(NukkitItemData data) {
-        return data.itemId() + ":" + data.metadata();
+        return data.identifier();
     }
 
     @Override
