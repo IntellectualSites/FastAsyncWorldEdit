@@ -427,7 +427,13 @@ public class NukkitGetBlocks extends CharGetBlocks {
             data = new char[4096];
         }
 
-        int baseY = layer << 4;
+        // CharBlocks.Section.update passes a normalized array index (absoluteLayer -
+        // minSectionPosition), not an absolute section position. Convert it back to absolute
+        // world Y so ordinalFor passes the correct world Y to FullChunk.getFullBlock. Without
+        // this, worlds with minY < 0 (PNX/MOT overworld, the Nether) read out-of-range sections
+        // and throw cn.nukkit.utils.ChunkException "Invalid section N" during HeightmapProcessor
+        // and other IChunkGet.load callers. For minY == 0 the addition is a no-op.
+        int baseY = (layer + getMinSectionPosition()) << 4;
         NukkitImplAdapter adapter = NukkitImplLoader.get();
         for (int y = 0; y < 16; y++) {
             for (int z = 0; z < 16; z++) {

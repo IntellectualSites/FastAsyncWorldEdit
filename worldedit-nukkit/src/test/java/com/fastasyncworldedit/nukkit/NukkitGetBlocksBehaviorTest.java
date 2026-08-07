@@ -57,6 +57,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -250,6 +251,31 @@ class NukkitGetBlocksBehaviorTest {
                 block,
                 "Unmapped Nukkit block should degrade to AIR instead of throwing"
         );
+    }
+
+    @Test
+    void loadUsesAbsoluteWorldYForNegativeMinSectionPosition() {
+        // PNX/MOT overworld (minY=-64) exposes a bug where NukkitGetBlocks.update treated the
+        // normalized array index handed to it by CharBlocks.Section.update as an absolute section
+        // position. That shifted every read up by |minSectionPosition|*16 blocks and read
+        // out-of-range sections, throwing cn.nukkit.utils.ChunkException "Invalid section N"
+        // (seen via HeightmapProcessor -> CharBlocks.load -> update).
+        //
+        // load(absoluteSection=0) flows to update with normalized index 0 - (-4) = 4.
+        // The fix recomputes baseY = (4 + minSectionPosition(-4)) << 4 = 0, so reads target
+        // world y=0..15. The buggy baseY = 4 << 4 = 64 would have requested world y=64..79.
+        when(level.getMinBlockY()).thenReturn(-64);
+        when(level.getMaxBlockY()).thenReturn(319);
+        when(chunk.getFullBlock(anyInt(), anyInt(), anyInt())).thenReturn(0);
+
+        NukkitGetBlocks getBlocks = new NukkitGetBlocks(level, 3, 5);
+        char[] section = getBlocks.load(0);
+
+        assertNotNull(section);
+        // baseY=0 corners must be read, and the buggy baseY=64 must never be requested.
+        verify(chunk, atLeastOnce()).getFullBlock(eq(0), eq(0), eq(0));
+        verify(chunk, atLeastOnce()).getFullBlock(eq(15), eq(15), eq(15));
+        verify(chunk, never()).getFullBlock(anyInt(), eq(64), anyInt());
     }
 
     @Test
