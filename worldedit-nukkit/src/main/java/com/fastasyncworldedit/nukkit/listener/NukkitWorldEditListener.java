@@ -22,10 +22,12 @@ import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.command.tool.Tool;
 import com.sk89q.worldedit.event.platform.SessionIdleEvent;
+import com.sk89q.worldedit.internal.event.InteractionDebouncer;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.Location;
 
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -34,9 +36,10 @@ import java.util.concurrent.TimeUnit;
 public class NukkitWorldEditListener implements Listener {
 
     private final WorldEditNukkitPlugin plugin;
+    private final InteractionDebouncer debouncer;
     /**
      * Tracks players whose LEFT_CLICK_BLOCK was already handled by {@link #onPlayerInteract},
-     * so that duplicate {@code PlayerInteractEvent} and {@link #onBlockBreak} can be skipped.
+     * so that duplicate {@code PlayerInteractEvent} and {@code #onBlockBreak} can be skipped.
      * Entries expire after 1 seconds in case {@code BlockBreakEvent} is never fired.
      */
     private final Cache<Player, Boolean> handledLeftClick = CacheBuilder.newBuilder()
@@ -50,6 +53,7 @@ public class NukkitWorldEditListener implements Listener {
 
     public NukkitWorldEditListener(WorldEditNukkitPlugin plugin) {
         this.plugin = plugin;
+        this.debouncer = new InteractionDebouncer(plugin.getInternalPlatform());
     }
 
     private static Direction adaptFace(BlockFace face) {
@@ -81,6 +85,19 @@ public class NukkitWorldEditListener implements Listener {
             return;
         }
 
+        // Skip duplicate interactions within the same tick (e.g. client click spam). Matches
+        // Bukkit WorldEditListener; LEFT_CLICK_BLOCK is exempt as it carries block-specific state.
+        if (event.getAction() != PlayerInteractEvent.Action.LEFT_CLICK_BLOCK) {
+            Optional<Boolean> previousResult = debouncer.getDuplicateInteractionResult(player);
+            if (previousResult.isPresent()) {
+                if (previousResult.get()) {
+                    event.setCancelled(true);
+                }
+                return;
+            }
+        }
+
+        boolean result = false;
         switch (event.getAction()) {
             case LEFT_CLICK_BLOCK -> {
                 if (handledLeftClick.getIfPresent(nukkitPlayer) != null) {
@@ -93,16 +110,15 @@ public class NukkitWorldEditListener implements Listener {
                         Vector3.at(block.getFloorX(), block.getFloorY(), block.getFloorZ())
                 );
                 Direction direction = adaptFace(event.getFace());
-                if (we.handleBlockLeftClick(player, loc, direction)) {
+                // BrushTool is a TraceTool, not a BlockTool/DoubleActionBlockTool, so
+                // handleBlockLeftClick (HIT) does not route to it. Fall back to handleArmSwing
+                // (PRIMARY input) which is where brushes actually fire, matching Bukkit.
+                result = we.handleBlockLeftClick(player, loc, direction) || we.handleArmSwing(player);
+                if (result) {
                     handledLeftClick.put(nukkitPlayer, Boolean.TRUE);
-                    event.setCancelled(true);
                 }
             }
-            case LEFT_CLICK_AIR -> {
-                if (we.handleArmSwing(player)) {
-                    event.setCancelled(true);
-                }
-            }
+            case LEFT_CLICK_AIR -> result = we.handleArmSwing(player);
             case RIGHT_CLICK_BLOCK -> {
                 Block block = event.getBlock();
                 Location loc = new Location(
@@ -110,18 +126,18 @@ public class NukkitWorldEditListener implements Listener {
                         Vector3.at(block.getFloorX(), block.getFloorY(), block.getFloorZ())
                 );
                 Direction direction = adaptFace(event.getFace());
-                if (we.handleBlockRightClick(player, loc, direction)) {
-                    event.setCancelled(true);
-                }
+                // Same TraceTool fallback as LEFT_CLICK_BLOCK: handleBlockRightClick (OPEN) does
+                // not route to BrushTool, so fall back to handleRightClick (SECONDARY input).
+                result = we.handleBlockRightClick(player, loc, direction) || we.handleRightClick(player);
             }
-            case RIGHT_CLICK_AIR -> {
-                if (we.handleRightClick(player)) {
-                    event.setCancelled(true);
-                }
-            }
+            case RIGHT_CLICK_AIR -> result = we.handleRightClick(player);
             default -> {
                 // PHYSICAL and other actions are not handled
             }
+        }
+        debouncer.setLastInteraction(player, result);
+        if (result) {
+            event.setCancelled(true);
         }
     }
 
@@ -192,7 +208,11 @@ public class NukkitWorldEditListener implements Listener {
                 Vector3.at(block.getFloorX(), block.getFloorY(), block.getFloorZ())
         );
         Direction direction = adaptFace(event.getFace());
-        if (WorldEdit.getInstance().handleBlockLeftClick(player, loc, direction)) {
+        // Fall back to handleArmSwing so brushes (TraceTool) fire when only BlockBreakEvent is
+        // emitted (e.g. creative/server-authoritative breaking), matching the PlayerInteractEvent
+        // path and Bukkit behaviour.
+        if (WorldEdit.getInstance().handleBlockLeftClick(player, loc, direction)
+                || WorldEdit.getInstance().handleArmSwing(player)) {
             handledLeftClick.put(nukkitPlayer, Boolean.TRUE);
             event.setCancelled(true);
         }
@@ -228,6 +248,7 @@ public class NukkitWorldEditListener implements Listener {
         );
         NukkitAdapter.uncachePlayer(nukkitPlayer);
         heldSlots.invalidate(nukkitPlayer);
+        debouncer.clearInteraction(wePlayer);
     }
 
 }
