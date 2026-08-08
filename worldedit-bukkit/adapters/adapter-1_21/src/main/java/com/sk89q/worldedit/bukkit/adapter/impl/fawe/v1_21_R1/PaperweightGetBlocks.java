@@ -338,6 +338,7 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
             ServerLevel nmsWorld
     ) throws Exception {
         Map<BlockPos, CompoundTag> tilesToInit = PaperweightPlatformAdapter.clearPostProcessing(nmsChunk, false);
+        boolean createCopy = this.createCopy;
         PaperweightGetBlocks_Copy copy = createCopy ? new PaperweightGetBlocks_Copy(nmsChunk) : null;
         if (createCopy) {
             if (copies.containsKey(copyKey)) {
