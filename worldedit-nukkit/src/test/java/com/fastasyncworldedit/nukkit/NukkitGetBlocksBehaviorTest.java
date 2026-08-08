@@ -1,5 +1,6 @@
 package com.fastasyncworldedit.nukkit;
 
+import cn.nukkit.item.Item;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.format.generic.BaseFullChunk;
 import com.fastasyncworldedit.core.extent.processor.heightmap.HeightMapType;
@@ -457,6 +458,47 @@ class NukkitGetBlocksBehaviorTest {
     }
 
     @Test
+    void airItemShortCircuitsLookup() {
+        // Holding nothing must resolve to minecraft:air without entering the lookup table,
+        // which never contains air because createItemData rejects null items.
+        assertEquals("minecraft:air", ItemMapping.beToJe(Item.get(Item.AIR)));
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    void beToJeSurvivesUnstableItemKeyLookup() throws Exception {
+        // A live item whose platform key lookup blows up (e.g. MOT getNamespaceId over
+        // runtime-unregistered items) must surface as the intended UnsupportedOperationException,
+        // never a raw NPE that masks the unmapped-item diagnostic.
+        NukkitImplAdapter previous = NukkitImplLoader.get();
+        Field beToJeField = ItemMapping.class.getDeclaredField("BE_TO_JE");
+        beToJeField.setAccessible(true);
+        Map<String, String> beToJe = (Map<String, String>) beToJeField.get(null);
+        Map<String, String> saved = new java.util.HashMap<>(beToJe);
+        try {
+            beToJe.clear();
+            NukkitImplAdapter unstableKeyAdapter = new TestAdapter() {
+                @Override
+                public String getItemMappingKey(Item item) {
+                    throw new RuntimeException("simulated unstable lookup");
+                }
+            };
+            setInstance(unstableKeyAdapter);
+            // A non-air item with a non-empty count so isAirItem is false, forcing the key lookup.
+            Item stone = Item.get(1, 0, 1);
+            var ex = assertThrows(
+                    UnsupportedOperationException.class,
+                    () -> ItemMapping.beToJe(stone)
+            );
+            assertTrue(ex.getMessage().contains("No Java item mapping"), ex::getMessage);
+        } finally {
+            beToJe.clear();
+            beToJe.putAll(saved);
+            setInstance(previous);
+        }
+    }
+
+    @Test
     void unmappedBiomeMappingsThrowInsteadOfFallingBackToPlains() {
         assertThrows(
                 UnsupportedOperationException.class,
@@ -524,7 +566,7 @@ class NukkitGetBlocksBehaviorTest {
         beToJe.put(4, "minecraft:forest");
     }
 
-    private static final class TestAdapter extends TestNukkitImplAdapter {
+    private static class TestAdapter extends TestNukkitImplAdapter {
 
         @Override
         public String getPlatformName() {

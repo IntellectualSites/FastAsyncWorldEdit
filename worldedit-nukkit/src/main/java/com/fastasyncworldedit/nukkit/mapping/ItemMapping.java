@@ -130,24 +130,37 @@ public final class ItemMapping {
      */
     public static String beToJe(Item item) {
         NukkitImplAdapter adapter = NukkitImplLoader.get();
-        String result = BE_TO_JE.get(adapter.getItemMappingKey(item));
+        // Air is an identical JE/BE constant and never enters BE_TO_JE (createItemData
+        // intentionally rejects null items, and air is a null item on every fork).
+        // Short-circuit it instead of routing through the lookup table; otherwise holding
+        // nothing (or any item that decays to air) throws on every hotbar switch.
+        if (adapter.isAirItem(item)) {
+            return "minecraft:air";
+        }
+        // Compute the key defensively: a live item's key lookup can blow up on some forks
+        // (e.g. MOT getNamespaceId over runtime-unregistered items). Such items are unmapped,
+        // so degrade to a stable id:meta key for the diagnostic rather than propagating the
+        // raw platform exception (which masks the intended "unmapped" error).
+        String key = safeItemKey(adapter, item);
+        String result = BE_TO_JE.get(key);
         if (result != null) {
             return result;
         }
-        // Air may map under a different key than the live item's key (e.g. fork identifier-based
-        // keys), so resolve it explicitly when the item is air before falling through to throw.
-        if (adapter.isAirItem(item)) {
-            NukkitItemData airData = adapter.createItemData("minecraft:air", 0);
-            if (airData != null) {
-                String airResult = BE_TO_JE.get(adapter.getItemMappingKey(airData));
-                if (airResult != null) {
-                    return airResult;
-                }
-            }
-        }
         throw new UnsupportedOperationException(
-                "No Java item mapping for Nukkit item: " + adapter.getItemMappingKey(item)
+                "No Java item mapping for Nukkit item: " + key
         );
+    }
+
+    /**
+     * Compute the mapping key for a live item without letting an unstable platform lookup
+     * surface as a raw exception.
+     */
+    private static String safeItemKey(NukkitImplAdapter adapter, Item item) {
+        try {
+            return adapter.getItemMappingKey(item);
+        } catch (RuntimeException ignored) {
+            return item.getId() + ":" + item.getDamage();
+        }
     }
 
     private static String beKey(int itemId, int metadata) {
