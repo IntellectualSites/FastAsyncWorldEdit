@@ -255,7 +255,7 @@ class NukkitGetBlocksBehaviorTest {
 
     @Test
     void loadUsesAbsoluteWorldYForNegativeMinSectionPosition() {
-        // PNX/MOT overworld (minY=-64) exposes a bug where NukkitGetBlocks.update treated the
+        // MOT overworld (minY=-64) exposes a bug where NukkitGetBlocks.update treated the
         // normalized array index handed to it by CharBlocks.Section.update as an absolute section
         // position. That shifted every read up by |minSectionPosition|*16 blocks and read
         // out-of-range sections, throwing cn.nukkit.utils.ChunkException "Invalid section N"

@@ -64,7 +64,7 @@ listOf("bukkit", "core", "cli", "nukkit").forEach {
     include("worldedit-$it")
 }
 
-listOf("mot", "nkx", "pnx").forEach {
+listOf("mot", "nkx").forEach {
     include("worldedit-nukkit:nk-adapters:adapter-$it")
 }
 

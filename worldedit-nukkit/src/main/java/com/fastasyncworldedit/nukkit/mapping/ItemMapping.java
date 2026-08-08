@@ -134,7 +134,7 @@ public final class ItemMapping {
         if (result != null) {
             return result;
         }
-        // Air may map under a different key than the live item's key (e.g. PNX identifier-based
+        // Air may map under a different key than the live item's key (e.g. fork identifier-based
         // keys), so resolve it explicitly when the item is air before falling through to throw.
         if (adapter.isAirItem(item)) {
             NukkitItemData airData = adapter.createItemData("minecraft:air", 0);

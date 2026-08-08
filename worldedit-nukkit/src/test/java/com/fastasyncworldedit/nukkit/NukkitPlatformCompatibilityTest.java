@@ -266,9 +266,9 @@ class NukkitPlatformCompatibilityTest {
     @Test
     void nukkitWorldReports3DBiomeStorageWhenAdapterSupportsIt() throws Exception {
         setInstance(new TestAdapter(
-                "PowerNukkitX",
-                "PowerNukkitX 1.0",
-                0,
+                "Nukkit-MOT",
+                "Nukkit-MOT 1.0",
+                13,
                 Set.of(NukkitPlatformCapabilities.THREE_DIMENSIONAL_BIOMES)
         ));
         NukkitWorld world = new NukkitWorld(level);
@@ -299,18 +299,11 @@ class NukkitPlatformCompatibilityTest {
                 6,
                 Set.of(NukkitPlatformCapabilities.THREE_DIMENSIONAL_BIOMES)
         );
-        NukkitImplAdapter pnx = new TestAdapter(
-                "PowerNukkitX",
-                "PowerNukkitX 1.0",
-                0,
-                Set.of(NukkitPlatformCapabilities.THREE_DIMENSIONAL_BIOMES)
-        );
 
         for (NukkitPlatformCapabilities capability : NukkitPlatformCapabilities.values()) {
             boolean expected3DBiomeSupport = capability == NukkitPlatformCapabilities.THREE_DIMENSIONAL_BIOMES;
             assertEquals(expected3DBiomeSupport, mot.supports(capability), capability::name);
             assertEquals(expected3DBiomeSupport, nkx.supports(capability), capability::name);
-            assertEquals(expected3DBiomeSupport, pnx.supports(capability), capability::name);
         }
     }
 

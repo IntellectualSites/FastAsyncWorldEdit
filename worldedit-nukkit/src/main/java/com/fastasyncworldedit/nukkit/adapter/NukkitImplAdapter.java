@@ -22,7 +22,7 @@ import java.util.Set;
 import java.util.UUID;
 
 /**
- * Adapter interface abstracting API differences between Nukkit-MOT, NKX, and PNX.
+ * Adapter interface abstracting API differences between Nukkit-MOT and NKX.
  * <p>
  * Nukkit has multiple active forks with incompatible APIs.
  * Unlike Bukkit, where FAWE compiles separate adapter modules per Minecraft
@@ -37,14 +37,13 @@ import java.util.UUID;
  * Key differences from Bukkit:
  * <ul>
  *   <li>Bukkit uses Paperweight per-MC-version adapters; Nukkit uses runtime fork detection</li>
- *   <li>Block state representation differs (legacy full IDs vs PNX block-state hashes)</li>
- *   <li>Layer access uses int, BlockLayer enum, or PNX BlockState APIs depending on the fork</li>
+ *   <li>Block state representation differs (legacy full IDs vs fork-specific APIs)</li>
+ *   <li>Layer access uses int or the BlockLayer enum depending on the fork</li>
  * </ul>
  *
  * @see NukkitImplLoader
  * @see com.fastasyncworldedit.nukkit.adapter.mot.NukkitMOTAdapter
  * @see com.fastasyncworldedit.nukkit.adapter.nkx.NukkitAdapter
- * @see com.fastasyncworldedit.nukkit.adapter.pnx.PowerNukkitXAdapter
  */
 public interface NukkitImplAdapter {
 
@@ -260,7 +259,7 @@ public interface NukkitImplAdapter {
 
     /**
      * Simulate using an item on a block. Forks expose incompatible signatures,
-     * so PNX overrides this while legacy forks use the common API.
+     * so adapters override this when their common API diverges.
      */
     default boolean useItemOn(Level level, BlockVector3 position, Item item, Direction face) {
         return level.useItemOn(
@@ -293,7 +292,6 @@ public interface NukkitImplAdapter {
      * <ul>
      *   <li>MOT: {@code FullChunk.recalculateHeightMap()} + {@code populateSkyLight()} + {@code populateBlockLight()}</li>
      *   <li>NKX: {@code recalculateHeightMap()} + {@code populateSkyLight()} (block light is recomputed on send)</li>
-     *   <li>PNX: {@code IChunk.recalculateHeightMap()} + {@code populateSkyLight()} plus level-level block light</li>
      * </ul>
      *
      * @param chunk the chunk object produced by {@link #getChunk}
@@ -305,7 +303,7 @@ public interface NukkitImplAdapter {
      * responsible for capturing the resulting block changes into FAWE history; this method only
      * performs the platform-native placement and reports whether anything was placed.
      * <p>
-     * Forks route to their own tree APIs ({@code ObjectTree} on NKX/MOT, the PNX generator on PNX).
+     * Forks route to their own tree APIs ({@code ObjectTree} on NKX/MOT).
      * Unknown types fall back to a plain oak tree ({@code ObjectTree}/equivalent).
      *
      * @param level the level to place in

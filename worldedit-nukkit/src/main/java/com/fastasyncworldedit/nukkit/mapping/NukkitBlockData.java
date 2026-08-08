@@ -5,7 +5,7 @@ import com.fastasyncworldedit.nukkit.adapter.NukkitImplLoader;
 /**
  * Represents a platform-specific Nukkit block mapping.
  * <p>
- * Legacy Nukkit forks use {@code blockId + metadata}; PNX uses the block state hash directly.
+ * Legacy Nukkit forks use {@code blockId + metadata}; forks may also use the block state hash directly.
  */
 public record NukkitBlockData(int blockId, int metadata, int fullId) {
 
