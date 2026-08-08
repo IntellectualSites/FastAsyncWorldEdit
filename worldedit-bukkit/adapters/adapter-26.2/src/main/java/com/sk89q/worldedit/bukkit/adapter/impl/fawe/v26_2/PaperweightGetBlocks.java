@@ -534,8 +534,8 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
                         lock.acquire(); // Wait until we have the lock
                         lock.release();
                         try {
+                            sectionLock.writeLock().lock();
                             synchronized (this) {
-                                sectionLock.writeLock().lock();
                                 if (this.getChunk() != nmsChunk) {
                                     this.levelChunk = nmsChunk;
                                     this.sections = null;
@@ -1067,7 +1067,6 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
         synchronized (this) {
             for (int i = getMinSectionPosition(); i <= getMaxSectionPosition(); i++) {
                 int layer = i - getMinSectionPosition();
-
                 if (forcedSections[layer] == null || super.blocks[layer] == null) {
                     continue;
                 }
