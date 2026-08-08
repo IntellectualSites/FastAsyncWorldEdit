@@ -44,10 +44,12 @@ import java.util.stream.Collectors;
 @Deprecated
 public class SignBlock extends LegacyBaseBlockWrapper {
 
-    private String[] text;
-    private final int dataVersion;
-
     private static final String EMPTY_JSON = "{\"text\":\"\"}";
+
+    private final boolean legacy;
+    private final boolean usesJsonText;
+    private final String emptyText;
+    private String[] text;
 
     /**
      * Construct the sign with text.
@@ -57,14 +59,16 @@ public class SignBlock extends LegacyBaseBlockWrapper {
      */
     public SignBlock(BlockState blockState, String[] text) {
         super(blockState);
-        this.dataVersion = WorldEdit.getInstance().getPlatformManager()
+        int dataVersion = WorldEdit.getInstance().getPlatformManager()
                 .queryCapability(Capability.WORLD_EDITING).getDataVersion();
+        this.legacy = dataVersion < Constants.DATA_VERSION_MC_1_20;
+        this.usesJsonText = dataVersion < Constants.DATA_VERSION_MC_1_21_5;
+        this.emptyText = usesJsonText ? EMPTY_JSON : "";
         if (text == null) {
-            String empty = emptyText();
-            this.text = new String[]{empty, empty, empty, empty};
+            this.text = new String[]{emptyText, emptyText, emptyText, emptyText};
             return;
         }
-        if (usesJsonText()) {
+        if (usesJsonText) {
             for (int i = 0; i < text.length; i++) {
                 if (text[i].isEmpty()) {
                     text[i] = EMPTY_JSON;
@@ -74,18 +78,6 @@ public class SignBlock extends LegacyBaseBlockWrapper {
             }
         }
         this.text = text;
-    }
-
-    private boolean isLegacy() {
-        return dataVersion < Constants.DATA_VERSION_MC_1_20;
-    }
-
-    private boolean usesJsonText() {
-        return dataVersion < Constants.DATA_VERSION_MC_1_21_5;
-    }
-
-    private String emptyText() {
-        return usesJsonText() ? EMPTY_JSON : "";
     }
 
     /**
@@ -124,7 +116,7 @@ public class SignBlock extends LegacyBaseBlockWrapper {
     @Deprecated
     public CompoundTag getNbtData() {
         Map<String, Tag<?, ?>> values = new HashMap<>();
-        if (isLegacy()) {
+        if (legacy) {
             values.put("Text1", new StringTag(text[0]));
             values.put("Text2", new StringTag(text[1]));
             values.put("Text3", new StringTag(text[2]));
@@ -149,15 +141,14 @@ public class SignBlock extends LegacyBaseBlockWrapper {
 
         Tag<?, ?> t;
 
-        String empty = emptyText();
-        text = new String[]{empty, empty, empty, empty};
+        text = new String[]{emptyText, emptyText, emptyText, emptyText};
 
         t = values.get("id");
         if (!(t instanceof StringTag) || !((StringTag) t).getValue().equals(getNbtId())) {
             throw new RuntimeException(String.format("'%s' tile entity expected", getNbtId()));
         }
 
-        if (isLegacy()) {
+        if (legacy) {
             t = values.get("Text1");
             if (t instanceof StringTag) {
                 text[0] = ((StringTag) t).getValue();
