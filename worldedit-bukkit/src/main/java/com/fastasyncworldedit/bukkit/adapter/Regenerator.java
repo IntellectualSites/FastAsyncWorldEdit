@@ -94,10 +94,7 @@ public abstract class Regenerator {
 
     private void createSource() {
 
-        source = new SingleThreadQueueExtent(
-                BukkitWorld.HAS_MIN_Y ? originalBukkitWorld.getMinHeight() : 0,
-                BukkitWorld.HAS_MIN_Y ? originalBukkitWorld.getMaxHeight() : 256
-        );
+        source = new SingleThreadQueueExtent(originalBukkitWorld.getMinHeight(), originalBukkitWorld.getMaxHeight());
         source.init(target, initSourceQueueCache(), null);
     }
 

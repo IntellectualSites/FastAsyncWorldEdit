@@ -123,10 +123,6 @@ public final class NullChunk implements IQueueChunk {
     public void setHeightMap(@Nullable HeightMapType type, @Nullable int[] heightMap) {
     }
 
-    public boolean fullySupports3DBiomes() {
-        return false;
-    }
-
     public void setBlockLight(int x, int y, int z, int value) {
     }
 

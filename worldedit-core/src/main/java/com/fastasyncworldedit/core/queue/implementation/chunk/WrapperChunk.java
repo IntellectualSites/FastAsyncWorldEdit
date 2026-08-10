@@ -204,11 +204,6 @@ public class WrapperChunk<T extends IChunk> implements IChunk {
     }
 
     @Override
-    public boolean fullySupports3DBiomes() {
-        return getWrapped().fullySupports3DBiomes();
-    }
-
-    @Override
     public boolean setBiome(final BlockVector2 position, final BiomeType biome) {
         return getWrapped().setBiome(position, biome);
     }

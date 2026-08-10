@@ -90,11 +90,6 @@ public class BukkitWorld extends AbstractWorld {
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
 
-    private static final boolean HAS_3D_BIOMES;
-    //FAWE start - allow access for easy checking if World#getMin/MaxHeight exists
-    public static final boolean HAS_MIN_Y;
-    //FAWE end
-
     private static final Map<Integer, Effect> effects = new HashMap<>();
 
     static {
@@ -103,22 +98,6 @@ public class BukkitWorld extends AbstractWorld {
             int id = effect.getId();
             effects.put(id, effect);
         }
-
-        boolean temp;
-        try {
-            World.class.getMethod("getBiome", int.class, int.class, int.class);
-            temp = true;
-        } catch (NoSuchMethodException e) {
-            temp = false;
-        }
-        HAS_3D_BIOMES = temp;
-        try {
-            World.class.getMethod("getMinHeight");
-            temp = true;
-        } catch (NoSuchMethodException e) {
-            temp = false;
-        }
-        HAS_MIN_Y = temp;
     }
 
     protected WeakReference<World> worldRef;
@@ -434,10 +413,7 @@ public class BukkitWorld extends AbstractWorld {
 
     @Override
     public int getMinY() {
-        if (HAS_MIN_Y) {
             return getWorld().getMinHeight();
-        }
-        return super.getMinY();
     }
 
     @SuppressWarnings("deprecation")
@@ -677,23 +653,13 @@ public class BukkitWorld extends AbstractWorld {
         return false;
     }
 
-    @Override
-    public boolean fullySupports3DBiomes() {
-        // Supports if API does and we're not in the overworld
-        return HAS_3D_BIOMES && getWorld().getEnvironment() != World.Environment.NORMAL || PaperLib.isVersion(18);
-    }
-
     @SuppressWarnings("deprecation")
     @Override
     public BiomeType getBiome(BlockVector3 position) {
         //FAWE start - safe edit region
         testCoords(position);
         //FAWE end
-        if (HAS_3D_BIOMES) {
-            return BukkitAdapter.adapt(getWorld().getBiome(position.x(), position.y(), position.z()));
-        } else {
-            return BukkitAdapter.adapt(getWorld().getBiome(position.x(), position.z()));
-        }
+        return BukkitAdapter.adapt(getWorld().getBiome(position.x(), position.y(), position.z()));
     }
 
     @SuppressWarnings("deprecation")
@@ -702,11 +668,7 @@ public class BukkitWorld extends AbstractWorld {
         //FAWE start - safe edit region
         testCoords(position);
         //FAWE end
-        if (HAS_3D_BIOMES) {
-            getWorld().setBiome(position.x(), position.y(), position.z(), BukkitAdapter.adapt(biome));
-        } else {
-            getWorld().setBiome(position.x(), position.z(), BukkitAdapter.adapt(biome));
-        }
+        getWorld().setBiome(position.x(), position.y(), position.z(), BukkitAdapter.adapt(biome));
         return true;
     }
 

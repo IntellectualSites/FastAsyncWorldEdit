@@ -93,10 +93,6 @@ public final class EmptyClipboard implements Clipboard {
         return false;
     }
 
-    public boolean fullySupports3DBiomes() {
-        return false;
-    }
-
     public boolean setBiome(int x, int y, int z, @Nonnull BiomeType biome) {
         return false;
     }

@@ -459,7 +459,7 @@ public class ForwardExtentCopy implements Operation {
         affectedBlocks += blockCopy.getAffected();
         if (copyingBiomes) {
             // We know biomes will have happened unless something else has gone wrong. Just calculate it.
-            affectedBiomeCols += source.fullySupports3DBiomes() ? (getAffected() >> 2) : (region.getWidth() * region.getLength());
+            affectedBiomeCols += getAffected() >> 2;
         }
         //FAWE end
         return null;

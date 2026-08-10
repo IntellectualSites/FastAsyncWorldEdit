@@ -112,11 +112,6 @@ public class RequestExtent implements Extent {
         return getExtent().setBlock(x, y, z, block);
     }
 
-    @Override
-    public boolean fullySupports3DBiomes() {
-        return getExtent().fullySupports3DBiomes();
-    }
-
     //FAWE start
     @Override
     public boolean tile(int x, int y, int z, FaweCompoundTag tile) throws WorldEditException {

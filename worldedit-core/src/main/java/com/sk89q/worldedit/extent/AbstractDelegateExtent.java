@@ -432,11 +432,6 @@ public class AbstractDelegateExtent implements Extent {
     //FAWE end
 
     @Override
-    public boolean fullySupports3DBiomes() {
-        return extent.fullySupports3DBiomes();
-    }
-
-    @Override
     public boolean setBiome(BlockVector3 position, BiomeType biome) {
         return extent.setBiome(position, biome);
     }

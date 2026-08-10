@@ -900,11 +900,6 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     }
 
     @Override
-    public boolean fullySupports3DBiomes() {
-        return this.getExtent().fullySupports3DBiomes();
-    }
-
-    @Override
     public BiomeType getBiome(BlockVector3 position) {
         return this.getExtent().getBiome(position);
     }
