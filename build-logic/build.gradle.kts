@@ -12,7 +12,6 @@ repositories {
 
 dependencies {
     implementation(gradleApi())
-    implementation(libs.grgit)
     implementation(libs.shadow)
     implementation(libs.paperweight)
 
