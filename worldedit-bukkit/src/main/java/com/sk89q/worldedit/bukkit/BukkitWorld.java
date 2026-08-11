@@ -671,7 +671,7 @@ public class BukkitWorld extends AbstractWorld {
         //FAWE end
         BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
         if (adapter != null) {
-            return adapter.simulateItemUse(getWorld(), position, item, face);
+            return TaskManager.taskManager().sync(() -> adapter.simulateItemUse(getWorld(), position, item, face));
         }
 
         return false;
