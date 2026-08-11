@@ -318,16 +318,35 @@ public class BlockMaskBuilder {
             }
         });
         try {
-            fut.get(5L, TimeUnit.MILLISECONDS);
-        } catch (ExecutionException e) {
-            if (e.getCause() instanceof InputParseException) {
-                throw (InputParseException) e.getCause();
-            }
-        } catch (InterruptedException | TimeoutException ignored) {
+            awaitRegexParse(fut, input);
         } finally {
-            executor.shutdown();
+            executor.shutdownNow();
         }
         return this;
+    }
+
+    static void awaitRegexParse(Future<?> future, String input) throws InputParseException {
+        try {
+            future.get(5L, TimeUnit.MILLISECONDS);
+        } catch (ExecutionException e) {
+            Throwable cause = e.getCause();
+            if (cause instanceof InputParseException inputParseException) {
+                throw inputParseException;
+            }
+            throw invalidBlockMask(input, cause);
+        } catch (InterruptedException e) {
+            future.cancel(true);
+            Thread.currentThread().interrupt();
+            throw invalidBlockMask(input, e);
+        } catch (TimeoutException e) {
+            future.cancel(true);
+            throw invalidBlockMask(input, e);
+        }
+    }
+
+    @SuppressWarnings("deprecation")
+    private static InputParseException invalidBlockMask(String input, Throwable cause) {
+        return new InputParseException("Unable to parse block mask: " + input, cause);
     }
 
     private void suggest(String input, String property, Collection<BlockType> finalTypes) throws InputParseException {
