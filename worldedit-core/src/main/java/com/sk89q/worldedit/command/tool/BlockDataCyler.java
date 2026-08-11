@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.command.tool;
 
 import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.registry.state.PropertyKey;
 import com.google.common.collect.Lists;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalConfiguration;
@@ -52,7 +53,7 @@ public class BlockDataCyler implements DoubleActionBlockTool {
         return player.hasPermission("worldedit.tool.data-cycler");
     }
 
-    private final Map<UUID, Property<?>> selectedProperties = new HashMap<>();
+    private final Map<UUID, PropertyKey> selectedProperties = new HashMap<>();
 
     private boolean handleCycle(
             LocalConfiguration config, Player player, LocalSession session,
@@ -74,15 +75,17 @@ public class BlockDataCyler implements DoubleActionBlockTool {
         if (block.getStates().keySet().isEmpty()) {
             player.print(Caption.of("worldedit.tool.data-cycler.cant-cycle"));
         } else {
-            Property<?> currentProperty = selectedProperties.get(player.getUniqueId());
+            PropertyKey selectedProperty = selectedProperties.get(player.getUniqueId());
+            Property<?> currentProperty = selectedProperty == null
+                    ? null
+                    : block.getBlockType().getProperty(selectedProperty);
 
-            if (currentProperty == null || (forward && block.getState(currentProperty) == null)) {
+            if (currentProperty == null) {
                 currentProperty = block.getStates().keySet().stream().findFirst().get();
-                selectedProperties.put(player.getUniqueId(), currentProperty);
+                selectedProperties.put(player.getUniqueId(), currentProperty.getKey());
             }
 
             if (forward) {
-                block.getState(currentProperty);
                 int index = currentProperty.getValues().indexOf(block.getState(currentProperty));
                 index = (index + 1) % currentProperty.getValues().size();
                 @SuppressWarnings("unchecked")
@@ -108,7 +111,7 @@ public class BlockDataCyler implements DoubleActionBlockTool {
                 int index = properties.indexOf(currentProperty);
                 index = (index + 1) % properties.size();
                 currentProperty = properties.get(index);
-                selectedProperties.put(player.getUniqueId(), currentProperty);
+                selectedProperties.put(player.getUniqueId(), currentProperty.getKey());
                 player.print(Caption.of("worldedit.tool.data-cycler.cycling", TextComponent.of(currentProperty.getName())));
             }
         }
