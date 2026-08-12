@@ -135,6 +135,7 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
         nbttFile.delete();
         entfFile.delete();
         enttFile.delete();
+        bioFile.delete();
     }
 
     public void undo(Actor actor, Region[] regions) {
@@ -284,16 +285,16 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
             total += bioFile.length();
         }
         if (nbtfFile.exists()) {
-            total += entfFile.length();
+            total += nbtfFile.length();
         }
         if (nbttFile.exists()) {
-            total += entfFile.length();
+            total += nbttFile.length();
         }
         if (entfFile.exists()) {
             total += entfFile.length();
         }
         if (enttFile.exists()) {
-            total += entfFile.length();
+            total += enttFile.length();
         }
         return total;
     }
