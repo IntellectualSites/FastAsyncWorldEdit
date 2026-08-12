@@ -462,8 +462,7 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
         int ox = getOriginX();
         int oz = getOriginZ();
         if (ox == 0 && oz == 0 && bdFile.exists()) {
-            try (FileInputStream fis = new FileInputStream(bdFile)) {
-                final FaweInputStream gis = MainUtil.getCompressedIS(fis);
+            try (var fis = new FileInputStream(bdFile); var gis = MainUtil.getCompressedIS(fis)) {
                 // skip mode
                 gis.skipFully(1);
                 // skip version
@@ -472,8 +471,6 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
                 ox = ((gis.read() << 24) + (gis.read() << 16) + (gis.read() << 8) + gis.read());
                 oz = ((gis.read() << 24) + (gis.read() << 16) + (gis.read() << 8) + gis.read());
                 setOrigin(ox, oz);
-                fis.close();
-                gis.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
