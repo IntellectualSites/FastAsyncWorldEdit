@@ -527,7 +527,7 @@ public class StringMan {
     }
 
     public static String repeat(String s, int n) {
-        return IntStream.range(0, n).mapToObj(i -> s).collect(Collectors.joining());
+        return s.repeat(n);
     }
 
     /**
