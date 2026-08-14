@@ -202,12 +202,19 @@ public class StringMan {
         return count;
     }
 
-    public static String padRight(String s, int n) {
-        return String.format("%1$-" + n + "s", s);
+    public static String padRight(String input, int totalLength) {
+        if (input == null) return null;
+        int padAmount = totalLength - input.length();
+        if (padAmount <= 0) return input;
+
+        return input + " ".repeat(padAmount);
     }
 
     public static String padLeft(String s, int n) {
-        return String.format("%1$" + n + "s", s);
+        if (s == null) return null;
+        int padAmount = n - s.length();
+        if (padAmount <= 0) return s;
+        return " ".repeat(padAmount) + s;
     }
 
     public static String getString(Object obj) {
@@ -527,7 +534,7 @@ public class StringMan {
     }
 
     public static String repeat(String s, int n) {
-        return IntStream.range(0, n).mapToObj(i -> s).collect(Collectors.joining());
+        return s.repeat(n);
     }
 
     /**
