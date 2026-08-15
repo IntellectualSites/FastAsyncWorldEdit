@@ -56,7 +56,7 @@ public abstract class SimpleClipboard implements Clipboard {
         this.size = dimensions;
         this.offset = offset;
         long longVolume = (long) getWidth() * (long) getHeight() * (long) getLength();
-        if (maxSize != -1 && longVolume >= maxSize) {
+        if (maxSize != -1 && longVolume > maxSize) {
             throw new IllegalArgumentException("Dimensions are too large for this clipboard format.");
         }
         this.area = getWidth() * getLength();
