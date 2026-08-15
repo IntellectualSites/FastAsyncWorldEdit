@@ -216,6 +216,15 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable, Fl
         return null;
     }
 
+    /**
+     * Check if this clipboard supports concurrent reading.
+     *
+     * @since TODO
+     */
+    default boolean supportsParallelAccess() {
+        return false;
+    }
+
     @Override
     default <T extends Filter> T apply(Region region, T filter, boolean full) {
         if (region.equals(getRegion())) {

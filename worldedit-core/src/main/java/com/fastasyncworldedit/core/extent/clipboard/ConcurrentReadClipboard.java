@@ -22,12 +22,7 @@ public class ConcurrentReadClipboard implements Clipboard {
     private final Clipboard parent;
 
     public static Clipboard tryWrap(Clipboard clipboard) {
-        if (clipboard instanceof ConcurrentReadClipboard
-                || clipboard instanceof WorldCopyClipboard
-                || clipboard instanceof EmptyClipboard
-                || clipboard instanceof DiskOptimizedClipboard // FastSchematicReaderV2/V3 no min offset
-                || (clipboard instanceof BlockArrayClipboard blockArrayClipboard
-                && blockArrayClipboard.getParent() instanceof DiskOptimizedClipboard)) {
+        if (clipboard.supportsParallelAccess()) {
             return clipboard;
         }
         return new ConcurrentReadClipboard(clipboard);
@@ -141,6 +136,11 @@ public class ConcurrentReadClipboard implements Clipboard {
     @Nonnull
     public Iterator<BlockVector3> iterator() {
         return parent.iterator();
+    }
+
+    @Override
+    public boolean supportsParallelAccess() {
+        return true;
     }
 
     @Override
