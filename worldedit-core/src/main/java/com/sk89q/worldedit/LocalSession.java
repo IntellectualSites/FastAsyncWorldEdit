@@ -1530,6 +1530,7 @@ public class LocalSession implements TextureHolder {
             }
             cuiTemporaryBlock = tempCuiTemporaryBlock;
             player.sendFakeBlock(cuiTemporaryBlock, block);
+            player.sendFakeOP();
         } else if (cuiTemporaryBlock != null) {
             // Remove the old block
             player.sendFakeBlock(cuiTemporaryBlock, null);
