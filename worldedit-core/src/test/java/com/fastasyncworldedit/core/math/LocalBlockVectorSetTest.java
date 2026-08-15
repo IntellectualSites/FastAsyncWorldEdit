@@ -23,6 +23,8 @@ import com.fastasyncworldedit.core.util.collection.BlockVector3Set;
 import com.sk89q.worldedit.math.BlockVector3;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class LocalBlockVectorSetTest {
@@ -45,6 +47,17 @@ class LocalBlockVectorSetTest {
         assertTrue(set.add(originalPosition));
         assertTrue(set.add(positionOutsideLocalRange));
         assertTrue(set.contains(originalPosition));
+        assertTrue(set.contains(positionOutsideLocalRange));
+    }
+
+    @Test
+    void upgradesWhenBulkAddingVectorsOutsideLocalRange() {
+        BlockVector3Set set = LocalBlockVectorSet.wrapped();
+        BlockVector3 positionInsideLocalRange = BlockVector3.at(-38, 128, -20);
+        BlockVector3 positionOutsideLocalRange = BlockVector3.at(-38, -357, -20);
+
+        assertTrue(set.addAll(List.of(positionInsideLocalRange, positionOutsideLocalRange)));
+        assertTrue(set.contains(positionInsideLocalRange));
         assertTrue(set.contains(positionOutsideLocalRange));
     }
 
