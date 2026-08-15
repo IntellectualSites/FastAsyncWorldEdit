@@ -1060,12 +1060,11 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
         LevelChunkSection[] forcedSections = getSections(true);
         boolean[] trim = new boolean[sectionCount];
         synchronized (this) {
-            for (int i = getMinSectionPosition(); i <= getMaxSectionPosition(); i++) {
-                int layer = i - getMinSectionPosition();
-                if (forcedSections[layer] == null || super.blocks[layer] == null) {
+            for (int i = 0; i <= getSectionCount(); i++) {
+                if (forcedSections[i] == null || super.blocks[i] == null) {
                     continue;
                 }
-                LevelChunkSection existing = forcedSections[layer];
+                LevelChunkSection existing = forcedSections[i];
                 try {
                     final PalettedContainer<BlockState> blocksExisting = existing.getStates();
 
@@ -1077,22 +1076,23 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
                     if (palette instanceof LinearPalette || palette instanceof HashMapPalette) {
                         paletteSize = palette.getSize();
                     } else {
-                        trim[layer] = true;
+                        trim[i] = true;
                         continue;
                     }
                     if (paletteSize == 1) {
                         //If the cached palette size is 1 then no blocks can have been changed i.e. do not need to update these chunks.
                         continue;
                     }
-                    trim[layer] = true;
+                    trim[i] = true;
                 } catch (IllegalAccessException ignored) {
-                    trim[layer] = true;
+                    trim[i] = true;
                 }
             }
         }
+        int minSection = getMinSectionPosition();
         for (int i = 0; i < trim.length; i++) {
             if (trim[i]) {
-                super.trim(false, i);
+                super.trim(false, i + minSection);
             }
         }
         return true;
