@@ -349,7 +349,7 @@ public interface Player extends Entity, Actor {
      * This change is client-side only and will not actually grant the player operator status.
      * </p>
      *
-     * @since TODO
+     * @since 2.15.4
      */
     void sendFakeOP();
 

@@ -35,7 +35,7 @@ extra.set("revision", revision)
 extra.set("buildNumber", buildNumber)
 extra.set("date", date)
 
-version = String.format("%s-%s", rootVersion, buildNumber)
+version = String.format("%s", rootVersion)
 
 if (!project.hasProperty("gitCommitHash")) {
     pluginManager.apply("org.ajoberstar.grgit")
