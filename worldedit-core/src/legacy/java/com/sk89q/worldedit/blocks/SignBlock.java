@@ -46,7 +46,6 @@ public class SignBlock extends LegacyBaseBlockWrapper {
 
     private static final String EMPTY_JSON = "{\"text\":\"\"}";
 
-    private final boolean legacy;
     private final boolean usesJsonText;
     private final String emptyText;
     private String[] text;
@@ -61,7 +60,6 @@ public class SignBlock extends LegacyBaseBlockWrapper {
         super(blockState);
         int dataVersion = WorldEdit.getInstance().getPlatformManager()
                 .queryCapability(Capability.WORLD_EDITING).getDataVersion();
-        this.legacy = dataVersion < Constants.DATA_VERSION_MC_1_20;
         this.usesJsonText = dataVersion < Constants.DATA_VERSION_MC_1_21_5;
         this.emptyText = usesJsonText ? EMPTY_JSON : "";
         if (text == null) {
@@ -116,17 +114,10 @@ public class SignBlock extends LegacyBaseBlockWrapper {
     @Deprecated
     public CompoundTag getNbtData() {
         Map<String, Tag<?, ?>> values = new HashMap<>();
-        if (legacy) {
-            values.put("Text1", new StringTag(text[0]));
-            values.put("Text2", new StringTag(text[1]));
-            values.put("Text3", new StringTag(text[2]));
-            values.put("Text4", new StringTag(text[3]));
-        } else {
-            ListTag<?, ?> messages = new ListTag<>(StringTag.class, Arrays.stream(text).map(StringTag::new).collect(Collectors.toList()));
-            Map<String, Tag<?, ?>> frontTextTag = new HashMap<>();
-            frontTextTag.put("messages", messages);
-            values.put("front_text", new CompoundTag(frontTextTag));
-        }
+        ListTag<?, ?> messages = new ListTag<>(StringTag.class, Arrays.stream(text).map(StringTag::new).collect(Collectors.toList()));
+        Map<String, Tag<?, ?>> frontTextTag = new HashMap<>();
+        frontTextTag.put("messages", messages);
+        values.put("front_text", new CompoundTag(frontTextTag));
         return new CompoundTag(values);
     }
 
@@ -148,33 +139,11 @@ public class SignBlock extends LegacyBaseBlockWrapper {
             throw new RuntimeException(String.format("'%s' tile entity expected", getNbtId()));
         }
 
-        if (legacy) {
-            t = values.get("Text1");
-            if (t instanceof StringTag) {
-                text[0] = ((StringTag) t).getValue();
-            }
-
-            t = values.get("Text2");
-            if (t instanceof StringTag) {
-                text[1] = ((StringTag) t).getValue();
-            }
-
-            t = values.get("Text3");
-            if (t instanceof StringTag) {
-                text[2] = ((StringTag) t).getValue();
-            }
-
-            t = values.get("Text4");
-            if (t instanceof StringTag) {
-                text[3] = ((StringTag) t).getValue();
-            }
-        } else {
-            CompoundTag frontTextTag = (CompoundTag) values.get("front_text");
-            ListTag<?, ?> messagesTag = frontTextTag.getListTag("messages");
-            for (int i = 0; i < messagesTag.getValue().size(); i++) {
-                StringTag tag = (StringTag) messagesTag.getValue().get(i);
-                text[i] = tag.getValue();
-            }
+        CompoundTag frontTextTag = (CompoundTag) values.get("front_text");
+        ListTag<?, ?> messagesTag = frontTextTag.getListTag("messages");
+        for (int i = 0; i < messagesTag.getValue().size(); i++) {
+            StringTag tag = (StringTag) messagesTag.getValue().get(i);
+            text[i] = tag.getValue();
         }
     }
 

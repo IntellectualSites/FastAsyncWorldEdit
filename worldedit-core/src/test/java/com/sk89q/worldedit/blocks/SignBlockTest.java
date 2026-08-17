@@ -33,7 +33,6 @@ import com.sk89q.worldedit.util.test.ResourceLockKeys;
 import com.sk89q.worldedit.world.block.BlockState;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.ResourceLock;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -72,9 +71,13 @@ class SignBlockTest {
         WorldEdit.getInstance().getPlatformManager().unregister(platform);
     }
 
-    @Test
-    void usesJsonStringsBeforeMinecraft1215() {
-        dataVersion.set(Constants.DATA_VERSION_MC_1_21_4);
+    @ParameterizedTest
+    @ValueSource(ints = {
+            Constants.DATA_VERSION_MC_1_21,
+            Constants.DATA_VERSION_MC_1_21_4
+    })
+    void usesJsonStringsBeforeMinecraft1215(int dataVersion) {
+        this.dataVersion.set(dataVersion);
 
         assertArrayEquals(
                 new String[]{EMPTY_JSON, HELLO_JSON, EMPTY_JSON, EMPTY_JSON},
