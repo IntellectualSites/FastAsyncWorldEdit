@@ -3,7 +3,6 @@ package com.fastasyncworldedit.core.util;
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.queue.implementation.QueueHandler;
-import com.fastasyncworldedit.core.util.task.RunnableVal;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import org.apache.logging.log4j.Logger;
 
@@ -15,6 +14,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public abstract class TaskManager {
@@ -254,8 +254,9 @@ public abstract class TaskManager {
      * @param objects  the list of objects to run the task for
      * @param task     the task to run on each object
      * @param whenDone when the object task completes
+     * @since 3.0.0
      */
-    public <T> void objectTask(Collection<T> objects, final RunnableVal<T> task, final Runnable whenDone) {
+    public <T> void objectTask(Collection<T> objects, final Consumer<T> task, final Runnable whenDone) {
         final Iterator<T> iterator = objects.iterator();
         task(new Runnable() {
             @Override
@@ -263,8 +264,7 @@ public abstract class TaskManager {
                 long start = System.currentTimeMillis();
                 boolean hasNext;
                 while ((hasNext = iterator.hasNext()) && System.currentTimeMillis() - start < 5) {
-                    task.value = iterator.next();
-                    task.run();
+                    task.accept(iterator.next());
                 }
                 if (!hasNext) {
                     later(whenDone, 1);
@@ -320,23 +320,6 @@ public abstract class TaskManager {
      * - Useful if you need to access something from the Bukkit API from another thread<br>
      * - Usually wait time is around 25ms<br>
      */
-    public <T> T syncWhenFree(@Nonnull final RunnableVal<T> function) {
-        if (Fawe.isMainThread()) {
-            function.run();
-            return function.value;
-        }
-        try {
-            return Fawe.instance().getQueueHandler().sync((Supplier<T>) function).get();
-        } catch (InterruptedException | ExecutionException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    /**
-     * Run a task on the main thread when the TPS is high enough, and wait for execution to finish.
-     * - Useful if you need to access something from the Bukkit API from another thread<br>
-     * - Usually wait time is around 25ms<br>
-     */
     public <T> T syncWhenFree(@Nonnull final Supplier<T> supplier) {
         if (Fawe.isMainThread()) {
             return supplier.get();
@@ -346,15 +329,6 @@ public abstract class TaskManager {
         } catch (InterruptedException | ExecutionException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    /**
-     * Quickly run a task on the main thread, and wait for execution to finish.
-     * - Useful if you need to access something from the Bukkit API from another thread<br>
-     * - Usually wait time is around 25ms
-     */
-    public <T> T sync(@Nonnull final RunnableVal<T> function) {
-        return sync((Supplier<T>) function);
     }
 
     /**
@@ -371,6 +345,20 @@ public abstract class TaskManager {
         } catch (InterruptedException | ExecutionException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * Quickly run a task on the main thread, and wait for execution to finish.
+     * - Useful if you need to access something from the Bukkit API from another thread<br>
+     * - Usually wait time is around 25ms
+     *
+     * @since 3.0.0
+     */
+    public void sync(@Nonnull final Runnable runnable) {
+        sync((Supplier<Void>) () -> {
+            runnable.run();
+            return null;
+        });
     }
 
 }
