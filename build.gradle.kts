@@ -12,7 +12,7 @@ plugins {
     id("xyz.jpenilla.run-paper") version "3.0.2"
 }
 
-val rootVersion: String = (extra.properties["rootVersion"] as? String) ?: "2.15.4"
+val rootVersion: String = (extra.properties["rootVersion"] as? String) ?: "2.15.5"
 val snapshot: String = (extra.properties["snapshot"] as? String) ?: "SNAPSHOT"
 var revision: String = (extra.properties["revision"] as? String) ?: ""
 var buildNumber: String = (extra.properties["buildNumber"] as? String) ?: ""
@@ -35,7 +35,7 @@ extra.set("revision", revision)
 extra.set("buildNumber", buildNumber)
 extra.set("date", date)
 
-version = String.format("%s-%s", rootVersion, buildNumber)
+version = String.format("%s-%s", rootVersion, snapshot)
 
 if (!project.hasProperty("gitCommitHash")) {
     pluginManager.apply("org.ajoberstar.grgit")
