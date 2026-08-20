@@ -36,7 +36,6 @@ import com.fastasyncworldedit.core.math.transform.MutatingOperationTransformHold
 import com.fastasyncworldedit.core.util.ImgurUtility;
 import com.fastasyncworldedit.core.util.MainUtil;
 import com.fastasyncworldedit.core.util.MaskTraverser;
-import com.fastasyncworldedit.core.util.task.RunnableVal;
 import com.google.common.collect.Lists;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalConfiguration;
@@ -381,23 +380,20 @@ public class ClipboardCommands {
             final LocalConfiguration config = WorldEdit.getInstance().getConfiguration();
             final File working = WorldEdit.getInstance().getWorkingDirectoryFile(config.saveDir).getAbsoluteFile();
 
-            url = MainUtil.upload(null, null, "zip", new RunnableVal<>() {
-                @Override
-                public void run(OutputStream out) {
-                    try (ZipOutputStream zos = new ZipOutputStream(out)) {
-                        for (File file : files) {
-                            String fileName = file.getName();
-                            if (MainUtil.isInSubDirectory(working, file)) {
-                                fileName = working.toURI().relativize(file.toURI()).getPath();
-                            }
-                            ZipEntry ze = new ZipEntry(fileName);
-                            zos.putNextEntry(ze);
-                            Files.copy(file.toPath(), zos);
-                            zos.closeEntry();
+            url = MainUtil.upload(null, null, "zip", (OutputStream out) -> {
+                try (ZipOutputStream zos = new ZipOutputStream(out)) {
+                    for (File file : files) {
+                        String fileName = file.getName();
+                        if (MainUtil.isInSubDirectory(working, file)) {
+                            fileName = working.toURI().relativize(file.toURI()).getPath();
                         }
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
+                        ZipEntry ze = new ZipEntry(fileName);
+                        zos.putNextEntry(ze);
+                        Files.copy(file.toPath(), zos);
+                        zos.closeEntry();
                     }
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
                 }
             });
         } else {

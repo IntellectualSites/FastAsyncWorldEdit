@@ -59,7 +59,6 @@ import com.fastasyncworldedit.core.util.MathMan;
 import com.fastasyncworldedit.core.util.ProcessorTraverser;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.fastasyncworldedit.core.util.collection.BlockVector3Set;
-import com.fastasyncworldedit.core.util.task.RunnableVal;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.entity.Player;
@@ -4100,11 +4099,8 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
             }
             if (containsAny) {
                 changes++;
-                TaskManager.taskManager().sync(new RunnableVal<Object>() {
-                    @Override
-                    public void run(Object value) {
-                        regenerateChunk(cx, cz, biome, seed);
-                    }
+                TaskManager.taskManager().sync(() -> {
+                    regenerateChunk(cx, cz, biome, seed);
                 });
             }
         }
