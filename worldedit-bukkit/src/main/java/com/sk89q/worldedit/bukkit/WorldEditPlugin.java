@@ -49,6 +49,7 @@ import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.internal.anvil.ChunkDeleter;
 import com.sk89q.worldedit.internal.command.CommandUtil;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
+import com.sk89q.worldedit.registry.Registries;
 import com.sk89q.worldedit.util.lifecycle.Lifecycled;
 import com.sk89q.worldedit.util.lifecycle.SimpleLifecycled;
 import com.sk89q.worldedit.world.World;
@@ -259,7 +260,6 @@ public class WorldEditPlugin extends JavaPlugin {
             getServer().getPluginManager().registerEvents(new AsyncTabCompleteListener(), this);
         }
 
-        initializeRegistries(); // this creates the objects matching Bukkit's enums - but doesn't fill them with data yet
         if (Bukkit.getWorlds().isEmpty()) {
             setupPreWorldData();
             // register this so we can load world-dependent data right as the first world is loading
@@ -291,6 +291,7 @@ public class WorldEditPlugin extends JavaPlugin {
 
     private void setupPreWorldData() {
         loadAdapter();
+        initializeRegistries(); // this creates the objects matching Bukkit's enums - but doesn't fill them with data yet
         WorldEdit.getInstance().loadMappings();
     }
 
@@ -352,9 +353,17 @@ public class WorldEditPlugin extends JavaPlugin {
                 EntityType.REGISTRY.register("minecraft:" + lowerCaseMcId, new EntityType("minecraft:" + lowerCaseMcId));
             }
         }
+
+        // Registries only available via NMS
+        BukkitImplAdapter adapter = getBukkitImplAdapter();
+        if (adapter != null) {
+            adapter.initializeRegistries();
+        }
+
         // ... :|
         GameModes.get("");
         WeatherTypes.get("");
+        Registries.get("");
     }
 
     private void setupTags() {

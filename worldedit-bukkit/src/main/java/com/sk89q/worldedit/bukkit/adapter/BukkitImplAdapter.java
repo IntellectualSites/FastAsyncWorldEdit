@@ -31,6 +31,7 @@ import com.fastasyncworldedit.core.queue.implementation.packet.ChunkPacket;
 import com.sk89q.jnbt.LinBusConverter;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
@@ -53,6 +54,7 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.generation.ConfiguredFeatureType;
 import com.sk89q.worldedit.world.generation.StructureType;
+import com.sk89q.worldedit.world.generation.TreeType;
 import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 import org.bukkit.Keyed;
@@ -62,6 +64,7 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.bukkit.block.Biome;
+import org.bukkit.block.TileState;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -191,8 +194,21 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
      * @param player  The player
      * @param pos     The position
      * @param nbtData The NBT Data
+     *
+     * @deprecated Only works for structure blocks
      */
+    @Deprecated(since = "2.15.1")
     void sendFakeNBT(Player player, BlockVector3 pos, LinCompoundTag nbtData);
+
+    /**
+     * Send the given NBT data to the player.
+     *
+     * @param player    The player
+     * @param pos       The position
+     * @param tileState The bukkit tile state
+     * @param nbtData   The NBT Data
+     */
+    void sendFakeNBT(Player player, BlockVector3 pos, TileState tileState, LinCompoundTag nbtData);
 
     /**
      * Make the client think it has operator status.
@@ -328,6 +344,19 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
      */
     default void sendBiomeUpdates(World world, Iterable<BlockVector2> chunks) {
 
+    }
+
+    /**
+     * Generates a Minecraft tree at the given location.
+     *
+     * @param treeType The tree
+     * @param world The world
+     * @param session The EditSession
+     * @param pt The location
+     * @return If it succeeded
+     */
+    default boolean generateTree(TreeType treeType, World world, EditSession session, BlockVector3 pt) throws MaxChangedBlocksException {
+        throw new UnsupportedOperationException("This adapter does not support generating features.");
     }
 
     /**

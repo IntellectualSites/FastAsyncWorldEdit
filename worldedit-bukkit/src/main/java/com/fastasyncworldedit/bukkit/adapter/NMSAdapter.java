@@ -20,7 +20,8 @@ public class NMSAdapter implements FAWEPlatformAdapterImpl {
             int[] paletteToBlock,
             int[] blocksCopy,
             char[] set,
-            CachedBukkitAdapter adapter
+            CachedBukkitAdapter adapter,
+            final boolean globalKindaDoesNotExist
     ) {
         int numPaletteEntries = 0;
         for (int i = 0; i < 4096; i++) {
@@ -33,7 +34,7 @@ public class NMSAdapter implements FAWEPlatformAdapterImpl {
                 numPaletteEntries++;
             }
         }
-        mapPalette(blockToPalette, paletteToBlock, blocksCopy, set, adapter, numPaletteEntries);
+        mapPalette(blockToPalette, paletteToBlock, blocksCopy, set, adapter, numPaletteEntries, globalKindaDoesNotExist);
 
         return numPaletteEntries;
     }
@@ -45,7 +46,8 @@ public class NMSAdapter implements FAWEPlatformAdapterImpl {
             int[] blocksCopy,
             IntFunction<char[]> get,
             char[] set,
-            CachedBukkitAdapter adapter
+            CachedBukkitAdapter adapter,
+            final boolean globalKindaDoesNotExist
     ) {
         int numPaletteEntries = 0;
         char[] getArr = null;
@@ -67,7 +69,7 @@ public class NMSAdapter implements FAWEPlatformAdapterImpl {
                 numPaletteEntries++;
             }
         }
-        mapPalette(blockToPalette, paletteToBlock, blocksCopy, set, adapter, numPaletteEntries);
+        mapPalette(blockToPalette, paletteToBlock, blocksCopy, set, adapter, numPaletteEntries, globalKindaDoesNotExist);
 
         return numPaletteEntries;
     }
@@ -78,11 +80,12 @@ public class NMSAdapter implements FAWEPlatformAdapterImpl {
             int[] blocksCopy,
             char[] set,
             CachedBukkitAdapter adapter,
-            int numPaletteEntries
+            int numPaletteEntries,
+            boolean globalKindaDoesNotExist
     ) {
         int bitsPerEntry = MathMan.log2nlz(numPaletteEntries - 1);
         // If bits per entry is over 8, the game uses the global palette.
-        if (bitsPerEntry > 8 && adapter != null) {
+        if (!globalKindaDoesNotExist && bitsPerEntry > 8 && adapter != null) {
             System.arraycopy(adapter.getIbdToOrdinal(), 0, paletteToBlock, 0, adapter.getIbdToOrdinal().length);
             System.arraycopy(adapter.getOrdinalToIbdID(), 0, blockToPalette, 0, adapter.getOrdinalToIbdID().length);
         }

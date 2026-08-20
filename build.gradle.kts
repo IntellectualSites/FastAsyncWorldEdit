@@ -8,32 +8,37 @@ plugins {
     alias(libs.plugins.codecov)
     jacoco
     id("buildlogic.common")
-    id("com.gradleup.nmcp.aggregation") version "1.4.4"
+    id("com.gradleup.nmcp.aggregation") version "1.6.1"
     id("xyz.jpenilla.run-paper") version "3.0.2"
 }
 
-var rootVersion by extra("2.15.1")
-var snapshot by extra("SNAPSHOT")
-var revision: String by extra("")
-var buildNumber by extra("")
-var date: String by extra("")
-ext {
-    val git: Grgit = Grgit.open {
-        dir = File("$rootDir/.git")
-    }
-    date = git.head().dateTime.format(DateTimeFormatter.ofPattern("yy.MM.dd"))
-    revision = "-${git.head().abbreviatedId}"
-    buildNumber = if (project.hasProperty("buildnumber")) {
-        snapshot + "-" + project.properties["buildnumber"] as String
-    } else {
-        project.properties["snapshot"] as String
-    }
-}
+val rootVersion: String = (extra.properties["rootVersion"] as? String) ?: "2.15.5"
+val snapshot: String = (extra.properties["snapshot"] as? String) ?: "SNAPSHOT"
+var revision: String = (extra.properties["revision"] as? String) ?: ""
+var buildNumber: String = (extra.properties["buildNumber"] as? String) ?: ""
+var date: String = (extra.properties["date"] as? String) ?: ""
 
-version = String.format("%s-%s", rootVersion, buildNumber)
+val git: Grgit = Grgit.open {
+    dir = File("$rootDir/.git")
+}
+date = git.head().dateTime.format(DateTimeFormatter.ofPattern("yy.MM.dd"))
+revision = "-${git.head().abbreviatedId}"
+    buildNumber = if (project.hasProperty("buildnumber")) {
+        snapshot + "-" + (project.findProperty("buildnumber") as? String ?: "")
+    } else {
+        (project.findProperty("snapshot") as? String) ?: snapshot
+    }
+
+extra.set("rootVersion", rootVersion)
+extra.set("snapshot", snapshot)
+extra.set("revision", revision)
+extra.set("buildNumber", buildNumber)
+extra.set("date", date)
+
+version = String.format("%s-%s", rootVersion, snapshot)
 
 if (!project.hasProperty("gitCommitHash")) {
-    apply(plugin = "org.ajoberstar.grgit")
+    pluginManager.apply("org.ajoberstar.grgit")
     ext["gitCommitHash"] = try {
         extensions.getByName<Grgit>("grgit").head()?.abbreviatedId
     } catch (e: Exception) {
@@ -44,8 +49,9 @@ if (!project.hasProperty("gitCommitHash")) {
 }
 
 val totalReport = tasks.register<JacocoReport>("jacocoTotalReport") {
+    description = "Generates a combined JaCoCo coverage report for all subprojects."
     for (proj in subprojects) {
-        proj.apply(plugin = "jacoco")
+        proj.pluginManager.apply("jacoco")
         proj.plugins.withId("java") {
             executionData(
                     fileTree(proj.layout.buildDirectory).include("**/jacoco/*.exec")
@@ -93,12 +99,13 @@ allprojects {
     }
 }
 
-val supportedVersions: List<String> = listOf("1.20.4", "1.20.5", "1.20.6", "1.21", "1.21.1", "1.21.4", "1.21.5",
-        "1.21.8", "1.21.10", "1.21.11")
+val supportedVersions: List<String> = listOf("1.21", "1.21.1", "1.21.4", "1.21.5",
+        "1.21.8", "1.21.10", "1.21.11", "26.1.2", "26.2")
 
 tasks {
     supportedVersions.forEach {
         register<RunServer>("runServer-$it") {
+            description = "Run a Paper server version $it."
             minecraftVersion(it)
             pluginJars(*project(":worldedit-bukkit").getTasksByName("shadowJar", false).map { (it as Jar).archiveFile }
                     .toTypedArray())
@@ -108,6 +115,7 @@ tasks {
         }
     }
     runServer<RunServer> {
+        description = "Run a Paper server for the latest supported Minecraft version (${supportedVersions.last()})."
         minecraftVersion(supportedVersions.last())
         pluginJars(*project(":worldedit-bukkit").getTasksByName("shadowJar", false).map { (it as Jar).archiveFile }
                 .toTypedArray())

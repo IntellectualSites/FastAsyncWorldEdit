@@ -66,6 +66,7 @@ import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.entity.EntityTypes;
 import com.sk89q.worldedit.world.generation.ConfiguredFeatureType;
 import com.sk89q.worldedit.world.generation.StructureType;
+import com.sk89q.worldedit.world.generation.TreeType;
 import com.sk89q.worldedit.world.item.ItemType;
 import net.minecraft.SharedConstants;
 import net.minecraft.Util;
@@ -126,6 +127,9 @@ import net.minecraft.world.level.chunk.status.ChunkStatus;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.WorldOptions;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
+import net.minecraft.world.level.levelgen.feature.FallenTreeFeature;
+import net.minecraft.world.level.levelgen.feature.TreeFeature;
+import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureStart;
@@ -137,9 +141,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.World.Environment;
+import org.bukkit.block.TileState;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.craftbukkit.CraftWorld;
+import org.bukkit.craftbukkit.block.CraftBlockEntityState;
 import org.bukkit.craftbukkit.block.data.CraftBlockData;
 import org.bukkit.craftbukkit.entity.CraftEntity;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
@@ -578,6 +584,18 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
     }
 
     @Override
+    public void sendFakeNBT(Player player, BlockVector3 pos, TileState tileState, LinCompoundTag nbtData) {
+        CraftBlockEntityState<?> craftState = (CraftBlockEntityState<?>) tileState;
+
+        CompoundTag vanillaNBT = (net.minecraft.nbt.CompoundTag) fromNative(nbtData);
+
+        ((CraftPlayer) player).getHandle().connection.send(new ClientboundBlockEntityDataPacket(
+            new BlockPos(pos.x(), pos.y(), pos.z()),
+            craftState.getBlockEntity().getType(),
+            vanillaNBT
+        ));
+    }
+    @Override
     public void sendFakeOP(Player player) {
         ((CraftPlayer) player).getHandle().connection.send(new ClientboundEntityEventPacket(
             ((CraftPlayer) player).getHandle(), (byte) 28
@@ -891,6 +909,19 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
             }
         }
 
+        // Trees
+        Registry<PlacedFeature> placedFeatureRegistry = server.registryAccess().lookupOrThrow(Registries.PLACED_FEATURE);
+        for (ResourceLocation name : placedFeatureRegistry.keySet()) {
+            // Do some hackery to make sure this is a tree
+            var underlyingFeature = placedFeatureRegistry.get(name).get().value().feature().value().feature();
+            if (underlyingFeature instanceof TreeFeature || underlyingFeature instanceof FallenTreeFeature) {
+                String key = name.toString();
+                if (TreeType.REGISTRY.get(key) == null) {
+                    TreeType.REGISTRY.register(key, new TreeType(key));
+                }
+            }
+        }
+
         // BiomeCategories
         Registry<Biome> biomeRegistry = server.registryAccess().lookupOrThrow(Registries.BIOME);
         biomeRegistry.getTags().forEach(tag -> {
@@ -907,6 +938,17 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
                 );
             }
         });
+    }
+
+    @Override
+    public boolean generateTree(TreeType treeType, World world, EditSession session, BlockVector3 pt) throws MaxChangedBlocksException {
+        ServerLevel originalWorld = ((CraftWorld) world).getHandle();
+        PlacedFeature feature = originalWorld.registryAccess().lookupOrThrow(Registries.PLACED_FEATURE).getValue(ResourceLocation.tryParse(treeType.id()));
+        ServerChunkCache chunkManager = originalWorld.getChunkSource();
+        try (PaperweightServerLevelDelegateProxy.LevelAndProxy proxyLevel =
+                     PaperweightServerLevelDelegateProxy.newInstance(session, originalWorld, this)) {
+            return feature != null && feature.place(proxyLevel.level(), chunkManager.getGenerator(), random, new BlockPos(pt.x(), pt.y(), pt.z()));
+        }
     }
 
     public boolean generateFeature(ConfiguredFeatureType type, World world, EditSession session, BlockVector3 pt) {

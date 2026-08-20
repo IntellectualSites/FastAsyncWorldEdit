@@ -1,27 +1,27 @@
 [versions]
 # Minecraft expectations
-paperApi = "1.21-R0.1-SNAPSHOT"
+paperApi = "1.21.1-R0.1-SNAPSHOT"
 fastutil = "8.5.15"
 guava = "33.3.1-jre"
-log4j = "2.24.1"
+log4j = "2.17.1"
 gson = "2.11.0"
 snakeyaml = "2.2"
 
 # Plugins
 dummypermscompat = "1.10"
-worldguard-bukkit = "7.0.15"
+worldguard-bukkit = "7.0.17"
 griefprevention = "18.0.0"
 griefdefender = "2.1.0-SNAPSHOT"
-residence = "6.0.0.1"
-towny = "0.102.0.7"
-plotsquared = "7.5.11"
+residence = "6.0.2.3"
+towny = "0.103.0.7"
+plotsquared = "7.5.13"
 
 # Third party
-bstats = "3.1.0"
+bstats = "3.2.1"
 sparsebitset = "1.3"
 parallelgzip = "1.0.5"
-adventure = "4.26.1"
-checkerqual = "3.53.1"
+adventure = "5.2.0"
+checkerqual = "4.2.1"
 truezip = "6.8.4"
 auto-value = "1.11.1"
 jsr305 = "3.0.2"
@@ -31,7 +31,7 @@ antlr4 = "4.13.2"
 json-simple = "1.1.1"
 jlibnoise = "1.0.0"
 jchronic = "0.2.4a"
-lz4-java = "1.10.3"
+lz4-java = "1.11.1"
 commons-cli = "1.11.0"
 paperLib = "1.0.8"
 paster = "1.1.7"
@@ -39,6 +39,7 @@ vault = "1.7.1"
 serverlib = "2.3.7"
 linbus = "0.2.0"
 autoService = "1.1.1"
+guice = "7.0.0"
 
 ## Internal
 text-adapter = "3.0.6"
@@ -46,25 +47,21 @@ text = "3.0.4"
 piston = "0.5.11"
 
 # Tests
-mockito = "5.21.0"
-junit = "6.0.3"
+mockito = "5.23.0"
+junit = "6.1.2"
 
 # Gradle plugins
 pluginyml = "0.6.0"
-mod-publish-plugin = "1.1.0"
+mod-publish-plugin = "2.1.1"
 grgit = "5.3.3"
-shadow = "9.3.1"
+shadow = "9.5.1"
 paperweight = "2.0.0-SNAPSHOT"
-codecov = "0.2.0"
-
-
-jqwik = "1.9.3"
+codecov = "0.3.0"
+jqwik = "1.10.1"
 
 # Minimum versions we apply to make dependencies support newer Java
 minimumAsm = "9.7"
 minimumJdependency = "2.10"
-#minimumTinyRemapper = "0.8.11"
-
 
 [libraries]
 # Gradle plugins
@@ -124,6 +121,8 @@ linBus-common = { group = "org.enginehub.lin-bus", name = "lin-bus-common" }
 linBus-stream = { group = "org.enginehub.lin-bus", name = "lin-bus-stream" }
 linBus-tree = { group = "org.enginehub.lin-bus", name = "lin-bus-tree" }
 linBus-format-snbt = { group = "org.enginehub.lin-bus.format", name = "lin-bus-format-snbt" }
+
+guice = { group = "com.google.inject", name = "guice", version.ref = "guice" }
 
 # Internal
 ## Text

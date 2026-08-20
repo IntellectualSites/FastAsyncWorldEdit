@@ -43,6 +43,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * [ WorldEdit action ]
@@ -363,16 +364,17 @@ public class Fawe {
             );
         }
         if (Settings.settings().HISTORY.DELETE_DISK_ON_LOGOUT && Settings.settings().HISTORY.USE_DATABASE) {
-            LOGGER.warn("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-            LOGGER.warn("!!!                                                                !!!");
-            LOGGER.warn("!!!    Using history database whilst deleting disk history!        !!!");
-            LOGGER.warn("!!!    You will not be able to rollback edits after a user logs    !!!");
-            LOGGER.warn("!!!    out, recommended to disable delete-disk-on-logout if you    !!!");
-            LOGGER.warn("!!!    you want to have full history rollback functionality.       !!!");
-            LOGGER.warn("!!!    Disable use-database if you do not need to have rollback    !!!");
-            LOGGER.warn("!!!    functionality and wish to disable this warning.             !!!");
-            LOGGER.warn("!!!                                                                !!!");
-            LOGGER.warn("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            LOGGER.warn("""
+                    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                    !!!                                                                !!!
+                    !!!    Using history database whilst deleting disk history!        !!!
+                    !!!    You will not be able to rollback edits after a user logs    !!!
+                    !!!    out, recommended to disable delete-disk-on-logout if you    !!!
+                    !!!    want to have full history rollback functionality.           !!!
+                    !!!    Disable use-database if you do not need to have rollback    !!!
+                    !!!    functionality and wish to disable this warning.             !!!
+                    !!!                                                                !!!
+                    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!""");
         }
         try {
             byte[] in = new byte[0];
@@ -413,26 +415,31 @@ public class Fawe {
             final MemoryMXBean memBean = ManagementFactory.getMemoryMXBean();
             final NotificationEmitter ne = (NotificationEmitter) memBean;
 
+            AtomicLong lastWarn = new AtomicLong(System.currentTimeMillis());
             ne.addNotificationListener((notification, handback) -> {
                 final long heapSize = Runtime.getRuntime().totalMemory();
                 final long heapMaxSize = Runtime.getRuntime().maxMemory();
                 if (heapSize < heapMaxSize) {
                     return;
                 }
-                LOGGER.warn("High memory usage detected, FAWE will attempt to slow operations to prevent a crash.");
+                final long time = System.currentTimeMillis();
+                if (time > lastWarn.get() + TimeUnit.SECONDS.toMillis(30)) {
+                    lastWarn.set(time);
+                    LOGGER.warn("High memory usage detected, FAWE will attempt to slow operations to prevent a crash.");
+                }
                 MemUtil.memoryLimitedTask();
             }, null, null);
 
             final List<MemoryPoolMXBean> memPools = ManagementFactory.getMemoryPoolMXBeans();
             for (final MemoryPoolMXBean mp : memPools) {
-                if (mp.isUsageThresholdSupported()) {
+                if (mp.isCollectionUsageThresholdSupported()) {
                     final MemoryUsage mu = mp.getUsage();
                     final long max = mu.getMax();
                     if (max < 0) {
                         continue;
                     }
                     final long alert = (max * Settings.settings().MAX_MEMORY_PERCENT) / 100;
-                    mp.setUsageThreshold(alert);
+                    mp.setCollectionUsageThreshold(alert);
                 }
             }
         } catch (Throwable ignored) {

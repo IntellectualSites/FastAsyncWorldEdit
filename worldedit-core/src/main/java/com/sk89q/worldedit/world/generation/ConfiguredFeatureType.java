@@ -31,7 +31,7 @@ import java.util.List;
 public record ConfiguredFeatureType(String id, boolean place_on_face) implements Keyed {
 //FAWE end
 
-    public static final NamespacedRegistry<ConfiguredFeatureType> REGISTRY = new NamespacedRegistry<>("configured feature type");
+    public static final NamespacedRegistry<ConfiguredFeatureType> REGISTRY = new NamespacedRegistry<>("configured feature type", "configured_feature_type", "minecraft");
 
     //FAWE start - place on face
     public ConfiguredFeatureType(String id) {

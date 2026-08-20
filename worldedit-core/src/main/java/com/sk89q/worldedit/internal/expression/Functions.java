@@ -133,17 +133,18 @@ public final class Functions {
         map.put("swap", lookup.findStatic(Functions.class, "swap",
                 methodType(double.class, Variable.class, Variable.class)
         ));
-        map.put("gmegabuf", lookup.findStatic(Functions.class, "gmegabuf",
-                methodType(double.class, double.class)
-        ));
-        map.put("gmegabuf", lookup.findStatic(Functions.class, "gmegabuf",
-                methodType(double.class, double.class, double.class)
-        ));
-        map.put("gclosest", lookup.findStatic(Functions.class, "gclosest",
-                methodType(double.class, double.class, double.class, double.class, double.class,
-                        double.class, double.class
-                )
-        ));
+        // FAWE - disable global megabuffer methods
+        // map.put("gmegabuf", lookup.findStatic(Functions.class, "gmegabuf",
+        //         methodType(double.class, double.class)
+        // ));
+        // map.put("gmegabuf", lookup.findStatic(Functions.class, "gmegabuf",
+        //         methodType(double.class, double.class, double.class)
+        // ));
+        // map.put("gclosest", lookup.findStatic(Functions.class, "gclosest",
+        //         methodType(double.class, double.class, double.class, double.class, double.class,
+        //                 double.class, double.class
+        //         )
+        // ));
         map.put("random", lookup.findStatic(Functions.class, "random",
                 methodType(double.class)
         ));
@@ -263,6 +264,11 @@ public final class Functions {
     }
 
     private static double[] getSubBuffer(Int2ObjectMap<double[]> megabuf, int key) {
+        // avoid taking up more than 128 MiB (ignoring overhead)
+        if (megabuf.size() > 16384) {
+            megabuf.clear(); // make elements unreachable as soon as possible
+            throw new ExpressionException(-1, "memory limit reached");
+        }
         return megabuf.computeIfAbsent(key, k -> new double[1024]);
     }
 

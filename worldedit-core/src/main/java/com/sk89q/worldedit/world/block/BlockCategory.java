@@ -36,7 +36,7 @@ public class BlockCategory extends Category<BlockType> implements Keyed {
     //FAWE start
     private boolean[] flatMap;
     //FAWE end
-    public static final NamespacedRegistry<BlockCategory> REGISTRY = new NamespacedRegistry<>("block tag", true);
+    public static final NamespacedRegistry<BlockCategory> REGISTRY = new NamespacedRegistry<>("block tag", "block_tag", "minecraft", true);
 
     public BlockCategory(final String id) {
         super(id);

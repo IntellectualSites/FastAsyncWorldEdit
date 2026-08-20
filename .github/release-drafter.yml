@@ -1,1 +1,1 @@
-_extends: .github
+_extends: github:IntellectualSites/.github:/.github/release-drafter.yml

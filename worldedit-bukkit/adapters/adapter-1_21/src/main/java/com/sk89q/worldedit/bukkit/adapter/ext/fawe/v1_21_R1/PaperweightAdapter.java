@@ -29,6 +29,7 @@ import com.google.common.util.concurrent.Futures;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.Lifecycle;
 import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.blocks.BaseItemStack;
@@ -68,11 +69,13 @@ import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.entity.EntityTypes;
 import com.sk89q.worldedit.world.generation.ConfiguredFeatureType;
 import com.sk89q.worldedit.world.generation.StructureType;
+import com.sk89q.worldedit.world.generation.TreeType;
 import com.sk89q.worldedit.world.item.ItemType;
 import net.minecraft.SharedConstants;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponentPatch;
@@ -117,6 +120,10 @@ import net.minecraft.world.level.chunk.status.ChunkStatus;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.WorldOptions;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
+import net.minecraft.world.level.levelgen.feature.CoralTreeFeature;
+import net.minecraft.world.level.levelgen.feature.Feature;
+import net.minecraft.world.level.levelgen.feature.TreeFeature;
+import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureStart;
@@ -128,9 +135,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.World.Environment;
+import org.bukkit.block.TileState;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.craftbukkit.CraftWorld;
+import org.bukkit.craftbukkit.block.CraftBlockEntityState;
 import org.bukkit.craftbukkit.block.data.CraftBlockData;
 import org.bukkit.craftbukkit.entity.CraftEntity;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
@@ -614,6 +623,19 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
     }
 
     @Override
+    public void sendFakeNBT(Player player, BlockVector3 pos, TileState tileState, LinCompoundTag nbtData) {
+        CraftBlockEntityState<?> craftState = (CraftBlockEntityState<?>) tileState;
+
+        CompoundTag vanillaNBT = (net.minecraft.nbt.CompoundTag) fromNativeLin(nbtData);
+
+        ((CraftPlayer) player).getHandle().connection.send(new ClientboundBlockEntityDataPacket(
+            new BlockPos(pos.x(), pos.y(), pos.z()),
+            craftState.getTileEntity().getType(),
+            vanillaNBT
+        ));
+    }
+
+    @Override
     public void sendFakeOP(Player player) {
         ((CraftPlayer) player).getHandle().connection.send(new ClientboundEntityEventPacket(
             ((CraftPlayer) player).getHandle(), (byte) 28
@@ -927,6 +949,20 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
             }
         }
 
+        // Trees
+        HolderLookup.RegistryLookup<PlacedFeature> placedFeatureRegistry = server.registryAccess().lookupOrThrow(Registries.PLACED_FEATURE);
+        placedFeatureRegistry.listElements()
+                .filter(feature -> {
+                    var underlyingFeature = feature.value().feature().value().feature();
+                    return underlyingFeature instanceof TreeFeature || underlyingFeature instanceof CoralTreeFeature;
+                })
+                .forEach(feature -> {
+                    String key = feature.key().location().toString();
+                    if (TreeType.REGISTRY.get(key) == null) {
+                        TreeType.REGISTRY.register(key, new TreeType(key));
+                    }
+                });
+
         // BiomeCategories
         Registry<Biome> biomeRegistry = server.registryAccess().registryOrThrow(Registries.BIOME);
         biomeRegistry.getTagNames().forEach(tagKey -> {
@@ -957,6 +993,16 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
     }
 
     @Override
+    public boolean generateTree(TreeType treeType, World world, EditSession session, BlockVector3 pt) throws MaxChangedBlocksException {
+        ServerLevel originalWorld = ((CraftWorld) world).getHandle();
+        PlacedFeature k = originalWorld.registryAccess().lookupOrThrow(Registries.PLACED_FEATURE)
+                .getOrThrow(ResourceKey.create(Registries.PLACED_FEATURE, ResourceLocation.tryParse(treeType.id())))
+                .value();
+        ServerChunkCache chunkManager = originalWorld.getChunkSource();
+        WorldGenLevel proxyLevel = PaperweightServerLevelDelegateProxy.newInstance(session, originalWorld, this);
+        return k != null && k.place(proxyLevel, chunkManager.getGenerator(), random, new BlockPos(pt.x(), pt.y(), pt.z()));
+    }
+
     public boolean generateFeature(ConfiguredFeatureType type, World world, EditSession session, BlockVector3 pt) {
         ServerLevel originalWorld = ((CraftWorld) world).getHandle();
         ConfiguredFeature<?, ?> k = originalWorld.registryAccess().registryOrThrow(Registries.CONFIGURED_FEATURE).get(ResourceLocation.tryParse(type.id()));

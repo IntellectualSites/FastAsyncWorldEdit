@@ -19,13 +19,13 @@ jobs:
         language: ['java']
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       - name: Setup Java
         uses: actions/setup-java@v5
         with:
           distribution: temurin
           cache: gradle
-          java-version: 21
+          java-version: 25
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v4
         with:

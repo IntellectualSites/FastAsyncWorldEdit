@@ -13,6 +13,7 @@ import com.fastasyncworldedit.core.queue.IChunk;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.IChunkSet;
 import com.fastasyncworldedit.core.registry.state.PropertyKey;
+import com.fastasyncworldedit.core.util.ExtentTraverser;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
@@ -24,6 +25,7 @@ import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.util.Direction;
+import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockCategories;
 import com.sk89q.worldedit.world.block.BlockCategory;
@@ -112,6 +114,18 @@ public abstract class PlacementStateProcessor extends AbstractDelegateExtent imp
         this.postCompleteSecondPasses = crossChunkSecondPasses;
         this.threadProcessors = threadProcessors;
         this.finished = finished;
+    }
+
+    protected static World getWorldFromExtent(Extent extent) throws UnsupportedOperationException {
+        World world = ExtentTraverser.getWorldFromExtent(extent);
+        if (world == null) {
+            throw new UnsupportedOperationException(
+                    "World is required for PlacementStateProcessor but none found in given extent (" + extent
+                            .getClass()
+                            .getName() + ").");
+        }
+        return world;
+
     }
 
     private static void setup() {

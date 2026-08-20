@@ -8,6 +8,8 @@ plugins {
     id("io.papermc.paperweight.userdev")
 }
 
+val requiresReobfJar = project.name.startsWith("adapter-1_")
+
 paperweight {
     injectPaperRepository = false
     reobfArtifactConfiguration = io.papermc.paperweight.userdev.ReobfArtifactConfiguration.REOBF_PRODUCTION
@@ -18,23 +20,23 @@ repositories {
         name = "PaperMC"
         url = uri("https://repo.papermc.io/repository/maven-public/")
         content {
-            excludeModule("io.papermc.paper", "dev-bundle")
+            // excludeModule("io.papermc.paper", "dev-bundle")
         }
     }
     maven {
         name = "EngineHub Repository"
         url = uri("https://maven.enginehub.org/repo/")
         content {
-            excludeModule("io.papermc.paper", "dev-bundle")
+            // excludeModule("io.papermc.paper", "dev-bundle")
         }
     }
-    maven {
+/*    maven {
         name = "IntellectualSites"
         url = uri("https://repo.intellectualsites.dev/repository/paper-dev-bundles/")
         content {
-            includeModule("io.papermc.paper", "dev-bundle")
+            // includeModule("io.papermc.paper", "dev-bundle")
         }
-    }
+    }*/
     mavenCentral()
     afterEvaluate {
         killNonEngineHubRepositories()
@@ -52,8 +54,15 @@ dependencies {
     }
 }
 
+java {
+    // Required when we de-sync release option and declared Java versions.
+    disableAutoTargetJvm()
+}
+
 tasks.named("assemble") {
-    dependsOn("reobfJar")
+    if (requiresReobfJar) {
+        dependsOn("reobfJar")
+    }
 }
 
 tasks.named<Javadoc>("javadoc") {
