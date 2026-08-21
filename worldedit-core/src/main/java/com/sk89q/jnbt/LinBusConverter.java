@@ -44,7 +44,7 @@ import java.util.Objects;
 import java.util.function.Function;
 
 /**
- * Converts between JNBT and Adventure-NBT classes.
+ * Converts between JNBT and lin-bus classes.
  *
  * @deprecated JNBT is being removed in WE8.
  */
