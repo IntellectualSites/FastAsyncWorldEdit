@@ -33,7 +33,6 @@ jlibnoise = "1.0.0"
 jchronic = "0.2.4a"
 lz4-java = "1.11.1"
 commons-cli = "1.11.0"
-paperLib = "1.0.8"
 paster = "1.1.7"
 vault = "1.7.1"
 serverlib = "2.3.7"
@@ -106,7 +105,6 @@ jlibnoise = { group = "com.sk89q.lib", name = "jlibnoise", version.ref = "jlibno
 jchronic = { group = "com.sk89q", name = "jchronic", version.ref = "jchronic" }
 lz4Java = { group = "at.yawk.lz4", name = "lz4-java", version.ref = "lz4-java" }
 commonsCli = { group = "commons-cli", name = "commons-cli", version.ref = "commons-cli" }
-paperLib = { group = "io.papermc", name = "paperlib", version.ref = "paperLib" }
 adventureApi = { group = "net.kyori", name = "adventure-api", version.ref = "adventure" }
 adventureMiniMessage = { group = "net.kyori", name = "adventure-text-minimessage", version.ref = "adventure" }
 paster = { group = "com.intellectualsites.paster", name = "Paster", version.ref = "paster" }
