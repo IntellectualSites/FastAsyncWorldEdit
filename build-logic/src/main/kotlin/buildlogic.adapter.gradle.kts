@@ -23,6 +23,9 @@ repositories {
     maven {
         name = "EngineHub Repository"
         url = uri("https://maven.enginehub.org/repo/")
+        content {
+            excludeModule("net.fabricmc", "yarn")
+        }
     }
     maven {
         name = "IntellectualSites"
