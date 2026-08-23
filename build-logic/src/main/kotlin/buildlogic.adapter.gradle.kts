@@ -19,24 +19,15 @@ repositories {
     maven {
         name = "PaperMC"
         url = uri("https://repo.papermc.io/repository/maven-public/")
-        content {
-            // excludeModule("io.papermc.paper", "dev-bundle")
-        }
     }
     maven {
         name = "EngineHub Repository"
         url = uri("https://maven.enginehub.org/repo/")
-        content {
-            // excludeModule("io.papermc.paper", "dev-bundle")
-        }
     }
-/*    maven {
+    maven {
         name = "IntellectualSites"
-        url = uri("https://repo.intellectualsites.dev/repository/paper-dev-bundles/")
-        content {
-            // includeModule("io.papermc.paper", "dev-bundle")
-        }
-    }*/
+        url = uri("https://repo.intellectualsites.dev/repository/maven-all/")
+    }
     mavenCentral()
     afterEvaluate {
         killNonEngineHubRepositories()
