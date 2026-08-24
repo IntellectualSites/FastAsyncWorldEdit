@@ -64,7 +64,6 @@ minimumJdependency = "2.10"
 
 [libraries]
 # Gradle plugins
-grgit = { group = "org.ajoberstar.grgit", name = "grgit-gradle", version.ref = "grgit" }
 shadow = { group = "com.gradleup.shadow", name = "shadow-gradle-plugin", version.ref = "shadow" }
 paperweight = { group = "io.papermc.paperweight.userdev", name = "io.papermc.paperweight.userdev.gradle.plugin", version.ref = "paperweight" }
 
