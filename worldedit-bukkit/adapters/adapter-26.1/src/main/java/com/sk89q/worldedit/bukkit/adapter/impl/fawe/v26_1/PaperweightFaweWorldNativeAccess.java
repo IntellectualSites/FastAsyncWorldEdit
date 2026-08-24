@@ -3,7 +3,6 @@ package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v26_1;
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.math.IntPair;
 import com.fastasyncworldedit.core.util.TaskManager;
-import com.fastasyncworldedit.core.util.task.RunnableVal;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.internal.block.BlockStateIdAccess;
 import com.sk89q.worldedit.internal.wna.WorldNativeAccess;
@@ -247,40 +246,34 @@ public class PaperweightFaweWorldNativeAccess implements WorldNativeAccess<Level
         } else {
             toSend = Collections.emptySet();
         }
-        RunnableVal<Object> runnableVal = new RunnableVal<>() {
-            @Override
-            public void run(Object value) {
-                changes.forEach(cc -> cc.levelChunk.setBlockState(cc.blockPos, cc.blockState,
-                        sideEffectSet.shouldApply(SideEffect.UPDATE) ? 0 : 512
-                ));
-                if (!sendChunks) {
-                    return;
-                }
-                for (IntPair chunk : toSend) {
-                    PaperweightPlatformAdapter.sendChunk(chunk, getLevel().getWorld().getHandle(), chunk.x(), chunk.z());
-                }
+        Runnable runnable = () -> {
+            changes.forEach(cc -> cc.levelChunk.setBlockState(cc.blockPos, cc.blockState,
+                    sideEffectSet.shouldApply(SideEffect.UPDATE) ? 0 : 512
+            ));
+            if (!sendChunks) {
+                return;
+            }
+            for (IntPair chunk : toSend) {
+                PaperweightPlatformAdapter.sendChunk(chunk, getLevel().getWorld().getHandle(), chunk.x(), chunk.z());
             }
         };
-        TaskManager.taskManager().async(() -> TaskManager.taskManager().sync(runnableVal));
+        TaskManager.taskManager().async(() -> TaskManager.taskManager().sync(runnable));
     }
 
     @Override
     public synchronized void flush() {
-        RunnableVal<Object> runnableVal = new RunnableVal<>() {
-            @Override
-            public void run(Object value) {
-                cachedChanges.forEach(cc -> cc.levelChunk.setBlockState(cc.blockPos, cc.blockState,
-                        sideEffectSet.shouldApply(SideEffect.UPDATE) ? 0 : 512
-                ));
-                for (IntPair chunk : cachedChunksToSend) {
-                    PaperweightPlatformAdapter.sendChunk(chunk, getLevel().getWorld().getHandle(), chunk.x(), chunk.z());
-                }
+        Runnable runnable = () -> {
+            cachedChanges.forEach(cc -> cc.levelChunk.setBlockState(cc.blockPos, cc.blockState,
+                    sideEffectSet.shouldApply(SideEffect.UPDATE) ? 0 : 512
+            ));
+            for (IntPair chunk : cachedChunksToSend) {
+                PaperweightPlatformAdapter.sendChunk(chunk, getLevel().getWorld().getHandle(), chunk.x(), chunk.z());
             }
         };
         if (Fawe.isMainThread()) {
-            runnableVal.run();
+            runnable.run();
         } else {
-            TaskManager.taskManager().sync(runnableVal);
+            TaskManager.taskManager().sync(runnable);
         }
         cachedChanges.clear();
         cachedChunksToSend.clear();

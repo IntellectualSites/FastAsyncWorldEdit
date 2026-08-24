@@ -21,7 +21,6 @@ package com.sk89q.worldedit.extent.clipboard.io;
 
 import com.fastasyncworldedit.core.extent.clipboard.URIClipboardHolder;
 import com.fastasyncworldedit.core.util.MainUtil;
-import com.fastasyncworldedit.core.util.task.RunnableVal;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.platform.Actor;
@@ -165,12 +164,7 @@ public interface ClipboardFormat {
     }
 
     default URL upload(final Clipboard clipboard) {
-        return MainUtil.upload(null, null, getPrimaryFileExtension(), new RunnableVal<>() {
-            @Override
-            public void run(OutputStream value) {
-                write(value, clipboard);
-            }
-        });
+        return MainUtil.upload(null, null, getPrimaryFileExtension(), value -> write(value, clipboard));
     }
 
     default void write(OutputStream value, Clipboard clipboard) {
