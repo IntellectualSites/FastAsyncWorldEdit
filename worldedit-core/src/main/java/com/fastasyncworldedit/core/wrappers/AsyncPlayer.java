@@ -3,7 +3,6 @@ package com.fastasyncworldedit.core.wrappers;
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.fastasyncworldedit.core.util.TaskManager;
-import com.fastasyncworldedit.core.util.task.RunnableVal;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
@@ -38,32 +37,17 @@ public class AsyncPlayer extends PlayerProxy {
 
     @Override
     public void findFreePosition(Location searchPos) {
-        TaskManager.taskManager().sync(new RunnableVal<Boolean>() {
-            @Override
-            public void run(Boolean value) {
-                getBasePlayer().findFreePosition(searchPos);
-            }
-        });
+        TaskManager.taskManager().sync(() -> getBasePlayer().findFreePosition(searchPos));
     }
 
     @Override
     public void setOnGround(Location searchPos) {
-        TaskManager.taskManager().sync(new RunnableVal<Boolean>() {
-            @Override
-            public void run(Boolean value) {
-                getBasePlayer().setOnGround(searchPos);
-            }
-        });
+        TaskManager.taskManager().sync(() -> getBasePlayer().setOnGround(searchPos));
     }
 
     @Override
     public void findFreePosition() {
-        TaskManager.taskManager().sync(new RunnableVal<Boolean>() {
-            @Override
-            public void run(Boolean value) {
-                getBasePlayer().findFreePosition();
-            }
-        });
+        TaskManager.taskManager().sync(() -> getBasePlayer().findFreePosition());
     }
 
     @Override
