@@ -1025,8 +1025,8 @@ public class TextureUtil implements TextureHolder {
                                 BufferedImage image = ImageIO.read(is);
                                 // Update biome colors
                                 for (BiomeColor biome : biomes) {
-                                    float adjTemp = MathMan.clamp(biome.temperature, 0.0f, 1.0f);
-                                    float adjRainfall = MathMan.clamp(biome.rainfall, 0.0f, 1.0f) * adjTemp;
+                                    float adjTemp = Math.clamp(biome.temperature, 0.0f, 1.0f);
+                                    float adjRainfall = Math.clamp(biome.rainfall, 0.0f, 1.0f) * adjTemp;
                                     int x = (int) (255 - adjTemp * 255);
                                     int z = (int) (255 - adjRainfall * 255);
                                     biome.grass = image.getRGB(x, z);

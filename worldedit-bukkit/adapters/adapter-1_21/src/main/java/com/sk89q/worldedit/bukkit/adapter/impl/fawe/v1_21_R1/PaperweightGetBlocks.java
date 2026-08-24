@@ -3,6 +3,7 @@ package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_21_R1;
 import com.fastasyncworldedit.bukkit.adapter.AbstractBukkitGetBlocks;
 import com.fastasyncworldedit.bukkit.adapter.DelegateSemaphore;
 import com.fastasyncworldedit.bukkit.adapter.NativeEntityFunctionSet;
+import com.fastasyncworldedit.bukkit.util.PaperSupport;
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.configuration.Settings;
@@ -27,7 +28,6 @@ import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
-import io.papermc.lib.PaperLib;
 import io.papermc.paper.event.block.BeaconDeactivatedEvent;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
@@ -361,7 +361,7 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
                 int ordinal = set.getBlock(lx, ly, lz).getOrdinal();
                 if (ordinal != BlockTypesCache.ReservedIDs.__RESERVED__) {
                     BlockEntity tile = entry.getValue();
-                    if (PaperLib.isPaper() && tile instanceof BeaconBlockEntity) {
+                    if (PaperSupport.isPaper() && tile instanceof BeaconBlockEntity) {
                         if (beacons == null) {
                             beacons = new ArrayList<>();
                         }
@@ -691,7 +691,7 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
                                 if (!set.getSideEffectSet().shouldApply(SideEffect.ENTITY_EVENTS)) {
                                     entity.spawnReason = CreatureSpawnEvent.SpawnReason.CUSTOM;
                                     entity.generation = false;
-                                    if (PaperLib.isPaper()) {
+                                    if (PaperSupport.isPaper()) {
                                         if (!nmsWorld.moonrise$getEntityLookup().addNewEntity(entity)) {
                                             onError.run();
                                         }
