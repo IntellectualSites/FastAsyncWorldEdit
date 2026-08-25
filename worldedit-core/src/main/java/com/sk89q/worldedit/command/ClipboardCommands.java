@@ -320,10 +320,11 @@ public class ClipboardCommands {
             Operations.completeLegacy(copy);
         } catch (Exception e) {
             DiskOptimizedClipboard doc;
-            if (clipboard instanceof DiskOptimizedClipboard) {
-                doc = (DiskOptimizedClipboard) clipboard;
-            } else if (clipboard instanceof BlockArrayClipboard && ((BlockArrayClipboard) clipboard).getParent() instanceof DiskOptimizedClipboard) {
-                doc = (DiskOptimizedClipboard) ((BlockArrayClipboard) clipboard).getParent();
+            if (clipboard instanceof final DiskOptimizedClipboard diskOptimizedClipboard) {
+                doc = diskOptimizedClipboard;
+            } else if (clipboard instanceof BlockArrayClipboard blockArrayClipboard
+                    && blockArrayClipboard.getParent() instanceof DiskOptimizedClipboard parentDoc) {
+                doc = parentDoc;
             } else {
                 throw e;
             }
@@ -360,13 +361,11 @@ public class ClipboardCommands {
         ClipboardHolder holder = session.getClipboard();
 
         URL url;
-        if (holder instanceof MultiClipboardHolder) {
-            MultiClipboardHolder multi = (MultiClipboardHolder) holder;
+        if (holder instanceof MultiClipboardHolder multi) {
             Set<File> files = new HashSet<>();
             Set<URI> invalid = new HashSet<>();
             for (ClipboardHolder cur : multi.getHolders()) {
-                if (cur instanceof URIClipboardHolder) {
-                    URIClipboardHolder uriHolder = (URIClipboardHolder) cur;
+                if (cur instanceof URIClipboardHolder uriHolder) {
                     URI uri = uriHolder.getUri();
                     File file = new File(uri.getPath());
                     if (file.exists() && file.isFile()) {
@@ -599,8 +598,8 @@ public class ClipboardCommands {
     //FAWE start
     private void checkPaste(Actor player, EditSession editSession, BlockVector3 to, ClipboardHolder holder, Clipboard clipboard) {
         URI uri = null;
-        if (holder instanceof URIClipboardHolder) {
-            uri = ((URIClipboardHolder) holder).getURI(clipboard);
+        if (holder instanceof URIClipboardHolder uriHolder) {
+            uri = uriHolder.getURI(clipboard);
         }
         PasteEvent event = new PasteEvent(player, clipboard, uri, editSession, to);
         WorldEdit.getInstance().getEventBus().post(event);
@@ -669,10 +668,11 @@ public class ClipboardCommands {
         }
         for (Clipboard clipboard : holder.getClipboards()) {
             DiskOptimizedClipboard doc;
-            if (clipboard instanceof DiskOptimizedClipboard) {
-                doc = (DiskOptimizedClipboard) clipboard;
-            } else if (clipboard instanceof BlockArrayClipboard && ((BlockArrayClipboard) clipboard).getParent() instanceof DiskOptimizedClipboard) {
-                doc = (DiskOptimizedClipboard) ((BlockArrayClipboard) clipboard).getParent();
+            if (clipboard instanceof DiskOptimizedClipboard diskOptimizedClipboard) {
+                doc = diskOptimizedClipboard;
+            } else if (clipboard instanceof BlockArrayClipboard blockArrayClipboard
+                    && blockArrayClipboard.getParent() instanceof DiskOptimizedClipboard parentDoc) {
+                doc = parentDoc;
             } else {
                 continue;
             }

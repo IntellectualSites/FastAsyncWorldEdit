@@ -99,7 +99,7 @@ public class BiomeType implements RegistryItem, Keyed, BiomePattern {
 
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof BiomeType && this.id.equals(((BiomeType) obj).id);
+        return obj instanceof BiomeType biomeType && this.id.equals(biomeType.id);
     }
     //FAWE end
 

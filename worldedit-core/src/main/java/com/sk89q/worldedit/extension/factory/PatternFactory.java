@@ -142,16 +142,17 @@ public final class PatternFactory extends AbstractFactory<Pattern> {
     @Override
     protected Pattern getParsed(final String input, final List<Pattern> patterns) {
         switch (patterns.size()) {
-            case 0:
-                throw new NoMatchException(Caption.of("worldedit.error.no-match", TextComponent.of(input)));
-            case 1:
-                return patterns.get(0);
-            default:
+            case 0 -> throw new NoMatchException(Caption.of("worldedit.error.no-match", TextComponent.of(input)));
+            case 1 -> {
+                return patterns.getFirst();
+            }
+            default -> {
                 RandomPattern randomPattern = new RandomPattern(new TrueRandom());
                 for (Pattern pattern : patterns) {
                     randomPattern.add(pattern, 1d);
                 }
                 return randomPattern;
+            }
         }
     }
     //FAWE end

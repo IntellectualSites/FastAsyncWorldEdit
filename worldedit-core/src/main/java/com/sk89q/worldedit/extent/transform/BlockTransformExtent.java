@@ -169,20 +169,20 @@ public class BlockTransformExtent extends ResettableExtent {
             List<?> values = property.getValues();
             PropertyKey key = property.getKey();
             switch (key.getName().toLowerCase()) {
-                case "half": {
+                case "half" -> {
                     return adapt(UP, DOWN);
                 }
-                case "type": {
+                case "type" -> {
                     return adapt(combine(UP), combine(DOWN), 0L);
                 }
-                case "rotation": {
+                case "rotation" -> {
                     List<Direction> directions = new ArrayList<>();
                     for (Object value : values) {
                         directions.add(Direction.fromRotationIndex((Integer) value).orElseThrow());
                     }
                     return adapt(directions.toArray(new Direction[0]));
                 }
-                case "axis": {
+                case "axis" -> {
                     return switch (property.getValues().size()) {
                         case 3 -> adapt(combine(EAST, WEST), combine(UP, DOWN), combine(SOUTH, NORTH));
                         case 2 -> adapt(combine(EAST, WEST), combine(SOUTH, NORTH));
@@ -192,26 +192,26 @@ public class BlockTransformExtent extends ResettableExtent {
                         }
                     };
                 }
-                case "facing": {
+                case "facing" -> {
                     List<Direction> directions = new ArrayList<>();
                     for (Object value : values) {
                         directions.add(Direction.valueOf(value.toString().toUpperCase(Locale.ROOT)));
                     }
                     return adapt(directions.toArray(new Direction[0]));
                 }
-                case "face": {
+                case "face" -> {
                     if (values.size() == 3) {
                         return adapt(combine(UP), combine(NORTH, EAST, SOUTH, WEST), combine(DOWN));
                     }
                     return null;
                 }
-                case "hinge": {
+                case "hinge" -> {
                     return adapt(
                             combine(NORTHEAST, NORTHWEST, SOUTHEAST, SOUTHWEST),
                             combine(NORTHEAST, NORTHWEST, SOUTHEAST, SOUTHWEST)
                     );
                 }
-                case "shape": {
+                case "shape" -> {
                     if (values.contains("left")) {
                         return adapt(combine(EAST, WEST), combine(NORTH, SOUTH));
                     }
@@ -247,72 +247,37 @@ public class BlockTransformExtent extends ResettableExtent {
                         List<Long> directions = new ArrayList<>();
                         for (Object value : values) {
                             switch (value.toString()) {
-                                case "north_south":
-                                    directions.add(combine(NORTH, SOUTH));
-                                    break;
-                                case "east_west":
-                                    directions.add(combine(EAST, WEST));
-                                    break;
-                                case "ascending_east":
-                                    directions.add(combine(ASCENDING_EAST));
-                                    break;
-                                case "ascending_west":
-                                    directions.add(combine(ASCENDING_WEST));
-                                    break;
-                                case "ascending_north":
-                                    directions.add(combine(ASCENDING_NORTH));
-                                    break;
-                                case "ascending_south":
-                                    directions.add(combine(ASCENDING_SOUTH));
-                                    break;
-                                case "south_east":
-                                    directions.add(combine(SOUTHEAST));
-                                    break;
-                                case "south_west":
-                                    directions.add(combine(SOUTHWEST));
-                                    break;
-                                case "north_west":
-                                    directions.add(combine(NORTHWEST));
-                                    break;
-                                case "north_east":
-                                    directions.add(combine(NORTHEAST));
-                                    break;
-                                default:
+                                case "north_south" -> directions.add(combine(NORTH, SOUTH));
+                                case "east_west" -> directions.add(combine(EAST, WEST));
+                                case "ascending_east" -> directions.add(combine(ASCENDING_EAST));
+                                case "ascending_west" -> directions.add(combine(ASCENDING_WEST));
+                                case "ascending_north" -> directions.add(combine(ASCENDING_NORTH));
+                                case "ascending_south" -> directions.add(combine(ASCENDING_SOUTH));
+                                case "south_east" -> directions.add(combine(SOUTHEAST));
+                                case "south_west" -> directions.add(combine(SOUTHWEST));
+                                case "north_west" -> directions.add(combine(NORTHWEST));
+                                case "north_east" -> directions.add(combine(NORTHEAST));
+                                default -> {
                                     LOGGER.warn("Unknown direction {}", value);
                                     directions.add(0L);
+                                }
                             }
                         }
                         return adapt(directions.toArray(new Long[0]));
                     }
                 }
-                case "orientiation": {
+                case "orientation" -> {
                     List<Long> directions = new ArrayList<>();
                     for (Object value : values) {
                         switch (value.toString()) {
-                            case "ascending_east":
-                                directions.add(combine(ASCENDING_EAST));
-                                break;
-                            case "ascending_west":
-                                directions.add(combine(ASCENDING_WEST));
-                                break;
-                            case "ascending_north":
-                                directions.add(combine(ASCENDING_NORTH));
-                                break;
-                            case "ascending_south":
-                                directions.add(combine(ASCENDING_SOUTH));
-                                break;
-                            case "descending_east":
-                                directions.add(combine(DESCENDING_EAST));
-                                break;
-                            case "descending_west":
-                                directions.add(combine(DESCENDING_WEST));
-                                break;
-                            case "descending_north":
-                                directions.add(combine(DESCENDING_NORTH));
-                                break;
-                            case "descending_south":
-                                directions.add(combine(DESCENDING_SOUTH));
-                                break;
+                            case "ascending_east" -> directions.add(combine(ASCENDING_EAST));
+                            case "ascending_west" -> directions.add(combine(ASCENDING_WEST));
+                            case "ascending_north" -> directions.add(combine(ASCENDING_NORTH));
+                            case "ascending_south" -> directions.add(combine(ASCENDING_SOUTH));
+                            case "descending_east" -> directions.add(combine(DESCENDING_EAST));
+                            case "descending_west" -> directions.add(combine(DESCENDING_WEST));
+                            case "descending_north" -> directions.add(combine(DESCENDING_NORTH));
+                            case "descending_south" -> directions.add(combine(DESCENDING_SOUTH));
                         }
                     }
                     return adapt(directions.toArray(new Long[0]));
@@ -353,8 +318,8 @@ public class BlockTransformExtent extends ResettableExtent {
             Vector3 newVector = transform.apply(oldVector).subtract(transform.apply(Vector3.ZERO)).normalize();
             boolean flip = false;
 
-            if (transform instanceof AffineTransform) {
-                flip = ((AffineTransform) transform).isScaled(oldVector);
+            if (transform instanceof AffineTransform affineTransform) {
+                flip = affineTransform.isScaled(oldVector);
             }
 
             // If we're flipping, it is possible for the old and new vectors to be equal

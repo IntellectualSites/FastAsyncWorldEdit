@@ -39,29 +39,26 @@ import java.util.stream.Collectors;
 public class CLIBlockRegistry extends BundledBlockRegistry {
 
     private Property<?> createProperty(String type, String key, List<String> values) {
-        switch (type) {
-            case "int": {
+        return switch (type) {
+            case "int" -> {
                 List<Integer> fixedValues = values.stream().map(Integer::parseInt).collect(Collectors.toList());
-                return new IntegerProperty(key, fixedValues);
+                yield new IntegerProperty(key, fixedValues);
             }
-            case "bool": {
+            case "bool" -> {
                 List<Boolean> fixedValues = values.stream().map(Boolean::parseBoolean).collect(Collectors.toList());
-                return new BooleanProperty(key, fixedValues);
+                yield new BooleanProperty(key, fixedValues);
             }
-            case "enum": {
-                return new EnumProperty(key, values);
-            }
-            case "direction": {
+            case "enum" -> new EnumProperty(key, values);
+            case "direction" -> {
                 List<Direction> fixedValues = values
                         .stream()
                         .map(String::toUpperCase)
                         .map(Direction::valueOf)
                         .collect(Collectors.toList());
-                return new DirectionalProperty(key, fixedValues);
+                yield new DirectionalProperty(key, fixedValues);
             }
-            default:
-                throw new RuntimeException("Failed to create property");
-        }
+            default -> throw new RuntimeException("Failed to create property");
+        };
     }
 
     @Nullable

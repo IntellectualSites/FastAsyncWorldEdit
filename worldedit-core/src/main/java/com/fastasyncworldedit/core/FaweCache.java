@@ -36,6 +36,8 @@ import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import org.apache.logging.log4j.Logger;
+import org.enginehub.linbus.tree.LinCompoundTag;
+import org.enginehub.linbus.tree.LinTag;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
@@ -664,9 +666,8 @@ public enum FaweCache implements Trimable {
 
             protected synchronized void afterExecute(Runnable runnable, Throwable throwable) {
                 super.afterExecute(runnable, throwable);
-                if (throwable == null && runnable instanceof Future<?>) {
+                if (throwable == null && runnable instanceof final Future<?> future) {
                     try {
-                        Future<?> future = (Future<?>) runnable;
                         if (future.isDone()) {
                             future.get();
                         }
