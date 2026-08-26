@@ -62,6 +62,13 @@ dependencies {
     // Tests
     testRuntimeOnly(libs.log4j.core)
     testImplementation(libs.parallelgzip)
+    // lz4-java is compileOnly for the main sourceSet (expected to be shaded in by platform jars
+    // at runtime), but MainUtil#getCompressedOS() references LZ4 stream types even on code paths
+    // that aren't taken at COMPRESSION_LEVEL 0 - the JVM verifier still needs to resolve those
+    // types when the method is first invoked, so tests exercising that method (e.g.
+    // DiskStorageHistory's stream getters, which delegate to it) need the real classes on the
+    // test runtime classpath.
+    testImplementation(libs.lz4Java) { isTransitive = false }
 }
 
 tasks.test {
