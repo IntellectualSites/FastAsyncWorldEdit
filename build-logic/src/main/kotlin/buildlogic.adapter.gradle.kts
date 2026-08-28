@@ -12,6 +12,9 @@ repositories {
     maven {
         name = "EngineHub Repository"
         url = uri("https://maven.enginehub.org/repo/")
+        content {
+            excludeModule("net.fabricmc", "yarn")
+        }
     }
     maven {
         name = "PaperMC"
@@ -22,9 +25,6 @@ repositories {
         url = uri("https://maven.fabricmc.net/#yarn-only")
     }
     mavenCentral()
-    afterEvaluate {
-        killNonEngineHubRepositories()
-    }
 }
 
 dependencies {
