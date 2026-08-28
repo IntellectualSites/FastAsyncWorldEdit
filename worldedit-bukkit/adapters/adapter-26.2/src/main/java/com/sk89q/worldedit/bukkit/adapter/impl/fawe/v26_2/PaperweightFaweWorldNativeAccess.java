@@ -6,6 +6,7 @@ import com.fastasyncworldedit.core.util.TaskManager;
 import com.fastasyncworldedit.core.util.task.RunnableVal;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.internal.block.BlockStateIdAccess;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.internal.wna.WorldNativeAccess;
 import com.sk89q.worldedit.util.SideEffect;
 import com.sk89q.worldedit.util.SideEffectSet;
@@ -21,6 +22,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.redstone.ExperimentalRedstoneUtils;
 import net.minecraft.world.level.storage.ValueInput;
+import org.apache.logging.log4j.Logger;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.block.data.CraftBlockData;
 import org.bukkit.event.block.BlockPhysicsEvent;
@@ -38,6 +40,8 @@ import static com.sk89q.worldedit.bukkit.adapter.impl.fawe.v26_2.PaperweightPlat
 
 public class PaperweightFaweWorldNativeAccess implements WorldNativeAccess<LevelChunk,
         net.minecraft.world.level.block.state.BlockState, BlockPos> {
+
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     private static final int UPDATE = 1;
     private static final int NOTIFY = 2;
@@ -207,9 +211,15 @@ public class PaperweightFaweWorldNativeAccess implements WorldNativeAccess<Level
         if (sideEffectSet.shouldApply(SideEffect.EVENTS)) {
             CraftWorld craftWorld = level.getWorld();
             if (craftWorld != null) {
+                CraftBlockData cbd;
+                try {
+                    cbd = PlatformCompat.fromData(newState);
+                } catch (Throwable e) {
+                    LOGGER.error("Failed to update neighbors: Failed to convert BlockState to CraftBlockData", e);
+                    return;
+                }
                 BlockPhysicsEvent event = new BlockPhysicsEvent(
-                        craftWorld.getBlockAt(blockPos.getX(), blockPos.getY(), blockPos.getZ()),
-                        newState.asBlockData()
+                        craftWorld.getBlockAt(blockPos.getX(), blockPos.getY(), blockPos.getZ()), cbd
                 );
                 level.getCraftServer().getPluginManager().callEvent(event);
                 if (event.isCancelled()) {
