@@ -94,7 +94,6 @@ dependencies {
     }
     localImplementation(libs.log4j.api)
 
-    implementation(libs.paperLib)
     compileOnly(libs.vault) { isTransitive = false }
     compileOnly(libs.dummypermscompat) {
         exclude("com.github.MilkBowl", "VaultAPI")
@@ -217,9 +216,6 @@ tasks.withType<ShadowJar>().configureEach {
         relocate("org.bstats", "com.sk89q.worldedit.bstats") {
             include(dependency(libs.bstats.bukkit))
             include(dependency(libs.bstats.base))
-        }
-        relocate("io.papermc.lib", "com.sk89q.worldedit.bukkit.paperlib") {
-            include(dependency("io.papermc:paperlib"))
         }
         relocate("net.royawesome.jlibnoise", "com.sk89q.worldedit.jlibnoise") {
             include(dependency("com.sk89q.lib:jlibnoise"))

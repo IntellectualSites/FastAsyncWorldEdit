@@ -13,15 +13,15 @@ worldguard-bukkit = "7.0.17"
 griefprevention = "18.0.0"
 griefdefender = "2.1.0-SNAPSHOT"
 residence = "6.0.2.3"
-towny = "0.103.0.7"
-plotsquared = "7.5.13"
+towny = "0.103.2.0"
+plotsquared = "7.6.0"
 
 # Third party
 bstats = "3.2.1"
 sparsebitset = "1.3"
 parallelgzip = "1.0.5"
 adventure = "5.2.0"
-checkerqual = "4.2.1"
+checkerqual = "4.2.2"
 truezip = "6.8.4"
 auto-value = "1.11.1"
 jsr305 = "3.0.2"
@@ -31,9 +31,8 @@ antlr4 = "4.13.2"
 json-simple = "1.1.1"
 jlibnoise = "1.0.0"
 jchronic = "0.2.4a"
-lz4-java = "1.11.1"
+lz4-java = "1.11.2"
 commons-cli = "1.11.0"
-paperLib = "1.0.8"
 paster = "1.1.7"
 vault = "1.7.1"
 serverlib = "2.3.7"
@@ -52,7 +51,7 @@ junit = "6.1.2"
 
 # Gradle plugins
 pluginyml = "0.6.0"
-mod-publish-plugin = "2.1.1"
+mod-publish-plugin = "2.2.0"
 grgit = "5.3.3"
 shadow = "9.5.1"
 paperweight = "2.0.0-SNAPSHOT"
@@ -65,7 +64,6 @@ minimumJdependency = "2.10"
 
 [libraries]
 # Gradle plugins
-grgit = { group = "org.ajoberstar.grgit", name = "grgit-gradle", version.ref = "grgit" }
 shadow = { group = "com.gradleup.shadow", name = "shadow-gradle-plugin", version.ref = "shadow" }
 paperweight = { group = "io.papermc.paperweight.userdev", name = "io.papermc.paperweight.userdev.gradle.plugin", version.ref = "paperweight" }
 
@@ -106,7 +104,6 @@ jlibnoise = { group = "com.sk89q.lib", name = "jlibnoise", version.ref = "jlibno
 jchronic = { group = "com.sk89q", name = "jchronic", version.ref = "jchronic" }
 lz4Java = { group = "at.yawk.lz4", name = "lz4-java", version.ref = "lz4-java" }
 commonsCli = { group = "commons-cli", name = "commons-cli", version.ref = "commons-cli" }
-paperLib = { group = "io.papermc", name = "paperlib", version.ref = "paperLib" }
 adventureApi = { group = "net.kyori", name = "adventure-api", version.ref = "adventure" }
 adventureMiniMessage = { group = "net.kyori", name = "adventure-text-minimessage", version.ref = "adventure" }
 paster = { group = "com.intellectualsites.paster", name = "Paster", version.ref = "paster" }

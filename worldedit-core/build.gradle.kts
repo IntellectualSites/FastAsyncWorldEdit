@@ -70,7 +70,6 @@ tasks.test {
 }
 
 tasks.compileJava {
-    dependsOn(":worldedit-libs:build")
     options.compilerArgs.add("-Aarg.name.key.prefix=")
 }
 
@@ -104,13 +103,28 @@ sourceSets.named("main") {
     }
 }
 
+// Resolve these to plain Strings up front. Referencing `version` or `rootProject`
+// inside the filesMatching action would capture a Project instance in the task,
+// which cannot be serialized by the configuration cache.
+val faweVersion = "$version"
+val faweCommit = "${rootProject.ext["revision"]}"
+val faweDate = "${rootProject.ext["date"]}"
+
 tasks.named<Copy>("processResources") {
+    // Collect into a local of THIS block. A top-level `val` in a .gradle.kts is a
+    // property of the script object, so referencing one from the filesMatching
+    // closure would capture the script itself - which the configuration cache
+    // cannot serialize. A local is captured by value instead.
+    val expansions = mapOf(
+            "version" to faweVersion,
+            "commit" to faweCommit,
+            "date" to faweDate
+    )
+    inputs.property("faweVersion", faweVersion)
+    inputs.property("faweCommit", faweCommit)
+    inputs.property("faweDate", faweDate)
     filesMatching("fawe.properties") {
-        expand(
-                "version" to "$version",
-                "commit" to "${rootProject.ext["revision"]}",
-                "date" to "${rootProject.ext["date"]}"
-        )
+        expand(expansions)
     }
 }
 
