@@ -19,14 +19,13 @@
 
 package com.sk89q.bukkit.util;
 
+import com.fastasyncworldedit.bukkit.util.PaperSupport;
 import com.sk89q.util.ReflectionUtil;
-import io.papermc.lib.PaperLib;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandMap;
 import org.bukkit.command.PluginIdentifiableCommand;
-import org.bukkit.command.SimpleCommandMap;
 import org.bukkit.plugin.Plugin;
 
 import java.util.ArrayList;
@@ -97,7 +96,7 @@ public class CommandRegistration {
             return fallbackCommands;
         }
 
-        CommandMap commandMap = PaperLib.isPaper() ? Bukkit.getCommandMap() : ReflectionUtil.getField(plugin.getServer().getPluginManager(), "commandMap");
+        CommandMap commandMap = PaperSupport.isPaper() ? Bukkit.getCommandMap() : ReflectionUtil.getField(plugin.getServer().getPluginManager(), "commandMap");
         if (commandMap == null) {
             Bukkit.getServer().getLogger().severe(plugin.getDescription().getName()
                     + ": Could not retrieve server CommandMap");
