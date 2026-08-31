@@ -1,7 +1,7 @@
 import io.papermc.paperweight.userdev.PaperweightUserDependenciesExtension
 
 plugins {
-    id("buildlogic.adapter")
+    id("buildlogic.adapter-mojmap")
 }
 
 // workaround LeafPile providing wrong snakeyaml version
