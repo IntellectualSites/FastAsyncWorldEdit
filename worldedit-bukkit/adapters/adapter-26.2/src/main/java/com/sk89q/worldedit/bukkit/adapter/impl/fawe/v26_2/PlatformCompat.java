@@ -14,37 +14,43 @@ public final class PlatformCompat {
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
 
-    private static MethodHandle SPIGOT__CRAFT_BLOCK_DATA__FROM_DATA;
+    private static final MethodHandle SPIGOT__CRAFT_BLOCK_DATA__FROM_DATA;
 
     static {
+        MethodHandle tmpSpigotCraftBlockDataFromData = null;
         if (!PaperSupport.isPaper()) {
             try {
                 //noinspection JavaLangInvokeHandleSignature (not available on Paper)
-                SPIGOT__CRAFT_BLOCK_DATA__FROM_DATA = MethodHandles.lookup().findStatic(
+                tmpSpigotCraftBlockDataFromData = MethodHandles.lookup().findStatic(
                         CraftBlockData.class,
                         "fromData",
-                        MethodType.methodType(CraftBlockData.class, net.minecraft.world.level.block.state.BlockState.class)
+                        MethodType.methodType(CraftBlockData.class, BlockState.class)
                 );
             } catch (NoSuchMethodException | IllegalAccessException e) {
                 LOGGER.error("Failed to lookup CraftBlockData#fromData(BlockState)", e);
             }
         }
+        SPIGOT__CRAFT_BLOCK_DATA__FROM_DATA = tmpSpigotCraftBlockDataFromData;
     }
 
-    public static CraftBlockData fromData(BlockState state) throws Throwable {
+    /**
+     * Adapts a {@link BlockState} to a {@link CraftBlockData} using platform-specific methods.
+     * On Paper {@code BlockState#asBlockData()} is used, on Spigot {@code CraftBlockData#fromData(BlockState)} is used.
+     * <p>
+     * Uses reflection on Spigot, as Paper dropped the Spigot method (-> Can't be directly called).
+     *
+     * @param state the {@link BlockState} to adapt.
+     * @return the {@link CraftBlockData}
+     */
+    public static CraftBlockData fromData(BlockState state) {
         if (SPIGOT__CRAFT_BLOCK_DATA__FROM_DATA == null) {
             return state.asBlockData();
         }
-        return (CraftBlockData) SPIGOT__CRAFT_BLOCK_DATA__FROM_DATA.invokeExact(state);
-    }
-
-    public static CraftBlockData fromDataUnsafe(BlockState state) {
         try {
-            return fromData(state);
-        } catch (Throwable e) {
-            LOGGER.error("Unsafe call to #fromData", e);
+            return (CraftBlockData) SPIGOT__CRAFT_BLOCK_DATA__FROM_DATA.invokeExact(state);
+        } catch (Throwable throwable) {
+            throw new RuntimeException("Caught unexpected Exception while converting BlockState to CraftBlockData", throwable);
         }
-        return null; // this will most likely fail somewhere along the call (NPE)
     }
 
 }

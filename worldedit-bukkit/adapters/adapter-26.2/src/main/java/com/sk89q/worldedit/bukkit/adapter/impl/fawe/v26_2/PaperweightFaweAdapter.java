@@ -251,12 +251,8 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
     @Override
     public Collection<String> getRegisteredDefaultBlockStates() {
         ArrayList<String> states = new ArrayList<>();
-        try {
-            for (final Block block : BuiltInRegistries.BLOCK) {
-                states.add(PlatformCompat.fromData(block.defaultBlockState()).getAsString());
-            }
-        } catch (Throwable e) {
-            LOGGER.error("Failed to initialize block state", e);
+        for (final Block block : BuiltInRegistries.BLOCK) {
+            states.add(PlatformCompat.fromData(block.defaultBlockState()).getAsString());
         }
         return states;
     }

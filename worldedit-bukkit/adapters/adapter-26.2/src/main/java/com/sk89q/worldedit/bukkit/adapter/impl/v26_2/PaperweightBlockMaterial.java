@@ -39,7 +39,7 @@ public class PaperweightBlockMaterial extends BukkitBlockMaterial<Block, BlockSt
     }
 
     public PaperweightBlockMaterial(Block block, BlockState blockState) {
-        super(block, blockState, PlatformCompat.fromDataUnsafe(blockState));
+        super(block, blockState, PlatformCompat.fromData(blockState));
     }
 
     @Override
