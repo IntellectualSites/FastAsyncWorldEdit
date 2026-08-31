@@ -197,12 +197,18 @@ tasks.named<ShadowJar>("shadowJar") {
 }
 
 tasks.withType<ShadowJar>().configureEach {
-    val shadowJar = this
+    // In tandem with not bundling log4j, we shouldn't relocate base package here.
+    // relocate("org.apache.logging", "com.sk89q.worldedit.log4j")
+    relocate("org.antlr.v4", "com.sk89q.worldedit.antlr4")
+    relocate("org.bstats", "com.sk89q.worldedit.bstats")
+    relocate("net.royawesome.jlibnoise", "com.sk89q.worldedit.jlibnoise")
+    relocate("org.incendo.serverlib", "com.fastasyncworldedit.serverlib")
+    relocate("com.intellectualsites.paster", "com.fastasyncworldedit.paster")
+    relocate("com.zaxxer", "com.fastasyncworldedit.core.math")
+    relocate("org.anarres", "com.fastasyncworldedit.core.internal.io")
+
     val taskCoordinates = "$group:$name"
     dependencies {
-        // In tandem with not bundling log4j, we shouldn't relocate base package here.
-        // relocate("org.apache.logging", "com.sk89q.worldedit.log4j")
-        shadowJar.relocate("org.antlr.v4", "com.sk89q.worldedit.antlr4")
         exclude(dependency(taskCoordinates))
 
         include(dependency(":worldedit-core"))
@@ -216,26 +222,14 @@ tasks.withType<ShadowJar>().configureEach {
         // ZSTD does not work if relocated. https://github.com/luben/zstd-jni/issues/189 Use not latest as it can be difficult
         // to obtain latest ZSTD lib
         include(dependency(libs.zstd))
-        shadowJar.relocate("org.bstats", "com.sk89q.worldedit.bstats") {
-            this@dependencies.include(this@dependencies.dependency(libs.bstats.bukkit))
-            this@dependencies.include(this@dependencies.dependency(libs.bstats.base))
-        }
-        shadowJar.relocate("net.royawesome.jlibnoise", "com.sk89q.worldedit.jlibnoise") {
-            this@dependencies.include(this@dependencies.dependency("com.sk89q.lib:jlibnoise"))
-        }
-        shadowJar.relocate("org.incendo.serverlib", "com.fastasyncworldedit.serverlib") {
-            this@dependencies.include(this@dependencies.dependency(libs.serverlib))
-        }
-        shadowJar.relocate("com.intellectualsites.paster", "com.fastasyncworldedit.paster") {
-            this@dependencies.include(this@dependencies.dependency(libs.paster))
-        }
+        include(dependency(libs.bstats.bukkit))
+        include(dependency(libs.bstats.base))
+        include(dependency("com.sk89q.lib:jlibnoise"))
+        include(dependency(libs.serverlib))
+        include(dependency(libs.paster))
         include(dependency(libs.lz4Java))
-        shadowJar.relocate("com.zaxxer", "com.fastasyncworldedit.core.math") {
-            this@dependencies.include(this@dependencies.dependency(libs.sparsebitset))
-        }
-        shadowJar.relocate("org.anarres", "com.fastasyncworldedit.core.internal.io") {
-            this@dependencies.include(this@dependencies.dependency(libs.parallelgzip))
-        }
+        include(dependency(libs.sparsebitset))
+        include(dependency(libs.parallelgzip))
     }
     project.project(":worldedit-bukkit:adapters").subprojects.forEach {
         dependencies {
