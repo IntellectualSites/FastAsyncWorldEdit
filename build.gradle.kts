@@ -7,7 +7,7 @@ plugins {
     jacoco
     id("buildlogic.common")
     id("com.gradleup.nmcp.aggregation") version "1.6.1"
-    id("xyz.jpenilla.run-paper") version "3.0.2"
+    id("xyz.jpenilla.run-paper") version "3.1.0"
 }
 
 val rootVersion: String = (extra.properties["rootVersion"] as? String) ?: "2.15.5"
