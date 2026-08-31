@@ -155,10 +155,11 @@ tasks.register<ShadowJar>("reobfShadowJar") {
         adaptersReobf
     )
     relocate("com.sk89q.jchronic", "com.sk89q.worldedit.jchronic")
+    val platformName = project.name.replace("worldedit-", "")
 
     dependencies {
         include(project(":worldedit-libs:core"))
-        include(project(":worldedit-libs:${project.name.replace("worldedit-", "")}"))
+        include(project(":worldedit-libs:$platformName"))
         include(project(":worldedit-core"))
         include(dependency(libs.jchronic))
         exclude(dependency(libs.jsr305))
@@ -196,11 +197,19 @@ tasks.named<ShadowJar>("shadowJar") {
 }
 
 tasks.withType<ShadowJar>().configureEach {
+    // In tandem with not bundling log4j, we shouldn't relocate base package here.
+    // relocate("org.apache.logging", "com.sk89q.worldedit.log4j")
+    relocate("org.antlr.v4", "com.sk89q.worldedit.antlr4")
+    relocate("org.bstats", "com.sk89q.worldedit.bstats")
+    relocate("net.royawesome.jlibnoise", "com.sk89q.worldedit.jlibnoise")
+    relocate("org.incendo.serverlib", "com.fastasyncworldedit.serverlib")
+    relocate("com.intellectualsites.paster", "com.fastasyncworldedit.paster")
+    relocate("com.zaxxer", "com.fastasyncworldedit.core.math")
+    relocate("org.anarres", "com.fastasyncworldedit.core.internal.io")
+
+    val taskCoordinates = "$group:$name"
     dependencies {
-        // In tandem with not bundling log4j, we shouldn't relocate base package here.
-        // relocate("org.apache.logging", "com.sk89q.worldedit.log4j")
-        relocate("org.antlr.v4", "com.sk89q.worldedit.antlr4")
-        exclude(dependency("$group:$name"))
+        exclude(dependency(taskCoordinates))
 
         include(dependency(":worldedit-core"))
         include(dependency(":worldedit-libs:bukkit"))
@@ -209,30 +218,18 @@ tasks.withType<ShadowJar>().configureEach {
         // include(dependency("org.apache.logging.log4j:log4j-api"))
         include(dependency("org.antlr:antlr4-runtime"))
 
-        exclude(dependency("$group:$name"))
+        exclude(dependency(taskCoordinates))
         // ZSTD does not work if relocated. https://github.com/luben/zstd-jni/issues/189 Use not latest as it can be difficult
         // to obtain latest ZSTD lib
         include(dependency(libs.zstd))
-        relocate("org.bstats", "com.sk89q.worldedit.bstats") {
-            include(dependency(libs.bstats.bukkit))
-            include(dependency(libs.bstats.base))
-        }
-        relocate("net.royawesome.jlibnoise", "com.sk89q.worldedit.jlibnoise") {
-            include(dependency("com.sk89q.lib:jlibnoise"))
-        }
-        relocate("org.incendo.serverlib", "com.fastasyncworldedit.serverlib") {
-            include(dependency(libs.serverlib))
-        }
-        relocate("com.intellectualsites.paster", "com.fastasyncworldedit.paster") {
-            include(dependency(libs.paster))
-        }
+        include(dependency(libs.bstats.bukkit))
+        include(dependency(libs.bstats.base))
+        include(dependency("com.sk89q.lib:jlibnoise"))
+        include(dependency(libs.serverlib))
+        include(dependency(libs.paster))
         include(dependency(libs.lz4Java))
-        relocate("com.zaxxer", "com.fastasyncworldedit.core.math") {
-            include(dependency(libs.sparsebitset))
-        }
-        relocate("org.anarres", "com.fastasyncworldedit.core.internal.io") {
-            include(dependency(libs.parallelgzip))
-        }
+        include(dependency(libs.sparsebitset))
+        include(dependency(libs.parallelgzip))
     }
     project.project(":worldedit-bukkit:adapters").subprojects.forEach {
         dependencies {

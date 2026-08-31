@@ -34,11 +34,12 @@ dependencies {
 }
 
 tasks.named<ShadowJar>("shadowJar") {
+    relocate("org.anarres", "com.fastasyncworldedit.core.internal.io")
+    relocate("net.jpountz", "com.fastasyncworldedit.core.jpountz")
+    relocate("org.lz4", "com.fastasyncworldedit.core.lz4")
+
     dependencies {
         include { true }
-        relocate("org.anarres", "com.fastasyncworldedit.core.internal.io")
-        relocate("net.jpountz", "com.fastasyncworldedit.core.jpountz")
-        relocate("org.lz4", "com.fastasyncworldedit.core.lz4")
     }
     //TODO Upstream doesn't include the line below so we should see if we need it or not.
     archiveFileName.set(moduleIdentifier)
