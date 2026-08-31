@@ -64,6 +64,11 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
     private final AtomicInteger lastException = new AtomicInteger();
     private final Semaphore workerSemaphore = new Semaphore(1, false);
     private final ConcurrentLinkedQueue<Runnable> queue = new ConcurrentLinkedQueue<>();
+    // Dedicated lock for close(), deliberately never `this`: see close()'s javadoc for why.
+    // Also deliberately separate from the `closed` field below, which is read/written directly by
+    // subclasses (e.g. RollbackOptimizedHistory) and must keep its existing type/visibility/
+    // semantics.
+    private final Object closeLock = new Object();
     protected volatile boolean closed;
 
     public AbstractChangeSet(World world) {
@@ -97,9 +102,41 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
         }
     }
 
+    /**
+     * Synchronizes on a dedicated lock object rather than {@code this}, and rather than a
+     * lock-free compare-and-set. Both alternatives were considered and rejected:
+     *
+     * <ul>
+     *     <li>Synchronizing on {@code this} would let a losing caller correctly block until the
+     *     winner finishes, but risks deadlock: {@link #flush()} can block in
+     *     {@link #drainQueue(boolean)}'s {@code workerSemaphore.acquireUninterruptibly()} waiting for another
+     *     thread's in-flight drain to finish, and that other thread may be running a queued write
+     *     task that itself synchronizes on {@code this} (e.g. subclasses' lazy stream getters,
+     *     such as {@code DiskStorageHistory#getBlockOS}). If this thread already held
+     *     {@code this}'s monitor while waiting on the semaphore, and that other thread needed
+     *     {@code this}'s monitor to make progress and release the semaphore, that's an AB-BA
+     *     deadlock.</li>
+     *     <li>A compare-and-set on an {@code AtomicBoolean} avoids that deadlock but only
+     *     guarantees a single flush runs - a losing caller returns from close() immediately
+     *     rather than waiting for the winner, so close() could return before the changeset is
+     *     actually flushed.</li>
+     * </ul>
+     *
+     * <p>A private lock object that nothing else in the class hierarchy ever synchronizes on
+     * gives both properties at once: losing callers block until the winner's synchronized block
+     * exits (at which point {@code closed} is already {@code true}, so they return immediately
+     * without re-running {@link #flush()}), and there is no path by which this lock can
+     * participate in a cycle with {@code this}'s monitor or {@code workerSemaphore}.</p>
+     */
     @Override
     public void close() throws IOException {
-        if (!closed) {
+        if (closed) {
+            return;
+        }
+        synchronized (closeLock) {
+            if (closed) {
+                return;
+            }
             flush();
             closed = true;
         }
@@ -454,26 +491,51 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
     }
 
     private void drainQueue(boolean ignoreRunningState) {
-        if (!workerSemaphore.tryAcquire()) {
-            if (ignoreRunningState) {
-                // ignoreRunningState means we want to block
-                // even if another thread is already draining
-                try {
-                    workerSemaphore.acquire();
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
+        // A task may be enqueued in the window between a poll() returning null (queue observed
+        // empty) and this method's release() completing: a producer arriving in that window sees
+        // availablePermits() == 0 in triggerWorker() and skips scheduling a drain, so its task
+        // would otherwise sit in the queue with no worker to run it.
+        //
+        // ignoreRunningState callers (flush(), and therefore close()) loop here until a release()
+        // is immediately followed by an empty queue, so this method never returns to them with a
+        // straggler still pending. Returning early and merely re-scheduling an async worker (as a
+        // prior version of this method did) would let flush()/close() return - and the caller
+        // proceed to finalize or log the changeset - while that worker was still about to run on
+        // a different thread, against a resource the caller now considers closed.
+        //
+        // Non-blocking callers (an async worker triggered via triggerWorker()) don't need that
+        // guarantee: they just re-trigger another async worker for anything left behind and
+        // return promptly, exactly as before.
+        while (true) {
+            if (!workerSemaphore.tryAcquire()) {
+                if (!ignoreRunningState) {
+                    return; // another thread is draining the queue already, ignore
                 }
-            } else {
-                return; // another thread is draining the queue already, ignore
+                // The wait must be uninterruptible: an interruptible acquire that returns early
+                // on interrupt would let close() mark the changeset closed with tasks still
+                // queued, silently losing history (flush() swallows exceptions, so nothing would
+                // surface). acquireUninterruptibly() keeps waiting through interrupts and
+                // preserves the thread's interrupt status for callers to observe afterwards. The
+                // wait is bounded by the concurrent drainer's finite queue.
+                workerSemaphore.acquireUninterruptibly();
             }
-        }
-        try {
-            Runnable next;
-            while ((next = queue.poll()) != null) { // process all tasks in the queue
-                next.run();
+            try {
+                Runnable next;
+                while ((next = queue.poll()) != null) { // process all tasks in the queue
+                    next.run();
+                }
+            } finally {
+                workerSemaphore.release();
             }
-        } finally {
-            workerSemaphore.release();
+            if (queue.isEmpty()) {
+                return;
+            }
+            if (!ignoreRunningState) {
+                triggerWorker();
+                return;
+            }
+            // ignoreRunningState: loop back and drain again rather than handing off to an async
+            // worker, so this method doesn't return until the queue is truly empty.
         }
     }
 
