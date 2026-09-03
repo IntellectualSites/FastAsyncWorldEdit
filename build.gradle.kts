@@ -19,7 +19,7 @@ var date: String = (extra.properties["date"] as? String) ?: ""
 // Get Git metadata during build setup using the Git CLI.
 // This replaces Grgit/JGit so the build stays compatible with Gradle's configuration cache.
 // The result is recorded as a build input and can be reused without re-running Git each time.
-// We keep the short hash length the same as before for consistency.
+// crankcase-git has no commit-date accessor, so `date` still goes through this directly.
 fun gitOutput(vararg args: String): String =
     providers.exec {
         commandLine("git", *args)
@@ -27,7 +27,7 @@ fun gitOutput(vararg args: String): String =
     }.standardOutput.asText.get().trim()
 
 date = gitOutput("show", "-s", "--format=%cd", "--date=format:%y.%m.%d", "HEAD")
-revision = "-" + gitOutput("rev-parse", "--short=7", "HEAD")
+revision = "-" + git.commitHash.get()
     buildNumber = if (project.hasProperty("buildnumber")) {
         snapshot + "-" + (project.findProperty("buildnumber") as? String ?: "")
     } else {
@@ -42,14 +42,12 @@ extra.set("date", date)
 
 version = String.format("%s-%s", rootVersion, snapshot)
 
-if (!project.hasProperty("gitCommitHash")) {
-    ext["gitCommitHash"] = try {
-        gitOutput("rev-parse", "--short=7", "HEAD")
-    } catch (e: Exception) {
-        logger.warn("Error getting commit hash", e)
+ext["gitCommitHash"] = try {
+    git.commitHash.get()
+} catch (e: Exception) {
+    logger.warn("Error getting commit hash", e)
 
-        "no.git.id"
-    }
+    "no.git.id"
 }
 
 val totalReport = tasks.register<JacocoReport>("jacocoTotalReport") {

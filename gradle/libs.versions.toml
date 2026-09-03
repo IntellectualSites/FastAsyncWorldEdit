@@ -57,6 +57,7 @@ shadow = "9.5.1"
 paperweight = "2.0.0-SNAPSHOT"
 codecov = "0.3.0"
 jqwik = "1.10.1"
+crankcase = "0.1.2"
 
 # Minimum versions we apply to make dependencies support newer Java
 minimumAsm = "9.7"
@@ -66,6 +67,7 @@ minimumJdependency = "2.10"
 # Gradle plugins
 shadow = { group = "com.gradleup.shadow", name = "shadow-gradle-plugin", version.ref = "shadow" }
 paperweight = { group = "io.papermc.paperweight.userdev", name = "io.papermc.paperweight.userdev.gradle.plugin", version.ref = "paperweight" }
+crankcase-git = { group = "org.enginehub.crankcase", name = "git", version.ref = "crankcase" }
 
 # Minecraft expectations
 paperApi = { group = "io.papermc.paper", name = "paper-api", version.ref = "paperApi" }

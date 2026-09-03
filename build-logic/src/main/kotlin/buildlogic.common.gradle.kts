@@ -2,6 +2,10 @@ import buildlogic.getLibrary
 import buildlogic.stringyLibs
 import org.gradle.plugins.ide.idea.model.IdeaModel
 
+plugins {
+    id("org.enginehub.crankcase.git")
+}
+
 group = rootProject.group
 version = rootProject.version
 

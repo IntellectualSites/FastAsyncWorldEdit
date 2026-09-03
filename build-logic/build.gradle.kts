@@ -8,12 +8,17 @@ repositories {
         name = "EngineHub Repository"
         url = uri("https://maven.enginehub.org/repo/")
     }
+    maven {
+        name = "EngineHub Releases"
+        url = uri("https://repo.enginehub.org/libs-release/")
+    }
 }
 
 dependencies {
     implementation(gradleApi())
     implementation(libs.shadow)
     implementation(libs.paperweight)
+    implementation(libs.crankcase.git)
 
     constraints {
         val asmVersion = "[${libs.versions.minimumAsm.get()},)"
