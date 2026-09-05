@@ -28,7 +28,6 @@ import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 
 import javax.annotation.Nullable;
-import java.lang.reflect.Field;
 import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -43,2441 +42,2430 @@ import java.util.stream.Stream;
 public final class BlockTypes {
 
     //FAWE start - init
-    // Doesn't really matter what the hardcoded values are, as FAWE will update it on load
-    @Nullable
-    public static final BlockType __RESERVED__ = init(); // Placeholder for null index (i.e. when block types are represented as primitives)
-    @Nullable
-    public static final BlockType ACACIA_BUTTON = init();
-    @Nullable
-    public static final BlockType ACACIA_DOOR = init();
-    @Nullable
-    public static final BlockType ACACIA_FENCE = init();
-    @Nullable
-    public static final BlockType ACACIA_FENCE_GATE = init();
-    @Nullable
-    public static final BlockType ACACIA_HANGING_SIGN = init();
-    @Nullable
-    public static final BlockType ACACIA_LEAVES = init();
-    @Nullable
-    public static final BlockType ACACIA_LOG = init();
-    @Nullable
-    public static final BlockType ACACIA_PLANKS = init();
-    @Nullable
-    public static final BlockType ACACIA_PRESSURE_PLATE = init();
-    @Nullable
-    public static final BlockType ACACIA_SAPLING = init();
-    @Nullable
-    public static final BlockType ACACIA_SHELF = init();
-    @Nullable
-    public static final BlockType ACACIA_SIGN = init();
-    @Nullable
-    public static final BlockType ACACIA_SLAB = init();
-    @Nullable
-    public static final BlockType ACACIA_STAIRS = init();
-    @Nullable
-    public static final BlockType ACACIA_TRAPDOOR = init();
-    @Nullable
-    public static final BlockType ACACIA_WALL_HANGING_SIGN = init();
-    @Nullable
-    public static final BlockType ACACIA_WALL_SIGN = init();
-    @Nullable
-    public static final BlockType ACACIA_WOOD = init();
-    @Nullable
-    public static final BlockType ACTIVATOR_RAIL = init();
-    @Nullable
-    public static final BlockType AIR = init();
-    @Nullable
-    public static final BlockType ALLIUM = init();
-    @Nullable
-    public static final BlockType AMETHYST_BLOCK = init();
-    @Nullable
-    public static final BlockType AMETHYST_CLUSTER = init();
-    @Nullable
-    public static final BlockType ANCIENT_DEBRIS = init();
-    @Nullable
-    public static final BlockType ANDESITE = init();
-    @Nullable
-    public static final BlockType ANDESITE_SLAB = init();
-    @Nullable
-    public static final BlockType ANDESITE_STAIRS = init();
-    @Nullable
-    public static final BlockType ANDESITE_WALL = init();
-    @Nullable
-    public static final BlockType ANVIL = init();
-    @Nullable
-    public static final BlockType ATTACHED_MELON_STEM = init();
-    @Nullable
-    public static final BlockType ATTACHED_PUMPKIN_STEM = init();
-    @Nullable
-    public static final BlockType AZALEA = init();
-    @Nullable
-    public static final BlockType AZALEA_LEAVES = init();
-    @Nullable
-    public static final BlockType AZURE_BLUET = init();
-    @Nullable
-    public static final BlockType BAMBOO = init();
-    @Nullable
-    public static final BlockType BAMBOO_BLOCK = init();
-    @Nullable
-    public static final BlockType BAMBOO_BUTTON = init();
-    @Nullable
-    public static final BlockType BAMBOO_DOOR = init();
-    @Nullable
-    public static final BlockType BAMBOO_FENCE = init();
-    @Nullable
-    public static final BlockType BAMBOO_FENCE_GATE = init();
-    @Nullable
-    public static final BlockType BAMBOO_HANGING_SIGN = init();
-    @Nullable
-    public static final BlockType BAMBOO_MOSAIC = init();
-    @Nullable
-    public static final BlockType BAMBOO_MOSAIC_SLAB = init();
-    @Nullable
-    public static final BlockType BAMBOO_MOSAIC_STAIRS = init();
-    @Nullable
-    public static final BlockType BAMBOO_PLANKS = init();
-    @Nullable
-    public static final BlockType BAMBOO_PRESSURE_PLATE = init();
-    @Nullable
-    public static final BlockType BAMBOO_SAPLING = init();
-    @Nullable
-    public static final BlockType BAMBOO_SHELF = init();
-    @Nullable
-    public static final BlockType BAMBOO_SIGN = init();
-    @Nullable
-    public static final BlockType BAMBOO_SLAB = init();
-    @Nullable
-    public static final BlockType BAMBOO_STAIRS = init();
-    @Nullable
-    public static final BlockType BAMBOO_TRAPDOOR = init();
-    @Nullable
-    public static final BlockType BAMBOO_WALL_HANGING_SIGN = init();
-    @Nullable
-    public static final BlockType BAMBOO_WALL_SIGN = init();
-    @Nullable
-    public static final BlockType BARREL = init();
-    @Nullable
-    public static final BlockType BARRIER = init();
-    @Nullable
-    public static final BlockType BASALT = init();
-    @Nullable
-    public static final BlockType BEACON = init();
-    @Nullable
-    public static final BlockType BEDROCK = init();
-    @Nullable
-    public static final BlockType BEEHIVE = init();
-    @Nullable
-    public static final BlockType BEETROOTS = init();
-    @Nullable
-    public static final BlockType BEE_NEST = init();
-    @Nullable
-    public static final BlockType BELL = init();
-    @Nullable
-    public static final BlockType BIG_DRIPLEAF = init();
-    @Nullable
-    public static final BlockType BIG_DRIPLEAF_STEM = init();
-    @Nullable
-    public static final BlockType BIRCH_BUTTON = init();
-    @Nullable
-    public static final BlockType BIRCH_DOOR = init();
-    @Nullable
-    public static final BlockType BIRCH_FENCE = init();
-    @Nullable
-    public static final BlockType BIRCH_FENCE_GATE = init();
-    @Nullable
-    public static final BlockType BIRCH_HANGING_SIGN = init();
-    @Nullable
-    public static final BlockType BIRCH_LEAVES = init();
-    @Nullable
-    public static final BlockType BIRCH_LOG = init();
-    @Nullable
-    public static final BlockType BIRCH_PLANKS = init();
-    @Nullable
-    public static final BlockType BIRCH_PRESSURE_PLATE = init();
-    @Nullable
-    public static final BlockType BIRCH_SAPLING = init();
-    @Nullable
-    public static final BlockType BIRCH_SHELF = init();
-    @Nullable
-    public static final BlockType BIRCH_SIGN = init();
-    @Nullable
-    public static final BlockType BIRCH_SLAB = init();
-    @Nullable
-    public static final BlockType BIRCH_STAIRS = init();
-    @Nullable
-    public static final BlockType BIRCH_TRAPDOOR = init();
-    @Nullable
-    public static final BlockType BIRCH_WALL_HANGING_SIGN = init();
-    @Nullable
-    public static final BlockType BIRCH_WALL_SIGN = init();
-    @Nullable
-    public static final BlockType BIRCH_WOOD = init();
-    @Nullable
-    public static final BlockType BLACKSTONE = init();
-    @Nullable
-    public static final BlockType BLACKSTONE_SLAB = init();
-    @Nullable
-    public static final BlockType BLACKSTONE_STAIRS = init();
-    @Nullable
-    public static final BlockType BLACKSTONE_WALL = init();
-    @Nullable
-    public static final BlockType BLACK_BANNER = init();
-    @Nullable
-    public static final BlockType BLACK_BED = init();
-    @Nullable
-    public static final BlockType BLACK_CANDLE = init();
-    @Nullable
-    public static final BlockType BLACK_CANDLE_CAKE = init();
-    @Nullable
-    public static final BlockType BLACK_CARPET = init();
-    @Nullable
-    public static final BlockType BLACK_CONCRETE = init();
-    @Nullable
-    public static final BlockType BLACK_CONCRETE_POWDER = init();
-    @Nullable
-    public static final BlockType BLACK_GLAZED_TERRACOTTA = init();
-    @Nullable
-    public static final BlockType BLACK_SHULKER_BOX = init();
-    @Nullable
-    public static final BlockType BLACK_STAINED_GLASS = init();
-    @Nullable
-    public static final BlockType BLACK_STAINED_GLASS_PANE = init();
-    @Nullable
-    public static final BlockType BLACK_TERRACOTTA = init();
-    @Nullable
-    public static final BlockType BLACK_WALL_BANNER = init();
-    @Nullable
-    public static final BlockType BLACK_WOOL = init();
-    @Nullable
-    public static final BlockType BLAST_FURNACE = init();
-    @Nullable
-    public static final BlockType BLUE_BANNER = init();
-    @Nullable
-    public static final BlockType BLUE_BED = init();
-    @Nullable
-    public static final BlockType BLUE_CANDLE = init();
-    @Nullable
-    public static final BlockType BLUE_CANDLE_CAKE = init();
-    @Nullable
-    public static final BlockType BLUE_CARPET = init();
-    @Nullable
-    public static final BlockType BLUE_CONCRETE = init();
-    @Nullable
-    public static final BlockType BLUE_CONCRETE_POWDER = init();
-    @Nullable
-    public static final BlockType BLUE_GLAZED_TERRACOTTA = init();
-    @Nullable
-    public static final BlockType BLUE_ICE = init();
-    @Nullable
-    public static final BlockType BLUE_ORCHID = init();
-    @Nullable
-    public static final BlockType BLUE_SHULKER_BOX = init();
-    @Nullable
-    public static final BlockType BLUE_STAINED_GLASS = init();
-    @Nullable
-    public static final BlockType BLUE_STAINED_GLASS_PANE = init();
-    @Nullable
-    public static final BlockType BLUE_TERRACOTTA = init();
-    @Nullable
-    public static final BlockType BLUE_WALL_BANNER = init();
-    @Nullable
-    public static final BlockType BLUE_WOOL = init();
-    @Nullable
-    public static final BlockType BONE_BLOCK = init();
-    @Nullable
-    public static final BlockType BOOKSHELF = init();
-    @Nullable
-    public static final BlockType BRAIN_CORAL = init();
-    @Nullable
-    public static final BlockType BRAIN_CORAL_BLOCK = init();
-    @Nullable
-    public static final BlockType BRAIN_CORAL_FAN = init();
-    @Nullable
-    public static final BlockType BRAIN_CORAL_WALL_FAN = init();
-    @Nullable
-    public static final BlockType BREWING_STAND = init();
-    @Nullable
-    public static final BlockType BRICKS = init();
-    @Nullable
-    public static final BlockType BRICK_SLAB = init();
-    @Nullable
-    public static final BlockType BRICK_STAIRS = init();
-    @Nullable
-    public static final BlockType BRICK_WALL = init();
-    @Nullable
-    public static final BlockType BROWN_BANNER = init();
-    @Nullable
-    public static final BlockType BROWN_BED = init();
-    @Nullable
-    public static final BlockType BROWN_CANDLE = init();
-    @Nullable
-    public static final BlockType BROWN_CANDLE_CAKE = init();
-    @Nullable
-    public static final BlockType BROWN_CARPET = init();
-    @Nullable
-    public static final BlockType BROWN_CONCRETE = init();
-    @Nullable
-    public static final BlockType BROWN_CONCRETE_POWDER = init();
-    @Nullable
-    public static final BlockType BROWN_GLAZED_TERRACOTTA = init();
-    @Nullable
-    public static final BlockType BROWN_MUSHROOM = init();
-    @Nullable
-    public static final BlockType BROWN_MUSHROOM_BLOCK = init();
-    @Nullable
-    public static final BlockType BROWN_SHULKER_BOX = init();
-    @Nullable
-    public static final BlockType BROWN_STAINED_GLASS = init();
-    @Nullable
-    public static final BlockType BROWN_STAINED_GLASS_PANE = init();
-    @Nullable
-    public static final BlockType BROWN_TERRACOTTA = init();
-    @Nullable
-    public static final BlockType BROWN_WALL_BANNER = init();
-    @Nullable
-    public static final BlockType BROWN_WOOL = init();
-    @Nullable
-    public static final BlockType BUBBLE_COLUMN = init();
-    @Nullable
-    public static final BlockType BUBBLE_CORAL = init();
-    @Nullable
-    public static final BlockType BUBBLE_CORAL_BLOCK = init();
-    @Nullable
-    public static final BlockType BUBBLE_CORAL_FAN = init();
-    @Nullable
-    public static final BlockType BUBBLE_CORAL_WALL_FAN = init();
-    @Nullable
-    public static final BlockType BUDDING_AMETHYST = init();
-    @Nullable
-    public static final BlockType BUSH = init();
-    @Nullable
-    public static final BlockType CACTUS = init();
-    @Nullable
-    public static final BlockType CACTUS_FLOWER = init();
-    @Nullable
-    public static final BlockType CAKE = init();
-    @Nullable
-    public static final BlockType CALCITE = init();
-    @Nullable
-    public static final BlockType CALIBRATED_SCULK_SENSOR = init();
-    @Nullable
-    public static final BlockType CAMPFIRE = init();
-    @Nullable
-    public static final BlockType CANDLE = init();
-    @Nullable
-    public static final BlockType CANDLE_CAKE = init();
-    @Nullable
-    public static final BlockType CARROTS = init();
-    @Nullable
-    public static final BlockType CARTOGRAPHY_TABLE = init();
-    @Nullable
-    public static final BlockType CARVED_PUMPKIN = init();
-    @Nullable
-    public static final BlockType CAULDRON = init();
-    @Nullable
-    public static final BlockType CAVE_AIR = init();
-    @Nullable
-    public static final BlockType CAVE_VINES = init();
-    @Nullable
-    public static final BlockType CAVE_VINES_PLANT = init();
-    @Deprecated
-    @Nullable
-    public static final BlockType CHAIN = init();
-    @Nullable
-    public static final BlockType CHAIN_COMMAND_BLOCK = init();
-    @Nullable
-    public static final BlockType CHERRY_BUTTON = init();
-    @Nullable
-    public static final BlockType CHERRY_DOOR = init();
-    @Nullable
-    public static final BlockType CHERRY_FENCE = init();
-    @Nullable
-    public static final BlockType CHERRY_FENCE_GATE = init();
-    @Nullable
-    public static final BlockType CHERRY_HANGING_SIGN = init();
-    @Nullable
-    public static final BlockType CHERRY_LEAVES = init();
-    @Nullable
-    public static final BlockType CHERRY_LOG = init();
-    @Nullable
-    public static final BlockType CHERRY_PLANKS = init();
-    @Nullable
-    public static final BlockType CHERRY_PRESSURE_PLATE = init();
-    @Nullable
-    public static final BlockType CHERRY_SAPLING = init();
-    @Nullable
-    public static final BlockType CHERRY_SHELF = init();
-    @Nullable
-    public static final BlockType CHERRY_SIGN = init();
-    @Nullable
-    public static final BlockType CHERRY_SLAB = init();
-    @Nullable
-    public static final BlockType CHERRY_STAIRS = init();
-    @Nullable
-    public static final BlockType CHERRY_TRAPDOOR = init();
-    @Nullable
-    public static final BlockType CHERRY_WALL_HANGING_SIGN = init();
-    @Nullable
-    public static final BlockType CHERRY_WALL_SIGN = init();
-    @Nullable
-    public static final BlockType CHERRY_WOOD = init();
-    @Nullable
-    public static final BlockType CHEST = init();
-    @Nullable
-    public static final BlockType CHIPPED_ANVIL = init();
-    @Nullable
-    public static final BlockType CHISELED_BOOKSHELF = init();
-    @Nullable
-    public static final BlockType CHISELED_CINNABAR = init();
-    @Nullable
-    public static final BlockType CHISELED_COPPER = init();
-    @Nullable
-    public static final BlockType CHISELED_DEEPSLATE = init();
-    @Nullable
-    public static final BlockType CHISELED_NETHER_BRICKS = init();
-    @Nullable
-    public static final BlockType CHISELED_POLISHED_BLACKSTONE = init();
-    @Nullable
-    public static final BlockType CHISELED_QUARTZ_BLOCK = init();
-    @Nullable
-    public static final BlockType CHISELED_RED_SANDSTONE = init();
-    @Nullable
-    public static final BlockType CHISELED_RESIN_BRICKS = init();
-    @Nullable
-    public static final BlockType CHISELED_SANDSTONE = init();
-    @Nullable
-    public static final BlockType CHISELED_STONE_BRICKS = init();
-    @Nullable
-    public static final BlockType CHISELED_SULFUR = init();
-    @Nullable
-    public static final BlockType CHISELED_TUFF = init();
-    @Nullable
-    public static final BlockType CHISELED_TUFF_BRICKS = init();
-    @Nullable
-    public static final BlockType CHORUS_FLOWER = init();
-    @Nullable
-    public static final BlockType CHORUS_PLANT = init();
-    @Nullable
-    public static final BlockType CINNABAR = init();
-    @Nullable
-    public static final BlockType CINNABAR_BRICK_SLAB = init();
-    @Nullable
-    public static final BlockType CINNABAR_BRICK_STAIRS = init();
-    @Nullable
-    public static final BlockType CINNABAR_BRICK_WALL = init();
-    @Nullable
-    public static final BlockType CINNABAR_BRICKS = init();
-    @Nullable
-    public static final BlockType CINNABAR_SLAB = init();
-    @Nullable
-    public static final BlockType CINNABAR_STAIRS = init();
-    @Nullable
-    public static final BlockType CINNABAR_WALL = init();
-    @Nullable
-    public static final BlockType CLAY = init();
-    @Nullable
-    public static final BlockType CLOSED_EYEBLOSSOM = init();
-    @Nullable
-    public static final BlockType COAL_BLOCK = init();
-    @Nullable
-    public static final BlockType COAL_ORE = init();
-    @Nullable
-    public static final BlockType COARSE_DIRT = init();
-    @Nullable
-    public static final BlockType COBBLED_DEEPSLATE = init();
-    @Nullable
-    public static final BlockType COBBLED_DEEPSLATE_SLAB = init();
-    @Nullable
-    public static final BlockType COBBLED_DEEPSLATE_STAIRS = init();
-    @Nullable
-    public static final BlockType COBBLED_DEEPSLATE_WALL = init();
-    @Nullable
-    public static final BlockType COBBLESTONE = init();
-    @Nullable
-    public static final BlockType COBBLESTONE_SLAB = init();
-    @Nullable
-    public static final BlockType COBBLESTONE_STAIRS = init();
-    @Nullable
-    public static final BlockType COBBLESTONE_WALL = init();
-    @Nullable
-    public static final BlockType COBWEB = init();
-    @Nullable
-    public static final BlockType COCOA = init();
-    @Nullable
-    public static final BlockType COMMAND_BLOCK = init();
-    @Nullable
-    public static final BlockType COMPARATOR = init();
-    @Nullable
-    public static final BlockType COMPOSTER = init();
-    @Nullable
-    public static final BlockType CONDUIT = init();
-    @Nullable
-    public static final BlockType COPPER_BARS = init();
-    @Nullable
-    public static final BlockType COPPER_BLOCK = init();
-    @Nullable
-    public static final BlockType COPPER_BULB = init();
-    @Nullable
-    public static final BlockType COPPER_CHAIN = init();
-    @Nullable
-    public static final BlockType COPPER_CHEST = init();
-    @Nullable
-    public static final BlockType COPPER_DOOR = init();
-    @Nullable
-    public static final BlockType COPPER_GOLEM_STATUE = init();
-    @Nullable
-    public static final BlockType COPPER_GRATE = init();
-    @Nullable
-    public static final BlockType COPPER_LANTERN = init();
-    @Nullable
-    public static final BlockType COPPER_ORE = init();
-    @Nullable
-    public static final BlockType COPPER_TORCH = init();
-    @Nullable
-    public static final BlockType COPPER_TRAPDOOR = init();
-    @Nullable
-    public static final BlockType COPPER_WALL_TORCH = init();
-    @Nullable
-    public static final BlockType CORNFLOWER = init();
-    @Nullable
-    public static final BlockType CRACKED_DEEPSLATE_BRICKS = init();
-    @Nullable
-    public static final BlockType CRACKED_DEEPSLATE_TILES = init();
-    @Nullable
-    public static final BlockType CRACKED_NETHER_BRICKS = init();
-    @Nullable
-    public static final BlockType CRACKED_POLISHED_BLACKSTONE_BRICKS = init();
-    @Nullable
-    public static final BlockType CRACKED_STONE_BRICKS = init();
-    @Nullable
-    public static final BlockType CRAFTER = init();
-    @Nullable
-    public static final BlockType CRAFTING_TABLE = init();
-    @Nullable
-    public static final BlockType CREAKING_HEART = init();
-    @Nullable
-    public static final BlockType CREEPER_HEAD = init();
-    @Nullable
-    public static final BlockType CREEPER_WALL_HEAD = init();
-    @Nullable
-    public static final BlockType CRIMSON_BUTTON = init();
-    @Nullable
-    public static final BlockType CRIMSON_DOOR = init();
-    @Nullable
-    public static final BlockType CRIMSON_FENCE = init();
-    @Nullable
-    public static final BlockType CRIMSON_FENCE_GATE = init();
-    @Nullable
-    public static final BlockType CRIMSON_FUNGUS = init();
-    @Nullable
-    public static final BlockType CRIMSON_HANGING_SIGN = init();
-    @Nullable
-    public static final BlockType CRIMSON_HYPHAE = init();
-    @Nullable
-    public static final BlockType CRIMSON_NYLIUM = init();
-    @Nullable
-    public static final BlockType CRIMSON_PLANKS = init();
-    @Nullable
-    public static final BlockType CRIMSON_PRESSURE_PLATE = init();
-    @Nullable
-    public static final BlockType CRIMSON_ROOTS = init();
-    @Nullable
-    public static final BlockType CRIMSON_SHELF = init();
-    @Nullable
-    public static final BlockType CRIMSON_SIGN = init();
-    @Nullable
-    public static final BlockType CRIMSON_SLAB = init();
-    @Nullable
-    public static final BlockType CRIMSON_STAIRS = init();
-    @Nullable
-    public static final BlockType CRIMSON_STEM = init();
-    @Nullable
-    public static final BlockType CRIMSON_TRAPDOOR = init();
-    @Nullable
-    public static final BlockType CRIMSON_WALL_HANGING_SIGN = init();
-    @Nullable
-    public static final BlockType CRIMSON_WALL_SIGN = init();
-    @Nullable
-    public static final BlockType CRYING_OBSIDIAN = init();
-    @Nullable
-    public static final BlockType CUT_COPPER = init();
-    @Nullable
-    public static final BlockType CUT_COPPER_SLAB = init();
-    @Nullable
-    public static final BlockType CUT_COPPER_STAIRS = init();
-    @Nullable
-    public static final BlockType CUT_RED_SANDSTONE = init();
-    @Nullable
-    public static final BlockType CUT_RED_SANDSTONE_SLAB = init();
-    @Nullable
-    public static final BlockType CUT_SANDSTONE = init();
-    @Nullable
-    public static final BlockType CUT_SANDSTONE_SLAB = init();
-    @Nullable
-    public static final BlockType CYAN_BANNER = init();
-    @Nullable
-    public static final BlockType CYAN_BED = init();
-    @Nullable
-    public static final BlockType CYAN_CANDLE = init();
-    @Nullable
-    public static final BlockType CYAN_CANDLE_CAKE = init();
-    @Nullable
-    public static final BlockType CYAN_CARPET = init();
-    @Nullable
-    public static final BlockType CYAN_CONCRETE = init();
-    @Nullable
-    public static final BlockType CYAN_CONCRETE_POWDER = init();
-    @Nullable
-    public static final BlockType CYAN_GLAZED_TERRACOTTA = init();
-    @Nullable
-    public static final BlockType CYAN_SHULKER_BOX = init();
-    @Nullable
-    public static final BlockType CYAN_STAINED_GLASS = init();
-    @Nullable
-    public static final BlockType CYAN_STAINED_GLASS_PANE = init();
-    @Nullable
-    public static final BlockType CYAN_TERRACOTTA = init();
-    @Nullable
-    public static final BlockType CYAN_WALL_BANNER = init();
-    @Nullable
-    public static final BlockType CYAN_WOOL = init();
-    @Nullable
-    public static final BlockType DAMAGED_ANVIL = init();
-    @Nullable
-    public static final BlockType DANDELION = init();
-    @Nullable
-    public static final BlockType DARK_OAK_BUTTON = init();
-    @Nullable
-    public static final BlockType DARK_OAK_DOOR = init();
-    @Nullable
-    public static final BlockType DARK_OAK_FENCE = init();
-    @Nullable
-    public static final BlockType DARK_OAK_FENCE_GATE = init();
-    @Nullable
-    public static final BlockType DARK_OAK_HANGING_SIGN = init();
-    @Nullable
-    public static final BlockType DARK_OAK_LEAVES = init();
-    @Nullable
-    public static final BlockType DARK_OAK_LOG = init();
-    @Nullable
-    public static final BlockType DARK_OAK_PLANKS = init();
-    @Nullable
-    public static final BlockType DARK_OAK_PRESSURE_PLATE = init();
-    @Nullable
-    public static final BlockType DARK_OAK_SAPLING = init();
-    @Nullable
-    public static final BlockType DARK_OAK_SHELF = init();
-    @Nullable
-    public static final BlockType DARK_OAK_SIGN = init();
-    @Nullable
-    public static final BlockType DARK_OAK_SLAB = init();
-    @Nullable
-    public static final BlockType DARK_OAK_STAIRS = init();
-    @Nullable
-    public static final BlockType DARK_OAK_TRAPDOOR = init();
-    @Nullable
-    public static final BlockType DARK_OAK_WALL_HANGING_SIGN = init();
-    @Nullable
-    public static final BlockType DARK_OAK_WALL_SIGN = init();
-    @Nullable
-    public static final BlockType DARK_OAK_WOOD = init();
-    @Nullable
-    public static final BlockType DARK_PRISMARINE = init();
-    @Nullable
-    public static final BlockType DARK_PRISMARINE_SLAB = init();
-    @Nullable
-    public static final BlockType DARK_PRISMARINE_STAIRS = init();
-    @Nullable
-    public static final BlockType DAYLIGHT_DETECTOR = init();
-    @Nullable
-    public static final BlockType DEAD_BRAIN_CORAL = init();
-    @Nullable
-    public static final BlockType DEAD_BRAIN_CORAL_BLOCK = init();
-    @Nullable
-    public static final BlockType DEAD_BRAIN_CORAL_FAN = init();
-    @Nullable
-    public static final BlockType DEAD_BRAIN_CORAL_WALL_FAN = init();
-    @Nullable
-    public static final BlockType DEAD_BUBBLE_CORAL = init();
-    @Nullable
-    public static final BlockType DEAD_BUBBLE_CORAL_BLOCK = init();
-    @Nullable
-    public static final BlockType DEAD_BUBBLE_CORAL_FAN = init();
-    @Nullable
-    public static final BlockType DEAD_BUBBLE_CORAL_WALL_FAN = init();
-    @Nullable
-    public static final BlockType DEAD_BUSH = init();
-    @Nullable
-    public static final BlockType DEAD_FIRE_CORAL = init();
-    @Nullable
-    public static final BlockType DEAD_FIRE_CORAL_BLOCK = init();
-    @Nullable
-    public static final BlockType DEAD_FIRE_CORAL_FAN = init();
-    @Nullable
-    public static final BlockType DEAD_FIRE_CORAL_WALL_FAN = init();
-    @Nullable
-    public static final BlockType DEAD_HORN_CORAL = init();
-    @Nullable
-    public static final BlockType DEAD_HORN_CORAL_BLOCK = init();
-    @Nullable
-    public static final BlockType DEAD_HORN_CORAL_FAN = init();
-    @Nullable
-    public static final BlockType DEAD_HORN_CORAL_WALL_FAN = init();
-    @Nullable
-    public static final BlockType DEAD_TUBE_CORAL = init();
-    @Nullable
-    public static final BlockType DEAD_TUBE_CORAL_BLOCK = init();
-    @Nullable
-    public static final BlockType DEAD_TUBE_CORAL_FAN = init();
-    @Nullable
-    public static final BlockType DEAD_TUBE_CORAL_WALL_FAN = init();
-    @Nullable
-    public static final BlockType DECORATED_POT = init();
-    @Nullable
-    public static final BlockType DEEPSLATE = init();
-    @Nullable
-    public static final BlockType DEEPSLATE_BRICKS = init();
-    @Nullable
-    public static final BlockType DEEPSLATE_BRICK_SLAB = init();
-    @Nullable
-    public static final BlockType DEEPSLATE_BRICK_STAIRS = init();
-    @Nullable
-    public static final BlockType DEEPSLATE_BRICK_WALL = init();
-    @Nullable
-    public static final BlockType DEEPSLATE_COAL_ORE = init();
-    @Nullable
-    public static final BlockType DEEPSLATE_COPPER_ORE = init();
-    @Nullable
-    public static final BlockType DEEPSLATE_DIAMOND_ORE = init();
-    @Nullable
-    public static final BlockType DEEPSLATE_EMERALD_ORE = init();
-    @Nullable
-    public static final BlockType DEEPSLATE_GOLD_ORE = init();
-    @Nullable
-    public static final BlockType DEEPSLATE_IRON_ORE = init();
-    @Nullable
-    public static final BlockType DEEPSLATE_LAPIS_ORE = init();
-    @Nullable
-    public static final BlockType DEEPSLATE_REDSTONE_ORE = init();
-    @Nullable
-    public static final BlockType DEEPSLATE_TILES = init();
-    @Nullable
-    public static final BlockType DEEPSLATE_TILE_SLAB = init();
-    @Nullable
-    public static final BlockType DEEPSLATE_TILE_STAIRS = init();
-    @Nullable
-    public static final BlockType DEEPSLATE_TILE_WALL = init();
-    @Nullable
-    public static final BlockType DETECTOR_RAIL = init();
-    @Nullable
-    public static final BlockType DIAMOND_BLOCK = init();
-    @Nullable
-    public static final BlockType DIAMOND_ORE = init();
-    @Nullable
-    public static final BlockType DIORITE = init();
-    @Nullable
-    public static final BlockType DIORITE_SLAB = init();
-    @Nullable
-    public static final BlockType DIORITE_STAIRS = init();
-    @Nullable
-    public static final BlockType DIORITE_WALL = init();
-    @Nullable
-    public static final BlockType DIRT = init();
-    @Nullable
-    public static final BlockType DIRT_PATH = init();
-    @Nullable
-    public static final BlockType DISPENSER = init();
-    @Nullable
-    public static final BlockType DRAGON_EGG = init();
-    @Nullable
-    public static final BlockType DRAGON_HEAD = init();
-    @Nullable
-    public static final BlockType DRAGON_WALL_HEAD = init();
-    @Nullable
-    public static final BlockType DRIED_KELP_BLOCK = init();
-    @Nullable
-    public static final BlockType DRIPSTONE_BLOCK = init();
-    @Nullable
-    public static final BlockType DROPPER = init();
-    @Nullable
-    public static final BlockType EMERALD_BLOCK = init();
-    @Nullable
-    public static final BlockType EMERALD_ORE = init();
-    @Nullable
-    public static final BlockType ENCHANTING_TABLE = init();
-    @Nullable
-    public static final BlockType ENDER_CHEST = init();
-    @Nullable
-    public static final BlockType END_GATEWAY = init();
-    @Nullable
-    public static final BlockType END_PORTAL = init();
-    @Nullable
-    public static final BlockType END_PORTAL_FRAME = init();
-    @Nullable
-    public static final BlockType END_ROD = init();
-    @Nullable
-    public static final BlockType END_STONE = init();
-    @Nullable
-    public static final BlockType END_STONE_BRICKS = init();
-    @Nullable
-    public static final BlockType END_STONE_BRICK_SLAB = init();
-    @Nullable
-    public static final BlockType END_STONE_BRICK_STAIRS = init();
-    @Nullable
-    public static final BlockType END_STONE_BRICK_WALL = init();
-    @Nullable
-    public static final BlockType EXPOSED_CHISELED_COPPER = init();
-    @Nullable
-    public static final BlockType EXPOSED_COPPER = init();
-    @Nullable
-    public static final BlockType EXPOSED_COPPER_BARS = init();
-    @Nullable
-    public static final BlockType EXPOSED_COPPER_BULB = init();
-    @Nullable
-    public static final BlockType EXPOSED_COPPER_CHAIN = init();
-    @Nullable
-    public static final BlockType EXPOSED_COPPER_CHEST = init();
-    @Nullable
-    public static final BlockType EXPOSED_COPPER_DOOR = init();
-    @Nullable
-    public static final BlockType EXPOSED_COPPER_GOLEM_STATUE = init();
-    @Nullable
-    public static final BlockType EXPOSED_COPPER_GRATE = init();
-    @Nullable
-    public static final BlockType EXPOSED_COPPER_LANTERN = init();
-    @Nullable
-    public static final BlockType EXPOSED_COPPER_TRAPDOOR = init();
-    @Nullable
-    public static final BlockType EXPOSED_CUT_COPPER = init();
-    @Nullable
-    public static final BlockType EXPOSED_CUT_COPPER_SLAB = init();
-    @Nullable
-    public static final BlockType EXPOSED_CUT_COPPER_STAIRS = init();
-    @Nullable
-    public static final BlockType EXPOSED_LIGHTNING_ROD = init();
-    @Nullable
-    public static final BlockType FARMLAND = init();
-    @Nullable
-    public static final BlockType FERN = init();
-    @Nullable
-    public static final BlockType FIRE = init();
-    @Nullable
-    public static final BlockType FIRE_CORAL = init();
-    @Nullable
-    public static final BlockType FIRE_CORAL_BLOCK = init();
-    @Nullable
-    public static final BlockType FIRE_CORAL_FAN = init();
-    @Nullable
-    public static final BlockType FIRE_CORAL_WALL_FAN = init();
-    @Nullable
-    public static final BlockType FIREFLY_BUSH = init();
-    @Nullable
-    public static final BlockType FLETCHING_TABLE = init();
-    @Nullable
-    public static final BlockType FLOWERING_AZALEA = init();
-    @Nullable
-    public static final BlockType FLOWERING_AZALEA_LEAVES = init();
-    @Nullable
-    public static final BlockType FROGSPAWN = init();
-    @Nullable
-    public static final BlockType FLOWER_POT = init();
-    @Nullable
-    public static final BlockType FROSTED_ICE = init();
-    @Nullable
-    public static final BlockType FURNACE = init();
-    @Nullable
-    public static final BlockType GILDED_BLACKSTONE = init();
-    @Nullable
-    public static final BlockType GLASS = init();
-    @Nullable
-    public static final BlockType GLASS_PANE = init();
-    @Nullable
-    public static final BlockType GLOWSTONE = init();
-    @Nullable
-    public static final BlockType GLOW_LICHEN = init();
-    @Nullable
-    public static final BlockType GOLD_BLOCK = init();
-    @Nullable
-    public static final BlockType GOLD_ORE = init();
-    @Nullable
-    public static final BlockType GOLDEN_DANDELION = init();
-    @Nullable
-    public static final BlockType GRANITE = init();
-    @Nullable
-    public static final BlockType GRANITE_SLAB = init();
-    @Nullable
-    public static final BlockType GRANITE_STAIRS = init();
-    @Nullable
-    public static final BlockType GRANITE_WALL = init();
-    @Nullable @Deprecated
-    public static final BlockType GRASS = init();
-    @Nullable
-    public static final BlockType GRASS_BLOCK = init();
-    @Deprecated
-    @Nullable
-    public static final BlockType GRASS_PATH = init();
-    @Nullable
-    public static final BlockType GRAVEL = init();
-    @Nullable
-    public static final BlockType GRAY_BANNER = init();
-    @Nullable
-    public static final BlockType GRAY_BED = init();
-    @Nullable
-    public static final BlockType GRAY_CANDLE = init();
-    @Nullable
-    public static final BlockType GRAY_CANDLE_CAKE = init();
-    @Nullable
-    public static final BlockType GRAY_CARPET = init();
-    @Nullable
-    public static final BlockType GRAY_CONCRETE = init();
-    @Nullable
-    public static final BlockType GRAY_CONCRETE_POWDER = init();
-    @Nullable
-    public static final BlockType GRAY_GLAZED_TERRACOTTA = init();
-    @Nullable
-    public static final BlockType GRAY_SHULKER_BOX = init();
-    @Nullable
-    public static final BlockType GRAY_STAINED_GLASS = init();
-    @Nullable
-    public static final BlockType GRAY_STAINED_GLASS_PANE = init();
-    @Nullable
-    public static final BlockType GRAY_TERRACOTTA = init();
-    @Nullable
-    public static final BlockType GRAY_WALL_BANNER = init();
-    @Nullable
-    public static final BlockType GRAY_WOOL = init();
-    @Nullable
-    public static final BlockType GREEN_BANNER = init();
-    @Nullable
-    public static final BlockType GREEN_BED = init();
-    @Nullable
-    public static final BlockType GREEN_CANDLE = init();
-    @Nullable
-    public static final BlockType GREEN_CANDLE_CAKE = init();
-    @Nullable
-    public static final BlockType GREEN_CARPET = init();
-    @Nullable
-    public static final BlockType GREEN_CONCRETE = init();
-    @Nullable
-    public static final BlockType GREEN_CONCRETE_POWDER = init();
-    @Nullable
-    public static final BlockType GREEN_GLAZED_TERRACOTTA = init();
-    @Nullable
-    public static final BlockType GREEN_SHULKER_BOX = init();
-    @Nullable
-    public static final BlockType GREEN_STAINED_GLASS = init();
-    @Nullable
-    public static final BlockType GREEN_STAINED_GLASS_PANE = init();
-    @Nullable
-    public static final BlockType GREEN_TERRACOTTA = init();
-    @Nullable
-    public static final BlockType GREEN_WALL_BANNER = init();
-    @Nullable
-    public static final BlockType GREEN_WOOL = init();
-    @Nullable
-    public static final BlockType GRINDSTONE = init();
-    @Nullable
-    public static final BlockType HANGING_ROOTS = init();
-    @Nullable
-    public static final BlockType HAY_BLOCK = init();
-    @Nullable
-    public static final BlockType HEAVY_CORE = init();
-    @Nullable
-    public static final BlockType HEAVY_WEIGHTED_PRESSURE_PLATE = init();
-    @Nullable
-    public static final BlockType HONEYCOMB_BLOCK = init();
-    @Nullable
-    public static final BlockType HONEY_BLOCK = init();
-    @Nullable
-    public static final BlockType HOPPER = init();
-    @Nullable
-    public static final BlockType HORN_CORAL = init();
-    @Nullable
-    public static final BlockType HORN_CORAL_BLOCK = init();
-    @Nullable
-    public static final BlockType HORN_CORAL_FAN = init();
-    @Nullable
-    public static final BlockType HORN_CORAL_WALL_FAN = init();
-    @Nullable
-    public static final BlockType ICE = init();
-    @Nullable
-    public static final BlockType INFESTED_CHISELED_STONE_BRICKS = init();
-    @Nullable
-    public static final BlockType INFESTED_COBBLESTONE = init();
-    @Nullable
-    public static final BlockType INFESTED_CRACKED_STONE_BRICKS = init();
-    @Nullable
-    public static final BlockType INFESTED_DEEPSLATE = init();
-    @Nullable
-    public static final BlockType INFESTED_MOSSY_STONE_BRICKS = init();
-    @Nullable
-    public static final BlockType INFESTED_STONE = init();
-    @Nullable
-    public static final BlockType INFESTED_STONE_BRICKS = init();
-    @Nullable
-    public static final BlockType IRON_BARS = init();
-    @Nullable
-    public static final BlockType IRON_BLOCK = init();
-    @Nullable
-    public static final BlockType IRON_CHAIN = init();
-    @Nullable
-    public static final BlockType IRON_DOOR = init();
-    @Nullable
-    public static final BlockType IRON_ORE = init();
-    @Nullable
-    public static final BlockType IRON_TRAPDOOR = init();
-    @Nullable
-    public static final BlockType JACK_O_LANTERN = init();
-    @Nullable
-    public static final BlockType JIGSAW = init();
-    @Nullable
-    public static final BlockType JUKEBOX = init();
-    @Nullable
-    public static final BlockType JUNGLE_BUTTON = init();
-    @Nullable
-    public static final BlockType JUNGLE_DOOR = init();
-    @Nullable
-    public static final BlockType JUNGLE_FENCE = init();
-    @Nullable
-    public static final BlockType JUNGLE_FENCE_GATE = init();
-    @Nullable
-    public static final BlockType JUNGLE_HANGING_SIGN = init();
-    @Nullable
-    public static final BlockType JUNGLE_LEAVES = init();
-    @Nullable
-    public static final BlockType JUNGLE_LOG = init();
-    @Nullable
-    public static final BlockType JUNGLE_PLANKS = init();
-    @Nullable
-    public static final BlockType JUNGLE_PRESSURE_PLATE = init();
-    @Nullable
-    public static final BlockType JUNGLE_SAPLING = init();
-    @Nullable
-    public static final BlockType JUNGLE_SHELF = init();
-    @Nullable
-    public static final BlockType JUNGLE_SIGN = init();
-    @Nullable
-    public static final BlockType JUNGLE_SLAB = init();
-    @Nullable
-    public static final BlockType JUNGLE_STAIRS = init();
-    @Nullable
-    public static final BlockType JUNGLE_TRAPDOOR = init();
-    @Nullable
-    public static final BlockType JUNGLE_WALL_HANGING_SIGN = init();
-    @Nullable
-    public static final BlockType JUNGLE_WALL_SIGN = init();
-    @Nullable
-    public static final BlockType JUNGLE_WOOD = init();
-    @Nullable
-    public static final BlockType KELP = init();
-    @Nullable
-    public static final BlockType KELP_PLANT = init();
-    @Nullable
-    public static final BlockType LADDER = init();
-    @Nullable
-    public static final BlockType LANTERN = init();
-    @Nullable
-    public static final BlockType LAPIS_BLOCK = init();
-    @Nullable
-    public static final BlockType LAPIS_ORE = init();
-    @Nullable
-    public static final BlockType LARGE_AMETHYST_BUD = init();
-    @Nullable
-    public static final BlockType LARGE_FERN = init();
-    @Nullable
-    public static final BlockType LAVA = init();
-    @Nullable
-    public static final BlockType LAVA_CAULDRON = init();
-    @Nullable
-    public static final BlockType LEAF_LITTER = init();
-    @Nullable
-    public static final BlockType LECTERN = init();
-    @Nullable
-    public static final BlockType LEVER = init();
-    @Nullable
-    public static final BlockType LIGHT = init();
-    @Nullable
-    public static final BlockType LIGHTNING_ROD = init();
-    @Nullable
-    public static final BlockType LIGHT_BLUE_BANNER = init();
-    @Nullable
-    public static final BlockType LIGHT_BLUE_BED = init();
-    @Nullable
-    public static final BlockType LIGHT_BLUE_CANDLE = init();
-    @Nullable
-    public static final BlockType LIGHT_BLUE_CANDLE_CAKE = init();
-    @Nullable
-    public static final BlockType LIGHT_BLUE_CARPET = init();
-    @Nullable
-    public static final BlockType LIGHT_BLUE_CONCRETE = init();
-    @Nullable
-    public static final BlockType LIGHT_BLUE_CONCRETE_POWDER = init();
-    @Nullable
-    public static final BlockType LIGHT_BLUE_GLAZED_TERRACOTTA = init();
-    @Nullable
-    public static final BlockType LIGHT_BLUE_SHULKER_BOX = init();
-    @Nullable
-    public static final BlockType LIGHT_BLUE_STAINED_GLASS = init();
-    @Nullable
-    public static final BlockType LIGHT_BLUE_STAINED_GLASS_PANE = init();
-    @Nullable
-    public static final BlockType LIGHT_BLUE_TERRACOTTA = init();
-    @Nullable
-    public static final BlockType LIGHT_BLUE_WALL_BANNER = init();
-    @Nullable
-    public static final BlockType LIGHT_BLUE_WOOL = init();
-    @Nullable
-    public static final BlockType LIGHT_GRAY_BANNER = init();
-    @Nullable
-    public static final BlockType LIGHT_GRAY_BED = init();
-    @Nullable
-    public static final BlockType LIGHT_GRAY_CANDLE = init();
-    @Nullable
-    public static final BlockType LIGHT_GRAY_CANDLE_CAKE = init();
-    @Nullable
-    public static final BlockType LIGHT_GRAY_CARPET = init();
-    @Nullable
-    public static final BlockType LIGHT_GRAY_CONCRETE = init();
-    @Nullable
-    public static final BlockType LIGHT_GRAY_CONCRETE_POWDER = init();
-    @Nullable
-    public static final BlockType LIGHT_GRAY_GLAZED_TERRACOTTA = init();
-    @Nullable
-    public static final BlockType LIGHT_GRAY_SHULKER_BOX = init();
-    @Nullable
-    public static final BlockType LIGHT_GRAY_STAINED_GLASS = init();
-    @Nullable
-    public static final BlockType LIGHT_GRAY_STAINED_GLASS_PANE = init();
-    @Nullable
-    public static final BlockType LIGHT_GRAY_TERRACOTTA = init();
-    @Nullable
-    public static final BlockType LIGHT_GRAY_WALL_BANNER = init();
-    @Nullable
-    public static final BlockType LIGHT_GRAY_WOOL = init();
-    @Nullable
-    public static final BlockType LIGHT_WEIGHTED_PRESSURE_PLATE = init();
-    @Nullable
-    public static final BlockType LILAC = init();
-    @Nullable
-    public static final BlockType LILY_OF_THE_VALLEY = init();
-    @Nullable
-    public static final BlockType LILY_PAD = init();
-    @Nullable
-    public static final BlockType LIME_BANNER = init();
-    @Nullable
-    public static final BlockType LIME_BED = init();
-    @Nullable
-    public static final BlockType LIME_CANDLE = init();
-    @Nullable
-    public static final BlockType LIME_CANDLE_CAKE = init();
-    @Nullable
-    public static final BlockType LIME_CARPET = init();
-    @Nullable
-    public static final BlockType LIME_CONCRETE = init();
-    @Nullable
-    public static final BlockType LIME_CONCRETE_POWDER = init();
-    @Nullable
-    public static final BlockType LIME_GLAZED_TERRACOTTA = init();
-    @Nullable
-    public static final BlockType LIME_SHULKER_BOX = init();
-    @Nullable
-    public static final BlockType LIME_STAINED_GLASS = init();
-    @Nullable
-    public static final BlockType LIME_STAINED_GLASS_PANE = init();
-    @Nullable
-    public static final BlockType LIME_TERRACOTTA = init();
-    @Nullable
-    public static final BlockType LIME_WALL_BANNER = init();
-    @Nullable
-    public static final BlockType LIME_WOOL = init();
-    @Nullable
-    public static final BlockType LODESTONE = init();
-    @Nullable
-    public static final BlockType LOOM = init();
-    @Nullable
-    public static final BlockType MAGENTA_BANNER = init();
-    @Nullable
-    public static final BlockType MAGENTA_BED = init();
-    @Nullable
-    public static final BlockType MAGENTA_CANDLE = init();
-    @Nullable
-    public static final BlockType MAGENTA_CANDLE_CAKE = init();
-    @Nullable
-    public static final BlockType MAGENTA_CARPET = init();
-    @Nullable
-    public static final BlockType MAGENTA_CONCRETE = init();
-    @Nullable
-    public static final BlockType MAGENTA_CONCRETE_POWDER = init();
-    @Nullable
-    public static final BlockType MAGENTA_GLAZED_TERRACOTTA = init();
-    @Nullable
-    public static final BlockType MAGENTA_SHULKER_BOX = init();
-    @Nullable
-    public static final BlockType MAGENTA_STAINED_GLASS = init();
-    @Nullable
-    public static final BlockType MAGENTA_STAINED_GLASS_PANE = init();
-    @Nullable
-    public static final BlockType MAGENTA_TERRACOTTA = init();
-    @Nullable
-    public static final BlockType MAGENTA_WALL_BANNER = init();
-    @Nullable
-    public static final BlockType MAGENTA_WOOL = init();
-    @Nullable
-    public static final BlockType MAGMA_BLOCK = init();
-    @Nullable
-    public static final BlockType MANGROVE_BUTTON = init();
-    @Nullable
-    public static final BlockType MANGROVE_DOOR = init();
-    @Nullable
-    public static final BlockType MANGROVE_FENCE = init();
-    @Nullable
-    public static final BlockType MANGROVE_FENCE_GATE = init();
-    @Nullable
-    public static final BlockType MANGROVE_HANGING_SIGN = init();
-    @Nullable
-    public static final BlockType MANGROVE_LEAVES = init();
-    @Nullable
-    public static final BlockType MANGROVE_LOG = init();
-    @Nullable
-    public static final BlockType MANGROVE_PLANKS = init();
-    @Nullable
-    public static final BlockType MANGROVE_PRESSURE_PLATE = init();
-    @Nullable
-    public static final BlockType MANGROVE_PROPAGULE = init();
-    @Nullable
-    public static final BlockType MANGROVE_ROOTS = init();
-    @Nullable
-    public static final BlockType MANGROVE_SHELF = init();
-    @Nullable
-    public static final BlockType MANGROVE_SIGN = init();
-    @Nullable
-    public static final BlockType MANGROVE_SLAB = init();
-    @Nullable
-    public static final BlockType MANGROVE_STAIRS = init();
-    @Nullable
-    public static final BlockType MANGROVE_TRAPDOOR = init();
-    @Nullable
-    public static final BlockType MANGROVE_WALL_HANGING_SIGN = init();
-    @Nullable
-    public static final BlockType MANGROVE_WALL_SIGN = init();
-    @Nullable
-    public static final BlockType MANGROVE_WOOD = init();
-    @Nullable
-    public static final BlockType MEDIUM_AMETHYST_BUD = init();
-    @Nullable
-    public static final BlockType MELON = init();
-    @Nullable
-    public static final BlockType MELON_STEM = init();
-    @Nullable
-    public static final BlockType MOSSY_COBBLESTONE = init();
-    @Nullable
-    public static final BlockType MOSSY_COBBLESTONE_SLAB = init();
-    @Nullable
-    public static final BlockType MOSSY_COBBLESTONE_STAIRS = init();
-    @Nullable
-    public static final BlockType MOSSY_COBBLESTONE_WALL = init();
-    @Nullable
-    public static final BlockType MOSSY_STONE_BRICKS = init();
-    @Nullable
-    public static final BlockType MOSSY_STONE_BRICK_SLAB = init();
-    @Nullable
-    public static final BlockType MOSSY_STONE_BRICK_STAIRS = init();
-    @Nullable
-    public static final BlockType MOSSY_STONE_BRICK_WALL = init();
-    @Nullable
-    public static final BlockType MOSS_BLOCK = init();
-    @Nullable
-    public static final BlockType MOSS_CARPET = init();
-    @Nullable
-    public static final BlockType MOVING_PISTON = init();
-    @Nullable
-    public static final BlockType MUD = init();
-    @Nullable
-    public static final BlockType MUD_BRICK_SLAB = init();
-    @Nullable
-    public static final BlockType MUD_BRICK_STAIRS = init();
-    @Nullable
-    public static final BlockType MUD_BRICK_WALL = init();
-    @Nullable
-    public static final BlockType MUD_BRICKS = init();
-    @Nullable
-    public static final BlockType MUDDY_MANGROVE_ROOTS = init();
-    @Nullable
-    public static final BlockType MUSHROOM_STEM = init();
-    @Nullable
-    public static final BlockType MYCELIUM = init();
-    @Nullable
-    public static final BlockType NETHERITE_BLOCK = init();
-    @Nullable
-    public static final BlockType NETHERRACK = init();
-    @Nullable
-    public static final BlockType NETHER_BRICKS = init();
-    @Nullable
-    public static final BlockType NETHER_BRICK_FENCE = init();
-    @Nullable
-    public static final BlockType NETHER_BRICK_SLAB = init();
-    @Nullable
-    public static final BlockType NETHER_BRICK_STAIRS = init();
-    @Nullable
-    public static final BlockType NETHER_BRICK_WALL = init();
-    @Nullable
-    public static final BlockType NETHER_GOLD_ORE = init();
-    @Nullable
-    public static final BlockType NETHER_PORTAL = init();
-    @Nullable
-    public static final BlockType NETHER_QUARTZ_ORE = init();
-    @Nullable
-    public static final BlockType NETHER_SPROUTS = init();
-    @Nullable
-    public static final BlockType NETHER_WART = init();
-    @Nullable
-    public static final BlockType NETHER_WART_BLOCK = init();
-    @Nullable
-    public static final BlockType NOTE_BLOCK = init();
-    @Nullable
-    public static final BlockType OAK_BUTTON = init();
-    @Nullable
-    public static final BlockType OAK_DOOR = init();
-    @Nullable
-    public static final BlockType OAK_FENCE = init();
-    @Nullable
-    public static final BlockType OAK_FENCE_GATE = init();
-    @Nullable
-    public static final BlockType OAK_HANGING_SIGN = init();
-    @Nullable
-    public static final BlockType OAK_LEAVES = init();
-    @Nullable
-    public static final BlockType OAK_LOG = init();
-    @Nullable
-    public static final BlockType OAK_PLANKS = init();
-    @Nullable
-    public static final BlockType OAK_PRESSURE_PLATE = init();
-    @Nullable
-    public static final BlockType OAK_SAPLING = init();
-    @Nullable
-    public static final BlockType OAK_SHELF = init();
-    @Nullable
-    public static final BlockType OAK_SIGN = init();
-    @Nullable
-    public static final BlockType OAK_SLAB = init();
-    @Nullable
-    public static final BlockType OAK_STAIRS = init();
-    @Nullable
-    public static final BlockType OAK_TRAPDOOR = init();
-    @Nullable
-    public static final BlockType OAK_WALL_HANGING_SIGN = init();
-    @Nullable
-    public static final BlockType OAK_WALL_SIGN = init();
-    @Nullable
-    public static final BlockType OAK_WOOD = init();
-    @Nullable
-    public static final BlockType OBSERVER = init();
-    @Nullable
-    public static final BlockType OBSIDIAN = init();
-    @Nullable
-    public static final BlockType OCHRE_FROGLIGHT = init();
-    @Nullable
-    public static final BlockType OPEN_EYEBLOSSOM = init();
-    @Nullable
-    public static final BlockType ORANGE_BANNER = init();
-    @Nullable
-    public static final BlockType ORANGE_BED = init();
-    @Nullable
-    public static final BlockType ORANGE_CANDLE = init();
-    @Nullable
-    public static final BlockType ORANGE_CANDLE_CAKE = init();
-    @Nullable
-    public static final BlockType ORANGE_CARPET = init();
-    @Nullable
-    public static final BlockType ORANGE_CONCRETE = init();
-    @Nullable
-    public static final BlockType ORANGE_CONCRETE_POWDER = init();
-    @Nullable
-    public static final BlockType ORANGE_GLAZED_TERRACOTTA = init();
-    @Nullable
-    public static final BlockType ORANGE_SHULKER_BOX = init();
-    @Nullable
-    public static final BlockType ORANGE_STAINED_GLASS = init();
-    @Nullable
-    public static final BlockType ORANGE_STAINED_GLASS_PANE = init();
-    @Nullable
-    public static final BlockType ORANGE_TERRACOTTA = init();
-    @Nullable
-    public static final BlockType ORANGE_TULIP = init();
-    @Nullable
-    public static final BlockType ORANGE_WALL_BANNER = init();
-    @Nullable
-    public static final BlockType ORANGE_WOOL = init();
-    @Nullable
-    public static final BlockType OXEYE_DAISY = init();
-    @Nullable
-    public static final BlockType OXIDIZED_CHISELED_COPPER = init();
-    @Nullable
-    public static final BlockType OXIDIZED_COPPER = init();
-    @Nullable
-    public static final BlockType OXIDIZED_COPPER_BARS = init();
-    @Nullable
-    public static final BlockType OXIDIZED_COPPER_BULB = init();
-    @Nullable
-    public static final BlockType OXIDIZED_COPPER_CHAIN = init();
-    @Nullable
-    public static final BlockType OXIDIZED_COPPER_CHEST = init();
-    @Nullable
-    public static final BlockType OXIDIZED_COPPER_DOOR = init();
-    @Nullable
-    public static final BlockType OXIDIZED_COPPER_GOLEM_STATUE = init();
-    @Nullable
-    public static final BlockType OXIDIZED_COPPER_GRATE = init();
-    @Nullable
-    public static final BlockType OXIDIZED_COPPER_LANTERN = init();
-    @Nullable
-    public static final BlockType OXIDIZED_COPPER_TRAPDOOR = init();
-    @Nullable
-    public static final BlockType OXIDIZED_CUT_COPPER = init();
-    @Nullable
-    public static final BlockType OXIDIZED_CUT_COPPER_SLAB = init();
-    @Nullable
-    public static final BlockType OXIDIZED_CUT_COPPER_STAIRS = init();
-    @Nullable
-    public static final BlockType OXIDIZED_LIGHTNING_ROD = init();
-    @Nullable
-    public static final BlockType PACKED_ICE = init();
-    @Nullable
-    public static final BlockType PACKED_MUD = init();
-    @Nullable
-    public static final BlockType PALE_HANGING_MOSS = init();
-    @Nullable
-    public static final BlockType PALE_MOSS_BLOCK = init();
-    @Nullable
-    public static final BlockType PALE_MOSS_CARPET = init();
-    @Nullable
-    public static final BlockType PALE_OAK_BUTTON = init();
-    @Nullable
-    public static final BlockType PALE_OAK_DOOR = init();
-    @Nullable
-    public static final BlockType PALE_OAK_FENCE = init();
-    @Nullable
-    public static final BlockType PALE_OAK_FENCE_GATE = init();
-    @Nullable
-    public static final BlockType PALE_OAK_HANGING_SIGN = init();
-    @Nullable
-    public static final BlockType PALE_OAK_LEAVES = init();
-    @Nullable
-    public static final BlockType PALE_OAK_LOG = init();
-    @Nullable
-    public static final BlockType PALE_OAK_PLANKS = init();
-    @Nullable
-    public static final BlockType PALE_OAK_PRESSURE_PLATE = init();
-    @Nullable
-    public static final BlockType PALE_OAK_SAPLING = init();
-    @Nullable
-    public static final BlockType PALE_OAK_SHELF = init();
-    @Nullable
-    public static final BlockType PALE_OAK_SIGN = init();
-    @Nullable
-    public static final BlockType PALE_OAK_SLAB = init();
-    @Nullable
-    public static final BlockType PALE_OAK_STAIRS = init();
-    @Nullable
-    public static final BlockType PALE_OAK_TRAPDOOR = init();
-    @Nullable
-    public static final BlockType PALE_OAK_WALL_HANGING_SIGN = init();
-    @Nullable
-    public static final BlockType PALE_OAK_WALL_SIGN = init();
-    @Nullable
-    public static final BlockType PALE_OAK_WOOD = init();
-    @Nullable
-    public static final BlockType PEARLESCENT_FROGLIGHT = init();
-    @Nullable
-    public static final BlockType PEONY = init();
-    @Nullable
-    public static final BlockType PETRIFIED_OAK_SLAB = init();
-    @Nullable
-    public static final BlockType PIGLIN_HEAD = init();
-    @Nullable
-    public static final BlockType PIGLIN_WALL_HEAD = init();
-    @Nullable
-    public static final BlockType PINK_BANNER = init();
-    @Nullable
-    public static final BlockType PINK_BED = init();
-    @Nullable
-    public static final BlockType PINK_CANDLE = init();
-    @Nullable
-    public static final BlockType PINK_CANDLE_CAKE = init();
-    @Nullable
-    public static final BlockType PINK_CARPET = init();
-    @Nullable
-    public static final BlockType PINK_CONCRETE = init();
-    @Nullable
-    public static final BlockType PINK_CONCRETE_POWDER = init();
-    @Nullable
-    public static final BlockType PINK_GLAZED_TERRACOTTA = init();
-    @Nullable
-    public static final BlockType PINK_PETALS = init();
-    @Nullable
-    public static final BlockType PINK_SHULKER_BOX = init();
-    @Nullable
-    public static final BlockType PINK_STAINED_GLASS = init();
-    @Nullable
-    public static final BlockType PINK_STAINED_GLASS_PANE = init();
-    @Nullable
-    public static final BlockType PINK_TERRACOTTA = init();
-    @Nullable
-    public static final BlockType PINK_TULIP = init();
-    @Nullable
-    public static final BlockType PINK_WALL_BANNER = init();
-    @Nullable
-    public static final BlockType PINK_WOOL = init();
-    @Nullable
-    public static final BlockType PISTON = init();
-    @Nullable
-    public static final BlockType PISTON_HEAD = init();
-    @Nullable
-    public static final BlockType PITCHER_CROP = init();
-    @Nullable
-    public static final BlockType PITCHER_PLANT = init();
-    @Nullable
-    public static final BlockType PLAYER_HEAD = init();
-    @Nullable
-    public static final BlockType PLAYER_WALL_HEAD = init();
-    @Nullable
-    public static final BlockType PODZOL = init();
-    @Nullable
-    public static final BlockType POINTED_DRIPSTONE = init();
-    @Nullable
-    public static final BlockType POLISHED_ANDESITE = init();
-    @Nullable
-    public static final BlockType POLISHED_ANDESITE_SLAB = init();
-    @Nullable
-    public static final BlockType POLISHED_ANDESITE_STAIRS = init();
-    @Nullable
-    public static final BlockType POLISHED_BASALT = init();
-    @Nullable
-    public static final BlockType POLISHED_BLACKSTONE = init();
-    @Nullable
-    public static final BlockType POLISHED_BLACKSTONE_BRICKS = init();
-    @Nullable
-    public static final BlockType POLISHED_BLACKSTONE_BRICK_SLAB = init();
-    @Nullable
-    public static final BlockType POLISHED_BLACKSTONE_BRICK_STAIRS = init();
-    @Nullable
-    public static final BlockType POLISHED_BLACKSTONE_BRICK_WALL = init();
-    @Nullable
-    public static final BlockType POLISHED_BLACKSTONE_BUTTON = init();
-    @Nullable
-    public static final BlockType POLISHED_BLACKSTONE_PRESSURE_PLATE = init();
-    @Nullable
-    public static final BlockType POLISHED_BLACKSTONE_SLAB = init();
-    @Nullable
-    public static final BlockType POLISHED_BLACKSTONE_STAIRS = init();
-    @Nullable
-    public static final BlockType POLISHED_BLACKSTONE_WALL = init();
-    @Nullable
-    public static final BlockType POLISHED_CINNABAR = init();
-    @Nullable
-    public static final BlockType POLISHED_CINNABAR_SLAB = init();
-    @Nullable
-    public static final BlockType POLISHED_CINNABAR_STAIRS = init();
-    @Nullable
-    public static final BlockType POLISHED_CINNABAR_WALL = init();
-    @Nullable
-    public static final BlockType POLISHED_DEEPSLATE = init();
-    @Nullable
-    public static final BlockType POLISHED_DEEPSLATE_SLAB = init();
-    @Nullable
-    public static final BlockType POLISHED_DEEPSLATE_STAIRS = init();
-    @Nullable
-    public static final BlockType POLISHED_DEEPSLATE_WALL = init();
-    @Nullable
-    public static final BlockType POLISHED_DIORITE = init();
-    @Nullable
-    public static final BlockType POLISHED_DIORITE_SLAB = init();
-    @Nullable
-    public static final BlockType POLISHED_DIORITE_STAIRS = init();
-    @Nullable
-    public static final BlockType POLISHED_GRANITE = init();
-    @Nullable
-    public static final BlockType POLISHED_GRANITE_SLAB = init();
-    @Nullable
-    public static final BlockType POLISHED_GRANITE_STAIRS = init();
-    @Nullable
-    public static final BlockType POLISHED_SULFUR = init();
-    @Nullable
-    public static final BlockType POLISHED_SULFUR_SLAB = init();
-    @Nullable
-    public static final BlockType POLISHED_SULFUR_STAIRS = init();
-    @Nullable
-    public static final BlockType POLISHED_SULFUR_WALL = init();
-    @Nullable
-    public static final BlockType POLISHED_TUFF = init();
-    @Nullable
-    public static final BlockType POLISHED_TUFF_SLAB = init();
-    @Nullable
-    public static final BlockType POLISHED_TUFF_STAIRS = init();
-    @Nullable
-    public static final BlockType POLISHED_TUFF_WALL = init();
-    @Nullable
-    public static final BlockType POPPY = init();
-    @Nullable
-    public static final BlockType POTATOES = init();
-    @Nullable
-    public static final BlockType POTENT_SULFUR = init();
-    @Nullable
-    public static final BlockType POTTED_ACACIA_SAPLING = init();
-    @Nullable
-    public static final BlockType POTTED_ALLIUM = init();
-    @Deprecated //No longer has "bush"
-    @Nullable
-    public static final BlockType POTTED_AZALEA_BUSH = init();
-    @Nullable
-    public static final BlockType POTTED_AZALEA = init();
-    @Nullable
-    public static final BlockType POTTED_AZURE_BLUET = init();
-    @Nullable
-    public static final BlockType POTTED_BAMBOO = init();
-    @Nullable
-    public static final BlockType POTTED_BIRCH_SAPLING = init();
-    @Nullable
-    public static final BlockType POTTED_BLUE_ORCHID = init();
-    @Nullable
-    public static final BlockType POTTED_BROWN_MUSHROOM = init();
-    @Nullable
-    public static final BlockType POTTED_CACTUS = init();
-    @Nullable
-    public static final BlockType POTTED_CHERRY_SAPLING = init();
-    @Nullable
-    public static final BlockType POTTED_CLOSED_EYEBLOSSOM = init();
-    @Nullable
-    public static final BlockType POTTED_CORNFLOWER = init();
-    @Nullable
-    public static final BlockType POTTED_CRIMSON_FUNGUS = init();
-    @Nullable
-    public static final BlockType POTTED_CRIMSON_ROOTS = init();
-    @Nullable
-    public static final BlockType POTTED_DANDELION = init();
-    @Nullable
-    public static final BlockType POTTED_DARK_OAK_SAPLING = init();
-    @Nullable
-    public static final BlockType POTTED_DEAD_BUSH = init();
-    @Nullable
-    public static final BlockType POTTED_FERN = init();
-    @Deprecated //No longer has "bush"
-    @Nullable
-    public static final BlockType POTTED_FLOWERING_AZALEA_BUSH = init();
-    @Nullable
-    public static final BlockType POTTED_FLOWERING_AZALEA = init();
-    @Nullable
-    public static final BlockType POTTED_GOLDEN_DANDELION = init();
-    @Nullable
-    public static final BlockType POTTED_JUNGLE_SAPLING = init();
-    @Nullable
-    public static final BlockType POTTED_LILY_OF_THE_VALLEY = init();
-    @Nullable
-    public static final BlockType POTTED_MANGROVE_PROPAGULE = init();
-    @Nullable
-    public static final BlockType POTTED_OAK_SAPLING = init();
-    @Nullable
-    public static final BlockType POTTED_OPEN_EYEBLOSSOM = init();
-    @Nullable
-    public static final BlockType POTTED_ORANGE_TULIP = init();
-    @Nullable
-    public static final BlockType POTTED_OXEYE_DAISY = init();
-    @Nullable
-    public static final BlockType POTTED_PALE_OAK_SAPLING = init();
-    @Nullable
-    public static final BlockType POTTED_PINK_TULIP = init();
-    @Nullable
-    public static final BlockType POTTED_POPPY = init();
-    @Nullable
-    public static final BlockType POTTED_RED_MUSHROOM = init();
-    @Nullable
-    public static final BlockType POTTED_RED_TULIP = init();
-    @Nullable
-    public static final BlockType POTTED_SPRUCE_SAPLING = init();
-    @Nullable
-    public static final BlockType POTTED_TORCHFLOWER = init();
-    @Nullable
-    public static final BlockType POTTED_WARPED_FUNGUS = init();
-    @Nullable
-    public static final BlockType POTTED_WARPED_ROOTS = init();
-    @Nullable
-    public static final BlockType POTTED_WHITE_TULIP = init();
-    @Nullable
-    public static final BlockType POTTED_WITHER_ROSE = init();
-    @Nullable
-    public static final BlockType POWDER_SNOW = init();
-    @Nullable
-    public static final BlockType POWDER_SNOW_CAULDRON = init();
-    @Nullable
-    public static final BlockType POWERED_RAIL = init();
-    @Nullable
-    public static final BlockType PRISMARINE = init();
-    @Nullable
-    public static final BlockType PRISMARINE_BRICKS = init();
-    @Nullable
-    public static final BlockType PRISMARINE_BRICK_SLAB = init();
-    @Nullable
-    public static final BlockType PRISMARINE_BRICK_STAIRS = init();
-    @Nullable
-    public static final BlockType PRISMARINE_SLAB = init();
-    @Nullable
-    public static final BlockType PRISMARINE_STAIRS = init();
-    @Nullable
-    public static final BlockType PRISMARINE_WALL = init();
-    @Nullable
-    public static final BlockType PUMPKIN = init();
-    @Nullable
-    public static final BlockType PUMPKIN_STEM = init();
-    @Nullable
-    public static final BlockType PURPLE_BANNER = init();
-    @Nullable
-    public static final BlockType PURPLE_BED = init();
-    @Nullable
-    public static final BlockType PURPLE_CANDLE = init();
-    @Nullable
-    public static final BlockType PURPLE_CANDLE_CAKE = init();
-    @Nullable
-    public static final BlockType PURPLE_CARPET = init();
-    @Nullable
-    public static final BlockType PURPLE_CONCRETE = init();
-    @Nullable
-    public static final BlockType PURPLE_CONCRETE_POWDER = init();
-    @Nullable
-    public static final BlockType PURPLE_GLAZED_TERRACOTTA = init();
-    @Nullable
-    public static final BlockType PURPLE_SHULKER_BOX = init();
-    @Nullable
-    public static final BlockType PURPLE_STAINED_GLASS = init();
-    @Nullable
-    public static final BlockType PURPLE_STAINED_GLASS_PANE = init();
-    @Nullable
-    public static final BlockType PURPLE_TERRACOTTA = init();
-    @Nullable
-    public static final BlockType PURPLE_WALL_BANNER = init();
-    @Nullable
-    public static final BlockType PURPLE_WOOL = init();
-    @Nullable
-    public static final BlockType PURPUR_BLOCK = init();
-    @Nullable
-    public static final BlockType PURPUR_PILLAR = init();
-    @Nullable
-    public static final BlockType PURPUR_SLAB = init();
-    @Nullable
-    public static final BlockType PURPUR_STAIRS = init();
-    @Nullable
-    public static final BlockType QUARTZ_BLOCK = init();
-    @Nullable
-    public static final BlockType QUARTZ_BRICKS = init();
-    @Nullable
-    public static final BlockType QUARTZ_PILLAR = init();
-    @Nullable
-    public static final BlockType QUARTZ_SLAB = init();
-    @Nullable
-    public static final BlockType QUARTZ_STAIRS = init();
-    @Nullable
-    public static final BlockType RAIL = init();
-    @Nullable
-    public static final BlockType RAW_COPPER_BLOCK = init();
-    @Nullable
-    public static final BlockType RAW_GOLD_BLOCK = init();
-    @Nullable
-    public static final BlockType RAW_IRON_BLOCK = init();
-    @Nullable
-    public static final BlockType REDSTONE_BLOCK = init();
-    @Nullable
-    public static final BlockType REDSTONE_LAMP = init();
-    @Nullable
-    public static final BlockType REDSTONE_ORE = init();
-    @Nullable
-    public static final BlockType REDSTONE_TORCH = init();
-    @Nullable
-    public static final BlockType REDSTONE_WALL_TORCH = init();
-    @Nullable
-    public static final BlockType REDSTONE_WIRE = init();
-    @Nullable
-    public static final BlockType REINFORCED_DEEPSLATE = init();
-    @Nullable
-    public static final BlockType RED_BANNER = init();
-    @Nullable
-    public static final BlockType RED_BED = init();
-    @Nullable
-    public static final BlockType RED_CANDLE = init();
-    @Nullable
-    public static final BlockType RED_CANDLE_CAKE = init();
-    @Nullable
-    public static final BlockType RED_CARPET = init();
-    @Nullable
-    public static final BlockType RED_CONCRETE = init();
-    @Nullable
-    public static final BlockType RED_CONCRETE_POWDER = init();
-    @Nullable
-    public static final BlockType RED_GLAZED_TERRACOTTA = init();
-    @Nullable
-    public static final BlockType RED_MUSHROOM = init();
-    @Nullable
-    public static final BlockType RED_MUSHROOM_BLOCK = init();
-    @Nullable
-    public static final BlockType RED_NETHER_BRICKS = init();
-    @Nullable
-    public static final BlockType RED_NETHER_BRICK_SLAB = init();
-    @Nullable
-    public static final BlockType RED_NETHER_BRICK_STAIRS = init();
-    @Nullable
-    public static final BlockType RED_NETHER_BRICK_WALL = init();
-    @Nullable
-    public static final BlockType RED_SAND = init();
-    @Nullable
-    public static final BlockType RED_SANDSTONE = init();
-    @Nullable
-    public static final BlockType RED_SANDSTONE_SLAB = init();
-    @Nullable
-    public static final BlockType RED_SANDSTONE_STAIRS = init();
-    @Nullable
-    public static final BlockType RED_SANDSTONE_WALL = init();
-    @Nullable
-    public static final BlockType RED_SHULKER_BOX = init();
-    @Nullable
-    public static final BlockType RED_STAINED_GLASS = init();
-    @Nullable
-    public static final BlockType RED_STAINED_GLASS_PANE = init();
-    @Nullable
-    public static final BlockType RED_TERRACOTTA = init();
-    @Nullable
-    public static final BlockType RED_TULIP = init();
-    @Nullable
-    public static final BlockType RED_WALL_BANNER = init();
-    @Nullable
-    public static final BlockType RED_WOOL = init();
-    @Nullable
-    public static final BlockType REPEATER = init();
-    @Nullable
-    public static final BlockType REPEATING_COMMAND_BLOCK = init();
-    @Nullable
-    public static final BlockType RESIN_BLOCK = init();
-    @Nullable
-    public static final BlockType RESIN_BRICK_SLAB = init();
-    @Nullable
-    public static final BlockType RESIN_BRICK_STAIRS = init();
-    @Nullable
-    public static final BlockType RESIN_BRICK_WALL = init();
-    @Nullable
-    public static final BlockType RESIN_BRICKS = init();
-    @Nullable
-    public static final BlockType RESIN_CLUMP = init();
-    @Nullable
-    public static final BlockType RESPAWN_ANCHOR = init();
-    @Nullable
-    public static final BlockType ROOTED_DIRT = init();
-    @Nullable
-    public static final BlockType ROSE_BUSH = init();
-    @Nullable
-    public static final BlockType SAND = init();
-    @Nullable
-    public static final BlockType SANDSTONE = init();
-    @Nullable
-    public static final BlockType SANDSTONE_SLAB = init();
-    @Nullable
-    public static final BlockType SANDSTONE_STAIRS = init();
-    @Nullable
-    public static final BlockType SANDSTONE_WALL = init();
-    @Nullable
-    public static final BlockType SCAFFOLDING = init();
-    @Nullable
-    public static final BlockType SCULK = init();
-    @Nullable
-    public static final BlockType SCULK_CATALYST = init();
-    @Nullable
-    public static final BlockType SCULK_SENSOR = init();
-    @Nullable
-    public static final BlockType SCULK_SHRIEKER = init();
-    @Nullable
-    public static final BlockType SCULK_VEIN = init();
-    @Nullable
-    public static final BlockType SEAGRASS = init();
-    @Nullable
-    public static final BlockType SHORT_DRY_GRASS  = init();
-    @Nullable
-    public static final BlockType SHORT_GRASS = init();
-    @Nullable
-    public static final BlockType SEA_LANTERN = init();
-    @Nullable
-    public static final BlockType SEA_PICKLE = init();
-    @Nullable
-    public static final BlockType SHROOMLIGHT = init();
-    @Nullable
-    public static final BlockType SHULKER_BOX = init();
-    @Deprecated
-    @Nullable
-    public static final BlockType SIGN = init();
-    @Nullable
-    public static final BlockType SKELETON_SKULL = init();
-    @Nullable
-    public static final BlockType SKELETON_WALL_SKULL = init();
-    @Nullable
-    public static final BlockType SLIME_BLOCK = init();
-    @Nullable
-    public static final BlockType SMALL_AMETHYST_BUD = init();
-    @Nullable
-    public static final BlockType SMALL_DRIPLEAF = init();
-    @Nullable
-    public static final BlockType SMITHING_TABLE = init();
-    @Nullable
-    public static final BlockType SMOKER = init();
-    @Nullable
-    public static final BlockType SMOOTH_BASALT = init();
-    @Nullable
-    public static final BlockType SMOOTH_QUARTZ = init();
-    @Nullable
-    public static final BlockType SMOOTH_QUARTZ_SLAB = init();
-    @Nullable
-    public static final BlockType SMOOTH_QUARTZ_STAIRS = init();
-    @Nullable
-    public static final BlockType SMOOTH_RED_SANDSTONE = init();
-    @Nullable
-    public static final BlockType SMOOTH_RED_SANDSTONE_SLAB = init();
-    @Nullable
-    public static final BlockType SMOOTH_RED_SANDSTONE_STAIRS = init();
-    @Nullable
-    public static final BlockType SMOOTH_SANDSTONE = init();
-    @Nullable
-    public static final BlockType SMOOTH_SANDSTONE_SLAB = init();
-    @Nullable
-    public static final BlockType SMOOTH_SANDSTONE_STAIRS = init();
-    @Nullable
-    public static final BlockType SMOOTH_STONE = init();
-    @Nullable
-    public static final BlockType SMOOTH_STONE_SLAB = init();
-    @Nullable
-    public static final BlockType SNIFFER_EGG = init();
-    @Nullable
-    public static final BlockType SNOW = init();
-    @Nullable
-    public static final BlockType SNOW_BLOCK = init();
-    @Nullable
-    public static final BlockType SOUL_CAMPFIRE = init();
-    @Nullable
-    public static final BlockType SOUL_FIRE = init();
-    @Nullable
-    public static final BlockType SOUL_LANTERN = init();
-    @Nullable
-    public static final BlockType SOUL_SAND = init();
-    @Nullable
-    public static final BlockType SOUL_SOIL = init();
-    @Nullable
-    public static final BlockType SOUL_TORCH = init();
-    @Nullable
-    public static final BlockType SOUL_WALL_TORCH = init();
-    @Nullable
-    public static final BlockType SPAWNER = init();
-    @Nullable
-    public static final BlockType SPONGE = init();
-    @Nullable
-    public static final BlockType SPORE_BLOSSOM = init();
-    @Nullable
-    public static final BlockType SPRUCE_BUTTON = init();
-    @Nullable
-    public static final BlockType SPRUCE_DOOR = init();
-    @Nullable
-    public static final BlockType SPRUCE_FENCE = init();
-    @Nullable
-    public static final BlockType SPRUCE_FENCE_GATE = init();
-    @Nullable
-    public static final BlockType SPRUCE_HANGING_SIGN = init();
-    @Nullable
-    public static final BlockType SPRUCE_LEAVES = init();
-    @Nullable
-    public static final BlockType SPRUCE_LOG = init();
-    @Nullable
-    public static final BlockType SPRUCE_PLANKS = init();
-    @Nullable
-    public static final BlockType SPRUCE_PRESSURE_PLATE = init();
-    @Nullable
-    public static final BlockType SPRUCE_SAPLING = init();
-    @Nullable
-    public static final BlockType SPRUCE_SHELF = init();
-    @Nullable
-    public static final BlockType SPRUCE_SIGN = init();
-    @Nullable
-    public static final BlockType SPRUCE_SLAB = init();
-    @Nullable
-    public static final BlockType SPRUCE_STAIRS = init();
-    @Nullable
-    public static final BlockType SPRUCE_TRAPDOOR = init();
-    @Nullable
-    public static final BlockType SPRUCE_WALL_HANGING_SIGN = init();
-    @Nullable
-    public static final BlockType SPRUCE_WALL_SIGN = init();
-    @Nullable
-    public static final BlockType SPRUCE_WOOD = init();
-    @Nullable
-    public static final BlockType STICKY_PISTON = init();
-    @Nullable
-    public static final BlockType STONE = init();
-    @Nullable
-    public static final BlockType STONECUTTER = init();
-    @Nullable
-    public static final BlockType STONE_BRICKS = init();
-    @Nullable
-    public static final BlockType STONE_BRICK_SLAB = init();
-    @Nullable
-    public static final BlockType STONE_BRICK_STAIRS = init();
-    @Nullable
-    public static final BlockType STONE_BRICK_WALL = init();
-    @Nullable
-    public static final BlockType STONE_BUTTON = init();
-    @Nullable
-    public static final BlockType STONE_PRESSURE_PLATE = init();
-    @Nullable
-    public static final BlockType STONE_SLAB = init();
-    @Nullable
-    public static final BlockType STONE_STAIRS = init();
-    @Nullable
-    public static final BlockType STRIPPED_ACACIA_LOG = init();
-    @Nullable
-    public static final BlockType STRIPPED_ACACIA_WOOD = init();
-    @Nullable
-    public static final BlockType STRIPPED_BAMBOO_BLOCK = init();
-    @Nullable
-    public static final BlockType STRIPPED_BIRCH_LOG = init();
-    @Nullable
-    public static final BlockType STRIPPED_BIRCH_WOOD = init();
-    @Nullable
-    public static final BlockType STRIPPED_CHERRY_LOG = init();
-    @Nullable
-    public static final BlockType STRIPPED_CHERRY_WOOD = init();
-    @Nullable
-    public static final BlockType STRIPPED_CRIMSON_HYPHAE = init();
-    @Nullable
-    public static final BlockType STRIPPED_CRIMSON_STEM = init();
-    @Nullable
-    public static final BlockType STRIPPED_DARK_OAK_LOG = init();
-    @Nullable
-    public static final BlockType STRIPPED_DARK_OAK_WOOD = init();
-    @Nullable
-    public static final BlockType STRIPPED_JUNGLE_LOG = init();
-    @Nullable
-    public static final BlockType STRIPPED_JUNGLE_WOOD = init();
-    @Nullable
-    public static final BlockType STRIPPED_MANGROVE_LOG = init();
-    @Nullable
-    public static final BlockType STRIPPED_MANGROVE_WOOD = init();
-    @Nullable
-    public static final BlockType STRIPPED_OAK_LOG = init();
-    @Nullable
-    public static final BlockType STRIPPED_OAK_WOOD = init();
-    @Nullable
-    public static final BlockType STRIPPED_PALE_OAK_LOG = init();
-    @Nullable
-    public static final BlockType STRIPPED_PALE_OAK_WOOD = init();
-    @Nullable
-    public static final BlockType STRIPPED_SPRUCE_LOG = init();
-    @Nullable
-    public static final BlockType STRIPPED_SPRUCE_WOOD = init();
-    @Nullable
-    public static final BlockType STRIPPED_WARPED_HYPHAE = init();
-    @Nullable
-    public static final BlockType STRIPPED_WARPED_STEM = init();
-    @Nullable
-    public static final BlockType STRUCTURE_BLOCK = init();
-    @Nullable
-    public static final BlockType STRUCTURE_VOID = init();
-    @Nullable
-    public static final BlockType SUGAR_CANE = init();
-    @Nullable
-    public static final BlockType SULFUR = init();
-    @Nullable
-    public static final BlockType SULFUR_BRICK_SLAB = init();
-    @Nullable
-    public static final BlockType SULFUR_BRICK_STAIRS = init();
-    @Nullable
-    public static final BlockType SULFUR_BRICK_WALL = init();
-    @Nullable
-    public static final BlockType SULFUR_BRICKS = init();
-    @Nullable
-    public static final BlockType SULFUR_SLAB = init();
-    @Nullable
-    public static final BlockType SULFUR_SPIKE = init();
-    @Nullable
-    public static final BlockType SULFUR_STAIRS = init();
-    @Nullable
-    public static final BlockType SULFUR_WALL = init();
-    @Nullable
-    public static final BlockType SUNFLOWER = init();
-    @Nullable
-    public static final BlockType SUSPICIOUS_GRAVEL = init();
-    @Nullable
-    public static final BlockType SUSPICIOUS_SAND = init();
-    @Nullable
-    public static final BlockType SWEET_BERRY_BUSH = init();
-    @Nullable
-    public static final BlockType TALL_DRY_GRASS = init();
-    @Nullable
-    public static final BlockType TALL_GRASS = init();
-    @Nullable
-    public static final BlockType TALL_SEAGRASS = init();
-    @Nullable
-    public static final BlockType TARGET = init();
-    @Nullable
-    public static final BlockType TERRACOTTA = init();
-    @Nullable
-    public static final BlockType TEST_BLOCK = init();
-    @Nullable
-    public static final BlockType TEST_INSTANCE_BLOCK = init();
-    @Nullable
-    public static final BlockType TINTED_GLASS = init();
-    @Nullable
-    public static final BlockType TNT = init();
-    @Nullable
-    public static final BlockType TORCH = init();
-    @Nullable
-    public static final BlockType TORCHFLOWER = init();
-    @Nullable
-    public static final BlockType TORCHFLOWER_CROP = init();
-    @Nullable
-    public static final BlockType TRAPPED_CHEST = init();
-    @Nullable
-    public static final BlockType TRIAL_SPAWNER = init();
-    @Nullable
-    public static final BlockType TRIPWIRE = init();
-    @Nullable
-    public static final BlockType TRIPWIRE_HOOK = init();
-    @Nullable
-    public static final BlockType TUBE_CORAL = init();
-    @Nullable
-    public static final BlockType TUBE_CORAL_BLOCK = init();
-    @Nullable
-    public static final BlockType TUBE_CORAL_FAN = init();
-    @Nullable
-    public static final BlockType TUBE_CORAL_WALL_FAN = init();
-    @Nullable
-    public static final BlockType TUFF = init();
-    @Nullable
-    public static final BlockType TUFF_BRICK_SLAB = init();
-    @Nullable
-    public static final BlockType TUFF_BRICK_STAIRS = init();
-    @Nullable
-    public static final BlockType TUFF_BRICK_WALL = init();
-    @Nullable
-    public static final BlockType TUFF_BRICKS = init();
-    @Nullable
-    public static final BlockType TUFF_SLAB = init();
-    @Nullable
-    public static final BlockType TUFF_STAIRS = init();
-    @Nullable
-    public static final BlockType TUFF_WALL = init();
-    @Nullable
-    public static final BlockType TURTLE_EGG = init();
-    @Nullable
-    public static final BlockType TWISTING_VINES = init();
-    @Nullable
-    public static final BlockType TWISTING_VINES_PLANT = init();
-    @Nullable
-    public static final BlockType VAULT = init();
-    @Nullable
-    public static final BlockType VERDANT_FROGLIGHT = init();
-    @Nullable
-    public static final BlockType VINE = init();
-    @Nullable
-    public static final BlockType VOID_AIR = init();
-    @Deprecated
-    @Nullable
-    public static final BlockType WALL_SIGN = init();
-    @Nullable
-    public static final BlockType WALL_TORCH = init();
-    @Nullable
-    public static final BlockType WARPED_BUTTON = init();
-    @Nullable
-    public static final BlockType WARPED_DOOR = init();
-    @Nullable
-    public static final BlockType WARPED_FENCE = init();
-    @Nullable
-    public static final BlockType WARPED_FENCE_GATE = init();
-    @Nullable
-    public static final BlockType WARPED_FUNGUS = init();
-    @Nullable
-    public static final BlockType WARPED_HANGING_SIGN = init();
-    @Nullable
-    public static final BlockType WARPED_HYPHAE = init();
-    @Nullable
-    public static final BlockType WARPED_NYLIUM = init();
-    @Nullable
-    public static final BlockType WARPED_PLANKS = init();
-    @Nullable
-    public static final BlockType WARPED_PRESSURE_PLATE = init();
-    @Nullable
-    public static final BlockType WARPED_ROOTS = init();
-    @Nullable
-    public static final BlockType WARPED_SHELF = init();
-    @Nullable
-    public static final BlockType WARPED_SIGN = init();
-    @Nullable
-    public static final BlockType WARPED_SLAB = init();
-    @Nullable
-    public static final BlockType WARPED_STAIRS = init();
-    @Nullable
-    public static final BlockType WARPED_STEM = init();
-    @Nullable
-    public static final BlockType WARPED_TRAPDOOR = init();
-    @Nullable
-    public static final BlockType WARPED_WALL_HANGING_SIGN = init();
-    @Nullable
-    public static final BlockType WARPED_WALL_SIGN = init();
-    @Nullable
-    public static final BlockType WARPED_WART_BLOCK = init();
-    @Nullable
-    public static final BlockType WATER = init();
-    @Nullable
-    public static final BlockType WATER_CAULDRON = init();
-    @Nullable
-    public static final BlockType WAXED_CHISELED_COPPER = init();
-    @Nullable
-    public static final BlockType WAXED_COPPER_BARS = init();
-    @Nullable
-    public static final BlockType WAXED_COPPER_BLOCK = init();
-    @Nullable
-    public static final BlockType WAXED_COPPER_BULB = init();
-    @Nullable
-    public static final BlockType WAXED_COPPER_CHAIN = init();
-    @Nullable
-    public static final BlockType WAXED_COPPER_CHEST = init();
-    @Nullable
-    public static final BlockType WAXED_COPPER_DOOR = init();
-    @Nullable
-    public static final BlockType WAXED_COPPER_GOLEM_STATUE = init();
-    @Nullable
-    public static final BlockType WAXED_COPPER_GRATE = init();
-    @Nullable
-    public static final BlockType WAXED_COPPER_LANTERN = init();
-    @Nullable
-    public static final BlockType WAXED_COPPER_TRAPDOOR = init();
-    @Nullable
-    public static final BlockType WAXED_CUT_COPPER = init();
-    @Nullable
-    public static final BlockType WAXED_CUT_COPPER_SLAB = init();
-    @Nullable
-    public static final BlockType WAXED_CUT_COPPER_STAIRS = init();
-    @Nullable
-    public static final BlockType WAXED_EXPOSED_CHISELED_COPPER = init();
-    @Nullable
-    public static final BlockType WAXED_EXPOSED_COPPER = init();
-    @Nullable
-    public static final BlockType WAXED_EXPOSED_COPPER_BARS = init();
-    @Nullable
-    public static final BlockType WAXED_EXPOSED_COPPER_BULB = init();
-    @Nullable
-    public static final BlockType WAXED_EXPOSED_COPPER_CHAIN = init();
-    @Nullable
-    public static final BlockType WAXED_EXPOSED_COPPER_CHEST = init();
-    @Nullable
-    public static final BlockType WAXED_EXPOSED_COPPER_DOOR = init();
-    @Nullable
-    public static final BlockType WAXED_EXPOSED_COPPER_GOLEM_STATUE = init();
-    @Nullable
-    public static final BlockType WAXED_EXPOSED_COPPER_GRATE = init();
-    @Nullable
-    public static final BlockType WAXED_EXPOSED_COPPER_LANTERN = init();
-    @Nullable
-    public static final BlockType WAXED_EXPOSED_COPPER_TRAPDOOR = init();
-    @Nullable
-    public static final BlockType WAXED_EXPOSED_CUT_COPPER = init();
-    @Nullable
-    public static final BlockType WAXED_EXPOSED_CUT_COPPER_SLAB = init();
-    @Nullable
-    public static final BlockType WAXED_EXPOSED_CUT_COPPER_STAIRS = init();
-    @Nullable
-    public static final BlockType WAXED_EXPOSED_LIGHTNING_ROD = init();
-    @Nullable
-    public static final BlockType WAXED_LIGHTNING_ROD = init();
-    @Nullable
-    public static final BlockType WAXED_OXIDIZED_COPPER = init();
-    @Nullable
-    public static final BlockType WAXED_OXIDIZED_COPPER_BARS = init();
-    @Nullable
-    public static final BlockType WAXED_OXIDIZED_COPPER_BULB = init();
-    @Nullable
-    public static final BlockType WAXED_OXIDIZED_COPPER_CHAIN = init();
-    @Nullable
-    public static final BlockType WAXED_OXIDIZED_COPPER_CHEST = init();
-    @Nullable
-    public static final BlockType WAXED_OXIDIZED_COPPER_DOOR = init();
-    @Nullable
-    public static final BlockType WAXED_OXIDIZED_COPPER_GOLEM_STATUE = init();
-    @Nullable
-    public static final BlockType WAXED_OXIDIZED_COPPER_GRATE = init();
-    @Nullable
-    public static final BlockType WAXED_OXIDIZED_COPPER_LANTERN = init();
-    @Nullable
-    public static final BlockType WAXED_OXIDIZED_COPPER_TRAPDOOR = init();
-    @Nullable
-    public static final BlockType WAXED_OXIDIZED_CHISELED_COPPER = init();
-    @Nullable
-    public static final BlockType WAXED_OXIDIZED_CUT_COPPER = init();
-    @Nullable
-    public static final BlockType WAXED_OXIDIZED_CUT_COPPER_SLAB = init();
-    @Nullable
-    public static final BlockType WAXED_OXIDIZED_CUT_COPPER_STAIRS = init();
-    @Nullable
-    public static final BlockType WAXED_OXIDIZED_LIGHTNING_ROD = init();
-    @Nullable
-    public static final BlockType WAXED_WEATHERED_CHISELED_COPPER = init();
-    @Nullable
-    public static final BlockType WAXED_WEATHERED_COPPER = init();
-    @Nullable
-    public static final BlockType WAXED_WEATHERED_COPPER_BARS = init();
-    @Nullable
-    public static final BlockType WAXED_WEATHERED_COPPER_BULB = init();
-    @Nullable
-    public static final BlockType WAXED_WEATHERED_COPPER_CHAIN = init();
-    @Nullable
-    public static final BlockType WAXED_WEATHERED_COPPER_CHEST = init();
-    @Nullable
-    public static final BlockType WAXED_WEATHERED_COPPER_DOOR = init();
-    @Nullable
-    public static final BlockType WAXED_WEATHERED_COPPER_GOLEM_STATUE = init();
-    @Nullable
-    public static final BlockType WAXED_WEATHERED_COPPER_GRATE = init();
-    @Nullable
-    public static final BlockType WAXED_WEATHERED_COPPER_LANTERN = init();
-    @Nullable
-    public static final BlockType WAXED_WEATHERED_COPPER_TRAPDOOR = init();
-    @Nullable
-    public static final BlockType WAXED_WEATHERED_CUT_COPPER = init();
-    @Nullable
-    public static final BlockType WAXED_WEATHERED_CUT_COPPER_SLAB = init();
-    @Nullable
-    public static final BlockType WAXED_WEATHERED_CUT_COPPER_STAIRS = init();
-    @Nullable
-    public static final BlockType WAXED_WEATHERED_LIGHTNING_ROD = init();
-    @Nullable
-    public static final BlockType WEATHERED_CHISELED_COPPER = init();
-    @Nullable
-    public static final BlockType WEATHERED_COPPER = init();
-    @Nullable
-    public static final BlockType WEATHERED_COPPER_BARS = init();
-    @Nullable
-    public static final BlockType WEATHERED_COPPER_BULB = init();
-    @Nullable
-    public static final BlockType WEATHERED_COPPER_CHAIN = init();
-    @Nullable
-    public static final BlockType WEATHERED_COPPER_CHEST = init();
-    @Nullable
-    public static final BlockType WEATHERED_COPPER_DOOR = init();
-    @Nullable
-    public static final BlockType WEATHERED_COPPER_GOLEM_STATUE = init();
-    @Nullable
-    public static final BlockType WEATHERED_COPPER_GRATE = init();
-    @Nullable
-    public static final BlockType WEATHERED_COPPER_LANTERN = init();
-    @Nullable
-    public static final BlockType WEATHERED_COPPER_TRAPDOOR = init();
-    @Nullable
-    public static final BlockType WEATHERED_CUT_COPPER = init();
-    @Nullable
-    public static final BlockType WEATHERED_CUT_COPPER_SLAB = init();
-    @Nullable
-    public static final BlockType WEATHERED_CUT_COPPER_STAIRS = init();
-    @Nullable
-    public static final BlockType WEATHERED_LIGHTNING_ROD = init();
-    @Nullable
-    public static final BlockType WEEPING_VINES = init();
-    @Nullable
-    public static final BlockType WEEPING_VINES_PLANT = init();
-    @Nullable
-    public static final BlockType WET_SPONGE = init();
-    @Nullable
-    public static final BlockType WHEAT = init();
-    @Nullable
-    public static final BlockType WHITE_BANNER = init();
-    @Nullable
-    public static final BlockType WHITE_BED = init();
-    @Nullable
-    public static final BlockType WHITE_CANDLE = init();
-    @Nullable
-    public static final BlockType WHITE_CANDLE_CAKE = init();
-    @Nullable
-    public static final BlockType WHITE_CARPET = init();
-    @Nullable
-    public static final BlockType WHITE_CONCRETE = init();
-    @Nullable
-    public static final BlockType WHITE_CONCRETE_POWDER = init();
-    @Nullable
-    public static final BlockType WHITE_GLAZED_TERRACOTTA = init();
-    @Nullable
-    public static final BlockType WHITE_SHULKER_BOX = init();
-    @Nullable
-    public static final BlockType WHITE_STAINED_GLASS = init();
-    @Nullable
-    public static final BlockType WHITE_STAINED_GLASS_PANE = init();
-    @Nullable
-    public static final BlockType WHITE_TERRACOTTA = init();
-    @Nullable
-    public static final BlockType WHITE_TULIP = init();
-    @Nullable
-    public static final BlockType WHITE_WALL_BANNER = init();
-    @Nullable
-    public static final BlockType WHITE_WOOL = init();
-    @Nullable
-    public static final BlockType WILDFLOWERS = init();
-    @Nullable
-    public static final BlockType WITHER_ROSE = init();
-    @Nullable
-    public static final BlockType WITHER_SKELETON_SKULL = init();
-    @Nullable
-    public static final BlockType WITHER_SKELETON_WALL_SKULL = init();
-    @Nullable
-    public static final BlockType YELLOW_BANNER = init();
-    @Nullable
-    public static final BlockType YELLOW_BED = init();
-    @Nullable
-    public static final BlockType YELLOW_CANDLE = init();
-    @Nullable
-    public static final BlockType YELLOW_CANDLE_CAKE = init();
-    @Nullable
-    public static final BlockType YELLOW_CARPET = init();
-    @Nullable
-    public static final BlockType YELLOW_CONCRETE = init();
-    @Nullable
-    public static final BlockType YELLOW_CONCRETE_POWDER = init();
-    @Nullable
-    public static final BlockType YELLOW_GLAZED_TERRACOTTA = init();
-    @Nullable
-    public static final BlockType YELLOW_SHULKER_BOX = init();
-    @Nullable
-    public static final BlockType YELLOW_STAINED_GLASS = init();
-    @Nullable
-    public static final BlockType YELLOW_STAINED_GLASS_PANE = init();
-    @Nullable
-    public static final BlockType YELLOW_TERRACOTTA = init();
-    @Nullable
-    public static final BlockType YELLOW_WALL_BANNER = init();
-    @Nullable
-    public static final BlockType YELLOW_WOOL = init();
-    @Nullable
-    public static final BlockType ZOMBIE_HEAD = init();
-    @Nullable
-    public static final BlockType ZOMBIE_WALL_HEAD = init();
-
-    private static Field[] fieldsTmp;
-    private static int initIndex;
-
-    // Init each field
-    // The order is important
-    public static BlockType init() {
-        if (fieldsTmp == null) {
-            fieldsTmp = BlockTypes.class.getDeclaredFields();
-            BlockTypesCache.$NAMESPACES.isEmpty(); // initialize cache
-        }
-        String name = fieldsTmp[initIndex++].getName().toLowerCase(Locale.ROOT);
-        return BlockType.REGISTRY.get(name);
+    static {
+        // Initializing the cache is what populates BlockType.REGISTRY from the running platform. Static initializers run in
+        // declaration order, so this must stay above the constants for them to resolve to anything.
+        //noinspection ResultOfMethodCallIgnored
+        BlockTypesCache.$NAMESPACES.isEmpty();
     }
 
-    // Clears memory after initialization
-    static {
-        // we should be at the first non-BlockType field now
-        if (!fieldsTmp[initIndex].getName().equals("fieldsTmp")) {
-            throw new IllegalStateException("improper initialization of block type fields");
-        }
-        fieldsTmp = null;
+    /**
+     * Placeholder occupying the null index, for use where block types are represented as primitives.
+     *
+     * <p>Bound to the synthetic id {@code minecraft:__reserved__}, which {@link BlockTypesCache} registers at internal id
+     * {@link BlockTypesCache.ReservedIDs#__RESERVED__} rather than obtaining from the platform. It is not a real block and
+     * must never be placed in the world.</p>
+     */
+    @Nullable
+    public static final BlockType __RESERVED__ = get("minecraft:__reserved__");
+    @Nullable
+    public static final BlockType ACACIA_BUTTON = get("minecraft:acacia_button");
+    @Nullable
+    public static final BlockType ACACIA_DOOR = get("minecraft:acacia_door");
+    @Nullable
+    public static final BlockType ACACIA_FENCE = get("minecraft:acacia_fence");
+    @Nullable
+    public static final BlockType ACACIA_FENCE_GATE = get("minecraft:acacia_fence_gate");
+    @Nullable
+    public static final BlockType ACACIA_HANGING_SIGN = get("minecraft:acacia_hanging_sign");
+    @Nullable
+    public static final BlockType ACACIA_LEAVES = get("minecraft:acacia_leaves");
+    @Nullable
+    public static final BlockType ACACIA_LOG = get("minecraft:acacia_log");
+    @Nullable
+    public static final BlockType ACACIA_PLANKS = get("minecraft:acacia_planks");
+    @Nullable
+    public static final BlockType ACACIA_PRESSURE_PLATE = get("minecraft:acacia_pressure_plate");
+    @Nullable
+    public static final BlockType ACACIA_SAPLING = get("minecraft:acacia_sapling");
+    @Nullable
+    public static final BlockType ACACIA_SHELF = get("minecraft:acacia_shelf");
+    @Nullable
+    public static final BlockType ACACIA_SIGN = get("minecraft:acacia_sign");
+    @Nullable
+    public static final BlockType ACACIA_SLAB = get("minecraft:acacia_slab");
+    @Nullable
+    public static final BlockType ACACIA_STAIRS = get("minecraft:acacia_stairs");
+    @Nullable
+    public static final BlockType ACACIA_TRAPDOOR = get("minecraft:acacia_trapdoor");
+    @Nullable
+    public static final BlockType ACACIA_WALL_HANGING_SIGN = get("minecraft:acacia_wall_hanging_sign");
+    @Nullable
+    public static final BlockType ACACIA_WALL_SIGN = get("minecraft:acacia_wall_sign");
+    @Nullable
+    public static final BlockType ACACIA_WOOD = get("minecraft:acacia_wood");
+    @Nullable
+    public static final BlockType ACTIVATOR_RAIL = get("minecraft:activator_rail");
+    @Nullable
+    public static final BlockType AIR = get("minecraft:air");
+    @Nullable
+    public static final BlockType ALLIUM = get("minecraft:allium");
+    @Nullable
+    public static final BlockType AMETHYST_BLOCK = get("minecraft:amethyst_block");
+    @Nullable
+    public static final BlockType AMETHYST_CLUSTER = get("minecraft:amethyst_cluster");
+    @Nullable
+    public static final BlockType ANCIENT_DEBRIS = get("minecraft:ancient_debris");
+    @Nullable
+    public static final BlockType ANDESITE = get("minecraft:andesite");
+    @Nullable
+    public static final BlockType ANDESITE_SLAB = get("minecraft:andesite_slab");
+    @Nullable
+    public static final BlockType ANDESITE_STAIRS = get("minecraft:andesite_stairs");
+    @Nullable
+    public static final BlockType ANDESITE_WALL = get("minecraft:andesite_wall");
+    @Nullable
+    public static final BlockType ANVIL = get("minecraft:anvil");
+    @Nullable
+    public static final BlockType ATTACHED_MELON_STEM = get("minecraft:attached_melon_stem");
+    @Nullable
+    public static final BlockType ATTACHED_PUMPKIN_STEM = get("minecraft:attached_pumpkin_stem");
+    @Nullable
+    public static final BlockType AZALEA = get("minecraft:azalea");
+    @Nullable
+    public static final BlockType AZALEA_LEAVES = get("minecraft:azalea_leaves");
+    @Nullable
+    public static final BlockType AZURE_BLUET = get("minecraft:azure_bluet");
+    @Nullable
+    public static final BlockType BAMBOO = get("minecraft:bamboo");
+    @Nullable
+    public static final BlockType BAMBOO_BLOCK = get("minecraft:bamboo_block");
+    @Nullable
+    public static final BlockType BAMBOO_BUTTON = get("minecraft:bamboo_button");
+    @Nullable
+    public static final BlockType BAMBOO_DOOR = get("minecraft:bamboo_door");
+    @Nullable
+    public static final BlockType BAMBOO_FENCE = get("minecraft:bamboo_fence");
+    @Nullable
+    public static final BlockType BAMBOO_FENCE_GATE = get("minecraft:bamboo_fence_gate");
+    @Nullable
+    public static final BlockType BAMBOO_HANGING_SIGN = get("minecraft:bamboo_hanging_sign");
+    @Nullable
+    public static final BlockType BAMBOO_MOSAIC = get("minecraft:bamboo_mosaic");
+    @Nullable
+    public static final BlockType BAMBOO_MOSAIC_SLAB = get("minecraft:bamboo_mosaic_slab");
+    @Nullable
+    public static final BlockType BAMBOO_MOSAIC_STAIRS = get("minecraft:bamboo_mosaic_stairs");
+    @Nullable
+    public static final BlockType BAMBOO_PLANKS = get("minecraft:bamboo_planks");
+    @Nullable
+    public static final BlockType BAMBOO_PRESSURE_PLATE = get("minecraft:bamboo_pressure_plate");
+    @Nullable
+    public static final BlockType BAMBOO_SAPLING = get("minecraft:bamboo_sapling");
+    @Nullable
+    public static final BlockType BAMBOO_SHELF = get("minecraft:bamboo_shelf");
+    @Nullable
+    public static final BlockType BAMBOO_SIGN = get("minecraft:bamboo_sign");
+    @Nullable
+    public static final BlockType BAMBOO_SLAB = get("minecraft:bamboo_slab");
+    @Nullable
+    public static final BlockType BAMBOO_STAIRS = get("minecraft:bamboo_stairs");
+    @Nullable
+    public static final BlockType BAMBOO_TRAPDOOR = get("minecraft:bamboo_trapdoor");
+    @Nullable
+    public static final BlockType BAMBOO_WALL_HANGING_SIGN = get("minecraft:bamboo_wall_hanging_sign");
+    @Nullable
+    public static final BlockType BAMBOO_WALL_SIGN = get("minecraft:bamboo_wall_sign");
+    @Nullable
+    public static final BlockType BARREL = get("minecraft:barrel");
+    @Nullable
+    public static final BlockType BARRIER = get("minecraft:barrier");
+    @Nullable
+    public static final BlockType BASALT = get("minecraft:basalt");
+    @Nullable
+    public static final BlockType BEACON = get("minecraft:beacon");
+    @Nullable
+    public static final BlockType BEDROCK = get("minecraft:bedrock");
+    @Nullable
+    public static final BlockType BEE_NEST = get("minecraft:bee_nest");
+    @Nullable
+    public static final BlockType BEEHIVE = get("minecraft:beehive");
+    @Nullable
+    public static final BlockType BEETROOTS = get("minecraft:beetroots");
+    @Nullable
+    public static final BlockType BELL = get("minecraft:bell");
+    @Nullable
+    public static final BlockType BIG_DRIPLEAF = get("minecraft:big_dripleaf");
+    @Nullable
+    public static final BlockType BIG_DRIPLEAF_STEM = get("minecraft:big_dripleaf_stem");
+    @Nullable
+    public static final BlockType BIRCH_BUTTON = get("minecraft:birch_button");
+    @Nullable
+    public static final BlockType BIRCH_DOOR = get("minecraft:birch_door");
+    @Nullable
+    public static final BlockType BIRCH_FENCE = get("minecraft:birch_fence");
+    @Nullable
+    public static final BlockType BIRCH_FENCE_GATE = get("minecraft:birch_fence_gate");
+    @Nullable
+    public static final BlockType BIRCH_HANGING_SIGN = get("minecraft:birch_hanging_sign");
+    @Nullable
+    public static final BlockType BIRCH_LEAVES = get("minecraft:birch_leaves");
+    @Nullable
+    public static final BlockType BIRCH_LOG = get("minecraft:birch_log");
+    @Nullable
+    public static final BlockType BIRCH_PLANKS = get("minecraft:birch_planks");
+    @Nullable
+    public static final BlockType BIRCH_PRESSURE_PLATE = get("minecraft:birch_pressure_plate");
+    @Nullable
+    public static final BlockType BIRCH_SAPLING = get("minecraft:birch_sapling");
+    @Nullable
+    public static final BlockType BIRCH_SHELF = get("minecraft:birch_shelf");
+    @Nullable
+    public static final BlockType BIRCH_SIGN = get("minecraft:birch_sign");
+    @Nullable
+    public static final BlockType BIRCH_SLAB = get("minecraft:birch_slab");
+    @Nullable
+    public static final BlockType BIRCH_STAIRS = get("minecraft:birch_stairs");
+    @Nullable
+    public static final BlockType BIRCH_TRAPDOOR = get("minecraft:birch_trapdoor");
+    @Nullable
+    public static final BlockType BIRCH_WALL_HANGING_SIGN = get("minecraft:birch_wall_hanging_sign");
+    @Nullable
+    public static final BlockType BIRCH_WALL_SIGN = get("minecraft:birch_wall_sign");
+    @Nullable
+    public static final BlockType BIRCH_WOOD = get("minecraft:birch_wood");
+    @Nullable
+    public static final BlockType BLACK_BANNER = get("minecraft:black_banner");
+    @Nullable
+    public static final BlockType BLACK_BED = get("minecraft:black_bed");
+    @Nullable
+    public static final BlockType BLACK_CANDLE = get("minecraft:black_candle");
+    @Nullable
+    public static final BlockType BLACK_CANDLE_CAKE = get("minecraft:black_candle_cake");
+    @Nullable
+    public static final BlockType BLACK_CARPET = get("minecraft:black_carpet");
+    @Nullable
+    public static final BlockType BLACK_CONCRETE = get("minecraft:black_concrete");
+    @Nullable
+    public static final BlockType BLACK_CONCRETE_POWDER = get("minecraft:black_concrete_powder");
+    @Nullable
+    public static final BlockType BLACK_GLAZED_TERRACOTTA = get("minecraft:black_glazed_terracotta");
+    @Nullable
+    public static final BlockType BLACK_SHULKER_BOX = get("minecraft:black_shulker_box");
+    @Nullable
+    public static final BlockType BLACK_STAINED_GLASS = get("minecraft:black_stained_glass");
+    @Nullable
+    public static final BlockType BLACK_STAINED_GLASS_PANE = get("minecraft:black_stained_glass_pane");
+    @Nullable
+    public static final BlockType BLACK_TERRACOTTA = get("minecraft:black_terracotta");
+    @Nullable
+    public static final BlockType BLACK_WALL_BANNER = get("minecraft:black_wall_banner");
+    @Nullable
+    public static final BlockType BLACK_WOOL = get("minecraft:black_wool");
+    @Nullable
+    public static final BlockType BLACKSTONE = get("minecraft:blackstone");
+    @Nullable
+    public static final BlockType BLACKSTONE_SLAB = get("minecraft:blackstone_slab");
+    @Nullable
+    public static final BlockType BLACKSTONE_STAIRS = get("minecraft:blackstone_stairs");
+    @Nullable
+    public static final BlockType BLACKSTONE_WALL = get("minecraft:blackstone_wall");
+    @Nullable
+    public static final BlockType BLAST_FURNACE = get("minecraft:blast_furnace");
+    @Nullable
+    public static final BlockType BLUE_BANNER = get("minecraft:blue_banner");
+    @Nullable
+    public static final BlockType BLUE_BED = get("minecraft:blue_bed");
+    @Nullable
+    public static final BlockType BLUE_CANDLE = get("minecraft:blue_candle");
+    @Nullable
+    public static final BlockType BLUE_CANDLE_CAKE = get("minecraft:blue_candle_cake");
+    @Nullable
+    public static final BlockType BLUE_CARPET = get("minecraft:blue_carpet");
+    @Nullable
+    public static final BlockType BLUE_CONCRETE = get("minecraft:blue_concrete");
+    @Nullable
+    public static final BlockType BLUE_CONCRETE_POWDER = get("minecraft:blue_concrete_powder");
+    @Nullable
+    public static final BlockType BLUE_GLAZED_TERRACOTTA = get("minecraft:blue_glazed_terracotta");
+    @Nullable
+    public static final BlockType BLUE_ICE = get("minecraft:blue_ice");
+    @Nullable
+    public static final BlockType BLUE_ORCHID = get("minecraft:blue_orchid");
+    @Nullable
+    public static final BlockType BLUE_SHULKER_BOX = get("minecraft:blue_shulker_box");
+    @Nullable
+    public static final BlockType BLUE_STAINED_GLASS = get("minecraft:blue_stained_glass");
+    @Nullable
+    public static final BlockType BLUE_STAINED_GLASS_PANE = get("minecraft:blue_stained_glass_pane");
+    @Nullable
+    public static final BlockType BLUE_TERRACOTTA = get("minecraft:blue_terracotta");
+    @Nullable
+    public static final BlockType BLUE_WALL_BANNER = get("minecraft:blue_wall_banner");
+    @Nullable
+    public static final BlockType BLUE_WOOL = get("minecraft:blue_wool");
+    @Nullable
+    public static final BlockType BONE_BLOCK = get("minecraft:bone_block");
+    @Nullable
+    public static final BlockType BOOKSHELF = get("minecraft:bookshelf");
+    @Nullable
+    public static final BlockType BRAIN_CORAL = get("minecraft:brain_coral");
+    @Nullable
+    public static final BlockType BRAIN_CORAL_BLOCK = get("minecraft:brain_coral_block");
+    @Nullable
+    public static final BlockType BRAIN_CORAL_FAN = get("minecraft:brain_coral_fan");
+    @Nullable
+    public static final BlockType BRAIN_CORAL_WALL_FAN = get("minecraft:brain_coral_wall_fan");
+    @Nullable
+    public static final BlockType BREWING_STAND = get("minecraft:brewing_stand");
+    @Nullable
+    public static final BlockType BRICK_SLAB = get("minecraft:brick_slab");
+    @Nullable
+    public static final BlockType BRICK_STAIRS = get("minecraft:brick_stairs");
+    @Nullable
+    public static final BlockType BRICK_WALL = get("minecraft:brick_wall");
+    @Nullable
+    public static final BlockType BRICKS = get("minecraft:bricks");
+    @Nullable
+    public static final BlockType BROWN_BANNER = get("minecraft:brown_banner");
+    @Nullable
+    public static final BlockType BROWN_BED = get("minecraft:brown_bed");
+    @Nullable
+    public static final BlockType BROWN_CANDLE = get("minecraft:brown_candle");
+    @Nullable
+    public static final BlockType BROWN_CANDLE_CAKE = get("minecraft:brown_candle_cake");
+    @Nullable
+    public static final BlockType BROWN_CARPET = get("minecraft:brown_carpet");
+    @Nullable
+    public static final BlockType BROWN_CONCRETE = get("minecraft:brown_concrete");
+    @Nullable
+    public static final BlockType BROWN_CONCRETE_POWDER = get("minecraft:brown_concrete_powder");
+    @Nullable
+    public static final BlockType BROWN_GLAZED_TERRACOTTA = get("minecraft:brown_glazed_terracotta");
+    @Nullable
+    public static final BlockType BROWN_MUSHROOM = get("minecraft:brown_mushroom");
+    @Nullable
+    public static final BlockType BROWN_MUSHROOM_BLOCK = get("minecraft:brown_mushroom_block");
+    @Nullable
+    public static final BlockType BROWN_SHULKER_BOX = get("minecraft:brown_shulker_box");
+    @Nullable
+    public static final BlockType BROWN_STAINED_GLASS = get("minecraft:brown_stained_glass");
+    @Nullable
+    public static final BlockType BROWN_STAINED_GLASS_PANE = get("minecraft:brown_stained_glass_pane");
+    @Nullable
+    public static final BlockType BROWN_TERRACOTTA = get("minecraft:brown_terracotta");
+    @Nullable
+    public static final BlockType BROWN_WALL_BANNER = get("minecraft:brown_wall_banner");
+    @Nullable
+    public static final BlockType BROWN_WOOL = get("minecraft:brown_wool");
+    @Nullable
+    public static final BlockType BUBBLE_COLUMN = get("minecraft:bubble_column");
+    @Nullable
+    public static final BlockType BUBBLE_CORAL = get("minecraft:bubble_coral");
+    @Nullable
+    public static final BlockType BUBBLE_CORAL_BLOCK = get("minecraft:bubble_coral_block");
+    @Nullable
+    public static final BlockType BUBBLE_CORAL_FAN = get("minecraft:bubble_coral_fan");
+    @Nullable
+    public static final BlockType BUBBLE_CORAL_WALL_FAN = get("minecraft:bubble_coral_wall_fan");
+    @Nullable
+    public static final BlockType BUDDING_AMETHYST = get("minecraft:budding_amethyst");
+    @Nullable
+    public static final BlockType BUSH = get("minecraft:bush");
+    @Nullable
+    public static final BlockType CACTUS = get("minecraft:cactus");
+    @Nullable
+    public static final BlockType CACTUS_FLOWER = get("minecraft:cactus_flower");
+    @Nullable
+    public static final BlockType CAKE = get("minecraft:cake");
+    @Nullable
+    public static final BlockType CALCITE = get("minecraft:calcite");
+    @Nullable
+    public static final BlockType CALIBRATED_SCULK_SENSOR = get("minecraft:calibrated_sculk_sensor");
+    @Nullable
+    public static final BlockType CAMPFIRE = get("minecraft:campfire");
+    @Nullable
+    public static final BlockType CANDLE = get("minecraft:candle");
+    @Nullable
+    public static final BlockType CANDLE_CAKE = get("minecraft:candle_cake");
+    @Nullable
+    public static final BlockType CARROTS = get("minecraft:carrots");
+    @Nullable
+    public static final BlockType CARTOGRAPHY_TABLE = get("minecraft:cartography_table");
+    @Nullable
+    public static final BlockType CARVED_PUMPKIN = get("minecraft:carved_pumpkin");
+    @Nullable
+    public static final BlockType CAULDRON = get("minecraft:cauldron");
+    @Nullable
+    public static final BlockType CAVE_AIR = get("minecraft:cave_air");
+    @Nullable
+    public static final BlockType CAVE_VINES = get("minecraft:cave_vines");
+    @Nullable
+    public static final BlockType CAVE_VINES_PLANT = get("minecraft:cave_vines_plant");
+    @Deprecated
+    @Nullable
+    public static final BlockType CHAIN = get("minecraft:chain");
+    @Nullable
+    public static final BlockType CHAIN_COMMAND_BLOCK = get("minecraft:chain_command_block");
+    @Nullable
+    public static final BlockType CHERRY_BUTTON = get("minecraft:cherry_button");
+    @Nullable
+    public static final BlockType CHERRY_DOOR = get("minecraft:cherry_door");
+    @Nullable
+    public static final BlockType CHERRY_FENCE = get("minecraft:cherry_fence");
+    @Nullable
+    public static final BlockType CHERRY_FENCE_GATE = get("minecraft:cherry_fence_gate");
+    @Nullable
+    public static final BlockType CHERRY_HANGING_SIGN = get("minecraft:cherry_hanging_sign");
+    @Nullable
+    public static final BlockType CHERRY_LEAVES = get("minecraft:cherry_leaves");
+    @Nullable
+    public static final BlockType CHERRY_LOG = get("minecraft:cherry_log");
+    @Nullable
+    public static final BlockType CHERRY_PLANKS = get("minecraft:cherry_planks");
+    @Nullable
+    public static final BlockType CHERRY_PRESSURE_PLATE = get("minecraft:cherry_pressure_plate");
+    @Nullable
+    public static final BlockType CHERRY_SAPLING = get("minecraft:cherry_sapling");
+    @Nullable
+    public static final BlockType CHERRY_SHELF = get("minecraft:cherry_shelf");
+    @Nullable
+    public static final BlockType CHERRY_SIGN = get("minecraft:cherry_sign");
+    @Nullable
+    public static final BlockType CHERRY_SLAB = get("minecraft:cherry_slab");
+    @Nullable
+    public static final BlockType CHERRY_STAIRS = get("minecraft:cherry_stairs");
+    @Nullable
+    public static final BlockType CHERRY_TRAPDOOR = get("minecraft:cherry_trapdoor");
+    @Nullable
+    public static final BlockType CHERRY_WALL_HANGING_SIGN = get("minecraft:cherry_wall_hanging_sign");
+    @Nullable
+    public static final BlockType CHERRY_WALL_SIGN = get("minecraft:cherry_wall_sign");
+    @Nullable
+    public static final BlockType CHERRY_WOOD = get("minecraft:cherry_wood");
+    @Nullable
+    public static final BlockType CHEST = get("minecraft:chest");
+    @Nullable
+    public static final BlockType CHIPPED_ANVIL = get("minecraft:chipped_anvil");
+    @Nullable
+    public static final BlockType CHISELED_BOOKSHELF = get("minecraft:chiseled_bookshelf");
+    @Nullable
+    public static final BlockType CHISELED_CINNABAR = get("minecraft:chiseled_cinnabar");
+    @Nullable
+    public static final BlockType CHISELED_COPPER = get("minecraft:chiseled_copper");
+    @Nullable
+    public static final BlockType CHISELED_DEEPSLATE = get("minecraft:chiseled_deepslate");
+    @Nullable
+    public static final BlockType CHISELED_NETHER_BRICKS = get("minecraft:chiseled_nether_bricks");
+    @Nullable
+    public static final BlockType CHISELED_POLISHED_BLACKSTONE = get("minecraft:chiseled_polished_blackstone");
+    @Nullable
+    public static final BlockType CHISELED_QUARTZ_BLOCK = get("minecraft:chiseled_quartz_block");
+    @Nullable
+    public static final BlockType CHISELED_RED_SANDSTONE = get("minecraft:chiseled_red_sandstone");
+    @Nullable
+    public static final BlockType CHISELED_RESIN_BRICKS = get("minecraft:chiseled_resin_bricks");
+    @Nullable
+    public static final BlockType CHISELED_SANDSTONE = get("minecraft:chiseled_sandstone");
+    @Nullable
+    public static final BlockType CHISELED_STONE_BRICKS = get("minecraft:chiseled_stone_bricks");
+    @Nullable
+    public static final BlockType CHISELED_SULFUR = get("minecraft:chiseled_sulfur");
+    @Nullable
+    public static final BlockType CHISELED_TUFF = get("minecraft:chiseled_tuff");
+    @Nullable
+    public static final BlockType CHISELED_TUFF_BRICKS = get("minecraft:chiseled_tuff_bricks");
+    @Nullable
+    public static final BlockType CHORUS_FLOWER = get("minecraft:chorus_flower");
+    @Nullable
+    public static final BlockType CHORUS_PLANT = get("minecraft:chorus_plant");
+    @Nullable
+    public static final BlockType CINNABAR = get("minecraft:cinnabar");
+    @Nullable
+    public static final BlockType CINNABAR_BRICK_SLAB = get("minecraft:cinnabar_brick_slab");
+    @Nullable
+    public static final BlockType CINNABAR_BRICK_STAIRS = get("minecraft:cinnabar_brick_stairs");
+    @Nullable
+    public static final BlockType CINNABAR_BRICK_WALL = get("minecraft:cinnabar_brick_wall");
+    @Nullable
+    public static final BlockType CINNABAR_BRICKS = get("minecraft:cinnabar_bricks");
+    @Nullable
+    public static final BlockType CINNABAR_SLAB = get("minecraft:cinnabar_slab");
+    @Nullable
+    public static final BlockType CINNABAR_STAIRS = get("minecraft:cinnabar_stairs");
+    @Nullable
+    public static final BlockType CINNABAR_WALL = get("minecraft:cinnabar_wall");
+    @Nullable
+    public static final BlockType CLAY = get("minecraft:clay");
+    @Nullable
+    public static final BlockType CLOSED_EYEBLOSSOM = get("minecraft:closed_eyeblossom");
+    @Nullable
+    public static final BlockType COAL_BLOCK = get("minecraft:coal_block");
+    @Nullable
+    public static final BlockType COAL_ORE = get("minecraft:coal_ore");
+    @Nullable
+    public static final BlockType COARSE_DIRT = get("minecraft:coarse_dirt");
+    @Nullable
+    public static final BlockType COBBLED_DEEPSLATE = get("minecraft:cobbled_deepslate");
+    @Nullable
+    public static final BlockType COBBLED_DEEPSLATE_SLAB = get("minecraft:cobbled_deepslate_slab");
+    @Nullable
+    public static final BlockType COBBLED_DEEPSLATE_STAIRS = get("minecraft:cobbled_deepslate_stairs");
+    @Nullable
+    public static final BlockType COBBLED_DEEPSLATE_WALL = get("minecraft:cobbled_deepslate_wall");
+    @Nullable
+    public static final BlockType COBBLESTONE = get("minecraft:cobblestone");
+    @Nullable
+    public static final BlockType COBBLESTONE_SLAB = get("minecraft:cobblestone_slab");
+    @Nullable
+    public static final BlockType COBBLESTONE_STAIRS = get("minecraft:cobblestone_stairs");
+    @Nullable
+    public static final BlockType COBBLESTONE_WALL = get("minecraft:cobblestone_wall");
+    @Nullable
+    public static final BlockType COBWEB = get("minecraft:cobweb");
+    @Nullable
+    public static final BlockType COCOA = get("minecraft:cocoa");
+    @Nullable
+    public static final BlockType COMMAND_BLOCK = get("minecraft:command_block");
+    @Nullable
+    public static final BlockType COMPARATOR = get("minecraft:comparator");
+    @Nullable
+    public static final BlockType COMPOSTER = get("minecraft:composter");
+    @Nullable
+    public static final BlockType CONDUIT = get("minecraft:conduit");
+    @Nullable
+    public static final BlockType COPPER_BARS = get("minecraft:copper_bars");
+    @Nullable
+    public static final BlockType COPPER_BLOCK = get("minecraft:copper_block");
+    @Nullable
+    public static final BlockType COPPER_BULB = get("minecraft:copper_bulb");
+    @Nullable
+    public static final BlockType COPPER_CHAIN = get("minecraft:copper_chain");
+    @Nullable
+    public static final BlockType COPPER_CHEST = get("minecraft:copper_chest");
+    @Nullable
+    public static final BlockType COPPER_DOOR = get("minecraft:copper_door");
+    @Nullable
+    public static final BlockType COPPER_GOLEM_STATUE = get("minecraft:copper_golem_statue");
+    @Nullable
+    public static final BlockType COPPER_GRATE = get("minecraft:copper_grate");
+    @Nullable
+    public static final BlockType COPPER_LANTERN = get("minecraft:copper_lantern");
+    @Nullable
+    public static final BlockType COPPER_ORE = get("minecraft:copper_ore");
+    @Nullable
+    public static final BlockType COPPER_TORCH = get("minecraft:copper_torch");
+    @Nullable
+    public static final BlockType COPPER_TRAPDOOR = get("minecraft:copper_trapdoor");
+    @Nullable
+    public static final BlockType COPPER_WALL_TORCH = get("minecraft:copper_wall_torch");
+    @Nullable
+    public static final BlockType CORNFLOWER = get("minecraft:cornflower");
+    @Nullable
+    public static final BlockType CRACKED_DEEPSLATE_BRICKS = get("minecraft:cracked_deepslate_bricks");
+    @Nullable
+    public static final BlockType CRACKED_DEEPSLATE_TILES = get("minecraft:cracked_deepslate_tiles");
+    @Nullable
+    public static final BlockType CRACKED_NETHER_BRICKS = get("minecraft:cracked_nether_bricks");
+    @Nullable
+    public static final BlockType CRACKED_POLISHED_BLACKSTONE_BRICKS = get("minecraft:cracked_polished_blackstone_bricks");
+    @Nullable
+    public static final BlockType CRACKED_STONE_BRICKS = get("minecraft:cracked_stone_bricks");
+    @Nullable
+    public static final BlockType CRAFTER = get("minecraft:crafter");
+    @Nullable
+    public static final BlockType CRAFTING_TABLE = get("minecraft:crafting_table");
+    @Nullable
+    public static final BlockType CREAKING_HEART = get("minecraft:creaking_heart");
+    @Nullable
+    public static final BlockType CREEPER_HEAD = get("minecraft:creeper_head");
+    @Nullable
+    public static final BlockType CREEPER_WALL_HEAD = get("minecraft:creeper_wall_head");
+    @Nullable
+    public static final BlockType CRIMSON_BUTTON = get("minecraft:crimson_button");
+    @Nullable
+    public static final BlockType CRIMSON_DOOR = get("minecraft:crimson_door");
+    @Nullable
+    public static final BlockType CRIMSON_FENCE = get("minecraft:crimson_fence");
+    @Nullable
+    public static final BlockType CRIMSON_FENCE_GATE = get("minecraft:crimson_fence_gate");
+    @Nullable
+    public static final BlockType CRIMSON_FUNGUS = get("minecraft:crimson_fungus");
+    @Nullable
+    public static final BlockType CRIMSON_HANGING_SIGN = get("minecraft:crimson_hanging_sign");
+    @Nullable
+    public static final BlockType CRIMSON_HYPHAE = get("minecraft:crimson_hyphae");
+    @Nullable
+    public static final BlockType CRIMSON_NYLIUM = get("minecraft:crimson_nylium");
+    @Nullable
+    public static final BlockType CRIMSON_PLANKS = get("minecraft:crimson_planks");
+    @Nullable
+    public static final BlockType CRIMSON_PRESSURE_PLATE = get("minecraft:crimson_pressure_plate");
+    @Nullable
+    public static final BlockType CRIMSON_ROOTS = get("minecraft:crimson_roots");
+    @Nullable
+    public static final BlockType CRIMSON_SHELF = get("minecraft:crimson_shelf");
+    @Nullable
+    public static final BlockType CRIMSON_SIGN = get("minecraft:crimson_sign");
+    @Nullable
+    public static final BlockType CRIMSON_SLAB = get("minecraft:crimson_slab");
+    @Nullable
+    public static final BlockType CRIMSON_STAIRS = get("minecraft:crimson_stairs");
+    @Nullable
+    public static final BlockType CRIMSON_STEM = get("minecraft:crimson_stem");
+    @Nullable
+    public static final BlockType CRIMSON_TRAPDOOR = get("minecraft:crimson_trapdoor");
+    @Nullable
+    public static final BlockType CRIMSON_WALL_HANGING_SIGN = get("minecraft:crimson_wall_hanging_sign");
+    @Nullable
+    public static final BlockType CRIMSON_WALL_SIGN = get("minecraft:crimson_wall_sign");
+    @Nullable
+    public static final BlockType CRYING_OBSIDIAN = get("minecraft:crying_obsidian");
+    @Nullable
+    public static final BlockType CUT_COPPER = get("minecraft:cut_copper");
+    @Nullable
+    public static final BlockType CUT_COPPER_SLAB = get("minecraft:cut_copper_slab");
+    @Nullable
+    public static final BlockType CUT_COPPER_STAIRS = get("minecraft:cut_copper_stairs");
+    @Nullable
+    public static final BlockType CUT_RED_SANDSTONE = get("minecraft:cut_red_sandstone");
+    @Nullable
+    public static final BlockType CUT_RED_SANDSTONE_SLAB = get("minecraft:cut_red_sandstone_slab");
+    @Nullable
+    public static final BlockType CUT_SANDSTONE = get("minecraft:cut_sandstone");
+    @Nullable
+    public static final BlockType CUT_SANDSTONE_SLAB = get("minecraft:cut_sandstone_slab");
+    @Nullable
+    public static final BlockType CYAN_BANNER = get("minecraft:cyan_banner");
+    @Nullable
+    public static final BlockType CYAN_BED = get("minecraft:cyan_bed");
+    @Nullable
+    public static final BlockType CYAN_CANDLE = get("minecraft:cyan_candle");
+    @Nullable
+    public static final BlockType CYAN_CANDLE_CAKE = get("minecraft:cyan_candle_cake");
+    @Nullable
+    public static final BlockType CYAN_CARPET = get("minecraft:cyan_carpet");
+    @Nullable
+    public static final BlockType CYAN_CONCRETE = get("minecraft:cyan_concrete");
+    @Nullable
+    public static final BlockType CYAN_CONCRETE_POWDER = get("minecraft:cyan_concrete_powder");
+    @Nullable
+    public static final BlockType CYAN_GLAZED_TERRACOTTA = get("minecraft:cyan_glazed_terracotta");
+    @Nullable
+    public static final BlockType CYAN_SHULKER_BOX = get("minecraft:cyan_shulker_box");
+    @Nullable
+    public static final BlockType CYAN_STAINED_GLASS = get("minecraft:cyan_stained_glass");
+    @Nullable
+    public static final BlockType CYAN_STAINED_GLASS_PANE = get("minecraft:cyan_stained_glass_pane");
+    @Nullable
+    public static final BlockType CYAN_TERRACOTTA = get("minecraft:cyan_terracotta");
+    @Nullable
+    public static final BlockType CYAN_WALL_BANNER = get("minecraft:cyan_wall_banner");
+    @Nullable
+    public static final BlockType CYAN_WOOL = get("minecraft:cyan_wool");
+    @Nullable
+    public static final BlockType DAMAGED_ANVIL = get("minecraft:damaged_anvil");
+    @Nullable
+    public static final BlockType DANDELION = get("minecraft:dandelion");
+    @Nullable
+    public static final BlockType DARK_OAK_BUTTON = get("minecraft:dark_oak_button");
+    @Nullable
+    public static final BlockType DARK_OAK_DOOR = get("minecraft:dark_oak_door");
+    @Nullable
+    public static final BlockType DARK_OAK_FENCE = get("minecraft:dark_oak_fence");
+    @Nullable
+    public static final BlockType DARK_OAK_FENCE_GATE = get("minecraft:dark_oak_fence_gate");
+    @Nullable
+    public static final BlockType DARK_OAK_HANGING_SIGN = get("minecraft:dark_oak_hanging_sign");
+    @Nullable
+    public static final BlockType DARK_OAK_LEAVES = get("minecraft:dark_oak_leaves");
+    @Nullable
+    public static final BlockType DARK_OAK_LOG = get("minecraft:dark_oak_log");
+    @Nullable
+    public static final BlockType DARK_OAK_PLANKS = get("minecraft:dark_oak_planks");
+    @Nullable
+    public static final BlockType DARK_OAK_PRESSURE_PLATE = get("minecraft:dark_oak_pressure_plate");
+    @Nullable
+    public static final BlockType DARK_OAK_SAPLING = get("minecraft:dark_oak_sapling");
+    @Nullable
+    public static final BlockType DARK_OAK_SHELF = get("minecraft:dark_oak_shelf");
+    @Nullable
+    public static final BlockType DARK_OAK_SIGN = get("minecraft:dark_oak_sign");
+    @Nullable
+    public static final BlockType DARK_OAK_SLAB = get("minecraft:dark_oak_slab");
+    @Nullable
+    public static final BlockType DARK_OAK_STAIRS = get("minecraft:dark_oak_stairs");
+    @Nullable
+    public static final BlockType DARK_OAK_TRAPDOOR = get("minecraft:dark_oak_trapdoor");
+    @Nullable
+    public static final BlockType DARK_OAK_WALL_HANGING_SIGN = get("minecraft:dark_oak_wall_hanging_sign");
+    @Nullable
+    public static final BlockType DARK_OAK_WALL_SIGN = get("minecraft:dark_oak_wall_sign");
+    @Nullable
+    public static final BlockType DARK_OAK_WOOD = get("minecraft:dark_oak_wood");
+    @Nullable
+    public static final BlockType DARK_PRISMARINE = get("minecraft:dark_prismarine");
+    @Nullable
+    public static final BlockType DARK_PRISMARINE_SLAB = get("minecraft:dark_prismarine_slab");
+    @Nullable
+    public static final BlockType DARK_PRISMARINE_STAIRS = get("minecraft:dark_prismarine_stairs");
+    @Nullable
+    public static final BlockType DAYLIGHT_DETECTOR = get("minecraft:daylight_detector");
+    @Nullable
+    public static final BlockType DEAD_BRAIN_CORAL = get("minecraft:dead_brain_coral");
+    @Nullable
+    public static final BlockType DEAD_BRAIN_CORAL_BLOCK = get("minecraft:dead_brain_coral_block");
+    @Nullable
+    public static final BlockType DEAD_BRAIN_CORAL_FAN = get("minecraft:dead_brain_coral_fan");
+    @Nullable
+    public static final BlockType DEAD_BRAIN_CORAL_WALL_FAN = get("minecraft:dead_brain_coral_wall_fan");
+    @Nullable
+    public static final BlockType DEAD_BUBBLE_CORAL = get("minecraft:dead_bubble_coral");
+    @Nullable
+    public static final BlockType DEAD_BUBBLE_CORAL_BLOCK = get("minecraft:dead_bubble_coral_block");
+    @Nullable
+    public static final BlockType DEAD_BUBBLE_CORAL_FAN = get("minecraft:dead_bubble_coral_fan");
+    @Nullable
+    public static final BlockType DEAD_BUBBLE_CORAL_WALL_FAN = get("minecraft:dead_bubble_coral_wall_fan");
+    @Nullable
+    public static final BlockType DEAD_BUSH = get("minecraft:dead_bush");
+    @Nullable
+    public static final BlockType DEAD_FIRE_CORAL = get("minecraft:dead_fire_coral");
+    @Nullable
+    public static final BlockType DEAD_FIRE_CORAL_BLOCK = get("minecraft:dead_fire_coral_block");
+    @Nullable
+    public static final BlockType DEAD_FIRE_CORAL_FAN = get("minecraft:dead_fire_coral_fan");
+    @Nullable
+    public static final BlockType DEAD_FIRE_CORAL_WALL_FAN = get("minecraft:dead_fire_coral_wall_fan");
+    @Nullable
+    public static final BlockType DEAD_HORN_CORAL = get("minecraft:dead_horn_coral");
+    @Nullable
+    public static final BlockType DEAD_HORN_CORAL_BLOCK = get("minecraft:dead_horn_coral_block");
+    @Nullable
+    public static final BlockType DEAD_HORN_CORAL_FAN = get("minecraft:dead_horn_coral_fan");
+    @Nullable
+    public static final BlockType DEAD_HORN_CORAL_WALL_FAN = get("minecraft:dead_horn_coral_wall_fan");
+    @Nullable
+    public static final BlockType DEAD_TUBE_CORAL = get("minecraft:dead_tube_coral");
+    @Nullable
+    public static final BlockType DEAD_TUBE_CORAL_BLOCK = get("minecraft:dead_tube_coral_block");
+    @Nullable
+    public static final BlockType DEAD_TUBE_CORAL_FAN = get("minecraft:dead_tube_coral_fan");
+    @Nullable
+    public static final BlockType DEAD_TUBE_CORAL_WALL_FAN = get("minecraft:dead_tube_coral_wall_fan");
+    @Nullable
+    public static final BlockType DECORATED_POT = get("minecraft:decorated_pot");
+    @Nullable
+    public static final BlockType DEEPSLATE = get("minecraft:deepslate");
+    @Nullable
+    public static final BlockType DEEPSLATE_BRICK_SLAB = get("minecraft:deepslate_brick_slab");
+    @Nullable
+    public static final BlockType DEEPSLATE_BRICK_STAIRS = get("minecraft:deepslate_brick_stairs");
+    @Nullable
+    public static final BlockType DEEPSLATE_BRICK_WALL = get("minecraft:deepslate_brick_wall");
+    @Nullable
+    public static final BlockType DEEPSLATE_BRICKS = get("minecraft:deepslate_bricks");
+    @Nullable
+    public static final BlockType DEEPSLATE_COAL_ORE = get("minecraft:deepslate_coal_ore");
+    @Nullable
+    public static final BlockType DEEPSLATE_COPPER_ORE = get("minecraft:deepslate_copper_ore");
+    @Nullable
+    public static final BlockType DEEPSLATE_DIAMOND_ORE = get("minecraft:deepslate_diamond_ore");
+    @Nullable
+    public static final BlockType DEEPSLATE_EMERALD_ORE = get("minecraft:deepslate_emerald_ore");
+    @Nullable
+    public static final BlockType DEEPSLATE_GOLD_ORE = get("minecraft:deepslate_gold_ore");
+    @Nullable
+    public static final BlockType DEEPSLATE_IRON_ORE = get("minecraft:deepslate_iron_ore");
+    @Nullable
+    public static final BlockType DEEPSLATE_LAPIS_ORE = get("minecraft:deepslate_lapis_ore");
+    @Nullable
+    public static final BlockType DEEPSLATE_REDSTONE_ORE = get("minecraft:deepslate_redstone_ore");
+    @Nullable
+    public static final BlockType DEEPSLATE_TILE_SLAB = get("minecraft:deepslate_tile_slab");
+    @Nullable
+    public static final BlockType DEEPSLATE_TILE_STAIRS = get("minecraft:deepslate_tile_stairs");
+    @Nullable
+    public static final BlockType DEEPSLATE_TILE_WALL = get("minecraft:deepslate_tile_wall");
+    @Nullable
+    public static final BlockType DEEPSLATE_TILES = get("minecraft:deepslate_tiles");
+    @Nullable
+    public static final BlockType DETECTOR_RAIL = get("minecraft:detector_rail");
+    @Nullable
+    public static final BlockType DIAMOND_BLOCK = get("minecraft:diamond_block");
+    @Nullable
+    public static final BlockType DIAMOND_ORE = get("minecraft:diamond_ore");
+    @Nullable
+    public static final BlockType DIORITE = get("minecraft:diorite");
+    @Nullable
+    public static final BlockType DIORITE_SLAB = get("minecraft:diorite_slab");
+    @Nullable
+    public static final BlockType DIORITE_STAIRS = get("minecraft:diorite_stairs");
+    @Nullable
+    public static final BlockType DIORITE_WALL = get("minecraft:diorite_wall");
+    @Nullable
+    public static final BlockType DIRT = get("minecraft:dirt");
+    @Nullable
+    public static final BlockType DIRT_PATH = get("minecraft:dirt_path");
+    @Nullable
+    public static final BlockType DISPENSER = get("minecraft:dispenser");
+    @Nullable
+    public static final BlockType DRAGON_EGG = get("minecraft:dragon_egg");
+    @Nullable
+    public static final BlockType DRAGON_HEAD = get("minecraft:dragon_head");
+    @Nullable
+    public static final BlockType DRAGON_WALL_HEAD = get("minecraft:dragon_wall_head");
+    @Nullable
+    public static final BlockType DRIED_GHAST = get("minecraft:dried_ghast");
+    @Nullable
+    public static final BlockType DRIED_KELP_BLOCK = get("minecraft:dried_kelp_block");
+    @Nullable
+    public static final BlockType DRIPSTONE_BLOCK = get("minecraft:dripstone_block");
+    @Nullable
+    public static final BlockType DROPPER = get("minecraft:dropper");
+    @Nullable
+    public static final BlockType EMERALD_BLOCK = get("minecraft:emerald_block");
+    @Nullable
+    public static final BlockType EMERALD_ORE = get("minecraft:emerald_ore");
+    @Nullable
+    public static final BlockType ENCHANTING_TABLE = get("minecraft:enchanting_table");
+    @Nullable
+    public static final BlockType END_GATEWAY = get("minecraft:end_gateway");
+    @Nullable
+    public static final BlockType END_PORTAL = get("minecraft:end_portal");
+    @Nullable
+    public static final BlockType END_PORTAL_FRAME = get("minecraft:end_portal_frame");
+    @Nullable
+    public static final BlockType END_ROD = get("minecraft:end_rod");
+    @Nullable
+    public static final BlockType END_STONE = get("minecraft:end_stone");
+    @Nullable
+    public static final BlockType END_STONE_BRICK_SLAB = get("minecraft:end_stone_brick_slab");
+    @Nullable
+    public static final BlockType END_STONE_BRICK_STAIRS = get("minecraft:end_stone_brick_stairs");
+    @Nullable
+    public static final BlockType END_STONE_BRICK_WALL = get("minecraft:end_stone_brick_wall");
+    @Nullable
+    public static final BlockType END_STONE_BRICKS = get("minecraft:end_stone_bricks");
+    @Nullable
+    public static final BlockType ENDER_CHEST = get("minecraft:ender_chest");
+    @Nullable
+    public static final BlockType EXPOSED_CHISELED_COPPER = get("minecraft:exposed_chiseled_copper");
+    @Nullable
+    public static final BlockType EXPOSED_COPPER = get("minecraft:exposed_copper");
+    @Nullable
+    public static final BlockType EXPOSED_COPPER_BARS = get("minecraft:exposed_copper_bars");
+    @Nullable
+    public static final BlockType EXPOSED_COPPER_BULB = get("minecraft:exposed_copper_bulb");
+    @Nullable
+    public static final BlockType EXPOSED_COPPER_CHAIN = get("minecraft:exposed_copper_chain");
+    @Nullable
+    public static final BlockType EXPOSED_COPPER_CHEST = get("minecraft:exposed_copper_chest");
+    @Nullable
+    public static final BlockType EXPOSED_COPPER_DOOR = get("minecraft:exposed_copper_door");
+    @Nullable
+    public static final BlockType EXPOSED_COPPER_GOLEM_STATUE = get("minecraft:exposed_copper_golem_statue");
+    @Nullable
+    public static final BlockType EXPOSED_COPPER_GRATE = get("minecraft:exposed_copper_grate");
+    @Nullable
+    public static final BlockType EXPOSED_COPPER_LANTERN = get("minecraft:exposed_copper_lantern");
+    @Nullable
+    public static final BlockType EXPOSED_COPPER_TRAPDOOR = get("minecraft:exposed_copper_trapdoor");
+    @Nullable
+    public static final BlockType EXPOSED_CUT_COPPER = get("minecraft:exposed_cut_copper");
+    @Nullable
+    public static final BlockType EXPOSED_CUT_COPPER_SLAB = get("minecraft:exposed_cut_copper_slab");
+    @Nullable
+    public static final BlockType EXPOSED_CUT_COPPER_STAIRS = get("minecraft:exposed_cut_copper_stairs");
+    @Nullable
+    public static final BlockType EXPOSED_LIGHTNING_ROD = get("minecraft:exposed_lightning_rod");
+    @Nullable
+    public static final BlockType FARMLAND = get("minecraft:farmland");
+    @Nullable
+    public static final BlockType FERN = get("minecraft:fern");
+    @Nullable
+    public static final BlockType FIRE = get("minecraft:fire");
+    @Nullable
+    public static final BlockType FIRE_CORAL = get("minecraft:fire_coral");
+    @Nullable
+    public static final BlockType FIRE_CORAL_BLOCK = get("minecraft:fire_coral_block");
+    @Nullable
+    public static final BlockType FIRE_CORAL_FAN = get("minecraft:fire_coral_fan");
+    @Nullable
+    public static final BlockType FIRE_CORAL_WALL_FAN = get("minecraft:fire_coral_wall_fan");
+    @Nullable
+    public static final BlockType FIREFLY_BUSH = get("minecraft:firefly_bush");
+    @Nullable
+    public static final BlockType FLETCHING_TABLE = get("minecraft:fletching_table");
+    @Nullable
+    public static final BlockType FLOWER_POT = get("minecraft:flower_pot");
+    @Nullable
+    public static final BlockType FLOWERING_AZALEA = get("minecraft:flowering_azalea");
+    @Nullable
+    public static final BlockType FLOWERING_AZALEA_LEAVES = get("minecraft:flowering_azalea_leaves");
+    @Nullable
+    public static final BlockType FROGSPAWN = get("minecraft:frogspawn");
+    @Nullable
+    public static final BlockType FROSTED_ICE = get("minecraft:frosted_ice");
+    @Nullable
+    public static final BlockType FURNACE = get("minecraft:furnace");
+    @Nullable
+    public static final BlockType GILDED_BLACKSTONE = get("minecraft:gilded_blackstone");
+    @Nullable
+    public static final BlockType GLASS = get("minecraft:glass");
+    @Nullable
+    public static final BlockType GLASS_PANE = get("minecraft:glass_pane");
+    @Nullable
+    public static final BlockType GLOW_LICHEN = get("minecraft:glow_lichen");
+    @Nullable
+    public static final BlockType GLOWSTONE = get("minecraft:glowstone");
+    @Nullable
+    public static final BlockType GOLD_BLOCK = get("minecraft:gold_block");
+    @Nullable
+    public static final BlockType GOLD_ORE = get("minecraft:gold_ore");
+    @Nullable
+    public static final BlockType GOLDEN_DANDELION = get("minecraft:golden_dandelion");
+    @Nullable
+    public static final BlockType GRANITE = get("minecraft:granite");
+    @Nullable
+    public static final BlockType GRANITE_SLAB = get("minecraft:granite_slab");
+    @Nullable
+    public static final BlockType GRANITE_STAIRS = get("minecraft:granite_stairs");
+    @Nullable
+    public static final BlockType GRANITE_WALL = get("minecraft:granite_wall");
+    @Nullable @Deprecated
+    public static final BlockType GRASS = get("minecraft:grass");
+    @Nullable
+    public static final BlockType GRASS_BLOCK = get("minecraft:grass_block");
+    @Deprecated
+    @Nullable
+    public static final BlockType GRASS_PATH = get("minecraft:grass_path");
+    @Nullable
+    public static final BlockType GRAVEL = get("minecraft:gravel");
+    @Nullable
+    public static final BlockType GRAY_BANNER = get("minecraft:gray_banner");
+    @Nullable
+    public static final BlockType GRAY_BED = get("minecraft:gray_bed");
+    @Nullable
+    public static final BlockType GRAY_CANDLE = get("minecraft:gray_candle");
+    @Nullable
+    public static final BlockType GRAY_CANDLE_CAKE = get("minecraft:gray_candle_cake");
+    @Nullable
+    public static final BlockType GRAY_CARPET = get("minecraft:gray_carpet");
+    @Nullable
+    public static final BlockType GRAY_CONCRETE = get("minecraft:gray_concrete");
+    @Nullable
+    public static final BlockType GRAY_CONCRETE_POWDER = get("minecraft:gray_concrete_powder");
+    @Nullable
+    public static final BlockType GRAY_GLAZED_TERRACOTTA = get("minecraft:gray_glazed_terracotta");
+    @Nullable
+    public static final BlockType GRAY_SHULKER_BOX = get("minecraft:gray_shulker_box");
+    @Nullable
+    public static final BlockType GRAY_STAINED_GLASS = get("minecraft:gray_stained_glass");
+    @Nullable
+    public static final BlockType GRAY_STAINED_GLASS_PANE = get("minecraft:gray_stained_glass_pane");
+    @Nullable
+    public static final BlockType GRAY_TERRACOTTA = get("minecraft:gray_terracotta");
+    @Nullable
+    public static final BlockType GRAY_WALL_BANNER = get("minecraft:gray_wall_banner");
+    @Nullable
+    public static final BlockType GRAY_WOOL = get("minecraft:gray_wool");
+    @Nullable
+    public static final BlockType GREEN_BANNER = get("minecraft:green_banner");
+    @Nullable
+    public static final BlockType GREEN_BED = get("minecraft:green_bed");
+    @Nullable
+    public static final BlockType GREEN_CANDLE = get("minecraft:green_candle");
+    @Nullable
+    public static final BlockType GREEN_CANDLE_CAKE = get("minecraft:green_candle_cake");
+    @Nullable
+    public static final BlockType GREEN_CARPET = get("minecraft:green_carpet");
+    @Nullable
+    public static final BlockType GREEN_CONCRETE = get("minecraft:green_concrete");
+    @Nullable
+    public static final BlockType GREEN_CONCRETE_POWDER = get("minecraft:green_concrete_powder");
+    @Nullable
+    public static final BlockType GREEN_GLAZED_TERRACOTTA = get("minecraft:green_glazed_terracotta");
+    @Nullable
+    public static final BlockType GREEN_SHULKER_BOX = get("minecraft:green_shulker_box");
+    @Nullable
+    public static final BlockType GREEN_STAINED_GLASS = get("minecraft:green_stained_glass");
+    @Nullable
+    public static final BlockType GREEN_STAINED_GLASS_PANE = get("minecraft:green_stained_glass_pane");
+    @Nullable
+    public static final BlockType GREEN_TERRACOTTA = get("minecraft:green_terracotta");
+    @Nullable
+    public static final BlockType GREEN_WALL_BANNER = get("minecraft:green_wall_banner");
+    @Nullable
+    public static final BlockType GREEN_WOOL = get("minecraft:green_wool");
+    @Nullable
+    public static final BlockType GRINDSTONE = get("minecraft:grindstone");
+    @Nullable
+    public static final BlockType HANGING_ROOTS = get("minecraft:hanging_roots");
+    @Nullable
+    public static final BlockType HAY_BLOCK = get("minecraft:hay_block");
+    @Nullable
+    public static final BlockType HEAVY_CORE = get("minecraft:heavy_core");
+    @Nullable
+    public static final BlockType HEAVY_WEIGHTED_PRESSURE_PLATE = get("minecraft:heavy_weighted_pressure_plate");
+    @Nullable
+    public static final BlockType HONEY_BLOCK = get("minecraft:honey_block");
+    @Nullable
+    public static final BlockType HONEYCOMB_BLOCK = get("minecraft:honeycomb_block");
+    @Nullable
+    public static final BlockType HOPPER = get("minecraft:hopper");
+    @Nullable
+    public static final BlockType HORN_CORAL = get("minecraft:horn_coral");
+    @Nullable
+    public static final BlockType HORN_CORAL_BLOCK = get("minecraft:horn_coral_block");
+    @Nullable
+    public static final BlockType HORN_CORAL_FAN = get("minecraft:horn_coral_fan");
+    @Nullable
+    public static final BlockType HORN_CORAL_WALL_FAN = get("minecraft:horn_coral_wall_fan");
+    @Nullable
+    public static final BlockType ICE = get("minecraft:ice");
+    @Nullable
+    public static final BlockType INFESTED_CHISELED_STONE_BRICKS = get("minecraft:infested_chiseled_stone_bricks");
+    @Nullable
+    public static final BlockType INFESTED_COBBLESTONE = get("minecraft:infested_cobblestone");
+    @Nullable
+    public static final BlockType INFESTED_CRACKED_STONE_BRICKS = get("minecraft:infested_cracked_stone_bricks");
+    @Nullable
+    public static final BlockType INFESTED_DEEPSLATE = get("minecraft:infested_deepslate");
+    @Nullable
+    public static final BlockType INFESTED_MOSSY_STONE_BRICKS = get("minecraft:infested_mossy_stone_bricks");
+    @Nullable
+    public static final BlockType INFESTED_STONE = get("minecraft:infested_stone");
+    @Nullable
+    public static final BlockType INFESTED_STONE_BRICKS = get("minecraft:infested_stone_bricks");
+    @Nullable
+    public static final BlockType IRON_BARS = get("minecraft:iron_bars");
+    @Nullable
+    public static final BlockType IRON_BLOCK = get("minecraft:iron_block");
+    @Nullable
+    public static final BlockType IRON_CHAIN = get("minecraft:iron_chain");
+    @Nullable
+    public static final BlockType IRON_DOOR = get("minecraft:iron_door");
+    @Nullable
+    public static final BlockType IRON_ORE = get("minecraft:iron_ore");
+    @Nullable
+    public static final BlockType IRON_TRAPDOOR = get("minecraft:iron_trapdoor");
+    @Nullable
+    public static final BlockType JACK_O_LANTERN = get("minecraft:jack_o_lantern");
+    @Nullable
+    public static final BlockType JIGSAW = get("minecraft:jigsaw");
+    @Nullable
+    public static final BlockType JUKEBOX = get("minecraft:jukebox");
+    @Nullable
+    public static final BlockType JUNGLE_BUTTON = get("minecraft:jungle_button");
+    @Nullable
+    public static final BlockType JUNGLE_DOOR = get("minecraft:jungle_door");
+    @Nullable
+    public static final BlockType JUNGLE_FENCE = get("minecraft:jungle_fence");
+    @Nullable
+    public static final BlockType JUNGLE_FENCE_GATE = get("minecraft:jungle_fence_gate");
+    @Nullable
+    public static final BlockType JUNGLE_HANGING_SIGN = get("minecraft:jungle_hanging_sign");
+    @Nullable
+    public static final BlockType JUNGLE_LEAVES = get("minecraft:jungle_leaves");
+    @Nullable
+    public static final BlockType JUNGLE_LOG = get("minecraft:jungle_log");
+    @Nullable
+    public static final BlockType JUNGLE_PLANKS = get("minecraft:jungle_planks");
+    @Nullable
+    public static final BlockType JUNGLE_PRESSURE_PLATE = get("minecraft:jungle_pressure_plate");
+    @Nullable
+    public static final BlockType JUNGLE_SAPLING = get("minecraft:jungle_sapling");
+    @Nullable
+    public static final BlockType JUNGLE_SHELF = get("minecraft:jungle_shelf");
+    @Nullable
+    public static final BlockType JUNGLE_SIGN = get("minecraft:jungle_sign");
+    @Nullable
+    public static final BlockType JUNGLE_SLAB = get("minecraft:jungle_slab");
+    @Nullable
+    public static final BlockType JUNGLE_STAIRS = get("minecraft:jungle_stairs");
+    @Nullable
+    public static final BlockType JUNGLE_TRAPDOOR = get("minecraft:jungle_trapdoor");
+    @Nullable
+    public static final BlockType JUNGLE_WALL_HANGING_SIGN = get("minecraft:jungle_wall_hanging_sign");
+    @Nullable
+    public static final BlockType JUNGLE_WALL_SIGN = get("minecraft:jungle_wall_sign");
+    @Nullable
+    public static final BlockType JUNGLE_WOOD = get("minecraft:jungle_wood");
+    @Nullable
+    public static final BlockType KELP = get("minecraft:kelp");
+    @Nullable
+    public static final BlockType KELP_PLANT = get("minecraft:kelp_plant");
+    @Nullable
+    public static final BlockType LADDER = get("minecraft:ladder");
+    @Nullable
+    public static final BlockType LANTERN = get("minecraft:lantern");
+    @Nullable
+    public static final BlockType LAPIS_BLOCK = get("minecraft:lapis_block");
+    @Nullable
+    public static final BlockType LAPIS_ORE = get("minecraft:lapis_ore");
+    @Nullable
+    public static final BlockType LARGE_AMETHYST_BUD = get("minecraft:large_amethyst_bud");
+    @Nullable
+    public static final BlockType LARGE_FERN = get("minecraft:large_fern");
+    @Nullable
+    public static final BlockType LAVA = get("minecraft:lava");
+    @Nullable
+    public static final BlockType LAVA_CAULDRON = get("minecraft:lava_cauldron");
+    @Nullable
+    public static final BlockType LEAF_LITTER = get("minecraft:leaf_litter");
+    @Nullable
+    public static final BlockType LECTERN = get("minecraft:lectern");
+    @Nullable
+    public static final BlockType LEVER = get("minecraft:lever");
+    @Nullable
+    public static final BlockType LIGHT = get("minecraft:light");
+    @Nullable
+    public static final BlockType LIGHT_BLUE_BANNER = get("minecraft:light_blue_banner");
+    @Nullable
+    public static final BlockType LIGHT_BLUE_BED = get("minecraft:light_blue_bed");
+    @Nullable
+    public static final BlockType LIGHT_BLUE_CANDLE = get("minecraft:light_blue_candle");
+    @Nullable
+    public static final BlockType LIGHT_BLUE_CANDLE_CAKE = get("minecraft:light_blue_candle_cake");
+    @Nullable
+    public static final BlockType LIGHT_BLUE_CARPET = get("minecraft:light_blue_carpet");
+    @Nullable
+    public static final BlockType LIGHT_BLUE_CONCRETE = get("minecraft:light_blue_concrete");
+    @Nullable
+    public static final BlockType LIGHT_BLUE_CONCRETE_POWDER = get("minecraft:light_blue_concrete_powder");
+    @Nullable
+    public static final BlockType LIGHT_BLUE_GLAZED_TERRACOTTA = get("minecraft:light_blue_glazed_terracotta");
+    @Nullable
+    public static final BlockType LIGHT_BLUE_SHULKER_BOX = get("minecraft:light_blue_shulker_box");
+    @Nullable
+    public static final BlockType LIGHT_BLUE_STAINED_GLASS = get("minecraft:light_blue_stained_glass");
+    @Nullable
+    public static final BlockType LIGHT_BLUE_STAINED_GLASS_PANE = get("minecraft:light_blue_stained_glass_pane");
+    @Nullable
+    public static final BlockType LIGHT_BLUE_TERRACOTTA = get("minecraft:light_blue_terracotta");
+    @Nullable
+    public static final BlockType LIGHT_BLUE_WALL_BANNER = get("minecraft:light_blue_wall_banner");
+    @Nullable
+    public static final BlockType LIGHT_BLUE_WOOL = get("minecraft:light_blue_wool");
+    @Nullable
+    public static final BlockType LIGHT_GRAY_BANNER = get("minecraft:light_gray_banner");
+    @Nullable
+    public static final BlockType LIGHT_GRAY_BED = get("minecraft:light_gray_bed");
+    @Nullable
+    public static final BlockType LIGHT_GRAY_CANDLE = get("minecraft:light_gray_candle");
+    @Nullable
+    public static final BlockType LIGHT_GRAY_CANDLE_CAKE = get("minecraft:light_gray_candle_cake");
+    @Nullable
+    public static final BlockType LIGHT_GRAY_CARPET = get("minecraft:light_gray_carpet");
+    @Nullable
+    public static final BlockType LIGHT_GRAY_CONCRETE = get("minecraft:light_gray_concrete");
+    @Nullable
+    public static final BlockType LIGHT_GRAY_CONCRETE_POWDER = get("minecraft:light_gray_concrete_powder");
+    @Nullable
+    public static final BlockType LIGHT_GRAY_GLAZED_TERRACOTTA = get("minecraft:light_gray_glazed_terracotta");
+    @Nullable
+    public static final BlockType LIGHT_GRAY_SHULKER_BOX = get("minecraft:light_gray_shulker_box");
+    @Nullable
+    public static final BlockType LIGHT_GRAY_STAINED_GLASS = get("minecraft:light_gray_stained_glass");
+    @Nullable
+    public static final BlockType LIGHT_GRAY_STAINED_GLASS_PANE = get("minecraft:light_gray_stained_glass_pane");
+    @Nullable
+    public static final BlockType LIGHT_GRAY_TERRACOTTA = get("minecraft:light_gray_terracotta");
+    @Nullable
+    public static final BlockType LIGHT_GRAY_WALL_BANNER = get("minecraft:light_gray_wall_banner");
+    @Nullable
+    public static final BlockType LIGHT_GRAY_WOOL = get("minecraft:light_gray_wool");
+    @Nullable
+    public static final BlockType LIGHT_WEIGHTED_PRESSURE_PLATE = get("minecraft:light_weighted_pressure_plate");
+    @Nullable
+    public static final BlockType LIGHTNING_ROD = get("minecraft:lightning_rod");
+    @Nullable
+    public static final BlockType LILAC = get("minecraft:lilac");
+    @Nullable
+    public static final BlockType LILY_OF_THE_VALLEY = get("minecraft:lily_of_the_valley");
+    @Nullable
+    public static final BlockType LILY_PAD = get("minecraft:lily_pad");
+    @Nullable
+    public static final BlockType LIME_BANNER = get("minecraft:lime_banner");
+    @Nullable
+    public static final BlockType LIME_BED = get("minecraft:lime_bed");
+    @Nullable
+    public static final BlockType LIME_CANDLE = get("minecraft:lime_candle");
+    @Nullable
+    public static final BlockType LIME_CANDLE_CAKE = get("minecraft:lime_candle_cake");
+    @Nullable
+    public static final BlockType LIME_CARPET = get("minecraft:lime_carpet");
+    @Nullable
+    public static final BlockType LIME_CONCRETE = get("minecraft:lime_concrete");
+    @Nullable
+    public static final BlockType LIME_CONCRETE_POWDER = get("minecraft:lime_concrete_powder");
+    @Nullable
+    public static final BlockType LIME_GLAZED_TERRACOTTA = get("minecraft:lime_glazed_terracotta");
+    @Nullable
+    public static final BlockType LIME_SHULKER_BOX = get("minecraft:lime_shulker_box");
+    @Nullable
+    public static final BlockType LIME_STAINED_GLASS = get("minecraft:lime_stained_glass");
+    @Nullable
+    public static final BlockType LIME_STAINED_GLASS_PANE = get("minecraft:lime_stained_glass_pane");
+    @Nullable
+    public static final BlockType LIME_TERRACOTTA = get("minecraft:lime_terracotta");
+    @Nullable
+    public static final BlockType LIME_WALL_BANNER = get("minecraft:lime_wall_banner");
+    @Nullable
+    public static final BlockType LIME_WOOL = get("minecraft:lime_wool");
+    @Nullable
+    public static final BlockType LODESTONE = get("minecraft:lodestone");
+    @Nullable
+    public static final BlockType LOOM = get("minecraft:loom");
+    @Nullable
+    public static final BlockType MAGENTA_BANNER = get("minecraft:magenta_banner");
+    @Nullable
+    public static final BlockType MAGENTA_BED = get("minecraft:magenta_bed");
+    @Nullable
+    public static final BlockType MAGENTA_CANDLE = get("minecraft:magenta_candle");
+    @Nullable
+    public static final BlockType MAGENTA_CANDLE_CAKE = get("minecraft:magenta_candle_cake");
+    @Nullable
+    public static final BlockType MAGENTA_CARPET = get("minecraft:magenta_carpet");
+    @Nullable
+    public static final BlockType MAGENTA_CONCRETE = get("minecraft:magenta_concrete");
+    @Nullable
+    public static final BlockType MAGENTA_CONCRETE_POWDER = get("minecraft:magenta_concrete_powder");
+    @Nullable
+    public static final BlockType MAGENTA_GLAZED_TERRACOTTA = get("minecraft:magenta_glazed_terracotta");
+    @Nullable
+    public static final BlockType MAGENTA_SHULKER_BOX = get("minecraft:magenta_shulker_box");
+    @Nullable
+    public static final BlockType MAGENTA_STAINED_GLASS = get("minecraft:magenta_stained_glass");
+    @Nullable
+    public static final BlockType MAGENTA_STAINED_GLASS_PANE = get("minecraft:magenta_stained_glass_pane");
+    @Nullable
+    public static final BlockType MAGENTA_TERRACOTTA = get("minecraft:magenta_terracotta");
+    @Nullable
+    public static final BlockType MAGENTA_WALL_BANNER = get("minecraft:magenta_wall_banner");
+    @Nullable
+    public static final BlockType MAGENTA_WOOL = get("minecraft:magenta_wool");
+    @Nullable
+    public static final BlockType MAGMA_BLOCK = get("minecraft:magma_block");
+    @Nullable
+    public static final BlockType MANGROVE_BUTTON = get("minecraft:mangrove_button");
+    @Nullable
+    public static final BlockType MANGROVE_DOOR = get("minecraft:mangrove_door");
+    @Nullable
+    public static final BlockType MANGROVE_FENCE = get("minecraft:mangrove_fence");
+    @Nullable
+    public static final BlockType MANGROVE_FENCE_GATE = get("minecraft:mangrove_fence_gate");
+    @Nullable
+    public static final BlockType MANGROVE_HANGING_SIGN = get("minecraft:mangrove_hanging_sign");
+    @Nullable
+    public static final BlockType MANGROVE_LEAVES = get("minecraft:mangrove_leaves");
+    @Nullable
+    public static final BlockType MANGROVE_LOG = get("minecraft:mangrove_log");
+    @Nullable
+    public static final BlockType MANGROVE_PLANKS = get("minecraft:mangrove_planks");
+    @Nullable
+    public static final BlockType MANGROVE_PRESSURE_PLATE = get("minecraft:mangrove_pressure_plate");
+    @Nullable
+    public static final BlockType MANGROVE_PROPAGULE = get("minecraft:mangrove_propagule");
+    @Nullable
+    public static final BlockType MANGROVE_ROOTS = get("minecraft:mangrove_roots");
+    @Nullable
+    public static final BlockType MANGROVE_SHELF = get("minecraft:mangrove_shelf");
+    @Nullable
+    public static final BlockType MANGROVE_SIGN = get("minecraft:mangrove_sign");
+    @Nullable
+    public static final BlockType MANGROVE_SLAB = get("minecraft:mangrove_slab");
+    @Nullable
+    public static final BlockType MANGROVE_STAIRS = get("minecraft:mangrove_stairs");
+    @Nullable
+    public static final BlockType MANGROVE_TRAPDOOR = get("minecraft:mangrove_trapdoor");
+    @Nullable
+    public static final BlockType MANGROVE_WALL_HANGING_SIGN = get("minecraft:mangrove_wall_hanging_sign");
+    @Nullable
+    public static final BlockType MANGROVE_WALL_SIGN = get("minecraft:mangrove_wall_sign");
+    @Nullable
+    public static final BlockType MANGROVE_WOOD = get("minecraft:mangrove_wood");
+    @Nullable
+    public static final BlockType MEDIUM_AMETHYST_BUD = get("minecraft:medium_amethyst_bud");
+    @Nullable
+    public static final BlockType MELON = get("minecraft:melon");
+    @Nullable
+    public static final BlockType MELON_STEM = get("minecraft:melon_stem");
+    @Nullable
+    public static final BlockType MOSS_BLOCK = get("minecraft:moss_block");
+    @Nullable
+    public static final BlockType MOSS_CARPET = get("minecraft:moss_carpet");
+    @Nullable
+    public static final BlockType MOSSY_COBBLESTONE = get("minecraft:mossy_cobblestone");
+    @Nullable
+    public static final BlockType MOSSY_COBBLESTONE_SLAB = get("minecraft:mossy_cobblestone_slab");
+    @Nullable
+    public static final BlockType MOSSY_COBBLESTONE_STAIRS = get("minecraft:mossy_cobblestone_stairs");
+    @Nullable
+    public static final BlockType MOSSY_COBBLESTONE_WALL = get("minecraft:mossy_cobblestone_wall");
+    @Nullable
+    public static final BlockType MOSSY_STONE_BRICK_SLAB = get("minecraft:mossy_stone_brick_slab");
+    @Nullable
+    public static final BlockType MOSSY_STONE_BRICK_STAIRS = get("minecraft:mossy_stone_brick_stairs");
+    @Nullable
+    public static final BlockType MOSSY_STONE_BRICK_WALL = get("minecraft:mossy_stone_brick_wall");
+    @Nullable
+    public static final BlockType MOSSY_STONE_BRICKS = get("minecraft:mossy_stone_bricks");
+    @Nullable
+    public static final BlockType MOVING_PISTON = get("minecraft:moving_piston");
+    @Nullable
+    public static final BlockType MUD = get("minecraft:mud");
+    @Nullable
+    public static final BlockType MUD_BRICK_SLAB = get("minecraft:mud_brick_slab");
+    @Nullable
+    public static final BlockType MUD_BRICK_STAIRS = get("minecraft:mud_brick_stairs");
+    @Nullable
+    public static final BlockType MUD_BRICK_WALL = get("minecraft:mud_brick_wall");
+    @Nullable
+    public static final BlockType MUD_BRICKS = get("minecraft:mud_bricks");
+    @Nullable
+    public static final BlockType MUDDY_MANGROVE_ROOTS = get("minecraft:muddy_mangrove_roots");
+    @Nullable
+    public static final BlockType MUSHROOM_STEM = get("minecraft:mushroom_stem");
+    @Nullable
+    public static final BlockType MYCELIUM = get("minecraft:mycelium");
+    @Nullable
+    public static final BlockType NETHER_BRICK_FENCE = get("minecraft:nether_brick_fence");
+    @Nullable
+    public static final BlockType NETHER_BRICK_SLAB = get("minecraft:nether_brick_slab");
+    @Nullable
+    public static final BlockType NETHER_BRICK_STAIRS = get("minecraft:nether_brick_stairs");
+    @Nullable
+    public static final BlockType NETHER_BRICK_WALL = get("minecraft:nether_brick_wall");
+    @Nullable
+    public static final BlockType NETHER_BRICKS = get("minecraft:nether_bricks");
+    @Nullable
+    public static final BlockType NETHER_GOLD_ORE = get("minecraft:nether_gold_ore");
+    @Nullable
+    public static final BlockType NETHER_PORTAL = get("minecraft:nether_portal");
+    @Nullable
+    public static final BlockType NETHER_QUARTZ_ORE = get("minecraft:nether_quartz_ore");
+    @Nullable
+    public static final BlockType NETHER_SPROUTS = get("minecraft:nether_sprouts");
+    @Nullable
+    public static final BlockType NETHER_WART = get("minecraft:nether_wart");
+    @Nullable
+    public static final BlockType NETHER_WART_BLOCK = get("minecraft:nether_wart_block");
+    @Nullable
+    public static final BlockType NETHERITE_BLOCK = get("minecraft:netherite_block");
+    @Nullable
+    public static final BlockType NETHERRACK = get("minecraft:netherrack");
+    @Nullable
+    public static final BlockType NOTE_BLOCK = get("minecraft:note_block");
+    @Nullable
+    public static final BlockType OAK_BUTTON = get("minecraft:oak_button");
+    @Nullable
+    public static final BlockType OAK_DOOR = get("minecraft:oak_door");
+    @Nullable
+    public static final BlockType OAK_FENCE = get("minecraft:oak_fence");
+    @Nullable
+    public static final BlockType OAK_FENCE_GATE = get("minecraft:oak_fence_gate");
+    @Nullable
+    public static final BlockType OAK_HANGING_SIGN = get("minecraft:oak_hanging_sign");
+    @Nullable
+    public static final BlockType OAK_LEAVES = get("minecraft:oak_leaves");
+    @Nullable
+    public static final BlockType OAK_LOG = get("minecraft:oak_log");
+    @Nullable
+    public static final BlockType OAK_PLANKS = get("minecraft:oak_planks");
+    @Nullable
+    public static final BlockType OAK_PRESSURE_PLATE = get("minecraft:oak_pressure_plate");
+    @Nullable
+    public static final BlockType OAK_SAPLING = get("minecraft:oak_sapling");
+    @Nullable
+    public static final BlockType OAK_SHELF = get("minecraft:oak_shelf");
+    @Nullable
+    public static final BlockType OAK_SIGN = get("minecraft:oak_sign");
+    @Nullable
+    public static final BlockType OAK_SLAB = get("minecraft:oak_slab");
+    @Nullable
+    public static final BlockType OAK_STAIRS = get("minecraft:oak_stairs");
+    @Nullable
+    public static final BlockType OAK_TRAPDOOR = get("minecraft:oak_trapdoor");
+    @Nullable
+    public static final BlockType OAK_WALL_HANGING_SIGN = get("minecraft:oak_wall_hanging_sign");
+    @Nullable
+    public static final BlockType OAK_WALL_SIGN = get("minecraft:oak_wall_sign");
+    @Nullable
+    public static final BlockType OAK_WOOD = get("minecraft:oak_wood");
+    @Nullable
+    public static final BlockType OBSERVER = get("minecraft:observer");
+    @Nullable
+    public static final BlockType OBSIDIAN = get("minecraft:obsidian");
+    @Nullable
+    public static final BlockType OCHRE_FROGLIGHT = get("minecraft:ochre_froglight");
+    @Nullable
+    public static final BlockType OPEN_EYEBLOSSOM = get("minecraft:open_eyeblossom");
+    @Nullable
+    public static final BlockType ORANGE_BANNER = get("minecraft:orange_banner");
+    @Nullable
+    public static final BlockType ORANGE_BED = get("minecraft:orange_bed");
+    @Nullable
+    public static final BlockType ORANGE_CANDLE = get("minecraft:orange_candle");
+    @Nullable
+    public static final BlockType ORANGE_CANDLE_CAKE = get("minecraft:orange_candle_cake");
+    @Nullable
+    public static final BlockType ORANGE_CARPET = get("minecraft:orange_carpet");
+    @Nullable
+    public static final BlockType ORANGE_CONCRETE = get("minecraft:orange_concrete");
+    @Nullable
+    public static final BlockType ORANGE_CONCRETE_POWDER = get("minecraft:orange_concrete_powder");
+    @Nullable
+    public static final BlockType ORANGE_GLAZED_TERRACOTTA = get("minecraft:orange_glazed_terracotta");
+    @Nullable
+    public static final BlockType ORANGE_SHULKER_BOX = get("minecraft:orange_shulker_box");
+    @Nullable
+    public static final BlockType ORANGE_STAINED_GLASS = get("minecraft:orange_stained_glass");
+    @Nullable
+    public static final BlockType ORANGE_STAINED_GLASS_PANE = get("minecraft:orange_stained_glass_pane");
+    @Nullable
+    public static final BlockType ORANGE_TERRACOTTA = get("minecraft:orange_terracotta");
+    @Nullable
+    public static final BlockType ORANGE_TULIP = get("minecraft:orange_tulip");
+    @Nullable
+    public static final BlockType ORANGE_WALL_BANNER = get("minecraft:orange_wall_banner");
+    @Nullable
+    public static final BlockType ORANGE_WOOL = get("minecraft:orange_wool");
+    @Nullable
+    public static final BlockType OXEYE_DAISY = get("minecraft:oxeye_daisy");
+    @Nullable
+    public static final BlockType OXIDIZED_CHISELED_COPPER = get("minecraft:oxidized_chiseled_copper");
+    @Nullable
+    public static final BlockType OXIDIZED_COPPER = get("minecraft:oxidized_copper");
+    @Nullable
+    public static final BlockType OXIDIZED_COPPER_BARS = get("minecraft:oxidized_copper_bars");
+    @Nullable
+    public static final BlockType OXIDIZED_COPPER_BULB = get("minecraft:oxidized_copper_bulb");
+    @Nullable
+    public static final BlockType OXIDIZED_COPPER_CHAIN = get("minecraft:oxidized_copper_chain");
+    @Nullable
+    public static final BlockType OXIDIZED_COPPER_CHEST = get("minecraft:oxidized_copper_chest");
+    @Nullable
+    public static final BlockType OXIDIZED_COPPER_DOOR = get("minecraft:oxidized_copper_door");
+    @Nullable
+    public static final BlockType OXIDIZED_COPPER_GOLEM_STATUE = get("minecraft:oxidized_copper_golem_statue");
+    @Nullable
+    public static final BlockType OXIDIZED_COPPER_GRATE = get("minecraft:oxidized_copper_grate");
+    @Nullable
+    public static final BlockType OXIDIZED_COPPER_LANTERN = get("minecraft:oxidized_copper_lantern");
+    @Nullable
+    public static final BlockType OXIDIZED_COPPER_TRAPDOOR = get("minecraft:oxidized_copper_trapdoor");
+    @Nullable
+    public static final BlockType OXIDIZED_CUT_COPPER = get("minecraft:oxidized_cut_copper");
+    @Nullable
+    public static final BlockType OXIDIZED_CUT_COPPER_SLAB = get("minecraft:oxidized_cut_copper_slab");
+    @Nullable
+    public static final BlockType OXIDIZED_CUT_COPPER_STAIRS = get("minecraft:oxidized_cut_copper_stairs");
+    @Nullable
+    public static final BlockType OXIDIZED_LIGHTNING_ROD = get("minecraft:oxidized_lightning_rod");
+    @Nullable
+    public static final BlockType PACKED_ICE = get("minecraft:packed_ice");
+    @Nullable
+    public static final BlockType PACKED_MUD = get("minecraft:packed_mud");
+    @Nullable
+    public static final BlockType PALE_HANGING_MOSS = get("minecraft:pale_hanging_moss");
+    @Nullable
+    public static final BlockType PALE_MOSS_BLOCK = get("minecraft:pale_moss_block");
+    @Nullable
+    public static final BlockType PALE_MOSS_CARPET = get("minecraft:pale_moss_carpet");
+    @Nullable
+    public static final BlockType PALE_OAK_BUTTON = get("minecraft:pale_oak_button");
+    @Nullable
+    public static final BlockType PALE_OAK_DOOR = get("minecraft:pale_oak_door");
+    @Nullable
+    public static final BlockType PALE_OAK_FENCE = get("minecraft:pale_oak_fence");
+    @Nullable
+    public static final BlockType PALE_OAK_FENCE_GATE = get("minecraft:pale_oak_fence_gate");
+    @Nullable
+    public static final BlockType PALE_OAK_HANGING_SIGN = get("minecraft:pale_oak_hanging_sign");
+    @Nullable
+    public static final BlockType PALE_OAK_LEAVES = get("minecraft:pale_oak_leaves");
+    @Nullable
+    public static final BlockType PALE_OAK_LOG = get("minecraft:pale_oak_log");
+    @Nullable
+    public static final BlockType PALE_OAK_PLANKS = get("minecraft:pale_oak_planks");
+    @Nullable
+    public static final BlockType PALE_OAK_PRESSURE_PLATE = get("minecraft:pale_oak_pressure_plate");
+    @Nullable
+    public static final BlockType PALE_OAK_SAPLING = get("minecraft:pale_oak_sapling");
+    @Nullable
+    public static final BlockType PALE_OAK_SHELF = get("minecraft:pale_oak_shelf");
+    @Nullable
+    public static final BlockType PALE_OAK_SIGN = get("minecraft:pale_oak_sign");
+    @Nullable
+    public static final BlockType PALE_OAK_SLAB = get("minecraft:pale_oak_slab");
+    @Nullable
+    public static final BlockType PALE_OAK_STAIRS = get("minecraft:pale_oak_stairs");
+    @Nullable
+    public static final BlockType PALE_OAK_TRAPDOOR = get("minecraft:pale_oak_trapdoor");
+    @Nullable
+    public static final BlockType PALE_OAK_WALL_HANGING_SIGN = get("minecraft:pale_oak_wall_hanging_sign");
+    @Nullable
+    public static final BlockType PALE_OAK_WALL_SIGN = get("minecraft:pale_oak_wall_sign");
+    @Nullable
+    public static final BlockType PALE_OAK_WOOD = get("minecraft:pale_oak_wood");
+    @Nullable
+    public static final BlockType PEARLESCENT_FROGLIGHT = get("minecraft:pearlescent_froglight");
+    @Nullable
+    public static final BlockType PEONY = get("minecraft:peony");
+    @Nullable
+    public static final BlockType PETRIFIED_OAK_SLAB = get("minecraft:petrified_oak_slab");
+    @Nullable
+    public static final BlockType PIGLIN_HEAD = get("minecraft:piglin_head");
+    @Nullable
+    public static final BlockType PIGLIN_WALL_HEAD = get("minecraft:piglin_wall_head");
+    @Nullable
+    public static final BlockType PINK_BANNER = get("minecraft:pink_banner");
+    @Nullable
+    public static final BlockType PINK_BED = get("minecraft:pink_bed");
+    @Nullable
+    public static final BlockType PINK_CANDLE = get("minecraft:pink_candle");
+    @Nullable
+    public static final BlockType PINK_CANDLE_CAKE = get("minecraft:pink_candle_cake");
+    @Nullable
+    public static final BlockType PINK_CARPET = get("minecraft:pink_carpet");
+    @Nullable
+    public static final BlockType PINK_CONCRETE = get("minecraft:pink_concrete");
+    @Nullable
+    public static final BlockType PINK_CONCRETE_POWDER = get("minecraft:pink_concrete_powder");
+    @Nullable
+    public static final BlockType PINK_GLAZED_TERRACOTTA = get("minecraft:pink_glazed_terracotta");
+    @Nullable
+    public static final BlockType PINK_PETALS = get("minecraft:pink_petals");
+    @Nullable
+    public static final BlockType PINK_SHULKER_BOX = get("minecraft:pink_shulker_box");
+    @Nullable
+    public static final BlockType PINK_STAINED_GLASS = get("minecraft:pink_stained_glass");
+    @Nullable
+    public static final BlockType PINK_STAINED_GLASS_PANE = get("minecraft:pink_stained_glass_pane");
+    @Nullable
+    public static final BlockType PINK_TERRACOTTA = get("minecraft:pink_terracotta");
+    @Nullable
+    public static final BlockType PINK_TULIP = get("minecraft:pink_tulip");
+    @Nullable
+    public static final BlockType PINK_WALL_BANNER = get("minecraft:pink_wall_banner");
+    @Nullable
+    public static final BlockType PINK_WOOL = get("minecraft:pink_wool");
+    @Nullable
+    public static final BlockType PISTON = get("minecraft:piston");
+    @Nullable
+    public static final BlockType PISTON_HEAD = get("minecraft:piston_head");
+    @Nullable
+    public static final BlockType PITCHER_CROP = get("minecraft:pitcher_crop");
+    @Nullable
+    public static final BlockType PITCHER_PLANT = get("minecraft:pitcher_plant");
+    @Nullable
+    public static final BlockType PLAYER_HEAD = get("minecraft:player_head");
+    @Nullable
+    public static final BlockType PLAYER_WALL_HEAD = get("minecraft:player_wall_head");
+    @Nullable
+    public static final BlockType PODZOL = get("minecraft:podzol");
+    @Nullable
+    public static final BlockType POINTED_DRIPSTONE = get("minecraft:pointed_dripstone");
+    @Nullable
+    public static final BlockType POLISHED_ANDESITE = get("minecraft:polished_andesite");
+    @Nullable
+    public static final BlockType POLISHED_ANDESITE_SLAB = get("minecraft:polished_andesite_slab");
+    @Nullable
+    public static final BlockType POLISHED_ANDESITE_STAIRS = get("minecraft:polished_andesite_stairs");
+    @Nullable
+    public static final BlockType POLISHED_BASALT = get("minecraft:polished_basalt");
+    @Nullable
+    public static final BlockType POLISHED_BLACKSTONE = get("minecraft:polished_blackstone");
+    @Nullable
+    public static final BlockType POLISHED_BLACKSTONE_BRICK_SLAB = get("minecraft:polished_blackstone_brick_slab");
+    @Nullable
+    public static final BlockType POLISHED_BLACKSTONE_BRICK_STAIRS = get("minecraft:polished_blackstone_brick_stairs");
+    @Nullable
+    public static final BlockType POLISHED_BLACKSTONE_BRICK_WALL = get("minecraft:polished_blackstone_brick_wall");
+    @Nullable
+    public static final BlockType POLISHED_BLACKSTONE_BRICKS = get("minecraft:polished_blackstone_bricks");
+    @Nullable
+    public static final BlockType POLISHED_BLACKSTONE_BUTTON = get("minecraft:polished_blackstone_button");
+    @Nullable
+    public static final BlockType POLISHED_BLACKSTONE_PRESSURE_PLATE = get("minecraft:polished_blackstone_pressure_plate");
+    @Nullable
+    public static final BlockType POLISHED_BLACKSTONE_SLAB = get("minecraft:polished_blackstone_slab");
+    @Nullable
+    public static final BlockType POLISHED_BLACKSTONE_STAIRS = get("minecraft:polished_blackstone_stairs");
+    @Nullable
+    public static final BlockType POLISHED_BLACKSTONE_WALL = get("minecraft:polished_blackstone_wall");
+    @Nullable
+    public static final BlockType POLISHED_CINNABAR = get("minecraft:polished_cinnabar");
+    @Nullable
+    public static final BlockType POLISHED_CINNABAR_SLAB = get("minecraft:polished_cinnabar_slab");
+    @Nullable
+    public static final BlockType POLISHED_CINNABAR_STAIRS = get("minecraft:polished_cinnabar_stairs");
+    @Nullable
+    public static final BlockType POLISHED_CINNABAR_WALL = get("minecraft:polished_cinnabar_wall");
+    @Nullable
+    public static final BlockType POLISHED_DEEPSLATE = get("minecraft:polished_deepslate");
+    @Nullable
+    public static final BlockType POLISHED_DEEPSLATE_SLAB = get("minecraft:polished_deepslate_slab");
+    @Nullable
+    public static final BlockType POLISHED_DEEPSLATE_STAIRS = get("minecraft:polished_deepslate_stairs");
+    @Nullable
+    public static final BlockType POLISHED_DEEPSLATE_WALL = get("minecraft:polished_deepslate_wall");
+    @Nullable
+    public static final BlockType POLISHED_DIORITE = get("minecraft:polished_diorite");
+    @Nullable
+    public static final BlockType POLISHED_DIORITE_SLAB = get("minecraft:polished_diorite_slab");
+    @Nullable
+    public static final BlockType POLISHED_DIORITE_STAIRS = get("minecraft:polished_diorite_stairs");
+    @Nullable
+    public static final BlockType POLISHED_GRANITE = get("minecraft:polished_granite");
+    @Nullable
+    public static final BlockType POLISHED_GRANITE_SLAB = get("minecraft:polished_granite_slab");
+    @Nullable
+    public static final BlockType POLISHED_GRANITE_STAIRS = get("minecraft:polished_granite_stairs");
+    @Nullable
+    public static final BlockType POLISHED_SULFUR = get("minecraft:polished_sulfur");
+    @Nullable
+    public static final BlockType POLISHED_SULFUR_SLAB = get("minecraft:polished_sulfur_slab");
+    @Nullable
+    public static final BlockType POLISHED_SULFUR_STAIRS = get("minecraft:polished_sulfur_stairs");
+    @Nullable
+    public static final BlockType POLISHED_SULFUR_WALL = get("minecraft:polished_sulfur_wall");
+    @Nullable
+    public static final BlockType POLISHED_TUFF = get("minecraft:polished_tuff");
+    @Nullable
+    public static final BlockType POLISHED_TUFF_SLAB = get("minecraft:polished_tuff_slab");
+    @Nullable
+    public static final BlockType POLISHED_TUFF_STAIRS = get("minecraft:polished_tuff_stairs");
+    @Nullable
+    public static final BlockType POLISHED_TUFF_WALL = get("minecraft:polished_tuff_wall");
+    @Nullable
+    public static final BlockType POPPY = get("minecraft:poppy");
+    @Nullable
+    public static final BlockType POTATOES = get("minecraft:potatoes");
+    @Nullable
+    public static final BlockType POTENT_SULFUR = get("minecraft:potent_sulfur");
+    @Nullable
+    public static final BlockType POTTED_ACACIA_SAPLING = get("minecraft:potted_acacia_sapling");
+    @Nullable
+    public static final BlockType POTTED_ALLIUM = get("minecraft:potted_allium");
+    @Nullable
+    public static final BlockType POTTED_AZALEA_BUSH = get("minecraft:potted_azalea_bush");
+    @Nullable
+    public static final BlockType POTTED_AZURE_BLUET = get("minecraft:potted_azure_bluet");
+    @Nullable
+    public static final BlockType POTTED_BAMBOO = get("minecraft:potted_bamboo");
+    @Nullable
+    public static final BlockType POTTED_BIRCH_SAPLING = get("minecraft:potted_birch_sapling");
+    @Nullable
+    public static final BlockType POTTED_BLUE_ORCHID = get("minecraft:potted_blue_orchid");
+    @Nullable
+    public static final BlockType POTTED_BROWN_MUSHROOM = get("minecraft:potted_brown_mushroom");
+    @Nullable
+    public static final BlockType POTTED_CACTUS = get("minecraft:potted_cactus");
+    @Nullable
+    public static final BlockType POTTED_CHERRY_SAPLING = get("minecraft:potted_cherry_sapling");
+    @Nullable
+    public static final BlockType POTTED_CLOSED_EYEBLOSSOM = get("minecraft:potted_closed_eyeblossom");
+    @Nullable
+    public static final BlockType POTTED_CORNFLOWER = get("minecraft:potted_cornflower");
+    @Nullable
+    public static final BlockType POTTED_CRIMSON_FUNGUS = get("minecraft:potted_crimson_fungus");
+    @Nullable
+    public static final BlockType POTTED_CRIMSON_ROOTS = get("minecraft:potted_crimson_roots");
+    @Nullable
+    public static final BlockType POTTED_DANDELION = get("minecraft:potted_dandelion");
+    @Nullable
+    public static final BlockType POTTED_DARK_OAK_SAPLING = get("minecraft:potted_dark_oak_sapling");
+    @Nullable
+    public static final BlockType POTTED_DEAD_BUSH = get("minecraft:potted_dead_bush");
+    @Nullable
+    public static final BlockType POTTED_FERN = get("minecraft:potted_fern");
+    @Nullable
+    public static final BlockType POTTED_FLOWERING_AZALEA_BUSH = get("minecraft:potted_flowering_azalea_bush");
+    @Nullable
+    public static final BlockType POTTED_GOLDEN_DANDELION = get("minecraft:potted_golden_dandelion");
+    @Nullable
+    public static final BlockType POTTED_JUNGLE_SAPLING = get("minecraft:potted_jungle_sapling");
+    @Nullable
+    public static final BlockType POTTED_LILY_OF_THE_VALLEY = get("minecraft:potted_lily_of_the_valley");
+    @Nullable
+    public static final BlockType POTTED_MANGROVE_PROPAGULE = get("minecraft:potted_mangrove_propagule");
+    @Nullable
+    public static final BlockType POTTED_OAK_SAPLING = get("minecraft:potted_oak_sapling");
+    @Nullable
+    public static final BlockType POTTED_OPEN_EYEBLOSSOM = get("minecraft:potted_open_eyeblossom");
+    @Nullable
+    public static final BlockType POTTED_ORANGE_TULIP = get("minecraft:potted_orange_tulip");
+    @Nullable
+    public static final BlockType POTTED_OXEYE_DAISY = get("minecraft:potted_oxeye_daisy");
+    @Nullable
+    public static final BlockType POTTED_PALE_OAK_SAPLING = get("minecraft:potted_pale_oak_sapling");
+    @Nullable
+    public static final BlockType POTTED_PINK_TULIP = get("minecraft:potted_pink_tulip");
+    @Nullable
+    public static final BlockType POTTED_POPPY = get("minecraft:potted_poppy");
+    @Nullable
+    public static final BlockType POTTED_RED_MUSHROOM = get("minecraft:potted_red_mushroom");
+    @Nullable
+    public static final BlockType POTTED_RED_TULIP = get("minecraft:potted_red_tulip");
+    @Nullable
+    public static final BlockType POTTED_SPRUCE_SAPLING = get("minecraft:potted_spruce_sapling");
+    @Nullable
+    public static final BlockType POTTED_TORCHFLOWER = get("minecraft:potted_torchflower");
+    @Nullable
+    public static final BlockType POTTED_WARPED_FUNGUS = get("minecraft:potted_warped_fungus");
+    @Nullable
+    public static final BlockType POTTED_WARPED_ROOTS = get("minecraft:potted_warped_roots");
+    @Nullable
+    public static final BlockType POTTED_WHITE_TULIP = get("minecraft:potted_white_tulip");
+    @Nullable
+    public static final BlockType POTTED_WITHER_ROSE = get("minecraft:potted_wither_rose");
+    @Nullable
+    public static final BlockType POWDER_SNOW = get("minecraft:powder_snow");
+    @Nullable
+    public static final BlockType POWDER_SNOW_CAULDRON = get("minecraft:powder_snow_cauldron");
+    @Nullable
+    public static final BlockType POWERED_RAIL = get("minecraft:powered_rail");
+    @Nullable
+    public static final BlockType PRISMARINE = get("minecraft:prismarine");
+    @Nullable
+    public static final BlockType PRISMARINE_BRICK_SLAB = get("minecraft:prismarine_brick_slab");
+    @Nullable
+    public static final BlockType PRISMARINE_BRICK_STAIRS = get("minecraft:prismarine_brick_stairs");
+    @Nullable
+    public static final BlockType PRISMARINE_BRICKS = get("minecraft:prismarine_bricks");
+    @Nullable
+    public static final BlockType PRISMARINE_SLAB = get("minecraft:prismarine_slab");
+    @Nullable
+    public static final BlockType PRISMARINE_STAIRS = get("minecraft:prismarine_stairs");
+    @Nullable
+    public static final BlockType PRISMARINE_WALL = get("minecraft:prismarine_wall");
+    @Nullable
+    public static final BlockType PUMPKIN = get("minecraft:pumpkin");
+    @Nullable
+    public static final BlockType PUMPKIN_STEM = get("minecraft:pumpkin_stem");
+    @Nullable
+    public static final BlockType PURPLE_BANNER = get("minecraft:purple_banner");
+    @Nullable
+    public static final BlockType PURPLE_BED = get("minecraft:purple_bed");
+    @Nullable
+    public static final BlockType PURPLE_CANDLE = get("minecraft:purple_candle");
+    @Nullable
+    public static final BlockType PURPLE_CANDLE_CAKE = get("minecraft:purple_candle_cake");
+    @Nullable
+    public static final BlockType PURPLE_CARPET = get("minecraft:purple_carpet");
+    @Nullable
+    public static final BlockType PURPLE_CONCRETE = get("minecraft:purple_concrete");
+    @Nullable
+    public static final BlockType PURPLE_CONCRETE_POWDER = get("minecraft:purple_concrete_powder");
+    @Nullable
+    public static final BlockType PURPLE_GLAZED_TERRACOTTA = get("minecraft:purple_glazed_terracotta");
+    @Nullable
+    public static final BlockType PURPLE_SHULKER_BOX = get("minecraft:purple_shulker_box");
+    @Nullable
+    public static final BlockType PURPLE_STAINED_GLASS = get("minecraft:purple_stained_glass");
+    @Nullable
+    public static final BlockType PURPLE_STAINED_GLASS_PANE = get("minecraft:purple_stained_glass_pane");
+    @Nullable
+    public static final BlockType PURPLE_TERRACOTTA = get("minecraft:purple_terracotta");
+    @Nullable
+    public static final BlockType PURPLE_WALL_BANNER = get("minecraft:purple_wall_banner");
+    @Nullable
+    public static final BlockType PURPLE_WOOL = get("minecraft:purple_wool");
+    @Nullable
+    public static final BlockType PURPUR_BLOCK = get("minecraft:purpur_block");
+    @Nullable
+    public static final BlockType PURPUR_PILLAR = get("minecraft:purpur_pillar");
+    @Nullable
+    public static final BlockType PURPUR_SLAB = get("minecraft:purpur_slab");
+    @Nullable
+    public static final BlockType PURPUR_STAIRS = get("minecraft:purpur_stairs");
+    @Nullable
+    public static final BlockType QUARTZ_BLOCK = get("minecraft:quartz_block");
+    @Nullable
+    public static final BlockType QUARTZ_BRICKS = get("minecraft:quartz_bricks");
+    @Nullable
+    public static final BlockType QUARTZ_PILLAR = get("minecraft:quartz_pillar");
+    @Nullable
+    public static final BlockType QUARTZ_SLAB = get("minecraft:quartz_slab");
+    @Nullable
+    public static final BlockType QUARTZ_STAIRS = get("minecraft:quartz_stairs");
+    @Nullable
+    public static final BlockType RAIL = get("minecraft:rail");
+    @Nullable
+    public static final BlockType RAW_COPPER_BLOCK = get("minecraft:raw_copper_block");
+    @Nullable
+    public static final BlockType RAW_GOLD_BLOCK = get("minecraft:raw_gold_block");
+    @Nullable
+    public static final BlockType RAW_IRON_BLOCK = get("minecraft:raw_iron_block");
+    @Nullable
+    public static final BlockType RED_BANNER = get("minecraft:red_banner");
+    @Nullable
+    public static final BlockType RED_BED = get("minecraft:red_bed");
+    @Nullable
+    public static final BlockType RED_CANDLE = get("minecraft:red_candle");
+    @Nullable
+    public static final BlockType RED_CANDLE_CAKE = get("minecraft:red_candle_cake");
+    @Nullable
+    public static final BlockType RED_CARPET = get("minecraft:red_carpet");
+    @Nullable
+    public static final BlockType RED_CONCRETE = get("minecraft:red_concrete");
+    @Nullable
+    public static final BlockType RED_CONCRETE_POWDER = get("minecraft:red_concrete_powder");
+    @Nullable
+    public static final BlockType RED_GLAZED_TERRACOTTA = get("minecraft:red_glazed_terracotta");
+    @Nullable
+    public static final BlockType RED_MUSHROOM = get("minecraft:red_mushroom");
+    @Nullable
+    public static final BlockType RED_MUSHROOM_BLOCK = get("minecraft:red_mushroom_block");
+    @Nullable
+    public static final BlockType RED_NETHER_BRICK_SLAB = get("minecraft:red_nether_brick_slab");
+    @Nullable
+    public static final BlockType RED_NETHER_BRICK_STAIRS = get("minecraft:red_nether_brick_stairs");
+    @Nullable
+    public static final BlockType RED_NETHER_BRICK_WALL = get("minecraft:red_nether_brick_wall");
+    @Nullable
+    public static final BlockType RED_NETHER_BRICKS = get("minecraft:red_nether_bricks");
+    @Nullable
+    public static final BlockType RED_SAND = get("minecraft:red_sand");
+    @Nullable
+    public static final BlockType RED_SANDSTONE = get("minecraft:red_sandstone");
+    @Nullable
+    public static final BlockType RED_SANDSTONE_SLAB = get("minecraft:red_sandstone_slab");
+    @Nullable
+    public static final BlockType RED_SANDSTONE_STAIRS = get("minecraft:red_sandstone_stairs");
+    @Nullable
+    public static final BlockType RED_SANDSTONE_WALL = get("minecraft:red_sandstone_wall");
+    @Nullable
+    public static final BlockType RED_SHULKER_BOX = get("minecraft:red_shulker_box");
+    @Nullable
+    public static final BlockType RED_STAINED_GLASS = get("minecraft:red_stained_glass");
+    @Nullable
+    public static final BlockType RED_STAINED_GLASS_PANE = get("minecraft:red_stained_glass_pane");
+    @Nullable
+    public static final BlockType RED_TERRACOTTA = get("minecraft:red_terracotta");
+    @Nullable
+    public static final BlockType RED_TULIP = get("minecraft:red_tulip");
+    @Nullable
+    public static final BlockType RED_WALL_BANNER = get("minecraft:red_wall_banner");
+    @Nullable
+    public static final BlockType RED_WOOL = get("minecraft:red_wool");
+    @Nullable
+    public static final BlockType REDSTONE_BLOCK = get("minecraft:redstone_block");
+    @Nullable
+    public static final BlockType REDSTONE_LAMP = get("minecraft:redstone_lamp");
+    @Nullable
+    public static final BlockType REDSTONE_ORE = get("minecraft:redstone_ore");
+    @Nullable
+    public static final BlockType REDSTONE_TORCH = get("minecraft:redstone_torch");
+    @Nullable
+    public static final BlockType REDSTONE_WALL_TORCH = get("minecraft:redstone_wall_torch");
+    @Nullable
+    public static final BlockType REDSTONE_WIRE = get("minecraft:redstone_wire");
+    @Nullable
+    public static final BlockType REINFORCED_DEEPSLATE = get("minecraft:reinforced_deepslate");
+    @Nullable
+    public static final BlockType REPEATER = get("minecraft:repeater");
+    @Nullable
+    public static final BlockType REPEATING_COMMAND_BLOCK = get("minecraft:repeating_command_block");
+    @Nullable
+    public static final BlockType RESIN_BLOCK = get("minecraft:resin_block");
+    @Nullable
+    public static final BlockType RESIN_BRICK_SLAB = get("minecraft:resin_brick_slab");
+    @Nullable
+    public static final BlockType RESIN_BRICK_STAIRS = get("minecraft:resin_brick_stairs");
+    @Nullable
+    public static final BlockType RESIN_BRICK_WALL = get("minecraft:resin_brick_wall");
+    @Nullable
+    public static final BlockType RESIN_BRICKS = get("minecraft:resin_bricks");
+    @Nullable
+    public static final BlockType RESIN_CLUMP = get("minecraft:resin_clump");
+    @Nullable
+    public static final BlockType RESPAWN_ANCHOR = get("minecraft:respawn_anchor");
+    @Nullable
+    public static final BlockType ROOTED_DIRT = get("minecraft:rooted_dirt");
+    @Nullable
+    public static final BlockType ROSE_BUSH = get("minecraft:rose_bush");
+    @Nullable
+    public static final BlockType SAND = get("minecraft:sand");
+    @Nullable
+    public static final BlockType SANDSTONE = get("minecraft:sandstone");
+    @Nullable
+    public static final BlockType SANDSTONE_SLAB = get("minecraft:sandstone_slab");
+    @Nullable
+    public static final BlockType SANDSTONE_STAIRS = get("minecraft:sandstone_stairs");
+    @Nullable
+    public static final BlockType SANDSTONE_WALL = get("minecraft:sandstone_wall");
+    @Nullable
+    public static final BlockType SCAFFOLDING = get("minecraft:scaffolding");
+    @Nullable
+    public static final BlockType SCULK = get("minecraft:sculk");
+    @Nullable
+    public static final BlockType SCULK_CATALYST = get("minecraft:sculk_catalyst");
+    @Nullable
+    public static final BlockType SCULK_SENSOR = get("minecraft:sculk_sensor");
+    @Nullable
+    public static final BlockType SCULK_SHRIEKER = get("minecraft:sculk_shrieker");
+    @Nullable
+    public static final BlockType SCULK_VEIN = get("minecraft:sculk_vein");
+    @Nullable
+    public static final BlockType SEA_LANTERN = get("minecraft:sea_lantern");
+    @Nullable
+    public static final BlockType SEA_PICKLE = get("minecraft:sea_pickle");
+    @Nullable
+    public static final BlockType SEAGRASS = get("minecraft:seagrass");
+    @Nullable
+    public static final BlockType SHORT_DRY_GRASS = get("minecraft:short_dry_grass");
+    @Nullable
+    public static final BlockType SHORT_GRASS = get("minecraft:short_grass");
+    @Nullable
+    public static final BlockType SHROOMLIGHT = get("minecraft:shroomlight");
+    @Nullable
+    public static final BlockType SHULKER_BOX = get("minecraft:shulker_box");
+    @Deprecated
+    @Nullable
+    public static final BlockType SIGN = get("minecraft:sign");
+    @Nullable
+    public static final BlockType SKELETON_SKULL = get("minecraft:skeleton_skull");
+    @Nullable
+    public static final BlockType SKELETON_WALL_SKULL = get("minecraft:skeleton_wall_skull");
+    @Nullable
+    public static final BlockType SLIME_BLOCK = get("minecraft:slime_block");
+    @Nullable
+    public static final BlockType SMALL_AMETHYST_BUD = get("minecraft:small_amethyst_bud");
+    @Nullable
+    public static final BlockType SMALL_DRIPLEAF = get("minecraft:small_dripleaf");
+    @Nullable
+    public static final BlockType SMITHING_TABLE = get("minecraft:smithing_table");
+    @Nullable
+    public static final BlockType SMOKER = get("minecraft:smoker");
+    @Nullable
+    public static final BlockType SMOOTH_BASALT = get("minecraft:smooth_basalt");
+    @Nullable
+    public static final BlockType SMOOTH_QUARTZ = get("minecraft:smooth_quartz");
+    @Nullable
+    public static final BlockType SMOOTH_QUARTZ_SLAB = get("minecraft:smooth_quartz_slab");
+    @Nullable
+    public static final BlockType SMOOTH_QUARTZ_STAIRS = get("minecraft:smooth_quartz_stairs");
+    @Nullable
+    public static final BlockType SMOOTH_RED_SANDSTONE = get("minecraft:smooth_red_sandstone");
+    @Nullable
+    public static final BlockType SMOOTH_RED_SANDSTONE_SLAB = get("minecraft:smooth_red_sandstone_slab");
+    @Nullable
+    public static final BlockType SMOOTH_RED_SANDSTONE_STAIRS = get("minecraft:smooth_red_sandstone_stairs");
+    @Nullable
+    public static final BlockType SMOOTH_SANDSTONE = get("minecraft:smooth_sandstone");
+    @Nullable
+    public static final BlockType SMOOTH_SANDSTONE_SLAB = get("minecraft:smooth_sandstone_slab");
+    @Nullable
+    public static final BlockType SMOOTH_SANDSTONE_STAIRS = get("minecraft:smooth_sandstone_stairs");
+    @Nullable
+    public static final BlockType SMOOTH_STONE = get("minecraft:smooth_stone");
+    @Nullable
+    public static final BlockType SMOOTH_STONE_SLAB = get("minecraft:smooth_stone_slab");
+    @Nullable
+    public static final BlockType SNIFFER_EGG = get("minecraft:sniffer_egg");
+    @Nullable
+    public static final BlockType SNOW = get("minecraft:snow");
+    @Nullable
+    public static final BlockType SNOW_BLOCK = get("minecraft:snow_block");
+    @Nullable
+    public static final BlockType SOUL_CAMPFIRE = get("minecraft:soul_campfire");
+    @Nullable
+    public static final BlockType SOUL_FIRE = get("minecraft:soul_fire");
+    @Nullable
+    public static final BlockType SOUL_LANTERN = get("minecraft:soul_lantern");
+    @Nullable
+    public static final BlockType SOUL_SAND = get("minecraft:soul_sand");
+    @Nullable
+    public static final BlockType SOUL_SOIL = get("minecraft:soul_soil");
+    @Nullable
+    public static final BlockType SOUL_TORCH = get("minecraft:soul_torch");
+    @Nullable
+    public static final BlockType SOUL_WALL_TORCH = get("minecraft:soul_wall_torch");
+    @Nullable
+    public static final BlockType SPAWNER = get("minecraft:spawner");
+    @Nullable
+    public static final BlockType SPONGE = get("minecraft:sponge");
+    @Nullable
+    public static final BlockType SPORE_BLOSSOM = get("minecraft:spore_blossom");
+    @Nullable
+    public static final BlockType SPRUCE_BUTTON = get("minecraft:spruce_button");
+    @Nullable
+    public static final BlockType SPRUCE_DOOR = get("minecraft:spruce_door");
+    @Nullable
+    public static final BlockType SPRUCE_FENCE = get("minecraft:spruce_fence");
+    @Nullable
+    public static final BlockType SPRUCE_FENCE_GATE = get("minecraft:spruce_fence_gate");
+    @Nullable
+    public static final BlockType SPRUCE_HANGING_SIGN = get("minecraft:spruce_hanging_sign");
+    @Nullable
+    public static final BlockType SPRUCE_LEAVES = get("minecraft:spruce_leaves");
+    @Nullable
+    public static final BlockType SPRUCE_LOG = get("minecraft:spruce_log");
+    @Nullable
+    public static final BlockType SPRUCE_PLANKS = get("minecraft:spruce_planks");
+    @Nullable
+    public static final BlockType SPRUCE_PRESSURE_PLATE = get("minecraft:spruce_pressure_plate");
+    @Nullable
+    public static final BlockType SPRUCE_SAPLING = get("minecraft:spruce_sapling");
+    @Nullable
+    public static final BlockType SPRUCE_SHELF = get("minecraft:spruce_shelf");
+    @Nullable
+    public static final BlockType SPRUCE_SIGN = get("minecraft:spruce_sign");
+    @Nullable
+    public static final BlockType SPRUCE_SLAB = get("minecraft:spruce_slab");
+    @Nullable
+    public static final BlockType SPRUCE_STAIRS = get("minecraft:spruce_stairs");
+    @Nullable
+    public static final BlockType SPRUCE_TRAPDOOR = get("minecraft:spruce_trapdoor");
+    @Nullable
+    public static final BlockType SPRUCE_WALL_HANGING_SIGN = get("minecraft:spruce_wall_hanging_sign");
+    @Nullable
+    public static final BlockType SPRUCE_WALL_SIGN = get("minecraft:spruce_wall_sign");
+    @Nullable
+    public static final BlockType SPRUCE_WOOD = get("minecraft:spruce_wood");
+    @Nullable
+    public static final BlockType STICKY_PISTON = get("minecraft:sticky_piston");
+    @Nullable
+    public static final BlockType STONE = get("minecraft:stone");
+    @Nullable
+    public static final BlockType STONE_BRICK_SLAB = get("minecraft:stone_brick_slab");
+    @Nullable
+    public static final BlockType STONE_BRICK_STAIRS = get("minecraft:stone_brick_stairs");
+    @Nullable
+    public static final BlockType STONE_BRICK_WALL = get("minecraft:stone_brick_wall");
+    @Nullable
+    public static final BlockType STONE_BRICKS = get("minecraft:stone_bricks");
+    @Nullable
+    public static final BlockType STONE_BUTTON = get("minecraft:stone_button");
+    @Nullable
+    public static final BlockType STONE_PRESSURE_PLATE = get("minecraft:stone_pressure_plate");
+    @Nullable
+    public static final BlockType STONE_SLAB = get("minecraft:stone_slab");
+    @Nullable
+    public static final BlockType STONE_STAIRS = get("minecraft:stone_stairs");
+    @Nullable
+    public static final BlockType STONECUTTER = get("minecraft:stonecutter");
+    @Nullable
+    public static final BlockType STRIPPED_ACACIA_LOG = get("minecraft:stripped_acacia_log");
+    @Nullable
+    public static final BlockType STRIPPED_ACACIA_WOOD = get("minecraft:stripped_acacia_wood");
+    @Nullable
+    public static final BlockType STRIPPED_BAMBOO_BLOCK = get("minecraft:stripped_bamboo_block");
+    @Nullable
+    public static final BlockType STRIPPED_BIRCH_LOG = get("minecraft:stripped_birch_log");
+    @Nullable
+    public static final BlockType STRIPPED_BIRCH_WOOD = get("minecraft:stripped_birch_wood");
+    @Nullable
+    public static final BlockType STRIPPED_CHERRY_LOG = get("minecraft:stripped_cherry_log");
+    @Nullable
+    public static final BlockType STRIPPED_CHERRY_WOOD = get("minecraft:stripped_cherry_wood");
+    @Nullable
+    public static final BlockType STRIPPED_CRIMSON_HYPHAE = get("minecraft:stripped_crimson_hyphae");
+    @Nullable
+    public static final BlockType STRIPPED_CRIMSON_STEM = get("minecraft:stripped_crimson_stem");
+    @Nullable
+    public static final BlockType STRIPPED_DARK_OAK_LOG = get("minecraft:stripped_dark_oak_log");
+    @Nullable
+    public static final BlockType STRIPPED_DARK_OAK_WOOD = get("minecraft:stripped_dark_oak_wood");
+    @Nullable
+    public static final BlockType STRIPPED_JUNGLE_LOG = get("minecraft:stripped_jungle_log");
+    @Nullable
+    public static final BlockType STRIPPED_JUNGLE_WOOD = get("minecraft:stripped_jungle_wood");
+    @Nullable
+    public static final BlockType STRIPPED_MANGROVE_LOG = get("minecraft:stripped_mangrove_log");
+    @Nullable
+    public static final BlockType STRIPPED_MANGROVE_WOOD = get("minecraft:stripped_mangrove_wood");
+    @Nullable
+    public static final BlockType STRIPPED_OAK_LOG = get("minecraft:stripped_oak_log");
+    @Nullable
+    public static final BlockType STRIPPED_OAK_WOOD = get("minecraft:stripped_oak_wood");
+    @Nullable
+    public static final BlockType STRIPPED_PALE_OAK_LOG = get("minecraft:stripped_pale_oak_log");
+    @Nullable
+    public static final BlockType STRIPPED_PALE_OAK_WOOD = get("minecraft:stripped_pale_oak_wood");
+    @Nullable
+    public static final BlockType STRIPPED_SPRUCE_LOG = get("minecraft:stripped_spruce_log");
+    @Nullable
+    public static final BlockType STRIPPED_SPRUCE_WOOD = get("minecraft:stripped_spruce_wood");
+    @Nullable
+    public static final BlockType STRIPPED_WARPED_HYPHAE = get("minecraft:stripped_warped_hyphae");
+    @Nullable
+    public static final BlockType STRIPPED_WARPED_STEM = get("minecraft:stripped_warped_stem");
+    @Nullable
+    public static final BlockType STRUCTURE_BLOCK = get("minecraft:structure_block");
+    @Nullable
+    public static final BlockType STRUCTURE_VOID = get("minecraft:structure_void");
+    @Nullable
+    public static final BlockType SUGAR_CANE = get("minecraft:sugar_cane");
+    @Nullable
+    public static final BlockType SULFUR = get("minecraft:sulfur");
+    @Nullable
+    public static final BlockType SULFUR_BRICK_SLAB = get("minecraft:sulfur_brick_slab");
+    @Nullable
+    public static final BlockType SULFUR_BRICK_STAIRS = get("minecraft:sulfur_brick_stairs");
+    @Nullable
+    public static final BlockType SULFUR_BRICK_WALL = get("minecraft:sulfur_brick_wall");
+    @Nullable
+    public static final BlockType SULFUR_BRICKS = get("minecraft:sulfur_bricks");
+    @Nullable
+    public static final BlockType SULFUR_SLAB = get("minecraft:sulfur_slab");
+    @Nullable
+    public static final BlockType SULFUR_SPIKE = get("minecraft:sulfur_spike");
+    @Nullable
+    public static final BlockType SULFUR_STAIRS = get("minecraft:sulfur_stairs");
+    @Nullable
+    public static final BlockType SULFUR_WALL = get("minecraft:sulfur_wall");
+    @Nullable
+    public static final BlockType SUNFLOWER = get("minecraft:sunflower");
+    @Nullable
+    public static final BlockType SUSPICIOUS_GRAVEL = get("minecraft:suspicious_gravel");
+    @Nullable
+    public static final BlockType SUSPICIOUS_SAND = get("minecraft:suspicious_sand");
+    @Nullable
+    public static final BlockType SWEET_BERRY_BUSH = get("minecraft:sweet_berry_bush");
+    @Nullable
+    public static final BlockType TALL_DRY_GRASS = get("minecraft:tall_dry_grass");
+    @Nullable
+    public static final BlockType TALL_GRASS = get("minecraft:tall_grass");
+    @Nullable
+    public static final BlockType TALL_SEAGRASS = get("minecraft:tall_seagrass");
+    @Nullable
+    public static final BlockType TARGET = get("minecraft:target");
+    @Nullable
+    public static final BlockType TERRACOTTA = get("minecraft:terracotta");
+    @Nullable
+    public static final BlockType TEST_BLOCK = get("minecraft:test_block");
+    @Nullable
+    public static final BlockType TEST_INSTANCE_BLOCK = get("minecraft:test_instance_block");
+    @Nullable
+    public static final BlockType TINTED_GLASS = get("minecraft:tinted_glass");
+    @Nullable
+    public static final BlockType TNT = get("minecraft:tnt");
+    @Nullable
+    public static final BlockType TORCH = get("minecraft:torch");
+    @Nullable
+    public static final BlockType TORCHFLOWER = get("minecraft:torchflower");
+    @Nullable
+    public static final BlockType TORCHFLOWER_CROP = get("minecraft:torchflower_crop");
+    @Nullable
+    public static final BlockType TRAPPED_CHEST = get("minecraft:trapped_chest");
+    @Nullable
+    public static final BlockType TRIAL_SPAWNER = get("minecraft:trial_spawner");
+    @Nullable
+    public static final BlockType TRIPWIRE = get("minecraft:tripwire");
+    @Nullable
+    public static final BlockType TRIPWIRE_HOOK = get("minecraft:tripwire_hook");
+    @Nullable
+    public static final BlockType TUBE_CORAL = get("minecraft:tube_coral");
+    @Nullable
+    public static final BlockType TUBE_CORAL_BLOCK = get("minecraft:tube_coral_block");
+    @Nullable
+    public static final BlockType TUBE_CORAL_FAN = get("minecraft:tube_coral_fan");
+    @Nullable
+    public static final BlockType TUBE_CORAL_WALL_FAN = get("minecraft:tube_coral_wall_fan");
+    @Nullable
+    public static final BlockType TUFF = get("minecraft:tuff");
+    @Nullable
+    public static final BlockType TUFF_BRICK_SLAB = get("minecraft:tuff_brick_slab");
+    @Nullable
+    public static final BlockType TUFF_BRICK_STAIRS = get("minecraft:tuff_brick_stairs");
+    @Nullable
+    public static final BlockType TUFF_BRICK_WALL = get("minecraft:tuff_brick_wall");
+    @Nullable
+    public static final BlockType TUFF_BRICKS = get("minecraft:tuff_bricks");
+    @Nullable
+    public static final BlockType TUFF_SLAB = get("minecraft:tuff_slab");
+    @Nullable
+    public static final BlockType TUFF_STAIRS = get("minecraft:tuff_stairs");
+    @Nullable
+    public static final BlockType TUFF_WALL = get("minecraft:tuff_wall");
+    @Nullable
+    public static final BlockType TURTLE_EGG = get("minecraft:turtle_egg");
+    @Nullable
+    public static final BlockType TWISTING_VINES = get("minecraft:twisting_vines");
+    @Nullable
+    public static final BlockType TWISTING_VINES_PLANT = get("minecraft:twisting_vines_plant");
+    @Nullable
+    public static final BlockType VAULT = get("minecraft:vault");
+    @Nullable
+    public static final BlockType VERDANT_FROGLIGHT = get("minecraft:verdant_froglight");
+    @Nullable
+    public static final BlockType VINE = get("minecraft:vine");
+    @Nullable
+    public static final BlockType VOID_AIR = get("minecraft:void_air");
+    @Deprecated
+    @Nullable
+    public static final BlockType WALL_SIGN = get("minecraft:wall_sign");
+    @Nullable
+    public static final BlockType WALL_TORCH = get("minecraft:wall_torch");
+    @Nullable
+    public static final BlockType WARPED_BUTTON = get("minecraft:warped_button");
+    @Nullable
+    public static final BlockType WARPED_DOOR = get("minecraft:warped_door");
+    @Nullable
+    public static final BlockType WARPED_FENCE = get("minecraft:warped_fence");
+    @Nullable
+    public static final BlockType WARPED_FENCE_GATE = get("minecraft:warped_fence_gate");
+    @Nullable
+    public static final BlockType WARPED_FUNGUS = get("minecraft:warped_fungus");
+    @Nullable
+    public static final BlockType WARPED_HANGING_SIGN = get("minecraft:warped_hanging_sign");
+    @Nullable
+    public static final BlockType WARPED_HYPHAE = get("minecraft:warped_hyphae");
+    @Nullable
+    public static final BlockType WARPED_NYLIUM = get("minecraft:warped_nylium");
+    @Nullable
+    public static final BlockType WARPED_PLANKS = get("minecraft:warped_planks");
+    @Nullable
+    public static final BlockType WARPED_PRESSURE_PLATE = get("minecraft:warped_pressure_plate");
+    @Nullable
+    public static final BlockType WARPED_ROOTS = get("minecraft:warped_roots");
+    @Nullable
+    public static final BlockType WARPED_SHELF = get("minecraft:warped_shelf");
+    @Nullable
+    public static final BlockType WARPED_SIGN = get("minecraft:warped_sign");
+    @Nullable
+    public static final BlockType WARPED_SLAB = get("minecraft:warped_slab");
+    @Nullable
+    public static final BlockType WARPED_STAIRS = get("minecraft:warped_stairs");
+    @Nullable
+    public static final BlockType WARPED_STEM = get("minecraft:warped_stem");
+    @Nullable
+    public static final BlockType WARPED_TRAPDOOR = get("minecraft:warped_trapdoor");
+    @Nullable
+    public static final BlockType WARPED_WALL_HANGING_SIGN = get("minecraft:warped_wall_hanging_sign");
+    @Nullable
+    public static final BlockType WARPED_WALL_SIGN = get("minecraft:warped_wall_sign");
+    @Nullable
+    public static final BlockType WARPED_WART_BLOCK = get("minecraft:warped_wart_block");
+    @Nullable
+    public static final BlockType WATER = get("minecraft:water");
+    @Nullable
+    public static final BlockType WATER_CAULDRON = get("minecraft:water_cauldron");
+    @Nullable
+    public static final BlockType WAXED_CHISELED_COPPER = get("minecraft:waxed_chiseled_copper");
+    @Nullable
+    public static final BlockType WAXED_COPPER_BARS = get("minecraft:waxed_copper_bars");
+    @Nullable
+    public static final BlockType WAXED_COPPER_BLOCK = get("minecraft:waxed_copper_block");
+    @Nullable
+    public static final BlockType WAXED_COPPER_BULB = get("minecraft:waxed_copper_bulb");
+    @Nullable
+    public static final BlockType WAXED_COPPER_CHAIN = get("minecraft:waxed_copper_chain");
+    @Nullable
+    public static final BlockType WAXED_COPPER_CHEST = get("minecraft:waxed_copper_chest");
+    @Nullable
+    public static final BlockType WAXED_COPPER_DOOR = get("minecraft:waxed_copper_door");
+    @Nullable
+    public static final BlockType WAXED_COPPER_GOLEM_STATUE = get("minecraft:waxed_copper_golem_statue");
+    @Nullable
+    public static final BlockType WAXED_COPPER_GRATE = get("minecraft:waxed_copper_grate");
+    @Nullable
+    public static final BlockType WAXED_COPPER_LANTERN = get("minecraft:waxed_copper_lantern");
+    @Nullable
+    public static final BlockType WAXED_COPPER_TRAPDOOR = get("minecraft:waxed_copper_trapdoor");
+    @Nullable
+    public static final BlockType WAXED_CUT_COPPER = get("minecraft:waxed_cut_copper");
+    @Nullable
+    public static final BlockType WAXED_CUT_COPPER_SLAB = get("minecraft:waxed_cut_copper_slab");
+    @Nullable
+    public static final BlockType WAXED_CUT_COPPER_STAIRS = get("minecraft:waxed_cut_copper_stairs");
+    @Nullable
+    public static final BlockType WAXED_EXPOSED_CHISELED_COPPER = get("minecraft:waxed_exposed_chiseled_copper");
+    @Nullable
+    public static final BlockType WAXED_EXPOSED_COPPER = get("minecraft:waxed_exposed_copper");
+    @Nullable
+    public static final BlockType WAXED_EXPOSED_COPPER_BARS = get("minecraft:waxed_exposed_copper_bars");
+    @Nullable
+    public static final BlockType WAXED_EXPOSED_COPPER_BULB = get("minecraft:waxed_exposed_copper_bulb");
+    @Nullable
+    public static final BlockType WAXED_EXPOSED_COPPER_CHAIN = get("minecraft:waxed_exposed_copper_chain");
+    @Nullable
+    public static final BlockType WAXED_EXPOSED_COPPER_CHEST = get("minecraft:waxed_exposed_copper_chest");
+    @Nullable
+    public static final BlockType WAXED_EXPOSED_COPPER_DOOR = get("minecraft:waxed_exposed_copper_door");
+    @Nullable
+    public static final BlockType WAXED_EXPOSED_COPPER_GOLEM_STATUE = get("minecraft:waxed_exposed_copper_golem_statue");
+    @Nullable
+    public static final BlockType WAXED_EXPOSED_COPPER_GRATE = get("minecraft:waxed_exposed_copper_grate");
+    @Nullable
+    public static final BlockType WAXED_EXPOSED_COPPER_LANTERN = get("minecraft:waxed_exposed_copper_lantern");
+    @Nullable
+    public static final BlockType WAXED_EXPOSED_COPPER_TRAPDOOR = get("minecraft:waxed_exposed_copper_trapdoor");
+    @Nullable
+    public static final BlockType WAXED_EXPOSED_CUT_COPPER = get("minecraft:waxed_exposed_cut_copper");
+    @Nullable
+    public static final BlockType WAXED_EXPOSED_CUT_COPPER_SLAB = get("minecraft:waxed_exposed_cut_copper_slab");
+    @Nullable
+    public static final BlockType WAXED_EXPOSED_CUT_COPPER_STAIRS = get("minecraft:waxed_exposed_cut_copper_stairs");
+    @Nullable
+    public static final BlockType WAXED_EXPOSED_LIGHTNING_ROD = get("minecraft:waxed_exposed_lightning_rod");
+    @Nullable
+    public static final BlockType WAXED_LIGHTNING_ROD = get("minecraft:waxed_lightning_rod");
+    @Nullable
+    public static final BlockType WAXED_OXIDIZED_CHISELED_COPPER = get("minecraft:waxed_oxidized_chiseled_copper");
+    @Nullable
+    public static final BlockType WAXED_OXIDIZED_COPPER = get("minecraft:waxed_oxidized_copper");
+    @Nullable
+    public static final BlockType WAXED_OXIDIZED_COPPER_BARS = get("minecraft:waxed_oxidized_copper_bars");
+    @Nullable
+    public static final BlockType WAXED_OXIDIZED_COPPER_BULB = get("minecraft:waxed_oxidized_copper_bulb");
+    @Nullable
+    public static final BlockType WAXED_OXIDIZED_COPPER_CHAIN = get("minecraft:waxed_oxidized_copper_chain");
+    @Nullable
+    public static final BlockType WAXED_OXIDIZED_COPPER_CHEST = get("minecraft:waxed_oxidized_copper_chest");
+    @Nullable
+    public static final BlockType WAXED_OXIDIZED_COPPER_DOOR = get("minecraft:waxed_oxidized_copper_door");
+    @Nullable
+    public static final BlockType WAXED_OXIDIZED_COPPER_GOLEM_STATUE = get("minecraft:waxed_oxidized_copper_golem_statue");
+    @Nullable
+    public static final BlockType WAXED_OXIDIZED_COPPER_GRATE = get("minecraft:waxed_oxidized_copper_grate");
+    @Nullable
+    public static final BlockType WAXED_OXIDIZED_COPPER_LANTERN = get("minecraft:waxed_oxidized_copper_lantern");
+    @Nullable
+    public static final BlockType WAXED_OXIDIZED_COPPER_TRAPDOOR = get("minecraft:waxed_oxidized_copper_trapdoor");
+    @Nullable
+    public static final BlockType WAXED_OXIDIZED_CUT_COPPER = get("minecraft:waxed_oxidized_cut_copper");
+    @Nullable
+    public static final BlockType WAXED_OXIDIZED_CUT_COPPER_SLAB = get("minecraft:waxed_oxidized_cut_copper_slab");
+    @Nullable
+    public static final BlockType WAXED_OXIDIZED_CUT_COPPER_STAIRS = get("minecraft:waxed_oxidized_cut_copper_stairs");
+    @Nullable
+    public static final BlockType WAXED_OXIDIZED_LIGHTNING_ROD = get("minecraft:waxed_oxidized_lightning_rod");
+    @Nullable
+    public static final BlockType WAXED_WEATHERED_CHISELED_COPPER = get("minecraft:waxed_weathered_chiseled_copper");
+    @Nullable
+    public static final BlockType WAXED_WEATHERED_COPPER = get("minecraft:waxed_weathered_copper");
+    @Nullable
+    public static final BlockType WAXED_WEATHERED_COPPER_BARS = get("minecraft:waxed_weathered_copper_bars");
+    @Nullable
+    public static final BlockType WAXED_WEATHERED_COPPER_BULB = get("minecraft:waxed_weathered_copper_bulb");
+    @Nullable
+    public static final BlockType WAXED_WEATHERED_COPPER_CHAIN = get("minecraft:waxed_weathered_copper_chain");
+    @Nullable
+    public static final BlockType WAXED_WEATHERED_COPPER_CHEST = get("minecraft:waxed_weathered_copper_chest");
+    @Nullable
+    public static final BlockType WAXED_WEATHERED_COPPER_DOOR = get("minecraft:waxed_weathered_copper_door");
+    @Nullable
+    public static final BlockType WAXED_WEATHERED_COPPER_GOLEM_STATUE = get("minecraft:waxed_weathered_copper_golem_statue");
+    @Nullable
+    public static final BlockType WAXED_WEATHERED_COPPER_GRATE = get("minecraft:waxed_weathered_copper_grate");
+    @Nullable
+    public static final BlockType WAXED_WEATHERED_COPPER_LANTERN = get("minecraft:waxed_weathered_copper_lantern");
+    @Nullable
+    public static final BlockType WAXED_WEATHERED_COPPER_TRAPDOOR = get("minecraft:waxed_weathered_copper_trapdoor");
+    @Nullable
+    public static final BlockType WAXED_WEATHERED_CUT_COPPER = get("minecraft:waxed_weathered_cut_copper");
+    @Nullable
+    public static final BlockType WAXED_WEATHERED_CUT_COPPER_SLAB = get("minecraft:waxed_weathered_cut_copper_slab");
+    @Nullable
+    public static final BlockType WAXED_WEATHERED_CUT_COPPER_STAIRS = get("minecraft:waxed_weathered_cut_copper_stairs");
+    @Nullable
+    public static final BlockType WAXED_WEATHERED_LIGHTNING_ROD = get("minecraft:waxed_weathered_lightning_rod");
+    @Nullable
+    public static final BlockType WEATHERED_CHISELED_COPPER = get("minecraft:weathered_chiseled_copper");
+    @Nullable
+    public static final BlockType WEATHERED_COPPER = get("minecraft:weathered_copper");
+    @Nullable
+    public static final BlockType WEATHERED_COPPER_BARS = get("minecraft:weathered_copper_bars");
+    @Nullable
+    public static final BlockType WEATHERED_COPPER_BULB = get("minecraft:weathered_copper_bulb");
+    @Nullable
+    public static final BlockType WEATHERED_COPPER_CHAIN = get("minecraft:weathered_copper_chain");
+    @Nullable
+    public static final BlockType WEATHERED_COPPER_CHEST = get("minecraft:weathered_copper_chest");
+    @Nullable
+    public static final BlockType WEATHERED_COPPER_DOOR = get("minecraft:weathered_copper_door");
+    @Nullable
+    public static final BlockType WEATHERED_COPPER_GOLEM_STATUE = get("minecraft:weathered_copper_golem_statue");
+    @Nullable
+    public static final BlockType WEATHERED_COPPER_GRATE = get("minecraft:weathered_copper_grate");
+    @Nullable
+    public static final BlockType WEATHERED_COPPER_LANTERN = get("minecraft:weathered_copper_lantern");
+    @Nullable
+    public static final BlockType WEATHERED_COPPER_TRAPDOOR = get("minecraft:weathered_copper_trapdoor");
+    @Nullable
+    public static final BlockType WEATHERED_CUT_COPPER = get("minecraft:weathered_cut_copper");
+    @Nullable
+    public static final BlockType WEATHERED_CUT_COPPER_SLAB = get("minecraft:weathered_cut_copper_slab");
+    @Nullable
+    public static final BlockType WEATHERED_CUT_COPPER_STAIRS = get("minecraft:weathered_cut_copper_stairs");
+    @Nullable
+    public static final BlockType WEATHERED_LIGHTNING_ROD = get("minecraft:weathered_lightning_rod");
+    @Nullable
+    public static final BlockType WEEPING_VINES = get("minecraft:weeping_vines");
+    @Nullable
+    public static final BlockType WEEPING_VINES_PLANT = get("minecraft:weeping_vines_plant");
+    @Nullable
+    public static final BlockType WET_SPONGE = get("minecraft:wet_sponge");
+    @Nullable
+    public static final BlockType WHEAT = get("minecraft:wheat");
+    @Nullable
+    public static final BlockType WHITE_BANNER = get("minecraft:white_banner");
+    @Nullable
+    public static final BlockType WHITE_BED = get("minecraft:white_bed");
+    @Nullable
+    public static final BlockType WHITE_CANDLE = get("minecraft:white_candle");
+    @Nullable
+    public static final BlockType WHITE_CANDLE_CAKE = get("minecraft:white_candle_cake");
+    @Nullable
+    public static final BlockType WHITE_CARPET = get("minecraft:white_carpet");
+    @Nullable
+    public static final BlockType WHITE_CONCRETE = get("minecraft:white_concrete");
+    @Nullable
+    public static final BlockType WHITE_CONCRETE_POWDER = get("minecraft:white_concrete_powder");
+    @Nullable
+    public static final BlockType WHITE_GLAZED_TERRACOTTA = get("minecraft:white_glazed_terracotta");
+    @Nullable
+    public static final BlockType WHITE_SHULKER_BOX = get("minecraft:white_shulker_box");
+    @Nullable
+    public static final BlockType WHITE_STAINED_GLASS = get("minecraft:white_stained_glass");
+    @Nullable
+    public static final BlockType WHITE_STAINED_GLASS_PANE = get("minecraft:white_stained_glass_pane");
+    @Nullable
+    public static final BlockType WHITE_TERRACOTTA = get("minecraft:white_terracotta");
+    @Nullable
+    public static final BlockType WHITE_TULIP = get("minecraft:white_tulip");
+    @Nullable
+    public static final BlockType WHITE_WALL_BANNER = get("minecraft:white_wall_banner");
+    @Nullable
+    public static final BlockType WHITE_WOOL = get("minecraft:white_wool");
+    @Nullable
+    public static final BlockType WILDFLOWERS = get("minecraft:wildflowers");
+    @Nullable
+    public static final BlockType WITHER_ROSE = get("minecraft:wither_rose");
+    @Nullable
+    public static final BlockType WITHER_SKELETON_SKULL = get("minecraft:wither_skeleton_skull");
+    @Nullable
+    public static final BlockType WITHER_SKELETON_WALL_SKULL = get("minecraft:wither_skeleton_wall_skull");
+    @Nullable
+    public static final BlockType YELLOW_BANNER = get("minecraft:yellow_banner");
+    @Nullable
+    public static final BlockType YELLOW_BED = get("minecraft:yellow_bed");
+    @Nullable
+    public static final BlockType YELLOW_CANDLE = get("minecraft:yellow_candle");
+    @Nullable
+    public static final BlockType YELLOW_CANDLE_CAKE = get("minecraft:yellow_candle_cake");
+    @Nullable
+    public static final BlockType YELLOW_CARPET = get("minecraft:yellow_carpet");
+    @Nullable
+    public static final BlockType YELLOW_CONCRETE = get("minecraft:yellow_concrete");
+    @Nullable
+    public static final BlockType YELLOW_CONCRETE_POWDER = get("minecraft:yellow_concrete_powder");
+    @Nullable
+    public static final BlockType YELLOW_GLAZED_TERRACOTTA = get("minecraft:yellow_glazed_terracotta");
+    @Nullable
+    public static final BlockType YELLOW_SHULKER_BOX = get("minecraft:yellow_shulker_box");
+    @Nullable
+    public static final BlockType YELLOW_STAINED_GLASS = get("minecraft:yellow_stained_glass");
+    @Nullable
+    public static final BlockType YELLOW_STAINED_GLASS_PANE = get("minecraft:yellow_stained_glass_pane");
+    @Nullable
+    public static final BlockType YELLOW_TERRACOTTA = get("minecraft:yellow_terracotta");
+    @Nullable
+    public static final BlockType YELLOW_WALL_BANNER = get("minecraft:yellow_wall_banner");
+    @Nullable
+    public static final BlockType YELLOW_WOOL = get("minecraft:yellow_wool");
+    @Nullable
+    public static final BlockType ZOMBIE_HEAD = get("minecraft:zombie_head");
+    @Nullable
+    public static final BlockType ZOMBIE_WALL_HEAD = get("minecraft:zombie_wall_head");
+
+    private BlockTypes() {
     }
 
     /*
@@ -2486,9 +2474,28 @@ public final class BlockTypes {
      -----------------------------------------------------
      */
 
+    /**
+     * Parses user input into a block type, using a default parser context.
+     *
+     * @param type the input to parse, with or without a namespace and with or without a property specification
+     * @return the matching block type
+     * @throws InputParseException if the input matches no block type
+     */
     public static BlockType parse(final String type) throws InputParseException {
         return parse(type, new ParserContext());
     }
+
+    /**
+     * Parses user input into a block type.
+     *
+     * <p>The input is lowercased and given the {@code minecraft:} namespace if it carries none. Should that fail to match and
+     * the context permits it, the input is retried against the legacy numeric id mapping.</p>
+     *
+     * @param type    the input to parse, with or without a namespace and with or without a property specification
+     * @param context the parser context, consulted for whether legacy ids may be tried
+     * @return the matching block type
+     * @throws InputParseException if the input matches no block type; the exception carries close matches as suggestions
+     */
     public static BlockType parse(final String type, final ParserContext context) throws InputParseException {
         final String inputLower = type.toLowerCase(Locale.ROOT);
         String input = inputLower;
@@ -2533,6 +2540,13 @@ public final class BlockTypes {
     }
 
     //FAWE start
+
+    /**
+     * Gets the {@link BlockType} associated with the given id.
+     *
+     * @param id the block id; the {@code minecraft:} namespace is assumed if none is given
+     * @return the block type, or {@code null} if no block is registered under that id
+     */
     @Nullable
     public static BlockType get(final CharSequence id) {
         return BlockType.REGISTRY.get(id.toString());
@@ -2553,6 +2567,14 @@ public final class BlockTypes {
         return BlockTypesCache.states[internalStateOrdinal].getBlockType();
     }
 
+    /**
+     * Returns the number of registered block types.
+     *
+     * <p>Counts the reserved placeholder alongside the real blocks, so this is the exclusive upper bound of the internal id
+     * space rather than a count of placeable blocks.</p>
+     *
+     * @return the number of registered block types
+     */
     public static int size() {
         return BlockTypesCache.values.length;
     }
