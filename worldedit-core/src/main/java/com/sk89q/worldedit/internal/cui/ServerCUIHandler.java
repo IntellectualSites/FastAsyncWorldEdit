@@ -126,9 +126,9 @@ public class ServerCUIHandler {
         double xz = Math.cos(Math.toRadians(rotY));
         int x = (int) (location.x() - (-xz * Math.sin(Math.toRadians(rotX))) * 12);
         int z = (int) (location.z() - (xz * Math.cos(Math.toRadians(rotX))) * 12);
-        int y = Math.max(
-                player.getWorld().getMinY(),
-                Math.min(Math.min(player.getWorld().getMaxY(), posY + MAX_DISTANCE), posY + 3)
+        int y = Math.clamp(
+                posY + 3,
+                player.getWorld().getMinY(), Math.min(player.getWorld().getMaxY(), posY + MAX_DISTANCE)
         );
 
         posX -= x;

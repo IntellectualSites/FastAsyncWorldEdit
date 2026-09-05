@@ -57,6 +57,10 @@ shadow = "9.5.1"
 paperweight = "2.0.0-SNAPSHOT"
 codecov = "0.3.0"
 jqwik = "1.10.1"
+errorproneGradlePlugin = "5.1.0"
+
+# Error Prone
+errorprone = "2.50.0"
 
 # Minimum versions we apply to make dependencies support newer Java
 minimumAsm = "9.7"
@@ -66,6 +70,7 @@ minimumJdependency = "2.10"
 # Gradle plugins
 shadow = { group = "com.gradleup.shadow", name = "shadow-gradle-plugin", version.ref = "shadow" }
 paperweight = { group = "io.papermc.paperweight.userdev", name = "io.papermc.paperweight.userdev.gradle.plugin", version.ref = "paperweight" }
+errorproneGradlePlugin = { group = "net.ltgt.gradle", name = "gradle-errorprone-plugin", version.ref = "errorproneGradlePlugin" }
 
 # Minecraft expectations
 paperApi = { group = "io.papermc.paper", name = "paper-api", version.ref = "paperApi" }
@@ -142,6 +147,9 @@ mockito-core = { group = "org.mockito", name = "mockito-core" }
 mockito-junit-jupiter = { group = "org.mockito", name = "mockito-core" }
 
 log4j-core = { group = "org.apache.logging.log4j", name = "log4j-core", version.ref = "log4j" }
+
+errorprone-core = { group = "com.google.errorprone", name = "error_prone_core", version.ref = "errorprone" }
+errorprone-annotations = { group = "com.google.errorprone", name = "error_prone_annotations", version.ref = "errorprone" }
 
 ## Piston
 [libraries.piston-core]

@@ -234,8 +234,7 @@ public class BukkitPlayer extends AbstractPlayerActor {
     public boolean trySetPosition(Vector3 pos, float pitch, float yaw) {
         //FAWE start
         org.bukkit.World world = player.getWorld();
-        if (pos instanceof com.sk89q.worldedit.util.Location) {
-            com.sk89q.worldedit.util.Location loc = (com.sk89q.worldedit.util.Location) pos;
+        if (pos instanceof com.sk89q.worldedit.util.Location loc) {
             Extent extent = loc.getExtent();
             if (extent instanceof World) {
                 world = Bukkit.getWorld(((World) extent).getName());

@@ -209,20 +209,21 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
         for (int i = last; i < length; i++) {
             char c = state.charAt(i);
             switch (c) {
-                case ']':
-                case ',': {
+                case ']', ',' -> {
                     charSequence.setSubstring(last, i);
                     if (property != null) {
                         int index;
                         try {
                             index = property.getIndexFor(charSequence);
                         } catch (Exception e) {
-                            throw new InputParseException(Caption.of(
-                                    "fawe.error.invalid-block-state-property",
-                                    TextComponent.of(charSequence.toString()),
-                                    TextComponent.of(property.getName()),
-                                    TextComponent.of(state)
-                            ), e);
+                            throw new InputParseException(
+                                    Caption.of(
+                                            "fawe.error.invalid-block-state-property",
+                                            TextComponent.of(charSequence.toString()),
+                                            TextComponent.of(property.getName()),
+                                            TextComponent.of(state)
+                                    ), e
+                            );
                         }
                         if (index == -1) {
                             throw SuggestInputParseException.of(charSequence.toString(), (List<Object>) property.getValues());
@@ -253,16 +254,15 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
                     }
                     property = null;
                     last = i + 1;
-                    break;
                 }
-                case '=': {
+                case '=' -> {
                     charSequence.setSubstring(last, i);
                     property = (AbstractProperty) type.getPropertyMap().get(charSequence);
                     last = i + 1;
-                    break;
                 }
-                default:
+                default -> {
                     continue;
+                }
             }
         }
         return type.withPropertyId(stateId >> BlockTypesCache.BIT_OFFSET);
@@ -515,11 +515,11 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
 
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof BlockState)) {
+        if (!(obj instanceof BlockState blockState)) {
             return false;
         }
 
-        return equalsFuzzy((BlockState) obj);
+        return equalsFuzzy(blockState);
     }
 
 }

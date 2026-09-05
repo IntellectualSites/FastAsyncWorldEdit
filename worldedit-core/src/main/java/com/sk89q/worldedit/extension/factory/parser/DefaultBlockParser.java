@@ -84,9 +84,9 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
     }
 
     private static BaseBlock getBlockInHand(Actor actor, HandSide handSide) throws InputParseException {
-        if (actor instanceof Player) {
+        if (actor instanceof Player player) {
             try {
-                return ((Player) actor).getBlockInHand(handSide);
+                return player.getBlockInHand(handSide);
             } catch (NotABlockException e) {
                 throw new InputParseException(e.getRichMessage());
             } catch (WorldEditException e) {
@@ -134,47 +134,25 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
      */
     @SuppressWarnings("ConstantConditions")
     private String woolMapper(String string) {
-        switch (string.toLowerCase(Locale.ROOT)) {
-            case "white":
-                return BlockTypes.WHITE_WOOL.id();
-            case "black":
-                return BlockTypes.BLACK_WOOL.id();
-            case "blue":
-                return BlockTypes.BLUE_WOOL.id();
-            case "brown":
-                return BlockTypes.BROWN_WOOL.id();
-            case "cyan":
-                return BlockTypes.CYAN_WOOL.id();
-            case "gray":
-            case "grey":
-                return BlockTypes.GRAY_WOOL.id();
-            case "green":
-                return BlockTypes.GREEN_WOOL.id();
-            case "light_blue":
-            case "lightblue":
-                return BlockTypes.LIGHT_BLUE_WOOL.id();
-            case "light_gray":
-            case "light_grey":
-            case "lightgray":
-            case "lightgrey":
-                return BlockTypes.LIGHT_GRAY_WOOL.id();
-            case "lime":
-                return BlockTypes.LIME_WOOL.id();
-            case "magenta":
-                return BlockTypes.MAGENTA_WOOL.id();
-            case "orange":
-                return BlockTypes.ORANGE_WOOL.id();
-            case "pink":
-                return BlockTypes.PINK_WOOL.id();
-            case "purple":
-                return BlockTypes.PURPLE_WOOL.id();
-            case "yellow":
-                return BlockTypes.YELLOW_WOOL.id();
-            case "red":
-                return BlockTypes.RED_WOOL.id();
-            default:
-                return string;
-        }
+        return switch (string.toLowerCase(Locale.ROOT)) {
+            case "white" -> BlockTypes.WHITE_WOOL.id();
+            case "black" -> BlockTypes.BLACK_WOOL.id();
+            case "blue" -> BlockTypes.BLUE_WOOL.id();
+            case "brown" -> BlockTypes.BROWN_WOOL.id();
+            case "cyan" -> BlockTypes.CYAN_WOOL.id();
+            case "gray", "grey" -> BlockTypes.GRAY_WOOL.id();
+            case "green" -> BlockTypes.GREEN_WOOL.id();
+            case "light_blue", "lightblue" -> BlockTypes.LIGHT_BLUE_WOOL.id();
+            case "light_gray", "light_grey", "lightgray", "lightgrey" -> BlockTypes.LIGHT_GRAY_WOOL.id();
+            case "lime" -> BlockTypes.LIME_WOOL.id();
+            case "magenta" -> BlockTypes.MAGENTA_WOOL.id();
+            case "orange" -> BlockTypes.ORANGE_WOOL.id();
+            case "pink" -> BlockTypes.PINK_WOOL.id();
+            case "purple" -> BlockTypes.PURPLE_WOOL.id();
+            case "yellow" -> BlockTypes.YELLOW_WOOL.id();
+            case "red" -> BlockTypes.RED_WOOL.id();
+            default -> string;
+        };
     }
 
     //FAWE start - make public
@@ -470,15 +448,13 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
             } else if (typeString.matches("slot[0-9]+")) {
                 int slot = Integer.parseInt(typeString.substring(4)) - 1;
                 Actor actor = context.requireActor();
-                if (!(actor instanceof Player)) {
+                if (!(actor instanceof final Player player)) {
                     throw new InputParseException(Caption.of("worldedit.command.player-only"));
                 }
-                Player player = (Player) actor;
                 BlockBag bag = player.getInventoryBlockBag();
-                if (!(bag instanceof SlottableBlockBag)) {
+                if (!(bag instanceof final SlottableBlockBag slottable)) {
                     throw new InputParseException(Caption.of("fawe.error.unsupported"));
                 }
-                SlottableBlockBag slottable = (SlottableBlockBag) bag;
                 BaseItem item = slottable.getItem(slot);
 
                 if (!item.getType().hasBlockType()) {

@@ -53,8 +53,8 @@ public class YAMLNode {
     private static Integer castInt(Object o) {
         if (o == null) {
             return null;
-        } else if (o instanceof Number) {
-            return ((Number) o).intValue();
+        } else if (o instanceof Number number) {
+            return number.intValue();
         } else {
             return null;
         }
@@ -70,8 +70,8 @@ public class YAMLNode {
     private static Double castDouble(Object o) {
         if (o == null) {
             return null;
-        } else if (o instanceof Number) {
-            return ((Number) o).doubleValue();
+        } else if (o instanceof Number number) {
+            return number.doubleValue();
         } else {
             return null;
         }
@@ -87,8 +87,8 @@ public class YAMLNode {
     private static Boolean castBoolean(Object o) {
         if (o == null) {
             return null;
-        } else if (o instanceof Boolean) {
-            return (Boolean) o;
+        } else if (o instanceof Boolean bool) {
+            return bool;
         } else {
             return null;
         }
@@ -158,35 +158,35 @@ public class YAMLNode {
      * @return the new object
      */
     private Object prepareSerialization(Object value) {
-        if (value instanceof Vector3) {
-            Map<String, Double> out = new LinkedHashMap<>();
-            Vector3 vec = (Vector3) value;
-            out.put("x", vec.x());
-            out.put("y", vec.y());
-            out.put("z", vec.z());
-            return out;
-        } else if (value instanceof BlockVector3) {
-            Map<String, Integer> out = new LinkedHashMap<>();
-            BlockVector3 vec = (BlockVector3) value;
-            out.put("x", vec.x());
-            out.put("y", vec.y());
-            out.put("z", vec.z());
-            return out;
-        } else if (value instanceof Vector2) {
-            Map<String, Double> out = new LinkedHashMap<>();
-            Vector2 vec = (Vector2) value;
-            out.put("x", vec.x());
-            out.put("z", vec.z());
-            return out;
-        } else if (value instanceof BlockVector2) {
-            Map<String, Integer> out = new LinkedHashMap<>();
-            BlockVector2 vec = (BlockVector2) value;
-            out.put("x", vec.x());
-            out.put("z", vec.z());
-            return out;
-        }
-
-        return value;
+        return switch (value) {
+            case Vector3(double x, double y, double z) -> {
+                Map<String, Double> out = new LinkedHashMap<>();
+                out.put("x", x);
+                out.put("y", y);
+                out.put("z", z);
+                yield out;
+            }
+            case BlockVector3(int x, int y, int z) -> {
+                Map<String, Integer> out = new LinkedHashMap<>();
+                out.put("x", x);
+                out.put("y", y);
+                out.put("z", z);
+                yield out;
+            }
+            case Vector2(double x, double z) -> {
+                Map<String, Double> out = new LinkedHashMap<>();
+                out.put("x", x);
+                out.put("z", z);
+                yield out;
+            }
+            case BlockVector2(int x, int z) -> {
+                Map<String, Integer> out = new LinkedHashMap<>();
+                out.put("x", x);
+                out.put("z", z);
+                yield out;
+            }
+            case null, default -> value;
+        };
     }
 
     /**
@@ -773,15 +773,15 @@ public class YAMLNode {
         Object o = getProperty(path);
         if (o == null) {
             return null;
-        } else if (o instanceof Map) {
+        } else if (o instanceof Map<?, ?> map) {
             Map<String, YAMLNode> nodes =
                     new LinkedHashMap<>();
 
-            for (Map.Entry<String, Object> entry : ((Map<String, Object>) o).entrySet()) {
-                if (entry.getValue() instanceof Map) {
+            for (Map.Entry<String, Object> entry : ((Map<String, Object>) map).entrySet()) {
+                if (entry.getValue() instanceof Map<?, ?> valueMap) {
                     nodes.put(
                             entry.getKey(),
-                            new YAMLNode((Map<String, Object>) entry.getValue(), writeDefaults)
+                            new YAMLNode((Map<String, Object>) valueMap, writeDefaults)
                     );
                 }
             }

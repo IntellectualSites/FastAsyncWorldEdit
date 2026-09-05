@@ -405,15 +405,10 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     public void setReorderMode(ReorderMode reorderMode) {
         //FAWE start - we don't do physics so we don't need this
         switch (reorderMode) {
-            case MULTI_STAGE:
-                enableQueue();
-                break;
-            case NONE: // Functionally the same, since FAWE doesn't perform physics
-            case FAST:
-                disableQueue();
-                break;
-            default:
-                throw new UnsupportedOperationException("Not implemented: " + reorderMode);
+            case MULTI_STAGE -> enableQueue();
+            // Functionally the same, since FAWE doesn't perform physics
+            case NONE, FAST -> disableQueue();
+            default -> throw new UnsupportedOperationException("Not implemented: " + reorderMode);
         }
         //FAWE end
     }
@@ -588,8 +583,8 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         ExtentTraverser<SourceMaskExtent> maskingExtent = new ExtentTraverser<>(getExtent()).find(SourceMaskExtent.class);
         if (maskingExtent != null && maskingExtent.get() != null) {
             Mask oldMask = maskingExtent.get().getMask();
-            if (oldMask instanceof ResettableMask) {
-                ((ResettableMask) oldMask).reset();
+            if (oldMask instanceof ResettableMask resettableMask) {
+                resettableMask.reset();
             }
             maskingExtent.get().setMask(mask);
         } else if (mask != Masks.alwaysTrue()) {
@@ -602,8 +597,8 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         checkNotNull(mask);
         Mask existing = getSourceMask();
         if (existing != null) {
-            if (existing instanceof MaskIntersection) {
-                Collection<Mask> masks = new HashSet<>(((MaskIntersection) existing).getMasks());
+            if (existing instanceof MaskIntersection maskIntersection) {
+                Collection<Mask> masks = new HashSet<>(maskIntersection.getMasks());
                 masks.add(mask);
                 mask = new MaskIntersection(masks);
             } else {
@@ -639,8 +634,8 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         }
         if (maskingExtent != null) {
             Mask oldMask = maskingExtent.getMask();
-            if (oldMask instanceof ResettableMask) {
-                ((ResettableMask) oldMask).reset();
+            if (oldMask instanceof ResettableMask resettableMask) {
+                resettableMask.reset();
             }
             maskingExtent.setMask(mask);
         } else if (mask != Masks.alwaysTrue()) {
@@ -788,8 +783,8 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
             ChangeSet changeSet = getChangeSet();
 
 
-            if (changeSet instanceof BlockBagChangeSet) {
-                missingBlocks = ((BlockBagChangeSet) changeSet).popMissing();
+            if (changeSet instanceof BlockBagChangeSet blockBagChangeSet) {
+                missingBlocks = blockBagChangeSet.popMissing();
             } else {
                 ExtentTraverser<BlockBagExtent> find = new ExtentTraverser<>(getExtent()).find(BlockBagExtent.class);
                 if (find != null && find.get() != null) {
@@ -997,17 +992,13 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         }
 
         this.changes++;
-        switch (stage) {
-            case BEFORE_HISTORY:
-                return this.getExtent().setBlock(position, block);
-            case BEFORE_CHANGE:
-                return bypassHistory.setBlock(position, block);
-            case BEFORE_REORDER:
-                return bypassAll.setBlock(position, block);
-        }
+        return switch (stage) {
+            case BEFORE_HISTORY -> this.getExtent().setBlock(position, block);
+            case BEFORE_CHANGE -> bypassHistory.setBlock(position, block);
+            case BEFORE_REORDER -> bypassAll.setBlock(position, block);
+        };
         //FAWE end
 
-        throw new RuntimeException("New enum entry added that is unhandled here");
     }
 
     //FAWE start - see former comment
@@ -2805,7 +2796,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         BlockState air = BlockTypes.AIR.getDefaultState();
         BlockState water = BlockTypes.WATER.getDefaultState();
 
-        int centerY = Math.max(minY, Math.min(maxY, oy));
+        int centerY = Math.clamp(oy, minY, maxY);
         int minY = Math.max(this.minY, centerY - height);
         int maxY = Math.min(this.maxY, centerY + height);
 
@@ -2949,7 +2940,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
 
         final BlockState grass = BlockTypes.GRASS_BLOCK.getDefaultState();
 
-        final int centerY = Math.max(minY, Math.min(maxY, oy));
+        final int centerY = Math.clamp(oy, minY, maxY);
         final int minY = Math.max(this.minY, centerY - height);
         final int maxY = Math.min(this.maxY, centerY + height);
 
