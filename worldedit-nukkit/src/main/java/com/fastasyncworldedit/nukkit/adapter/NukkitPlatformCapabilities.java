@@ -3,28 +3,34 @@ package com.fastasyncworldedit.nukkit.adapter;
 /**
  * Granular runtime capabilities reported by the active Nukkit adapter.
  * <p>
- * Nukkit forks vary widely in feature support. Rather than branching on
- * platform name strings, FAWE queries capability flags to determine what
- * operations are safe. Most capabilities are absent because Nukkit's
- * Bedrock-based architecture lacks Java Edition features like CUI
- * protocol support, explicit relighting, and fake chunk packets.
+ * Nukkit forks vary in feature support. Rather than branching on platform
+ * name strings, code queries capability flags to determine what operations
+ * are safe: {@code NukkitGetBlocks} switches its biome write strategy on
+ * {@link #THREE_DIMENSIONAL_BIOMES}, and {@code NukkitPlayer} gates CUI
+ * dispatch on {@link #CUI_SUPPORT} (never granted today — Bedrock clients
+ * have no modded CUI channel).
  * <p>
  * Key differences from Bukkit:
  * <ul>
- *   <li>Bukkit generally supports all capabilities; Nukkit supports very few</li>
- *   <li>Chunk sections and chunk caching are not real abstractions on Nukkit</li>
- *   <li>Tree history capture is unsupported because Nukkit's tree API mutates directly</li>
+ *   <li>Bukkit adapters are selected per Minecraft version at compile time and
+ *       are broadly capable; Nukkit adapters are selected per fork at runtime
+ *       and report few capabilities</li>
+ *   <li>Chunk sections and chunk caching are emulated uniformly by
+ *       {@code NukkitGetBlocks} for every fork, so they are not fork-dependent
+ *       capabilities here</li>
  * </ul>
+ * <p>
+ * Policy: a capability constant must have at least one runtime query site. Do
+ * not add speculative flags for features no adapter reports and no code
+ * branches on — unsupported behaviour is instead made loud (a thrown
+ * {@code UnsupportedOperationException} with an explanation) at the place it
+ * would otherwise fail silently.
  *
  * @see NukkitImplAdapter#getCapabilities()
  */
 public enum NukkitPlatformCapabilities {
 
-    FAKE_CHUNKS("Can send fake chunk packets for clipboard previews."),
-    EXPLICIT_RELIGHTING("Can manually recalculate lighting instead of relying on Nukkit's internal lighting updates."),
     CUI_SUPPORT("Can communicate with the WorldEdit CUI protocol."),
-    CHUNK_SECTIONS("Provides a real chunk section abstraction for direct section-level access."),
-    CHUNK_CACHING("Allows chunk references to be cached safely across queue operations."),
     THREE_DIMENSIONAL_BIOMES("Stores biomes with a vertical coordinate instead of legacy 2D x/z columns.");
 
     private final String description;

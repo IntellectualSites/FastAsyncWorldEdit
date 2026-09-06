@@ -299,21 +299,35 @@ public interface NukkitImplAdapter {
     void recalculateLight(Object chunk);
 
     /**
-     * Attempt to grow a tree of the given WorldEdit type at the world coordinates. The caller is
+     * Whether this fork can place the given tree kind. The set differs between forks:
+     * {@code PALE_OAK} exists only on Nukkit-MOT ({@code ObjectPaleOakTree}) and
+     * {@code AZALEA} only on NKX ({@code ObjectAzaleaTree}).
+     */
+    boolean supportsTree(com.fastasyncworldedit.nukkit.util.NukkitTreeTypes.NukkitTreeKind kind);
+
+    /**
+     * Attempt to grow a tree of the given kind at the world coordinates. The caller is
      * responsible for capturing the resulting block changes into FAWE history; this method only
      * performs the platform-native placement and reports whether anything was placed.
      * <p>
-     * Forks route to their own tree APIs ({@code ObjectTree} on NKX/MOT).
-     * Unknown types fall back to a plain oak tree ({@code ObjectTree}/equivalent).
+     * Kinds with a legacy code (see
+     * {@link com.fastasyncworldedit.nukkit.util.NukkitTreeTypes.NukkitTreeKind#getLegacyCode()})
+     * route through {@code ObjectTree.growTree}; the other kinds instantiate the fork's
+     * generator classes directly ({@code ObjectDarkOakTree}, {@code ObjectCherryTree}, ...),
+     * because those classes are not reachable through the legacy switch. Placement failures
+     * are logged and reported as {@code false}. Kinds unavailable on this fork throw
+     * {@link UnsupportedOperationException}; callers normally pre-check
+     * {@link #supportsTree} to fail before taking history snapshots.
      *
      * @param level the level to place in
-     * @param type  the WorldEdit tree type
+     * @param kind  the resolved Nukkit tree kind
      * @param x     world x
      * @param y     world y
      * @param z     world z
      * @return {@code true} if the tree was placed
+     * @throws UnsupportedOperationException if this fork cannot place the kind
      */
-    boolean growTree(Level level, com.sk89q.worldedit.util.TreeGenerator.TreeType type, int x, int y, int z);
+    boolean growTree(Level level, com.fastasyncworldedit.nukkit.util.NukkitTreeTypes.NukkitTreeKind kind, int x, int y, int z);
 
 }
 

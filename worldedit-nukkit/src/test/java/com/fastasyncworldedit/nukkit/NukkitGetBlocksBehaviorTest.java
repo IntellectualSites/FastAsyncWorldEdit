@@ -56,9 +56,9 @@ import static org.mockito.ArgumentMatchers.anyByte;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.CALLS_REAL_METHODS;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -105,7 +105,10 @@ class NukkitGetBlocksBehaviorTest {
 
         WorldEdit.getInstance().getPlatformManager().register(platform);
         WorldEdit.getInstance().getPlatformManager().handlePlatformsRegistered(new PlatformsRegisteredEvent());
-        BiomeType.REGISTRY.register("minecraft:plains", new BiomeType("minecraft:plains"));
+        // The static registry is shared across test classes when they run in the same JVM.
+        if (BiomeType.REGISTRY.get("minecraft:plains") == null) {
+            BiomeType.REGISTRY.register("minecraft:plains", new BiomeType("minecraft:plains"));
+        }
         setBiomeMappings();
 
         Int2CharOpenHashMap beToJe = new Int2CharOpenHashMap();

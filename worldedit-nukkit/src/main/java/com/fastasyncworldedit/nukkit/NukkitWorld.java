@@ -13,10 +13,11 @@ import com.fastasyncworldedit.nukkit.adapter.NukkitPlatformCapabilities;
 import com.fastasyncworldedit.nukkit.blocks.NukkitGetBlocks;
 import com.fastasyncworldedit.nukkit.mapping.BiomeMapping;
 import com.fastasyncworldedit.nukkit.mapping.BlockMapping;
-import com.sk89q.worldedit.blocks.BaseItem;
+import com.fastasyncworldedit.nukkit.util.NukkitTreeTypes;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.entity.Player;
@@ -55,11 +56,13 @@ import java.util.Set;
  * public Block and Level APIs. This is necessary because Nukkit does not
  * expose an equivalent low-level chunk section API.
  * <p>
- * Tree generation throws {@link UnsupportedOperationException} because
- * Nukkit's {@code ObjectTree} / {@code TreeGenerator} APIs mutate the
- * world directly without providing a block capture mechanism. FAWE's
- * history and undo system requires capturing all block changes, which
- * is impossible with Nukkit's tree API.
+ * Tree generation places trees with Nukkit's native {@code ObjectTree} generators,
+ * which mutate the level directly and offer no block-capture hook. To keep such
+ * edits inside FAWE history, {@code generateTreeLegacy} snapshots the affected
+ * bounding box before placement and replays the differing blocks through the
+ * {@link EditSession} afterwards, so undo/redo covers the edit and the re-applied
+ * blocks go through FAWE's queue. Which {@code TreeType}s can actually be placed
+ * is defined by {@link com.fastasyncworldedit.nukkit.util.NukkitTreeTypes}.
  * <p>
  * {@link #sendFakeChunk} is unsupported because converting Java Edition
  * block states to Bedrock runtime IDs and serializing into Nukkit's
@@ -69,9 +72,13 @@ import java.util.Set;
  * Key differences from Bukkit:
  * <ul>
  *   <li>setBlock uses Nukkit's public API instead of direct NMS writes</li>
- *   <li>Tree generation cannot participate in history/undo</li>
+ *   <li>Trees are placed natively and captured into history via snapshot/replay,
+ *       not by a platform block-capture mechanism</li>
  *   <li>Fake chunk packets for clipboard previews are unsupported</li>
- *   <li>Biomes are stored as 2D columns, not Java Edition 3D biome sections</li>
+ *   <li>3D biome support depends on the fork (see
+ *       {@link NukkitPlatformCapabilities#THREE_DIMENSIONAL_BIOMES}); on forks
+ *       without it, conflicting vertical biome updates are rejected by
+ *       {@code NukkitGetBlocks} rather than silently flattened</li>
  *   <li>Side effects are applied atomically in setBlock</li>
  * </ul>
  *
@@ -278,10 +285,14 @@ public class NukkitWorld extends AbstractWorld {
      * Place a tree using the platform-native generator and capture the resulting block changes into
      * the given {@link EditSession} so FAWE history/undo covers the edit.
      * <p>
-     * Nukkit's {@code ObjectTree} mutates the level directly via {@code ChunkManager} without a
+     * Nukkit's tree generators mutate the level directly via {@code ChunkManager} without a
      * block-capture hook, so this method snapshots the affected bounding box before placement and
      * replays the differing blocks through {@code editSession.setBlock}. That both records the
      * change for undo and re-applies it through FAWE's queue so lighting/refresh is consistent.
+     * <p>
+     * Unsupported tree types fail fast with {@link UnsupportedOperationException} — resolved and
+     * fork-checked before any snapshot or placement — instead of silently substituting a
+     * different tree (see {@link NukkitTreeTypes}).
      */
     private boolean generateTreeLegacy(
             TreeGenerator.TreeType type,
@@ -290,6 +301,14 @@ public class NukkitWorld extends AbstractWorld {
     ) throws MaxChangedBlocksException {
         Level level = getLevel();
         NukkitImplAdapter adapter = NukkitImplLoader.get();
+        // Resolve before taking any snapshot so unsupported types fail fast and mutate nothing.
+        NukkitTreeTypes.NukkitTreeKind kind = NukkitTreeTypes.resolve(type);
+        if (!adapter.supportsTree(kind)) {
+            throw new UnsupportedOperationException(
+                    "Tree type '" + type.name() + "' is not available on " + adapter.getPlatformName()
+                            + ": this fork provides no generator for it."
+            );
+        }
         int ox = position.x();
         int oy = position.y();
         int oz = position.z();
@@ -325,12 +344,15 @@ public class NukkitWorld extends AbstractWorld {
             }
         }
 
-        boolean placed = adapter.growTree(level, type, ox, oy, oz);
+        boolean placed = adapter.growTree(level, kind, ox, oy, oz);
         if (!placed) {
             return false;
         }
 
         // Post-snapshot: replay differing blocks through the EditSession for history + refresh.
+        // An empty diff means the native placement wrote nothing (e.g. its ground check failed),
+        // so report failure instead of claiming a tree was generated.
+        boolean anyChanged = false;
         for (int dx = -radius; dx <= radius; dx++) {
             for (int dz = -radius; dz <= radius; dz++) {
                 Object chunk = adapter.getChunk(level, (ox + dx) >> 4, (oz + dz) >> 4);
@@ -350,11 +372,12 @@ public class NukkitWorld extends AbstractWorld {
                                         ? com.sk89q.worldedit.world.block.BlockTypes.AIR.getDefaultState()
                                         : com.sk89q.worldedit.world.block.BlockTypesCache.states[after];
                         editSession.setBlock(wx, wy, wz, state);
+                        anyChanged = true;
                     }
                 }
             }
         }
-        return true;
+        return anyChanged;
     }
 
     @Override
@@ -365,14 +388,15 @@ public class NukkitWorld extends AbstractWorld {
     ) throws MaxChangedBlocksException {
         // The new TreeType-based contract maps onto the legacy TreeGenerator.TreeType generator so
         // the same snapshot/replay capture path applies. TreeType carries only an id string, so
-        // resolve it back to a legacy type when possible; otherwise fall back to a plain oak tree.
+        // resolve it back to a legacy type; unknown ids fail loudly rather than becoming oak.
         TreeGenerator.TreeType legacy = resolveLegacyTreeType(type);
         return generateTreeLegacy(legacy, editSession, position);
     }
 
     /**
-     * Best-effort resolution from the new {@code TreeType} record to a legacy
-     * {@link TreeGenerator.TreeType}. Falls back to {@code TREE} (oak) when unknown.
+     * Resolution from the new {@code TreeType} record to a legacy
+     * {@link TreeGenerator.TreeType}. Unknown ids throw {@link UnsupportedOperationException}
+     * instead of silently substituting a plain oak tree.
      */
     private static TreeGenerator.TreeType resolveLegacyTreeType(
             com.sk89q.worldedit.world.generation.TreeType type
@@ -381,10 +405,16 @@ public class NukkitWorld extends AbstractWorld {
             return TreeGenerator.TreeType.TREE;
         }
         String id = type.id();
-        // Strip any "minecraft:" prefix and try by alias; fallback to oak.
+        // Strip any "minecraft:" prefix and try by alias.
         String key = id.contains(":") ? id.substring(id.indexOf(':') + 1) : id;
         TreeGenerator.TreeType resolved = TreeGenerator.TreeType.lookup(key);
-        return resolved != null ? resolved : TreeGenerator.TreeType.TREE;
+        if (resolved == null) {
+            throw new UnsupportedOperationException(
+                    "Tree type '" + id + "' is unknown to WorldEdit-on-Nukkit and has no Nukkit equivalent. "
+                            + "Supported types: " + NukkitTreeTypes.SUPPORTED_TYPES + "."
+            );
+        }
+        return resolved;
     }
 
     /**

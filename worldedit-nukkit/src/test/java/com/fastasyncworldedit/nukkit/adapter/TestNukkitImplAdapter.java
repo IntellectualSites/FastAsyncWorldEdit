@@ -13,7 +13,6 @@ import com.fastasyncworldedit.nukkit.mapping.NukkitBlockData;
 import org.cloudburstmc.nbt.NbtMap;
 
 import javax.annotation.Nullable;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -195,9 +194,14 @@ public abstract class TestNukkitImplAdapter implements NukkitImplAdapter {
     }
 
     @Override
+    public boolean supportsTree(com.fastasyncworldedit.nukkit.util.NukkitTreeTypes.NukkitTreeKind kind) {
+        return true;
+    }
+
+    @Override
     public boolean growTree(
             Level level,
-            com.sk89q.worldedit.util.TreeGenerator.TreeType type,
+            com.fastasyncworldedit.nukkit.util.NukkitTreeTypes.NukkitTreeKind kind,
             int x, int y, int z
     ) {
         return false;

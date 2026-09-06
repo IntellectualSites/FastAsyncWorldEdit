@@ -43,9 +43,13 @@ import java.util.stream.Stream;
  * Commands are registered by wrapping WorldEdit's piston commands in
  * Nukkit {@code Command} objects that dispatch via the event bus.
  * <p>
- * The relighter factory returns {@link NukkitRelighter}, a no-op
- * implementation, because Nukkit handles lighting internally. Using
- * NullRelighter would fail RelightProcessor's constructor validation.
+ * The relighter factory returns {@link NukkitRelighter}, which records the chunks
+ * touched by an edit and delegates recalculation (height map, sky and block light)
+ * to {@link NukkitImplAdapter#recalculateLight(Object)}, mapping to whatever
+ * recalculation surface the runtime fork exposes. This is needed because FAWE's
+ * queue writes blocks through raw {@code FullChunk} access that bypasses Nukkit's
+ * per-block light propagation. A shared no-op Relighter is not an option either,
+ * as NullRelighter fails RelightProcessor's constructor validation.
  * <p>
  * Data version is fixed to the Java Edition block registry version
  * (1.21.10) because FAWE's block mapping files are maintained against
@@ -53,7 +57,8 @@ import java.util.stream.Stream;
  * <p>
  * Key differences from Bukkit:
  * <ul>
- *   <li>Relighter is no-op; Bukkit requires active NMS relighting</li>
+ *   <li>Relighting recalculates whole chunks through the fork adapter; Bukkit
+ *       relights per-section through NMS</li>
  *   <li>Commands wrapped as Nukkit Command objects instead of Bukkit CommandExecutor</li>
  *   <li>No WorldGuard/PlotSquared integration; mask managers are empty</li>
  *   <li>Data version tracks JE registry, not Bedrock</li>

@@ -105,10 +105,9 @@ class NukkitPlatformCompatibilityTest {
 
         WorldEdit.getInstance().getPlatformManager().register(platform);
         WorldEdit.getInstance().getPlatformManager().handlePlatformsRegistered(new PlatformsRegisteredEvent());
-        try {
+        // The static registry is shared across test classes when they run in the same JVM.
+        if (BiomeType.REGISTRY.get("minecraft:plains") == null) {
             BiomeType.REGISTRY.register("minecraft:plains", new BiomeType("minecraft:plains"));
-        } catch (IllegalArgumentException ignored) {
-            // Shared static registry may already be initialized by another Nukkit test class.
         }
         setBiomeMappings();
 
@@ -219,10 +218,17 @@ class NukkitPlatformCompatibilityTest {
     }
 
     @ParameterizedTest
-    @EnumSource(TreeGenerator.TreeType.class)
-    void allTreeTypesReturnFalseWhenAdapterDoesNotPlace(TreeGenerator.TreeType type) throws Exception {
+    @EnumSource(
+            value = TreeGenerator.TreeType.class,
+            mode = EnumSource.Mode.EXCLUDE,
+            names = {"RED_MUSHROOM", "BROWN_MUSHROOM", "RANDOM_MUSHROOM", "JUNGLE_BUSH", "CHORUS_PLANT",
+                    "PALE_OAK_CREAKING", "RANDOM"}
+    )
+    void supportedTreeTypesReturnFalseWhenAdapterDoesNotPlace(TreeGenerator.TreeType type) throws Exception {
         // TestAdapter.growTree returns false, so generateTree returns false without throwing and
-        // without recording history (the EditSession is not touched).
+        // without recording history (the EditSession is not touched). Types without any Nukkit
+        // generator are excluded here; their loud UnsupportedOperationException behaviour is
+        // covered by NukkitTreeGenerationTest.
         setInstance(new TestAdapter("Nukkit-MOT", "Nukkit-MOT 1.0", 6, Set.of()));
         NukkitWorld world = new NukkitWorld(level);
         EditSession editSession = mock(EditSession.class);

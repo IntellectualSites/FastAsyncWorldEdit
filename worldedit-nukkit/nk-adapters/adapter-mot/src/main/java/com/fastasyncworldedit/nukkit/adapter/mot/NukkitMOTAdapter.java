@@ -11,12 +11,26 @@ import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.format.leveldb.BlockStateMapping;
 import cn.nukkit.level.format.leveldb.NukkitLegacyMapper;
 import cn.nukkit.level.format.leveldb.structure.BlockStateSnapshot;
+import cn.nukkit.level.generator.object.tree.ObjectCherryTree;
+import cn.nukkit.level.generator.object.tree.ObjectCrimsonTree;
+import cn.nukkit.level.generator.object.tree.ObjectDarkOakTree;
+import cn.nukkit.level.generator.object.tree.ObjectMangroveTree;
+import cn.nukkit.level.generator.object.tree.ObjectNetherTree;
+import cn.nukkit.level.generator.object.tree.ObjectPaleOakTree;
+import cn.nukkit.level.generator.object.tree.ObjectSavannaTree;
+import cn.nukkit.level.generator.object.tree.ObjectSwampTree;
+import cn.nukkit.level.generator.object.tree.ObjectTree;
+import cn.nukkit.level.generator.object.tree.ObjectWarpedTree;
+import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.utils.Identifier;
 import com.fastasyncworldedit.nukkit.adapter.NukkitImplAdapter;
 import com.fastasyncworldedit.nukkit.adapter.NukkitPlatformCapabilities;
 import com.fastasyncworldedit.nukkit.mapping.ItemMapping.NukkitItemData;
 import com.fastasyncworldedit.nukkit.mapping.NukkitBlockData;
+import com.fastasyncworldedit.nukkit.util.NukkitTreeTypes.NukkitTreeKind;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
+import org.apache.logging.log4j.Logger;
 import org.cloudburstmc.nbt.NbtMap;
 
 import javax.annotation.Nullable;
@@ -46,6 +60,8 @@ import java.util.UUID;
  * @see NukkitImplLoader
  */
 public class NukkitMOTAdapter implements NukkitImplAdapter {
+
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     private static final Set<NukkitPlatformCapabilities> CAPABILITIES = Set.of(
             NukkitPlatformCapabilities.THREE_DIMENSIONAL_BIOMES
@@ -273,20 +289,60 @@ public class NukkitMOTAdapter implements NukkitImplAdapter {
     }
 
     @Override
-    public boolean growTree(
-            Level level,
-            com.sk89q.worldedit.util.TreeGenerator.TreeType type,
-            int x, int y, int z
-    ) {
+    public boolean supportsTree(NukkitTreeKind kind) {
+        // ObjectAzaleaTree only exists on NKX; MOT has no azalea generator.
+        return kind != NukkitTreeKind.AZALEA;
+    }
+
+    @Override
+    public boolean growTree(Level level, NukkitTreeKind kind, int x, int y, int z) {
         cn.nukkit.math.NukkitRandom random = new cn.nukkit.math.NukkitRandom();
-        // Map common WorldEdit tree types to Nukkit ObjectTree type codes.
-        int code = com.fastasyncworldedit.nukkit.util.NukkitTreeTypes.toNukkitCode(type);
         try {
-            cn.nukkit.level.generator.object.tree.ObjectTree.growTree(level, x, y, z, random, code);
-            return true;
-        } catch (Exception ignored) {
+            int code = kind.getLegacyCode();
+            if (code >= 0) {
+                ObjectTree.growTree(level, x, y, z, random, code);
+                return true;
+            }
+            return switch (kind) {
+                // MOT's dark oak/acacia/swamp/cherry/mangrove/pale-oak generators extend
+                // BasicGenerator, so the entry point is generate(ChunkManager, NukkitRandom, Vector3).
+                case DARK_OAK -> new ObjectDarkOakTree().generate(level, random, new Vector3(x, y, z));
+                case ACACIA -> new ObjectSavannaTree().generate(level, random, new Vector3(x, y, z));
+                case SWAMP -> new ObjectSwampTree().generate(level, random, new Vector3(x, y, z));
+                case CHERRY -> new ObjectCherryTree().generate(level, random, new Vector3(x, y, z));
+                case MANGROVE -> new ObjectMangroveTree().generate(level, random, new Vector3(x, y, z));
+                case PALE_OAK -> new ObjectPaleOakTree().generate(level, random, new Vector3(x, y, z));
+                case CRIMSON, WARPED -> placeNetherTree(
+                        kind == NukkitTreeKind.CRIMSON ? new ObjectCrimsonTree() : new ObjectWarpedTree(),
+                        level, x, y, z, random
+                );
+                default -> throw new UnsupportedOperationException(
+                        "Nukkit-MOT provides no generator for tree kind " + kind
+                );
+            };
+        } catch (UnsupportedOperationException e) {
+            // Unsupported kinds must propagate (contract of NukkitImplAdapter#growTree), not be
+            // swallowed into a generic placement failure.
+            throw e;
+        } catch (Exception e) {
+            LOGGER.warn("Failed to place {} tree on Nukkit-MOT at {},{},{}", kind, x, y, z, e);
             return false;
         }
+    }
+
+    /**
+     * Crimson/warped "fungi" generators extend {@code ObjectNetherTree} (an {@code ObjectTree}),
+     * so mirror {@code ObjectTree.growTree}: check placement first, then write — the placement
+     * check is not silent here because the result is returned to the caller.
+     */
+    private static boolean placeNetherTree(
+            ObjectNetherTree tree, Level level, int x, int y, int z, cn.nukkit.math.NukkitRandom random
+    ) {
+        if (!tree.canPlaceObject(level, x, y, z, random)) {
+            return false;
+        }
+        tree.placeObject(level, x, y, z, random);
+        return true;
     }
 
 }
