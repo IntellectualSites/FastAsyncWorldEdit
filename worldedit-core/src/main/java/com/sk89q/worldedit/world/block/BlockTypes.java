@@ -28,6 +28,7 @@ import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 
 import javax.annotation.Nullable;
+import java.lang.invoke.MethodHandles;
 import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -45,17 +46,17 @@ public final class BlockTypes {
     static {
         // Initializing the cache is what populates BlockType.REGISTRY from the running platform. Static initializers run in
         // declaration order, so this must stay above the constants for them to resolve to anything.
-        //noinspection ResultOfMethodCallIgnored
-        BlockTypesCache.$NAMESPACES.isEmpty();
+        try {
+            MethodHandles.lookup().ensureInitialized(BlockTypesCache.class);
+        } catch (IllegalAccessException e) {
+            throw new ExceptionInInitializerError(e);
+        }
     }
 
-    /**
-     * Placeholder occupying the null index, for use where block types are represented as primitives.
-     *
-     * <p>Bound to the synthetic id {@code minecraft:__reserved__}, which {@link BlockTypesCache} registers at internal id
-     * {@link BlockTypesCache.ReservedIDs#__RESERVED__} rather than obtaining from the platform. It is not a real block and
-     * must never be placed in the world.</p>
-     */
+    /* Placeholder occupying the null index, for use where block types are represented as primitives.
+       Bound to the synthetic id minecraft:__reserved__, which BlockTypesCache registers at internal id
+       BlockTypesCache.ReservedIDs.__RESERVED__ rather than obtaining from the platform. Not a real block,
+       must never be placed in the world. */
     @Nullable
     public static final BlockType __RESERVED__ = get("minecraft:__reserved__");
     @Nullable
@@ -2474,13 +2475,6 @@ public final class BlockTypes {
      -----------------------------------------------------
      */
 
-    /**
-     * Parses user input into a block type, using a default parser context.
-     *
-     * @param type the input to parse, with or without a namespace and with or without a property specification
-     * @return the matching block type
-     * @throws InputParseException if the input matches no block type
-     */
     public static BlockType parse(final String type) throws InputParseException {
         return parse(type, new ParserContext());
     }
