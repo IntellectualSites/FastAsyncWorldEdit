@@ -54,9 +54,9 @@ public class RandomTextureUtil extends CachedTextureUtil {
         byte red2 = (byte) (c2 >> 16);
         byte green2 = (byte) (c2 >> 8);
         byte blue2 = (byte) (c2 >> 0);
-        int red = MathMan.clamp(red1 + random(red2), 0, 255);
-        int green = MathMan.clamp(green1 + random(green2), 0, 255);
-        int blue = MathMan.clamp(blue1 + random(blue2), 0, 255);
+        int red = Math.clamp(red1 + random(red2), 0, 255);
+        int green = Math.clamp(green1 + random(green2), 0, 255);
+        int blue = Math.clamp(blue1 + random(blue2), 0, 255);
         return (red << 16) + (green << 8) + (blue << 0) + (255 << 24);
     }
 

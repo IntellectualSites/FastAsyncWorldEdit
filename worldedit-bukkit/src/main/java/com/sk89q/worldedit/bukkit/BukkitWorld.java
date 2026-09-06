@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.bukkit;
 
+import com.fastasyncworldedit.bukkit.util.PaperSupport;
 import com.fastasyncworldedit.bukkit.util.WorldUnloadedException;
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.FaweCache;
@@ -59,7 +60,6 @@ import com.sk89q.worldedit.world.generation.ConfiguredFeatureType;
 import com.sk89q.worldedit.world.generation.StructureType;
 import com.sk89q.worldedit.world.weather.WeatherType;
 import com.sk89q.worldedit.world.weather.WeatherTypes;
-import io.papermc.lib.PaperLib;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.Effect;
@@ -292,13 +292,17 @@ public class BukkitWorld extends AbstractWorld {
         }
 
         Block block = getWorld().getBlockAt(pt.x(), pt.y(), pt.z());
-        BlockState state = PaperLib.getBlockState(block, false).getState();
-        if (!(state instanceof InventoryHolder)) {
+        BlockState state;
+        if (PaperSupport.isPaper()) {
+            state = block.getState(false);
+        } else {
+            state = block.getState();
+        }
+        if (!(state instanceof InventoryHolder chest)) {
             return false;
         }
 
         TaskManager.taskManager().sync(() -> {
-            InventoryHolder chest = (InventoryHolder) state;
             Inventory inven = chest.getInventory();
             if (chest instanceof Chest) {
                 inven = ((Chest) chest).getBlockInventory();
@@ -399,8 +403,8 @@ public class BukkitWorld extends AbstractWorld {
         int Z = pt.z() >> 4;
         if (Fawe.isMainThread()) {
             world.getChunkAt(X, Z);
-        } else if (PaperLib.isPaper()) {
-            PaperLib.getChunkAtAsync(world, X, Z, true);
+        } else if (PaperSupport.isPaper()) {
+            world.getChunkAtAsync(X, Z, true);
         }
         //FAWE end
     }
@@ -675,12 +679,6 @@ public class BukkitWorld extends AbstractWorld {
         }
 
         return false;
-    }
-
-    @Override
-    public boolean fullySupports3DBiomes() {
-        // Supports if API does and we're not in the overworld
-        return HAS_3D_BIOMES && getWorld().getEnvironment() != World.Environment.NORMAL || PaperLib.isVersion(18);
     }
 
     @SuppressWarnings("deprecation")

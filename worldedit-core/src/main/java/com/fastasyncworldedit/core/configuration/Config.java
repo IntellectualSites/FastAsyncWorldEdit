@@ -298,7 +298,7 @@ public class Config {
     private void save(PrintWriter writer, Class<?> clazz, final Object instance, int indent, String parentNode) {
         try {
             String CTRF = System.lineSeparator();
-            String spacing = StringMan.repeat(" ", indent);
+            String spacing = " ".repeat(indent);
             for (Field field : clazz.getFields()) {
                 if (field.getAnnotation(Ignore.class) != null) {
                     continue;

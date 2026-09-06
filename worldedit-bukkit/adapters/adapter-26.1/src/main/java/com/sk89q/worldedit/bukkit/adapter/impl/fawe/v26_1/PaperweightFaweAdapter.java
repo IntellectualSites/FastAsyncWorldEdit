@@ -2,6 +2,7 @@ package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v26_1;
 
 import com.fastasyncworldedit.bukkit.adapter.FaweAdapter;
 import com.fastasyncworldedit.bukkit.adapter.NMSRelighterFactory;
+import com.fastasyncworldedit.bukkit.util.PaperSupport;
 import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.entity.LazyBaseEntity;
 import com.fastasyncworldedit.core.extent.processor.PlacementStateProcessor;
@@ -23,14 +24,6 @@ import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.bukkit.adapter.impl.v26_1.PaperweightAdapter;
-import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v26_1.*;
-import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v26_1.FaweBlockStateListPopulator;
-import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v26_1.PaperweightFaweWorldNativeAccess;
-import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v26_1.PaperweightMapChunkUtil;
-import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v26_1.PaperweightPlacementStateProcessor;
-import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v26_1.PaperweightPlatformAdapter;
-import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v26_1.PaperweightPostProcessor;
-import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v26_1.PaperweightStarlightRelighterFactory;
 import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v26_1.regen.PaperweightRegen;
 import com.sk89q.worldedit.bukkit.adapter.impl.v26_1.PaperweightBlockMaterial;
 import com.sk89q.worldedit.entity.BaseEntity;
@@ -63,7 +56,6 @@ import com.sk89q.worldedit.world.generation.StructureType;
 import com.sk89q.worldedit.world.generation.TreeType;
 import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
-import io.papermc.lib.PaperLib;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
@@ -863,7 +855,7 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
 
     @Override
     public RelighterFactory getRelighterFactory() {
-        if (PaperLib.isPaper()) {
+        if (PaperSupport.isPaper()) {
             return new PaperweightStarlightRelighterFactory();
         } else {
             return new NMSRelighterFactory();
@@ -895,7 +887,7 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
     }
 
     private boolean wasAccessibleSinceLastSave(ChunkHolder holder) {
-        if (PaperLib.isPaper()) { // Papers new chunk system has no related replacement - therefor we assume true.
+        if (PaperSupport.isPaper()) { // Papers new chunk system has no related replacement - therefor we assume true.
             return true;
         }
         try {

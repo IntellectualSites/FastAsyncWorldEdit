@@ -1,6 +1,7 @@
 package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v26_2.regen;
 
 import com.fastasyncworldedit.bukkit.adapter.Regenerator;
+import com.fastasyncworldedit.bukkit.util.PaperSupport;
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.queue.IChunkCache;
 import com.fastasyncworldedit.core.queue.IChunkGet;
@@ -13,7 +14,6 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.io.file.SafeFiles;
 import com.sk89q.worldedit.world.RegenOptions;
-import io.papermc.lib.PaperLib;
 import io.papermc.paper.world.PaperWorldLoader;
 import io.papermc.paper.world.saveddata.PaperWorldPDC;
 import net.minecraft.core.Holder;
@@ -115,7 +115,7 @@ public class PaperweightRegen extends Regenerator {
 
     @Override
     protected boolean initNewWorld() throws Exception {
-        if (!PaperLib.isPaper()) {
+        if (!PaperSupport.isPaper()) {
             throw new UnsupportedOperationException("Regen requires Paper");
         }
 

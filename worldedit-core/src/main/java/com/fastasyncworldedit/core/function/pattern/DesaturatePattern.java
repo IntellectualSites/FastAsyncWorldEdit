@@ -27,7 +27,7 @@ public class DesaturatePattern extends AbstractPattern {
     public DesaturatePattern(Extent extent, TextureHolder holder, double value) {
         this.extent = extent;
         this.util = holder.getTextureUtil();
-        this.value = Math.max(0, Math.min(1, value));
+        this.value = Math.clamp(value, 0, 1);
     }
 
     /**
@@ -41,7 +41,7 @@ public class DesaturatePattern extends AbstractPattern {
     private DesaturatePattern(Extent extent, double value, TextureUtil util) {
         this.extent = extent;
         this.util = util;
-        this.value = Math.max(0, Math.min(1, value));
+        this.value = Math.clamp(value, 0, 1);
     }
 
     @Override
