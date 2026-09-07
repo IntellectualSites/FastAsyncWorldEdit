@@ -54,7 +54,7 @@ public class CopyPastaBrush implements Brush, ResettableTool {
     public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws
             MaxChangedBlocksException {
         Actor actor = editSession.getActor();
-        if (!(actor instanceof final Player player)) {
+        if (!(actor instanceof Player player)) {
             throw FaweCache.PLAYER_ONLY;
         }
         ClipboardHolder clipboard = session.getExistingClipboard();

@@ -320,7 +320,7 @@ public class ClipboardCommands {
             Operations.completeLegacy(copy);
         } catch (Exception e) {
             DiskOptimizedClipboard doc;
-            if (clipboard instanceof final DiskOptimizedClipboard diskOptimizedClipboard) {
+            if (clipboard instanceof DiskOptimizedClipboard diskOptimizedClipboard) {
                 doc = diskOptimizedClipboard;
             } else if (clipboard instanceof BlockArrayClipboard blockArrayClipboard
                     && blockArrayClipboard.getParent() instanceof DiskOptimizedClipboard parentDoc) {

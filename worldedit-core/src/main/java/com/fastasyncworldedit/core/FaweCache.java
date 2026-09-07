@@ -666,7 +666,7 @@ public enum FaweCache implements Trimable {
 
             protected synchronized void afterExecute(Runnable runnable, Throwable throwable) {
                 super.afterExecute(runnable, throwable);
-                if (throwable == null && runnable instanceof final Future<?> future) {
+                if (throwable == null && runnable instanceof Future<?> future) {
                     try {
                         if (future.isDone()) {
                             future.get();

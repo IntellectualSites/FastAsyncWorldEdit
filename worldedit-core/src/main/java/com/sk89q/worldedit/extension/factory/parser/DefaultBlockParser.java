@@ -448,11 +448,11 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
             } else if (typeString.matches("slot[0-9]+")) {
                 int slot = Integer.parseInt(typeString.substring(4)) - 1;
                 Actor actor = context.requireActor();
-                if (!(actor instanceof final Player player)) {
+                if (!(actor instanceof Player player)) {
                     throw new InputParseException(Caption.of("worldedit.command.player-only"));
                 }
                 BlockBag bag = player.getInventoryBlockBag();
-                if (!(bag instanceof final SlottableBlockBag slottable)) {
+                if (!(bag instanceof SlottableBlockBag slottable)) {
                     throw new InputParseException(Caption.of("fawe.error.unsupported"));
                 }
                 BaseItem item = slottable.getItem(slot);

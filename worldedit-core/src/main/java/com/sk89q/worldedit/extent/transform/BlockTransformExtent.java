@@ -163,7 +163,7 @@ public class BlockTransformExtent extends ResettableExtent {
     }
 
     private static long[] getDirections(AbstractProperty<?> property) {
-        if (property instanceof final DirectionalProperty dir) {
+        if (property instanceof DirectionalProperty dir) {
             return adapt(dir.getValues().toArray(new Direction[0]));
         } else {
             List<?> values = property.getValues();
