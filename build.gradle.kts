@@ -6,7 +6,7 @@ plugins {
     alias(libs.plugins.codecov)
     jacoco
     id("buildlogic.common")
-    id("com.gradleup.nmcp.aggregation") version "1.6.1"
+    id("com.gradleup.nmcp.aggregation") version "1.6.2"
     id("xyz.jpenilla.run-paper") version "3.1.0"
 }
 
