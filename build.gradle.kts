@@ -10,7 +10,7 @@ plugins {
     id("xyz.jpenilla.run-paper") version "3.0.2"
 }
 
-val rootVersion: String = (extra.properties["rootVersion"] as? String) ?: "2.15.5"
+val rootVersion: String = (extra.properties["rootVersion"] as? String) ?: "3.0.0"
 val snapshot: String = (extra.properties["snapshot"] as? String) ?: "SNAPSHOT"
 var revision: String = (extra.properties["revision"] as? String) ?: ""
 var buildNumber: String = (extra.properties["buildNumber"] as? String) ?: ""
