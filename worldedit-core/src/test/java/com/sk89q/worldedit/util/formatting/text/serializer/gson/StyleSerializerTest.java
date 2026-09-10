@@ -13,12 +13,17 @@ class StyleSerializerTest {
     @Test
     void hexColorIsDroppedInsteadOfFailing() {
         // Vanilla item names may carry hex colors ("#RRGGBB") since 1.16, text3 cannot represent them.
-        Component component = GsonComponentSerializer.INSTANCE.deserialize(
+        Component hexOnly = GsonComponentSerializer.INSTANCE.deserialize(
                 "{\"text\":\"Gold item\",\"color\":\"#FFD700\"}"
         );
-        assertEquals("Gold item", ((TextComponent) component).content());
-        assertNull(component.color());
-    }
+        assertEquals("Gold item", ((TextComponent) hexOnly).content());
+        assertNull(hexOnly.color());
+
+        Component prefixed = GsonComponentSerializer.INSTANCE.deserialize(
+                "{\"text\":\"Gold item\",\"color\":\"■ #FFD700\"}"
+        );
+        assertEquals("Gold item", ((TextComponent) prefixed).content());
+        assertNull(prefixed.color());
 
     @Test
     void namedColorStillParsed() {
