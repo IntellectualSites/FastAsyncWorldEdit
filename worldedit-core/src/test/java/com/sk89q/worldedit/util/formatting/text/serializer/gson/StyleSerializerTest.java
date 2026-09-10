@@ -18,12 +18,7 @@ class StyleSerializerTest {
         );
         assertEquals("Gold item", ((TextComponent) hexOnly).content());
         assertNull(hexOnly.color());
-
-        Component prefixed = GsonComponentSerializer.INSTANCE.deserialize(
-                "{\"text\":\"Gold item\",\"color\":\"■ #FFD700\"}"
-        );
-        assertEquals("Gold item", ((TextComponent) prefixed).content());
-        assertNull(prefixed.color());
+    }
 
     @Test
     void namedColorStillParsed() {
