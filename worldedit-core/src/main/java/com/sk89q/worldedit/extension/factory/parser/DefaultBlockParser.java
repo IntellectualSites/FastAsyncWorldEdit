@@ -64,6 +64,7 @@ import com.sk89q.worldedit.world.block.FuzzyBlockState;
 import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.entity.EntityTypes;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
+import org.enginehub.linbus.tree.LinCompoundTag;
 
 import javax.annotation.Nonnull;
 import java.util.Arrays;
@@ -386,7 +387,7 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
             }
         }
 
-        CompoundTag nbt = null;
+        LinCompoundTag nbt = null;
         //FAWE end
         if (state == null) {
             String typeString;
@@ -423,14 +424,14 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
                 final BaseBlock blockInHand = getBlockInHand(context.requireActor(), HandSide.MAIN_HAND);
                 //FAWE start
                 state = blockInHand.toBlockState();
-                nbt = blockInHand.getNbtData();
+                nbt = blockInHand.getNbt();
                 //FAWE end
             } else if ("offhand".equalsIgnoreCase(typeString) || "oh".equalsIgnoreCase(typeString)) {
                 // Get the block type from the item in the user's off hand.
                 final BaseBlock blockInHand = getBlockInHand(context.requireActor(), HandSide.OFF_HAND);
                 //FAWE start
                 state = blockInHand.toBlockState();
-                nbt = blockInHand.getNbtData();
+                nbt = blockInHand.getNbt();
                 //FAWE end
             } else if (typeString.matches("pos[0-9]+")) {
                 int index = Integer.parseInt(typeString.replaceAll("[a-z]+", ""));
@@ -443,7 +444,7 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
                     throw new InputParseException(Caption.of("worldedit.error.incomplete-region"));
                 }
                 state = world.getBlock(primaryPosition);
-                nbt = state.getNbtData();
+                nbt = state.getNbt();
                 //FAWE start
             } else if (typeString.matches("slot[0-9]+")) {
                 int slot = Integer.parseInt(typeString.substring(4)) - 1;
@@ -461,7 +462,7 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
                     throw new InputParseException(Caption.of("worldedit.error.not-a-block"));
                 }
                 state = item.getType().getBlockType().getDefaultState();
-                nbt = item.getNbtData();
+                nbt = item.getNbt();
             } else {
                 BlockType type = BlockTypes.parse(typeString.toLowerCase(Locale.ROOT), context);
 
@@ -471,7 +472,7 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
                 if (state == null) {
                     throw new NoMatchException(Caption.of("fawe.error.invalid-block-type", TextComponent.of(input)));
                 }
-                nbt = state.getNbtData();
+                nbt = state.getNbt();
             }
             //FAWE end
 
@@ -589,7 +590,7 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
         } else {
             //FAWE start
             if (nbt == null) {
-                nbt = state.getNbtData();
+                nbt = state.getNbt();
             }
             BaseBlock result;
             if (nbt != null) {
@@ -612,12 +613,12 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
                         TextComponent.of(String.valueOf(holder))
                 ));
             }
-            CompoundTag nbt = holder.getNbtData();
+            LinCompoundTag nbt = holder.getNbt();
             if (nbt != null) {
                 if (actor.hasPermission("worldedit.anyblock.nbt")) {
                     return holder;
                 }
-                if (nbt.equals(holder.getBlockType().getDefaultState().getNbtData())) {
+                if (nbt.equals(holder.getBlockType().getDefaultState().getNbt())) {
                     if (!actor.hasPermission("worldedit.anyblock.default-nbt")) {
                         throw new DisallowedUsageException(Caption.of(
                                 "fawe.error.nbt.forbidden",
