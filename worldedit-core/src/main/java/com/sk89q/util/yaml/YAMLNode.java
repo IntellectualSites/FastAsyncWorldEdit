@@ -158,35 +158,31 @@ public class YAMLNode {
      * @return the new object
      */
     private Object prepareSerialization(Object value) {
-        return switch (value) {
-            case Vector3(double x, double y, double z) -> {
-                Map<String, Double> out = new LinkedHashMap<>();
-                out.put("x", x);
-                out.put("y", y);
-                out.put("z", z);
-                yield out;
-            }
-            case BlockVector3(int x, int y, int z) -> {
-                Map<String, Integer> out = new LinkedHashMap<>();
-                out.put("x", x);
-                out.put("y", y);
-                out.put("z", z);
-                yield out;
-            }
-            case Vector2(double x, double z) -> {
-                Map<String, Double> out = new LinkedHashMap<>();
-                out.put("x", x);
-                out.put("z", z);
-                yield out;
-            }
-            case BlockVector2(int x, int z) -> {
-                Map<String, Integer> out = new LinkedHashMap<>();
-                out.put("x", x);
-                out.put("z", z);
-                yield out;
-            }
-            case null, default -> value;
-        };
+        if (value instanceof Vector3 vec) {
+            Map<String, Double> out = new LinkedHashMap<>();
+            out.put("x", vec.x());
+            out.put("y", vec.y());
+            out.put("z", vec.z());
+            return out;
+        } else if (value instanceof BlockVector3 vec) {
+            Map<String, Integer> out = new LinkedHashMap<>();
+            out.put("x", vec.x());
+            out.put("y", vec.y());
+            out.put("z", vec.z());
+            return out;
+        } else if (value instanceof Vector2 vec) {
+            Map<String, Double> out = new LinkedHashMap<>();
+            out.put("x", vec.x());
+            out.put("z", vec.z());
+            return out;
+        } else if (value instanceof BlockVector2 vec) {
+            Map<String, Integer> out = new LinkedHashMap<>();
+            out.put("x", vec.x());
+            out.put("z", vec.z());
+            return out;
+        }
+
+        return value;
     }
 
     /**
