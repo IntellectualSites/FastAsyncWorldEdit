@@ -144,8 +144,7 @@ public class BukkitCommandSender extends AbstractNonPlayerActor {
             @Override
             public boolean isActive() {
                 //FAWE start - check if sender instanceof Entity, before returning true
-                if (sender instanceof Entity) {
-                    Entity entity = (Entity) sender;
+                if (sender instanceof Entity entity) {
                     return entity.isValid() && !entity.isDead();
                 }
                 //FAWE end

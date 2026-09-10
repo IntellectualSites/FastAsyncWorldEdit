@@ -659,33 +659,20 @@ public final class WorldEdit {
         if (byName != null) {
             return byName;
         }
-        switch (dirStr) {
-            case "m":
-            case "me":
-            case "f":
-            case "forward":
-                return getDirectionRelative(player, 0);
-
-            case "b":
-            case "back":
+        return switch (dirStr) {
+            case "m", "me", "f", "forward" -> getDirectionRelative(player, 0);
+            case "b", "back" -> {
                 Direction dir = getDirectionRelative(player, 180);
                 if (dir.isUpright()) {
                     // If this is an upright direction, flip it.
                     dir = dir == Direction.UP ? Direction.DOWN : Direction.UP;
                 }
-                return dir;
-
-            case "l":
-            case "left":
-                return getDirectionRelative(player, -90);
-
-            case "r":
-            case "right":
-                return getDirectionRelative(player, 90);
-
-            default:
-                throw new UnknownDirectionException(dirStr);
-        }
+                yield dir;
+            }
+            case "l", "left" -> getDirectionRelative(player, -90);
+            case "r", "right" -> getDirectionRelative(player, 90);
+            default -> throw new UnknownDirectionException(dirStr);
+        };
     }
 
     private Direction getDirectionRelative(Player player, int yawOffset) throws UnknownDirectionException {

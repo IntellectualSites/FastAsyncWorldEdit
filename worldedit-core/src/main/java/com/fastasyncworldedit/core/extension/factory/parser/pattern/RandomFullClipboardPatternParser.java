@@ -36,7 +36,7 @@ public class RandomFullClipboardPatternParser extends RichParser<Pattern> {
     @Override
     protected Stream<String> getSuggestions(String argumentInput, int index, ParserContext context) {
         switch (index) {
-            case 0:
+            case 0 -> {
                 if (argumentInput.equals("#") || argumentInput.equals("#c")) {
                     return Stream.of("#copy", "#clipboard");
                 } else if ("#copy".startsWith(argumentInput.toLowerCase(Locale.ROOT))) {
@@ -46,11 +46,13 @@ public class RandomFullClipboardPatternParser extends RichParser<Pattern> {
                 } else {
                     return Stream.empty();
                 }
-            case 1:
-            case 2:
+            }
+            case 1, 2 -> {
                 return SuggestionHelper.suggestBoolean(argumentInput);
-            default:
+            }
+            default -> {
                 return Stream.empty();
+            }
         }
     }
 

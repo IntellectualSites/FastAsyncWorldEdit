@@ -121,12 +121,12 @@ public class FactoryConverter<T> implements ArgumentConverter<T> {
 
         ParserContext parserContext = new ParserContext();
         parserContext.setActor(actor);
-        if (actor instanceof Locatable) {
-            Extent extent = ((Locatable) actor).getExtent();
-            if (extent instanceof World) {
-                parserContext.setWorld((World) extent);
+        if (actor instanceof Locatable locatable) {
+            Extent extent = locatable.getExtent();
+            if (extent instanceof World world) {
+                parserContext.setWorld(world);
             }
-            parserContext.setExtent(new SupplyingExtent(((Locatable) actor)::getExtent));
+            parserContext.setExtent(new SupplyingExtent(locatable::getExtent));
         } else if (session.hasWorldOverride()) {
             parserContext.setWorld(session.getWorldOverride());
             parserContext.setExtent(new SupplyingExtent(session::getWorldOverride));

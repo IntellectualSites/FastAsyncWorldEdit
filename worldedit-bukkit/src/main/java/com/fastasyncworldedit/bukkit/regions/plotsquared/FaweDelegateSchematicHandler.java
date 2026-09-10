@@ -177,8 +177,7 @@ public class FaweDelegateSchematicHandler {
         try {
             File tmp = FileUtils.getFile(PlotSquared.platform().getDirectory(), path);
             tmp.getParentFile().mkdirs();
-            if (tag instanceof CompressedCompoundTag) {
-                CompressedCompoundTag cTag = (CompressedCompoundTag) tag;
+            if (tag instanceof CompressedCompoundTag cTag) {
                 if (cTag instanceof CompressedSchematicTag) {
                     Clipboard clipboard = (Clipboard) cTag.getSource();
                     try (OutputStream stream = new FileOutputStream(tmp);

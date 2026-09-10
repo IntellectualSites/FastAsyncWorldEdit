@@ -56,8 +56,7 @@ public final class Functions {
         MethodHandles.Lookup lookup = MethodHandles.lookup();
         try {
             DOUBLE_VALUE = lookup.findVirtual(Number.class, "doubleValue",
-                    methodType(double.class)
-            );
+                methodType(double.class));
         } catch (NoSuchMethodException | IllegalAccessException e) {
             throw new IllegalStateException(e);
         }
@@ -69,10 +68,8 @@ public final class Functions {
         handle = handle.asType(handle.type().wrap());
         if (handle.type().returnType() != Double.class) {
             // Ensure that the handle returns a Double, even if originally a Number
-            checkState(
-                    Number.class.isAssignableFrom(handle.type().returnType()),
-                    "Function does not return a number"
-            );
+            checkState(Number.class.isAssignableFrom(handle.type().returnType()),
+                "Function does not return a number");
             handle = handle.asType(handle.type().changeReturnType(Number.class));
             handle = filterReturnValue(handle, DOUBLE_VALUE);
             handle = handle.asType(handle.type().wrap());
@@ -80,47 +77,41 @@ public final class Functions {
         // return vararg-ity
         if (wasVarargs) {
             handle = handle.asVarargsCollector(
-                    handle.type().parameterType(handle.type().parameterCount() - 1)
+                handle.type().parameterType(handle.type().parameterCount() - 1)
             );
         }
         return handle;
     }
 
     private static void addMathHandles(
-            SetMultimap<String, MethodHandle> map,
-            MethodHandles.Lookup lookup
+        SetMultimap<String, MethodHandle> map,
+        MethodHandles.Lookup lookup
     ) throws NoSuchMethodException, IllegalAccessException {
         // double <name>(double) functions
         for (String name : ImmutableList.of(
-                "sin", "cos", "tan", "asin", "acos", "atan",
-                "sinh", "cosh", "tanh", "sqrt", "cbrt", "abs",
-                "ceil", "floor", "rint", "exp", "log", "log10"
+            "sin", "cos", "tan", "asin", "acos", "atan",
+            "sinh", "cosh", "tanh", "sqrt", "cbrt", "abs",
+            "ceil", "floor", "rint", "exp", "log", "log10"
         )) {
             map.put(name, lookup.findStatic(Math.class, name,
-                    methodType(double.class, double.class)
-            ));
+                methodType(double.class, double.class)));
         }
         // Alias ln -> log
         map.put("ln", lookup.findStatic(Math.class, "log",
-                methodType(double.class, double.class)
-        ));
+            methodType(double.class, double.class)));
         map.put("round", lookup.findStatic(Math.class, "round",
-                methodType(long.class, double.class)
-        ));
+            methodType(long.class, double.class)));
 
         map.put("atan2", lookup.findStatic(Math.class, "atan2",
-                methodType(double.class, double.class, double.class)
-        ));
+            methodType(double.class, double.class, double.class)));
 
         // Special cases: we accept varargs for these
         map.put("min", lookup.findStatic(Doubles.class, "min",
-                        methodType(double.class, double[].class)
-                )
-                .asVarargsCollector(double[].class));
+            methodType(double.class, double[].class))
+            .asVarargsCollector(double[].class));
         map.put("max", lookup.findStatic(Doubles.class, "max",
-                        methodType(double.class, double[].class)
-                )
-                .asVarargsCollector(double[].class));
+            methodType(double.class, double[].class))
+            .asVarargsCollector(double[].class));
     }
 
     private static void addStaticFunctionHandles(
@@ -247,7 +238,7 @@ public final class Functions {
             throw new IllegalStateException(e);
         }
         this.map = ImmutableSetMultimap.copyOf(
-                Multimaps.transformValues(map, Functions::clean)
+            Multimaps.transformValues(map, Functions::clean)
         );
     }
 
@@ -298,13 +289,13 @@ public final class Functions {
 
     private double closest(double x, double y, double z, double index, double count, double stride) {
         return findClosest(
-                megaBuffer, x, y, z, (int) index, (int) count, (int) stride
+            megaBuffer, x, y, z, (int) index, (int) count, (int) stride
         );
     }
 
     private static double gclosest(double x, double y, double z, double index, double count, double stride) {
         return findClosest(
-                globalMegaBuffer, x, y, z, (int) index, (int) count, (int) stride
+            globalMegaBuffer, x, y, z, (int) index, (int) count, (int) stride
         );
     }
 
@@ -348,10 +339,8 @@ public final class Functions {
 
     private static final ThreadLocal<PerlinNoise> localPerlin = ThreadLocal.withInitial(PerlinNoise::new);
 
-    private static double perlin(
-            double seed, double x, double y, double z,
-            double frequency, double octaves, double persistence
-    ) {
+    private static double perlin(double seed, double x, double y, double z,
+                                 double frequency, double octaves, double persistence) {
         PerlinNoise perlin = localPerlin.get();
         try {
             perlin.setSeed((int) seed);
@@ -379,10 +368,8 @@ public final class Functions {
 
     private static final ThreadLocal<RidgedMultiFractalNoise> localRidgedMulti = ThreadLocal.withInitial(RidgedMultiFractalNoise::new);
 
-    private static double ridgedmulti(
-            double seed, double x, double y, double z,
-            double frequency, double octaves
-    ) {
+    private static double ridgedmulti(double seed, double x, double y, double z,
+                                      double frequency, double octaves) {
         RidgedMultiFractalNoise ridgedMulti = localRidgedMulti.get();
         try {
             ridgedMulti.setSeed((int) seed);
@@ -398,13 +385,13 @@ public final class Functions {
         // Compare to input values and determine return value
         // -1 is a wildcard, always true
         double ret = ((type.value() == -1 || typeId == type.value())
-                && (data.value() == -1 || dataValue == data.value())) ? 1.0 : 0.0;
+            && (data.value() == -1 || dataValue == data.value())) ? 1.0 : 0.0;
 
-        if (type instanceof Variable) {
-            ((Variable) type).setValue(typeId);
+        if (type instanceof Variable typeVar) {
+            typeVar.setValue(typeId);
         }
-        if (data instanceof Variable) {
-            ((Variable) data).setValue(dataValue);
+        if (data instanceof Variable dataVar) {
+            dataVar.setValue(dataValue);
         }
 
         return ret;

@@ -201,7 +201,7 @@ public class BukkitPlayerBlockBag extends BlockBag implements SlottableBlockBag 
     @Override
     public void setItem(int slot, BaseItem block) {
         loadInventory();
-        BaseItemStack stack = block instanceof BaseItemStack ? (BaseItemStack) block : new BaseItemStack(
+        BaseItemStack stack = block instanceof BaseItemStack baseItemStack ? baseItemStack : new BaseItemStack(
                 block.getType(),
                 block.getNbtData(),
                 1

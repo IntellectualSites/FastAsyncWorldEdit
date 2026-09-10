@@ -124,8 +124,7 @@ public class CommandContext {
             argIndexList.add(i);
 
             switch (arg.charAt(0)) {
-                case '\'':
-                case '"':
+                case '\'', '"' -> {
                     final StringBuilder build = new StringBuilder();
                     final char quotedChar = arg.charAt(0);
 
@@ -155,6 +154,7 @@ public class CommandContext {
                         continue;
                     }
                     // else raise exception about hanging quotes?
+                }
             }
             argList.add(arg);
         }

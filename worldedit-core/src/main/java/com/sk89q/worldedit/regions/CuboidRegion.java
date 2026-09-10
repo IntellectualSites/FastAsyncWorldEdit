@@ -469,8 +469,7 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
 
             @Override
             public boolean contains(Object o) {
-                if (o instanceof BlockVector2) {
-                    BlockVector2 cv = (BlockVector2) o;
+                if (o instanceof BlockVector2 cv) {
                     return cv.x() >= minX && cv.x() <= maxX && cv.z() >= minZ && cv.z() <= maxZ;
                 }
                 return false;

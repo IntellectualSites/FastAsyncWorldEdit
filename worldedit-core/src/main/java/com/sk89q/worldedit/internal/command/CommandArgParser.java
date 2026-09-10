@@ -64,17 +64,13 @@ public class CommandArgParser {
         for (; index < input.size(); index++) {
             Substring nextPart = input.get(index);
             switch (state) {
-                case NORMAL:
-                    handleNormal(nextPart);
-                    break;
-                case QUOTE:
-                    handleQuote(nextPart);
-                    break;
-                default:
-                    break;
+                case NORMAL -> handleNormal(nextPart);
+                case QUOTE -> handleQuote(nextPart);
+                default -> {
+                }
             }
         }
-        if (currentArg.size() > 0) {
+        if (!currentArg.isEmpty()) {
             finishArg(); // force finish "hanging" args
         }
         return args.build();

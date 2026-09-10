@@ -153,10 +153,12 @@ public class MultiClipboardHolder extends URIClipboardHolder implements Iterable
             cached = available = getClipboards().toArray(new Clipboard[0]);
         }
         switch (available.length) {
-            case 0:
+            case 0 -> {
                 return EmptyClipboard.getInstance();
-            case 1:
+            }
+            case 1 -> {
                 return available[0];
+            }
         }
 
         int index = ThreadLocalRandom.current().nextInt(available.length);

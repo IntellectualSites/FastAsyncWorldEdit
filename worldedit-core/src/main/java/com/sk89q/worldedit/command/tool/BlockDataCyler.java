@@ -71,7 +71,7 @@ public class BlockDataCyler implements DoubleActionBlockTool {
             return true;
         }
 
-        if (block.getStates().keySet().isEmpty()) {
+        if (block.getStates().isEmpty()) {
             player.print(Caption.of("worldedit.tool.data-cycler.cant-cycle"));
         } else {
             Property<?> currentProperty = selectedProperties.get(player.getUniqueId());

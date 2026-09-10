@@ -777,7 +777,7 @@ public abstract class Vector3 {
     //FAWE start - not a record, need own implementations
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof final Vector3 other)) {
+        if (!(obj instanceof Vector3 other)) {
             return false;
         }
 

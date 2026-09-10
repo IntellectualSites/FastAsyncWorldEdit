@@ -631,7 +631,7 @@ public class WorldEditPlugin extends JavaPlugin {
         if (meta.isEmpty()) {
             return null;
         }
-        return (BukkitPlayer) meta.get(0).value();
+        return (BukkitPlayer) meta.getFirst().value();
     }
 
     BukkitPlayer reCachePlayer(Player player) {
@@ -644,10 +644,10 @@ public class WorldEditPlugin extends JavaPlugin {
     //FAWE end
 
     public Actor wrapCommandSender(CommandSender sender) {
-        if (sender instanceof Player) {
-            return wrapPlayer((Player) sender);
-        } else if (config.commandBlockSupport && sender instanceof BlockCommandSender) {
-            return new BukkitBlockCommandSender(this, (BlockCommandSender) sender);
+        if (sender instanceof Player player) {
+            return wrapPlayer(player);
+        } else if (config.commandBlockSupport && sender instanceof BlockCommandSender blockCommandSender) {
+            return new BukkitBlockCommandSender(this, blockCommandSender);
         }
 
         return bukkitConsoleCommandSender;

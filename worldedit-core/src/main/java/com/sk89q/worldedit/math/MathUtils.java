@@ -63,16 +63,20 @@ public final class MathUtils {
                 dInt += 360;
             }
             switch (dInt) {
-                case 0:
+                case 0 -> {
                     return 1.0;
-                case 90:
+                }
+                case 90 -> {
                     return 0.0;
-                case 180:
+                }
+                case 180 -> {
                     return -1.0;
-                case 270:
+                }
+                case 270 -> {
                     return 0.0;
-                default:
-                    break;
+                }
+                default -> {
+                }
             }
         }
         return Math.cos(Math.toRadians(degrees));
@@ -94,16 +98,20 @@ public final class MathUtils {
                 dInt += 360;
             }
             switch (dInt) {
-                case 0:
+                case 0 -> {
                     return 0.0;
-                case 90:
+                }
+                case 90 -> {
                     return 1.0;
-                case 180:
+                }
+                case 180 -> {
                     return 0.0;
-                case 270:
+                }
+                case 270 -> {
                     return -1.0;
-                default:
-                    break;
+                }
+                default -> {
+                }
             }
         }
         return Math.sin(Math.toRadians(degrees));

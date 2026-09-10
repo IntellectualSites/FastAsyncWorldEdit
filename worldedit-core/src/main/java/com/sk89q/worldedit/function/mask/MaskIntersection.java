@@ -83,14 +83,11 @@ public class MaskIntersection extends AbstractMask {
                 }
             }
         }
-        switch (set.size()) {
-            case 0:
-                return Masks.alwaysTrue();
-            case 1:
-                return set.iterator().next();
-            default:
-                return new MaskIntersection(set).optimize();
-        }
+        return switch (set.size()) {
+            case 0 -> Masks.alwaysTrue();
+            case 1 -> set.iterator().next();
+            default -> new MaskIntersection(set).optimize();
+        };
     }
     //FAWE end
 

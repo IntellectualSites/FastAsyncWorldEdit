@@ -198,7 +198,7 @@ public class RichPatternParser extends FaweParser<Pattern> {
             return null;
         }
         if (patterns.size() == 1) {
-            return patterns.get(0);
+            return patterns.getFirst();
         }
         RandomPattern random = new RandomPattern(new TrueRandom());
         for (int i = 0; i < patterns.size(); i++) {

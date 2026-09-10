@@ -48,8 +48,8 @@ public class LinearPatternParser extends RichParser<Pattern> {
         if (inner instanceof BlockStateHolder) {
             return inner;
         }
-        if (inner instanceof RandomPattern) {
-            Set<Pattern> patterns = ((RandomPattern) inner).getPatterns();
+        if (inner instanceof RandomPattern randomPattern) {
+            Set<Pattern> patterns = randomPattern.getPatterns();
             return new LinearBlockPattern(patterns.toArray(new Pattern[0]));
         }
         throw new InputParseException(TextComponent.of("Pattern " + inner.getClass().getSimpleName()

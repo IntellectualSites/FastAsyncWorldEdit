@@ -50,7 +50,7 @@ public class SafeFiles {
      */
     public static Stream<Path> noLeakFileList(Path dir) throws IOException {
         try (Stream<Path> stream = Files.list(dir)) {
-            return stream.collect(Collectors.toList()).stream();
+            return stream.toList().stream();
         }
     }
 
@@ -184,14 +184,11 @@ public class SafeFiles {
      * @return the owner-only file attributes
      */
     public static FileAttribute<?>[] getOwnerOnlyFileAttributes(AttributeTarget attributeTarget) {
-        switch (attributeTarget) {
-            case FILE:
-                return OWNER_ONLY_FILE_ATTRS;
-            case DIRECTORY:
-                return OWNER_ONLY_DIR_ATTRS;
-            default:
-                throw new IllegalStateException("Unknown attribute target " + attributeTarget);
-        }
+        return switch (attributeTarget) {
+            case FILE -> OWNER_ONLY_FILE_ATTRS;
+            case DIRECTORY -> OWNER_ONLY_DIR_ATTRS;
+            default -> throw new IllegalStateException("Unknown attribute target " + attributeTarget);
+        };
     }
 
     private SafeFiles() {

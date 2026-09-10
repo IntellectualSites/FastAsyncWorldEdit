@@ -304,8 +304,8 @@ public class BukkitWorld extends AbstractWorld {
 
         TaskManager.taskManager().sync(() -> {
             Inventory inven = chest.getInventory();
-            if (chest instanceof Chest) {
-                inven = ((Chest) chest).getBlockInventory();
+            if (chest instanceof Chest chest1) {
+                inven = chest1.getBlockInventory();
             }
             inven.clear();
             return null;
@@ -416,11 +416,11 @@ public class BukkitWorld extends AbstractWorld {
             return false;
         } else if (other == null) {
             return false;
-        } else if ((other instanceof BukkitWorld)) {
-            World otherWorld = ((BukkitWorld) other).worldRef.get();
+        } else if (other instanceof BukkitWorld bukkitWorld) {
+            World otherWorld = bukkitWorld.worldRef.get();
             return ref.equals(otherWorld);
-        } else if (other instanceof com.sk89q.worldedit.world.World) {
-            return ((com.sk89q.worldedit.world.World) other).getName().equals(ref.getName());
+        } else if (other instanceof com.sk89q.worldedit.world.World world) {
+            return world.getName().equals(ref.getName());
         } else {
             return false;
         }
@@ -610,10 +610,10 @@ public class BukkitWorld extends AbstractWorld {
             try {
                 return worldNativeAccess.setBlock(position, block, sideEffects);
             } catch (Exception e) {
-                if (block instanceof BaseBlock && ((BaseBlock) block).getNbt() != null) {
+                if (block instanceof BaseBlock baseBlock && baseBlock.getNbt() != null) {
                     LOGGER.warn(
                             "Tried to set a corrupt tile entity at " + position.toString()
-                                    + ": " + ((BaseBlock) block).getNbt(), e
+                                    + ": " + baseBlock.getNbt(), e
                     );
                 } else {
                     LOGGER.warn("Failed to set block via adapter, falling back to generic", e);

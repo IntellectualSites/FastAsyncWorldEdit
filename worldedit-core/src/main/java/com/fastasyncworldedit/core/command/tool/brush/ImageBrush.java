@@ -51,12 +51,10 @@ public class ImageBrush implements Brush {
             colorFunction = (x1, z1, x2, z2, extent, pos) -> {
                 int color = table.averageRGBA(x1, z1, x2, z2);
                 int alpha1 = (color >> 24) & 0xFF;
-                switch (alpha1) {
-                    case 0:
-                        return 0;
-                    case 255:
-                        return color;
-                    default:
+                return switch (alpha1) {
+                    case 0 -> 0;
+                    case 255 -> color;
+                    default -> {
                         BlockState block = extent.getBlock(pos);
                         TextureUtil tu = session.getTextureUtil();
                         BlockType type = block.getBlockType();
@@ -66,9 +64,9 @@ public class ImageBrush implements Brush {
                         } else {
                             existingColor = tu.getColor(type);
                         }
-                        return TextureUtil.combineTransparency(color, existingColor);
-
-                }
+                        yield TextureUtil.combineTransparency(color, existingColor);
+                    }
+                };
             };
         } else {
             colorFunction = (x1, z1, x2, z2, extent, pos) -> table.averageRGB(x1, z1, x2, z2);
