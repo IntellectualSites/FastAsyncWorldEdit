@@ -47,7 +47,7 @@ val localImplementation = configurations.create("localImplementation") {
 configurations["compileOnly"].extendsFrom(localImplementation)
 configurations["testImplementation"].extendsFrom(localImplementation)
 
-val adapters = configurations.create("adapters") {
+val adaptersMojmap = configurations.create("adapters") {
     description = "Adapters to include in the JAR (Mojmap)"
     isCanBeConsumed = false
     isCanBeResolved = true
@@ -64,6 +64,17 @@ val adaptersReobf = configurations.create("adaptersReobf") {
     shouldResolveConsistentlyWith(configurations["runtimeClasspath"])
     attributes {
         attribute(Obfuscation.OBFUSCATION_ATTRIBUTE, objects.named(Obfuscation.OBFUSCATED))
+    }
+}
+
+val adaptersGlobalMojmap = configurations.create("adaptersGlobalMojmap") {
+    extendsFrom(adaptersMojmap)
+    isCanBeConsumed = false
+    isCanBeResolved = true
+    shouldResolveConsistentlyWith(configurations["runtimeClasspath"])
+    description = "Adapters which are included in Spigot + Paper JARs without being remapped (26+)"
+    attributes {
+        attribute(Obfuscation.OBFUSCATION_ATTRIBUTE, objects.named(Obfuscation.NONE))
     }
 }
 
@@ -103,9 +114,18 @@ dependencies {
     implementation(libs.fastutil)
 
     project.project(":worldedit-bukkit:adapters").subprojects.forEach {
-        "adapters"(project(it.path))
+        // If the adapter module name starts with `adapter-1`, the adapter itself must be reobfuscated for spigot
+        // Otherwise, if the adapter starts with e.g. `adapter-26` the adapter does not need any reobfuscation as Spigot
+        // supports mojang-mapped code starting with MC 26
+        // Paper supports Mojang-Mapped adapters for the whole range of supported adapter versions
         if (it.name.startsWith("adapter-1_")) {
+            // use adapters as is for Paper
+            "adapters"(project(it.path))
+            // reobfuscate adapters for spigot
             "adaptersReobf"(project(it.path))
+        } else {
+            // don't reobfuscate for Paper or Spigot
+            "adaptersGlobalMojmap"(project(it.path))
         }
     }
     compileOnly(libs.worldguard) {
@@ -152,7 +172,8 @@ tasks.register<ShadowJar>("reobfShadowJar") {
     archiveFileName.set("${rootProject.name}-Bukkit-${project.version}.${archiveExtension.getOrElse("jar")}")
     configurations = listOf(
         project.configurations.runtimeClasspath.get(), // as is done by shadow for the default shadowJar
-        adaptersReobf
+        adaptersReobf,
+        adaptersGlobalMojmap
     )
     relocate("com.sk89q.jchronic", "com.sk89q.worldedit.jchronic")
 
@@ -186,7 +207,7 @@ tasks.register<ShadowJar>("reobfShadowJar") {
 
 tasks.named<ShadowJar>("shadowJar") {
     archiveFileName.set("${rootProject.name}-Paper-${project.version}.${archiveExtension.getOrElse("jar")}")
-    configurations.add(adapters)
+    configurations.addAll(adaptersMojmap, adaptersGlobalMojmap)
     manifest {
         attributes(
             "paperweight-mappings-namespace" to "mojang",
