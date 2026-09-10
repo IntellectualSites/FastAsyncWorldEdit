@@ -44,9 +44,11 @@ import java.util.stream.Collectors;
 @Deprecated
 public class SignBlock extends LegacyBaseBlockWrapper {
 
-    private String[] text;
+    private static final String EMPTY_JSON = "{\"text\":\"\"}";
 
-    private static final String EMPTY =  "{\"text\":\"\"}";
+    private final boolean usesJsonText;
+    private final String emptyText;
+    private String[] text;
 
     /**
      * Construct the sign with text.
@@ -56,23 +58,24 @@ public class SignBlock extends LegacyBaseBlockWrapper {
      */
     public SignBlock(BlockState blockState, String[] text) {
         super(blockState);
+        int dataVersion = WorldEdit.getInstance().getPlatformManager()
+                .queryCapability(Capability.WORLD_EDITING).getDataVersion();
+        this.usesJsonText = dataVersion < Constants.DATA_VERSION_MC_1_21_5;
+        this.emptyText = usesJsonText ? EMPTY_JSON : "";
         if (text == null) {
-            this.text = new String[]{EMPTY, EMPTY, EMPTY, EMPTY};
+            this.text = new String[]{emptyText, emptyText, emptyText, emptyText};
             return;
         }
-        for (int i = 0; i < text.length; i++) {
-            if (text[i].isEmpty()) {
-                text[i] = EMPTY;
-            } else {
-                text[i] = "{\"text\":" + GsonUtil.stringValue(text[i]) + "}";
+        if (usesJsonText) {
+            for (int i = 0; i < text.length; i++) {
+                if (text[i].isEmpty()) {
+                    text[i] = EMPTY_JSON;
+                } else {
+                    text[i] = "{\"text\":" + GsonUtil.stringValue(text[i]) + "}";
+                }
             }
         }
         this.text = text;
-    }
-
-    private boolean isLegacy() {
-        int dataVersion = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).getDataVersion();
-        return dataVersion < Constants.DATA_VERSION_MC_1_20;
     }
 
     /**
@@ -111,17 +114,10 @@ public class SignBlock extends LegacyBaseBlockWrapper {
     @Deprecated
     public CompoundTag getNbtData() {
         Map<String, Tag<?, ?>> values = new HashMap<>();
-        if (isLegacy()) {
-            values.put("Text1", new StringTag(text[0]));
-            values.put("Text2", new StringTag(text[1]));
-            values.put("Text3", new StringTag(text[2]));
-            values.put("Text4", new StringTag(text[3]));
-        } else {
-            ListTag<?, ?> messages = new ListTag<>(StringTag.class, Arrays.stream(text).map(StringTag::new).collect(Collectors.toList()));
-            Map<String, Tag<?, ?>> frontTextTag = new HashMap<>();
-            frontTextTag.put("messages", messages);
-            values.put("front_text", new CompoundTag(frontTextTag));
-        }
+        ListTag<?, ?> messages = new ListTag<>(StringTag.class, Arrays.stream(text).map(StringTag::new).collect(Collectors.toList()));
+        Map<String, Tag<?, ?>> frontTextTag = new HashMap<>();
+        frontTextTag.put("messages", messages);
+        values.put("front_text", new CompoundTag(frontTextTag));
         return new CompoundTag(values);
     }
 
@@ -136,40 +132,18 @@ public class SignBlock extends LegacyBaseBlockWrapper {
 
         Tag<?, ?> t;
 
-        text = new String[]{EMPTY, EMPTY, EMPTY, EMPTY};
+        text = new String[]{emptyText, emptyText, emptyText, emptyText};
 
         t = values.get("id");
         if (!(t instanceof StringTag) || !((StringTag) t).getValue().equals(getNbtId())) {
             throw new RuntimeException(String.format("'%s' tile entity expected", getNbtId()));
         }
 
-        if (isLegacy()) {
-            t = values.get("Text1");
-            if (t instanceof StringTag) {
-                text[0] = ((StringTag) t).getValue();
-            }
-
-            t = values.get("Text2");
-            if (t instanceof StringTag) {
-                text[1] = ((StringTag) t).getValue();
-            }
-
-            t = values.get("Text3");
-            if (t instanceof StringTag) {
-                text[2] = ((StringTag) t).getValue();
-            }
-
-            t = values.get("Text4");
-            if (t instanceof StringTag) {
-                text[3] = ((StringTag) t).getValue();
-            }
-        } else {
-            CompoundTag frontTextTag = (CompoundTag) values.get("front_text");
-            ListTag<?, ?> messagesTag = frontTextTag.getListTag("messages");
-            for (int i = 0; i < messagesTag.getValue().size(); i++) {
-                StringTag tag = (StringTag) messagesTag.getValue().get(i);
-                text[i] = tag.getValue();
-            }
+        CompoundTag frontTextTag = (CompoundTag) values.get("front_text");
+        ListTag<?, ?> messagesTag = frontTextTag.getListTag("messages");
+        for (int i = 0; i < messagesTag.getValue().size(); i++) {
+            StringTag tag = (StringTag) messagesTag.getValue().get(i);
+            text[i] = tag.getValue();
         }
     }
 
