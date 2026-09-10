@@ -1,63 +1,50 @@
-import org.ajoberstar.grgit.Grgit
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
 import org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED
-import java.net.URI
-import java.time.format.DateTimeFormatter
 import xyz.jpenilla.runpaper.task.RunServer
 
 plugins {
-    id("io.github.gradle-nexus.publish-plugin") version "2.0.0"
-    id("xyz.jpenilla.run-paper") version "2.3.1"
+    alias(libs.plugins.codecov)
+    jacoco
+    id("buildlogic.common")
+    id("com.gradleup.nmcp.aggregation") version "1.6.2"
+    id("xyz.jpenilla.run-paper") version "3.1.0"
 }
 
-if (!File("$rootDir/.git").exists()) {
-    logger.lifecycle("""
-    **************************************************************************************
-    You need to fork and clone this repository! Don't download a .zip file.
-    If you need assistance, consult the GitHub docs: https://docs.github.com/get-started/quickstart/fork-a-repo
-    **************************************************************************************
-    """.trimIndent()
-    ).also { kotlin.system.exitProcess(1) }
-}
+val rootVersion: String = (extra.properties["rootVersion"] as? String) ?: "2.15.5"
+val snapshot: String = (extra.properties["snapshot"] as? String) ?: "SNAPSHOT"
+var revision: String = (extra.properties["revision"] as? String) ?: ""
+var buildNumber: String = (extra.properties["buildNumber"] as? String) ?: ""
+var date: String = (extra.properties["date"] as? String) ?: ""
 
-logger.lifecycle("""
-*******************************************
- You are building FastAsyncWorldEdit!
+// Get Git metadata during build setup using the Git CLI.
+// This replaces Grgit/JGit so the build stays compatible with Gradle's configuration cache.
+// The result is recorded as a build input and can be reused without re-running Git each time.
+// We keep the short hash length the same as before for consistency.
+fun gitOutput(vararg args: String): String =
+    providers.exec {
+        commandLine("git", *args)
+        workingDir = rootDir
+    }.standardOutput.asText.get().trim()
 
- If you encounter trouble:
- 1) Read COMPILING.adoc if you haven't yet
- 2) Try running 'build' in a separate Gradle run
- 3) Use gradlew and not gradle
- 4) If you still need help, ask on Discord! https://discord.gg/intellectualsites
-
- Output files will be in [subproject]/build/libs
-*******************************************
-""")
-
-var rootVersion by extra("2.12.4")
-var snapshot by extra("SNAPSHOT")
-var revision: String by extra("")
-var buildNumber by extra("")
-var date: String by extra("")
-ext {
-    val git: Grgit = Grgit.open {
-        dir = File("$rootDir/.git")
-    }
-    date = git.head().dateTime.format(DateTimeFormatter.ofPattern("yy.MM.dd"))
-    revision = "-${git.head().abbreviatedId}"
+date = gitOutput("show", "-s", "--format=%cd", "--date=format:%y.%m.%d", "HEAD")
+revision = "-" + gitOutput("rev-parse", "--short=7", "HEAD")
     buildNumber = if (project.hasProperty("buildnumber")) {
-        snapshot + "-" + project.properties["buildnumber"] as String
+        snapshot + "-" + (project.findProperty("buildnumber") as? String ?: "")
     } else {
-        project.properties["snapshot"] as String
+        (project.findProperty("snapshot") as? String) ?: snapshot
     }
-}
 
-version = String.format("%s-%s", rootVersion, buildNumber)
+extra.set("rootVersion", rootVersion)
+extra.set("snapshot", snapshot)
+extra.set("revision", revision)
+extra.set("buildNumber", buildNumber)
+extra.set("date", date)
+
+version = String.format("%s-%s", rootVersion, snapshot)
 
 if (!project.hasProperty("gitCommitHash")) {
-    apply(plugin = "org.ajoberstar.grgit")
     ext["gitCommitHash"] = try {
-        extensions.getByName<Grgit>("grgit").head()?.abbreviatedId
+        gitOutput("rev-parse", "--short=7", "HEAD")
     } catch (e: Exception) {
         logger.warn("Error getting commit hash", e)
 
@@ -65,29 +52,62 @@ if (!project.hasProperty("gitCommitHash")) {
     }
 }
 
-allprojects {
-    gradle.projectsEvaluated {
-        tasks.withType(JavaCompile::class) {
-            options.compilerArgs.addAll(arrayOf("-Xmaxerrs", "1000"))
-        }
-        tasks.withType(Test::class) {
-            testLogging {
-                events(FAILED)
-                exceptionFormat = FULL
-                showExceptions = true
-                showCauses = true
-                showStackTraces = true
+val totalReport = tasks.register<JacocoReport>("jacocoTotalReport") {
+    description = "Generates a combined JaCoCo coverage report for all subprojects."
+    for (proj in subprojects) {
+        proj.pluginManager.apply("jacoco")
+        proj.plugins.withId("java") {
+            executionData(
+                    fileTree(proj.layout.buildDirectory).include("**/jacoco/*.exec")
+            )
+            sourceSets(proj.the<JavaPluginExtension>().sourceSets["main"])
+            reports {
+                xml.required.set(true)
+                xml.outputLocation.set(rootProject.layout.buildDirectory.file("reports/jacoco/report.xml"))
+                html.required.set(true)
             }
+            dependsOn(proj.tasks.named("test"))
+        }
+    }
+}
+afterEvaluate {
+    totalReport.configure {
+        classDirectories.setFrom(classDirectories.files.map {
+            fileTree(it).apply {
+                exclude("**/*AutoValue_*")
+                exclude("**/*Registration.*")
+            }
+        })
+    }
+}
+
+codecov {
+    reportTask.set(totalReport)
+}
+
+allprojects {
+    tasks.withType<JavaCompile>().configureEach {
+        options.compilerArgs.addAll(arrayOf("-Xmaxerrs", "1000"))
+    }
+    tasks.withType<Test>().configureEach {
+        maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).takeIf { it > 0 } ?: 1
+        testLogging {
+            events(FAILED)
+            exceptionFormat = FULL
+            showExceptions = true
+            showCauses = true
+            showStackTraces = true
         }
     }
 }
 
-applyCommonConfiguration()
-val supportedVersions = listOf("1.20.4", "1.20.5", "1.20.6", "1.21", "1.21.1", "1.21.3", "1.21.4")
+val supportedVersions: List<String> = listOf("1.21", "1.21.1", "1.21.4", "1.21.5",
+        "1.21.8", "1.21.10", "1.21.11", "26.1.2", "26.2")
 
 tasks {
     supportedVersions.forEach {
         register<RunServer>("runServer-$it") {
+            description = "Run a Paper server version $it."
             minecraftVersion(it)
             pluginJars(*project(":worldedit-bukkit").getTasksByName("shadowJar", false).map { (it as Jar).archiveFile }
                     .toTypedArray())
@@ -96,19 +116,22 @@ tasks {
             runDirectory.set(file("run-$it"))
         }
     }
-    runServer {
-        minecraftVersion("1.21.3")
+    runServer<RunServer> {
+        description = "Run a Paper server for the latest supported Minecraft version (${supportedVersions.last()})."
+        minecraftVersion(supportedVersions.last())
         pluginJars(*project(":worldedit-bukkit").getTasksByName("shadowJar", false).map { (it as Jar).archiveFile }
                 .toTypedArray())
+        jvmArgs("-Dcom.mojang.eula.agree=true")
 
     }
 }
 
-nexusPublishing {
-    this.repositories {
-        sonatype {
-            nexusUrl.set(URI.create("https://s01.oss.sonatype.org/service/local/"))
-            snapshotRepositoryUrl.set(URI.create("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
-        }
+nmcpAggregation {
+    centralPortal {
+        publishingType = "AUTOMATIC"
+        username = providers.gradleProperty("mavenCentralUsername")
+        password = providers.gradleProperty("mavenCentralPassword")
     }
+
+    publishAllProjectsProbablyBreakingProjectIsolation()
 }

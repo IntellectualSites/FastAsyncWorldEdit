@@ -118,10 +118,14 @@ public abstract class StarlightRelighter<SERVER_LEVEL, CHUNK_POS> implements Rel
     public boolean addChunk(int cx, int cz, byte[] skipReason, int bitmask) {
         areaLock.lock();
         try {
-            long key = MathMan.pairInt(cx >> CHUNKS_PER_BATCH_SQRT_LOG2, cz >> CHUNKS_PER_BATCH_SQRT_LOG2);
-            // TODO probably submit here already if chunks.size == CHUNKS_PER_BATCH?
-            LongSet chunks = this.regions.computeIfAbsent(key, k -> new LongArraySet(CHUNKS_PER_BATCH >> 2));
-            chunks.add(asLong(cx, cz));
+            // light can go into neighboring chunks, make sure they are relighted too.
+            for (int x = cx - 1; x <= cx + 1; x++) {
+                for (int z = cz - 1; z <= cz + 1; z++) {
+                    long key = MathMan.pairInt(x >> CHUNKS_PER_BATCH_SQRT_LOG2, z >> CHUNKS_PER_BATCH_SQRT_LOG2);
+                    LongSet chunks = this.regions.computeIfAbsent(key, k -> new LongArraySet(CHUNKS_PER_BATCH >> 2));
+                    chunks.add(asLong(x, z));
+                }
+            }
         } finally {
             areaLock.unlock();
         }

@@ -136,7 +136,7 @@ public class FastSchematicWriterV3 implements ClipboardWriter {
                                 throw new RuntimeException("Failed to write tile data", e);
                             }
                         }
-                        return block;
+                        return block.toImmutableState();
                     },
                     block -> {
                         char ordinal = block.getOrdinalChar();

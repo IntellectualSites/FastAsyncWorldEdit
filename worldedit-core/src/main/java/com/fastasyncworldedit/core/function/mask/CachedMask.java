@@ -27,12 +27,13 @@ public class CachedMask extends AbstractDelegateMask implements ResettableMask {
      * @param local If the area will be small
      * @since 2.4.0
      */
+    @Deprecated(forRemoval = true, since = "2.13.0")
     public CachedMask(Mask mask, boolean local) {
         super(mask);
         hasExtent = mask instanceof AbstractExtentMask;
         if (local) {
-            cache_checked = new LocalBlockVectorSet();
-            cache_results = new LocalBlockVectorSet();
+            cache_checked = LocalBlockVectorSet.wrapped();
+            cache_results = LocalBlockVectorSet.wrapped();
         } else {
             cache_checked = new BlockVectorSet();
             cache_results = new BlockVectorSet();
@@ -63,54 +64,33 @@ public class CachedMask extends AbstractDelegateMask implements ResettableMask {
         int x = vector.x();
         int y = vector.y();
         int z = vector.z();
-        try {
-            boolean check = cache_checked.add(x, y, z);
-            if (!check) {
-                return cache_results.contains(x, y, z);
-            }
-            boolean result = getMask().test(vector);
-            if (result) {
-                cache_results.add(x, y, z);
-            }
-            return result;
-        } catch (UnsupportedOperationException ignored) {
-            boolean result = getMask().test(vector);
-            resetCache();
-            cache_checked.add(x, y, z);
-            if (result) {
-                cache_results.add(x, y, z);
-            }
-            return result;
+        boolean check = cache_checked.add(x, y, z);
+        if (!check) {
+            return cache_results.contains(x, y, z);
         }
+        boolean result = getMask().test(vector);
+        if (result) {
+            cache_results.add(x, y, z);
+        }
+        return result;
     }
 
     public boolean test(@Nullable Extent extent, BlockVector3 vector) {
-        if (!hasExtent || !(extent instanceof AbstractExtentMask)) {
+        if (!hasExtent || !(getMask() instanceof final AbstractExtentMask mask)) {
             return test(vector);
         }
         int x = vector.x();
         int y = vector.y();
         int z = vector.z();
-        AbstractExtentMask mask = (AbstractExtentMask) getMask();
-        try {
-            boolean check = cache_checked.add(x, y, z);
-            if (!check) {
-                return cache_results.contains(x, y, z);
-            }
-            boolean result = mask.test(extent, vector);
-            if (result) {
-                cache_results.add(x, y, z);
-            }
-            return result;
-        } catch (UnsupportedOperationException ignored) {
-            boolean result = mask.test(extent, vector);
-            resetCache();
-            cache_checked.add(x, y, z);
-            if (result) {
-                cache_results.add(x, y, z);
-            }
-            return result;
+        boolean check = cache_checked.add(x, y, z);
+        if (!check) {
+            return cache_results.contains(x, y, z);
         }
+        boolean result = mask.test(extent, vector);
+        if (result) {
+            cache_results.add(x, y, z);
+        }
+        return result;
     }
 
     @Override

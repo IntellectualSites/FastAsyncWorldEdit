@@ -92,7 +92,7 @@ public abstract class RichParser<E> extends InputParser<E> implements AliasedPar
     }
 
     @Override
-    public Stream<String> getSuggestions(String input) {
+    public Stream<String> getSuggestions(String input, ParserContext context) {
         return Arrays.stream(this.prefixes)
                 .filter(validPrefix(input))
                 .flatMap(extractArguments(input, new ParserContext()));

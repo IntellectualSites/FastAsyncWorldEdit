@@ -55,6 +55,7 @@ public class EllipsoidRegion extends AbstractRegion {
 
     //FAWE start
     private Vector3 radiusSqr;
+    private BlockVector3 radiusSqrBlocks;
     private Vector3 inverseRadiusSqr;
     private int radiusLengthSqr;
     private boolean sphere;
@@ -198,6 +199,7 @@ public class EllipsoidRegion extends AbstractRegion {
         this.radius = radius.add(0.5, 0.5, 0.5);
         //FAWE start
         radiusSqr = radius.multiply(radius);
+        radiusSqrBlocks = radiusSqr.toBlockPoint();
         radiusLengthSqr = (int) radiusSqr.x();
         this.sphere = radius.y() == radius.x() && radius.x() == radius.z();
         inverseRadiusSqr = Vector3.ONE.divide(radiusSqr);
@@ -233,17 +235,17 @@ public class EllipsoidRegion extends AbstractRegion {
     public boolean contains(int x, int y, int z) {
         int cx = x - center.x();
         int cx2 = cx * cx;
-        if (cx2 > radiusSqr.getBlockX()) {
+        if (cx2 > radiusSqrBlocks.x()) {
             return false;
         }
         int cz = z - center.z();
         int cz2 = cz * cz;
-        if (cz2 > radiusSqr.getBlockZ()) {
+        if (cz2 > radiusSqrBlocks.z()) {
             return false;
         }
         int cy = y - center.y();
         int cy2 = cy * cy;
-        if (radiusSqr.getBlockY() < getWorldMaxY() && cy2 > radiusSqr.getBlockY()) {
+        if (radiusSqrBlocks.y() < getWorldMaxY() && cy2 > radiusSqrBlocks.y()) {
             return false;
         }
         if (sphere) {
@@ -272,12 +274,12 @@ public class EllipsoidRegion extends AbstractRegion {
     public boolean contains(int x, int z) {
         int cx = x - center.x();
         int cx2 = cx * cx;
-        if (cx2 > radiusSqr.getBlockX()) {
+        if (cx2 > radiusSqrBlocks.x()) {
             return false;
         }
         int cz = z - center.z();
         int cz2 = cz * cz;
-        if (cz2 > radiusSqr.getBlockZ()) {
+        if (cz2 > radiusSqrBlocks.z()) {
             return false;
         }
         double cxd = cx2 * inverseRadiusSqr.x();

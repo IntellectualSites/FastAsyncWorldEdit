@@ -53,17 +53,19 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldedit.util.TreeGenerator.TreeType;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockType;
+import com.sk89q.worldedit.world.generation.ConfiguredFeatureType;
+import com.sk89q.worldedit.world.generation.StructureType;
+import com.sk89q.worldedit.world.generation.TreeType;
 import org.enginehub.piston.annotation.Command;
 import org.enginehub.piston.annotation.CommandContainer;
 import org.enginehub.piston.annotation.param.Arg;
 import org.enginehub.piston.annotation.param.Switch;
 import org.jetbrains.annotations.Range;
 
-import java.awt.RenderingHints;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -360,6 +362,53 @@ public class GenerationCommands {
     }
 
     @Command(
+            name = "/feature",
+            //FAWE start
+            aliases = {"/placefeature"},
+            //FAWE end
+            desc = "Generate Minecraft features"
+    )
+    @Logging(PLACEMENT)
+    @CommandPermissions("worldedit.generation.feature")
+    public int feature(
+            Actor actor, LocalSession session, EditSession editSession,
+            @Arg(desc = "Type of feature to place")
+            ConfiguredFeatureType feature
+    ) throws WorldEditException {
+        //FAWE start
+        int affected = editSession.generateFeature(feature, session.getPlacementPosition(actor));
+
+        if (affected == 0) {
+            actor.print(Caption.of("worldedit.generate.feature.failed"));
+        } else {
+            actor.print(Caption.of("worldedit.feature.created", TextComponent.of(affected)));
+        }
+        return affected;
+        //FAWE end
+    }
+
+    @Command(
+            name = "/structure",
+            desc = "Generate Minecraft structures"
+    )
+    @CommandPermissions("worldedit.generation.structure")
+    @Logging(POSITION)
+    public int structure(Actor actor, LocalSession session, EditSession editSession,
+                        @Arg(desc = "The structure")
+                        StructureType feature) throws WorldEditException {
+        //FAWE start
+        int affected = editSession.generateStructure(feature, session.getPlacementPosition(actor));
+
+        if (affected > 0) {
+            actor.printInfo(Caption.of("worldedit.structure.created", TextComponent.of(affected)));
+        } else {
+            actor.printError(Caption.of("worldedit.generate.structure.failed"));
+        }
+        return affected;
+        //FAWE end
+    }
+
+    @Command(
             name = "/hpyramid",
             desc = "Generate a hollow pyramid"
     )
@@ -622,10 +671,12 @@ public class GenerationCommands {
             LocalSession session,
             EditSession editSession,
             @Selection Region region,
-            @Arg(desc = "Mask") Mask mask
+            @Arg(desc = "Mask") Mask mask,
+            @Switch(name = 'b', desc = "Make all ores deepslate equivalent for y<0") boolean deepslateBelowZero,
+            @Switch(name = 'd', desc = "Make all ores deepslate equivalent when placed into deepslate, tuff, etc.") boolean deepslateWhereDeepslate
     ) throws WorldEditException {
         new MaskTraverser(mask).setNewExtent(editSession);
-        editSession.addOres(region, mask);
+        editSession.addOres(region, mask, deepslateBelowZero, deepslateWhereDeepslate);
         actor.print(Caption.of("fawe.worldedit.visitor.visitor.block", editSession.getBlockChangeCount()));
     }
 
@@ -767,7 +818,7 @@ public class GenerationCommands {
         if (actor instanceof Player && Settings.settings().GENERAL.UNSTUCK_ON_GENERATE) {
             ((Player) actor).findFreePosition();
         }
-        actor.print(Caption.of("worldedit.sphere.created", TextComponent.of(affected)));
+        actor.print(Caption.of("worldedit.blob.created", TextComponent.of(affected)));
         return affected;
     }
     //FAWE end

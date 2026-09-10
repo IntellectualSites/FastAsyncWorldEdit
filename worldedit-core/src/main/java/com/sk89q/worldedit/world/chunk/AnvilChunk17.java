@@ -294,7 +294,11 @@ public class AnvilChunk17 implements Chunk {
      */
     private void populateEntities() {
         entities = new ArrayList<>();
-        LinListTag<LinCompoundTag> tags = rootTag.findListTag(
+        LinCompoundTag entityTag;
+        if (entityTagSupplier == null || (entityTag = entityTagSupplier.get()) == null) {
+            return;
+        }
+        LinListTag<LinCompoundTag> tags = entityTag.findListTag(
                 "Entities", LinTagType.compoundTag()
         );
         if (tags == null) {

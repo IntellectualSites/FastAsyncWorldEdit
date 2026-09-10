@@ -39,6 +39,7 @@ import com.sk89q.worldedit.extent.clipboard.io.sponge.SpongeSchematicV3Writer;
 import it.unimi.dsi.fastutil.io.FastBufferedInputStream;
 import org.anarres.parallelgzip.ParallelGZIPOutputStream;
 import org.enginehub.linbus.stream.LinBinaryIO;
+import org.enginehub.linbus.stream.LinReadOptions;
 import org.enginehub.linbus.tree.LinRootEntry;
 
 import java.io.BufferedInputStream;
@@ -219,7 +220,7 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
             LinRootEntry rootEntry;
             try {
                 DataInputStream stream = new DataInputStream(new GZIPInputStream(inputStream));
-                rootEntry = LinBinaryIO.readUsing(stream, LinRootEntry::readFrom);
+                rootEntry = LinBinaryIO.readUsing(stream, LEGACY_OPTIONS, LinRootEntry::readFrom);
             } catch (Exception e) {
                 return false;
             }
@@ -242,7 +243,9 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
 
         @Override
         public ClipboardReader getReader(InputStream inputStream) throws IOException {
-            return new SpongeSchematicV1Reader(LinBinaryIO.read(new DataInputStream(new GZIPInputStream(inputStream))));
+            return new SpongeSchematicV1Reader(LinBinaryIO.read(
+                new DataInputStream(new GZIPInputStream(inputStream)), LEGACY_OPTIONS
+            ));
         }
 
         @Override
@@ -257,7 +260,11 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
 
         @Override
         public boolean isFormat(File file) {
-            return MCEDIT_SCHEMATIC.isFormat(file);
+            String name = file.getName().toLowerCase(Locale.ROOT);
+            if (name.endsWith(".mcedit") || name.endsWith(".mce")) {
+                return false;
+            }
+            return super.isFormat(file);
         }
 
         @Override
@@ -268,7 +275,7 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
 
     /**
      * @deprecated Slow, resource intensive, but sometimes safer than using the recommended
-     *         {@link BuiltInClipboardFormat#FAST}.
+     *         {@link BuiltInClipboardFormat#FAST_V2}.
      *         Avoid using with any large schematics/clipboards for reading/writing.
      */
     @Deprecated
@@ -281,7 +288,9 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
 
         @Override
         public ClipboardReader getReader(InputStream inputStream) throws IOException {
-            return new SpongeSchematicV2Reader(LinBinaryIO.read(new DataInputStream(new GZIPInputStream(inputStream))));
+            return new SpongeSchematicV2Reader(LinBinaryIO.read(
+                new DataInputStream(new GZIPInputStream(inputStream)), LEGACY_OPTIONS
+            ));
         }
 
         @Override
@@ -519,6 +528,8 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
     @Deprecated
     public static final BuiltInClipboardFormat FAST = FAST_V2;
     //FAWE end
+
+    private static final LinReadOptions LEGACY_OPTIONS = LinReadOptions.builder().allowNormalUtf8Encoding(true).build();
 
     private final ImmutableSet<String> aliases;
 

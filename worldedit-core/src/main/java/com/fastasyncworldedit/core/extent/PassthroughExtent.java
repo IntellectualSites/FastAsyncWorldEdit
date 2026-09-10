@@ -127,11 +127,6 @@ public class PassthroughExtent extends AbstractDelegateExtent {
     }
 
     @Override
-    public void addOres(Region region, Mask mask) throws WorldEditException {
-        getExtent().addOres(region, mask);
-    }
-
-    @Override
     public List<Countable<BlockType>> getBlockDistribution(Region region) {
         return getExtent().getBlockDistribution(region);
     }

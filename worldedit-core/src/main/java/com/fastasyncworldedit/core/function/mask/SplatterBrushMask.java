@@ -1,6 +1,7 @@
 package com.fastasyncworldedit.core.function.mask;
 
 import com.fastasyncworldedit.core.math.LocalBlockVectorSet;
+import com.fastasyncworldedit.core.util.collection.BlockVector3Set;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.AbstractExtentMask;
@@ -14,14 +15,38 @@ public class SplatterBrushMask extends AbstractExtentMask {
     private final BlockVector3 position;
     private final int size2;
     private final Mask surface;
-    private final LocalBlockVectorSet placed;
+    private final BlockVector3Set placed;
 
+    /**
+     * @deprecated in favour of {@link SplatterBrushMask#SplatterBrushMask(EditSession, BlockVector3, int, Mask, BlockVector3Set)}
+     */
+    @Deprecated(forRemoval = true, since = "2.13.0")
     public SplatterBrushMask(
             EditSession editSession,
             BlockVector3 position,
             int size2,
             Mask surface,
             LocalBlockVectorSet placed
+    ) {
+        this(editSession, position, size2, surface, LocalBlockVectorSet.wrap(placed));
+    }
+
+    /**
+     * Create a new instance
+     *
+     * @param editSession Editsession to use
+     * @param position    position applied to
+     * @param size2       radius squared
+     * @param surface     surface mask
+     * @param placed      {@link BlockVector3Set} of placed blocks
+     * @since 2.13.0
+     */
+    public SplatterBrushMask(
+            EditSession editSession,
+            BlockVector3 position,
+            int size2,
+            Mask surface,
+            BlockVector3Set placed
     ) {
         super(editSession);
         this.position = position;

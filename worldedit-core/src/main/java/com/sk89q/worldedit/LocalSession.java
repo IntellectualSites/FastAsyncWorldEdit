@@ -1530,6 +1530,7 @@ public class LocalSession implements TextureHolder {
             }
             cuiTemporaryBlock = tempCuiTemporaryBlock;
             player.sendFakeBlock(cuiTemporaryBlock, block);
+            player.sendFakeOP();
         } else if (cuiTemporaryBlock != null) {
             // Remove the old block
             player.sendFakeBlock(cuiTemporaryBlock, null);
@@ -1573,8 +1574,10 @@ public class LocalSession implements TextureHolder {
     public void dispatchCUISelection(Actor actor) {
         checkNotNull(actor);
 
-        if (!hasCUISupport && useServerCUI) {
-            updateServerCUI(actor);
+        if (!hasCUISupport) {
+            if (useServerCUI) {
+                updateServerCUI(actor);
+            }
             return;
         }
 
@@ -1751,7 +1754,9 @@ public class LocalSession implements TextureHolder {
         //FAWE start
         builder.command(command);
         builder.fastMode(this.fastMode);
-        builder.setSideEffectSet(this.sideEffectSet);
+        if (!this.fastMode) {
+            builder.setSideEffectSet(this.sideEffectSet);
+        }
 
         EditSession editSession = builder.build();
 
@@ -1826,6 +1831,7 @@ public class LocalSession implements TextureHolder {
      *
      * @return The reorder mode
      */
+    @Deprecated
     public EditSession.ReorderMode getReorderMode() {
         return EditSession.ReorderMode.FAST;
     }
@@ -1835,6 +1841,7 @@ public class LocalSession implements TextureHolder {
      *
      * @param reorderMode The reorder mode
      */
+    @Deprecated
     public void setReorderMode(EditSession.ReorderMode reorderMode) {
     }
 

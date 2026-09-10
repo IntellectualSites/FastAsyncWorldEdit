@@ -26,7 +26,7 @@ public class VectorFacade {
 
     public ShortVector getOrZero(VectorSpecies<Short> species) {
         if (this.data == null) {
-            return species.zero().reinterpretAsShorts();
+            return ShortVector.zero(species);
         }
         return ShortVector.fromCharArray(species, this.data, this.index);
     }

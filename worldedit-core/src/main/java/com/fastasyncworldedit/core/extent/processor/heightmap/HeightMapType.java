@@ -1,6 +1,7 @@
 package com.fastasyncworldedit.core.extent.processor.heightmap;
 
 import com.fastasyncworldedit.core.registry.state.PropertyKey;
+import com.sk89q.worldedit.function.mask.SolidBlockMask;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.world.block.BlockCategories;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -17,19 +18,19 @@ public enum HeightMapType {
     MOTION_BLOCKING {
         @Override
         public boolean includes(BlockState state) {
-            return state.getMaterial().isMovementBlocker() || HeightMapType.hasFluid(state);
+            return isMovementBlocker(state) || HeightMapType.hasFluid(state);
         }
     },
     MOTION_BLOCKING_NO_LEAVES {
         @Override
         public boolean includes(BlockState state) {
-            return (state.getMaterial().isMovementBlocker() || HeightMapType.hasFluid(state)) && !HeightMapType.isLeaf(state);
+            return (isMovementBlocker(state) || HeightMapType.hasFluid(state)) && !HeightMapType.isLeaf(state);
         }
     },
     OCEAN_FLOOR {
         @Override
         public boolean includes(BlockState state) {
-            return state.getMaterial().isMovementBlocker();
+            return HeightMapType.isMovementBlocker(state);
         }
     },
     WORLD_SURFACE {
@@ -38,6 +39,10 @@ public enum HeightMapType {
             return !state.isAir();
         }
     };
+
+    private static boolean isMovementBlocker(BlockState state) {
+        return SolidBlockMask.isSolid(state);
+    }
 
     static {
         BlockCategories.LEAVES.getAll(); // make sure this category is initialized, otherwise isLeaf might fail

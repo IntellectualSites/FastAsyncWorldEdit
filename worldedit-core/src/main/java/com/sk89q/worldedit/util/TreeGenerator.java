@@ -41,8 +41,10 @@ import java.util.Set;
 /**
  * Tree generator.
  */
+@Deprecated
 public final class TreeGenerator {
 
+    @Deprecated
     public enum TreeType {
         TREE("Oak tree", "oak", "tree", "regular"),
         BIG_TREE("Large oak tree", "largeoak", "bigoak", "big", "bigtree"),
@@ -168,6 +170,8 @@ public final class TreeGenerator {
         MANGROVE("Mangrove tree", "mangrove"),
         TALL_MANGROVE("Tall mangrove tree", "tall_mangrove"),
         CHERRY("Cherry blossom", "cherry"),
+        PALE_OAK("Pale oak tree", "pale_oak"),
+        PALE_OAK_CREAKING("Pale oak creaking tree", "pale_oak_creaking"),
         RANDOM("Random tree", "rand", "random") {
             @Override
             public boolean generate(EditSession editSession, BlockVector3 pos) throws MaxChangedBlocksException {

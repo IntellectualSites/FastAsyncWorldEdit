@@ -28,12 +28,28 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
 
     private static final Pool<CharSetBlocks> POOL = FaweCache.INSTANCE.registerPool(
             CharSetBlocks.class,
-            CharSetBlocks::new,
-            Settings.settings().QUEUE.POOL
+            CharSetBlocks::new, Settings.settings().QUEUE.POOL
     );
 
+    /**
+     * @deprecated Use {@link CharSetBlocks#newInstance(int, int)}
+     */
+    @Deprecated(forRemoval = true, since = "2.13.0")
     public static CharSetBlocks newInstance() {
         return POOL.poll();
+    }
+
+    /**
+     * Create a new {@link CharSetBlocks} instance
+     *
+     * @param x chunk x
+     * @param z chunk z
+     * @return New pooled CharSetBlocks instance.
+     */
+    public static CharSetBlocks newInstance(int x, int z) {
+        CharSetBlocks set = POOL.poll();
+        set.init(x, z);
+        return set;
     }
 
     public BiomeType[][] biomes;
@@ -53,7 +69,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
     }
 
     @Override
-    public synchronized void recycle() {
+    public void recycle() {
         reset();
         POOL.offer(this);
     }
@@ -125,7 +141,6 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
     public void setBlocks(int layer, char[] data) {
         updateSectionIndexRange(layer);
         layer -= minSectionPosition;
-        this.sections[layer] = data == null ? EMPTY : FULL;
         this.blocks[layer] = data;
     }
 
@@ -333,7 +348,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
     @Override
     public boolean hasBiomes(int layer) {
         layer -= minSectionPosition;
-        if (layer < 0 || layer >= sections.length) {
+        if (layer < 0 || layer >= blocks.length) {
             return false;
         }
         return biomes != null && biomes[layer] != null;
@@ -377,7 +392,9 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
                 defaultOrdinal(),
                 fastMode,
                 bitMask,
-                sideEffectSet
+                sideEffectSet,
+                getX(),
+                getZ()
         );
     }
 
@@ -437,20 +454,16 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
 
     private void resizeSectionsArrays(int diff, boolean appendNew) {
         char[][] tmpBlocks = new char[sectionCount][];
-        Section[] tmpSections = new Section[sectionCount];
         Object[] tmpSectionLocks = new Object[sectionCount];
         int destPos = appendNew ? 0 : diff;
         System.arraycopy(blocks, 0, tmpBlocks, destPos, blocks.length);
-        System.arraycopy(sections, 0, tmpSections, destPos, sections.length);
-        System.arraycopy(sectionLocks, 0, tmpSectionLocks, destPos, sections.length);
+        System.arraycopy(sectionLocks, 0, tmpSectionLocks, destPos, blocks.length);
         int toFillFrom = appendNew ? sectionCount - diff : 0;
         int toFillTo = appendNew ? sectionCount : diff;
         for (int i = toFillFrom; i < toFillTo; i++) {
-            tmpSections[i] = EMPTY;
             tmpSectionLocks[i] = new Object();
         }
         blocks = tmpBlocks;
-        sections = tmpSections;
         sectionLocks = tmpSectionLocks;
         if (biomes != null) {
             BiomeType[][] tmpBiomes = new BiomeType[sectionCount][64];

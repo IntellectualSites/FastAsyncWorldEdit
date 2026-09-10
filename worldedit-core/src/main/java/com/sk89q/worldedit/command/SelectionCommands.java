@@ -21,7 +21,11 @@ package com.sk89q.worldedit.command;
 
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.extent.clipboard.URIClipboardHolder;
+import com.fastasyncworldedit.core.extent.filter.ForkedFilter;
+import com.fastasyncworldedit.core.extent.filter.MaskFilter;
+import com.fastasyncworldedit.core.extent.filter.block.FilterBlock;
 import com.fastasyncworldedit.core.function.mask.IdMask;
+import com.fastasyncworldedit.core.queue.Filter;
 import com.fastasyncworldedit.core.regions.selector.FuzzyRegionSelector;
 import com.fastasyncworldedit.core.regions.selector.PolyhedralRegionSelector;
 import com.fastasyncworldedit.core.util.MaskTraverser;
@@ -47,11 +51,14 @@ import com.sk89q.worldedit.extension.platform.permission.ActorSelectorLimits;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.block.BlockDistributionCounter;
 import com.sk89q.worldedit.function.mask.Mask;
+import com.sk89q.worldedit.function.mask.MaskIntersection;
+import com.sk89q.worldedit.function.mask.RegionMask;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.visitor.RegionVisitor;
 import com.sk89q.worldedit.internal.annotation.Direction;
 import com.sk89q.worldedit.internal.annotation.MultiDirection;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.RegionOperationException;
 import com.sk89q.worldedit.regions.RegionSelector;
@@ -506,6 +513,112 @@ public class SelectionCommands {
         }
 
         return changes.build().map(v -> v.multiply(amount)).toArray(BlockVector3[]::new);
+    }
+
+    @Command(
+            name = "/trim",
+            desc = "Minimize the selection to encompass matching blocks"
+    )
+    @Logging(REGION)
+    @CommandPermissions("worldedit.selection.trim")
+    public void trim(Actor actor, World world, LocalSession session, EditSession editSession,
+                     @Arg(desc = "Mask of blocks to keep within the selection", def = "#existing")
+                         Mask mask) throws WorldEditException {
+        //FAWE start
+        // Avoid checking blocks outside the original region but within the cuboid region
+        Region originalRegion = session.getSelection(world);
+        new MaskTraverser(mask).setNewExtent(editSession);
+
+        // Result region will be cuboid
+        final CuboidRegion region = originalRegion.getBoundingBox();
+
+        // subtract offset to determine if there was any change later
+        final BlockVector3 min = region.getMinimumPoint().subtract(BlockVector3.ONE);
+        final BlockVector3 max = region.getMaximumPoint();
+
+        class TrimFilter extends ForkedFilter<TrimFilter> {
+            private int minX;
+            private int minY;
+            private int minZ;
+            private int maxX;
+            private int maxY;
+            private int maxZ;
+
+            public TrimFilter(final BlockVector3 min, final BlockVector3 max) {
+                super(null);
+                this.minX = max.x();
+                this.minY = max.y();
+                this.minZ = max.z();
+                this.maxX = min.x();
+                this.maxY = min.y();
+                this.maxZ = min.z();
+            }
+
+            public TrimFilter(
+                    final TrimFilter root,
+                    final int minX,
+                    final int minY,
+                    final int minZ,
+                    final int maxX,
+                    final int maxY,
+                    final int maxZ
+            ) {
+                super(root);
+                this.minX = minX;
+                this.minY = minY;
+                this.minZ = minZ;
+                this.maxX = maxX;
+                this.maxY = maxY;
+                this.maxZ = maxZ;
+            }
+
+            @Override
+            public void applyBlock(final FilterBlock block) {
+                this.minX = Math.min(this.minX, block.x());
+                this.maxX = Math.max(this.maxX, block.x());
+                this.minY = Math.min(this.minY, block.y());
+                this.maxY = Math.max(this.maxY, block.y());
+                this.minZ = Math.min(this.minZ, block.z());
+                this.maxZ = Math.max(this.maxZ, block.z());
+            }
+
+            @Override
+            public TrimFilter init() {
+                return new TrimFilter(this, this.minX, this.minY, this.minZ, this.maxX, this.maxY, this.maxZ);
+            }
+
+            @Override
+            public void join(final TrimFilter filter) {
+                this.minX = Math.min(this.minX, filter.minX);
+                this.maxX = Math.max(this.maxX, filter.maxX);
+                this.minY = Math.min(this.minY, filter.minY);
+                this.maxY = Math.max(this.maxY, filter.maxY);
+                this.minZ = Math.min(this.minZ, filter.minZ);
+                this.maxZ = Math.max(this.maxZ, filter.maxZ);
+            }
+
+        }
+        TrimFilter result = editSession.apply(region, new MaskFilter<>(new TrimFilter(min, max), mask), true).getParent();
+
+        final CuboidRegionSelector selector;
+        final BlockVector3 newMin = BlockVector3.at(result.minX, result.minY, result.minZ);
+        final BlockVector3 newMax = BlockVector3.at(result.maxX, result.maxY, result.maxZ);
+
+        // If anything was found, then all variables are guaranteed to be set to something inside the region
+        if (newMax.equals(min)) {
+            throw new StopExecutionException(Caption.of("worldedit.trim.no-blocks"));
+        }
+        if (session.getRegionSelector(world) instanceof ExtendingCuboidRegionSelector) {
+            selector = new ExtendingCuboidRegionSelector(world, newMin, newMax);
+        } else {
+            selector = new CuboidRegionSelector(world, newMin, newMax);
+        }
+        //FAWE end
+        session.setRegionSelector(world, selector);
+
+        session.getRegionSelector(world).learnChanges();
+        session.getRegionSelector(world).explainRegionAdjust(actor, session);
+        actor.print(Caption.of("worldedit.trim.trim"));
     }
 
     @Command(

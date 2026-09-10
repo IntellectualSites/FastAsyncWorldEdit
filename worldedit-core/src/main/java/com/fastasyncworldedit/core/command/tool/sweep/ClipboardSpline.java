@@ -2,6 +2,7 @@ package com.fastasyncworldedit.core.command.tool.sweep;
 
 import com.fastasyncworldedit.core.math.LocalBlockVectorSet;
 import com.fastasyncworldedit.core.math.transform.RoundedTransform;
+import com.fastasyncworldedit.core.util.collection.BlockVector3Set;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
@@ -28,7 +29,7 @@ public class ClipboardSpline extends Spline {
 
     private BlockVector3 center;
     private final BlockVector3 centerOffset;
-    private final LocalBlockVectorSet buffer;
+    private final BlockVector3Set buffer;
 
     /**
      * Constructor without position-correction. Use this constructor for an interpolation
@@ -87,7 +88,7 @@ public class ClipboardSpline extends Spline {
         this.centerOffset = center.subtract(center.round());
         this.center = center.subtract(centerOffset);
         this.transform = transform;
-        this.buffer = new LocalBlockVectorSet();
+        this.buffer = LocalBlockVectorSet.wrapped();
     }
 
     @Override

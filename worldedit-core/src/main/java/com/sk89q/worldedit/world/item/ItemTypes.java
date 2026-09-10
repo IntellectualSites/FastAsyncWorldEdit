@@ -61,6 +61,8 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType ACACIA_SAPLING = init();
     @Nullable
+    public static final ItemType ACACIA_SHELF = init();
+    @Nullable
     public static final ItemType ACACIA_SIGN = init();
     @Nullable
     public static final ItemType ACACIA_SLAB = init();
@@ -151,6 +153,8 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType BAMBOO_PRESSURE_PLATE = init();
     @Nullable
+    public static final ItemType BAMBOO_SHELF = init();
+    @Nullable
     public static final ItemType BAMBOO_RAFT = init();
     @Nullable
     public static final ItemType BAMBOO_SIGN = init();
@@ -215,6 +219,8 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType BIRCH_SAPLING = init();
     @Nullable
+    public static final ItemType BIRCH_SHELF = init();
+    @Nullable
     public static final ItemType BIRCH_SIGN = init();
     @Nullable
     public static final ItemType BIRCH_SLAB = init();
@@ -228,6 +234,8 @@ public final class ItemTypes {
     public static final ItemType BLACK_BANNER = init();
     @Nullable
     public static final ItemType BLACK_BED = init();
+    @Nullable
+    public static final ItemType BLACK_BUNDLE = init();
     @Nullable
     public static final ItemType BLACK_CANDLE = init();
     @Nullable
@@ -273,6 +281,8 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType BLUE_BED = init();
     @Nullable
+    public static final ItemType BLUE_BUNDLE = init();
+    @Nullable
     public static final ItemType BLUE_CANDLE = init();
     @Nullable
     public static final ItemType BROWN_CANDLE = init();
@@ -284,6 +294,8 @@ public final class ItemTypes {
     public static final ItemType BLUE_CONCRETE_POWDER = init();
     @Nullable
     public static final ItemType BLUE_DYE = init();
+    @Nullable
+    public static final ItemType BLUE_EGG = init();
     @Nullable
     public static final ItemType BLUE_GLAZED_TERRACOTTA = init();
     @Nullable
@@ -314,6 +326,8 @@ public final class ItemTypes {
     public static final ItemType BOOK = init();
     @Nullable
     public static final ItemType BOOKSHELF = init();
+    @Nullable
+    public static final ItemType BORDURE_INDENTED_BANNER_PATTERN = init();
     @Nullable
     public static final ItemType BOW = init();
     @Nullable
@@ -349,6 +363,8 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType BROWN_BED = init();
     @Nullable
+    public static final ItemType BROWN_BUNDLE = init();
+    @Nullable
     public static final ItemType BROWN_CARPET = init();
     @Nullable
     public static final ItemType BROWN_CONCRETE = init();
@@ -356,6 +372,8 @@ public final class ItemTypes {
     public static final ItemType BROWN_CONCRETE_POWDER = init();
     @Nullable
     public static final ItemType BROWN_DYE = init();
+    @Nullable
+    public static final ItemType BROWN_EGG = init();
     @Nullable
     public static final ItemType BROWN_GLAZED_TERRACOTTA = init();
     @Nullable
@@ -389,7 +407,11 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType BURN_POTTERY_SHERD = init();
     @Nullable
+    public static final ItemType BUSH = init();
+    @Nullable
     public static final ItemType CACTUS = init();
+    @Nullable
+    public static final ItemType CACTUS_FLOWER = init();
     @Deprecated
     @Nullable
     public static final ItemType CACTUS_GREEN = init();
@@ -399,6 +421,8 @@ public final class ItemTypes {
     public static final ItemType CALCITE = init();
     @Nullable
     public static final ItemType CALIBRATED_SCULK_SENSOR = init();
+    @Nullable
+    public static final ItemType CAMEL_HUSK_SPAWN_EGG = init();
     @Nullable
     public static final ItemType CAMEL_SPAWN_EGG = init();
     @Nullable
@@ -419,6 +443,7 @@ public final class ItemTypes {
     public static final ItemType CAULDRON = init();
     @Nullable
     public static final ItemType CAVE_SPIDER_SPAWN_EGG = init();
+    @Deprecated
     @Nullable
     public static final ItemType CHAIN = init();
     @Nullable
@@ -458,6 +483,8 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType CHERRY_SAPLING = init();
     @Nullable
+    public static final ItemType CHERRY_SHELF = init();
+    @Nullable
     public static final ItemType CHERRY_SIGN = init();
     @Nullable
     public static final ItemType CHERRY_SLAB = init();
@@ -480,6 +507,8 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType CHISELED_BOOKSHELF = init();
     @Nullable
+    public static final ItemType CHISELED_CINNABAR = init();
+    @Nullable
     public static final ItemType CHISELED_COPPER = init();
     @Nullable
     public static final ItemType CHISELED_DEEPSLATE = init();
@@ -498,6 +527,8 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType CHISELED_STONE_BRICKS = init();
     @Nullable
+    public static final ItemType CHISELED_SULFUR = init();
+    @Nullable
     public static final ItemType CHISELED_TUFF = init();
     @Nullable
     public static final ItemType CHISELED_TUFF_BRICKS = init();
@@ -507,6 +538,22 @@ public final class ItemTypes {
     public static final ItemType CHORUS_FRUIT = init();
     @Nullable
     public static final ItemType CHORUS_PLANT = init();
+    @Nullable
+    public static final ItemType CINNABAR = init();
+    @Nullable
+    public static final ItemType CINNABAR_BRICK_SLAB = init();
+    @Nullable
+    public static final ItemType CINNABAR_BRICK_STAIRS = init();
+    @Nullable
+    public static final ItemType CINNABAR_BRICK_WALL = init();
+    @Nullable
+    public static final ItemType CINNABAR_BRICKS = init();
+    @Nullable
+    public static final ItemType CINNABAR_SLAB = init();
+    @Nullable
+    public static final ItemType CINNABAR_STAIRS = init();
+    @Nullable
+    public static final ItemType CINNABAR_WALL = init();
     @Nullable
     public static final ItemType CLAY = init();
     @Nullable
@@ -580,17 +627,57 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType COOKIE = init();
     @Nullable
+    public static final ItemType COPPER_AXE = init();
+    @Nullable
+    public static final ItemType COPPER_BARS = init();
+    @Nullable
     public static final ItemType COPPER_BLOCK = init();
+    @Nullable
+    public static final ItemType COPPER_BOOTS = init();
     @Nullable
     public static final ItemType COPPER_BULB = init();
     @Nullable
+    public static final ItemType COPPER_CHAIN = init();
+    @Nullable
+    public static final ItemType COPPER_CHEST = init();
+    @Nullable
+    public static final ItemType COPPER_CHESTPLATE = init();
+    @Nullable
     public static final ItemType COPPER_DOOR = init();
+    @Nullable
+    public static final ItemType COPPER_GOLEM_SPAWN_EGG = init();
+    @Nullable
+    public static final ItemType COPPER_GOLEM_STATUE = init();
     @Nullable
     public static final ItemType COPPER_GRATE = init();
     @Nullable
+    public static final ItemType COPPER_HELMET = init();
+    @Nullable
+    public static final ItemType COPPER_HOE = init();
+    @Nullable
+    public static final ItemType COPPER_HORSE_ARMOR = init();
+    @Nullable
     public static final ItemType COPPER_INGOT = init();
     @Nullable
+    public static final ItemType COPPER_LANTERN = init();
+    @Nullable
+    public static final ItemType COPPER_LEGGINGS = init();
+    @Nullable
+    public static final ItemType COPPER_NAUTILUS_ARMOR = init();
+    @Nullable
+    public static final ItemType COPPER_NUGGET = init();
+    @Nullable
     public static final ItemType COPPER_ORE = init();
+    @Nullable
+    public static final ItemType COPPER_PICKAXE = init();
+    @Nullable
+    public static final ItemType COPPER_SHOVEL = init();
+    @Nullable
+    public static final ItemType COPPER_SPEAR = init();
+    @Nullable
+    public static final ItemType COPPER_SWORD = init();
+    @Nullable
+    public static final ItemType COPPER_TORCH = init();
     @Nullable
     public static final ItemType COPPER_TRAPDOOR = init();
     @Nullable
@@ -611,6 +698,8 @@ public final class ItemTypes {
     public static final ItemType CRAFTER = init();
     @Nullable
     public static final ItemType CRAFTING_TABLE = init();
+    @Nullable public static final ItemType CREAKING_HEART = init();
+    @Nullable public static final ItemType CREAKING_SPAWN_EGG = init();
     @Nullable
     public static final ItemType CREEPER_BANNER_PATTERN = init();
     @Nullable
@@ -639,6 +728,8 @@ public final class ItemTypes {
     public static final ItemType CRIMSON_PRESSURE_PLATE = init();
     @Nullable
     public static final ItemType CRIMSON_ROOTS = init();
+    @Nullable
+    public static final ItemType CRIMSON_SHELF = init();
     @Nullable
     public static final ItemType CRIMSON_SIGN = init();
     @Nullable
@@ -671,6 +762,7 @@ public final class ItemTypes {
     public static final ItemType CYAN_BANNER = init();
     @Nullable
     public static final ItemType CYAN_BED = init();
+    @Nullable public static final ItemType CYAN_BUNDLE = init();
     @Nullable
     public static final ItemType CYAN_CANDLE = init();
     @Nullable
@@ -726,6 +818,8 @@ public final class ItemTypes {
     public static final ItemType DARK_OAK_PRESSURE_PLATE = init();
     @Nullable
     public static final ItemType DARK_OAK_SAPLING = init();
+    @Nullable
+    public static final ItemType DARK_OAK_SHELF = init();
     @Nullable
     public static final ItemType DARK_OAK_SIGN = init();
     @Nullable
@@ -835,11 +929,15 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType DIAMOND_LEGGINGS = init();
     @Nullable
+    public static final ItemType DIAMOND_NAUTILUS_ARMOR = init();
+    @Nullable
     public static final ItemType DIAMOND_ORE = init();
     @Nullable
     public static final ItemType DIAMOND_PICKAXE = init();
     @Nullable
     public static final ItemType DIAMOND_SHOVEL = init();
+    @Nullable
+    public static final ItemType DIAMOND_SPEAR = init();
     @Nullable
     public static final ItemType DIAMOND_SWORD = init();
     @Nullable
@@ -939,11 +1037,21 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType EXPOSED_COPPER = init();
     @Nullable
+    public static final ItemType EXPOSED_COPPER_BARS = init();
+    @Nullable
     public static final ItemType EXPOSED_COPPER_BULB = init();
+    @Nullable
+    public static final ItemType EXPOSED_COPPER_CHAIN = init();
+    @Nullable
+    public static final ItemType EXPOSED_COPPER_CHEST = init();
     @Nullable
     public static final ItemType EXPOSED_COPPER_DOOR = init();
     @Nullable
+    public static final ItemType EXPOSED_COPPER_GOLEM_STATUE = init();
+    @Nullable
     public static final ItemType EXPOSED_COPPER_GRATE = init();
+    @Nullable
+    public static final ItemType EXPOSED_COPPER_LANTERN = init();
     @Nullable
     public static final ItemType EXPOSED_COPPER_TRAPDOOR = init();
     @Nullable
@@ -952,6 +1060,8 @@ public final class ItemTypes {
     public static final ItemType EXPOSED_CUT_COPPER_SLAB = init();
     @Nullable
     public static final ItemType EXPOSED_CUT_COPPER_STAIRS = init();
+    @Nullable
+    public static final ItemType EXPOSED_LIGHTNING_ROD = init();
     @Nullable
     public static final ItemType EYE_ARMOR_TRIM_SMITHING_TEMPLATE = init();
     @Nullable
@@ -962,6 +1072,7 @@ public final class ItemTypes {
     public static final ItemType FERMENTED_SPIDER_EYE = init();
     @Nullable
     public static final ItemType FERN = init();
+    @Nullable public static final ItemType FIELD_MASONED_BANNER_PATTERN = init();
     @Nullable
     public static final ItemType FILLED_MAP = init();
     @Nullable
@@ -972,6 +1083,8 @@ public final class ItemTypes {
     public static final ItemType FIRE_CORAL_BLOCK = init();
     @Nullable
     public static final ItemType FIRE_CORAL_FAN = init();
+    @Nullable
+    public static final ItemType FIREFLY_BUSH = init();
     @Nullable
     public static final ItemType FIREWORK_ROCKET = init();
     @Nullable
@@ -1063,6 +1176,8 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType GOLDEN_CHESTPLATE = init();
     @Nullable
+    public static final ItemType GOLDEN_DANDELION = init();
+    @Nullable
     public static final ItemType GOLDEN_HELMET = init();
     @Nullable
     public static final ItemType GOLDEN_HOE = init();
@@ -1071,9 +1186,13 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType GOLDEN_LEGGINGS = init();
     @Nullable
+    public static final ItemType GOLDEN_NAUTILUS_ARMOR = init();
+    @Nullable
     public static final ItemType GOLDEN_PICKAXE = init();
     @Nullable
     public static final ItemType GOLDEN_SHOVEL = init();
+    @Nullable
+    public static final ItemType GOLDEN_SPEAR = init();
     @Nullable
     public static final ItemType GOLDEN_SWORD = init();
     @Nullable
@@ -1097,6 +1216,7 @@ public final class ItemTypes {
     public static final ItemType GRAY_BANNER = init();
     @Nullable
     public static final ItemType GRAY_BED = init();
+    @Nullable public static final ItemType GRAY_BUNDLE = init();
     @Nullable
     public static final ItemType GRAY_CANDLE = init();
     @Nullable
@@ -1123,6 +1243,7 @@ public final class ItemTypes {
     public static final ItemType GREEN_BANNER = init();
     @Nullable
     public static final ItemType GREEN_BED = init();
+    @Nullable public static final ItemType GREEN_BUNDLE = init();
     @Nullable
     public static final ItemType GREEN_CANDLE = init();
     @Nullable
@@ -1224,6 +1345,8 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType IRON_BOOTS = init();
     @Nullable
+    public static final ItemType IRON_CHAIN = init();
+    @Nullable
     public static final ItemType IRON_CHESTPLATE = init();
     @Nullable
     public static final ItemType IRON_DOOR = init();
@@ -1240,6 +1363,8 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType IRON_LEGGINGS = init();
     @Nullable
+    public static final ItemType IRON_NAUTILUS_ARMOR = init();
+    @Nullable
     public static final ItemType IRON_NUGGET = init();
     @Nullable
     public static final ItemType IRON_ORE = init();
@@ -1247,6 +1372,8 @@ public final class ItemTypes {
     public static final ItemType IRON_PICKAXE = init();
     @Nullable
     public static final ItemType IRON_SHOVEL = init();
+    @Nullable
+    public static final ItemType IRON_SPEAR = init();
     @Nullable
     public static final ItemType IRON_SWORD = init();
     @Nullable
@@ -1284,6 +1411,8 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType JUNGLE_SAPLING = init();
     @Nullable
+    public static final ItemType JUNGLE_SHELF = init();
+    @Nullable
     public static final ItemType JUNGLE_SIGN = init();
     @Nullable
     public static final ItemType JUNGLE_SLAB = init();
@@ -1316,6 +1445,8 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType LEAD = init();
     @Nullable
+    public static final ItemType LEAF_LITTER = init();
+    @Nullable
     public static final ItemType LEATHER = init();
     @Nullable
     public static final ItemType LEATHER_BOOTS = init();
@@ -1337,6 +1468,7 @@ public final class ItemTypes {
     public static final ItemType LIGHT_BLUE_BANNER = init();
     @Nullable
     public static final ItemType LIGHT_BLUE_BED = init();
+    @Nullable public static final ItemType LIGHT_BLUE_BUNDLE = init();
     @Nullable
     public static final ItemType LIGHT_BLUE_CANDLE = init();
     @Nullable
@@ -1363,6 +1495,7 @@ public final class ItemTypes {
     public static final ItemType LIGHT_GRAY_BANNER = init();
     @Nullable
     public static final ItemType LIGHT_GRAY_BED = init();
+    @Nullable public static final ItemType LIGHT_GRAY_BUNDLE = init();
     @Nullable
     public static final ItemType LIGHT_GRAY_CANDLE = init();
     @Nullable
@@ -1399,6 +1532,7 @@ public final class ItemTypes {
     public static final ItemType LIME_BANNER = init();
     @Nullable
     public static final ItemType LIME_BED = init();
+    @Nullable public static final ItemType LIME_BUNDLE = init();
     @Nullable
     public static final ItemType LIME_CANDLE = init();
     @Nullable
@@ -1435,6 +1569,7 @@ public final class ItemTypes {
     public static final ItemType MAGENTA_BANNER = init();
     @Nullable
     public static final ItemType MAGENTA_BED = init();
+    @Nullable public static final ItemType MAGENTA_BUNDLE = init();
     @Nullable
     public static final ItemType MAGENTA_CANDLE = init();
     @Nullable
@@ -1489,6 +1624,8 @@ public final class ItemTypes {
     public static final ItemType MANGROVE_PROPAGULE = init();
     @Nullable
     public static final ItemType MANGROVE_ROOTS = init();
+    @Nullable
+    public static final ItemType MANGROVE_SHELF = init();
     @Nullable
     public static final ItemType MANGROVE_SIGN = init();
     @Nullable
@@ -1568,11 +1705,19 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType MUSIC_DISC_BLOCKS = init();
     @Nullable
+    public static final ItemType MUSIC_DISC_BOUNCE = init();
+    @Nullable
     public static final ItemType MUSIC_DISC_CAT = init();
     @Nullable
     public static final ItemType MUSIC_DISC_CHIRP = init();
     @Nullable
+    public static final ItemType MUSIC_DISC_CREATOR = init();
+    @Nullable
+    public static final ItemType MUSIC_DISC_CREATOR_MUSIC_BOX = init();
+    @Nullable
     public static final ItemType MUSIC_DISC_FAR = init();
+    @Nullable
+    public static final ItemType MUSIC_DISC_LAVA_CHICKEN = init();
     @Nullable
     public static final ItemType MUSIC_DISC_MALL = init();
     @Nullable
@@ -1581,6 +1726,8 @@ public final class ItemTypes {
     public static final ItemType MUSIC_DISC_OTHERSIDE = init();
     @Nullable
     public static final ItemType MUSIC_DISC_PIGSTEP = init();
+    @Nullable
+    public static final ItemType MUSIC_DISC_PRECIPICE = init();
     @Nullable
     public static final ItemType MUSIC_DISC_RELIC = init();
     @Nullable
@@ -1599,6 +1746,8 @@ public final class ItemTypes {
     public static final ItemType NAME_TAG = init();
     @Nullable
     public static final ItemType NAUTILUS_SHELL = init();
+    @Nullable
+    public static final ItemType NAUTILUS_SPAWN_EGG = init();
     @Nullable
     public static final ItemType NETHER_BRICK = init();
     @Nullable
@@ -1636,15 +1785,21 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType NETHERITE_HOE = init();
     @Nullable
+    public static final ItemType NETHERITE_HORSE_ARMOR = init();
+    @Nullable
     public static final ItemType NETHERITE_INGOT = init();
     @Nullable
     public static final ItemType NETHERITE_LEGGINGS = init();
+    @Nullable
+    public static final ItemType NETHERITE_NAUTILUS_ARMOR = init();
     @Nullable
     public static final ItemType NETHERITE_PICKAXE = init();
     @Nullable
     public static final ItemType NETHERITE_SCRAP = init();
     @Nullable
     public static final ItemType NETHERITE_SHOVEL = init();
+    @Nullable
+    public static final ItemType NETHERITE_SPEAR = init();
     @Nullable
     public static final ItemType NETHERITE_SWORD = init();
     @Nullable
@@ -1678,6 +1833,8 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType OAK_SAPLING = init();
     @Nullable
+    public static final ItemType OAK_SHELF = init();
+    @Nullable
     public static final ItemType OAK_SIGN = init();
     @Nullable
     public static final ItemType OAK_SLAB = init();
@@ -1705,6 +1862,7 @@ public final class ItemTypes {
     public static final ItemType ORANGE_BANNER = init();
     @Nullable
     public static final ItemType ORANGE_BED = init();
+    @Nullable public static final ItemType ORANGE_BUNDLE = init();
     @Nullable
     public static final ItemType ORANGE_CANDLE = init();
     @Nullable
@@ -1736,11 +1894,21 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType OXIDIZED_COPPER = init();
     @Nullable
+    public static final ItemType OXIDIZED_COPPER_BARS = init();
+    @Nullable
     public static final ItemType OXIDIZED_COPPER_BULB = init();
+    @Nullable
+    public static final ItemType OXIDIZED_COPPER_CHAIN = init();
+    @Nullable
+    public static final ItemType OXIDIZED_COPPER_CHEST = init();
     @Nullable
     public static final ItemType OXIDIZED_COPPER_DOOR = init();
     @Nullable
+    public static final ItemType OXIDIZED_COPPER_GOLEM_STATUE = init();
+    @Nullable
     public static final ItemType OXIDIZED_COPPER_GRATE = init();
+    @Nullable
+    public static final ItemType OXIDIZED_COPPER_LANTERN = init();
     @Nullable
     public static final ItemType OXIDIZED_COPPER_TRAPDOOR = init();
     @Nullable
@@ -1750,15 +1918,40 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType OXIDIZED_CUT_COPPER_STAIRS = init();
     @Nullable
+    public static final ItemType OXIDIZED_LIGHTNING_ROD = init();
+    @Nullable
     public static final ItemType PACKED_ICE = init();
     @Nullable
     public static final ItemType PACKED_MUD = init();
     @Nullable
     public static final ItemType PAINTING = init();
+    @Nullable public static final ItemType PALE_HANGING_MOSS = init();
+    @Nullable public static final ItemType PALE_MOSS_BLOCK = init();
+    @Nullable public static final ItemType PALE_MOSS_CARPET = init();
+    @Nullable public static final ItemType PALE_OAK_BOAT = init();
+    @Nullable public static final ItemType PALE_OAK_BUTTON = init();
+    @Nullable public static final ItemType PALE_OAK_CHEST_BOAT = init();
+    @Nullable public static final ItemType PALE_OAK_DOOR = init();
+    @Nullable public static final ItemType PALE_OAK_FENCE = init();
+    @Nullable public static final ItemType PALE_OAK_FENCE_GATE = init();
+    @Nullable public static final ItemType PALE_OAK_HANGING_SIGN = init();
+    @Nullable public static final ItemType PALE_OAK_LEAVES = init();
+    @Nullable public static final ItemType PALE_OAK_LOG = init();
+    @Nullable public static final ItemType PALE_OAK_PLANKS = init();
+    @Nullable public static final ItemType PALE_OAK_PRESSURE_PLATE = init();
+    @Nullable public static final ItemType PALE_OAK_SAPLING = init();
+    @Nullable public static final ItemType PALE_OAK_SHELF = init();
+    @Nullable public static final ItemType PALE_OAK_SIGN = init();
+    @Nullable public static final ItemType PALE_OAK_SLAB = init();
+    @Nullable public static final ItemType PALE_OAK_STAIRS = init();
+    @Nullable public static final ItemType PALE_OAK_TRAPDOOR = init();
+    @Nullable public static final ItemType PALE_OAK_WOOD = init();
     @Nullable
     public static final ItemType PANDA_SPAWN_EGG = init();
     @Nullable
     public static final ItemType PAPER = init();
+    @Nullable
+    public static final ItemType PARCHED_SPAWN_EGG = init();
     @Nullable
     public static final ItemType PARROT_SPAWN_EGG = init();
     @Nullable
@@ -1787,6 +1980,7 @@ public final class ItemTypes {
     public static final ItemType PINK_BANNER = init();
     @Nullable
     public static final ItemType PINK_BED = init();
+    @Nullable public static final ItemType PINK_BUNDLE = init();
     @Nullable
     public static final ItemType PINK_CANDLE = init();
     @Nullable
@@ -1860,6 +2054,14 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType POLISHED_BLACKSTONE_WALL = init();
     @Nullable
+    public static final ItemType POLISHED_CINNABAR = init();
+    @Nullable
+    public static final ItemType POLISHED_CINNABAR_SLAB = init();
+    @Nullable
+    public static final ItemType POLISHED_CINNABAR_STAIRS = init();
+    @Nullable
+    public static final ItemType POLISHED_CINNABAR_WALL = init();
+    @Nullable
     public static final ItemType POLISHED_DEEPSLATE = init();
     @Nullable
     public static final ItemType POLISHED_DEEPSLATE_SLAB = init();
@@ -1880,6 +2082,14 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType POLISHED_GRANITE_STAIRS = init();
     @Nullable
+    public static final ItemType POLISHED_SULFUR = init();
+    @Nullable
+    public static final ItemType POLISHED_SULFUR_SLAB = init();
+    @Nullable
+    public static final ItemType POLISHED_SULFUR_STAIRS = init();
+    @Nullable
+    public static final ItemType POLISHED_SULFUR_WALL = init();
+    @Nullable
     public static final ItemType POLISHED_TUFF = init();
     @Nullable
     public static final ItemType POLISHED_TUFF_SLAB = init();
@@ -1895,6 +2105,8 @@ public final class ItemTypes {
     public static final ItemType PORKCHOP = init();
     @Nullable
     public static final ItemType POTATO = init();
+    @Nullable
+    public static final ItemType POTENT_SULFUR = init();
     @Nullable
     public static final ItemType POTION = init();
     @Nullable
@@ -1937,6 +2149,7 @@ public final class ItemTypes {
     public static final ItemType PURPLE_BANNER = init();
     @Nullable
     public static final ItemType PURPLE_BED = init();
+    @Nullable public static final ItemType PURPLE_BUNDLE = init();
     @Nullable
     public static final ItemType PURPLE_CANDLE = init();
     @Nullable
@@ -2013,6 +2226,7 @@ public final class ItemTypes {
     public static final ItemType RED_BANNER = init();
     @Nullable
     public static final ItemType RED_BED = init();
+    @Nullable public static final ItemType RED_BUNDLE = init();
     @Nullable
     public static final ItemType RED_CANDLE = init();
     @Nullable
@@ -2158,6 +2372,8 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType SHIELD = init();
     @Nullable
+    public static final ItemType SHORT_DRY_GRASS = init();
+    @Nullable
     public static final ItemType SHORT_GRASS = init();
     @Nullable
     public static final ItemType SHROOMLIGHT = init();
@@ -2289,6 +2505,8 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType SPRUCE_SAPLING = init();
     @Nullable
+    public static final ItemType SPRUCE_SHELF = init();
+    @Nullable
     public static final ItemType SPRUCE_SIGN = init();
     @Nullable
     public static final ItemType SPRUCE_SLAB = init();
@@ -2330,6 +2548,8 @@ public final class ItemTypes {
     public static final ItemType STONE_SHOVEL = init();
     @Nullable
     public static final ItemType STONE_SLAB = init();
+    @Nullable
+    public static final ItemType STONE_SPEAR = init();
     @Nullable
     public static final ItemType STONE_STAIRS = init();
     @Nullable
@@ -2376,6 +2596,8 @@ public final class ItemTypes {
     public static final ItemType STRIPPED_OAK_LOG = init();
     @Nullable
     public static final ItemType STRIPPED_OAK_WOOD = init();
+    @Nullable public static final ItemType STRIPPED_PALE_OAK_LOG = init();
+    @Nullable public static final ItemType STRIPPED_PALE_OAK_WOOD = init();
     @Nullable
     public static final ItemType STRIPPED_SPRUCE_LOG = init();
     @Nullable
@@ -2393,6 +2615,28 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType SUGAR_CANE = init();
     @Nullable
+    public static final ItemType SULFUR = init();
+    @Nullable
+    public static final ItemType SULFUR_BRICK_SLAB = init();
+    @Nullable
+    public static final ItemType SULFUR_BRICK_STAIRS = init();
+    @Nullable
+    public static final ItemType SULFUR_BRICK_WALL = init();
+    @Nullable
+    public static final ItemType SULFUR_BRICKS = init();
+    @Nullable
+    public static final ItemType SULFUR_CUBE_BUCKET = init();
+    @Nullable
+    public static final ItemType SULFUR_CUBE_SPAWN_EGG = init();
+    @Nullable
+    public static final ItemType SULFUR_SLAB = init();
+    @Nullable
+    public static final ItemType SULFUR_SPIKE = init();
+    @Nullable
+    public static final ItemType SULFUR_STAIRS = init();
+    @Nullable
+    public static final ItemType SULFUR_WALL = init();
+    @Nullable
     public static final ItemType SUNFLOWER = init();
     @Nullable
     public static final ItemType SUSPICIOUS_GRAVEL = init();
@@ -2407,11 +2651,17 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType TADPOLE_SPAWN_EGG = init();
     @Nullable
+    public static final ItemType TALL_DRY_GRASS = init();
+    @Nullable
     public static final ItemType TALL_GRASS = init();
     @Nullable
     public static final ItemType TARGET = init();
     @Nullable
     public static final ItemType TERRACOTTA = init();
+    @Nullable
+    public static final ItemType TEST_BLOCK = init();
+    @Nullable
+    public static final ItemType TEST_INSTANCE_BLOCK = init();
     @Nullable
     public static final ItemType TIDE_ARMOR_TRIM_SMITHING_TEMPLATE = init();
     @Nullable
@@ -2525,6 +2775,8 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType WARPED_ROOTS = init();
     @Nullable
+    public static final ItemType WARPED_SHELF = init();
+    @Nullable
     public static final ItemType WARPED_SIGN = init();
     @Nullable
     public static final ItemType WARPED_SLAB = init();
@@ -2541,13 +2793,23 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType WAXED_CHISELED_COPPER = init();
     @Nullable
+    public static final ItemType WAXED_COPPER_BARS = init();
+    @Nullable
     public static final ItemType WAXED_COPPER_BLOCK = init();
     @Nullable
     public static final ItemType WAXED_COPPER_BULB = init();
     @Nullable
+    public static final ItemType WAXED_COPPER_CHAIN = init();
+    @Nullable
+    public static final ItemType WAXED_COPPER_CHEST = init();
+    @Nullable
     public static final ItemType WAXED_COPPER_DOOR = init();
     @Nullable
+    public static final ItemType WAXED_COPPER_GOLEM_STATUE = init();
+    @Nullable
     public static final ItemType WAXED_COPPER_GRATE = init();
+    @Nullable
+    public static final ItemType WAXED_COPPER_LANTERN = init();
     @Nullable
     public static final ItemType WAXED_COPPER_TRAPDOOR = init();
     @Nullable
@@ -2561,11 +2823,21 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType WAXED_EXPOSED_COPPER = init();
     @Nullable
+    public static final ItemType WAXED_EXPOSED_COPPER_BARS = init();
+    @Nullable
     public static final ItemType WAXED_EXPOSED_COPPER_BULB = init();
+    @Nullable
+    public static final ItemType WAXED_EXPOSED_COPPER_CHAIN = init();
+    @Nullable
+    public static final ItemType WAXED_EXPOSED_COPPER_CHEST = init();
     @Nullable
     public static final ItemType WAXED_EXPOSED_COPPER_DOOR = init();
     @Nullable
+    public static final ItemType WAXED_EXPOSED_COPPER_GOLEM_STATUE = init();
+    @Nullable
     public static final ItemType WAXED_EXPOSED_COPPER_GRATE = init();
+    @Nullable
+    public static final ItemType WAXED_EXPOSED_COPPER_LANTERN = init();
     @Nullable
     public static final ItemType WAXED_EXPOSED_COPPER_TRAPDOOR = init();
     @Nullable
@@ -2575,15 +2847,29 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType WAXED_EXPOSED_CUT_COPPER_STAIRS = init();
     @Nullable
+    public static final ItemType WAXED_EXPOSED_LIGHTNING_ROD = init();
+    @Nullable
+    public static final ItemType WAXED_LIGHTNING_ROD  = init();
+    @Nullable
     public static final ItemType WAXED_OXIDIZED_CHISELED_COPPER = init();
     @Nullable
     public static final ItemType WAXED_OXIDIZED_COPPER = init();
     @Nullable
+    public static final ItemType WAXED_OXIDIZED_COPPER_BARS = init();
+    @Nullable
     public static final ItemType WAXED_OXIDIZED_COPPER_BULB = init();
+    @Nullable
+    public static final ItemType WAXED_OXIDIZED_COPPER_CHAIN = init();
+    @Nullable
+    public static final ItemType WAXED_OXIDIZED_COPPER_CHEST = init();
     @Nullable
     public static final ItemType WAXED_OXIDIZED_COPPER_DOOR = init();
     @Nullable
+    public static final ItemType WAXED_OXIDIZED_COPPER_GOLEM_STATUE = init();
+    @Nullable
     public static final ItemType WAXED_OXIDIZED_COPPER_GRATE = init();
+    @Nullable
+    public static final ItemType WAXED_OXIDIZED_COPPER_LANTERN = init();
     @Nullable
     public static final ItemType WAXED_OXIDIZED_COPPER_TRAPDOOR = init();
     @Nullable
@@ -2593,15 +2879,27 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType WAXED_OXIDIZED_CUT_COPPER_STAIRS = init();
     @Nullable
+    public static final ItemType WAXED_OXIDIZED_LIGHTNING_ROD = init();
+    @Nullable
     public static final ItemType WAXED_WEATHERED_CHISELED_COPPER = init();
     @Nullable
     public static final ItemType WAXED_WEATHERED_COPPER = init();
     @Nullable
+    public static final ItemType WAXED_WEATHERED_COPPER_BARS = init();
+    @Nullable
     public static final ItemType WAXED_WEATHERED_COPPER_BULB = init();
+    @Nullable
+    public static final ItemType WAXED_WEATHERED_COPPER_CHAIN = init();
+    @Nullable
+    public static final ItemType WAXED_WEATHERED_COPPER_CHEST = init();
     @Nullable
     public static final ItemType WAXED_WEATHERED_COPPER_DOOR = init();
     @Nullable
+    public static final ItemType WAXED_WEATHERED_COPPER_GOLEM_STATUE = init();
+    @Nullable
     public static final ItemType WAXED_WEATHERED_COPPER_GRATE = init();
+    @Nullable
+    public static final ItemType WAXED_WEATHERED_COPPER_LANTERN = init();
     @Nullable
     public static final ItemType WAXED_WEATHERED_COPPER_TRAPDOOR = init();
     @Nullable
@@ -2611,17 +2909,29 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType WAXED_WEATHERED_CUT_COPPER_STAIRS = init();
     @Nullable
+    public static final ItemType WAXED_WEATHERED_LIGHTNING_ROD = init();
+    @Nullable
     public static final ItemType WAYFINDER_ARMOR_TRIM_SMITHING_TEMPLATE = init();
     @Nullable
     public static final ItemType WEATHERED_CHISELED_COPPER = init();
     @Nullable
     public static final ItemType WEATHERED_COPPER = init();
     @Nullable
+    public static final ItemType WEATHERED_COPPER_BARS = init();
+    @Nullable
     public static final ItemType WEATHERED_COPPER_BULB = init();
+    @Nullable
+    public static final ItemType WEATHERED_COPPER_CHAIN = init();
+    @Nullable
+    public static final ItemType WEATHERED_COPPER_CHEST = init();
     @Nullable
     public static final ItemType WEATHERED_COPPER_DOOR = init();
     @Nullable
+    public static final ItemType WEATHERED_COPPER_GOLEM_STATUE = init();
+    @Nullable
     public static final ItemType WEATHERED_COPPER_GRATE = init();
+    @Nullable
+    public static final ItemType WEATHERED_COPPER_LANTERN = init();
     @Nullable
     public static final ItemType WEATHERED_COPPER_TRAPDOOR = init();
     @Nullable
@@ -2630,6 +2940,8 @@ public final class ItemTypes {
     public static final ItemType WEATHERED_CUT_COPPER_SLAB = init();
     @Nullable
     public static final ItemType WEATHERED_CUT_COPPER_STAIRS = init();
+    @Nullable
+    public static final ItemType WEATHERED_LIGHTNING_ROD = init();
     @Nullable
     public static final ItemType WEEPING_VINES = init();
     @Nullable
@@ -2642,6 +2954,7 @@ public final class ItemTypes {
     public static final ItemType WHITE_BANNER = init();
     @Nullable
     public static final ItemType WHITE_BED = init();
+    @Nullable public static final ItemType WHITE_BUNDLE = init();
     @Nullable
     public static final ItemType WHITE_CANDLE = init();
     @Nullable
@@ -2669,6 +2982,8 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType WILD_ARMOR_TRIM_SMITHING_TEMPLATE = init();
     @Nullable
+    public static final ItemType WILDFLOWERS = init();
+    @Nullable
     public static final ItemType WIND_CHARGE = init();
     @Nullable
     public static final ItemType WITCH_SPAWN_EGG = init();
@@ -2693,6 +3008,8 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType WOODEN_SHOVEL = init();
     @Nullable
+    public static final ItemType WOODEN_SPEAR = init();
+    @Nullable
     public static final ItemType WOODEN_SWORD = init();
     @Nullable
     public static final ItemType WRITABLE_BOOK = init();
@@ -2702,6 +3019,7 @@ public final class ItemTypes {
     public static final ItemType YELLOW_BANNER = init();
     @Nullable
     public static final ItemType YELLOW_BED = init();
+    @Nullable public static final ItemType YELLOW_BUNDLE = init();
     @Nullable
     public static final ItemType YELLOW_CANDLE = init();
     @Nullable
@@ -2730,6 +3048,8 @@ public final class ItemTypes {
     public static final ItemType ZOMBIE_HEAD = init();
     @Nullable
     public static final ItemType ZOMBIE_HORSE_SPAWN_EGG = init();
+    @Nullable
+    public static final ItemType ZOMBIE_NAUTILUS_SPAWN_EGG = init();
     @Deprecated
     @Nullable
     public static final ItemType ZOMBIE_PIGMAN_SPAWN_EGG = init();
@@ -2744,7 +3064,7 @@ public final class ItemTypes {
     }
 
     private static Field[] fieldsTmp;
-    private static int initIndex = 0;
+    private static int initIndex;
 
     private static ItemType init() {
         try {
@@ -2761,6 +3081,10 @@ public final class ItemTypes {
     }
 
     static {
+        // we should be at the first non-ItemType field now
+        if (!fieldsTmp[initIndex].getName().equals("fieldsTmp")) {
+            throw new IllegalStateException("improper initialization of item type fields");
+        }
         fieldsTmp = null;
     }
 

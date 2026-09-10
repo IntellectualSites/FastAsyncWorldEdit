@@ -30,7 +30,7 @@ import com.sk89q.worldedit.registry.NamespacedRegistry;
 public class FluidType implements RegistryItem, Keyed {
 //FAWE end
 
-    public static final NamespacedRegistry<FluidType> REGISTRY = new NamespacedRegistry<>("fluid type");
+    public static final NamespacedRegistry<FluidType> REGISTRY = new NamespacedRegistry<>("fluid type", "fluid_type", "minecraft");
 
     //FAWE start
     private final String id;
@@ -40,17 +40,18 @@ public class FluidType implements RegistryItem, Keyed {
     }
 
     /**
-     * Gets the ID of this block.
+     * Gets the ID of this fluid.
      *
      * @return The id
      * @since 2.11.0
      */
+    @Override
     public String id() {
         return this.id;
     }
 
     /**
-     * Gets the ID of this block.
+     * Gets the ID of this fluid.
      *
      * @return The id
      * @deprecated use {@link #id()}

@@ -43,14 +43,14 @@ public class NegateMaskParser extends InputParser<Mask> implements AliasedParser
     }
 
     @Override
-    public Stream<String> getSuggestions(String input) {
+    public Stream<String> getSuggestions(String input, ParserContext context) {
         if (input.isEmpty()) {
             return Stream.of("!");
         }
         if (input.charAt(0) != '!') {
             return Stream.empty();
         }
-        return worldEdit.getMaskFactory().getSuggestions(input.substring(1)).stream().map(s -> "!" + s);
+        return worldEdit.getMaskFactory().getSuggestions(input.substring(1), context).stream().map(s -> "!" + s);
     }
 
     @Override

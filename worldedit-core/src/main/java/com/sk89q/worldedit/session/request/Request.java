@@ -31,13 +31,11 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Describes the current request using a {@link ThreadLocal}.
+ * Describes the current request using a {@link ConcurrentHashMap}.
  */
 public final class Request {
 
-    private static final ThreadLocal<Request> threadLocal = ThreadLocal.withInitial(Request::new);
-    //FAWE start
-    // TODO any better way to deal with this?
+    //FAWE start use CHM instead of ThreadLocal
     private static final Map<Thread, Request> requests = new ConcurrentHashMap<>();
     //FAWE end
 
@@ -56,9 +54,6 @@ public final class Request {
     //FAWE end
 
     private Request() {
-        //FAWE start
-        requests.put(Thread.currentThread(), this);
-        //FAWE end
     }
 
     //FAWE start
@@ -162,17 +157,18 @@ public final class Request {
      * @return the current request
      */
     public static Request request() {
-        return threadLocal.get();
+        return requests.computeIfAbsent(Thread.currentThread(), t -> new Request());
     }
 
     /**
      * Reset the current request and clear all fields.
      */
     public static void reset() {
-        request().invalidate();
-        threadLocal.remove();
         //FAWE start
-        requests.remove(Thread.currentThread());
+        Request request = requests.remove(Thread.currentThread());
+        if (request != null) {
+            request.invalidate();
+        }
         //FAWE end
     }
 

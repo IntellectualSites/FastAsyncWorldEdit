@@ -104,7 +104,15 @@ public class ChunkStoreHelper {
         }
 
         if (dataVersion >= Constants.DATA_VERSION_MC_1_18) {
-            return new AnvilChunk18(rootTag);
+            return new AnvilChunk18(
+                    rootTag, () -> {
+                CompoundTag compoundTag = entitiesTag.get();
+                if (compoundTag == null) {
+                    return null;
+                }
+                return compoundTag.toLinTag();
+            }
+            );
         }
 
         Map<String, Tag<?, ?>> children = rootTag.getValue();

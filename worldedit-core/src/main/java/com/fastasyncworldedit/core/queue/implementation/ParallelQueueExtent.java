@@ -1,6 +1,5 @@
 package com.fastasyncworldedit.core.queue.implementation;
 
-import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.extent.NullExtent;
@@ -19,6 +18,7 @@ import com.fastasyncworldedit.core.internal.simd.VectorizedFilter;
 import com.fastasyncworldedit.core.queue.Filter;
 import com.fastasyncworldedit.core.queue.IQueueChunk;
 import com.fastasyncworldedit.core.queue.IQueueExtent;
+import com.fastasyncworldedit.core.util.task.FaweThreadUtil;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
@@ -48,12 +48,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ForkJoinTask;
-import java.util.stream.IntStream;
 
 public class ParallelQueueExtent extends PassthroughExtent {
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
-    private static final ThreadLocal<Extent> extents = new ThreadLocal<>();
 
     private final World world;
     private final QueueHandler handler;
@@ -65,8 +63,6 @@ public class ParallelQueueExtent extends PassthroughExtent {
     private final boolean fastmode;
     private final SideEffectSet sideEffectSet;
     private int changes;
-    private int lastException = Integer.MIN_VALUE;
-    private int exceptionCount = 0;
 
     public ParallelQueueExtent(QueueHandler handler, World world, boolean fastmode, @Nullable SideEffectSet sideEffectSet) {
         super(handler.getQueue(world, new BatchProcessorHolder(), new BatchProcessorHolder()));
@@ -87,29 +83,31 @@ public class ParallelQueueExtent extends PassthroughExtent {
     /**
      * Removes the extent currently associated with the calling thread.
      */
+    @Deprecated(forRemoval = true, since = "2.13.0")
     public static void clearCurrentExtent() {
-        extents.remove();
+        FaweThreadUtil.clearCurrentExtent();
     }
 
     /**
      * Sets the extent associated with the calling thread.
      */
+    @Deprecated(forRemoval = true, since = "2.13.0")
     public static void setCurrentExtent(Extent extent) {
-        extents.set(extent);
+        FaweThreadUtil.setCurrentExtent(extent);
     }
 
-    private void enter(Extent extent) {
-        setCurrentExtent(extent);
+    void enter(Extent extent) {
+        FaweThreadUtil.setCurrentExtent(extent);
     }
 
-    private void exit() {
-        clearCurrentExtent();
+    void exit() {
+        FaweThreadUtil.clearCurrentExtent();
     }
 
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     public IQueueExtent<IQueueChunk> getExtent() {
-        Extent extent = extents.get();
+        Extent extent = FaweThreadUtil.getCurrentExtent();
         if (extent == null) {
             extent = super.getExtent();
         }
@@ -127,12 +125,12 @@ public class ParallelQueueExtent extends PassthroughExtent {
     }
 
     @SuppressWarnings("rawtypes")
-    private IQueueExtent<IQueueChunk> getNewQueue() {
+    IQueueExtent<IQueueChunk> getNewQueue() {
         SingleThreadQueueExtent queue = (SingleThreadQueueExtent) handler.getQueue(world, this.processor, this.postProcessor);
         queue.setFastMode(fastmode);
         queue.setSideEffectSet(sideEffectSet);
         queue.setFaweExceptionArray(faweExceptionReasonsUsed);
-        enter(queue);
+        queue.setTargetSize(Settings.settings().QUEUE.TARGET_SIZE * Settings.settings().QUEUE.THREAD_TARGET_SIZE_PERCENT / 100);
         return queue;
     }
 
@@ -155,62 +153,16 @@ public class ParallelQueueExtent extends PassthroughExtent {
             getExtent().flush();
             filter.finish();
         } else {
-            final ForkJoinTask[] tasks = IntStream.range(0, size).mapToObj(i -> handler.submit(() -> {
-                try {
-                    final Filter newFilter = filter.fork();
-                    final Region newRegion = region.clone();
-                    // Create a chunk that we will reuse/reset for each operation
-                    final SingleThreadQueueExtent queue = (SingleThreadQueueExtent) getNewQueue();
-                    synchronized (queue) {
-                        try {
-                            ChunkFilterBlock block = null;
-                            while (true) {
-                                // Get the next chunk posWeakChunk
-                                final int chunkX;
-                                final int chunkZ;
-                                synchronized (chunksIter) {
-                                    if (!chunksIter.hasNext()) {
-                                        break;
-                                    }
-                                    final BlockVector2 pos = chunksIter.next();
-                                    chunkX = pos.x();
-                                    chunkZ = pos.z();
-                                }
-                                block = queue.apply(block, newFilter, newRegion, chunkX, chunkZ, full);
-                            }
-                            queue.flush();
-                            filter.finish();
-                        } catch (Throwable t) {
-                            if (t instanceof FaweException) {
-                                Fawe.handleFaweException(faweExceptionReasonsUsed, (FaweException) t, LOGGER);
-                            } else if (t.getCause() instanceof FaweException) {
-                                Fawe.handleFaweException(faweExceptionReasonsUsed, (FaweException) t.getCause(), LOGGER);
-                            } else {
-                                throw t;
-                            }
-                        }
-                    }
-                } catch (Throwable e) {
-                    String message = e.getMessage();
-                    int hash = message != null ? message.hashCode() : 0;
-                    if (lastException != hash) {
-                        lastException = hash;
-                        exceptionCount = 0;
-                        LOGGER.catching(e);
-                    } else if (exceptionCount < Settings.settings().QUEUE.PARALLEL_THREADS) {
-                        exceptionCount++;
-                        LOGGER.warn(message);
-                    }
-                } finally {
-                    exit();
-                }
-            })).toArray(ForkJoinTask[]::new);
-            // Join filters
-            for (ForkJoinTask task : tasks) {
-                if (task != null) {
-                    task.quietlyJoin();
-                }
+            ForkJoinTask<?> task = this.handler.submit(
+                    new ApplyTask<>(region, filter, this, full, this.faweExceptionReasonsUsed)
+            );
+            // wait for task to finish
+            try {
+                task.join();
+            } catch (Throwable e) {
+                LOGGER.catching(e);
             }
+            // Join filters
             filter.join();
         }
         return filter;
@@ -295,7 +247,7 @@ public class ParallelQueueExtent extends PassthroughExtent {
      */
     @Override
     public Clipboard lazyCopy(Region region) {
-        Clipboard clipboard = new WorldCopyClipboard(() -> this, region);
+        Clipboard clipboard = WorldCopyClipboard.of(this, region);
         clipboard.setOrigin(region.getMinimumPoint());
         return clipboard;
     }

@@ -32,6 +32,8 @@ import com.sk89q.worldedit.world.DataException;
 import com.sk89q.worldedit.world.chunk.Chunk;
 import com.sk89q.worldedit.world.storage.ChunkStore;
 import com.sk89q.worldedit.world.storage.MissingChunkException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.enginehub.linbus.tree.LinCompoundTag;
 import org.enginehub.linbus.tree.LinDoubleTag;
 import org.enginehub.linbus.tree.LinFloatTag;
@@ -49,6 +51,8 @@ import java.util.Set;
  * A snapshot restore operation.
  */
 public class SnapshotRestore {
+
+    private static final Logger LOGGER = LogManager.getLogger();
 
     //FAWE start - Set instead of ArrayList
     private final Map<BlockVector2, Set<BlockVector3>> neededChunks = new LinkedHashMap<>();
@@ -223,6 +227,7 @@ public class SnapshotRestore {
             } catch (MissingChunkException me) {
                 missingChunks.add(chunkPos);
             } catch (IOException | DataException me) {
+                LOGGER.info(() -> "Failed to load chunk at " + chunkPos, me);
                 errorChunks.add(chunkPos);
                 lastErrorMessage = me.getMessage();
             }

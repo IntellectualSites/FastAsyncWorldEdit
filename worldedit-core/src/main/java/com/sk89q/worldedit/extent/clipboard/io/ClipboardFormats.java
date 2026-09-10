@@ -30,12 +30,19 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import com.google.common.io.ByteSource;
 import com.google.common.io.Files;
+import com.sk89q.jnbt.NBTConstants;
+import com.sk89q.jnbt.NBTInputStream;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import it.unimi.dsi.fastutil.io.FastBufferedInputStream;
+import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
+import java.io.DataInputStream;
+import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -44,6 +51,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -55,8 +63,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.regex.Pattern;
+import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipException;
 import java.util.zip.ZipInputStream;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -69,6 +80,22 @@ public class ClipboardFormats {
     private static final Multimap<String, ClipboardFormat> explicitFileExtensionMap = Multimaps.newMultimap(new HashMap<>(), LinkedHashSet::new);
     // FAWE end
     private static final List<ClipboardFormat> registeredFormats = new ArrayList<>();
+
+    // FAWE start - provide logger instance + track fast-search formats
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
+    // a list of all schematic formats which are handled by the faster detection algorithm.
+    // contains all builtin formats as of the time of writing, but in case we forget updating the algorithm after introducing a
+    // new format, we keep track manually to avoid breaking something.
+    @SuppressWarnings("deprecation")
+    private static final Set<ClipboardFormat> FAST_SEARCH_BUILTIN_FORMATS = Set.of(
+            BuiltInClipboardFormat.PNG, BuiltInClipboardFormat.MCEDIT_SCHEMATIC, BuiltInClipboardFormat.MINECRAFT_STRUCTURE,
+            BuiltInClipboardFormat.SPONGE_V1_SCHEMATIC, BuiltInClipboardFormat.FAST_V2, BuiltInClipboardFormat.FAST_V3,
+            // the following formats are not explicitly supported, but either don't support reading or
+            // are handled by previous formats (e.g. SPONGE_V2_SCHEMATIC -> FAST_V2)
+            BuiltInClipboardFormat.SPONGE_V2_SCHEMATIC, BuiltInClipboardFormat.SPONGE_V3_SCHEMATIC,
+            BuiltInClipboardFormat.BROKENENTITY
+    );
+    // FAWE end
 
     public static void registerClipboardFormat(ClipboardFormat format) {
         checkNotNull(format);
@@ -112,24 +139,118 @@ public class ClipboardFormats {
         return aliasMap.get(alias.toLowerCase(Locale.ROOT).trim());
     }
 
+    //FAWE start - optimize format detection for builtin / known formats
+
     /**
-     * Detect the format of given a file.
+     * Detect the format of a given file.
      *
      * @param file the file
      * @return the format, otherwise null if one cannot be detected
      */
+    @SuppressWarnings("removal") // NBTInputStream + NBTConstants
     @Nullable
     public static ClipboardFormat findByFile(File file) {
         checkNotNull(file);
 
+        if (file.getName().toLowerCase().endsWith(".png")) {
+            return BuiltInClipboardFormat.PNG;
+        }
+
+        /* Conditions for known formats
+            FAST_V3:             Compound_Tag("") -> Compound_Tag("Schematic") -> Int_Tag("Version") == 3
+            MINECRAFT_STRUCTURE: Compound_Tag("") -> exist(Nbt_List_Tag("size" || "palette" || "blocks" || "entities"))
+            FAST_V2:             Compound_Tag("Schematic") -> Int_Tag("Version") == 2
+            SPONGE_V1:           Compound_Tag("Schematic") -> Int_Tag("Version") == 1
+            MC_EDIT:             Compound_Tag("Schematic") -> exist(Byte_Array_Tag("Blocks") || String_Tag("Materials"))
+         */
+        try (final DataInputStream inputStream = new DataInputStream(new GZIPInputStream(new FastBufferedInputStream(java.nio.file.Files.newInputStream(
+                file.toPath()))));
+             final NBTInputStream nbtInputStream = new NBTInputStream(inputStream)) {
+            if (inputStream.readByte() != NBTConstants.TYPE_COMPOUND) {
+                return findByFileInExternalFormats(file);
+            }
+            final int rootNameTagLength = inputStream.readShort() & 0xFFFF;
+            if (rootNameTagLength != 0 && rootNameTagLength != 9) { // Only allow "" and "Schematic"
+                return findByFileInExternalFormats(file);
+            }
+            final String rootName = new String(inputStream.readNBytes(rootNameTagLength), StandardCharsets.UTF_8);
+            if (rootName.isEmpty()) {
+                // Only FAST_V3 and MINECRAFT_STRUCTURE use empty named root compound tags
+                // FAST_V3 only contains a single child component - if that's not present, only MINECRAFT_STRUCTURE is possible
+                do {
+                    byte type = inputStream.readByte();
+                    if (type == NBTConstants.TYPE_END) {
+                        return findByFileInExternalFormats(file);
+                    }
+                    String name = nbtInputStream.readNamedTagName(type);
+                    if (type == NBTConstants.TYPE_COMPOUND && name.equals("Schematic")) {
+                        // unwrap inner schematic compound for general processing below
+                        break;
+                    }
+                    // search for almost all known compound children for a fast return path (lowercase is specific enough for now)
+                    if (type == NBTConstants.TYPE_LIST &&
+                            (name.equals("size") || name.equals("palette") || name.equals("blocks") || name.equals("entities"))) {
+                        return BuiltInClipboardFormat.MINECRAFT_STRUCTURE;
+                    }
+                    nbtInputStream.readTagPayloadLazy(type, 0); // skip unwanted tags and continue search
+                } while (true);
+            }
+
+            do {
+                byte type = inputStream.readByte();
+                if (type == NBTConstants.TYPE_END) {
+                    return findByFileInExternalFormats(file);
+                }
+                String name = nbtInputStream.readNamedTagName(type);
+                if ((type == NBTConstants.TYPE_BYTE_ARRAY && name.equals("Blocks")) ||
+                        (type == NBTConstants.TYPE_STRING && name.equals("Materials"))) {
+                    return BuiltInClipboardFormat.MCEDIT_SCHEMATIC;
+                }
+                if (type == NBTConstants.TYPE_INT && name.equals("Version")) {
+                    int version = inputStream.readInt();
+                    return switch (version) {
+                        case 1 -> BuiltInClipboardFormat.SPONGE_V1_SCHEMATIC;
+                        case 2 -> BuiltInClipboardFormat.FAST_V2;
+                        case 3 -> BuiltInClipboardFormat.FAST_V3;
+                        default -> findByFileInExternalFormats(file);
+                    };
+                }
+                nbtInputStream.readTagPayloadLazy(type, 0); // skip unwanted tags and continue search
+            } while (true);
+        } catch (ZipException | EOFException ignored) {
+            // ignore gzip errors and EOFs - the file format might not use gzip, or we expected more data from known formats
+            // all other builtin formats use gzip compression
+        } catch (IOException e) {
+            // other IO errors (non gzip-related) should be logged
+            LOGGER.error("Failed determining clipboard format for file {}", file.getAbsolutePath(), e);
+            return null;
+        }
+
+        // no builtin format seems to match - test the remaining registered formats (added by other plugins, for example)
+        return findByFileInExternalFormats(file);
+    }
+
+    /**
+     * Detect the clipboard format for a specified file while skipping optimized builtin formats
+     *
+     * @param file the file
+     * @return the format or {@code null}
+     */
+    private static ClipboardFormat findByFileInExternalFormats(File file) {
+        if (registeredFormats.size() == FAST_SEARCH_BUILTIN_FORMATS.size()) {
+            return null;
+        }
         for (ClipboardFormat format : registeredFormats) {
+            if (FAST_SEARCH_BUILTIN_FORMATS.contains(format)) {
+                continue;
+            }
             if (format.isFormat(file)) {
                 return format;
             }
         }
-
         return null;
     }
+    //FAWE end
 
     /**
      * A mapping from extensions to formats.

@@ -175,7 +175,7 @@ public class FastSchematicReaderV3 implements ClipboardReader {
                 default -> this.nbtInputStream.readTagPayloadLazy(type, 0);
             }
             if (clipboard == null && this.areDimensionsAvailable()) {
-                clipboard = createOutput.apply(this.dimensions);
+                clipboard = createOutput.apply(this.dimensions.toImmutable());
             }
         }
 
@@ -242,7 +242,6 @@ public class FastSchematicReaderV3 implements ClipboardReader {
                     case CACHE_IDENTIFIER_BLOCK -> this.readPaletteData(cacheStream, this.getBlockWriter(clipboard));
                     case CACHE_IDENTIFIER_BIOMES -> this.readPaletteData(cacheStream, this.getBiomeWriter(clipboard));
                     case CACHE_IDENTIFIER_ENTITIES -> {
-                        cacheStream.skipNBytes(1); // list child type (TAG_Compound)
                         this.readEntityContainers(
                                 cacheStream,
                                 cacheNbtIn,
@@ -251,7 +250,6 @@ public class FastSchematicReaderV3 implements ClipboardReader {
                         );
                     }
                     case CACHE_IDENTIFIER_BLOCK_TILE_ENTITIES -> {
-                        cacheStream.skipNBytes(1); // list child type (TAG_Compound)
                         this.readEntityContainers(
                                 cacheStream,
                                 cacheNbtIn,
@@ -370,9 +368,6 @@ public class FastSchematicReaderV3 implements ClipboardReader {
             cacheStream.writeTagPayload(this.nbtInputStream.readTagPayload(NBTConstants.TYPE_LIST, 0));
             return;
         }
-        if (this.dataInputStream.read() != NBTConstants.TYPE_COMPOUND) {
-            throw new IOException("Expected a compound block for entity");
-        }
         this.readEntityContainers(
                 this.dataInputStream, this.nbtInputStream, DataFixer.FixTypes.ENTITY, this.provideEntityTransformer(target)
         );
@@ -392,9 +387,6 @@ public class FastSchematicReaderV3 implements ClipboardReader {
             cacheStream.writeTagPayload(this.nbtInputStream.readTagPayload(NBTConstants.TYPE_LIST, 0));
             return;
         }
-        if (this.dataInputStream.read() != NBTConstants.TYPE_COMPOUND) {
-            throw new IOException("Expected a compound block for tile entity");
-        }
         this.readEntityContainers(
                 this.dataInputStream,
                 this.nbtInputStream,
@@ -413,7 +405,13 @@ public class FastSchematicReaderV3 implements ClipboardReader {
         LinCompoundTag tag;
         String id;
         byte type;
+
+        int listType = stream.read();
         int count = stream.readInt();
+        if (count > 0 && listType != NBTConstants.TYPE_COMPOUND) {
+            throw new IOException("Expected a compound block for tile entity list");
+        }
+
         while (count-- > 0) {
             x = -1;
             y = -1;
@@ -472,6 +470,7 @@ public class FastSchematicReaderV3 implements ClipboardReader {
                 transformer.transform(x, y, z, id, LinCompoundTag.of(Map.of()));
                 continue;
             }
+            tag = tag.toBuilder().putString("id", id).remove("Id").build();
             tag = this.dataFixer.fixUp(fixType, tag);
             if (tag == null) {
                 LOGGER.warn("Failed to fix-up entity for {} @ {},{},{} - skipping", id, x, y, z);

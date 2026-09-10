@@ -4,8 +4,11 @@ import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.extent.processor.heightmap.HeightMapType;
 import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.fastasyncworldedit.core.queue.IBlocks;
+import com.fastasyncworldedit.core.queue.IChunk;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.IChunkSet;
+import com.fastasyncworldedit.core.queue.IQueueExtent;
+import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
@@ -18,6 +21,7 @@ import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Future;
 
@@ -63,6 +67,11 @@ public final class NullChunkGet implements IChunkGet {
         return Collections.emptyList();
     }
 
+    @Nullable
+    public Set<Entity> getFullEntities() {
+        return null;
+    }
+
     @Override
     public int setCreateCopy(boolean createCopy) {
         return -1;
@@ -105,6 +114,16 @@ public final class NullChunkGet implements IChunkGet {
         return 0;
     }
 
+    @Override
+    public int getX() {
+        return 0;
+    }
+
+    @Override
+    public int getZ() {
+        return 0;
+    }
+
     public boolean trim(boolean aggressive) {
         return true;
     }
@@ -114,7 +133,7 @@ public final class NullChunkGet implements IChunkGet {
     }
 
     @Nullable
-    public <T extends Future<T>> T call(@Nonnull IChunkSet set, @Nonnull Runnable finalize) {
+    public <T extends Future<T>> T call(IQueueExtent<? extends IChunk> owner, @Nonnull IChunkSet set, @Nonnull Runnable finalize) {
         return null;
     }
 

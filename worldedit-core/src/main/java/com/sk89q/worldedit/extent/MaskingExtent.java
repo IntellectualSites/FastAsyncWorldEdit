@@ -111,6 +111,11 @@ public class MaskingExtent extends AbstractDelegateExtent implements IBatchProce
     }
 
     @Override
+    public boolean setBiome(BlockVector3 location, BiomeType biome) {
+        return mask.test(location) && super.setBiome(location, biome);
+    }
+
+    @Override
     public boolean setBiome(int x, int y, int z, BiomeType biome) {
         return this.mask.test(BlockVector3.at(x, y, z)) && super.setBiome(x, y, z, biome);
     }

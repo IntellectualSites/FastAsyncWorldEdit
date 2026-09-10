@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.math.transform;
 
+import com.fastasyncworldedit.core.math.transform.MutatingOperationTransformHolder;
 import com.sk89q.worldedit.math.Vector3;
 
 import java.util.ArrayList;
@@ -95,5 +96,19 @@ public class CombinedTransform implements Transform {
             return new CombinedTransform(this, other);
         }
     }
+
+    //FAWE start
+
+    /**
+     * Get an unmodifiable view of the transforms stored by this {@link CombinedTransform}. Individuable transforms may be
+     * mutable ({@link MutatingOperationTransformHolder})
+     *
+     * @return view of held transforms
+     * @since 2.13.1
+     */
+    public List<Transform> getTransforms() {
+        return List.of(transforms);
+    }
+    //FAWE end
 
 }

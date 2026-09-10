@@ -333,7 +333,6 @@ public class TextureUtil implements TextureHolder {
             new BiomeColor(255, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F)};
 
     private static final String VERSION_MANIFEST = "https://piston-meta.mojang.com/mc/game/version_manifest.json";
-    private final BlockType[] layerBuffer = new BlockType[2];
     protected int[] blockColors = new int[BlockTypes.size()];
     protected long[] blockDistance = new long[BlockTypes.size()];
     protected long[] distances;
@@ -385,34 +384,31 @@ public class TextureUtil implements TextureHolder {
                         final String sha1 = calculateSha1(out);
                         if (!sha1.equals(resource.hash())) {
                             Files.deleteIfExists(out);
-                            LOGGER.error(
-                                    "Hash comparison of final file failed (Expected: '{}', Calculated: '{}')",
+                            LOGGER.error("""
+                                    Hash comparison of final file failed (Expected: '{}', Calculated: '{}')
+                                    To prevent possibly malicious intentions, the downloaded file has been removed""",
                                     resource.hash(), sha1
                             );
-                            LOGGER.error("To prevent possibly malicious intentions, the downloaded file has been removed");
                             return;
                         }
                     } catch (NoSuchAlgorithmException e) {
-                        LOGGER.warn("Couldn't verify integrity of downloaded client file");
-                        LOGGER.warn(
-                                "Please verify that the downloaded files '{}' hash is equal to '{}'",
+                        LOGGER.warn("""
+                                Couldn't verify integrity of downloaded client file
+                                Please verify that the downloaded files '{}' hash is equal to '{}'""",
                                 out, resource.hash()
                         );
                         return;
                     }
                     LOGGER.info("Asset jar has been downloaded and validated successfully.");
                 } catch (IOException e) {
-                    LOGGER.error(
-                            "Could not download version jar. Please do so manually by creating a `FastAsyncWorldEdit/textures` " +
-                                    "folder with a `.minecraft/versions` jar in it.");
-                    LOGGER.error("If the file exists, please make sure the server has read access to the directory.");
+                    LOGGER.error("""
+                            Could not download version jar. Please do so manually by creating a `FastAsyncWorldEdit/textures` folder with a `.minecraft/versions` jar in it.
+                            If the file exists, please make sure the server has read access to the directory.""");
                 }
             } catch (SecurityException e) {
-                LOGGER.error(
-                        "Could not download asset jar. It's likely your file permission are setup improperly and do not allow fetching data from the Mojang servers.");
-                LOGGER.error(
-                        "Please create the following folder manually: `FastAsyncWorldEdit/textures` with a `" +
-                                ".minecraft/versions` jar in it.");
+                LOGGER.error("""
+                        Could not download asset jar. It's likely your file permission are setup improperly and do not allow fetching data from the Mojang servers.
+                        Please create the following folder manually: `FastAsyncWorldEdit/textures` with a `.minecraft/versions` jar in it.""");
 
             }
         }
@@ -659,6 +655,17 @@ public class TextureUtil implements TextureHolder {
     }
 
     /**
+     * Create a copy of this {@link TextureUtil} instance if required for thread safety.
+     *
+     * @return either this {@link TextureUtil} instance if thread safe or a new copied instance.
+     * @since 2.13.0
+     */
+    public TextureUtil fork() {
+        // Default implementation should be thread safe (only array lookups)
+        return this;
+    }
+
+    /**
      * Get the block most closely matching a color based on the block's average color
      *
      * @param color color to match
@@ -736,9 +743,10 @@ public class TextureUtil implements TextureHolder {
                 }
             }
         }
-        layerBuffer[0] = BlockTypesCache.values[closest[0]];
-        layerBuffer[1] = BlockTypesCache.values[closest[1]];
-        return layerBuffer;
+        BlockType[] result = new BlockType[2];
+        result[0] = BlockTypesCache.values[closest[0]];
+        result[1] = BlockTypesCache.values[closest[1]];
+        return result;
     }
 
     /**
@@ -906,11 +914,10 @@ public class TextureUtil implements TextureHolder {
             File[] files = folder.listFiles((dir, name) -> name.endsWith(".jar"));
             // We expect the latest version to be already there, due to the download in TextureUtil#<init>
             if (files == null || files.length == 0) {
-                LOGGER.error("No version jar found in {}. Delete the named folder and restart your server to download the " +
-                        "missing assets.", folder.getPath());
-                LOGGER.error(
-                        "If no asset jar is created, please do so manually by creating a `FastAsyncWorldEdit/textures` " +
-                                "folder with a `.minecraft/versions` jar or mods in it.");
+                LOGGER.error("""
+                        No version jar found in {}. Delete the named folder and restart your server to download the missing assets.
+                        If no asset jar is created, please do so manually by creating a `FastAsyncWorldEdit/textures` folder with a `.minecraft/versions` jar or mods in it.""",
+                        folder.getPath());
             }
             if (files != null && (files.length > 0)) {
                 for (File file : files) {
@@ -1018,8 +1025,8 @@ public class TextureUtil implements TextureHolder {
                                 BufferedImage image = ImageIO.read(is);
                                 // Update biome colors
                                 for (BiomeColor biome : biomes) {
-                                    float adjTemp = MathMan.clamp(biome.temperature, 0.0f, 1.0f);
-                                    float adjRainfall = MathMan.clamp(biome.rainfall, 0.0f, 1.0f) * adjTemp;
+                                    float adjTemp = Math.clamp(biome.temperature, 0.0f, 1.0f);
+                                    float adjRainfall = Math.clamp(biome.rainfall, 0.0f, 1.0f) * adjTemp;
                                     int x = (int) (255 - adjTemp * 255);
                                     int z = (int) (255 - adjRainfall * 255);
                                     biome.grass = image.getRGB(x, z);

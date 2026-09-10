@@ -26,8 +26,6 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -38,7 +36,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class BiomeMask extends AbstractExtentMask {
 //FAWE end
 
-    private final Set<BiomeType> biomes = new HashSet<>();
+    //FAWE start - avoid HashSet usage
+    private final boolean[] biomes;
+    //FAWE end
 
     /**
      * Create a new biome mask.
@@ -51,7 +51,17 @@ public class BiomeMask extends AbstractExtentMask {
         super(extent);
         //FAWE end
         checkNotNull(biomes);
-        this.biomes.addAll(biomes);
+        //FAWE start - avoid HashSet usage
+        this.biomes = new boolean[BiomeType.REGISTRY.size()];
+        for (final BiomeType biome : biomes) {
+            this.biomes[biome.getInternalId()] = true;
+        }
+        //FAWE end
+    }
+
+    private BiomeMask(Extent extent, boolean[] biomes) {
+        super(extent);
+        this.biomes = biomes;
     }
 
     /**
@@ -71,7 +81,11 @@ public class BiomeMask extends AbstractExtentMask {
      */
     public void add(Collection<BiomeType> biomes) {
         checkNotNull(biomes);
-        this.biomes.addAll(biomes);
+        //FAWE start - avoid HashSet usage
+        for (final BiomeType biome : biomes) {
+            this.biomes[biome.getInternalId()] = true;
+        }
+        //FAWE end
     }
 
     /**
@@ -89,13 +103,17 @@ public class BiomeMask extends AbstractExtentMask {
      * @return a list of biomes
      */
     public Collection<BiomeType> getBiomes() {
-        return biomes;
+        //FAWE start - avoid HashSet usage
+        return BiomeType.REGISTRY.values().stream().filter(type -> biomes[type.getInternalId()]).toList();
+        //FAWE end
     }
 
     @Override
     public boolean test(BlockVector3 vector) {
+        //FAWE start - avoid HashSet usage
         BiomeType biome = vector.getBiome(getExtent());
-        return biomes.contains(biome);
+        return biomes[biome.getInternalId()];
+        //FAWE end
     }
 
     @Nullable
@@ -107,14 +125,14 @@ public class BiomeMask extends AbstractExtentMask {
     //FAWE start
     @Override
     public Mask copy() {
-        return new BiomeMask(getExtent(), new HashSet<>(biomes));
+        return new BiomeMask(getExtent(), this.biomes.clone());
     }
-    //FAWE end
 
     @Override
     public boolean test(Extent extent, BlockVector3 position) {
         BiomeType biome = getExtent().getBiome(position);
-        return biomes.contains(biome);
+        return biomes[biome.getInternalId()];
     }
+    //FAWE end
 
 }

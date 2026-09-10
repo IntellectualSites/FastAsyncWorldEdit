@@ -31,6 +31,7 @@ import com.fastasyncworldedit.core.world.block.BlanketBaseBlock;
 import com.google.common.collect.Maps;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.IncompleteRegionException;
+import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.NotABlockException;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
@@ -319,7 +320,7 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
     }
 
     @Override
-    public Stream<String> getSuggestions(String input) {
+    public Stream<String> getSuggestions(String input, ParserContext context) {
         final int idx = input.lastIndexOf('[');
         if (idx < 0) {
             return SuggestionHelper.getNamespacedRegistrySuggestions(BlockType.REGISTRY, input);
@@ -327,7 +328,36 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
         String blockType = input.substring(0, idx);
         BlockType type = BlockTypes.get(blockType.toLowerCase(Locale.ROOT));
         if (type == null) {
-            return Stream.empty();
+            var lowerBlockType = blockType.toLowerCase(Locale.ROOT);
+            switch (lowerBlockType) {
+                case "hand", "offhand" -> {
+                    var actor = context.getActor();
+                    if (actor instanceof Player player) {
+                        var itemInHand = player.getItemInHand(lowerBlockType.equals("hand") ? HandSide.MAIN_HAND : HandSide.OFF_HAND);
+                        if (itemInHand.getType().hasBlockType()) {
+                            type = itemInHand.getType().getBlockType();
+                        }
+                    }
+                }
+                case "pos1" -> {
+                    // Get the block type from the "primary position"
+                    World world = context.getWorld();
+                    LocalSession session = context.getSession();
+                    if (world != null && session != null) {
+                        try {
+                            BlockVector3 primaryPosition = session.getRegionSelector(world).getPrimaryPosition();
+                            type = world.getBlock(primaryPosition).getBlockType();
+                        } catch (IncompleteRegionException ignored) {
+                        }
+                    }
+                }
+                default -> {
+                }
+            }
+
+            if (type == null) {
+                return Stream.empty();
+            }
         }
 
         String props = input.substring(idx + 1);
@@ -335,7 +365,7 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
             return type.getProperties().stream().map(p -> input + p.getName() + "=");
         }
 
-        return SuggestionHelper.getBlockPropertySuggestions(blockType, props);
+        return SuggestionHelper.getBlockPropertySuggestions(blockType, type, props);
     }
 
     @Nonnull
@@ -538,7 +568,11 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
             //FAWE end
         }
 
-        if (DeprecationUtil.isSign(blockType)) {
+        //FAWE start - only handle if extra data is actually supplied or if the user has permission for nbt
+        boolean allowWorkingDefault = nbt != null &&
+                (context.getActor() == null || context.getActor().hasPermission("worldedit.anyblock.nbt"));
+        if (DeprecationUtil.isSign(blockType) && (blockAndExtraData.length > 1 || allowWorkingDefault)) {
+            //FAWE end
             // Allow special sign text syntax
             String[] text = new String[4];
             text[0] = blockAndExtraData.length > 1 ? blockAndExtraData[1] : "";
@@ -546,7 +580,9 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
             text[2] = blockAndExtraData.length > 3 ? blockAndExtraData[3] : "";
             text[3] = blockAndExtraData.length > 4 ? blockAndExtraData[4] : "";
             return validate(context, new SignBlock(state, text));
-        } else if (blockType == BlockTypes.SPAWNER && (blockAndExtraData.length > 1 || nbt != null)) {
+            //FAWE start - only handle if extra data is actually supplied or if the user has permission for nbt
+        } else if (blockType == BlockTypes.SPAWNER && (blockAndExtraData.length > 1 || allowWorkingDefault)) {
+            //FAWE end
             // Allow setting mob spawn type
             String mobName;
             if (blockAndExtraData.length > 1) {
@@ -563,7 +599,9 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
                 mobName = EntityTypes.PIG.id();
             }
             return validate(context, new MobSpawnerBlock(state, mobName));
-        } else if ((blockType == BlockTypes.PLAYER_HEAD || blockType == BlockTypes.PLAYER_WALL_HEAD) && (blockAndExtraData.length > 1 || nbt != null)) {
+            //FAWE start - only handle if extra data is actually supplied or if the user has permission for nbt
+        } else if ((blockType == BlockTypes.PLAYER_HEAD || blockType == BlockTypes.PLAYER_WALL_HEAD) && (blockAndExtraData.length > 1 || allowWorkingDefault)) {
+            //FAWE end
             // allow setting type/player/rotation
             if (blockAndExtraData.length == 1) {
                 return validate(context, new SkullBlock(state));
@@ -600,7 +638,17 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
             }
             CompoundTag nbt = holder.getNbtData();
             if (nbt != null) {
-                if (!actor.hasPermission("worldedit.anyblock.nbt")) {
+                if (actor.hasPermission("worldedit.anyblock.nbt")) {
+                    return holder;
+                }
+                if (nbt.equals(holder.getBlockType().getDefaultState().getNbtData())) {
+                    if (!actor.hasPermission("worldedit.anyblock.default-nbt")) {
+                        throw new DisallowedUsageException(Caption.of(
+                                "fawe.error.nbt.forbidden",
+                                TextComponent.of("worldedit.anyblock.default-nbt")
+                        ));
+                    }
+                } else {
                     throw new DisallowedUsageException(Caption.of(
                             "fawe.error.nbt.forbidden",
                             TextComponent.of("worldedit.anyblock.nbt")

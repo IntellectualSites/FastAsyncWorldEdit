@@ -21,8 +21,9 @@ package com.sk89q.worldedit.bukkit;
 
 import com.fastasyncworldedit.bukkit.BukkitPermissionAttachmentManager;
 import com.fastasyncworldedit.bukkit.FaweBukkit;
-import com.fastasyncworldedit.core.util.UpdateNotification;
+import com.fastasyncworldedit.bukkit.util.PaperSupport;
 import com.fastasyncworldedit.core.Fawe;
+import com.fastasyncworldedit.core.util.UpdateNotification;
 import com.fastasyncworldedit.core.util.WEManager;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
@@ -36,7 +37,6 @@ import com.sk89q.worldedit.WorldEditManifest;
 import com.sk89q.worldedit.bukkit.adapter.AdapterLoadException;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplLoader;
-import com.sk89q.worldedit.bukkit.adapter.Refraction;
 import com.sk89q.worldedit.event.platform.CommandEvent;
 import com.sk89q.worldedit.event.platform.CommandSuggestionEvent;
 import com.sk89q.worldedit.event.platform.PlatformReadyEvent;
@@ -49,6 +49,7 @@ import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.internal.anvil.ChunkDeleter;
 import com.sk89q.worldedit.internal.command.CommandUtil;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
+import com.sk89q.worldedit.registry.Registries;
 import com.sk89q.worldedit.util.lifecycle.Lifecycled;
 import com.sk89q.worldedit.util.lifecycle.SimpleLifecycled;
 import com.sk89q.worldedit.world.World;
@@ -58,7 +59,6 @@ import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.gamemode.GameModes;
 import com.sk89q.worldedit.world.item.ItemCategory;
 import com.sk89q.worldedit.world.weather.WeatherTypes;
-import io.papermc.lib.PaperLib;
 import org.apache.logging.log4j.Logger;
 import org.bstats.bukkit.Metrics;
 import org.bstats.charts.SimplePie;
@@ -140,41 +140,28 @@ public class WorldEditPlugin extends JavaPlugin {
         Objects.requireNonNull(attributes, "Could not retrieve manifest attributes");
         final String type = attributes.getValue("FAWE-Plugin-Jar-Type");
         Objects.requireNonNull(type, "Could not determine plugin jar type");
-        if (PaperLib.isPaper()) {
-            if (PaperLib.getMinecraftVersion() < 20 || (PaperLib.getMinecraftVersion() == 20 && PaperLib.getMinecraftPatchVersion() < 5)) {
-                if (type.equals("mojang") && !Refraction.isMojangMapped()) {
-                    throw new IllegalStateException(
+        if (PaperSupport.isPaper()) {
+            if (type.equals("spigot")) {
+                LOGGER.warn(
                         """
-                        
-                        **********************************************
-                        ** You are using the wrong FAWE jar for your Minecraft version.
-                        ** Download the correct FAWE jar from Modrinth: https://modrinth.com/plugin/fastasyncworldedit/
-                        **********************************************"""
-                    );
-                }
-            } else if (PaperLib.getMinecraftVersion() > 20 || (PaperLib.getMinecraftVersion() == 20 && PaperLib.getMinecraftPatchVersion() >= 5)) {
-                if (type.equals("spigot")) {
-                    LOGGER.warn(
-                        """
-                        
-                        **********************************************
-                        ** You are using the Spigot-mapped FAWE jar on a modern Paper version.
-                        ** This will result in slower first-run times and wasted disk space from plugin remapping.
-                        ** Download the Paper FAWE jar from Modrinth to avoid this: https://modrinth.com/plugin/fastasyncworldedit/
-                        **********************************************"""
-                    );
-                }
+                                
+                                **********************************************
+                                ** You are using the Spigot-mapped FAWE jar on a modern Paper version.
+                                ** This will result in slower first-run times and wasted disk space from plugin remapping.
+                                ** Download the Paper FAWE jar from Modrinth to avoid this: https://modrinth.com/plugin/fastasyncworldedit/
+                                **********************************************"""
+                );
             }
         } else {
             if (type.equals("mojang")) {
                 throw new IllegalStateException(
-                    """
-                    
-                    **********************************************
-                    ** You are attempting to run the Paper FAWE jar on a Spigot server.
-                    ** Either switch to Paper (https://papermc.io), or download the correct FAWE jar for your platform
-                    ** from Modrinth: https://modrinth.com/plugin/fastasyncworldedit/
-                    **********************************************"""
+                        """
+                                
+                                **********************************************
+                                ** You are attempting to run the Paper FAWE jar on a Spigot server.
+                                ** Either switch to Paper (https://papermc.io), or download the correct FAWE jar for your platform
+                                ** from Modrinth: https://modrinth.com/plugin/fastasyncworldedit/
+                                **********************************************"""
                 );
             }
         }
@@ -255,11 +242,10 @@ public class WorldEditPlugin extends JavaPlugin {
         // Now we can register events
         getServer().getPluginManager().registerEvents(new WorldEditListener(this), this);
         // register async tab complete, if available
-        if (PaperLib.isPaper()) {
+        if (PaperSupport.isPaper()) {
             getServer().getPluginManager().registerEvents(new AsyncTabCompleteListener(), this);
         }
 
-        initializeRegistries(); // this creates the objects matching Bukkit's enums - but doesn't fill them with data yet
         if (Bukkit.getWorlds().isEmpty()) {
             setupPreWorldData();
             // register this so we can load world-dependent data right as the first world is loading
@@ -291,6 +277,7 @@ public class WorldEditPlugin extends JavaPlugin {
 
     private void setupPreWorldData() {
         loadAdapter();
+        initializeRegistries(); // this creates the objects matching Bukkit's enums - but doesn't fill them with data yet
         WorldEdit.getInstance().loadMappings();
     }
 
@@ -300,6 +287,7 @@ public class WorldEditPlugin extends JavaPlugin {
         setupTags();
         setupBiomes(false); // FAWE - load biomes later. Initialize biomes twice to allow for the registry to be present for
         // plugins requiring WE biomes during startup, as well as allowing custom biomes loaded later on to be present in WE.
+        ((BukkitImplAdapter<?>) adapter.value().get()).setupFeatures();
         WorldEdit.getInstance().getEventBus().post(new PlatformReadyEvent(platform));
     }
 
@@ -312,9 +300,10 @@ public class WorldEditPlugin extends JavaPlugin {
         /*
 
         // Block & Item
-        for (Material material : Material.values()) {
-            if (material.isBlock() && !material.isLegacy()) {
-                BlockType.REGISTRY.register(material.getKey().toString(), new BlockType(material.getKey().toString(), blockState -> {
+        Registry.MATERIAL.forEach(material -> {
+            String key = material.getKey().toString();
+            if (material.isBlock()) {
+                BlockType.REGISTRY.register(key, new BlockType(key, blockState -> {
                     // TODO Use something way less hacky than this.
                     ParserContext context = new ParserContext();
                     context.setPreferringWildcard(true);
@@ -331,13 +320,13 @@ public class WorldEditPlugin extends JavaPlugin {
                         }
                         return defaultState;
                     } catch (InputParseException e) {
-                        LOGGER.warn("Error loading block state for " + material.getKey(), e);
+                        LOGGER.warn("Error loading block state for " + key, e);
                         return blockState;
                     }
                 }));
             }
-            if (material.isItem() && !material.isLegacy()) {
-                ItemType.REGISTRY.register(material.getKey().toString(), new ItemType(material.getKey().toString()));
+            if (material.isItem()) {
+                ItemType.REGISTRY.register(key, new ItemType(key));
             }
         }
 */
@@ -350,19 +339,29 @@ public class WorldEditPlugin extends JavaPlugin {
                 EntityType.REGISTRY.register("minecraft:" + lowerCaseMcId, new EntityType("minecraft:" + lowerCaseMcId));
             }
         }
+
+        // Registries only available via NMS
+        BukkitImplAdapter adapter = getBukkitImplAdapter();
+        if (adapter != null) {
+            adapter.initializeRegistries();
+        }
+
         // ... :|
         GameModes.get("");
         WeatherTypes.get("");
+        Registries.get("");
     }
 
     private void setupTags() {
         // Tags
         try {
             for (Tag<Material> blockTag : Bukkit.getTags(Tag.REGISTRY_BLOCKS, Material.class)) {
-                BlockCategory.REGISTRY.register(blockTag.getKey().toString(), new BlockCategory(blockTag.getKey().toString()));
+                String key = blockTag.getKey().toString();
+                BlockCategory.REGISTRY.register(key, new BlockCategory(blockTag.getKey().toString()));
             }
             for (Tag<Material> itemTag : Bukkit.getTags(Tag.REGISTRY_ITEMS, Material.class)) {
-                ItemCategory.REGISTRY.register(itemTag.getKey().toString(), new ItemCategory(itemTag.getKey().toString()));
+                String key = itemTag.getKey().toString();
+                ItemCategory.REGISTRY.register(key, new ItemCategory(itemTag.getKey().toString()));
             }
         } catch (NoSuchMethodError ignored) {
             LOGGER.warn(

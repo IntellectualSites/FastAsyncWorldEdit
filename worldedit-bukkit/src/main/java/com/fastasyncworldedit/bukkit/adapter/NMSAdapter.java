@@ -20,7 +20,8 @@ public class NMSAdapter implements FAWEPlatformAdapterImpl {
             int[] paletteToBlock,
             int[] blocksCopy,
             char[] set,
-            CachedBukkitAdapter adapter
+            CachedBukkitAdapter adapter,
+            final boolean globalKindaDoesNotExist
     ) {
         int numPaletteEntries = 0;
         for (int i = 0; i < 4096; i++) {
@@ -33,7 +34,7 @@ public class NMSAdapter implements FAWEPlatformAdapterImpl {
                 numPaletteEntries++;
             }
         }
-        mapPalette(blockToPalette, paletteToBlock, blocksCopy, set, adapter, numPaletteEntries);
+        mapPalette(blockToPalette, paletteToBlock, blocksCopy, set, adapter, numPaletteEntries, globalKindaDoesNotExist);
 
         return numPaletteEntries;
     }
@@ -45,7 +46,8 @@ public class NMSAdapter implements FAWEPlatformAdapterImpl {
             int[] blocksCopy,
             IntFunction<char[]> get,
             char[] set,
-            CachedBukkitAdapter adapter
+            CachedBukkitAdapter adapter,
+            final boolean globalKindaDoesNotExist
     ) {
         int numPaletteEntries = 0;
         char[] getArr = null;
@@ -67,7 +69,7 @@ public class NMSAdapter implements FAWEPlatformAdapterImpl {
                 numPaletteEntries++;
             }
         }
-        mapPalette(blockToPalette, paletteToBlock, blocksCopy, set, adapter, numPaletteEntries);
+        mapPalette(blockToPalette, paletteToBlock, blocksCopy, set, adapter, numPaletteEntries, globalKindaDoesNotExist);
 
         return numPaletteEntries;
     }
@@ -78,28 +80,31 @@ public class NMSAdapter implements FAWEPlatformAdapterImpl {
             int[] blocksCopy,
             char[] set,
             CachedBukkitAdapter adapter,
-            int numPaletteEntries
+            int numPaletteEntries,
+            boolean globalKindaDoesNotExist
     ) {
         int bitsPerEntry = MathMan.log2nlz(numPaletteEntries - 1);
         // If bits per entry is over 8, the game uses the global palette.
-        if (bitsPerEntry > 8 && adapter != null) {
+        if (!globalKindaDoesNotExist && bitsPerEntry > 8 && adapter != null) {
             System.arraycopy(adapter.getIbdToOrdinal(), 0, paletteToBlock, 0, adapter.getIbdToOrdinal().length);
             System.arraycopy(adapter.getOrdinalToIbdID(), 0, blockToPalette, 0, adapter.getOrdinalToIbdID().length);
         }
+        int oldVal = blockToPalette[BlockTypesCache.ReservedIDs.__RESERVED__];
+        blockToPalette[BlockTypesCache.ReservedIDs.__RESERVED__] = blockToPalette[BlockTypesCache.ReservedIDs.AIR];
         for (int i = 0; i < 4096; i++) {
             int ordinal = set[i];
-            ordinal = Math.max(ordinal, BlockTypesCache.ReservedIDs.AIR);
             int palette = blockToPalette[ordinal];
             blocksCopy[i] = palette;
         }
+        blockToPalette[BlockTypesCache.ReservedIDs.__RESERVED__] = oldVal;
     }
 
     @Override
     public void sendChunk(IChunkGet chunk, int mask, boolean lighting) {
-        if (!(chunk instanceof BukkitGetBlocks)) {
+        if (!(chunk instanceof AbstractBukkitGetBlocks)) {
             throw new IllegalArgumentException("(IChunkGet) chunk not of type BukkitGetBlocks");
         }
-        ((BukkitGetBlocks) chunk).send();
+        ((AbstractBukkitGetBlocks) chunk).send();
     }
 
     /**
@@ -181,7 +186,7 @@ public class NMSAdapter implements FAWEPlatformAdapterImpl {
                 lock = new ChunkSendLock();
             }
             // Allow twice-read-locking, so if the packets have been created but not sent, we can queue another read
-            if (lock.writeWaiting || lock.lock.getReadLockCount() > 1 || lock.lock.isWriteLocked()) {
+            if (lock.writeWaiting || lock.lock.getReadLockCount() >= 1 || lock.lock.isWriteLocked()) {
                 return lock;
             }
             stampedLock.stamp = lock.lock.readLock();

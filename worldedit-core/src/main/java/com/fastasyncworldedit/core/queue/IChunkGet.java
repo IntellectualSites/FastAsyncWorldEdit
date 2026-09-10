@@ -3,6 +3,7 @@ package com.fastasyncworldedit.core.queue;
 import com.fastasyncworldedit.core.extent.processor.heightmap.HeightMapType;
 import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.InputExtent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
@@ -10,6 +11,7 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 
 import javax.annotation.Nullable;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Future;
 
@@ -45,7 +47,7 @@ public interface IChunkGet extends IBlocks, Trimable, InputExtent, ITileInput {
 
     }
 
-    <T extends Future<T>> T call(IChunkSet set, Runnable finalize);
+    <T extends Future<T>> T call(IQueueExtent<? extends IChunk> owner, IChunkSet set, Runnable finalize);
 
     @Deprecated(forRemoval = true, since = "2.11.2")
     default CompoundTag getEntity(UUID uuid) {
@@ -68,6 +70,13 @@ public interface IChunkGet extends IBlocks, Trimable, InputExtent, ITileInput {
         return IBlocks.super.getTile(x, y, z);
     }
 
+    /**
+     * Get the entities in the chunk as "full" entities.
+     *
+     * @since 2.13.0;
+     */
+    Set<Entity> getFullEntities();
+
     boolean isCreateCopy();
 
     /**
@@ -81,7 +90,7 @@ public interface IChunkGet extends IBlocks, Trimable, InputExtent, ITileInput {
     }
 
     /**
-     * Lock the {@link IChunkGet#call(IChunkSet, Runnable)} method to the current thread using a reentrant lock. Also locks
+     * Lock the {@link IChunkGet#call(IQueueExtent, IChunkSet, Runnable)} method to the current thread using a reentrant lock. Also locks
      * related methods e.g. {@link IChunkGet#setCreateCopy(boolean)}
      *
      * @since 2.8.2
@@ -89,7 +98,7 @@ public interface IChunkGet extends IBlocks, Trimable, InputExtent, ITileInput {
     default void lockCall() {}
 
     /**
-     * Unlock {@link IChunkGet#call(IChunkSet, Runnable)} (and other related methods) to executions from other threads
+     * Unlock {@link IChunkGet#call(IQueueExtent, IChunkSet, Runnable)} (and other related methods) to executions from other threads
      *
      * @since 2.8.2
      */

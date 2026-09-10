@@ -14,7 +14,7 @@ public class AngleMask extends AbstractExtentMask implements ResettableMask {
     protected static double ADJACENT_MOD = 0.5;
     protected static double DIAGONAL_MOD = 1 / Math.sqrt(8);
 
-    protected final CachedMask mask;
+    private final SolidBlockMask mask;
     protected final double max;
     protected final double min;
     protected final boolean overlay;
@@ -32,7 +32,7 @@ public class AngleMask extends AbstractExtentMask implements ResettableMask {
 
     public AngleMask(Extent extent, double min, double max, boolean overlay, int distance) {
         super(extent);
-        this.mask = new CachedMask(new SolidBlockMask(extent));
+        this.mask = new SolidBlockMask(extent);
         this.min = min;
         this.max = max;
         this.checkFirst = max >= (Math.tan(90 * (Math.PI / 180)));
@@ -126,10 +126,21 @@ public class AngleMask extends AbstractExtentMask implements ResettableMask {
         }
     }
 
-    private boolean adjacentAir(Extent extent, MutableBlockVector3 mutable) {
-        int x = mutable.x();
-        int y = mutable.y();
-        int z = mutable.z();
+    // for optimal performance, this method should be called with base being a CharFilterBlock
+    private boolean adjacentAir(Extent extent, BlockVector3 base) {
+        int y = base.y();
+        // we expect the data for blocks above and below to be loaded already
+        // in which case caching/reading from cache has more overhead
+        if (y != maxY && !SolidBlockMask.isSolid(base.getStateRelativeY(extent, 1))) {
+            return true;
+        }
+        if (y != minY && !SolidBlockMask.isSolid(base.getStateRelativeY(extent, -1))) {
+            return true;
+        }
+        // other positions might be in different chunks, go a slower, cached path there
+        MutableBlockVector3 mutable = new MutableBlockVector3();
+        int x = base.x();
+        int z = base.z();
         if (!mask.test(extent, mutable.setComponents(x + 1, y, z))) {
             return true;
         }
@@ -139,13 +150,7 @@ public class AngleMask extends AbstractExtentMask implements ResettableMask {
         if (!mask.test(extent, mutable.setComponents(x, y, z + 1))) {
             return true;
         }
-        if (!mask.test(extent, mutable.setComponents(x, y, z - 1))) {
-            return true;
-        }
-        if (y != maxY && !mask.test(extent, mutable.setComponents(x, y + 1, z))) {
-            return true;
-        }
-        return y != minY && !mask.test(extent, mutable.setComponents(x, y - 1, z));
+        return !mask.test(extent, mutable.setComponents(x, y, z - 1));
     }
 
     @Override
@@ -156,8 +161,7 @@ public class AngleMask extends AbstractExtentMask implements ResettableMask {
         }
         int y = vector.y();
         if (overlay) {
-            MutableBlockVector3 mutable = new MutableBlockVector3(vector);
-            if (y < maxY && !adjacentAir(null, mutable)) {
+            if (y < maxY && !adjacentAir(getExtent(), vector)) {
                 return false;
             }
         }
@@ -179,13 +183,11 @@ public class AngleMask extends AbstractExtentMask implements ResettableMask {
             }
         }
 
-        MutableBlockVector3 mutable = new MutableBlockVector3(x, y, z);
-
-        if (!mask.test(extent, mutable)) {
+        if (!mask.test(extent, vector)) {
             return false;
         }
         if (overlay) {
-            if (y < maxY && !adjacentAir(extent, mutable)) {
+            if (y < maxY && !adjacentAir(extent, vector)) {
                 return lastValue = false;
             }
         }

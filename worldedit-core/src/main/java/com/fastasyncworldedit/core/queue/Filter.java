@@ -17,17 +17,14 @@ public interface Filter {
 //     * @param chunkX the x coordinate in the chunk
 //     * @param chunkZ the z coordinate in the chunk
 //     */
-//    default boolean appliesChunk(
-//            int chunkX,
-//            int chunkZ
-//    ) {
+//    default boolean appliesChunk(int chunkX, int chunkZ) {
 //        return true;
 //    }
 
     /**
      * Do something with the IChunk<br>
      */
-    default @Nonnull <T extends IChunk> T applyChunk(T chunk, @Nullable Region region) {
+    default @Nonnull <U extends IChunk> U applyChunk(U chunk, @Nullable Region region) {
         return chunk;
     }
 

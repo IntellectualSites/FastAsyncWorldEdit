@@ -26,6 +26,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.bukkit.block.Biome;
+import org.bukkit.block.TileState;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -35,6 +36,7 @@ import org.enginehub.linbus.tree.LinCompoundTag;
 import org.enginehub.linbus.tree.LinTag;
 
 import javax.annotation.Nullable;
+import java.util.Collection;
 import java.util.Map;
 import java.util.OptionalInt;
 
@@ -86,6 +88,11 @@ public interface IDelegateBukkitImplAdapter<T> extends BukkitImplAdapter<T> {
     }
 
     @Override
+    default void sendFakeNBT(Player player, BlockVector3 pos, TileState tileState, LinCompoundTag nbtData) {
+        getParent().sendFakeNBT(player, pos, tileState, nbtData);
+    }
+
+    @Override
     default void sendFakeOP(Player player) {
         getParent().sendFakeOP(player);
     }
@@ -133,6 +140,11 @@ public interface IDelegateBukkitImplAdapter<T> extends BukkitImplAdapter<T> {
     @Override
     default void sendBiomeUpdates(World world, Iterable<BlockVector2> chunks) {
         getParent().sendBiomeUpdates(world, chunks);
+    }
+
+    @Override
+    default Collection<String> getRegisteredDefaultBlockStates() {
+        return getParent().getRegisteredDefaultBlockStates();
     }
 
     @Override

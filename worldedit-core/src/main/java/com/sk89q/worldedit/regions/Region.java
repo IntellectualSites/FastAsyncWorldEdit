@@ -381,6 +381,9 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
                 && contains(tx, ty, tz);
     }
 
+    /**
+     * {@return whether this region <b>intersects</b> with the AABB of the given chunk}
+     */
     default boolean containsChunk(int chunkX, int chunkZ) {
         int bx = chunkX << 4;
         int bz = chunkZ << 4;
@@ -499,7 +502,7 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
         if (isGlobal()) {
             return child;
         }
-        return new SingleRegionExtent(child, FaweLimit.MAX, this);
+        return new SingleRegionExtent(child, null, this);
     }
 
     @Override

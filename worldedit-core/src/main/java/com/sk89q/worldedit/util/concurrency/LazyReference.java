@@ -26,39 +26,34 @@ import java.util.function.Supplier;
 /**
  * Thread-safe lazy reference.
  */
-public class LazyReference<T> {
+public final class LazyReference<T> {
 
     public static <T> LazyReference<T> from(Supplier<T> valueComputation) {
         return new LazyReference<>(valueComputation);
     }
 
-    //FAWE start
-
     /**
      * Pre-computed reference, for setting a lazy reference field with a known value.
      *
      * @param value the value of the reference
-     * @param <T>   the type of the value
+     * @param <T> the type of the value
      * @return the new reference
      */
     public static <T> LazyReference<T> computed(T value) {
         return new LazyReference<>(value);
     }
-    //FAWE end
 
     // Memory saving technique: hold the computation info in the same reference field that we'll
     // put the value into, so the memory possibly retained by those parts is GC'able as soon as
     // it's no longer needed.
 
     private static final class RefInfo<T> {
-
         private final Lock lock = new ReentrantLock();
         private final Supplier<T> valueComputation;
 
         private RefInfo(Supplier<T> valueComputation) {
             this.valueComputation = valueComputation;
         }
-
     }
 
     private Object value;
@@ -67,11 +62,9 @@ public class LazyReference<T> {
         this.value = new RefInfo<>(valueComputation);
     }
 
-    //FAWE start
     private LazyReference(T value) {
         this.value = value;
     }
-    //FAWE end
 
     // casts are safe, value is either RefInfo or T
     @SuppressWarnings("unchecked")

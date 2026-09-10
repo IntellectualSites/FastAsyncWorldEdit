@@ -27,7 +27,7 @@ import com.sk89q.worldedit.registry.NamespacedRegistry;
 public class EntityType implements RegistryItem, Keyed {
 //FAWE end
 
-    public static final NamespacedRegistry<EntityType> REGISTRY = new NamespacedRegistry<>("entity type", true);
+    public static final NamespacedRegistry<EntityType> REGISTRY = new NamespacedRegistry<>("entity type", "entity_type", "minecraft", true);
 
     //FAWE start
     private final String id;

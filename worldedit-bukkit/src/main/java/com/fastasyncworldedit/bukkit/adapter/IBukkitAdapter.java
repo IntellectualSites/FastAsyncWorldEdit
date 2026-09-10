@@ -166,10 +166,8 @@ public interface IBukkitAdapter {
      */
     default Material adapt(ItemType itemType) {
         checkNotNull(itemType);
-        if (!itemType.id().startsWith("minecraft:")) {
-            throw new IllegalArgumentException("Bukkit only supports Minecraft items");
-        }
-        return Material.getMaterial(itemType.id().substring(10).toUpperCase(Locale.ROOT));
+        NamespacedKey key = checkNotNull(NamespacedKey.fromString(itemType.id()), "Item type key is invalid");
+        return Registry.MATERIAL.get(key);
     }
 
     /**
@@ -180,11 +178,8 @@ public interface IBukkitAdapter {
      */
     default Material adapt(BlockType blockType) {
         checkNotNull(blockType);
-        if (!blockType.id().startsWith("minecraft:")) {
-            throw new IllegalArgumentException("Bukkit only supports Minecraft blocks");
-        }
-        String id = blockType.id().substring(10).toUpperCase(Locale.ROOT);
-        return Material.getMaterial(id);
+        NamespacedKey key = checkNotNull(NamespacedKey.fromString(blockType.id()), "Block type key is invalid");
+        return Registry.MATERIAL.get(key);
     }
 
     default org.bukkit.entity.EntityType adapt(EntityType entityType) {
@@ -394,6 +389,14 @@ public interface IBukkitAdapter {
      */
     default List<org.bukkit.entity.Entity> getEntities(org.bukkit.World world) {
         return TaskManager.taskManager().sync(world::getEntities);
+    }
+
+    /**
+     * Import Minecraft internal features into FAWE. Should be executed after worlds loading (in order to capture datapacks)
+     *
+     * @since 2.14.1
+     */
+    default void setupFeatures() {
     }
 
 }

@@ -24,9 +24,10 @@ import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.function.pattern.Pattern;
-import com.sk89q.worldedit.function.pattern.RandomStatePattern;
+import com.sk89q.worldedit.function.pattern.RandomPattern;
 import com.sk89q.worldedit.internal.registry.InputParser;
 import com.sk89q.worldedit.world.block.BaseBlock;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.FuzzyBlockState;
 
 import java.util.Collections;
@@ -42,7 +43,7 @@ public class RandomStatePatternParser extends InputParser<Pattern> implements Al
     }
 
     @Override
-    public Stream<String> getSuggestions(String input) {
+    public Stream<String> getSuggestions(String input, ParserContext context) {
         if (input.isEmpty()) {
             return Stream.of("*");
         }
@@ -50,7 +51,7 @@ public class RandomStatePatternParser extends InputParser<Pattern> implements Al
             return Stream.empty();
         }
 
-        return worldEdit.getBlockFactory().getSuggestions(input.substring(1)).stream().map(s -> "*" + s);
+        return worldEdit.getBlockFactory().getSuggestions(input.substring(1), context).stream().map(s -> "*" + s);
     }
 
     @Override
@@ -66,8 +67,15 @@ public class RandomStatePatternParser extends InputParser<Pattern> implements Al
         if (block.getStates().size() == block.getBlockType().getPropertyMap().size()) {
             // they requested random with *, but didn't leave any states empty - simplify
             return block;
-        } else if (block.toImmutableState() instanceof FuzzyBlockState) {
-            return new RandomStatePattern((FuzzyBlockState) block.toImmutableState());
+            // FAWE start - use RandomPattern instead of RandomStatePattern
+        } else if (block.toImmutableState() instanceof FuzzyBlockState fbs) {
+            RandomPattern randomPattern = new RandomPattern();
+            fbs.getBlockType().getAllStates().stream()
+                    .filter(fbs::equalsFuzzy)
+                    .map(BlockState::toBaseBlock)
+                    .forEach(bb -> randomPattern.add(bb, 1.0));
+            return randomPattern;
+            // FAWE end
         } else {
             return null; // only should happen if parseLogic changes
         }

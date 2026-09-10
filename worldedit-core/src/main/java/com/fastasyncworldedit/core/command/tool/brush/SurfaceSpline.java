@@ -4,6 +4,7 @@ import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.math.LocalBlockVectorSet;
 import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.fastasyncworldedit.core.util.MathMan;
+import com.fastasyncworldedit.core.util.collection.BlockVector3Set;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.command.tool.brush.Brush;
@@ -66,7 +67,7 @@ public class SurfaceSpline implements Brush {
         MutableBlockVector3 mutable = MutableBlockVector3.at(0, 0, 0);
         interpol.setNodes(nodes);
         final double splinelength = interpol.arcLength(0, 1);
-        LocalBlockVectorSet vset = new LocalBlockVectorSet();
+        BlockVector3Set vset = LocalBlockVectorSet.wrapped();
         for (double loop = 0; loop <= 1; loop += 1D / splinelength / quality) {
             final Vector3 tipv = interpol.getPosition(loop);
             final int tipx = MathMan.roundInt(tipv.x());
@@ -85,7 +86,7 @@ public class SurfaceSpline implements Brush {
         }
         if (radius != 0) {
             double radius2 = radius * radius;
-            LocalBlockVectorSet newSet = new LocalBlockVectorSet();
+            BlockVector3Set newSet = LocalBlockVectorSet.wrapped();
             final int ceilrad = (int) Math.ceil(radius);
             for (BlockVector3 v : vset) {
                 final int tipx = v.x();

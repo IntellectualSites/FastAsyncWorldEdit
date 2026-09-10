@@ -1,6 +1,8 @@
 package com.fastasyncworldedit.core;
 
 import com.fastasyncworldedit.core.util.StringMan;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
+import org.apache.logging.log4j.Logger;
 
 import java.util.Locale;
 
@@ -8,6 +10,8 @@ import java.util.Locale;
  * An internal FAWE class not meant for public use.
  **/
 public class FaweVersion {
+
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     public final int year;
     public final int month;
@@ -48,8 +52,8 @@ public class FaweVersion {
     public static FaweVersion tryParse(String version, String commit, String date) {
         try {
             return new FaweVersion(version, commit, date);
-        } catch (Exception exception) {
-            exception.printStackTrace();
+        } catch (Exception e) {
+            LOGGER.error("Failed to parse FaweVersion", e);
             return new FaweVersion(0, 0, 0, null, true, 0, 0);
         }
     }
