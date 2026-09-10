@@ -2479,17 +2479,6 @@ public final class BlockTypes {
         return parse(type, new ParserContext());
     }
 
-    /**
-     * Parses user input into a block type.
-     *
-     * <p>The input is lowercased and given the {@code minecraft:} namespace if it carries none. Should that fail to match and
-     * the context permits it, the input is retried against the legacy numeric id mapping.</p>
-     *
-     * @param type    the input to parse, with or without a namespace and with or without a property specification
-     * @param context the parser context, consulted for whether legacy ids may be tried
-     * @return the matching block type
-     * @throws InputParseException if the input matches no block type; the exception carries close matches as suggestions
-     */
     public static BlockType parse(final String type, final ParserContext context) throws InputParseException {
         final String inputLower = type.toLowerCase(Locale.ROOT);
         String input = inputLower;
