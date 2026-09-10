@@ -2524,12 +2524,6 @@ public final class BlockTypes {
 
     //FAWE start
 
-    /**
-     * Gets the {@link BlockType} associated with the given id.
-     *
-     * @param id the block id; the {@code minecraft:} namespace is assumed if none is given
-     * @return the block type, or {@code null} if no block is registered under that id
-     */
     @Nullable
     public static BlockType get(final CharSequence id) {
         return BlockType.REGISTRY.get(id.toString());
@@ -2550,14 +2544,6 @@ public final class BlockTypes {
         return BlockTypesCache.states[internalStateOrdinal].getBlockType();
     }
 
-    /**
-     * Returns the number of registered block types.
-     *
-     * <p>Counts the reserved placeholder alongside the real blocks, so this is the exclusive upper bound of the internal id
-     * space rather than a count of placeable blocks.</p>
-     *
-     * @return the number of registered block types
-     */
     public static int size() {
         return BlockTypesCache.values.length;
     }
