@@ -403,8 +403,7 @@ public class LocalBlockVectorSet implements BlockVector3Set {
 
     @Override
     public boolean remove(Object o) {
-        if (o instanceof BlockVector3) {
-            BlockVector3 v = (BlockVector3) o;
+        if (o instanceof BlockVector3 v) {
             return remove(v.x(), v.y(), v.z());
         }
         return false;

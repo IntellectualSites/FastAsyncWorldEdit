@@ -129,7 +129,7 @@ public class CLIWorldEdit {
                                 manifestEntry.getValue().defaultstate,
                                 context
                         ).toImmutableState();
-                        BlockState defaultState = input.getBlockType().getAllStates().get(0);
+                        BlockState defaultState = input.getBlockType().getAllStates().getFirst();
                         for (Map.Entry<Property<?>, Object> propertyObjectEntry : state.getStates().entrySet()) {
                             @SuppressWarnings("unchecked")
                             Property<Object> prop = (Property<Object>) propertyObjectEntry.getKey();

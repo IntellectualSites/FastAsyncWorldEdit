@@ -631,7 +631,7 @@ public class WorldEditPlugin extends JavaPlugin {
         if (meta.isEmpty()) {
             return null;
         }
-        return (BukkitPlayer) meta.get(0).value();
+        return (BukkitPlayer) meta.getFirst().value();
     }
 
     BukkitPlayer reCachePlayer(Player player) {

@@ -1296,7 +1296,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         }
         stackToPosition.forEach((stack, position) -> {
             // stack can never be empty, something has to have touched the position
-            TracingExtent failure = stack.get(0);
+            TracingExtent failure = stack.getFirst();
             actor.printDebug(Caption.of(
                     "worldedit.trace.action-failed",
                     failure.getFailedActions().get(position).toString(),

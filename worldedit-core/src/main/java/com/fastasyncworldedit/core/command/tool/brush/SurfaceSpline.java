@@ -37,7 +37,7 @@ public class SurfaceSpline implements Brush {
             MaxChangedBlocksException {
         int maxY = editSession.getMaxY();
         int minY = editSession.getMinY();
-        if (path.isEmpty() || !pos.equals(path.get(path.size() - 1))) {
+        if (path.isEmpty() || !pos.equals(path.getLast())) {
             int max = editSession.getNearestSurfaceTerrainBlock(
                     pos.x(),
                     pos.z(),
