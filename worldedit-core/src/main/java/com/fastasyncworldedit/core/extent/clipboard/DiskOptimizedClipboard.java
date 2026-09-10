@@ -594,8 +594,8 @@ public class DiskOptimizedClipboard extends LinearClipboard {
                                 HashMap<String, Tag<?, ?>> value = new HashMap<>(data.getValue());
                                 List<DoubleTag> pos = new ArrayList<>(3);
                                 pos.add(new DoubleTag(entity.getLocation().x()));
-                                pos.add(new DoubleTag(entity.getLocation().x()));
-                                pos.add(new DoubleTag(entity.getLocation().x()));
+                                pos.add(new DoubleTag(entity.getLocation().y()));
+                                pos.add(new DoubleTag(entity.getLocation().z()));
                                 value.put("Pos", new ListTag(DoubleTag.class, pos));
                                 nbtOS.writeTag(new CompoundTag(value));
                             }
