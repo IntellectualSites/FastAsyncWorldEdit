@@ -18,6 +18,7 @@ import com.fastasyncworldedit.core.util.collection.AdaptedMap;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.BukkitEntity;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
+import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.internal.Constants;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -25,6 +26,7 @@ import com.sk89q.worldedit.util.SideEffect;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
+import com.sk89q.worldedit.world.entity.EntityTypes;
 import io.papermc.paper.event.block.BeaconDeactivatedEvent;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
@@ -57,6 +59,7 @@ import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.lighting.LevelLightEngine;
 import net.minecraft.world.level.storage.ValueInput;
 import org.apache.logging.log4j.Logger;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.block.CraftBlock;
@@ -100,6 +103,7 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
     public static final Function<BlockEntity, FaweCompoundTag> NMS_TO_TILE = ((PaperweightFaweAdapter) WorldEditPlugin
             .getInstance()
             .getBukkitImplAdapter()).blockEntityToCompoundTag();
+    private static final Set<UUID> CREATED_PASSENGERS_UUIDS = new HashSet<>();
     private final PaperweightFaweAdapter adapter = ((PaperweightFaweAdapter) WorldEditPlugin
             .getInstance()
             .getBukkitImplAdapter());
@@ -619,7 +623,7 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
                             if (createCopy) {
                                 copy.storeEntity(entity);
                             }
-                            removeEntity(entity);
+                            removeEntityRecursive(entity);
                             entitiesRemoved.add(uuid);
                             entityRemoves.remove(uuid);
                         }
@@ -665,46 +669,52 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
                                 .getOptional(Identifier.parse(id))
                                 .orElse(null);
                         if (type != null) {
-                            Entity entity = type.create(nmsWorld, EntitySpawnReason.COMMAND);
-                            if (entity != null) {
-                                final LinCompoundTag.Builder toLoadComponentBuilder = linTag.toBuilder();
-                                for (final String name : Constants.NO_COPY_ENTITY_NBT_FIELDS) {
-                                    toLoadComponentBuilder.remove(name);
+                            Runnable onError = () -> LOGGER.warn(
+                                    "Error creating entity of type `{}` in world `{}` at location `{},{},{}`",
+                                    id,
+                                    nmsWorld.getWorld().getName(),
+                                    x,
+                                    y,
+                                    z
+                            );
+
+                            final LinCompoundTag.Builder toLoadComponentBuilder = linTag.toBuilder();
+                            for (final String name : Constants.NO_COPY_ENTITY_NBT_FIELDS) {
+                                toLoadComponentBuilder.remove(name);
+                            }
+
+                            // NEW: rewrite passenger UUIDs in the tag itself, before it's ever loaded
+                            LinListTag<LinCompoundTag> passengers = linTag.findListTag("Passengers", LinTagType.compoundTag());
+                            if (passengers != null) {
+                                List<LinCompoundTag> rewritten = new ArrayList<>();
+                                for (LinCompoundTag passengerTag : passengers.value()) {
+                                    rewritten.add(randomizePassengerUuidsInTag(passengerTag));
                                 }
-                                ValueInput input = createInput(toLoadComponentBuilder.build());
-                                entity.load(input);
-                                entity.absSnapTo(x, y, z, yaw, pitch);
-                                entity.setUUID(NbtUtils.uuid(nativeTag));
-                                Runnable onError = () -> LOGGER.warn(
-                                        "Error creating entity of type `{}` in world `{}` at location `{},{},{}`",
-                                        id,
-                                        nmsWorld.getWorld().getName(),
-                                        x,
-                                        y,
-                                        z
-                                );
+                                toLoadComponentBuilder.put("Passengers", LinListTag.of(LinTagType.compoundTag(), rewritten));
+                            }
+
+                            ValueInput input = createInput(toLoadComponentBuilder.build());
+
+                            Entity createdEntity = EntityType.loadEntityRecursive(
+                                    type,
+                                    input,
+                                    nmsWorld,
+                                    EntitySpawnReason.COMMAND,
+                                    (loadedEntity) -> {
+                                        loadedEntity.absSnapTo(x, y, z, yaw, pitch);
+                                        return loadedEntity;
+                                    }
+                            );
+
+                            if (createdEntity == null) {
+                                onError.run();
+                                iterator.remove();
+                            } else {
+                                createdEntity.setUUID(NbtUtils.uuid(nativeTag)); // NEW — restore parity with the recorded UUID
                                 if (!set.getSideEffectSet().shouldApply(SideEffect.ENTITY_EVENTS)) {
-                                    entity.spawnReason = CreatureSpawnEvent.SpawnReason.CUSTOM;
-                                    entity.generation = false;
-                                    if (PaperSupport.isPaper()) {
-                                        if (!nmsWorld.moonrise$getEntityLookup().addNewEntity(entity, false)) {
-                                            onError.run();
-                                        }
-                                        continue;
-                                    }
-                                    // Not paper
-                                    try {
-                                        PaperweightPlatformAdapter.getEntitySectionManager(nmsWorld).addNewEntity(entity);
-                                        continue;
-                                    } catch (IllegalAccessException e) {
-                                        // Fallback
-                                        LOGGER.warn("Error bypassing entity events on spawn on Spigot", e);
-                                    }
-                                }
-                                if (!nmsWorld.addFreshEntity(entity, CreatureSpawnEvent.SpawnReason.CUSTOM)) {
-                                    onError.run();
-                                    // Unsuccessful create should not be saved to history
-                                    iterator.remove();
+                                    addRecursiveNoEvents(createdEntity, nmsWorld);
+                                } else {
+                                    nmsWorld.addFreshEntityWithPassengers(createdEntity, CreatureSpawnEvent.SpawnReason.CUSTOM);
                                 }
                             }
                         }
@@ -766,6 +776,51 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
                 };
             }
             return handleCallFinalizer(syncTasks, callback, finalizer);
+        }
+    }
+
+    private void removeEntityRecursive(Entity entity) {
+        // snapshot first — removing the parent may clear/mutate its passenger list mid-iteration
+        List<Entity> passengers = new ArrayList<>(entity.getPassengers());
+        for (Entity passenger : passengers) {
+            if (CREATED_PASSENGERS_UUIDS.contains(passenger.getUUID())) {
+                removeEntityRecursive(passenger);
+            }
+        }
+        removeEntity(entity);
+    }
+
+    private LinCompoundTag randomizePassengerUuidsInTag(LinCompoundTag tag) {
+        UUID fresh = UUID.randomUUID();
+        CREATED_PASSENGERS_UUIDS.add(fresh);
+        int[] uuidInts = {
+                (int) (fresh.getMostSignificantBits() >> 32),
+                (int) fresh.getMostSignificantBits(),
+                (int) (fresh.getLeastSignificantBits() >> 32),
+                (int) fresh.getLeastSignificantBits()
+        };
+
+        LinCompoundTag.Builder builder = tag.toBuilder();
+        builder.putIntArray("UUID", uuidInts);
+
+        LinListTag<LinCompoundTag> passengers = tag.findListTag("Passengers", LinTagType.compoundTag());
+        if (passengers != null) {
+            List<LinCompoundTag> rewritten = new ArrayList<>();
+            for (LinCompoundTag passengerTag : passengers.value()) {
+                rewritten.add(randomizePassengerUuidsInTag(passengerTag)); // recurse for nested riders
+            }
+            builder.put("Passengers", LinListTag.of(LinTagType.compoundTag(), rewritten));
+        }
+
+        return builder.build();
+    }
+
+    private void addRecursiveNoEvents(Entity entity, ServerLevel nmsWorld) {
+        entity.spawnReason = CreatureSpawnEvent.SpawnReason.CUSTOM;
+        entity.generation = false;
+        nmsWorld.moonrise$getEntityLookup().addNewEntity(entity, false);
+        for (Entity passenger : entity.getPassengers()) {
+            addRecursiveNoEvents(passenger, nmsWorld);
         }
     }
 
