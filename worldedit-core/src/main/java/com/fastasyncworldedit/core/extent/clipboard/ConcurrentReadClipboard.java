@@ -2,7 +2,6 @@ package com.fastasyncworldedit.core.extent.clipboard;
 
 import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.sk89q.worldedit.entity.Entity;
-import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
@@ -16,6 +15,7 @@ import javax.annotation.Nonnull;
 import java.util.Iterator;
 import java.util.List;
 
+// Only wraps block-handling as reading the rest should be safe for the CPU and memory clips (ignoring 3rd party impls)
 @ApiStatus.Experimental // Temporary wrapper
 public class ConcurrentReadClipboard implements Clipboard {
 
@@ -33,23 +33,31 @@ public class ConcurrentReadClipboard implements Clipboard {
     }
 
     @Override
-    public synchronized BlockState getBlock(BlockVector3 position) {
-        return parent.getBlock(position);
+    public BlockState getBlock(BlockVector3 position) {
+        synchronized (parent) {
+            return parent.getBlock(position);
+        }
     }
 
     @Override
-    public synchronized BlockState getBlock(int x, int y, int z) {
-        return parent.getBlock(x, y, z);
+    public BlockState getBlock(int x, int y, int z) {
+        synchronized (parent) {
+            return parent.getBlock(x, y, z);
+        }
     }
 
     @Override
-    public synchronized BaseBlock getFullBlock(BlockVector3 position) {
-        return parent.getFullBlock(position);
+    public BaseBlock getFullBlock(BlockVector3 position) {
+        synchronized (parent) {
+            return parent.getFullBlock(position);
+        }
     }
 
     @Override
-    public synchronized BaseBlock getFullBlock(int x, int y, int z) {
-        return parent.getFullBlock(x, y, z);
+    public BaseBlock getFullBlock(int x, int y, int z) {
+        synchronized (parent) {
+            return parent.getFullBlock(x, y, z);
+        }
     }
 
     @Override

@@ -49,6 +49,7 @@ import com.sk89q.worldedit.regions.Regions;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BaseBlock;
+import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -221,6 +222,7 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable, Fl
      *
      * @since TODO
      */
+    @ApiStatus.Experimental
     default boolean supportsParallelAccess() {
         return false;
     }
