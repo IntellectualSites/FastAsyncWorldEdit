@@ -2647,7 +2647,6 @@ public final class BlockTypes {
     @Nullable
     public static final BlockType ZOMBIE_WALL_HEAD = get("minecraft:zombie_wall_head");
 
-
     private BlockTypes() {
     }
 
