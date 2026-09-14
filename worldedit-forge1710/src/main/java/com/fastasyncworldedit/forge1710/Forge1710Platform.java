@@ -181,6 +181,9 @@ public class Forge1710Platform extends AbstractPlatform {
         capabilities.put(Capability.PERMISSIONS, Preference.NORMAL);
         capabilities.put(Capability.USER_COMMANDS, Preference.NORMAL);
         capabilities.put(Capability.WORLD_EDITING, Preference.PREFERRED);
+        // PlatformManager.createProxyActor queries this for every player action, even without a CUI client mod.
+        // AbstractPlayerActor.dispatchCUIEvent is a no-op, so CUI events are simply dropped.
+        capabilities.put(Capability.WORLDEDIT_CUI, Preference.NORMAL);
         return capabilities;
     }
 
