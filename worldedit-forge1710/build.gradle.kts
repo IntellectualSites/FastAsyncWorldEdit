@@ -1,4 +1,4 @@
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+﻿import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.gtnewhorizons.retrofuturagradle.mcp.ReobfuscatedJar
 
 plugins {
@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "com.fastasyncworldedit"
-version = "0.0.1-M0"
+version = "0.1.0-M1"
 
 val faweCoreVersion = "2.15.5-SNAPSHOT"
 val libsPrefix = "com.fastasyncworldedit.forge1710.libs"
