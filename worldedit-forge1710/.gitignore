@@ -1,0 +1,5 @@
+/build/
+/.gradle/
+/run/
+/out/
+*.iml

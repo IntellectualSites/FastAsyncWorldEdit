@@ -1,0 +1,15 @@
+[
+  {
+    "modid": "fastasyncworldedit",
+    "name": "FastAsyncWorldEdit (Forge 1.7.10)",
+    "description": "FastAsyncWorldEdit port for Minecraft Forge 1.7.10 on Java 21+.",
+    "version": "${version}",
+    "mcversion": "1.7.10",
+    "url": "https://github.com/ayuruka/FastAsyncWorldEdit",
+    "authorList": ["IntellectualSites", "EngineHub"],
+    "credits": "",
+    "logoFile": "",
+    "screenshots": [],
+    "dependencies": []
+  }
+]
