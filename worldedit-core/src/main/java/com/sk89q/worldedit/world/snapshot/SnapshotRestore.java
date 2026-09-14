@@ -227,7 +227,9 @@ public class SnapshotRestore {
             } catch (MissingChunkException me) {
                 missingChunks.add(chunkPos);
             } catch (IOException | DataException me) {
-                LOGGER.info(() -> "Failed to load chunk at " + chunkPos, me);
+                //FAWE start - log4j-api 2.0-beta9 (Forge 1.7.10) has no Supplier overloads
+                LOGGER.info("Failed to load chunk at " + chunkPos, me);
+                //FAWE end
                 errorChunks.add(chunkPos);
                 lastErrorMessage = me.getMessage();
             }

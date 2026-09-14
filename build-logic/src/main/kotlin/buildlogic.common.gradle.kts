@@ -11,6 +11,17 @@ configurations.configureEach {
     }
 }
 
+// Forge 1.7.10 port: Minecraft 1.7.10 ships log4j-api 2.0-beta9, which lacks the fixed-arity Logger overloads
+// (e.g. info(String, Object, Object)) that javac picks against newer APIs. Building with
+// -Pfawe.log4jApiVersion=2.0-beta9 compiles against that API so calls bind to the varargs overloads instead.
+val forcedLog4jApiVersion = providers.gradleProperty("fawe.log4jApiVersion")
+if (forcedLog4jApiVersion.isPresent) {
+    val forced = "org.apache.logging.log4j:log4j-api:${forcedLog4jApiVersion.get()}"
+    configurations.configureEach {
+        resolutionStrategy.force(forced)
+    }
+}
+
 plugins.withId("java") {
     the<JavaPluginExtension>().toolchain {
         languageVersion.set(JavaLanguageVersion.of(25))
