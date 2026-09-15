@@ -734,7 +734,7 @@ public class WorldEditPlugin extends JavaPlugin {
             final Optional<org.enginehub.piston.Command> command
                     = WorldEdit.getInstance().getPlatformManager().getPlatformCommandManager().getCommandManager().getCommand(
                     label);
-            if (!command.isPresent()) {
+            if (command.isEmpty()) {
                 return;
             }
 

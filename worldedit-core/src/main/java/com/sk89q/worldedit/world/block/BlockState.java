@@ -161,7 +161,7 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
                         .map(BlockType::id)
                         .filter(id -> StringMan.blockStateMatches(input, id))
                         .sorted(StringMan.blockStateComparator(input))
-                        .collect(Collectors.toList())
+                        .toList()
                 );
             }
         }
