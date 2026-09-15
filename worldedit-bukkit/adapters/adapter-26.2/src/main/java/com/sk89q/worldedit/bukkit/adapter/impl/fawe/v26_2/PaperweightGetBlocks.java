@@ -18,7 +18,6 @@ import com.fastasyncworldedit.core.util.collection.AdaptedMap;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.BukkitEntity;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
-import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.internal.Constants;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -26,13 +25,13 @@ import com.sk89q.worldedit.util.SideEffect;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
-import com.sk89q.worldedit.world.entity.EntityTypes;
 import io.papermc.paper.event.block.BeaconDeactivatedEvent;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.IdMap;
 import net.minecraft.core.Registry;
 import net.minecraft.core.SectionPos;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
@@ -59,17 +58,11 @@ import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.lighting.LevelLightEngine;
 import net.minecraft.world.level.storage.ValueInput;
 import org.apache.logging.log4j.Logger;
-import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.block.CraftBlock;
 import org.bukkit.event.entity.CreatureSpawnEvent;
-import org.enginehub.linbus.tree.LinCompoundTag;
-import org.enginehub.linbus.tree.LinDoubleTag;
-import org.enginehub.linbus.tree.LinFloatTag;
-import org.enginehub.linbus.tree.LinListTag;
-import org.enginehub.linbus.tree.LinStringTag;
-import org.enginehub.linbus.tree.LinTagType;
+import org.enginehub.linbus.tree.*;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -103,7 +96,6 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
     public static final Function<BlockEntity, FaweCompoundTag> NMS_TO_TILE = ((PaperweightFaweAdapter) WorldEditPlugin
             .getInstance()
             .getBukkitImplAdapter()).blockEntityToCompoundTag();
-    private static final Set<UUID> CREATED_PASSENGERS_UUIDS = new HashSet<>();
     private final PaperweightFaweAdapter adapter = ((PaperweightFaweAdapter) WorldEditPlugin
             .getInstance()
             .getBukkitImplAdapter());
@@ -623,10 +615,11 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
                             if (createCopy) {
                                 copy.storeEntity(entity);
                             }
-                            removeEntityRecursive(entity);
+                            removeEntity(entity);
                             entitiesRemoved.add(uuid);
                             entityRemoves.remove(uuid);
                         }
+
                     }
                     if (Settings.settings().EXPERIMENTAL.REMOVE_ENTITY_FROM_WORLD_ON_CHUNK_FAIL) {
                         for (UUID uuid : entityRemoves) {
@@ -646,6 +639,8 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
             if (entities != null && !entities.isEmpty()) {
 
                 syncTasks.add(() -> {
+                    List<FaweCompoundTag> newPassengerRecords = new ArrayList<>();
+                    Map<UUID, LinCompoundTag> passengerTagsByUuid = new HashMap<>();
                     Iterator<FaweCompoundTag> iterator = entities.iterator();
                     while (iterator.hasNext()) {
                         final FaweCompoundTag nativeTag = iterator.next();
@@ -688,7 +683,7 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
                             if (passengers != null) {
                                 List<LinCompoundTag> rewritten = new ArrayList<>();
                                 for (LinCompoundTag passengerTag : passengers.value()) {
-                                    rewritten.add(randomizePassengerUuidsInTag(passengerTag));
+                                    rewritten.add(randomizePassengerUuidsInTag(passengerTag, passengerTagsByUuid));
                                 }
                                 toLoadComponentBuilder.put("Passengers", LinListTag.of(LinTagType.compoundTag(), rewritten));
                             }
@@ -711,14 +706,23 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
                                 iterator.remove();
                             } else {
                                 createdEntity.setUUID(NbtUtils.uuid(nativeTag)); // NEW — restore parity with the recorded UUID
-                                if (!set.getSideEffectSet().shouldApply(SideEffect.ENTITY_EVENTS)) {
-                                    addRecursiveNoEvents(createdEntity, nmsWorld);
-                                } else {
-                                    nmsWorld.addFreshEntityWithPassengers(createdEntity, CreatureSpawnEvent.SpawnReason.CUSTOM);
+
+                                boolean noEvents = !set.getSideEffectSet().shouldApply(SideEffect.ENTITY_EVENTS);
+                                boolean added = noEvents
+                                        ? addNoEvents(createdEntity, nmsWorld, onError)
+                                        : nmsWorld.addFreshEntity(createdEntity, CreatureSpawnEvent.SpawnReason.CUSTOM);
+
+                                if (!added) {
+                                    onError.run();
+                                    iterator.remove(); // vehicle failed — matches reviewer's exact request
+                                    continue;
                                 }
+
+                                addPassengersRecursive(createdEntity, noEvents, nmsWorld, id, newPassengerRecords, onError, passengerTagsByUuid);
                             }
                         }
                     }
+                    entities.addAll(newPassengerRecords);
                 });
             }
 
@@ -779,20 +783,10 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
         }
     }
 
-    private void removeEntityRecursive(Entity entity) {
-        // snapshot first — removing the parent may clear/mutate its passenger list mid-iteration
-        List<Entity> passengers = new ArrayList<>(entity.getPassengers());
-        for (Entity passenger : passengers) {
-            if (CREATED_PASSENGERS_UUIDS.contains(passenger.getUUID())) {
-                removeEntityRecursive(passenger);
-            }
-        }
-        removeEntity(entity);
-    }
-
-    private LinCompoundTag randomizePassengerUuidsInTag(LinCompoundTag tag) {
+    private LinCompoundTag randomizePassengerUuidsInTag(LinCompoundTag tag,
+                                                        Map<UUID, LinCompoundTag> collector
+    ) {
         UUID fresh = UUID.randomUUID();
-        CREATED_PASSENGERS_UUIDS.add(fresh);
         int[] uuidInts = {
                 (int) (fresh.getMostSignificantBits() >> 32),
                 (int) fresh.getMostSignificantBits(),
@@ -807,21 +801,76 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
         if (passengers != null) {
             List<LinCompoundTag> rewritten = new ArrayList<>();
             for (LinCompoundTag passengerTag : passengers.value()) {
-                rewritten.add(randomizePassengerUuidsInTag(passengerTag)); // recurse for nested riders
+                rewritten.add(randomizePassengerUuidsInTag(passengerTag, collector)); // recurse for nested riders
             }
             builder.put("Passengers", LinListTag.of(LinTagType.compoundTag(), rewritten));
         }
 
-        return builder.build();
+        LinCompoundTag finalTag = builder.build();
+        collector.put(fresh, finalTag);
+        return finalTag;
     }
 
-    private void addRecursiveNoEvents(Entity entity, ServerLevel nmsWorld) {
+    private boolean addNoEvents(Entity entity,
+                                ServerLevel nmsWorld,
+                                Runnable onError
+    ) {
         entity.spawnReason = CreatureSpawnEvent.SpawnReason.CUSTOM;
         entity.generation = false;
-        nmsWorld.moonrise$getEntityLookup().addNewEntity(entity, false);
-        for (Entity passenger : entity.getPassengers()) {
-            addRecursiveNoEvents(passenger, nmsWorld);
+        if (PaperSupport.isPaper()) {
+            boolean status = nmsWorld.moonrise$getEntityLookup().addNewEntity(entity, false);
+            if (!status) {
+                onError.run();
+            }
+            return status;
         }
+        else {
+            // Not paper
+            try {
+                return PaperweightPlatformAdapter.getEntitySectionManager(nmsWorld).addNewEntity(entity);
+            } catch (IllegalAccessException e) {
+                // Fallback
+                LOGGER.warn("Error bypassing entity events on spawn on Spigot", e);
+            }
+        }
+
+        return false;
+    }
+
+    private void addPassengersRecursive(Entity parent,
+                                        boolean noEvents,
+                                        ServerLevel nmsWorld,
+                                        String vehicleId,
+                                        List<FaweCompoundTag> newRecords,
+                                        Runnable onError,
+                                        Map<UUID, LinCompoundTag> passengerTagsByUuid
+    ) {
+        for (Entity passenger : new ArrayList<>(parent.getPassengers())) { // snapshot, load already attached them
+            boolean added = noEvents
+                    ? addNoEvents(passenger, nmsWorld, onError)
+                    : nmsWorld.addFreshEntity(passenger, CreatureSpawnEvent.SpawnReason.CUSTOM);
+            if (!added) {
+                LOGGER.warn("Error creating passenger `{}` for vehicle `{}`", passenger.getType(), vehicleId);
+                passenger.stopRiding();
+                continue;
+            }
+
+            LinCompoundTag sourceTag = passengerTagsByUuid.get(passenger.getUUID());
+            if (sourceTag != null) {
+                newRecords.add(buildEntityRecordFromTag(sourceTag, passenger.getType()));
+            } else {
+                LOGGER.warn("No recorded tag found for passenger `{}` — history entry skipped", passenger.getUUID());
+            }
+
+            addPassengersRecursive(passenger, noEvents, nmsWorld, vehicleId, newRecords, onError, passengerTagsByUuid);
+        }
+    }
+
+    private FaweCompoundTag buildEntityRecordFromTag(LinCompoundTag sourceTag, EntityType<?> type) {
+        LinCompoundTag withId = sourceTag.toBuilder()
+                .putString("Id", BuiltInRegistries.ENTITY_TYPE.getKey(type).toString())
+                .build();
+        return FaweCompoundTag.of(withId);
     }
 
     private void updateGet(
