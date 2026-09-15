@@ -889,7 +889,7 @@ public abstract class BlockVector3 {
     //FAWE start - not a record, need own implementations
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof final BlockVector3 other)) {
+        if (!(obj instanceof BlockVector3 other)) {
             return false;
         }
 

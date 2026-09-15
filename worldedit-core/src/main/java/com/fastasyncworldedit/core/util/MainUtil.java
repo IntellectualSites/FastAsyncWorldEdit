@@ -87,6 +87,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.Deflater;
 import java.util.zip.GZIPInputStream;
@@ -866,83 +867,53 @@ public class MainUtil {
         }
     }
 
+    private static final long[] TIME_UNIT_SECONDS = {33868800L, 604800L, 86400L, 3600L, 60L};
+    private static final String[] TIME_UNIT_SUFFIXES = {"y", "w", "d", "h", "m"};
+
     public static String secToTime(long time) {
-        StringBuilder toreturn = new StringBuilder();
-        if (time >= 33868800) {
-            int years = (int) (time / 33868800);
-            int time1 = years * 33868800;
-            time -= time1;
-            toreturn.append(years).append("y ");
+        StringBuilder result = new StringBuilder();
+        for (int i = 0; i < TIME_UNIT_SECONDS.length; i++) {
+            long unitSeconds = TIME_UNIT_SECONDS[i];
+            if (time >= unitSeconds) {
+                long amount = time / unitSeconds;
+                time -= amount * unitSeconds;
+                result.append(amount).append(TIME_UNIT_SUFFIXES[i]).append(' ');
+            }
         }
-        if (time >= 604800) {
-            int weeks = (int) (time / 604800);
-            time -= weeks * 604800L;
-            toreturn.append(weeks).append("w ");
+        if (result.isEmpty() || time > 0) {
+            result.append(time).append("s ");
         }
-        if (time >= 86400) {
-            int days = (int) (time / 86400);
-            time -= days * 86400L;
-            toreturn.append(days).append("d ");
-        }
-        if (time >= 3600) {
-            int hours = (int) (time / 3600);
-            time -= hours * 3600L;
-            toreturn.append(hours).append("h ");
-        }
-        if (time >= 60) {
-            int minutes = (int) (time / 60);
-            time -= minutes * 60L;
-            toreturn.append(minutes).append("m ");
-        }
-        if (toreturn.equals("") || time > 0) {
-            toreturn.append(time).append("s ");
-        }
-        return toreturn.toString().trim();
+        return result.toString().trim();
     }
+
+    private static final Pattern TIME_COMPONENT = Pattern.compile("(\\d+)([a-z]*)");
 
     public static long timeToSec(String string) {
         if (MathMan.isInteger(string)) {
             return Long.parseLong(string);
         }
-        string = string.toLowerCase(Locale.ROOT).trim().toLowerCase(Locale.ROOT);
-        if (string.equalsIgnoreCase("false")) {
+        string = string.strip().toLowerCase(Locale.ROOT);
+        if (string.equals("false")) {
             return 0;
         }
-        String[] split = string.split(" ");
         long time = 0;
-        for (String value : split) {
-            int nums = Integer.parseInt(value.replaceAll("[^\\d]", ""));
-            String letters = value.replaceAll("[^a-z]", "");
-            switch (letters) {
-                case "week":
-                case "weeks":
-                case "wks":
-                case "w":
-
-                    time += 604800L * nums;
-                case "days":
-                case "day":
-                case "d":
-                    time += 86400L * nums;
-                case "hour":
-                case "hr":
-                case "hrs":
-                case "hours":
-                case "h":
-                    time += 3600L * nums;
-                case "minutes":
-                case "minute":
-                case "mins":
-                case "min":
-                case "m":
-                    time += 60L * nums;
-                case "seconds":
-                case "second":
-                case "secs":
-                case "sec":
-                case "s":
-                    time += nums;
+        for (String component : string.split(" ")) {
+            if (component.isEmpty()) {
+                continue;
             }
+            Matcher matcher = TIME_COMPONENT.matcher(component);
+            if (!matcher.matches()) {
+                throw new IllegalArgumentException("Invalid time component: " + component);
+            }
+            long amount = Long.parseLong(matcher.group(1));
+            time += switch (matcher.group(2)) {
+                case "week", "weeks", "wks", "w" -> 604800L * amount;
+                case "day", "days", "d" -> 86400L * amount;
+                case "hour", "hours", "hr", "hrs", "h" -> 3600L * amount;
+                case "minute", "minutes", "min", "mins", "m" -> 60L * amount;
+                case "second", "seconds", "sec", "secs", "s", "" -> amount;
+                default -> throw new IllegalArgumentException("Unknown time unit: " + matcher.group(2));
+            };
         }
         return time;
     }

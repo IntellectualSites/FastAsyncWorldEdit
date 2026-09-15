@@ -14,8 +14,8 @@ public record IntTriple(int x, int y, int z) {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof IntTriple other) {
-            return other.x == x && other.z == z && other.y == y;
+        if (obj instanceof IntTriple(int x1, int y1, int z1)) {
+            return x1 == x && z1 == z && y1 == y;
         }
         return false;
     }

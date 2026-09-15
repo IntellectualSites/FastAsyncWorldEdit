@@ -156,7 +156,7 @@ public class RichTransformParser extends FaweParser<ResettableExtent> {
                     ))
             ));
         } else if (union.size() == 1) {
-            return union.get(0);
+            return union.getFirst();
         } else {
             RandomTransform random = new RandomTransform(new TrueRandom());
             for (int i = 0; i < union.size(); i++) {

@@ -13,7 +13,7 @@ public class ScrollSize extends Scroll {
     @Override
     public boolean increment(Player player, int amount) {
         int max = player.getLimit().MAX_RADIUS;
-        double newSize = Math.max(0, Math.min(max == -1 ? 4095 : max, getTool().getSize() + amount));
+        double newSize = Math.clamp(getTool().getSize() + amount, 0, max == -1 ? 4095 : max);
         getTool().setSize(newSize);
         return true;
     }

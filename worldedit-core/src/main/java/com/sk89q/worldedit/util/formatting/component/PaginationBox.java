@@ -43,7 +43,7 @@ public abstract class PaginationBox extends MessageBox {
     private int currentPage = -1;
 
     /**
-     * Creates a Paginated component
+     * Creates a Paginated component.
      *
      * @param title The title
      */
@@ -51,25 +51,8 @@ public abstract class PaginationBox extends MessageBox {
         this(title, null);
     }
 
-    public abstract Component getComponent(int number);
-
-    public abstract int getComponentsSize();
-
-    public void setComponentsPerPage(int componentsPerPage) {
-        this.componentsPerPage = componentsPerPage;
-    }
-
-    public void formatForConsole() {
-        this.pageCommand = null;
-        this.componentsPerPage = 20;
-    }
-
-    protected final int getCurrentPage() {
-        return currentPage;
-    }
-
     /**
-     * Creates a Paginated component
+     * Creates a Paginated component.
      *
      * @param title       The title
      * @param pageCommand The command to run to switch page, with %page% representing page number
@@ -87,6 +70,23 @@ public abstract class PaginationBox extends MessageBox {
             //FAWE end
         }
         this.pageCommand = pageCommand;
+    }
+
+    public abstract Component getComponent(int number);
+
+    public abstract int getComponentsSize();
+
+    public void setComponentsPerPage(int componentsPerPage) {
+        this.componentsPerPage = componentsPerPage;
+    }
+
+    public void formatForConsole() {
+        this.pageCommand = null;
+        this.componentsPerPage = 20;
+    }
+
+    protected final int getCurrentPage() {
+        return currentPage;
     }
 
     public Component create(int page) throws InvalidComponentException {

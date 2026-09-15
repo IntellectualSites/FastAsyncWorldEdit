@@ -30,8 +30,7 @@ public class MaskTraverser {
         }
         Class<?> current = mask.getClass();
         while (current.getSuperclass() != null) {
-            if (mask instanceof AbstractExtentMask) {
-                AbstractExtentMask mask1 = (AbstractExtentMask) mask;
+            if (mask instanceof AbstractExtentMask mask1) {
                 mask1.setExtent(newExtent);
             } else {
                 try {
@@ -41,8 +40,7 @@ public class MaskTraverser {
                 } catch (NoSuchFieldException | IllegalAccessException ignored) {
                 }
             }
-            if (mask instanceof MaskIntersection) {
-                MaskIntersection mask1 = (MaskIntersection) mask;
+            if (mask instanceof MaskIntersection mask1) {
                 try {
                     Field field = mask1.getClass().getDeclaredField("masks");
                     field.setAccessible(true);
@@ -83,8 +81,7 @@ public class MaskTraverser {
         }
         Class<?> current = mask.getClass();
         while (current.getSuperclass() != null) {
-            if (mask instanceof AbstractExtentMask) {
-                AbstractExtentMask mask1 = (AbstractExtentMask) mask;
+            if (mask instanceof AbstractExtentMask mask1) {
                 mask1.setExtent(newExtent);
             } else {
                 try {
@@ -94,8 +91,7 @@ public class MaskTraverser {
                 } catch (NoSuchFieldException | IllegalAccessException ignored) {
                 }
             }
-            if (mask instanceof MaskIntersection) {
-                MaskIntersection mask1 = (MaskIntersection) mask;
+            if (mask instanceof MaskIntersection mask1) {
                 try {
                     Field field = mask1.getClass().getDeclaredField("masks");
                     field.setAccessible(true);

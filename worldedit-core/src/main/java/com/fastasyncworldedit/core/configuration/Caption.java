@@ -94,7 +94,7 @@ public class Caption {
         }
         if (parent.color() == null) {
             if (!children.isEmpty()) {
-                lastColor = children.get(children.size() - 1).color();
+                lastColor = children.getLast().color();
             }
             if (lastColor != null) {
                 parent = parent.color(lastColor);

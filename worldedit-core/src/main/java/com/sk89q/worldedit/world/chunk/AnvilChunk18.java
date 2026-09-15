@@ -49,7 +49,7 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 /**
- * The chunk format for Minecraft 1.18 and newer
+ * The chunk format for Minecraft 1.18 and newer.
  */
 public class AnvilChunk18 implements Chunk {
 
@@ -79,11 +79,10 @@ public class AnvilChunk18 implements Chunk {
         blocks = new Int2ObjectOpenHashMap<>(sections.size());
 
         for (Tag rawSectionTag : sections) {
-            if (!(rawSectionTag instanceof CompoundTag)) {
+            if (!(rawSectionTag instanceof CompoundTag sectionTag)) {
                 continue;
             }
 
-            CompoundTag sectionTag = (CompoundTag) rawSectionTag;
             Object yValue = sectionTag.getValue().get("Y").getValue(); // sometimes a byte, sometimes an int
             if (!(yValue instanceof Number)) {
                 throw new InvalidFormatException("Y is not numeric: " + yValue);
@@ -91,11 +90,10 @@ public class AnvilChunk18 implements Chunk {
             int y = ((Number) yValue).intValue();
 
             Tag rawBlockStatesTag = sectionTag.getValue().get("block_states"); // null for sections outside of the world limits
-            if (rawBlockStatesTag instanceof CompoundTag) {
-                CompoundTag blockStatesTag = (CompoundTag) rawBlockStatesTag;
+            if (rawBlockStatesTag instanceof CompoundTag blockStatesTag) {
 
                 // parse palette
-                List<CompoundTag> paletteEntries = blockStatesTag.getList("palette", CompoundTag.class);
+                var paletteEntries = blockStatesTag.getList("palette", CompoundTag.class);
                 int paletteSize = paletteEntries.size();
                 if (paletteSize == 0) {
                     continue;
@@ -167,11 +165,9 @@ public class AnvilChunk18 implements Chunk {
                 "block_entities", ListTag.class).getValue();
 
         for (Tag tag : tags) {
-            if (!(tag instanceof CompoundTag)) {
+            if (!(tag instanceof CompoundTag t)) {
                 throw new InvalidFormatException("CompoundTag expected in block_entities");
             }
-
-            CompoundTag t = (CompoundTag) tag;
 
             Map<String, Tag<?, ?>> values = new HashMap<>(t.getValue());
             int x = ((IntTag) values.get("x")).getValue();

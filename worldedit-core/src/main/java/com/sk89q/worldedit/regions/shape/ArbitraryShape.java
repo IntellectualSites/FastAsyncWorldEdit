@@ -162,7 +162,7 @@ public abstract class ArbitraryShape {
         final int index = (y - cacheOffsetY) + (z - cacheOffsetZ) * cacheSizeY + (x - cacheOffsetX) * cacheSizeY * cacheSizeZ;
 
         switch (cache[index]) {
-            case 0:
+            case 0 -> {
                 BaseBlock mat = getMaterial(x, y, z, pattern.applyBlock(BlockVector3.at(x, y, z)));
                 if (mat == null) {
                     cache[index] = -1;
@@ -170,14 +170,16 @@ public abstract class ArbitraryShape {
                 }
                 cache[index] = 1;
                 return true;
-
-            case -1:
+            }
+            case -1 -> {
                 // outside
                 return false;
-
-            default:
+                // outside
+            }
+            default -> {
                 // inside
                 return true;
+            }
         }
     }
 

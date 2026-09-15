@@ -197,9 +197,9 @@ public final class NBTInputStream implements Closeable {
 
     public void readTagPayloadLazy(int type, int depth, StreamDelegate scope) throws IOException {
         switch (type) {
-            case NBTConstants.TYPE_END:
-                return;
-            case NBTConstants.TYPE_BYTE: {
+            case NBTConstants.TYPE_END -> {
+            }
+            case NBTConstants.TYPE_BYTE -> {
                 ValueReader value = scope.getValueReader();
                 if (value == null) {
                     value = scope.getElemReader();
@@ -209,9 +209,8 @@ public final class NBTInputStream implements Closeable {
                 } else {
                     is.skipBytes(1);
                 }
-                return;
             }
-            case NBTConstants.TYPE_SHORT: {
+            case NBTConstants.TYPE_SHORT -> {
                 ValueReader value = scope.getValueReader();
                 if (value == null) {
                     value = scope.getElemReader();
@@ -221,9 +220,8 @@ public final class NBTInputStream implements Closeable {
                 } else {
                     is.skipBytes(2);
                 }
-                return;
             }
-            case NBTConstants.TYPE_INT: {
+            case NBTConstants.TYPE_INT -> {
                 ValueReader value = scope.getValueReader();
                 if (value == null) {
                     value = scope.getElemReader();
@@ -233,9 +231,8 @@ public final class NBTInputStream implements Closeable {
                 } else {
                     is.skipBytes(4);
                 }
-                return;
             }
-            case NBTConstants.TYPE_LONG: {
+            case NBTConstants.TYPE_LONG -> {
                 ValueReader value = scope.getValueReader();
                 if (value == null) {
                     value = scope.getElemReader();
@@ -245,9 +242,8 @@ public final class NBTInputStream implements Closeable {
                 } else {
                     is.skipBytes(8);
                 }
-                return;
             }
-            case NBTConstants.TYPE_FLOAT: {
+            case NBTConstants.TYPE_FLOAT -> {
                 ValueReader value = scope.getValueReader();
                 if (value == null) {
                     value = scope.getElemReader();
@@ -257,9 +253,8 @@ public final class NBTInputStream implements Closeable {
                 } else {
                     is.skipBytes(4);
                 }
-                return;
             }
-            case NBTConstants.TYPE_DOUBLE: {
+            case NBTConstants.TYPE_DOUBLE -> {
                 ValueReader value = scope.getValueReader();
                 if (value == null) {
                     value = scope.getElemReader();
@@ -269,9 +264,8 @@ public final class NBTInputStream implements Closeable {
                 } else {
                     is.skipBytes(8);
                 }
-                return;
             }
-            case NBTConstants.TYPE_STRING: {
+            case NBTConstants.TYPE_STRING -> {
                 ValueReader value = scope.getValueReader();
                 if (value == null) {
                     value = scope.getElemReader();
@@ -284,9 +278,8 @@ public final class NBTInputStream implements Closeable {
                 } else {
                     is.skipBytes(length);
                 }
-                return;
             }
-            case NBTConstants.TYPE_LIST: {
+            case NBTConstants.TYPE_LIST -> {
                 int childType = is.readByte();
                 int length = is.readInt();
                 StreamDelegate child;
@@ -314,9 +307,8 @@ public final class NBTInputStream implements Closeable {
                         readTagPayloadLazy(childType, depth + 1, child);
                     }
                 }
-                return;
             }
-            case NBTConstants.TYPE_COMPOUND: {
+            case NBTConstants.TYPE_COMPOUND -> {
                 // readDataPayload
                 scope.acceptInfo(-1, NBTConstants.TYPE_BYTE);
                 ValueReader valueReader = scope.getValueReader();
@@ -350,7 +342,7 @@ public final class NBTInputStream implements Closeable {
                     }
                 }
             }
-            case NBTConstants.TYPE_BYTE_ARRAY: {
+            case NBTConstants.TYPE_BYTE_ARRAY -> {
                 int length = is.readInt();
                 scope.acceptInfo(length, NBTConstants.TYPE_BYTE);
                 if (scope.acceptLazy(length, this)) {
@@ -385,9 +377,8 @@ public final class NBTInputStream implements Closeable {
                     return;
                 }
                 is.skipBytes(length);
-                return;
             }
-            case NBTConstants.TYPE_INT_ARRAY: {
+            case NBTConstants.TYPE_INT_ARRAY -> {
                 int length = is.readInt();
                 scope.acceptInfo(length, NBTConstants.TYPE_INT);
                 if (scope.acceptLazy(length, this)) {
@@ -406,9 +397,8 @@ public final class NBTInputStream implements Closeable {
                     return;
                 }
                 is.skipBytes(length << 2);
-                return;
             }
-            case NBTConstants.TYPE_LONG_ARRAY: {
+            case NBTConstants.TYPE_LONG_ARRAY -> {
                 int length = is.readInt();
                 scope.acceptInfo(length, NBTConstants.TYPE_LONG);
                 if (scope.acceptLazy(length, this)) {
@@ -427,11 +417,8 @@ public final class NBTInputStream implements Closeable {
                     return;
                 }
                 is.skipBytes(length << 3);
-                return;
             }
-
-            default:
-                throw new IOException("Invalid tag type: " + type + ".");
+            default -> throw new IOException("Invalid tag type: " + type + ".");
         }
     }
 
@@ -448,26 +435,13 @@ public final class NBTInputStream implements Closeable {
     }
 
     public static int getSize(int type) {
-        switch (type) {
-            default:
-            case NBTConstants.TYPE_END:
-            case NBTConstants.TYPE_BYTE:
-                return 1;
-            case NBTConstants.TYPE_BYTE_ARRAY:
-            case NBTConstants.TYPE_STRING:
-            case NBTConstants.TYPE_LIST:
-            case NBTConstants.TYPE_COMPOUND:
-            case NBTConstants.TYPE_INT_ARRAY:
-            case NBTConstants.TYPE_LONG_ARRAY:
-            case NBTConstants.TYPE_SHORT:
-                return 2;
-            case NBTConstants.TYPE_FLOAT:
-            case NBTConstants.TYPE_INT:
-                return 4;
-            case NBTConstants.TYPE_DOUBLE:
-            case NBTConstants.TYPE_LONG:
-                return 8;
-        }
+        return switch (type) {
+            case NBTConstants.TYPE_BYTE_ARRAY, NBTConstants.TYPE_STRING, NBTConstants.TYPE_LIST, NBTConstants.TYPE_COMPOUND,
+                 NBTConstants.TYPE_INT_ARRAY, NBTConstants.TYPE_LONG_ARRAY, NBTConstants.TYPE_SHORT -> 2;
+            case NBTConstants.TYPE_FLOAT, NBTConstants.TYPE_INT -> 4;
+            case NBTConstants.TYPE_DOUBLE, NBTConstants.TYPE_LONG -> 8;
+            default -> 1;
+        };
     }
 
     public Object readTagPayloadRaw(int type, int depth) throws IOException {

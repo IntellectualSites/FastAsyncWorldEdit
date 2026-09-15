@@ -113,8 +113,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class LocalSession implements TextureHolder {
 
-    public static int MAX_HISTORY_SIZE = 15;
     private static final int CUI_VERSION_UNINITIALIZED = -1;
+    public static int MAX_HISTORY_SIZE = 15;
 
     // Non-session related fields
     private transient LocalConfiguration config;
@@ -304,7 +304,7 @@ public class LocalSession implements TextureHolder {
         );
         if (file.exists()) {
             try (FaweInputStream is = new FaweInputStream(new FileInputStream(file))) {
-                historyNegativeIndex = Math.min(Math.max(0, is.readInt()), history.size());
+                historyNegativeIndex = Math.clamp(is.readInt(), 0, history.size());
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -469,8 +469,7 @@ public class LocalSession implements TextureHolder {
     }
 
     private ChangeSet getChangeSet(Object o) {
-        if (o instanceof ChangeSet) {
-            ChangeSet cs = (ChangeSet) o;
+        if (o instanceof ChangeSet cs) {
             try {
                 cs.close();
             } catch (IOException e) {
@@ -479,17 +478,17 @@ public class LocalSession implements TextureHolder {
             }
             return cs;
         }
-        if (o instanceof Integer) {
+        if (o instanceof Integer integer) {
             File folder = MainUtil.getFile(
                     Fawe.platform().getDirectory(),
                     Settings.settings().PATHS.HISTORY + File.separator + currentWorld.getName() + File.separator + uuid
             );
-            File specific = new File(folder, o.toString());
+            File specific = new File(folder, integer.toString());
             if (specific.isDirectory()) {
                 // TODO NOT IMPLEMENTED
 //                return new AnvilHistory(currentWorld.getName(), specific);
             } else {
-                return new DiskStorageHistory(currentWorld, this.uuid, (Integer) o);
+                return new DiskStorageHistory(currentWorld, this.uuid, integer);
             }
         }
         return null;
@@ -513,8 +512,8 @@ public class LocalSession implements TextureHolder {
                     Object item = iter.next();
                     if (++i > cutoffIndex) {
                         ChangeSet oldChangeSet;
-                        if (item instanceof ChangeSet) {
-                            oldChangeSet = (ChangeSet) item;
+                        if (item instanceof ChangeSet set) {
+                            oldChangeSet = set;
                         } else {
                             oldChangeSet = getChangeSet(item);
                         }
@@ -574,8 +573,8 @@ public class LocalSession implements TextureHolder {
                     Object item = iter.next();
                     if (++i > cutoffIndex) {
                         ChangeSet oldChangeSet;
-                        if (item instanceof ChangeSet) {
-                            oldChangeSet = (ChangeSet) item;
+                        if (item instanceof ChangeSet set) {
+                            oldChangeSet = set;
                         } else {
                             oldChangeSet = getChangeSet(item);
                         }
@@ -658,7 +657,7 @@ public class LocalSession implements TextureHolder {
     }
 
     /**
-     * Performs a redo
+     * Performs a redo.
      *
      * @param newBlockBag a new block bag
      * @param actor       the actor
@@ -1581,8 +1580,7 @@ public class LocalSession implements TextureHolder {
             return;
         }
 
-        if (selector instanceof CUIRegion) {
-            CUIRegion tempSel = (CUIRegion) selector;
+        if (selector instanceof CUIRegion tempSel) {
 
             if (tempSel.getProtocolVersion() > cuiVersion) {
                 actor.dispatchCUIEvent(new SelectionShapeEvent(tempSel.getLegacyTypeID()));
@@ -1611,8 +1609,7 @@ public class LocalSession implements TextureHolder {
             return;
         }
 
-        if (selector instanceof CUIRegion) {
-            CUIRegion tempSel = (CUIRegion) selector;
+        if (selector instanceof CUIRegion tempSel) {
 
             if (tempSel.getProtocolVersion() > cuiVersion) {
                 tempSel.describeLegacyCUI(this, actor);
@@ -1930,7 +1927,7 @@ public class LocalSession implements TextureHolder {
 
     //FAWE start
     /**
-     * Get the preferred wand item for this user, or {@code null} to use the default
+     * Get if the preferred wand item for this user, or {@code null} to use the default
      *
      * @return item id of wand item, or {@code null}
      * @since 2.11.0

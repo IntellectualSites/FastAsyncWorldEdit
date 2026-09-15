@@ -275,8 +275,7 @@ public class Config {
     }
 
     private String toYamlString(Object value, String spacing) {
-        if (value instanceof List) {
-            Collection<?> listValue = (Collection<?>) value;
+        if (value instanceof List<?> listValue) {
             if (listValue.isEmpty()) {
                 return "[]";
             }
