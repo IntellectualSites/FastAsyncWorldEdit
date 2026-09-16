@@ -115,6 +115,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.Climate;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -234,6 +235,9 @@ public final class PaperweightAdapter implements BukkitImplAdapter<Tag> {
 
         int dataVersion = SharedConstants.getCurrentVersion().dataVersion().version();
         if (dataVersion != Constants.DATA_VERSION_MC_26_3) {
+            if (dataVersion <= Constants.DATA_VERSION_MC_26_2) {
+                throw new RuntimeException("Force prevent this loading on <=26.2");
+            }
             logger.warning(WRONG_VERSION);
         }
 

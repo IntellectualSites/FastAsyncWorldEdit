@@ -161,8 +161,6 @@ public final class Constants {
 
     /**
      * The DataVersion for Minecraft 26.3.
-     *
-     * <p>TODO: placeholder value pending release of the 26.3 dev bundle; update once the real DataVersion is known.</p>
      */
-    public static final int DATA_VERSION_MC_26_3 = 4904;
+    public static final int DATA_VERSION_MC_26_3 = 5023;
 }
