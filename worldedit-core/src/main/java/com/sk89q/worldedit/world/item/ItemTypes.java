@@ -3321,7 +3321,7 @@ public static final ItemType POPLAR_BUTTON = get("minecraft:poplar_button");
     @Nullable
     public static final ItemType WOODLAND_MANSION_MAP = get("minecraft:woodland_mansion_map");
     @Nullable
- public static final ItemType WRITABLE_BOOK = get("minecraft:writable_book");
+    public static final ItemType WRITABLE_BOOK = get("minecraft:writable_book");
     @Nullable
     public static final ItemType WRITTEN_BOOK = get("minecraft:written_book");
     @Nullable
