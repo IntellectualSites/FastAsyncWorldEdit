@@ -17,7 +17,6 @@ import net.minecraft.world.level.LevelHeightAccessor;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeGenerationSettings;
 import net.minecraft.world.level.biome.BiomeResolver;
-import net.minecraft.world.level.biome.Climate;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -29,7 +28,6 @@ import net.minecraft.world.level.chunk.status.ChunkStatus;
 import net.minecraft.world.level.gameevent.GameEventListenerRegistry;
 import net.minecraft.world.level.levelgen.BelowZeroRetrogen;
 import net.minecraft.world.level.levelgen.Heightmap;
-import net.minecraft.world.level.levelgen.NoiseChunk;
 import net.minecraft.world.level.levelgen.blending.BlendingData;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureStart;
@@ -50,16 +48,15 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiConsumer;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 /**
- * This exists solely for the {@link PaperweightChunkAccessProxy#markPosForPostprocessing(BlockPos)} override, as the way we
+ * This exists solely for the {@link PaperweightChunkAccessProxy#markPosForPostProcessing(BlockPos)} override, as the way we
  * handle feature/structure generation means the chunks returned in {@link FaweBlockStateListPopulator#getChunk(BlockPos)} (and
  * other getChunk) are not {@link net.minecraft.world.level.chunk.ProtoChunk} types, so do not override the
- * {@link ChunkAccess#markPosForPostprocessing(BlockPos)} function.
+ * {@link ChunkAccess#markPosForPostProcessing(BlockPos)} function.
  */
 @SuppressWarnings({"removal", "deprecation"})
 public final class PaperweightChunkAccessProxy extends ChunkAccess {
@@ -487,8 +484,8 @@ public final class PaperweightChunkAccessProxy extends ChunkAccess {
     }
 
     @Override
-    public void incrementInhabitedTime(final long amount) {
-        parent.incrementInhabitedTime(amount);
+    public void incrementInhabitedTime() {
+        parent.incrementInhabitedTime();
     }
 
     @Override
@@ -517,11 +514,6 @@ public final class PaperweightChunkAccessProxy extends ChunkAccess {
     }
 
     @Override
-    public @Nonnull NoiseChunk getOrCreateNoiseChunk(final @Nonnull Function<ChunkAccess, NoiseChunk> noiseChunkCreator) {
-        return parent.getOrCreateNoiseChunk(noiseChunkCreator);
-    }
-
-    @Override
     public @Nonnull BiomeGenerationSettings carverBiome(final @Nonnull Supplier<BiomeGenerationSettings> caverBiomeSettingsSupplier) {
         return parent.carverBiome(caverBiomeSettingsSupplier);
     }
@@ -532,13 +524,12 @@ public final class PaperweightChunkAccessProxy extends ChunkAccess {
     }
 
     @Override
-    public void fillBiomesFromNoise(final @Nonnull BiomeResolver resolver, final @Nonnull Climate.Sampler sampler) {
-        parent.fillBiomesFromNoise(resolver, sampler);
+    public void fillBiomesFromNoise(final @Nonnull BiomeResolver resolver) {
+        parent.fillBiomesFromNoise(resolver);
     }
 
-    @Override
     public boolean hasAnyStructureReferences() {
-        return parent.hasAnyStructureReferences();
+        return !parent.getAllReferences().isEmpty();
     }
 
     @Override

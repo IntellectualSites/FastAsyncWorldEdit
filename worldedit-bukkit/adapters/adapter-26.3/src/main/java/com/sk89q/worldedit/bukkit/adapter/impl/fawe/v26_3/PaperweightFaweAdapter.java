@@ -92,7 +92,9 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.chunk.LevelChunk;
-import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
+import net.minecraft.world.level.levelgen.RandomState;
+import net.minecraft.world.level.levelgen.densityfunction.SamplerContext;
+import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.Structure;
@@ -568,9 +570,9 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
         ServerLevel serverLevel = getServerLevel(world);
         ChunkGenerator generator = serverLevel.getMinecraftWorld().getChunkSource().getGenerator();
 
-        ConfiguredFeature<?, ?> configuredFeature = serverLevel
+        Feature configuredFeature = serverLevel
                 .registryAccess()
-                .lookupOrThrow(Registries.CONFIGURED_FEATURE)
+                .lookupOrThrow(Registries.FEATURE)
                 .getValue(Identifier.tryParse(feature.id()));
 
         FaweBlockStateListPopulator populator = new FaweBlockStateListPopulator(serverLevel);
@@ -614,14 +616,16 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
         List<CraftBlockState> placed = TaskManager.taskManager().sync(() -> {
             preCaptureStates(serverLevel);
             try {
+                var randomState = chunkManager.randomState();
                 StructureStart structureStart = structure.generate(
                         structureRegistry.wrapAsHolder(structure),
                         serverLevel.dimension(),
                         serverLevel.registryAccess(),
                         chunkManager.getGenerator(),
                         chunkManager.getGenerator().getBiomeSource(),
-                        chunkManager.randomState(),
-                        serverLevel.getStructureManager(),
+                        randomState.createClimateSampler(SamplerContext.EMPTY_UNCACHED),
+                        randomState,
+                        serverLevel.getStructureTemplateManager(),
                         serverLevel.getSeed(),
                         chunkPos,
                         0,
@@ -769,7 +773,7 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
         face_features.add(NetherFeatures.GLOWSTONE_EXTRA.identifier().toString());
 
         // Features
-        for (Identifier name : server.registryAccess().lookupOrThrow(Registries.CONFIGURED_FEATURE).keySet()) {
+        for (Identifier name : server.registryAccess().lookupOrThrow(Registries.FEATURE).keySet()) {
             String id = name.toString();
             if (ConfiguredFeatureType.REGISTRY.get(id) == null) {
                 ConfiguredFeatureType.REGISTRY.register(id, new ConfiguredFeatureType(id, face_features.contains(id)));
