@@ -633,11 +633,11 @@ public class WorldEditPlugin extends JavaPlugin {
     }
 
     BukkitPlayer reCachePlayer(Player player) {
+        BukkitPlayer wePlayer = new BukkitPlayer(this, player);
         synchronized (playerCache) {
-            BukkitPlayer wePlayer = new BukkitPlayer(this, player);
             playerCache.put(player, wePlayer);
-            return wePlayer;
         }
+        return wePlayer;
     }
 
     void removeCachedPlayer(Player player) {
