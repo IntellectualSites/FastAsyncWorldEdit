@@ -75,8 +75,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.WorldInitEvent;
-import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.metadata.MetadataValue;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.enginehub.piston.CommandManager;
@@ -94,6 +92,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.WeakHashMap;
 import java.util.jar.Attributes;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -118,6 +117,7 @@ public class WorldEditPlugin extends JavaPlugin {
     private BukkitPermissionAttachmentManager permissionAttachmentManager;
     // Fawe start
     private BukkitCommandSender bukkitConsoleCommandSender;
+    private final WeakHashMap<Player, BukkitPlayer> playerCache = new WeakHashMap<>();
     // Fawe end
 
     @Override
@@ -614,11 +614,11 @@ public class WorldEditPlugin extends JavaPlugin {
         if (wePlayer != null) {
             return wePlayer;
         }
-        synchronized (player) {
+        synchronized (playerCache) {
             BukkitPlayer bukkitPlayer = getCachedPlayer(player);
             if (bukkitPlayer == null) {
                 bukkitPlayer = new BukkitPlayer(this, player);
-                player.setMetadata("WE", new FixedMetadataValue(this, bukkitPlayer));
+                playerCache.put(player, bukkitPlayer);
             }
             return bukkitPlayer;
         }
@@ -627,17 +627,13 @@ public class WorldEditPlugin extends JavaPlugin {
 
     //FAWE start
     BukkitPlayer getCachedPlayer(Player player) {
-        List<MetadataValue> meta = player.getMetadata("WE");
-        if (meta.isEmpty()) {
-            return null;
-        }
-        return (BukkitPlayer) meta.get(0).value();
+        return playerCache.get(player);
     }
 
     BukkitPlayer reCachePlayer(Player player) {
-        synchronized (player) {
+        synchronized (playerCache) {
             BukkitPlayer wePlayer = new BukkitPlayer(this, player);
-            player.setMetadata("WE", new FixedMetadataValue(this, wePlayer));
+            playerCache.put(player, wePlayer);
             return wePlayer;
         }
     }
