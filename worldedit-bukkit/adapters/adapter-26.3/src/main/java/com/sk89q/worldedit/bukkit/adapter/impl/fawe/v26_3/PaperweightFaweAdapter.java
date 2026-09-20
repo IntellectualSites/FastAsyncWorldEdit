@@ -23,8 +23,8 @@ import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
-import com.sk89q.worldedit.bukkit.adapter.impl.v26_3.PaperweightAdapter;
 import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v26_3.regen.PaperweightRegen;
+import com.sk89q.worldedit.bukkit.adapter.impl.v26_3.PaperweightAdapter;
 import com.sk89q.worldedit.bukkit.adapter.impl.v26_3.PaperweightBlockMaterial;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.extent.Extent;
@@ -92,7 +92,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.chunk.LevelChunk;
-import net.minecraft.world.level.levelgen.RandomState;
 import net.minecraft.world.level.levelgen.densityfunction.SamplerContext;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
@@ -543,8 +542,8 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
                     .getOrThrow();
             stack.applyComponents(patch);
         }
-        // TODO Paper renamed this from asCraftMirror to asBukkitMirror in 26.3 for some odd reason we may need to add a Paper
-        //  check here.
+        //TODO Paper renamed this from asCraftMirror to asBukkitMirror in 26.3 for some odd reason we may need to add a Paper
+        // check here.
         return CraftItemStack.asBukkitMirror(stack);
     }
 

@@ -374,7 +374,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                         null,
                         null
                         // boolean parameter was removed from paper in 26.3
-                        // TODO Check when Paper 26.3 approaches beta.
+                        //TODO Check when Paper 26.3 approaches beta.
                     );
                 } else {
                     // deprecated on paper - deprecation suppressed
@@ -461,8 +461,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             var packedData = new PalettedContainerRO.PackedData<>(palette, Optional.ofNullable(bits));
             DataResult<PalettedContainer<net.minecraft.world.level.block.state.BlockState>> result;
             if (PaperSupport.isPaper()) {
-                // TODO this may change as Paper for 26.3 matures. May return to 26.2 implementation.
-                result = PalettedContainer.unpack(strategy, packedData);
+                result = PalettedContainer.unpack(strategy, packedData, Blocks.AIR.defaultBlockState(), null);
             } else {
                 //noinspection unchecked
                 result = (DataResult<PalettedContainer<BlockState>>)
@@ -538,10 +537,12 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         );
         DataResult<PalettedContainer<Holder<Biome>>> result;
         if (PaperSupport.isPaper()) {
-            // TODO this may change as Paper for 26.3 matures. May return to 26.2 implementation.
             result = PalettedContainer.unpack(
-                strategy,
-                packedData);
+                    strategy,
+                    packedData,
+                    biomeRegistry.byIdOrThrow(adapter.getInternalBiomeId(BiomeTypes.PLAINS)),
+                    null
+            );
         } else {
             try {
                 //noinspection unchecked
