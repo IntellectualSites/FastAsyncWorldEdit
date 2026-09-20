@@ -116,6 +116,9 @@ import org.bukkit.craftbukkit.util.TransformerLevelAccessor;
 import org.bukkit.entity.Player;
 import org.enginehub.linbus.tree.LinCompoundTag;
 
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -147,12 +150,28 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
     private static final Codec<DataComponentPatch> COMPONENTS_CODEC = DataComponentPatch.CODEC.optionalFieldOf(
             "components", DataComponentPatch.EMPTY
     ).codec();
+    // Paper renamed CraftItemStack#asCraftMirror to #asBukkitMirror; Spigot still uses the old name and no
+    // longer exists on the (Paper-only) compile classpath, so it has to be resolved reflectively.
+    private static final MethodHandle CRAFT_ITEM_STACK_AS_CRAFT_MIRROR_SPIGOT;
 
     static {
         try {
             CHUNK_HOLDER_WAS_ACCESSIBLE_SINCE_LAST_SAVE = ChunkHolder.class.getDeclaredMethod("wasAccessibleSinceLastSave");
         } catch (NoSuchMethodException ignored) { // may not be present in newer paper versions
         }
+        MethodHandle asCraftMirror = null;
+        if (!PaperSupport.isPaper()) {
+            try {
+                asCraftMirror = MethodHandles.lookup().findStatic(
+                        CraftItemStack.class,
+                        "asCraftMirror",
+                        MethodType.methodType(org.bukkit.inventory.ItemStack.class, ItemStack.class)
+                );
+            } catch (ReflectiveOperationException e) {
+                LOGGER.error("Failed to resolve CraftItemStack#asCraftMirror for Spigot support", e);
+            }
+        }
+        CRAFT_ITEM_STACK_AS_CRAFT_MIRROR_SPIGOT = asCraftMirror;
     }
 
     private final PaperweightMapChunkUtil mapUtil = new PaperweightMapChunkUtil();
@@ -542,9 +561,15 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
                     .getOrThrow();
             stack.applyComponents(patch);
         }
-        //TODO Paper renamed this from asCraftMirror to asBukkitMirror in 26.3 for some odd reason we may need to add a Paper
-        // check here.
-        return CraftItemStack.asBukkitMirror(stack);
+        if (PaperSupport.isPaper()) {
+            return CraftItemStack.asBukkitMirror(stack);
+        } else {
+            try {
+                return (org.bukkit.inventory.ItemStack) CRAFT_ITEM_STACK_AS_CRAFT_MIRROR_SPIGOT.invoke(stack);
+            } catch (Throwable t) {
+                throw new RuntimeException("Failed to invoke CraftItemStack#asCraftMirror", t);
+            }
+        }
     }
 
     @Override
