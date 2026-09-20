@@ -478,7 +478,7 @@ public class BukkitPlayer extends AbstractPlayerActor {
 
     @Override
     public void unregister() {
-        player.removeMetadata("WE", WorldEditPlugin.getInstance());
+        WorldEditPlugin.getInstance().removeCachedPlayer(player);
         plugin.getPermissionAttachmentManager().removeAttachment(player);
         super.unregister();
     }

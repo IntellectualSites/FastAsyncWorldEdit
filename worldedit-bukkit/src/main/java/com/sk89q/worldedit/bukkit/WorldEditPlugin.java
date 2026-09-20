@@ -88,11 +88,11 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.WeakHashMap;
 import java.util.jar.Attributes;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -117,7 +117,7 @@ public class WorldEditPlugin extends JavaPlugin {
     private BukkitPermissionAttachmentManager permissionAttachmentManager;
     // Fawe start
     private BukkitCommandSender bukkitConsoleCommandSender;
-    private final WeakHashMap<Player, BukkitPlayer> playerCache = new WeakHashMap<>();
+    private final HashMap<Player, BukkitPlayer> playerCache = new HashMap<>();
     // Fawe end
 
     @Override
@@ -627,7 +627,9 @@ public class WorldEditPlugin extends JavaPlugin {
 
     //FAWE start
     BukkitPlayer getCachedPlayer(Player player) {
-        return playerCache.get(player);
+        synchronized (playerCache) {
+            return playerCache.get(player);
+        }
     }
 
     BukkitPlayer reCachePlayer(Player player) {
@@ -635,6 +637,12 @@ public class WorldEditPlugin extends JavaPlugin {
             BukkitPlayer wePlayer = new BukkitPlayer(this, player);
             playerCache.put(player, wePlayer);
             return wePlayer;
+        }
+    }
+
+    void removeCachedPlayer(Player player) {
+        synchronized (playerCache) {
+            playerCache.remove(player);
         }
     }
     //FAWE end
