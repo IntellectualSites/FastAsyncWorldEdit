@@ -74,7 +74,7 @@ public class PaperweightBlockMaterial extends BukkitBlockMaterial<Block, BlockSt
 
     @Override
     public boolean isSolid() {
-        return this.blockState.isSolidRender();
+        return this.blockState.isSolid();
     }
 
     @Override
