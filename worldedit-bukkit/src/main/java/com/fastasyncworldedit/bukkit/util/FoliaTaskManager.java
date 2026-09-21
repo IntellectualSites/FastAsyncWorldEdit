@@ -7,10 +7,13 @@ import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.World;
+import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.invoke.MethodHandle;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
@@ -33,19 +36,27 @@ public class FoliaTaskManager extends TaskManager {
         }
     }
 
-    private final AtomicInteger idCounter = new AtomicInteger();
+    private final AtomicInteger idCounter = new AtomicInteger(1);
+    private final Map<Integer, ScheduledTask> tasks = new ConcurrentHashMap<>();
 
     @Override
     public int repeatAsync(@NotNull final Runnable runnable, final int interval) {
-        // TODO (folia) return some kind of own ScheduledTask instead of int
-        Bukkit.getAsyncScheduler().runAtFixedRate(
+        int id = idCounter.getAndIncrement();
+        ScheduledTask task = Bukkit.getAsyncScheduler().runAtFixedRate(
                 WorldEditPlugin.getInstance(),
-                asConsumer(runnable),
-                0,
+                scheduledTask -> {
+                    if (scheduledTask.isCancelled()) {
+                        tasks.remove(id);
+                        return;
+                    }
+                    runnable.run();
+                },
+                ticksToMs(interval),
                 ticksToMs(interval),
                 TimeUnit.MILLISECONDS
         );
-        return idCounter.getAndIncrement();
+        tasks.put(id, task);
+        return id;
     }
 
     @Override
@@ -71,6 +82,10 @@ public class FoliaTaskManager extends TaskManager {
 
     @Override
     public void later(@NotNull final Runnable runnable, final Location location, final int delay) {
+        if (delay <= 0) {
+            task(runnable, (World) location.getExtent(), location.getBlockX() >> 4, location.getBlockZ() >> 4);
+            return;
+        }
         Bukkit.getRegionScheduler().runDelayed(
                 WorldEditPlugin.getInstance(),
                 BukkitAdapter.adapt(location),
@@ -81,6 +96,10 @@ public class FoliaTaskManager extends TaskManager {
 
     @Override
     public void laterGlobal(@NotNull final Runnable runnable, final int delay) {
+        if (delay <= 0) {
+            taskGlobal(runnable);
+            return;
+        }
         Bukkit.getGlobalRegionScheduler().runDelayed(
                 WorldEditPlugin.getInstance(),
                 asConsumer(runnable),
@@ -90,6 +109,10 @@ public class FoliaTaskManager extends TaskManager {
 
     @Override
     public void laterAsync(@NotNull final Runnable runnable, final int delay) {
+        if (delay <= 0) {
+            async(runnable);
+            return;
+        }
         Bukkit.getAsyncScheduler().runDelayed(
                 WorldEditPlugin.getInstance(),
                 asConsumer(runnable),
@@ -100,7 +123,12 @@ public class FoliaTaskManager extends TaskManager {
 
     @Override
     public void cancel(final int task) {
-        fail("Not implemented");
+        if (task != -1) {
+            ScheduledTask scheduledTask = tasks.remove(task);
+            if (scheduledTask != null) {
+                scheduledTask.cancel();
+            }
+        }
     }
 
     @Override
