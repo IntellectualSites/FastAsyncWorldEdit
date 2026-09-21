@@ -53,6 +53,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.enginehub.linbus.tree.LinCompoundTag;
 
+import javax.annotation.Nullable;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -66,7 +67,6 @@ import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import javax.annotation.Nullable;
 
 /**
  * Handles converting all Pre 1.13.2 data using the Legacy DataFix System (ported to 1.13.2)
@@ -86,17 +86,17 @@ import javax.annotation.Nullable;
  * </p>
  */
 @SuppressWarnings({
-    "UnnecessarilyQualifiedStaticUsage",
-    "StringSplitter",
-    "ImmutableEnumChecker",
-    "MissingOverride",
-    "StaticAssignmentInConstructor",
-    "EffectivelyPrivate",
-    "FallThrough",
-    "MutablePublicArray",
-    "unused",
-    "unchecked",
-    "rawtypes"
+        "UnnecessarilyQualifiedStaticUsage",
+        "StringSplitter",
+        "ImmutableEnumChecker",
+        "MissingOverride",
+        "StaticAssignmentInConstructor",
+        "EffectivelyPrivate",
+        "FallThrough",
+        "MutablePublicArray",
+        "unused",
+        "unchecked",
+        "rawtypes"
 })
 class PaperweightDataConverters implements com.sk89q.worldedit.world.DataFixer {
 
@@ -146,8 +146,11 @@ class PaperweightDataConverters implements com.sk89q.worldedit.world.DataFixer {
 
     private String nbtToState(net.minecraft.nbt.CompoundTag tagCompound) {
         StringBuilder sb = new StringBuilder();
-        sb.append(tagCompound.getString("Name").get());
-        tagCompound.getCompound("Properties").ifPresent(props -> {
+        // Minecraft 26.3's DataFixerUpper emits the block name/properties keyed as "id"/"properties"
+        // (lowercase) rather than the historical "Name"/"Properties".
+        String name = tagCompound.getString("Name").or(() -> tagCompound.getString("id")).orElse("minecraft:air");
+        sb.append(name);
+        tagCompound.getCompound("Properties").or(() -> tagCompound.getCompound("properties")).ifPresent(props -> {
             sb.append('[');
             sb.append(props.keySet().stream().map(k -> k + "=" + props.getString(k).get().replace("\"", "")).collect(Collectors.joining(",")));
             sb.append(']');
