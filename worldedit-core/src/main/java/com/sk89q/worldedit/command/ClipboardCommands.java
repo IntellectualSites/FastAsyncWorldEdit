@@ -102,6 +102,7 @@ import java.nio.file.Files;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -530,74 +531,103 @@ public class ClipboardCommands {
             @Switch(name = 'x', desc = "Remove existing entities in the affected region")
                     boolean removeEntities,
             @Switch(name = 'v', desc = "Don't paste structure void blocks and keep the target block state")
-                    boolean ignoreStructureVoidBlocks
+                    boolean ignoreStructureVoidBlocks,
+            @Switch(name = 'r', desc = "Rotate the clipboard by a random multiple of 90 degrees (y-axis)")
+                    boolean randomRotate
             //FAWE end
     ) throws WorldEditException {
 
         ClipboardHolder holder = session.getClipboard();
-        //FAWE start - use place
-        if (holder.getTransform().isIdentity() && sourceMask == null && !ignoreStructureVoidBlocks) {
-            place(actor, world, session, editSession, ignoreAirBlocks, atOrigin, selectPasted, onlySelect,
-                    pasteEntities, pasteBiomes, removeEntities
-            );
-            return;
+        final Transform originalTransform = holder.getTransform();
+        if (randomRotate) {
+            final int quarters = nextRandomPasteRotation(session.getLastRandomPasteRotation());
+            session.setLastRandomPasteRotation(quarters);
+            holder.setTransform(new AffineTransform().rotateY(90 * quarters).combine(originalTransform));
         }
-        //FAWE end
-        Clipboard clipboard = holder.getClipboard();
-        Region region = clipboard.getRegion();
-        List<Component> messages = Lists.newArrayList();
-
-        BlockVector3 to = atOrigin ? clipboard.getOrigin() : session.getPlacementPosition(actor);
-        //FAWE start
-        checkPaste(actor, editSession, to, holder, clipboard);
-        //FAWE end
-
-        if (!onlySelect) {
-            final Mask finalSourceMask = ignoreStructureVoidBlocks ?
-                    MaskIntersection.of(sourceMask, new InverseSingleBlockTypeMask(clipboard, BlockTypes.STRUCTURE_VOID)) :
-                    sourceMask;
-            Operation operation = holder
-                    .createPaste(editSession)
-                    .to(to)
-                    .ignoreAirBlocks(ignoreAirBlocks)
-                    .copyBiomes(pasteBiomes)
-                    .copyEntities(pasteEntities)
-                    .maskSource(finalSourceMask)
-                    .build();
-            Operations.completeLegacy(operation);
-            messages.addAll(Lists.newArrayList(operation.getStatusMessages()));
-        }
-
-        if (selectPasted || onlySelect || removeEntities) {
-            BlockVector3 clipboardOffset = clipboard.getRegion().getMinimumPoint().subtract(clipboard.getOrigin());
-            Transform transform = MutatingOperationTransformHolder.transform(holder.getTransform()); //FAWE: mutate transform
-            Vector3 realTo = to.toVector3().add(transform.apply(clipboardOffset.toVector3()));
-            Vector3 max = realTo.add(transform.apply(region.getMaximumPoint().subtract(region.getMinimumPoint()).toVector3()));
-
-            // FAWE start - entity removal
-            if (removeEntities) {
-                editSession.removeEntities(new CuboidRegion(realTo.toBlockPoint(), max.toBlockPoint()));
+        try {
+            //FAWE start - use place
+            if (holder.getTransform().isIdentity() && sourceMask == null && !ignoreStructureVoidBlocks) {
+                place(actor, world, session, editSession, ignoreAirBlocks, atOrigin, selectPasted, onlySelect,
+                        pasteEntities, pasteBiomes, removeEntities
+                );
+                return;
             }
-            if (selectPasted || onlySelect) {
-                //FAWE end
-                final CuboidRegionSelector selector;
-                if (session.getRegionSelector(world) instanceof ExtendingCuboidRegionSelector) {
-                    selector = new ExtendingCuboidRegionSelector(world, realTo.toBlockPoint(), max.toBlockPoint());
-                } else {
-                    selector = new CuboidRegionSelector(world, realTo.toBlockPoint(), max.toBlockPoint());
+            //FAWE end
+            Clipboard clipboard = holder.getClipboard();
+            Region region = clipboard.getRegion();
+            List<Component> messages = Lists.newArrayList();
+
+            BlockVector3 to = atOrigin ? clipboard.getOrigin() : session.getPlacementPosition(actor);
+            //FAWE start
+            checkPaste(actor, editSession, to, holder, clipboard);
+            //FAWE end
+
+            if (!onlySelect) {
+                final Mask finalSourceMask = ignoreStructureVoidBlocks ?
+                        MaskIntersection.of(sourceMask, new InverseSingleBlockTypeMask(clipboard, BlockTypes.STRUCTURE_VOID)) :
+                        sourceMask;
+                Operation operation = holder
+                        .createPaste(editSession)
+                        .to(to)
+                        .ignoreAirBlocks(ignoreAirBlocks)
+                        .copyBiomes(pasteBiomes)
+                        .copyEntities(pasteEntities)
+                        .maskSource(finalSourceMask)
+                        .build();
+                Operations.completeLegacy(operation);
+                messages.addAll(Lists.newArrayList(operation.getStatusMessages()));
+            }
+
+            if (selectPasted || onlySelect || removeEntities) {
+                BlockVector3 clipboardOffset = clipboard.getRegion().getMinimumPoint().subtract(clipboard.getOrigin());
+                Transform transform = MutatingOperationTransformHolder.transform(holder.getTransform()); //FAWE: mutate transform
+                Vector3 realTo = to.toVector3().add(transform.apply(clipboardOffset.toVector3()));
+                Vector3 max = realTo.add(transform.apply(region.getMaximumPoint().subtract(region.getMinimumPoint()).toVector3()));
+
+                // FAWE start - entity removal
+                if (removeEntities) {
+                    editSession.removeEntities(new CuboidRegion(realTo.toBlockPoint(), max.toBlockPoint()));
                 }
-                session.setRegionSelector(world, selector);
-                selector.learnChanges();
-                selector.explainRegionAdjust(actor, session);
+                if (selectPasted || onlySelect) {
+                    //FAWE end
+                    final CuboidRegionSelector selector;
+                    if (session.getRegionSelector(world) instanceof ExtendingCuboidRegionSelector) {
+                        selector = new ExtendingCuboidRegionSelector(world, realTo.toBlockPoint(), max.toBlockPoint());
+                    } else {
+                        selector = new CuboidRegionSelector(world, realTo.toBlockPoint(), max.toBlockPoint());
+                    }
+                    session.setRegionSelector(world, selector);
+                    selector.learnChanges();
+                    selector.explainRegionAdjust(actor, session);
+                }
+            }
+
+            if (onlySelect) {
+                actor.print(Caption.of("worldedit.paste.selected"));
+            } else {
+                actor.print(Caption.of("worldedit.paste.pasted", TextComponent.of(to.toString())));
+            }
+            messages.forEach(actor::print);
+        } finally {
+            if (randomRotate) {
+                holder.setTransform(originalTransform);
             }
         }
+    }
 
-        if (onlySelect) {
-            actor.print(Caption.of("worldedit.paste.selected"));
-        } else {
-            actor.print(Caption.of("worldedit.paste.pasted", TextComponent.of(to.toString())));
+    /**
+     * Pick a rotation in quarter turns around the y-axis, never the one the previous paste used.
+     *
+     * @param previous the previous paste's rotation, or a negative value if there was none
+     * @return a rotation in the range {@code [0, 3]}, different from {@code previous}
+     * @since TODO
+     */
+    private static int nextRandomPasteRotation(int previous) {
+        if (previous < 0) {
+            return ThreadLocalRandom.current().nextInt(4);
         }
-        messages.forEach(actor::print);
+
+        return (previous + 1 + ThreadLocalRandom.current().nextInt(3)) % 4;
     }
 
     //FAWE start
