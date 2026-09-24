@@ -102,6 +102,7 @@ import java.nio.file.Files;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -530,11 +531,38 @@ public class ClipboardCommands {
             @Switch(name = 'x', desc = "Remove existing entities in the affected region")
                     boolean removeEntities,
             @Switch(name = 'v', desc = "Don't paste structure void blocks and keep the target block state")
-                    boolean ignoreStructureVoidBlocks
+                    boolean ignoreStructureVoidBlocks,
+            @Switch(name = 'r', desc = "Rotate the clipboard by a random multiple of 90 degrees (y-axis)")
+                    boolean randomRotate
             //FAWE end
     ) throws WorldEditException {
-
         ClipboardHolder holder = session.getClipboard();
+        //FAWE start - random rotation
+        final Transform originalTransform = holder.getTransform();
+        final int quarters = randomRotate ? nextRandomPasteRotation(session.getLastRandomPasteRotation()) : -1;
+        if (randomRotate) {
+            holder.setTransform(new AffineTransform().rotateY(90 * quarters).combine(originalTransform));
+        }
+        try {
+            doPaste(actor, world, session, editSession, holder, ignoreAirBlocks, atOrigin, selectPasted, onlySelect,
+                    pasteEntities, pasteBiomes, sourceMask, removeEntities, ignoreStructureVoidBlocks
+            );
+        } finally {
+            if (randomRotate) {
+                holder.setTransform(originalTransform);
+            }
+        }
+        if (randomRotate && !onlySelect) {
+            session.setLastRandomPasteRotation(quarters);
+        }
+    }
+
+    private void doPaste(
+            Actor actor, World world, LocalSession session, EditSession editSession, ClipboardHolder holder,
+            boolean ignoreAirBlocks, boolean atOrigin, boolean selectPasted, boolean onlySelect, boolean pasteEntities,
+            boolean pasteBiomes, Mask sourceMask, boolean removeEntities, boolean ignoreStructureVoidBlocks
+    ) throws WorldEditException {
+        //FAWE end
         //FAWE start - use place
         if (holder.getTransform().isIdentity() && sourceMask == null && !ignoreStructureVoidBlocks) {
             place(actor, world, session, editSession, ignoreAirBlocks, atOrigin, selectPasted, onlySelect,
@@ -598,6 +626,21 @@ public class ClipboardCommands {
             actor.print(Caption.of("worldedit.paste.pasted", TextComponent.of(to.toString())));
         }
         messages.forEach(actor::print);
+    }
+
+    /**
+     * Pick a rotation in quarter turns around the y-axis, never the one the previous paste used.
+     *
+     * @param previous the previous paste's rotation, or a negative value if there was none
+     * @return a rotation in the range {@code [0, 3]}, different from {@code previous}
+     * @since TODO
+     */
+    private static int nextRandomPasteRotation(int previous) {
+        if (previous < 0) {
+            return ThreadLocalRandom.current().nextInt(4);
+        }
+
+        return (previous + 1 + ThreadLocalRandom.current().nextInt(3)) % 4;
     }
 
     //FAWE start
