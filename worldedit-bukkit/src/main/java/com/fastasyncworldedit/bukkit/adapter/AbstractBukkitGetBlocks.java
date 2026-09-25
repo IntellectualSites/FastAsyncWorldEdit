@@ -23,6 +23,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantLock;
 
 public abstract class AbstractBukkitGetBlocks<ServerLevel, LevelChunk> extends CharGetBlocks {
@@ -34,6 +36,10 @@ public abstract class AbstractBukkitGetBlocks<ServerLevel, LevelChunk> extends C
     protected final int chunkZ;
     protected final ReentrantLock callLock = new ReentrantLock();
     protected final ConcurrentHashMap<Integer, IChunkGet> copies = new ConcurrentHashMap<>();
+    // Completes when the post-processors of the last write to this chunk have run. The next write runs its
+    // post-processors after it, so post-processors see the writes to one chunk in the order they were made.
+    private final AtomicReference<CompletableFuture<Void>> lastPostProcess = new AtomicReference<>(
+            CompletableFuture.completedFuture(null));
     protected final IntPair chunkPos;
     protected final int minHeight;
     protected final int maxHeight;
@@ -87,9 +93,11 @@ public abstract class AbstractBukkitGetBlocks<ServerLevel, LevelChunk> extends C
             }
         }
         final int finalCopyKey = copyKey;
+        // A copy is created exactly when the edit has post-processors
+        final boolean postProcess = createCopy;
         // Run immediately if possible
         if (chunk != null) {
-            return tryInternalCall(set, finalizer, finalCopyKey, chunk, nmsWorld);
+            return tryInternalCall(set, finalizer, finalCopyKey, chunk, nmsWorld, postProcess);
         }
         // Submit via the STQE as that will help handle excessive queuing by waiting for the submission count to fall below the
         // target size
@@ -100,6 +108,7 @@ public abstract class AbstractBukkitGetBlocks<ServerLevel, LevelChunk> extends C
                 finalCopyKey,
                 nmsChunk,
                 nmsWorld,
+                postProcess,
                 extent
         )));
         // If we have re-submitted, return a completed future to prevent potential deadlocks where a future reliant on the
@@ -114,26 +123,44 @@ public abstract class AbstractBukkitGetBlocks<ServerLevel, LevelChunk> extends C
             int copyKey,
             LevelChunk nmsChunk,
             ServerLevel nmsWorld,
+            boolean postProcess,
             Extent extent
     ) {
         FaweThreadUtil.setCurrentExtent(extent);
         try {
-            return tryInternalCall(set, finalizer, copyKey, nmsChunk, nmsWorld);
+            return tryInternalCall(set, finalizer, copyKey, nmsChunk, nmsWorld, postProcess);
         } finally {
             FaweThreadUtil.clearCurrentExtent();
         }
     }
 
+    @SuppressWarnings({"rawtypes", "unchecked"})
     private <T extends Future<T>> T tryInternalCall(
             IChunkSet set,
             Runnable finalizer,
             int copyKey,
             LevelChunk nmsChunk,
-            ServerLevel nmsWorld
+            ServerLevel nmsWorld,
+            boolean postProcess
     ) {
+        // A write on the main thread is not ordered: its queue may wait on the main thread for the post-processors, and the
+        // post-processors of an earlier write may wait for the main thread
+        OrderedFinalizer ordered = null;
+        if (postProcess && !Fawe.isMainThread()) {
+            CompletableFuture<Void> done = new CompletableFuture<>();
+            ordered = new OrderedFinalizer(lastPostProcess.getAndSet(done), done, finalizer);
+        }
         try {
-            return internalCall(set, finalizer, copyKey, nmsChunk, nmsWorld);
+            if (ordered == null) {
+                return internalCall(set, finalizer, copyKey, nmsChunk, nmsWorld);
+            }
+            final T result = internalCall(set, ordered, copyKey, nmsChunk, nmsWorld);
+            // The queue waits until the post-processors of this write have run, as it does when they run unordered
+            return (T) (Future) ordered.done.thenApply(ignored -> result);
         } catch (Throwable e) {
+            if (ordered != null) {
+                ordered.skip();
+            }
             LOGGER.error("Error performing chunk call at chunk {},{}", chunkX, chunkZ, e);
             return null;
         } finally {
@@ -160,12 +187,20 @@ public abstract class AbstractBukkitGetBlocks<ServerLevel, LevelChunk> extends C
                         }
                     }
                     if (callback != null) {
-                        return queueHandler.async(callback, null);
+                        return queueHandler.async(() -> {
+                            try {
+                                callback.run();
+                            } finally {
+                                // The callback may throw before it runs the finalizer
+                                skip(finalizer);
+                            }
+                        }, null);
                     } else if (finalizer != null) {
                         return queueHandler.async(finalizer, null);
                     }
                     return null;
                 } catch (Throwable e) {
+                    skip(finalizer);
                     LOGGER.error("Error performing final chunk calling at {},{}", chunkX, chunkZ, e);
                     throw e;
                 }
@@ -230,6 +265,61 @@ public abstract class AbstractBukkitGetBlocks<ServerLevel, LevelChunk> extends C
     @Override
     public int getMinY() {
         return minHeight;
+    }
+
+    private static void skip(Runnable finalizer) {
+        if (finalizer instanceof OrderedFinalizer ordered) {
+            ordered.skip();
+        }
+    }
+
+    /**
+     * Runs a finalizer, which runs the post-processors, after the finalizer of the previous write to the same chunk. It chains
+     * on that write and never blocks a thread. A path that will never run the finalizer must call {@link #skip()}, so that the
+     * next write does not wait for it.
+     */
+    private static final class OrderedFinalizer implements Runnable {
+
+        private final CompletableFuture<Void> previous;
+        private final CompletableFuture<Void> done;
+        private final Runnable finalizer;
+        private final AtomicBoolean claimed = new AtomicBoolean();
+
+        private OrderedFinalizer(CompletableFuture<Void> previous, CompletableFuture<Void> done, Runnable finalizer) {
+            this.previous = previous;
+            this.done = done;
+            this.finalizer = finalizer;
+        }
+
+        @Override
+        public void run() {
+            if (claimed.compareAndSet(false, true)) {
+                previous.whenComplete((ignored, error) -> {
+                    // The previous write completes on the main thread if its sync tasks fail. Post-processors do not run there.
+                    if (Fawe.isMainThread()) {
+                        Fawe.instance().getQueueHandler().async(this::finish);
+                    } else {
+                        finish();
+                    }
+                });
+            }
+        }
+
+        private void finish() {
+            try {
+                finalizer.run();
+                done.complete(null);
+            } catch (Throwable e) {
+                done.completeExceptionally(e);
+            }
+        }
+
+        private void skip() {
+            if (claimed.compareAndSet(false, true)) {
+                done.complete(null);
+            }
+        }
+
     }
 
 }
