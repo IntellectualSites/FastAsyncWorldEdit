@@ -1,6 +1,5 @@
 package com.fastasyncworldedit.core.extent.clipboard;
 
-import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.entity.BaseEntity;
@@ -41,7 +40,6 @@ public abstract class ReadOnlyClipboard extends SimpleClipboard {
     }
 
     public static ReadOnlyClipboard of(Extent extent, final Region region) {
-        Fawe.instance().getQueueHandler().unCache();
         return of(() -> extent, region);
     }
 
@@ -54,7 +52,6 @@ public abstract class ReadOnlyClipboard extends SimpleClipboard {
     }
 
     public static ReadOnlyClipboard of(Extent extent, final Region region, boolean copyEntities, boolean copyBiomes) {
-        Fawe.instance().getQueueHandler().unCache();
         return WorldCopyClipboard.of(extent, region, copyEntities, copyBiomes);
     }
 

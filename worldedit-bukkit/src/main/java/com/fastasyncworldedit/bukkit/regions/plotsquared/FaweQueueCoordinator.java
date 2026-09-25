@@ -38,7 +38,6 @@ public class FaweQueueCoordinator extends QueueCoordinator {
         super(world);
         this.world = world;
         instance = Fawe.instance().getQueueHandler().getQueue(world);
-        Fawe.instance().getQueueHandler().unCache();
     }
 
     @Override

@@ -13,7 +13,6 @@ import com.fastasyncworldedit.core.queue.Trimable;
 import com.fastasyncworldedit.core.queue.implementation.chunk.ChunkCache;
 import com.fastasyncworldedit.core.util.MemUtil;
 import com.fastasyncworldedit.core.util.TaskManager;
-import com.fastasyncworldedit.core.util.collection.CleanableThreadLocal;
 import com.fastasyncworldedit.core.util.task.FaweForkJoinWorkerThreadFactory;
 import com.fastasyncworldedit.core.wrappers.WorldWrapper;
 import com.google.common.util.concurrent.Futures;
@@ -89,7 +88,6 @@ public abstract class QueueHandler implements Trimable, Runnable {
     private final ConcurrentLinkedQueue<FutureTask> syncWhenFree = new ConcurrentLinkedQueue<>();
 
     private final Map<World, WeakReference<IChunkCache<IChunkGet>>> chunkGetCache = new HashMap<>();
-    private final CleanableThreadLocal<IQueueExtent<IQueueChunk>> queuePool = new CleanableThreadLocal<>(QueueHandler.this::create);
     /**
      * Used to calculate elapsed time in milliseconds and ensure block placement doesn't lag the
      * server
@@ -438,18 +436,12 @@ public abstract class QueueHandler implements Trimable, Runnable {
     }
 
     /**
-     * Sets the current thread's {@link IQueueExtent} instance in the queue pool to null.
+     * Does nothing. Queues are no longer pooled per thread: {@link #getQueue(World)} returns a new queue on each call.
+     *
+     * @deprecated No replacement needed.
      */
+    @Deprecated(forRemoval = true, since = "TODO")
     public void unCache() {
-        queuePool.remove();
-    }
-
-    private IQueueExtent<IQueueChunk> pool() {
-        IQueueExtent<IQueueChunk> queue = queuePool.get();
-        if (queue == null) {
-            queuePool.set(queue = queuePool.init());
-        }
-        return queue;
     }
 
     /**
@@ -505,7 +497,7 @@ public abstract class QueueHandler implements Trimable, Runnable {
      * @return New queue for given world
      */
     public IQueueExtent<IQueueChunk> getQueue(World world, IBatchProcessor processor, IBatchProcessor postProcessor) {
-        final IQueueExtent<IQueueChunk> queue = pool();
+        final IQueueExtent<IQueueChunk> queue = create();
         IChunkCache<IChunkGet> cacheGet = getOrCreateWorldCache(world);
         IChunkCache<IChunkSet> set = null; // TODO cache?
         queue.init(world, cacheGet, set);
