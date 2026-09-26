@@ -16,12 +16,9 @@ import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.command.util.SuggestionHelper;
-import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
-import com.sk89q.worldedit.world.biome.Biomes;
-import com.sk89q.worldedit.world.registry.BiomeRegistry;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -68,11 +65,7 @@ public class PlotSetBiome extends Command {
                 TagResolver.resolver("value", Tag.inserting(Component.text(getUsage())))
         );
         final Set<CuboidRegion> regions = plot.getRegions();
-        BiomeRegistry biomeRegistry =
-                WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS).getRegistries()
-                        .getBiomeRegistry();
-        Collection<BiomeType> knownBiomes = BiomeTypes.values();
-        final BiomeType biome = Biomes.findBiomeByName(knownBiomes, args[0], biomeRegistry);
+        final BiomeType biome = BiomeTypes.get(args[0].toLowerCase(Locale.ENGLISH));
         if (biome == null) {
             String biomes = StringMan.join(
                     BiomeType.REGISTRY.values(),
