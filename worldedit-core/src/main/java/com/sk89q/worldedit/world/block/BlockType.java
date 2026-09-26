@@ -75,7 +75,7 @@ public class BlockType implements Keyed, Pattern {
     private ItemType itemType;
 
     protected BlockType(String id, int internalId, List<BlockState> states) {
-        int i = id.indexOf("[");
+        int i = id.indexOf('[');
         this.id = i == -1 ? id : id.substring(0, i);
         this.settings = new BlockTypesCache.Settings(this, id, internalId, states);
     }

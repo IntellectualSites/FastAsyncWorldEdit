@@ -53,7 +53,7 @@ public abstract class Scroll implements ScrollTool {
         parserContext.setSession(session);
         parserContext.setTryLegacy(player.getLimit().ALLOW_LEGACY);
         switch (mode) {
-            case CLIPBOARD:
+            case CLIPBOARD -> {
                 if (arguments.size() != 2) {
                     if (message) {
                         player.print(Caption.of("fawe.error.command.syntax", "clipboard [file]"));
@@ -70,7 +70,8 @@ public abstract class Scroll implements ScrollTool {
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
-            case MASK:
+            }
+            case MASK -> {
                 if (arguments.size() < 2) {
                     if (message) {
                         player.print(Caption.of("fawe.error.command.syntax", "mask [mask 1] [mask 2] [mask 3]..."));
@@ -83,7 +84,8 @@ public abstract class Scroll implements ScrollTool {
                     masks[i - 1] = WorldEdit.getInstance().getMaskFactory().parseFromInput(arg, parserContext);
                 }
                 return (new ScrollMask(tool, masks));
-            case PATTERN:
+            }
+            case PATTERN -> {
                 if (arguments.size() < 2) {
                     if (message) {
                         player.print(Caption.of("fawe.error.command.syntax", "pattern [pattern 1] [pattern 2] [pattern 3]..."));
@@ -96,17 +98,22 @@ public abstract class Scroll implements ScrollTool {
                     patterns[i - 1] = WorldEdit.getInstance().getPatternFactory().parseFromInput(arg, parserContext);
                 }
                 return (new ScrollPattern(tool, patterns));
-            case TARGET_OFFSET:
+            }
+            case TARGET_OFFSET -> {
                 return (new ScrollTargetOffset(tool));
-            case RANGE:
+            }
+            case RANGE -> {
                 return (new ScrollRange(tool));
-            case SIZE:
+            }
+            case SIZE -> {
                 return (new ScrollSize(tool));
-            case TARGET:
+            }
+            case TARGET -> {
                 return (new ScrollTarget(tool));
-            default:
+            }
+            default -> {
                 return null;
-
+            }
         }
     }
 

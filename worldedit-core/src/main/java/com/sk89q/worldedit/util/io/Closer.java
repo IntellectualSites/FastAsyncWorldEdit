@@ -123,7 +123,7 @@ public final class Closer implements Closeable {
      */
     public RuntimeException rethrow(Throwable e) throws IOException {
         thrown = e;
-        Throwables.propagateIfPossible(e, IOException.class);
+        Throwables.throwIfInstanceOf(e, IOException.class);
         Throwables.throwIfUnchecked(e);
         throw new RuntimeException(e);
     }
@@ -147,8 +147,8 @@ public final class Closer implements Closeable {
             Class<X> declaredType
     ) throws IOException, X {
         thrown = e;
-        Throwables.propagateIfPossible(e, IOException.class);
-        Throwables.propagateIfPossible(e, declaredType);
+        Throwables.throwIfInstanceOf(e, IOException.class);
+        Throwables.throwIfInstanceOf(e, declaredType);
         Throwables.throwIfUnchecked(e);
         throw new RuntimeException(e);
     }
@@ -172,8 +172,9 @@ public final class Closer implements Closeable {
             Throwable e, Class<X1> declaredType1, Class<X2> declaredType2
     ) throws IOException, X1, X2 {
         thrown = e;
-        Throwables.propagateIfPossible(e, IOException.class);
-        Throwables.propagateIfPossible(e, declaredType1, declaredType2);
+        Throwables.throwIfInstanceOf(e, IOException.class);
+        Throwables.throwIfInstanceOf(e, declaredType1);
+        Throwables.throwIfInstanceOf(e, declaredType2);
         Throwables.throwIfUnchecked(e);
         throw new RuntimeException(e);
     }
@@ -216,7 +217,7 @@ public final class Closer implements Closeable {
         }
 
         if (thrown == null && throwable != null) {
-            Throwables.propagateIfPossible(throwable, IOException.class);
+            Throwables.throwIfInstanceOf(throwable, IOException.class);
             throw new AssertionError(throwable); // not possible
         }
     }

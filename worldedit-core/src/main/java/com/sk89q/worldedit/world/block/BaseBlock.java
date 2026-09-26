@@ -139,7 +139,7 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
      */
     @Override
     public Map<Property<?>, Object> getStates() {
-        return toImmutableState().getStates();
+        return this.blockState.getStates();
     }
 
     @Override
@@ -149,7 +149,7 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
 
     @Override
     public <V> BaseBlock with(Property<V> property, V value) {
-        return toImmutableState().with(property, value).toBaseBlock(getNbtReference());
+        return this.blockState.with(property, value).toBaseBlock(getNbtReference());
     }
 
     /**
@@ -160,7 +160,7 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
      */
     @Override
     public <V> V getState(Property<V> property) {
-        return toImmutableState().getState(property);
+        return this.blockState.getState(property);
     }
 
     @Override
@@ -188,14 +188,13 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
      */
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof BaseBlock)) {
+        if (!(o instanceof BaseBlock otherBlock)) {
             if (nbtData == null && o instanceof BlockStateHolder) {
                 return Objects.equals(toImmutableState(), ((BlockStateHolder<?>) o).toImmutableState());
             }
             return false;
         }
 
-        final BaseBlock otherBlock = (BaseBlock) o;
 
         return this.blockState.equalsFuzzy(otherBlock.blockState) && Objects.equals(getNbt(), otherBlock.getNbt());
     }
@@ -276,22 +275,22 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
 
     @Override
     public int getInternalBlockTypeId() {
-        return toImmutableState().getInternalBlockTypeId();
+        return this.blockState.getInternalBlockTypeId();
     }
 
     @Override
     public int getInternalPropertiesId() {
-        return toImmutableState().getInternalPropertiesId();
+        return this.blockState.getInternalPropertiesId();
     }
 
     @Override
     public <V> BaseBlock with(PropertyKey property, V value) {
-        return toImmutableState().with(property, value).toBaseBlock(getNbtReference());
+        return this.blockState.with(property, value).toBaseBlock(getNbtReference());
     }
 
     @Override
     public <V> V getState(PropertyKey property) {
-        return toImmutableState().getState(property);
+        return this.blockState.getState(property);
     }
 
     public BlockState toBlockState() {

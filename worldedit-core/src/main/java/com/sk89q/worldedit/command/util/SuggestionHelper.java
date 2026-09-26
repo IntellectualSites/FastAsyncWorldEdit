@@ -95,17 +95,15 @@ public final class SuggestionHelper {
                     final List<? extends Property<?>> matchingProps = propertyMap.entrySet().stream()
                             .filter(p -> !matchedProperties.contains(p.getKey()) && p.getKey().startsWith(matchProp))
                             .map(Map.Entry::getValue).collect(Collectors.toList());
-                    switch (matchingProps.size()) {
-                        case 0:
-                            return propertyMap.keySet().stream().filter(p -> !matchedProperties.contains(p)).map(prop ->
-                                    lastValidInput + prop + "=");
-                        case 1:
-                            return matchingProps.get(0).getValues().stream().map(val ->
-                                    lastValidInput + matchingProps.get(0).getName() + "="
-                                            + val.toString().toLowerCase(Locale.ROOT));
-                        default:
-                            return matchingProps.stream().map(p -> lastValidInput + p.getName() + "=");
-                    }
+                    return switch (matchingProps.size()) {
+                        case 0 -> propertyMap.keySet().stream().filter(p -> !matchedProperties.contains(p)).map(prop ->
+                                lastValidInput + prop + "=");
+                        case 1 -> matchingProps.getFirst().getValues().stream().map(val ->
+                                lastValidInput + matchingProps.getFirst().getName() + "="
+                                        + val.toString().toLowerCase(Locale.ROOT)
+                        );
+                        default -> matchingProps.stream().map(p -> lastValidInput + p.getName() + "=");
+                    };
                 } else {
                     Property<?> prop = propertyMap.get(matchProp);
                     if (prop == null) {

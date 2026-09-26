@@ -50,15 +50,19 @@ public class BukkitImplLoader {
     private static final String CLASS_SUFFIX = ".class";
 
     private static final String LOAD_ERROR_MESSAGE =
-            //FAWE start - exchange WorldEdit to FAWE & suggest to update Fawe & the server software
-            "\n**********************************************\n"
-                    + "** This FastAsyncWorldEdit version does not fully support your version of Bukkit.\n"
-                    + "** You can fix this by:\n"
-                    + "** - Updating your server version (Check /version to see how many versions you are behind)\n** - Updating FAWE\n"
-                    + "**\n" + "** When working with blocks or undoing, chests will be empty, signs\n"
-                    + "** will be blank, and so on. There will be no support for entity\n"
-                    + "** and block property-related functions.\n"
-                    + "**********************************************\n";
+            //FAWE start - exchange WorldEdit to FAWE & suggest to update FAWE & the server software
+            """  
+            **********************************************
+            ** This FastAsyncWorldEdit version does not fully support your version of Bukkit.
+            ** You can fix this by:
+            ** - Updating your server version (Check /version to see how many versions you are behind)
+            ** - Updating FAWE
+            **
+            ** When working with blocks or undoing, chests will be empty, signs
+            ** will be blank, and so on. There will be no support for entity
+            ** and block property-related functions.
+            **********************************************
+            """;
     //FAWE end
 
     /**
@@ -89,9 +93,8 @@ public class BukkitImplLoader {
      * @throws IOException thrown on I/O error
      */
     public void addFromJar(File file) throws IOException {
-        Closer closer = Closer.create();
+        try (Closer closer = Closer.create()) {
         JarFile jar = closer.register(new JarFile(file));
-        try {
             Enumeration<JarEntry> entries = jar.entries();
             while (entries.hasMoreElements()) {
                 JarEntry jarEntry = entries.nextElement();
@@ -111,8 +114,6 @@ public class BukkitImplLoader {
                     adapterCandidates.add(className);
                 }
             }
-        } finally {
-            closer.close();
         }
     }
 

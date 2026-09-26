@@ -118,8 +118,8 @@ public class AdaptedMap<K, V, K2, V2> implements IAdaptedMap<K, V, K2, V2> {
 
         @Override
         public boolean equals(Object o) {
-            if (o instanceof Entry) {
-                return Objects.equals(((Entry) o).getKey(), getKey()) && Objects.equals(((Entry) o).getValue(), getValue());
+            if (o instanceof Entry entry) {
+                return Objects.equals(entry.getKey(), getKey()) && Objects.equals(entry.getValue(), getValue());
             }
             return false;
         }

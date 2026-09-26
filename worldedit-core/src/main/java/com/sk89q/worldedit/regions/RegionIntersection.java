@@ -100,7 +100,7 @@ public class RegionIntersection extends AbstractRegion {
 
     @Override
     public BlockVector3 getMinimumPoint() {
-        BlockVector3 minimum = regions.get(0).getMinimumPoint();
+        BlockVector3 minimum = regions.getFirst().getMinimumPoint();
         for (int i = 1; i < regions.size(); i++) {
             minimum = regions.get(i).getMinimumPoint().getMinimum(minimum);
         }
@@ -109,7 +109,7 @@ public class RegionIntersection extends AbstractRegion {
 
     @Override
     public BlockVector3 getMaximumPoint() {
-        BlockVector3 maximum = regions.get(0).getMaximumPoint();
+        BlockVector3 maximum = regions.getFirst().getMaximumPoint();
         for (int i = 1; i < regions.size(); i++) {
             maximum = regions.get(i).getMaximumPoint().getMaximum(maximum);
         }
@@ -176,7 +176,7 @@ public class RegionIntersection extends AbstractRegion {
             return null;
         }
         if (intersecting.size() == 1) {
-            return intersecting.get(0).processSet(chunk, get, set);
+            return intersecting.getFirst().processSet(chunk, get, set);
         }
         // if multiple regions intersect with this chunk, we must be more careful, otherwise one region might trim content of
         // another region

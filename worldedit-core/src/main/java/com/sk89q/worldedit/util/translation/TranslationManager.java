@@ -142,7 +142,7 @@ public class TranslationManager {
             }
         }
 
-        return baseTranslations.size() == 0 ? Optional.empty() : Optional.of(baseTranslations);
+        return baseTranslations.isEmpty() ? Optional.empty() : Optional.of(baseTranslations);
     }
 
     private boolean tryLoadTranslations(Locale locale) {
@@ -159,7 +159,7 @@ public class TranslationManager {
         if (!locale.getCountry().isEmpty()) {
             langData = loadTranslationFile(locale.getLanguage() + "-" + locale.getCountry() + "/strings.json");
         }
-        if (!langData.isPresent()) {
+        if (langData.isEmpty()) {
             langData = loadTranslationFile(locale.getLanguage() + "/strings.json");
         }
         if (langData.isPresent()) {

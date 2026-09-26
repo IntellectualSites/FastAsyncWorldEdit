@@ -35,7 +35,7 @@ public abstract class HotbarParser<T> extends SimpleInputParser<T> {
     protected List<BlockType> getBlockTypes(ParserContext context) {
         Player player = context.requirePlayer();
         BlockBag bag = player.getInventoryBlockBag();
-        if (!(bag instanceof final SlottableBlockBag slottable)) {
+        if (!(bag instanceof SlottableBlockBag slottable)) {
             // Matches DefaultBlockParser
             throw new InputParseException(Caption.of("fawe.error.unsupported"));
         }

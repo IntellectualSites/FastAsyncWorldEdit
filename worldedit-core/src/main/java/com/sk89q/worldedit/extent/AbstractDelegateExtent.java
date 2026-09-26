@@ -219,8 +219,8 @@ public class AbstractDelegateExtent implements Extent {
             }
         } catch (FaweException ignored) {
         }
-        if (extent instanceof AbstractDelegateExtent) {
-            Extent next = ((AbstractDelegateExtent) extent).getExtent();
+        if (extent instanceof AbstractDelegateExtent delegateExtent) {
+            Extent next = delegateExtent.getExtent();
             new ExtentTraverser(this).setNext(next);
         } else {
             LOGGER.error("Cannot disable queue");
@@ -395,15 +395,14 @@ public class AbstractDelegateExtent implements Extent {
     }
 
     public void setChangeSet(AbstractChangeSet changeSet) {
-        if (extent instanceof HistoryExtent) {
-            HistoryExtent history = ((HistoryExtent) extent);
+        if (extent instanceof HistoryExtent history) {
             if (changeSet == null) {
                 new ExtentTraverser(this).setNext(history.getExtent());
             } else {
                 history.setChangeSet(changeSet);
             }
-        } else if (extent instanceof AbstractDelegateExtent) {
-            ((AbstractDelegateExtent) extent).setChangeSet(changeSet);
+        } else if (extent instanceof AbstractDelegateExtent delegateExtent) {
+            delegateExtent.setChangeSet(changeSet);
         } else if (changeSet != null) {
             new ExtentTraverser<>(this).setNext(new HistoryExtent(extent, changeSet));
         }

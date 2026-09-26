@@ -56,12 +56,12 @@ public final class SubCommandPermissionCondition extends PermissionCondition {
             final List<Command.Condition> conditions = subCommands
                     .stream()
                     .map(Command::getCondition)
-                    .collect(Collectors.toList());
+                    .toList();
             final List<Optional<PermissionCondition>> permConds = conditions
                     .stream()
                     .map(c -> c.as(PermissionCondition.class))
-                    .collect(Collectors.toList());
-            if (permConds.stream().anyMatch(o -> !o.isPresent())) {
+                    .toList();
+            if (permConds.stream().anyMatch(Optional::isEmpty)) {
                 // if any sub-command doesn't require permissions, then this command doesn't require permissions
                 return new PermissionCondition(ImmutableSet.of());
             }

@@ -225,26 +225,23 @@ public final class ChunkDeleter {
             } catch (NumberFormatException e) {
                 throw new IllegalStateException("Modification time predicate specified invalid time: " + deletionPredicate.value);
             }
-            switch (deletionPredicate.comparison) {
-                case "<":
-                    return (r, p) -> {
-                        try {
-                            return r.getModificationTime(p) < time;
-                        } catch (IOException e) {
-                            return false;
-                        }
-                    };
-                case ">":
-                    return (r, p) -> {
-                        try {
-                            return r.getModificationTime(p) > time;
-                        } catch (IOException e) {
-                            return false;
-                        }
-                    };
-                default:
-                    throw new IllegalStateException("Unexpected comparison value: " + deletionPredicate.comparison);
-            }
+            return switch (deletionPredicate.comparison) {
+                case "<" -> (r, p) -> {
+                    try {
+                        return r.getModificationTime(p) < time;
+                    } catch (IOException e) {
+                        return false;
+                    }
+                };
+                case ">" -> (r, p) -> {
+                    try {
+                        return r.getModificationTime(p) > time;
+                    } catch (IOException e) {
+                        return false;
+                    }
+                };
+                default -> throw new IllegalStateException("Unexpected comparison value: " + deletionPredicate.comparison);
+            };
         }
         throw new IllegalStateException("Unexpected property value: " + deletionPredicate.property);
     }

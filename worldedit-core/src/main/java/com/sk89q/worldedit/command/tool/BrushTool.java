@@ -210,8 +210,8 @@ public class BrushTool
     @Override
     public boolean reset() {
         Brush br = getBrush();
-        if (br instanceof ResettableTool) {
-            return ((ResettableTool) br).reset();
+        if (br instanceof ResettableTool resettableTool) {
+            return resettableTool.reset();
         }
         return false;
     }
@@ -372,18 +372,18 @@ public class BrushTool
     public BlockVector3 getPosition(EditSession editSession, Player player) {
         Location loc = player.getLocation();
         switch (targetMode) {
-            case TARGET_BLOCK_RANGE:
+            case TARGET_BLOCK_RANGE, TARGET_FACE_RANGE -> {
                 return offset(trace(editSession, player, getRange(), true), loc).toBlockPoint();
-            case FORWARD_POINT_PITCH: {
-                int d = 0;
+            }
+            case FORWARD_POINT_PITCH -> {
                 float pitch = loc.getPitch();
                 pitch = 23 - (pitch / 4);
-                d += (int) (Math.sin(Math.toRadians(pitch)) * 50);
+                int d = (int) (Math.sin(Math.toRadians(pitch)) * 50);
                 final Vector3 vector = loc.getDirection().withY(0).normalize().multiply(d)
                         .add(loc.x(), loc.y(), loc.z());
                 return offset(vector, loc).toBlockPoint();
             }
-            case TARGET_POINT_HEIGHT: {
+            case TARGET_POINT_HEIGHT -> {
                 final int height = loc.getBlockY();
                 final int x = loc.getBlockX();
                 final int z = loc.getBlockZ();
@@ -397,10 +397,9 @@ public class BrushTool
                 final int distance = (height - y) + 8;
                 return offset(trace(editSession, player, distance, true), loc).toBlockPoint();
             }
-            case TARGET_FACE_RANGE:
-                return offset(trace(editSession, player, getRange(), true), loc).toBlockPoint();
-            default:
+            default -> {
                 return null;
+            }
         }
     }
 
@@ -420,14 +419,9 @@ public class BrushTool
 
     public boolean act(BrushAction action, Player player, LocalSession session) {
         switch (action) {
-            case PRIMARY:
-                setContext(primary);
-                break;
-            case SECONDARY:
-                setContext(secondary);
-                break;
-            default:
-                throw new IllegalStateException("Unexpected value: " + action);
+            case PRIMARY -> setContext(primary);
+            case SECONDARY -> setContext(secondary);
+            default -> throw new IllegalStateException("Unexpected value: " + action);
         }
         BrushSettings current = getContext();
         Brush brush = current.getBrush();
@@ -457,8 +451,8 @@ public class BrushTool
 
                 if (existingMask == null) {
                     editSession.setMask(mask);
-                } else if (existingMask instanceof MaskIntersection) {
-                    ((MaskIntersection) existingMask).add(mask);
+                } else if (existingMask instanceof MaskIntersection maskIntersection) {
+                    maskIntersection.add(mask);
                 } else {
                     MaskIntersection newMask = new MaskIntersection(existingMask);
                     newMask.add(mask);

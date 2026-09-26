@@ -54,13 +54,13 @@ public class ChunkStoreHelper {
     public static CompoundTag readCompoundTag(ChunkDataInputSupplier input) throws DataException, IOException {
         try (InputStream stream = input.openInputStream();
             NBTInputStream nbt = new NBTInputStream(stream)) {
-            Tag tag = nbt.readNamedTag().getTag();
-            if (!(tag instanceof CompoundTag)) {
+            Tag<?, ?> tag = nbt.readNamedTag().getTag();
+            if (!(tag instanceof CompoundTag compoundTag)) {
                 throw new ChunkStoreException("CompoundTag expected for chunk; got "
                         + tag.getClass().getName());
             }
 
-            return (CompoundTag) tag;
+            return compoundTag;
         }
     }
 

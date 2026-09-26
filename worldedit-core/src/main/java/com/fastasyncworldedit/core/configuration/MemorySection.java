@@ -78,7 +78,7 @@ public class MemorySection implements ConfigurationSection {
             }
         } else if (obj instanceof List<?> val) {
             if (!val.isEmpty()) {
-                return toDouble(val.get(0), def);
+                return toDouble(val.getFirst(), def);
             }
         }
         return def;
@@ -95,7 +95,7 @@ public class MemorySection implements ConfigurationSection {
             }
         } else if (obj instanceof List<?> val) {
             if (!val.isEmpty()) {
-                return toInt(val.get(0), def);
+                return toInt(val.getFirst(), def);
             }
         }
         return def;
@@ -112,7 +112,7 @@ public class MemorySection implements ConfigurationSection {
             }
         } else if (obj instanceof List<?> val) {
             if (!val.isEmpty()) {
-                return toLong(val.get(0), def);
+                return toLong(val.getFirst(), def);
             }
         }
         return def;

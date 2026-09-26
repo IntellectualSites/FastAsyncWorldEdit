@@ -260,8 +260,7 @@ public class BlockArrayClipboard implements Clipboard {
         region.shift(BlockVector3.ZERO.subtract(offset));
         return getParent().getEntities(region).stream().map(e ->
         {
-            if (e instanceof ClipboardEntity) {
-                ClipboardEntity ce = (ClipboardEntity) e;
+            if (e instanceof ClipboardEntity ce) {
                 Location oldloc = ce.getLocation();
                 Location loc = new Location(oldloc.getExtent(),
                         oldloc.x() + offset.x(),
@@ -279,8 +278,7 @@ public class BlockArrayClipboard implements Clipboard {
     public List<? extends Entity> getEntities() {
         return getParent().getEntities().stream().map(e ->
         {
-            if (e instanceof ClipboardEntity) {
-                ClipboardEntity ce = (ClipboardEntity) e;
+            if (e instanceof ClipboardEntity ce) {
                 Location oldloc = ce.getLocation();
                 Location loc = new Location(oldloc.getExtent(),
                         oldloc.x() + offset.x(),

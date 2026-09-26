@@ -194,8 +194,8 @@ public class YamlConfiguration extends FileConfiguration {
         if (options().copyHeader()) {
             final Configuration def = getDefaults();
 
-            if (def != null && def instanceof final FileConfiguration filedefaults) {
-                final String defaultsHeader = filedefaults.buildHeader();
+            if (def != null && def instanceof FileConfiguration fileDefaults) {
+                final String defaultsHeader = fileDefaults.buildHeader();
 
                 if ((defaultsHeader != null) && !defaultsHeader.isEmpty()) {
                     return defaultsHeader;

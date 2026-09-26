@@ -78,22 +78,26 @@ public class DinnerPermsResolver implements PermissionsResolver {
             return false; // Permissions are only registered for objects with a Permissible
         }
         switch (internalHasPermission(perms, permission)) {
-            case -1:
+            case -1 -> {
                 return false;
-            case 1:
+            }
+            case 1 -> {
                 return true;
-            default:
-                break;
+            }
+            default -> {
+            }
         }
         int dotPos = permission.lastIndexOf(".");
         while (dotPos > -1) {
             switch (internalHasPermission(perms, permission.substring(0, dotPos + 1) + "*")) {
-                case -1:
+                case -1 -> {
                     return false;
-                case 1:
+                }
+                case 1 -> {
                     return true;
-                default:
-                    break;
+                }
+                default -> {
+                }
             }
             dotPos = permission.lastIndexOf(".", dotPos - 1);
         }

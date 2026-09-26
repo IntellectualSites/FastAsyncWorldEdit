@@ -134,7 +134,7 @@ public class Deform implements Contextual<Operation> {
         Region region = firstNonNull(context.getRegion(), this.region);
 
         switch (mode) {
-            case UNIT_CUBE:
+            case UNIT_CUBE -> {
                 final Vector3 min = region.getMinimumPoint().toVector3();
                 final Vector3 max = region.getMaximumPoint().toVector3();
 
@@ -150,15 +150,15 @@ public class Deform implements Contextual<Operation> {
                 if (unit.z() == 0) {
                     unit = unit.withZ(1.0);
                 }
-                break;
-            case RAW_COORD:
+            }
+            case RAW_COORD -> {
                 zero = Vector3.ZERO;
                 unit = Vector3.ONE;
-                break;
-            case OFFSET:
-            default:
+            }
+            default -> {
                 zero = offset;
                 unit = Vector3.ONE;
+            }
         }
 
         LocalSession session = context.getSession();

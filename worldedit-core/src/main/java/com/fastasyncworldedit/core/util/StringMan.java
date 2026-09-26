@@ -382,12 +382,13 @@ public class StringMan {
                 if (bj != ai) {
                     distance++;
                     switch (bj) {
-                        case ':':
-                        case '_':
+                        case ':', '_' -> {
                             continue;
-                        default:
+                        }
+                        default -> {
                             sequentail = true;
                             continue;
+                        }
                     }
                 }
                 break;
@@ -450,12 +451,10 @@ public class StringMan {
     }
 
     public static String join(Object[] array, String delimiter) {
-        switch (array.length) {
-            case 0:
-                return "";
-            case 1:
-                return array[0].toString();
-            default:
+        return switch (array.length) {
+            case 0 -> "";
+            case 1 -> array[0].toString();
+            default -> {
                 final StringBuilder result = new StringBuilder();
                 for (int i = 0, j = array.length; i < j; i++) {
                     if (i > 0) {
@@ -463,8 +462,9 @@ public class StringMan {
                     }
                     result.append(array[i]);
                 }
-                return result.toString();
-        }
+                yield result.toString();
+            }
+        };
     }
 
     public static Integer toInteger(String string, int start, int end) {
@@ -480,20 +480,10 @@ public class StringMan {
         for (int i = start; i < end; i++) {
             char c = string.charAt(i);
             switch (c) {
-                case '0':
-                case '1':
-                case '2':
-                case '3':
-                case '4':
-                case '5':
-                case '6':
-                case '7':
-                case '8':
-                case '9':
-                    value = value * 10 + c - '0';
-                    break;
-                default:
+                case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' -> value = value * 10 + c - '0';
+                default -> {
                     return null;
+                }
             }
         }
         return negative ? -value : value;

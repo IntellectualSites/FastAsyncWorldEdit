@@ -320,8 +320,8 @@ public class BlockMaskBuilder {
         try {
             fut.get(5L, TimeUnit.MILLISECONDS);
         } catch (ExecutionException e) {
-            if (e.getCause() instanceof InputParseException) {
-                throw (InputParseException) e.getCause();
+            if (e.getCause() instanceof InputParseException inputException) {
+                throw inputException;
             }
         } catch (InterruptedException | TimeoutException ignored) {
         } finally {

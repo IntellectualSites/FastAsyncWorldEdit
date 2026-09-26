@@ -47,18 +47,17 @@ public class TransformFactory extends AbstractFactory<ResettableExtent> {
 
     @Override
     protected ResettableExtent getParsed(final String input, final List<ResettableExtent> transforms) {
-        switch (transforms.size()) {
-            case 0:
-                throw new NoMatchException(Caption.of("worldedit.error.no-match", TextComponent.of(input)));
-            case 1:
-                return transforms.get(0);
-            default:
+        return switch (transforms.size()) {
+            case 0 -> throw new NoMatchException(Caption.of("worldedit.error.no-match", TextComponent.of(input)));
+            case 1 -> transforms.getFirst();
+            default -> {
                 RandomTransform randomTransform = new RandomTransform(new TrueRandom());
                 for (ResettableExtent transform : transforms) {
                     randomTransform.add(transform, 1d);
                 }
-                return randomTransform;
-        }
+                yield randomTransform;
+            }
+        };
     }
 
     // TODO is there a better default?

@@ -301,7 +301,7 @@ public class FaweAPI {
                 }
             }
             if (isIn) {
-                result.add(0, dsh);
+                result.addFirst(dsh);
                 if (!encompassed) {
                     regionSet.add(region);
                 }

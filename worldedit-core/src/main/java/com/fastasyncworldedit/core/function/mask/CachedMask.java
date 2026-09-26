@@ -76,7 +76,7 @@ public class CachedMask extends AbstractDelegateMask implements ResettableMask {
     }
 
     public boolean test(@Nullable Extent extent, BlockVector3 vector) {
-        if (!hasExtent || !(getMask() instanceof final AbstractExtentMask mask)) {
+        if (!hasExtent || !(getMask() instanceof AbstractExtentMask mask)) {
             return test(vector);
         }
         int x = vector.x();
