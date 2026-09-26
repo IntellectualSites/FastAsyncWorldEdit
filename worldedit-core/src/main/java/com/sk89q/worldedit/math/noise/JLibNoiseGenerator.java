@@ -56,7 +56,7 @@ abstract class JLibNoiseGenerator<V extends Module> implements NoiseGenerator {
     }
 
     private float forceRange(double value) {
-        return (float) Math.max(0, Math.min(1, value / 2.0 + 0.5));
+        return (float) Math.clamp(value / 2.0 + 0.5, 0, 1);
     }
 
 }

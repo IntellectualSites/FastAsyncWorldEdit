@@ -287,8 +287,8 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable, Fl
         checkNotNull(world);
         checkNotNull(to);
         EditSession editSession;
-        if (world instanceof EditSession) {
-            editSession = (EditSession) world;
+        if (world instanceof EditSession session) {
+            editSession = session;
         } else {
             EditSessionBuilder builder = WorldEdit
                     .getInstance()
@@ -339,11 +339,11 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable, Fl
             Extent extent, BlockVector3 to, boolean pasteAir,
             @Nullable Transform transform
     ) {
-        if (extent instanceof World) {
+        if (extent instanceof World world) {
             EditSessionBuilder builder = WorldEdit
                     .getInstance()
                     .newEditSessionBuilder()
-                    .world((World) extent)
+                    .world(world)
                     .checkMemory(false)
                     .allowedRegionsEverywhere()
                     .limitUnlimited()
@@ -382,12 +382,12 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable, Fl
 
     default void paste(Extent extent, BlockVector3 to, boolean pasteAir, boolean pasteEntities, boolean pasteBiomes) {
         boolean close = false;
-        if (extent instanceof World) {
+        if (extent instanceof World world) {
             close = true;
             EditSessionBuilder builder = WorldEdit
                     .getInstance()
                     .newEditSessionBuilder()
-                    .world((World) extent)
+                    .world(world)
                     .checkMemory(false)
                     .allowedRegionsEverywhere()
                     .limitUnlimited()

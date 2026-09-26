@@ -80,8 +80,7 @@ public class ArrayListHistory implements ChangeSet {
     public ChangeSetSummary summarize(Region region, boolean shallow) {
         SimpleChangeSetSummary summary = new SimpleChangeSetSummary();
         for (Change change : changes) {
-            if (change instanceof BlockChange) {
-                BlockChange blockChange = (BlockChange) change;
+            if (change instanceof BlockChange blockChange) {
                 BlockVector3 pos = blockChange.getPosition();
                 summary.add(pos.x(), pos.z(), blockChange.getCurrent().getOrdinal());
             }

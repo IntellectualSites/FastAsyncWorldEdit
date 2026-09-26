@@ -221,7 +221,7 @@ public class RichMaskParser extends FaweParser<Mask> {
                 if (pe.isAnd()) {
                     masks.add(new ArrayList<>());
                 }
-                masks.get(masks.size() - 1).add(mask);
+                masks.getLast().add(mask);
             }
         } catch (InputParseException rethrow) {
             throw rethrow;
@@ -232,13 +232,13 @@ public class RichMaskParser extends FaweParser<Mask> {
         List<Mask> maskUnions = new ArrayList<>();
         for (List<Mask> maskList : masks) {
             if (maskList.size() == 1) {
-                maskUnions.add(maskList.get(0));
+                maskUnions.add(maskList.getFirst());
             } else if (maskList.size() != 0) {
                 maskUnions.add(new MaskUnion(maskList));
             }
         }
         if (maskUnions.size() == 1) {
-            return maskUnions.get(0);
+            return maskUnions.getFirst();
         } else if (maskUnions.size() != 0) {
             return new MaskIntersection(maskUnions);
         } else {

@@ -21,8 +21,6 @@ package com.sk89q.worldedit.extension.factory.parser;
 
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.extent.inventory.SlottableBlockBag;
-import com.fastasyncworldedit.core.jnbt.JSON2NBT;
-import com.fastasyncworldedit.core.jnbt.NBTException;
 import com.fastasyncworldedit.core.limit.FaweLimit;
 import com.fastasyncworldedit.core.limit.PropertyRemap;
 import com.fastasyncworldedit.core.util.MathMan;
@@ -64,6 +62,9 @@ import com.sk89q.worldedit.world.block.FuzzyBlockState;
 import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.entity.EntityTypes;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
+import org.enginehub.linbus.format.snbt.LinStringIO;
+import org.enginehub.linbus.stream.exception.NbtParseException;
+import org.enginehub.linbus.tree.LinCompoundTag;
 
 import javax.annotation.Nonnull;
 import java.util.Arrays;
@@ -84,9 +85,9 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
     }
 
     private static BaseBlock getBlockInHand(Actor actor, HandSide handSide) throws InputParseException {
-        if (actor instanceof Player) {
+        if (actor instanceof Player player) {
             try {
-                return ((Player) actor).getBlockInHand(handSide);
+                return player.getBlockInHand(handSide);
             } catch (NotABlockException e) {
                 throw new InputParseException(e.getRichMessage());
             } catch (WorldEditException e) {
@@ -134,47 +135,25 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
      */
     @SuppressWarnings("ConstantConditions")
     private String woolMapper(String string) {
-        switch (string.toLowerCase(Locale.ROOT)) {
-            case "white":
-                return BlockTypes.WHITE_WOOL.id();
-            case "black":
-                return BlockTypes.BLACK_WOOL.id();
-            case "blue":
-                return BlockTypes.BLUE_WOOL.id();
-            case "brown":
-                return BlockTypes.BROWN_WOOL.id();
-            case "cyan":
-                return BlockTypes.CYAN_WOOL.id();
-            case "gray":
-            case "grey":
-                return BlockTypes.GRAY_WOOL.id();
-            case "green":
-                return BlockTypes.GREEN_WOOL.id();
-            case "light_blue":
-            case "lightblue":
-                return BlockTypes.LIGHT_BLUE_WOOL.id();
-            case "light_gray":
-            case "light_grey":
-            case "lightgray":
-            case "lightgrey":
-                return BlockTypes.LIGHT_GRAY_WOOL.id();
-            case "lime":
-                return BlockTypes.LIME_WOOL.id();
-            case "magenta":
-                return BlockTypes.MAGENTA_WOOL.id();
-            case "orange":
-                return BlockTypes.ORANGE_WOOL.id();
-            case "pink":
-                return BlockTypes.PINK_WOOL.id();
-            case "purple":
-                return BlockTypes.PURPLE_WOOL.id();
-            case "yellow":
-                return BlockTypes.YELLOW_WOOL.id();
-            case "red":
-                return BlockTypes.RED_WOOL.id();
-            default:
-                return string;
-        }
+        return switch (string.toLowerCase(Locale.ROOT)) {
+            case "white" -> BlockTypes.WHITE_WOOL.id();
+            case "black" -> BlockTypes.BLACK_WOOL.id();
+            case "blue" -> BlockTypes.BLUE_WOOL.id();
+            case "brown" -> BlockTypes.BROWN_WOOL.id();
+            case "cyan" -> BlockTypes.CYAN_WOOL.id();
+            case "gray", "grey" -> BlockTypes.GRAY_WOOL.id();
+            case "green" -> BlockTypes.GREEN_WOOL.id();
+            case "light_blue", "lightblue" -> BlockTypes.LIGHT_BLUE_WOOL.id();
+            case "light_gray", "light_grey", "lightgray", "lightgrey" -> BlockTypes.LIGHT_GRAY_WOOL.id();
+            case "lime" -> BlockTypes.LIME_WOOL.id();
+            case "magenta" -> BlockTypes.MAGENTA_WOOL.id();
+            case "orange" -> BlockTypes.ORANGE_WOOL.id();
+            case "pink" -> BlockTypes.PINK_WOOL.id();
+            case "purple" -> BlockTypes.PURPLE_WOOL.id();
+            case "yellow" -> BlockTypes.YELLOW_WOOL.id();
+            case "red" -> BlockTypes.RED_WOOL.id();
+            default -> string;
+        };
     }
 
     //FAWE start - make public
@@ -408,7 +387,7 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
             }
         }
 
-        CompoundTag nbt = null;
+        LinCompoundTag nbt = null;
         //FAWE end
         if (state == null) {
             String typeString;
@@ -445,14 +424,14 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
                 final BaseBlock blockInHand = getBlockInHand(context.requireActor(), HandSide.MAIN_HAND);
                 //FAWE start
                 state = blockInHand.toBlockState();
-                nbt = blockInHand.getNbtData();
+                nbt = blockInHand.getNbt();
                 //FAWE end
             } else if ("offhand".equalsIgnoreCase(typeString) || "oh".equalsIgnoreCase(typeString)) {
                 // Get the block type from the item in the user's off hand.
                 final BaseBlock blockInHand = getBlockInHand(context.requireActor(), HandSide.OFF_HAND);
                 //FAWE start
                 state = blockInHand.toBlockState();
-                nbt = blockInHand.getNbtData();
+                nbt = blockInHand.getNbt();
                 //FAWE end
             } else if (typeString.matches("pos[0-9]+")) {
                 int index = Integer.parseInt(typeString.replaceAll("[a-z]+", ""));
@@ -465,27 +444,25 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
                     throw new InputParseException(Caption.of("worldedit.error.incomplete-region"));
                 }
                 state = world.getBlock(primaryPosition);
-                nbt = state.getNbtData();
+                nbt = state.getNbt();
                 //FAWE start
             } else if (typeString.matches("slot[0-9]+")) {
                 int slot = Integer.parseInt(typeString.substring(4)) - 1;
                 Actor actor = context.requireActor();
-                if (!(actor instanceof Player)) {
+                if (!(actor instanceof Player player)) {
                     throw new InputParseException(Caption.of("worldedit.command.player-only"));
                 }
-                Player player = (Player) actor;
                 BlockBag bag = player.getInventoryBlockBag();
-                if (!(bag instanceof SlottableBlockBag)) {
+                if (!(bag instanceof SlottableBlockBag slottable)) {
                     throw new InputParseException(Caption.of("fawe.error.unsupported"));
                 }
-                SlottableBlockBag slottable = (SlottableBlockBag) bag;
                 BaseItem item = slottable.getItem(slot);
 
                 if (!item.getType().hasBlockType()) {
                     throw new InputParseException(Caption.of("worldedit.error.not-a-block"));
                 }
                 state = item.getType().getBlockType().getDefaultState();
-                nbt = item.getNbtData();
+                nbt = item.getNbt();
             } else {
                 BlockType type = BlockTypes.parse(typeString.toLowerCase(Locale.ROOT), context);
 
@@ -495,7 +472,7 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
                 if (state == null) {
                     throw new NoMatchException(Caption.of("fawe.error.invalid-block-type", TextComponent.of(input)));
                 }
-                nbt = state.getNbtData();
+                nbt = state.getNbt();
             }
             //FAWE end
 
@@ -532,8 +509,8 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
         if (blockAndExtraData.length > 1 && blockAndExtraData[1].startsWith("{")) {
             String joined = StringMan.join(Arrays.copyOfRange(blockAndExtraData, 1, blockAndExtraData.length), "|");
             try {
-                nbt = JSON2NBT.getTagFromJson(joined);
-            } catch (NBTException e) {
+                nbt = LinStringIO.readFromStringUsing(joined, LinCompoundTag::readFrom);
+            } catch (NbtParseException e) {
                 throw new NoMatchException(TextComponent.of(e.getMessage()));
             }
         }
@@ -613,7 +590,7 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
         } else {
             //FAWE start
             if (nbt == null) {
-                nbt = state.getNbtData();
+                nbt = state.getNbt();
             }
             BaseBlock result;
             if (nbt != null) {
@@ -636,12 +613,12 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
                         TextComponent.of(String.valueOf(holder))
                 ));
             }
-            CompoundTag nbt = holder.getNbtData();
+            LinCompoundTag nbt = holder.getNbt();
             if (nbt != null) {
                 if (actor.hasPermission("worldedit.anyblock.nbt")) {
                     return holder;
                 }
-                if (nbt.equals(holder.getBlockType().getDefaultState().getNbtData())) {
+                if (nbt.equals(holder.getBlockType().getDefaultState().getNbt())) {
                     if (!actor.hasPermission("worldedit.anyblock.default-nbt")) {
                         throw new DisallowedUsageException(Caption.of(
                                 "fawe.error.nbt.forbidden",

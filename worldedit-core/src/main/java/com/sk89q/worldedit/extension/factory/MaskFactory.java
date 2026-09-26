@@ -142,7 +142,7 @@ public final class MaskFactory extends AbstractFactory<Mask> {
     protected Mask getParsed(final String input, final List<Mask> masks) {
         return switch (masks.size()) {
             case 0 -> throw new NoMatchException(Caption.of("worldedit.error.no-match", TextComponent.of(input)));
-            case 1 -> masks.get(0).optimize();
+            case 1 -> masks.getFirst().optimize();
             default -> new MaskIntersection(masks).optimize();
         };
     }
