@@ -787,11 +787,11 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
                         }
                         if (callback == null) {
                             if (finalizer != null) {
-                                queueHandler.async(finalizer, null);
+                                queueHandler.completion(finalizer, null);
                             }
                             return null;
                         } else {
-                            return queueHandler.async(callback, null);
+                            return queueHandler.completion(callback, null);
                         }
                     } catch (Throwable e) {
                         LOGGER.error("Error performing final chunk calling at {},{}", chunkX, chunkZ, e);

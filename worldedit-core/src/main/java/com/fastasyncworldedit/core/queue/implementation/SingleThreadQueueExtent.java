@@ -225,8 +225,11 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
         this.lastChunk.compareAndExchange(chunk, null);
         final long index = MathMan.pairInt(chunk.getX(), chunk.getZ());
         getChunkLock.lock();
-        chunks.remove(index, chunk);
-        getChunkLock.unlock();
+        try {
+            chunks.remove(index, chunk);
+        } finally {
+            getChunkLock.unlock();
+        }
         V future = submitUnchecked(chunk);
         submissions.add(future);
         return future;
@@ -278,7 +281,6 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
     public synchronized boolean trim(boolean aggressive) {
         cacheGet.trim(aggressive);
         cacheSet.trim(aggressive);
-        LOGGER.info("trim");
         if (Thread.currentThread() == currentThread) {
             lastChunk.set(null);
             return chunks.isEmpty();
@@ -481,27 +483,30 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
     public synchronized void flush() {
         if (!chunks.isEmpty()) {
             getChunkLock.lock();
-            if (MemUtil.isMemoryLimited()) {
-                while (!chunks.isEmpty()) {
-                    IQueueChunk chunk = chunks.removeFirst();
-                    this.lastChunk.compareAndExchange(chunk, null);
-                    final Future future = submitUnchecked(chunk);
-                    if (future != null && !future.isDone()) {
-                        pollSubmissions(Settings.settings().QUEUE.PARALLEL_THREADS, true);
-                        submissions.add(future);
+            try {
+                if (MemUtil.isMemoryLimited()) {
+                    while (!chunks.isEmpty()) {
+                        IQueueChunk chunk = chunks.removeFirst();
+                        this.lastChunk.compareAndExchange(chunk, null);
+                        final Future future = submitUnchecked(chunk);
+                        if (future != null && !future.isDone()) {
+                            pollSubmissions(Settings.settings().QUEUE.PARALLEL_THREADS, true);
+                            submissions.add(future);
+                        }
+                    }
+                } else {
+                    while (!chunks.isEmpty()) {
+                        IQueueChunk chunk = chunks.removeFirst();
+                        this.lastChunk.compareAndExchange(chunk, null);
+                        final Future future = submitUnchecked(chunk);
+                        if (future != null && !future.isDone()) {
+                            submissions.add(future);
+                        }
                     }
                 }
-            } else {
-                while (!chunks.isEmpty()) {
-                    IQueueChunk chunk = chunks.removeFirst();
-                    this.lastChunk.compareAndExchange(chunk, null);
-                    final Future future = submitUnchecked(chunk);
-                    if (future != null && !future.isDone()) {
-                        submissions.add(future);
-                    }
-                }
+            } finally {
+                getChunkLock.unlock();
             }
-            getChunkLock.unlock();
         }
         pollSubmissions(0, true);
     }
