@@ -106,6 +106,8 @@ public final class EntityTypes {
     @Nullable
     public static final EntityType CREEPER = get("minecraft:creeper");
     @Nullable
+    public static final EntityType CUSHION = get("minecraft:cushion");
+    @Nullable
     public static final EntityType DARK_OAK_BOAT = get("minecraft:dark_oak_boat");
     @Nullable
     public static final EntityType DARK_OAK_CHEST_BOAT = get("minecraft:dark_oak_chest_boat");
@@ -255,7 +257,12 @@ public final class EntityTypes {
     public static final EntityType PLAYER = get("minecraft:player");
     @Nullable
     public static final EntityType POLAR_BEAR = get("minecraft:polar_bear");
-    @Deprecated @Nullable
+    @Nullable
+    public static final EntityType POPLAR_BOAT = get("minecraft:poplar_boat");
+    @Nullable
+    public static final EntityType POPLAR_CHEST_BOAT = get("minecraft:poplar_chest_boat");
+    @Deprecated
+    @Nullable
     public static final EntityType POTION = get("minecraft:potion");
     @Nullable
     public static final EntityType PUFFERFISH = get("minecraft:pufferfish");
