@@ -12,7 +12,7 @@ minimumTinyRemapper = "0.8.11"
 
 # Plugins
 dummypermscompat = "1.10"
-worldguard-bukkit = "7.0.17"
+worldguard-bukkit = "7.0.19"
 griefprevention = "18.0.0"
 griefdefender = "2.1.0-SNAPSHOT"
 residence = "6.0.2.3"
