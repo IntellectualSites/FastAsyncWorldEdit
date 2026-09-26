@@ -75,8 +75,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.WorldInitEvent;
-import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.metadata.MetadataValue;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.enginehub.piston.CommandManager;
@@ -90,6 +88,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -118,6 +117,7 @@ public class WorldEditPlugin extends JavaPlugin {
     private BukkitPermissionAttachmentManager permissionAttachmentManager;
     // Fawe start
     private BukkitCommandSender bukkitConsoleCommandSender;
+    private final HashMap<Player, BukkitPlayer> playerCache = new HashMap<>();
     // Fawe end
 
     @Override
@@ -614,11 +614,11 @@ public class WorldEditPlugin extends JavaPlugin {
         if (wePlayer != null) {
             return wePlayer;
         }
-        synchronized (player) {
+        synchronized (playerCache) {
             BukkitPlayer bukkitPlayer = getCachedPlayer(player);
             if (bukkitPlayer == null) {
                 bukkitPlayer = new BukkitPlayer(this, player);
-                player.setMetadata("WE", new FixedMetadataValue(this, bukkitPlayer));
+                playerCache.put(player, bukkitPlayer);
             }
             return bukkitPlayer;
         }
@@ -627,18 +627,22 @@ public class WorldEditPlugin extends JavaPlugin {
 
     //FAWE start
     BukkitPlayer getCachedPlayer(Player player) {
-        List<MetadataValue> meta = player.getMetadata("WE");
-        if (meta.isEmpty()) {
-            return null;
+        synchronized (playerCache) {
+            return playerCache.get(player);
         }
-        return (BukkitPlayer) meta.get(0).value();
     }
 
     BukkitPlayer reCachePlayer(Player player) {
-        synchronized (player) {
-            BukkitPlayer wePlayer = new BukkitPlayer(this, player);
-            player.setMetadata("WE", new FixedMetadataValue(this, wePlayer));
-            return wePlayer;
+        BukkitPlayer wePlayer = new BukkitPlayer(this, player);
+        synchronized (playerCache) {
+            playerCache.put(player, wePlayer);
+        }
+        return wePlayer;
+    }
+
+    void removeCachedPlayer(Player player) {
+        synchronized (playerCache) {
+            playerCache.remove(player);
         }
     }
     //FAWE end
