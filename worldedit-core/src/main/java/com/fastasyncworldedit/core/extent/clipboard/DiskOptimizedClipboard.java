@@ -702,6 +702,9 @@ public class DiskOptimizedClipboard extends LinearClipboard {
         try {
             int diskIndex = headerSize + (index << 1);
             char ordinal = byteBuffer.getChar(diskIndex);
+            if (ordinal == BlockTypesCache.ReservedIDs.__RESERVED__) {
+                ordinal = BlockTypesCache.ReservedIDs.AIR;
+            }
             return BlockState.getFromOrdinal(ordinal);
         } catch (IndexOutOfBoundsException ignored) {
         }
