@@ -20,7 +20,6 @@
 package com.sk89q.worldedit.bukkit;
 
 import com.fastasyncworldedit.bukkit.util.MinecraftVersion;
-import com.fastasyncworldedit.bukkit.util.PaperSupport;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.extent.processor.PlacementStateProcessor;
 import com.fastasyncworldedit.core.extent.processor.lighting.RelighterFactory;
@@ -265,10 +264,7 @@ public class BukkitServerInterface extends AbstractPlatform implements MultiUser
 
     @Override
     public long getTickCount() {
-        if (PaperSupport.isPaper()) {
-            return Bukkit.getCurrentTick();
-        }
-        return super.getTickCount();
+        return Bukkit.getCurrentTick();
     }
 
     public void unregisterCommands() {

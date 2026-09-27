@@ -17,7 +17,6 @@ body:
       multiple: false
       options:
         - Paper
-        - Spigot
     validations:
       required: true
 

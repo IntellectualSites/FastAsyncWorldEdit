@@ -19,7 +19,6 @@
 
 package com.sk89q.bukkit.util;
 
-import com.fastasyncworldedit.bukkit.util.PaperSupport;
 import com.sk89q.util.ReflectionUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -96,7 +95,7 @@ public class CommandRegistration {
             return fallbackCommands;
         }
 
-        CommandMap commandMap = PaperSupport.isPaper() ? Bukkit.getCommandMap() : ReflectionUtil.getField(plugin.getServer().getPluginManager(), "commandMap");
+        CommandMap commandMap = Bukkit.getCommandMap();
         if (commandMap == null) {
             Bukkit.getServer().getLogger().severe(plugin.getDescription().getName()
                     + ": Could not retrieve server CommandMap");

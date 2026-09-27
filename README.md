@@ -52,7 +52,7 @@ Releases are available either on Modrinth or on CurseForge.
 There are several placement modes, each supporting higher throughput than the previous. All editing is processed
 asynchronously, with
 certain tasks being broken up on the main thread. The default mode is chunk placement.
-* Blocks (Bukkit-API) - Only used if chunk placement isn't supported. Still faster than any other plugin on Spigot.
+* Blocks (Bukkit-API) - Only used if chunk placement isn't supported. Still faster than any other plugin on Paper.
 * Chunks (NMS) - Places entire chunk sections
 * World (CFI) - Used to generate new worlds/regions
 

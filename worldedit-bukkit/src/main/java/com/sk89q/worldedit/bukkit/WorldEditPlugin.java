@@ -33,7 +33,6 @@ import com.sk89q.wepif.PermissionsResolverManager;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.WorldEditManifest;
 import com.sk89q.worldedit.bukkit.adapter.AdapterLoadException;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplLoader;
@@ -92,9 +91,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.jar.Attributes;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.sk89q.worldedit.internal.anvil.ChunkDeleter.DELCHUNKS_FILE_NAME;
@@ -136,34 +133,15 @@ public class WorldEditPlugin extends JavaPlugin {
         }
         //FAWE end
         //FAWE start
-        final Attributes attributes = WorldEditManifest.readAttributes();
-        Objects.requireNonNull(attributes, "Could not retrieve manifest attributes");
-        final String type = attributes.getValue("FAWE-Plugin-Jar-Type");
-        Objects.requireNonNull(type, "Could not determine plugin jar type");
-        if (PaperSupport.isPaper()) {
-            if (type.equals("spigot")) {
-                LOGGER.warn(
-                        """
-                                
-                                **********************************************
-                                ** You are using the Spigot-mapped FAWE jar on a modern Paper version.
-                                ** This will result in slower first-run times and wasted disk space from plugin remapping.
-                                ** Download the Paper FAWE jar from Modrinth to avoid this: https://modrinth.com/plugin/fastasyncworldedit/
-                                **********************************************"""
-                );
-            }
-        } else {
-            if (type.equals("mojang")) {
-                throw new IllegalStateException(
-                        """
-                                
-                                **********************************************
-                                ** You are attempting to run the Paper FAWE jar on a Spigot server.
-                                ** Either switch to Paper (https://papermc.io), or download the correct FAWE jar for your platform
-                                ** from Modrinth: https://modrinth.com/plugin/fastasyncworldedit/
-                                **********************************************"""
-                );
-            }
+        if (!PaperSupport.isPaper()) {
+            throw new IllegalStateException(
+                    """
+                            
+                            **********************************************
+                            ** FastAsyncWorldEdit requires Paper or a fork of Paper.
+                            ** Spigot and CraftBukkit are no longer supported. Switch to Paper: https://papermc.io
+                            **********************************************"""
+            );
         }
         //FAWE end
 
@@ -241,10 +219,7 @@ public class WorldEditPlugin extends JavaPlugin {
 
         // Now we can register events
         getServer().getPluginManager().registerEvents(new WorldEditListener(this), this);
-        // register async tab complete, if available
-        if (PaperSupport.isPaper()) {
-            getServer().getPluginManager().registerEvents(new AsyncTabCompleteListener(), this);
-        }
+        getServer().getPluginManager().registerEvents(new AsyncTabCompleteListener(), this);
 
         if (Bukkit.getWorlds().isEmpty()) {
             setupPreWorldData();

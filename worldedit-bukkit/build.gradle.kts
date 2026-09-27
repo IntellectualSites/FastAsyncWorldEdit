@@ -57,16 +57,6 @@ val adapters = configurations.create("adapters") {
     }
 }
 
-val adaptersReobf = configurations.create("adaptersReobf") {
-    description = "Adapters to include in the JAR (Spigot-Mapped)"
-    isCanBeConsumed = false
-    isCanBeResolved = true
-    shouldResolveConsistentlyWith(configurations["runtimeClasspath"])
-    attributes {
-        attribute(Obfuscation.OBFUSCATION_ATTRIBUTE, objects.named(Obfuscation.OBFUSCATED))
-    }
-}
-
 allprojects {
     configurations.configureEach {
         resolutionStrategy {
@@ -90,7 +80,7 @@ dependencies {
         exclude(group = "org.slf4j", module = "slf4j-api")
     }
     localImplementation(platform(libs.log4j.bom)) {
-        because("Spigot provides Log4J (sort of, not in API, implicitly part of server)")
+        because("Paper provides Log4J (sort of, not in API, implicitly part of server)")
     }
     localImplementation(libs.log4j.api)
 
@@ -104,9 +94,6 @@ dependencies {
 
     project.project(":worldedit-bukkit:adapters").subprojects.forEach {
         "adapters"(project(it.path))
-        if (it.name.startsWith("adapter-1_")) {
-            "adaptersReobf"(project(it.path))
-        }
     }
     compileOnly(libs.worldguard) {
         exclude("com.sk89q.worldedit", "worldedit-bukkit")
@@ -145,52 +132,12 @@ tasks.named<Copy>("processResources") {
     }
 }
 
-tasks.register<ShadowJar>("reobfShadowJar") {
-    // The `fawe.properties` file from `worldedit-core` is not automatically
-    // included, so we explicitly add the `worldedit-core` source set output.
-    from(project(":worldedit-core").sourceSets.main.get().output)
-    archiveFileName.set("${rootProject.name}-Bukkit-${project.version}.${archiveExtension.getOrElse("jar")}")
-    configurations = listOf(
-        project.configurations.runtimeClasspath.get(), // as is done by shadow for the default shadowJar
-        adaptersReobf
-    )
-    relocate("com.sk89q.jchronic", "com.sk89q.worldedit.jchronic")
-
-    dependencies {
-        include(project(":worldedit-libs:core"))
-        include(project(":worldedit-libs:${project.name.replace("worldedit-", "")}"))
-        include(project(":worldedit-core"))
-        include(dependency(libs.jchronic))
-        exclude(dependency(libs.jsr305))
-    }
-    minimize {
-        // jchronic + lz4-java uses reflection to load things, so we need to exclude it from minimizing
-        exclude(dependency(libs.jchronic))
-        exclude(dependency(libs.lz4Java))
-    }
-
-    // as is done by shadow for the default shadowJar
-    from(sourceSets.main.map { it.output })
-    manifest.from(tasks.jar.get().manifest) {
-     eachEntry {
-         if (key == "FAWE-Plugin-Jar-Type") {
-             value = "spigot"
-         }
-         if (key == "paperweight-mappings-namespace") {
-             exclude()
-         }
-     }
-    }
-    exclude("META-INF/INDEX.LIST", "META-INF/*.SF", "META-INF/*.DSA", "META-INF/*.RSA", "module-info.class")
-}
-
 tasks.named<ShadowJar>("shadowJar") {
     archiveFileName.set("${rootProject.name}-Paper-${project.version}.${archiveExtension.getOrElse("jar")}")
     configurations.add(adapters)
     manifest {
         attributes(
-            "paperweight-mappings-namespace" to "mojang",
-            "FAWE-Plugin-Jar-Type" to "mojang"
+            "paperweight-mappings-namespace" to "mojang"
         )
     }
 }
@@ -205,7 +152,7 @@ tasks.withType<ShadowJar>().configureEach {
         include(dependency(":worldedit-core"))
         include(dependency(":worldedit-libs:bukkit"))
         // Purposefully not included, we assume (even though no API exposes it) that Log4J will be present at runtime
-        // If it turns out not to be true for Spigot/Paper, our only two official platforms, this can be uncommented.
+        // If it turns out not to be true for Paper, our only official platform, this can be uncommented.
         // include(dependency("org.apache.logging.log4j:log4j-api"))
         include(dependency("org.antlr:antlr4-runtime"))
 
@@ -246,7 +193,6 @@ tasks.withType<ShadowJar>().configureEach {
 
 tasks.named("assemble").configure {
     dependsOn("shadowJar")
-    dependsOn("reobfShadowJar")
 }
 
 publishMods {
@@ -262,20 +208,9 @@ publishMods {
         projectDescription = providers.fileContents(layout.projectDirectory.file("README.md")).asText
     }
 
-    // We publish the reobfJar twice to ensure that the modrinth download menu picks the right jar for the platform regardless
-    // of minecraft version.
     val mojmapPaperVersions = listOf("1.21.1", "1.21.4", "1.21.5", "1.21.6", "1.21.7", "1.21.8", "1.21.9", "1.21.10",
             "1.21.11", "26.1", "26.1.1", "26.1.2", "26.2")
 
-    // Mark reobfJar as spigot
-    modrinth("spigot") {
-        from(common)
-        file = tasks.named<ShadowJar>("reobfShadowJar").flatMap { it.archiveFile }
-        minecraftVersions = mojmapPaperVersions
-        modLoaders = listOf("spigot")
-    }
-
-    // Mark mojang mapped jar as paper
     modrinth {
         from(common)
         file = tasks.named<ShadowJar>("shadowJar").flatMap { it.archiveFile }

@@ -8,11 +8,9 @@ plugins {
     id("io.papermc.paperweight.userdev")
 }
 
-val requiresReobfJar = project.name.startsWith("adapter-1_")
-
 paperweight {
     injectPaperRepository = false
-    reobfArtifactConfiguration = io.papermc.paperweight.userdev.ReobfArtifactConfiguration.REOBF_PRODUCTION
+    reobfArtifactConfiguration = io.papermc.paperweight.userdev.ReobfArtifactConfiguration.MOJANG_PRODUCTION
 }
 
 repositories {
@@ -51,12 +49,6 @@ dependencies {
 java {
     // Required when we de-sync release option and declared Java versions.
     disableAutoTargetJvm()
-}
-
-tasks.named("assemble") {
-    if (requiresReobfJar) {
-        dependsOn("reobfJar")
-    }
 }
 
 tasks.named<Javadoc>("javadoc") {

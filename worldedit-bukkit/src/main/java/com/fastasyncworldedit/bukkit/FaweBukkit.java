@@ -12,7 +12,6 @@ import com.fastasyncworldedit.bukkit.regions.TownyFeature;
 import com.fastasyncworldedit.bukkit.regions.WorldGuardFeature;
 import com.fastasyncworldedit.bukkit.util.BukkitTaskManager;
 import com.fastasyncworldedit.bukkit.util.ItemUtil;
-import com.fastasyncworldedit.bukkit.util.PaperSupport;
 import com.fastasyncworldedit.core.FAWEPlatformAdapterImpl;
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.IFawe;
@@ -70,7 +69,7 @@ public class FaweBukkit implements IFawe, Listener {
             } catch (Throwable e) {
                 LOGGER.error("Brush Listener Failed", e);
             }
-            if (PaperSupport.isPaper() && Settings.settings().EXPERIMENTAL.DYNAMIC_CHUNK_RENDERING > 1) {
+            if (Settings.settings().EXPERIMENTAL.DYNAMIC_CHUNK_RENDERING > 1) {
                 new RenderListener(plugin);
             }
         } catch (final Throwable e) {
@@ -80,7 +79,6 @@ public class FaweBukkit implements IFawe, Listener {
 
         platformAdapter = new NMSAdapter();
 
-        //PlotSquared support is limited to Spigot/Paper as of 02/20/2020
         TaskManager.taskManager().later(this::setupPlotSquared, 0);
 
         // Registered delayed Event Listeners
@@ -155,7 +153,7 @@ public class FaweBukkit implements IFawe, Listener {
                     .append("  • Provides: ").append(p.getDescription().getProvides()).append("\n");
         }
         int dataVersion = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS).getDataVersion();
-        if (dataVersion >= 2586 && PaperSupport.isPaper()) {
+        if (dataVersion >= 2586) {
             Collection<Datapack> datapacks = Bukkit.getServer().getDatapackManager().getEnabledPacks();
             msg.append("Enabled Datapacks (").append(datapacks.size()).append("):\n");
             for (Datapack dp : datapacks) {
@@ -271,13 +269,10 @@ public class FaweBukkit implements IFawe, Listener {
 
     @Override
     public Preloader getPreloader(boolean initialise) {
-        if (PaperSupport.isPaper()) {
-            if (preloader == null && initialise) {
-                return preloader = new AsyncPreloader();
-            }
-            return preloader;
+        if (preloader == null && initialise) {
+            return preloader = new AsyncPreloader();
         }
-        return null;
+        return preloader;
     }
 
     @Override

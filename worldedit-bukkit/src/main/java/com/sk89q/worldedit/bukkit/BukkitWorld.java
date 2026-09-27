@@ -19,7 +19,6 @@
 
 package com.sk89q.worldedit.bukkit;
 
-import com.fastasyncworldedit.bukkit.util.PaperSupport;
 import com.fastasyncworldedit.bukkit.util.WorldUnloadedException;
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.FaweCache;
@@ -292,12 +291,7 @@ public class BukkitWorld extends AbstractWorld {
         }
 
         Block block = getWorld().getBlockAt(pt.x(), pt.y(), pt.z());
-        BlockState state;
-        if (PaperSupport.isPaper()) {
-            state = block.getState(false);
-        } else {
-            state = block.getState();
-        }
+        BlockState state = block.getState(false);
         if (!(state instanceof InventoryHolder chest)) {
             return false;
         }
@@ -403,7 +397,7 @@ public class BukkitWorld extends AbstractWorld {
         int Z = pt.z() >> 4;
         if (Fawe.isMainThread()) {
             world.getChunkAt(X, Z);
-        } else if (PaperSupport.isPaper()) {
+        } else {
             world.getChunkAtAsync(X, Z, true);
         }
         //FAWE end
