@@ -67,6 +67,22 @@ dependencies {
 
 tasks.test {
     maxHeapSize = "1G"
+    systemProperty("fawe.stress.factor", providers.gradleProperty("fawe.stress.factor").getOrElse("1"))
+}
+
+// Concurrency stress tests only, at a higher intensity than in the regular test run.
+// Usage: ./gradlew :worldedit-core:stressTest [-Pfawe.stress.factor=N]
+val stressTest by tasks.registering(Test::class) {
+    description = "Runs the concurrency stress tests (tag 'stress') at a higher intensity."
+    group = "verification"
+    testClassesDirs = sourceSets.test.get().output.classesDirs
+    classpath = sourceSets.test.get().runtimeClasspath
+    useJUnitPlatform {
+        includeTags("stress")
+    }
+    maxHeapSize = "1G"
+    systemProperty("fawe.stress.factor", providers.gradleProperty("fawe.stress.factor").getOrElse("10"))
+    outputs.upToDateWhen { false }
 }
 
 tasks.compileJava {
