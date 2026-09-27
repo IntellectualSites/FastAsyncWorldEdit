@@ -37,6 +37,12 @@ public abstract class CharBlocks implements IBlocks {
         @Override
         public char[] get(CharBlocks blocks, int layer, char[] arr, boolean aggressive) {
             synchronized (blocks.sectionLocks[layer]) {
+                // Another thread may have initialised the section while we were waiting for the lock. Updating it again
+                // would overwrite anything written to it since, and expose a partially filled array to lock-free readers.
+                char[] existing = blocks.blocks[layer];
+                if (existing != null) {
+                    return existing;
+                }
                 return update(blocks, layer, aggressive);
             }
         }
