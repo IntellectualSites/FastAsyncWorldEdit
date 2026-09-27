@@ -1,7 +1,6 @@
 package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v26_1.regen;
 
 import com.fastasyncworldedit.bukkit.adapter.Regenerator;
-import com.fastasyncworldedit.bukkit.util.PaperSupport;
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.queue.IChunkCache;
 import com.fastasyncworldedit.core.queue.IChunkGet;
@@ -114,10 +113,6 @@ public class PaperweightRegen extends Regenerator {
 
     @Override
     protected boolean initNewWorld() throws Exception {
-        if (!PaperSupport.isPaper()) {
-            throw new UnsupportedOperationException("Regen requires Paper");
-        }
-
         //world folder
         tempDir = java.nio.file.Files.createTempDirectory("FastAsyncWorldEditWorldGen");
 

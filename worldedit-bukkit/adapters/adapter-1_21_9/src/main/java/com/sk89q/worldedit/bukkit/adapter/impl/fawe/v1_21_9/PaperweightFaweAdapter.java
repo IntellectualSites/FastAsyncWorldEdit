@@ -1,8 +1,6 @@
 package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_21_9;
 
 import com.fastasyncworldedit.bukkit.adapter.FaweAdapter;
-import com.fastasyncworldedit.bukkit.adapter.NMSRelighterFactory;
-import com.fastasyncworldedit.bukkit.util.PaperSupport;
 import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.entity.LazyBaseEntity;
 import com.fastasyncworldedit.core.extent.processor.PlacementStateProcessor;
@@ -120,8 +118,6 @@ import org.enginehub.linbus.tree.LinTag;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -145,17 +141,9 @@ import static net.minecraft.core.registries.Registries.BIOME;
 public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.Tag, ServerLevel> {
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
-    private static Method CHUNK_HOLDER_WAS_ACCESSIBLE_SINCE_LAST_SAVE;
     private static final Codec<DataComponentPatch> COMPONENTS_CODEC = DataComponentPatch.CODEC.optionalFieldOf(
             "components", DataComponentPatch.EMPTY
     ).codec();
-
-    static {
-        try {
-            CHUNK_HOLDER_WAS_ACCESSIBLE_SINCE_LAST_SAVE = ChunkHolder.class.getDeclaredMethod("wasAccessibleSinceLastSave");
-        } catch (NoSuchMethodException ignored) { // may not be present in newer paper versions
-        }
-    }
 
     private final PaperweightMapChunkUtil mapUtil = new PaperweightMapChunkUtil();
 
@@ -499,7 +487,7 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
     public void sendFakeChunk(org.bukkit.World world, Player player, ChunkPacket chunkPacket) {
         ServerLevel nmsWorld = getServerLevel(world);
         ChunkHolder map = PaperweightPlatformAdapter.getPlayerChunk(nmsWorld, chunkPacket.getChunkX(), chunkPacket.getChunkZ());
-        if (map != null && wasAccessibleSinceLastSave(map)) {
+        if (map != null) {
             boolean flag = false;
             // PlayerChunk.d players = map.players;
             Stream<ServerPlayer> stream = /*players.a(new ChunkCoordIntPair(packet.getChunkX(), packet.getChunkZ()), flag)
@@ -871,11 +859,7 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
 
     @Override
     public RelighterFactory getRelighterFactory() {
-        if (PaperSupport.isPaper()) {
-            return new PaperweightStarlightRelighterFactory();
-        } else {
-            return new NMSRelighterFactory();
-        }
+        return new PaperweightStarlightRelighterFactory();
     }
 
     @Override
@@ -900,17 +884,6 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
     @Override
     public PlacementStateProcessor getPlatformPlacementProcessor(Extent extent, BlockTypeMask mask, Region region) {
         return new PaperweightPlacementStateProcessor(extent, mask, region);
-    }
-
-    private boolean wasAccessibleSinceLastSave(ChunkHolder holder) {
-        if (PaperSupport.isPaper()) { // Papers new chunk system has no related replacement - therefor we assume true.
-            return true;
-        }
-        try {
-            return (boolean) CHUNK_HOLDER_WAS_ACCESSIBLE_SINCE_LAST_SAVE.invoke(holder);
-        } catch (IllegalAccessException | InvocationTargetException ignored) {
-            return false;
-        }
     }
 
 }

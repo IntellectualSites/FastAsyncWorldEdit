@@ -1,6 +1,5 @@
 package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v26_2;
 
-import com.fastasyncworldedit.bukkit.util.PaperSupport;
 import com.fastasyncworldedit.core.extent.processor.heightmap.HeightMapType;
 import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.fastasyncworldedit.core.queue.IBlocks;
@@ -190,19 +189,8 @@ public class PaperweightGetBlocks_Copy implements IChunkGet {
             biomes[layer] = new Holder[64];
         }
         if (biomeData instanceof PalettedContainer<Holder<Biome>> palettedContainer) {
-            if (PaperSupport.isPaper()) {
-                for (int i = 0; i < 64; i++) {
-                    biomes[layer][i] = palettedContainer.get(i); // Only public on paper
-                }
-            } else {
-                try {
-                    for (int i = 0; i < 64; i++) {
-                        biomes[layer][i] =
-                            (Holder<Biome>) PaperweightPlatformAdapter.PALETTED_CONTAINER_GET.invoke(palettedContainer, i);
-                    }
-                } catch (Throwable e) {
-                    throw new RuntimeException(e);
-                }
+            for (int i = 0; i < 64; i++) {
+                biomes[layer][i] = palettedContainer.get(i); // Only public on paper
             }
         } else {
             LOGGER.error(

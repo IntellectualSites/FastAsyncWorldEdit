@@ -19,7 +19,6 @@
 
 package com.sk89q.worldedit.bukkit.adapter.impl.v26_2;
 
-import com.fastasyncworldedit.bukkit.util.PaperSupport;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -748,10 +747,6 @@ public final class PaperweightAdapter implements BukkitImplAdapter<Tag> {
     }
 
     private void doRegen(World bukkitWorld, Region region, Extent extent, RegenOptions options) throws Exception {
-        if (!PaperSupport.isPaper()) {
-            throw new UnsupportedOperationException("Regen requires Paper");
-        }
-
         Environment env = bukkitWorld.getEnvironment();
         ChunkGenerator gen = bukkitWorld.getGenerator();
 

@@ -3,7 +3,6 @@ package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v26_2;
 import com.fastasyncworldedit.bukkit.adapter.AbstractBukkitGetBlocks;
 import com.fastasyncworldedit.bukkit.adapter.DelegateSemaphore;
 import com.fastasyncworldedit.bukkit.adapter.NativeEntityFunctionSet;
-import com.fastasyncworldedit.bukkit.util.PaperSupport;
 import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.extent.processor.heightmap.HeightMapType;
@@ -360,7 +359,7 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
                 int ordinal = set.getBlock(lx, ly, lz).getOrdinal();
                 if (ordinal != BlockTypesCache.ReservedIDs.__RESERVED__) {
                     BlockEntity tile = entry.getValue();
-                    if (PaperSupport.isPaper() && tile instanceof BeaconBlockEntity) {
+                    if (tile instanceof BeaconBlockEntity) {
                         if (beacons == null) {
                             beacons = new ArrayList<>();
                         }
@@ -686,20 +685,10 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
                                 if (!set.getSideEffectSet().shouldApply(SideEffect.ENTITY_EVENTS)) {
                                     entity.spawnReason = CreatureSpawnEvent.SpawnReason.CUSTOM;
                                     entity.generation = false;
-                                    if (PaperSupport.isPaper()) {
-                                        if (!nmsWorld.moonrise$getEntityLookup().addNewEntity(entity, false)) {
-                                            onError.run();
-                                        }
-                                        continue;
+                                    if (!nmsWorld.moonrise$getEntityLookup().addNewEntity(entity, false)) {
+                                        onError.run();
                                     }
-                                    // Not paper
-                                    try {
-                                        PaperweightPlatformAdapter.getEntitySectionManager(nmsWorld).addNewEntity(entity);
-                                        continue;
-                                    } catch (IllegalAccessException e) {
-                                        // Fallback
-                                        LOGGER.warn("Error bypassing entity events on spawn on Spigot", e);
-                                    }
+                                    continue;
                                 }
                                 if (!nmsWorld.addFreshEntity(entity, CreatureSpawnEvent.SpawnReason.CUSTOM)) {
                                     onError.run();
