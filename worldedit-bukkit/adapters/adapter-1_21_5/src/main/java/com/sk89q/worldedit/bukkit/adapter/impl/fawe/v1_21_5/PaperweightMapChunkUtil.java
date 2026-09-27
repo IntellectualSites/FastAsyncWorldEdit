@@ -1,7 +1,6 @@
 package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_21_5;
 
 import com.fastasyncworldedit.bukkit.adapter.MapChunkUtil;
-import com.sk89q.worldedit.bukkit.adapter.Refraction;
 import net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData;
 import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
 
@@ -9,13 +8,13 @@ import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
 public class PaperweightMapChunkUtil extends MapChunkUtil<ClientboundLevelChunkWithLightPacket> {
 
     public PaperweightMapChunkUtil() throws NoSuchFieldException {
-        fieldX = ClientboundLevelChunkPacketData.class.getDeclaredField(Refraction.pickName("TWO_MEGABYTES", "a"));
-        fieldZ = ClientboundLevelChunkWithLightPacket.class.getDeclaredField(Refraction.pickName("x", "b"));
-        fieldBitMask = ClientboundLevelChunkWithLightPacket.class.getDeclaredField(Refraction.pickName("z", "c"));
-        fieldHeightMap = ClientboundLevelChunkPacketData.class.getDeclaredField(Refraction.pickName("heightmaps", "b"));
-        fieldChunkData = ClientboundLevelChunkWithLightPacket.class.getDeclaredField(Refraction.pickName("chunkData", "d"));
-        fieldBlockEntities = ClientboundLevelChunkPacketData.class.getDeclaredField(Refraction.pickName("buffer", "c"));
-        fieldFull = ClientboundLevelChunkPacketData.class.getDeclaredField(Refraction.pickName("blockEntitiesData", "d"));
+        fieldX = ClientboundLevelChunkPacketData.class.getDeclaredField("TWO_MEGABYTES");
+        fieldZ = ClientboundLevelChunkWithLightPacket.class.getDeclaredField("x");
+        fieldBitMask = ClientboundLevelChunkWithLightPacket.class.getDeclaredField("z");
+        fieldHeightMap = ClientboundLevelChunkPacketData.class.getDeclaredField("heightmaps");
+        fieldChunkData = ClientboundLevelChunkWithLightPacket.class.getDeclaredField("chunkData");
+        fieldBlockEntities = ClientboundLevelChunkPacketData.class.getDeclaredField("buffer");
+        fieldFull = ClientboundLevelChunkPacketData.class.getDeclaredField("blockEntitiesData");
         fieldX.setAccessible(true);
         fieldZ.setAccessible(true);
         fieldBitMask.setAccessible(true);

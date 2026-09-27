@@ -8,7 +8,6 @@ import com.fastasyncworldedit.core.queue.implementation.chunk.ChunkCache;
 import com.google.common.collect.ImmutableList;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
-import com.sk89q.worldedit.bukkit.adapter.Refraction;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.io.file.SafeFiles;
@@ -71,8 +70,7 @@ public class PaperweightRegen extends Regenerator {
             }
             paperConfigField = tmpPaperConfigField;
 
-            generatorSettingBaseSupplierField = NoiseBasedChunkGenerator.class.getDeclaredField(Refraction.pickName(
-                    "settings", "e"));
+            generatorSettingBaseSupplierField = NoiseBasedChunkGenerator.class.getDeclaredField("settings");
             generatorSettingBaseSupplierField.setAccessible(true);
         } catch (Exception e) {
             throw new RuntimeException(e);

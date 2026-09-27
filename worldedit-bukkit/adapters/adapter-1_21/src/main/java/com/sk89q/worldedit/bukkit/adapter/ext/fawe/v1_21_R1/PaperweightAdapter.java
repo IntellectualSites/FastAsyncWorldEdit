@@ -35,7 +35,6 @@ import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
-import com.sk89q.worldedit.bukkit.adapter.Refraction;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.extension.platform.Watchdog;
 import com.sk89q.worldedit.extent.Extent;
@@ -1206,7 +1205,7 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
         MojangWatchdog(DedicatedServer server) throws NoSuchFieldException {
             this.server = server;
             Field tickField = MinecraftServer.class.getDeclaredField(
-                    Refraction.pickName("nextTickTime", "ag")
+                    "nextTickTime"
             );
             if (tickField.getType() != long.class) {
                 throw new IllegalStateException("nextTickTime is not a long field, mapping is likely incorrect");

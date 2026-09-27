@@ -121,7 +121,7 @@ public class WorldEditPlugin extends JavaPlugin {
     public void onLoad() {
 
         //FAWE start
-        // This is already covered by Spigot, however, a more pesky warning with a proper explanation over "Ambiguous plugin name..." can't hurt.
+        // This is already covered by Paper, however, a more pesky warning with a proper explanation over "Ambiguous plugin name..." can't hurt.
         Plugin[] plugins = Bukkit.getServer().getPluginManager().getPlugins();
         for (Plugin p : plugins) {
             if (p.getName().equals("WorldEdit")) {
@@ -340,7 +340,7 @@ public class WorldEditPlugin extends JavaPlugin {
             }
         } catch (NoSuchMethodError ignored) {
             LOGGER.warn(
-                    "The version of Spigot/Paper you are using doesn't support Tags. The usage of tags with WorldEdit will not work until you update.");
+                    "The version of Paper you are using doesn't support Tags. The usage of tags with WorldEdit will not work until you update.");
         }
     }
 

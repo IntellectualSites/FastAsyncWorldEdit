@@ -13,7 +13,6 @@ import com.fastasyncworldedit.core.util.MathMan;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
-import com.sk89q.worldedit.bukkit.adapter.Refraction;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
@@ -109,43 +108,33 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
     static {
         final MethodHandles.Lookup lookup = MethodHandles.lookup();
         try {
-            fieldData = PalettedContainer.class.getDeclaredField(Refraction.pickName("data", "d"));
+            fieldData = PalettedContainer.class.getDeclaredField("data");
             fieldData.setAccessible(true);
 
             Class<?> dataClazz = fieldData.getType();
             dataConstructor = dataClazz.getDeclaredConstructors()[0];
             dataConstructor.setAccessible(true);
 
-            fieldStorage = dataClazz.getDeclaredField(Refraction.pickName("storage", "b"));
+            fieldStorage = dataClazz.getDeclaredField("storage");
             fieldStorage.setAccessible(true);
-            fieldPalette = dataClazz.getDeclaredField(Refraction.pickName("palette", "c"));
+            fieldPalette = dataClazz.getDeclaredField("palette");
             fieldPalette.setAccessible(true);
 
-            fieldTickingFluidCount = LevelChunkSection.class.getDeclaredField(Refraction.pickName("tickingFluidCount", "g"));
+            fieldTickingFluidCount = LevelChunkSection.class.getDeclaredField("tickingFluidCount");
             fieldTickingFluidCount.setAccessible(true);
-            fieldTickingBlockCount = LevelChunkSection.class.getDeclaredField(Refraction.pickName("tickingBlockCount", "f"));
+            fieldTickingBlockCount = LevelChunkSection.class.getDeclaredField("tickingBlockCount");
             fieldTickingBlockCount.setAccessible(true);
-            Field tmpFieldBiomes;
-            try {
-                // Seems it's sometimes biomes and sometimes "i". Idk this is just easier than having to try to deal with it
-                tmpFieldBiomes = LevelChunkSection.class.getDeclaredField("biomes"); // apparently unobf
-            } catch (NoSuchFieldException ignored) {
-                tmpFieldBiomes = LevelChunkSection.class.getDeclaredField("i"); // apparently obf
-            }
-            fieldBiomes = tmpFieldBiomes;
+            fieldBiomes = LevelChunkSection.class.getDeclaredField("biomes");
             fieldBiomes.setAccessible(true);
 
             Method getVisibleChunkIfPresent = ChunkMap.class.getDeclaredMethod(
-                    Refraction.pickName(
-                            "getVisibleChunkIfPresent",
-                            "b"
-                    ), long.class
+                    "getVisibleChunkIfPresent", long.class
             );
             getVisibleChunkIfPresent.setAccessible(true);
             methodGetVisibleChunk = lookup.unreflect(getVisibleChunkIfPresent);
 
             Method removeGameEventListener = LevelChunk.class.getDeclaredMethod(
-                    Refraction.pickName("removeGameEventListener", "a"),
+                    "removeGameEventListener",
                     BlockEntity.class,
                     ServerLevel.class
             );
@@ -153,15 +142,12 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             methodRemoveGameEventListener = lookup.unreflect(removeGameEventListener);
 
             Method removeBlockEntityTicker = LevelChunk.class.getDeclaredMethod(
-                    Refraction.pickName(
-                            "removeBlockEntityTicker",
-                            "k"
-                    ), BlockPos.class
+                    "removeBlockEntityTicker", BlockPos.class
             );
             removeBlockEntityTicker.setAccessible(true);
             methodremoveTickingBlockEntity = lookup.unreflect(removeBlockEntityTicker);
 
-            fieldRemove = BlockEntity.class.getDeclaredField(Refraction.pickName("remove", "p"));
+            fieldRemove = BlockEntity.class.getDeclaredField("remove");
             fieldRemove.setAccessible(true);
         } catch (RuntimeException | Error e) {
             throw e;
