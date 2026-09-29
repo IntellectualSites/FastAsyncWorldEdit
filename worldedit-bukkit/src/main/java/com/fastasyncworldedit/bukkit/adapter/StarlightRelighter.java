@@ -78,7 +78,8 @@ public abstract class StarlightRelighter<SERVER_LEVEL, CHUNK_POS> implements Rel
                 LOGGER.warn("Processed {} chunks instead of {}", i, coords.size());
             }
             // post process chunks on main thread
-            TaskManager.taskManager().task(() -> postProcessChunks(coords));
+            // safe to run globally on Folia as ticket modification is behind a lock
+            TaskManager.taskManager().taskGlobal(() -> postProcessChunks(coords));
             // call callback on our own threads
             TaskManager.taskManager().async(andThen);
         };
@@ -99,7 +100,7 @@ public abstract class StarlightRelighter<SERVER_LEVEL, CHUNK_POS> implements Rel
      */
     protected void fixLighting(LongSet chunks, Runnable andThen) {
         Set<CHUNK_POS> coords = convertChunkKeysToChunkPos(chunks);
-        TaskManager.taskManager().task(() -> {
+        TaskManager.taskManager().taskGlobal(() -> {
             // trigger chunk load and apply ticket on main thread
             List<CompletableFuture<?>> futures = chunkLoadFutures(coords);
             // collect futures and trigger relight once all chunks are loaded

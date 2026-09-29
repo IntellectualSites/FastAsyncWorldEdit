@@ -7,6 +7,7 @@ import com.fastasyncworldedit.core.queue.implementation.QueueHandler;
 import com.fastasyncworldedit.core.util.CachedTextureUtil;
 import com.fastasyncworldedit.core.util.CleanTextureUtil;
 import com.fastasyncworldedit.core.util.FaweTimer;
+import com.fastasyncworldedit.core.util.FoliaSupport;
 import com.fastasyncworldedit.core.util.MainUtil;
 import com.fastasyncworldedit.core.util.MemUtil;
 import com.fastasyncworldedit.core.util.RandomTextureUtil;
@@ -130,7 +131,7 @@ public class Fawe {
         this.timer = new FaweTimer();
 
         // Delayed worldedit setup
-        TaskManager.taskManager().later(() -> {
+        TaskManager.taskManager().laterGlobal(() -> {
             try {
                 WEManager.weManager().addManagers(Fawe.this.implementation.getMaskManagers());
             } catch (Throwable ignored) {
@@ -138,7 +139,9 @@ public class Fawe {
         }, 0);
         TaskManager.taskManager().repeatAsync(MemUtil::checkAndSetApproachingLimit, 1);
 
-        TaskManager.taskManager().repeat(timer, 1);
+        if (!FoliaSupport.isFolia()) {
+            TaskManager.taskManager().repeat(timer, 1);
+        }
         uuidKeyQueuedExecutorService = new KeyQueuedExecutorService<>(new ThreadPoolExecutor(
                 1,
                 Settings.settings().QUEUE.PARALLEL_THREADS,
@@ -207,8 +210,13 @@ public class Fawe {
         }
     }
 
+    @Deprecated
     public static boolean isMainThread() {
         return instance == null || instance.thread == Thread.currentThread();
+    }
+
+    public static boolean isTickThread() {
+        return instance == null || instance.implementation.isTickThread();
     }
 
     /**

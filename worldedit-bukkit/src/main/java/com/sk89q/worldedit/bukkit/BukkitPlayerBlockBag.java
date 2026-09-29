@@ -172,10 +172,10 @@ public class BukkitPlayerBlockBag extends BlockBag implements SlottableBlockBag 
     @Override
     public void flushChanges() {
         if (items != null) {
-            TaskManager.taskManager().sync(() -> {
+            TaskManager.taskManager().syncWith(() -> {
                 player.getInventory().setContents(items);
                 return null;
-            });
+            }, BukkitAdapter.adapt(player));
             items = null;
         }
     }

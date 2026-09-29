@@ -4099,8 +4099,9 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
             }
             if (containsAny) {
                 changes++;
-                TaskManager.taskManager().sync(() -> {
+                TaskManager.taskManager().syncGlobal(() -> {
                     regenerateChunk(cx, cz, biome, seed);
+                    return null;
                 });
             }
         }

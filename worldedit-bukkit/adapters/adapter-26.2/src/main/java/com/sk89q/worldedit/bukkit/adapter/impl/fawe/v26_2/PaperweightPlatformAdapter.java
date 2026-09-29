@@ -10,12 +10,13 @@ import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.math.BitArrayUnstretched;
 import com.fastasyncworldedit.core.math.IntPair;
+import com.fastasyncworldedit.core.util.FoliaSupport;
 import com.fastasyncworldedit.core.util.MathMan;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.mojang.serialization.DataResult;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
-import com.sk89q.worldedit.bukkit.adapter.Refraction;
 import com.sk89q.worldedit.bukkit.adapter.impl.v26_2.PaperweightBlockMaterial;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.world.biome.BiomeType;
@@ -52,6 +53,7 @@ import net.minecraft.world.level.chunk.Strategy;
 import net.minecraft.world.level.chunk.status.ChunkStatus;
 import net.minecraft.world.level.entity.PersistentEntitySectionManager;
 import org.apache.logging.log4j.Logger;
+import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.craftbukkit.CraftChunk;
 import org.enginehub.linbus.tree.LinCompoundTag;
@@ -112,31 +114,28 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
     static {
         final MethodHandles.Lookup lookup = MethodHandles.lookup();
         try {
-            fieldData = PalettedContainer.class.getDeclaredField(Refraction.pickName("data", "b"));
+            fieldData = PalettedContainer.class.getDeclaredField("data");
             fieldData.setAccessible(true);
 
             Class<?> dataClazz = fieldData.getType();
             dataConstructor = dataClazz.getDeclaredConstructors()[0];
             dataConstructor.setAccessible(true);
 
-            fieldStorage = dataClazz.getDeclaredField(Refraction.pickName("storage", "b"));
+            fieldStorage = dataClazz.getDeclaredField("storage");
             fieldStorage.setAccessible(true);
-            fieldPalette = dataClazz.getDeclaredField(Refraction.pickName("palette", "c"));
+            fieldPalette = dataClazz.getDeclaredField("palette");
             fieldPalette.setAccessible(true);
 
-            //noinspection JavaLangInvokeHandleSignature - method is obfuscated
+            //noinspection JavaLangInvokeHandleSignature - signature differs between Paper and Spigot
             palettedContainerUnpackSpigot = PaperSupport.isPaper() ? null : lookup.findStatic(
-                PalettedContainer.class,
-                "a", // unpack
-                MethodType.methodType(DataResult.class, Strategy.class, PalettedContainerRO.PackedData.class)
+                    PalettedContainer.class,
+                    "unpack",
+                    MethodType.methodType(DataResult.class, Strategy.class, PalettedContainerRO.PackedData.class)
             );
 
-            fieldTickingFluidCount = LevelChunkSection.class.getDeclaredField(Refraction.pickName(
-                    "tickingFluidCount",
-                    "g"
-            ));
+            fieldTickingFluidCount = LevelChunkSection.class.getDeclaredField("tickingFluidCount");
             fieldTickingFluidCount.setAccessible(true);
-            fieldTickingBlockCount = LevelChunkSection.class.getDeclaredField(Refraction.pickName("tickingBlockCount", "f"));
+            fieldTickingBlockCount = LevelChunkSection.class.getDeclaredField("tickingBlockCount");
             fieldTickingBlockCount.setAccessible(true);
             Field tmpFieldBiomes;
             try {
@@ -148,21 +147,16 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             fieldBiomes = tmpFieldBiomes;
             fieldBiomes.setAccessible(true);
 
-            Method getVisibleChunkIfPresent = ChunkMap.class.getDeclaredMethod(
-                    Refraction.pickName(
-                            "getVisibleChunkIfPresent",
-                            "b"
-                    ), long.class
-            );
+            Method getVisibleChunkIfPresent = ChunkMap.class.getDeclaredMethod("getVisibleChunkIfPresent", long.class);
             getVisibleChunkIfPresent.setAccessible(true);
             methodGetVisibleChunk = lookup.unreflect(getVisibleChunkIfPresent);
 
             if (!PaperSupport.isPaper()) {
-                fieldThreadingDetector = PalettedContainer.class.getDeclaredField(Refraction.pickName("threadingDetector", "d"));
+                fieldThreadingDetector = PalettedContainer.class.getDeclaredField("threadingDetector");
                 fieldThreadingDetector.setAccessible(true);
-                fieldLock = ThreadingDetector.class.getDeclaredField(Refraction.pickName("lock", "c"));
+                fieldLock = ThreadingDetector.class.getDeclaredField("lock");
                 fieldLock.setAccessible(true);
-                SERVER_LEVEL_ENTITY_MANAGER = ServerLevel.class.getDeclaredField(Refraction.pickName("entityManager", "M"));
+                SERVER_LEVEL_ENTITY_MANAGER = ServerLevel.class.getDeclaredField("entityManager");
                 SERVER_LEVEL_ENTITY_MANAGER.setAccessible(true);
             } else {
                 // in paper, the used methods are synchronized properly
@@ -171,29 +165,21 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             }
 
             Method removeGameEventListener = LevelChunk.class.getDeclaredMethod(
-                    Refraction.pickName("removeGameEventListener", "a"),
+                    "removeGameEventListener",
                     BlockEntity.class,
                     ServerLevel.class
             );
             removeGameEventListener.setAccessible(true);
             methodRemoveGameEventListener = lookup.unreflect(removeGameEventListener);
 
-            Method removeBlockEntityTicker = LevelChunk.class.getDeclaredMethod(
-                    Refraction.pickName(
-                            "removeBlockEntityTicker",
-                            "k"
-                    ), BlockPos.class
-            );
+            Method removeBlockEntityTicker = LevelChunk.class.getDeclaredMethod("removeBlockEntityTicker", BlockPos.class);
             removeBlockEntityTicker.setAccessible(true);
             methodremoveTickingBlockEntity = lookup.unreflect(removeBlockEntityTicker);
 
-            fieldRemove = BlockEntity.class.getDeclaredField(Refraction.pickName("remove", "p"));
+            fieldRemove = BlockEntity.class.getDeclaredField("remove");
             fieldRemove.setAccessible(true);
 
-            Method palettedContainerGet = PalettedContainer.class.getDeclaredMethod(
-                    Refraction.pickName("get", "a"),
-                    int.class
-            );
+            Method palettedContainerGet = PalettedContainer.class.getDeclaredMethod("get", int.class);
             palettedContainerGet.setAccessible(true);
             PALETTED_CONTAINER_GET = lookup.unreflect(palettedContainerGet);
         } catch (RuntimeException | Error e) {
@@ -328,9 +314,14 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
 
     private static void addTicket(ServerLevel serverLevel, int chunkX, int chunkZ) {
         // Ensure chunk is definitely loaded before applying a ticket
-        io.papermc.paper.util.MCUtil.MAIN_EXECUTOR.execute(() -> serverLevel
+        final Runnable addChunkTicket = () -> serverLevel
                 .getChunkSource()
-                .addTicketWithRadius(ChunkHolderManager.UNLOAD_COOLDOWN, new ChunkPos(chunkX, chunkZ), 0));
+                .addTicketWithRadius(ChunkHolderManager.UNLOAD_COOLDOWN, new ChunkPos(chunkX, chunkZ), 0);
+        if (FoliaSupport.isFolia()) {
+            addChunkTicket.run();
+            return;
+        }
+        io.papermc.paper.util.MCUtil.MAIN_EXECUTOR.execute(addChunkTicket);
     }
 
     public static ChunkHolder getPlayerChunk(ServerLevel nmsWorld, final int chunkX, final int chunkZ) {
@@ -363,7 +354,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         if (lockHolder.chunkLock == null) {
             return;
         }
-        MinecraftServer.getServer().execute(() -> {
+        Runnable sendPacket = () -> {
             try {
                 ChunkPos pos = levelChunk.getPos();
                 ClientboundLevelChunkWithLightPacket packet;
@@ -388,7 +379,12 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             } finally {
                 NMSAdapter.endChunkPacketSend(nmsWorld.getWorld().getName(), pair, lockHolder);
             }
-        });
+        };
+        if (FoliaSupport.isFolia()) {
+            task(sendPacket, nmsWorld, chunkX, chunkZ);
+        } else {
+            MinecraftServer.getServer().execute(sendPacket);
+        }
     }
 
     private static List<ServerPlayer> nearbyPlayers(ServerLevel serverLevel, ChunkPos coordIntPair) {
@@ -626,6 +622,17 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
     static PersistentEntitySectionManager<Entity> getEntitySectionManager(ServerLevel level) throws IllegalAccessException {
         //noinspection unchecked
         return (PersistentEntitySectionManager<Entity>) (SERVER_LEVEL_ENTITY_MANAGER.get(level));
+    }
+
+    public static void task(Runnable task, ServerLevel level, int chunkX, int chunkZ) {
+        TaskManager.taskManager().task(task, BukkitAdapter.adapt(level.getWorld()), chunkX, chunkZ);
+    }
+
+    public static boolean isTickThreadFor(LevelChunk levelChunk) {
+        if (FoliaSupport.isFolia()) {
+            return Bukkit.isOwnedByCurrentRegion(levelChunk.getLevel().getWorld(), levelChunk.locX, levelChunk.locZ);
+        }
+        return Fawe.isTickThread();
     }
 
 }

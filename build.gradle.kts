@@ -6,8 +6,8 @@ plugins {
     alias(libs.plugins.codecov)
     jacoco
     id("buildlogic.common")
-    id("com.gradleup.nmcp.aggregation") version "1.6.1"
-    id("xyz.jpenilla.run-paper") version "3.0.2"
+    id("com.gradleup.nmcp.aggregation") version "1.6.2"
+    id("xyz.jpenilla.run-paper") version "3.1.0"
 }
 
 val rootVersion: String = (extra.properties["rootVersion"] as? String) ?: "3.0.0"
@@ -122,7 +122,6 @@ tasks {
         pluginJars(*project(":worldedit-bukkit").getTasksByName("shadowJar", false).map { (it as Jar).archiveFile }
                 .toTypedArray())
         jvmArgs("-Dcom.mojang.eula.agree=true")
-
     }
 }
 

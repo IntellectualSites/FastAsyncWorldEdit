@@ -1,5 +1,6 @@
 package com.fastasyncworldedit.bukkit.adapter;
 
+import com.fastasyncworldedit.core.util.FoliaSupport;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
@@ -13,8 +14,16 @@ import org.bukkit.TreeType;
 import org.bukkit.World;
 import org.bukkit.block.BlockState;
 
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.VarHandle;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import static com.fastasyncworldedit.core.util.FoliaSupport.getRethrowing;
+import static com.fastasyncworldedit.core.util.FoliaSupport.runRethrowing;
+import static java.lang.invoke.MethodType.methodType;
 
 /**
  * A base class for version-specific implementations of the BukkitImplAdapter
@@ -24,11 +33,44 @@ import java.util.Map;
  */
 public abstract class FaweAdapter<TAG, SERVER_LEVEL> extends CachedBukkitAdapter implements IDelegateBukkitImplAdapter<TAG> {
 
+    private static final VarHandle CAPTURE_TREE_GENERATION;
+    private static final VarHandle CAPTURE_BLOCK_STATES;
+    private static final MethodHandle CAPTURED_BLOCK_STATES;
+    private static final MethodHandle GET_CURRENT_WORLD_DATA;
+
     protected final BukkitImplAdapter<TAG> parent;
     protected int[] ibdToOrdinal = null;
     protected int[] ordinalToIbdID = null;
     protected boolean initialised = false;
     protected Map<String, List<Property<?>>> allBlockProperties = null;
+
+    static {
+        VarHandle captureTreeGeneration = null;
+        VarHandle captureBlockStates = null;
+        MethodHandle capturedBlockStates = null;
+        MethodHandle getCurrentWorldData = null;
+        if (FoliaSupport.isFolia()) {
+            MethodHandles.Lookup lookup = MethodHandles.lookup();
+            try {
+                Class<?> regionizedWorldDataClass = Class.forName("io.papermc.paper.threadedregions.RegionizedWorldData");
+                Class<?> serverLevelClass = regionizedWorldDataClass.getDeclaredField("world").getType();
+                captureTreeGeneration = lookup.findVarHandle(regionizedWorldDataClass, "captureTreeGeneration", boolean.class);
+                captureBlockStates = lookup.findVarHandle(regionizedWorldDataClass, "captureBlockStates", boolean.class);
+                capturedBlockStates = lookup.findGetter(regionizedWorldDataClass, "capturedBlockStates", Map.class);
+                getCurrentWorldData = lookup.findVirtual(
+                        serverLevelClass,
+                        "getCurrentWorldData",
+                        methodType(regionizedWorldDataClass)
+                );
+            } catch (ClassNotFoundException | NoSuchFieldException | NoSuchMethodException | IllegalAccessException e) {
+                throw new AssertionError("Incompatible Folia version", e);
+            }
+        }
+        CAPTURE_TREE_GENERATION = captureTreeGeneration;
+        CAPTURE_BLOCK_STATES = captureBlockStates;
+        CAPTURED_BLOCK_STATES = capturedBlockStates;
+        GET_CURRENT_WORLD_DATA = getCurrentWorldData;
+    }
 
     protected FaweAdapter(final BukkitImplAdapter<TAG> parent) {
         this.parent = parent;
@@ -53,17 +95,17 @@ public abstract class FaweAdapter<TAG, SERVER_LEVEL> extends CachedBukkitAdapter
         }
         BlockVector3 target = blockVector3;
         SERVER_LEVEL serverLevel = getServerLevel(world);
-        List<BlockState> placed = TaskManager.taskManager().sync(() -> {
-            preCaptureStates(serverLevel);
+        List<BlockState> placed = TaskManager.taskManager().syncAt(() -> {
+            preCaptureStatesCommon(serverLevel);
             try {
                 if (!world.generateTree(BukkitAdapter.adapt(world, target), bukkitType)) {
                     return null;
                 }
-                return getCapturedBlockStatesCopy(serverLevel);
+                return getCapturedBlockStatesCopyCommon(serverLevel);
             } finally {
-                postCaptureBlockStates(serverLevel);
+                postCaptureBlockStatesCommon(serverLevel);
             }
-        });
+        }, BukkitAdapter.adapt(world), blockVector3.getBlockX() >> 4, blockVector3.getBlockZ() >> 4);
 
         if (placed == null || placed.isEmpty()) {
             return false;
@@ -91,12 +133,63 @@ public abstract class FaweAdapter<TAG, SERVER_LEVEL> extends CachedBukkitAdapter
         for (int i = 0; i < 4096; i++) {
             char paletteVal = data[i];
             char val = paletteToOrdinal[paletteVal];
-            assert val != Character.MAX_VALUE; // paletteToOrdinal should prevent that
+            assert val != Character.MAX_VALUE;
             data[i] = val;
         }
     }
 
     protected abstract void ensureInit();
+
+    private void preCaptureStatesCommon(SERVER_LEVEL serverLevel) {
+        if (FoliaSupport.isFolia()) {
+            preCaptureStatesFolia(serverLevel);
+        } else {
+            preCaptureStates(serverLevel);
+        }
+    }
+
+    private List<BlockState> getCapturedBlockStatesCopyCommon(SERVER_LEVEL serverLevel) {
+        if (FoliaSupport.isFolia()) {
+            return getCapturedBlockStatesCopyFolia(serverLevel);
+        } else {
+            return getCapturedBlockStatesCopy(serverLevel);
+        }
+    }
+
+    private void postCaptureBlockStatesCommon(SERVER_LEVEL serverLevel) {
+        if (FoliaSupport.isFolia()) {
+            postCaptureBlockStatesFolia(serverLevel);
+        } else {
+            postCaptureBlockStates(serverLevel);
+        }
+    }
+
+    private void preCaptureStatesFolia(SERVER_LEVEL serverLevel) {
+        runRethrowing(() -> {
+            Object currentWorldData = GET_CURRENT_WORLD_DATA.invoke(serverLevel);
+            CAPTURE_TREE_GENERATION.set(currentWorldData, true);
+            CAPTURE_BLOCK_STATES.set(currentWorldData, true);
+        });
+    }
+
+    private List<BlockState> getCapturedBlockStatesCopyFolia(SERVER_LEVEL serverLevel) {
+        return getRethrowing(() -> {
+            Object currentWorldData = GET_CURRENT_WORLD_DATA.invoke(serverLevel);
+            @SuppressWarnings("unchecked")
+            var capturedBlockStates = (Map<?, BlockState>) CAPTURED_BLOCK_STATES.invoke(currentWorldData);
+            return new ArrayList<>(capturedBlockStates.values());
+        });
+    }
+
+    private void postCaptureBlockStatesFolia(SERVER_LEVEL serverLevel) {
+        runRethrowing(() -> {
+            Object currentWorldData = GET_CURRENT_WORLD_DATA.invoke(serverLevel);
+            CAPTURE_TREE_GENERATION.set(currentWorldData, false);
+            CAPTURE_BLOCK_STATES.set(currentWorldData, false);
+            var capturedBlockStates = (Map<?, ?>) CAPTURED_BLOCK_STATES.invoke(currentWorldData);
+            capturedBlockStates.clear();
+        });
+    }
 
     protected abstract void preCaptureStates(SERVER_LEVEL serverLevel);
 

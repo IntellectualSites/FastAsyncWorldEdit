@@ -17,6 +17,7 @@ import com.fastasyncworldedit.core.util.collection.CleanableThreadLocal;
 import com.fastasyncworldedit.core.util.task.FaweForkJoinWorkerThreadFactory;
 import com.fastasyncworldedit.core.wrappers.WorldWrapper;
 import com.google.common.util.concurrent.Futures;
+import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.World;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -98,7 +99,8 @@ public abstract class QueueHandler implements Trimable, Runnable {
     private long allocate = 50;
 
     protected QueueHandler() {
-        TaskManager.taskManager().repeat(this, 1);
+        // TODO (folia) make main thread independent
+        // TaskManager.taskManager().repeat(this, 1);
     }
 
     @ApiStatus.Internal
@@ -108,8 +110,8 @@ public abstract class QueueHandler implements Trimable, Runnable {
 
     @Override
     public void run() {
-        if (!Fawe.isMainThread()) {
-            throw new IllegalStateException("Not main thread");
+        if (!Fawe.isTickThread()) {
+            throw new IllegalStateException("Not ticking thread");
         }
         if (!syncTasks.isEmpty()) {
             long currentAllocate = getAllocate();

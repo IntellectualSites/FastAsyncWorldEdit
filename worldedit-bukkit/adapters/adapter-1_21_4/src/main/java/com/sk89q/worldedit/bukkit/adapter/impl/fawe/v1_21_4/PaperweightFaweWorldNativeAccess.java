@@ -1,8 +1,9 @@
 package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_21_4;
 
-import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.math.IntPair;
+import com.fastasyncworldedit.core.util.FoliaSupport;
 import com.fastasyncworldedit.core.util.TaskManager;
+import com.fastasyncworldedit.core.util.collection.FlushingPartitionedCache;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.internal.block.BlockStateIdAccess;
 import com.sk89q.worldedit.internal.wna.WorldNativeAccess;
@@ -14,13 +15,20 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.dedicated.DedicatedServer;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.server.level.FullChunkStatus;
 import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.chunk.LevelChunk;
+import org.bukkit.Bukkit;
 import net.minecraft.world.level.redstone.ExperimentalRedstoneUtils;
+import org.bukkit.craftbukkit.CraftWorld;
+import org.bukkit.craftbukkit.block.data.CraftBlockData;
+import net.minecraft.world.level.redstone.ExperimentalRedstoneUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.block.data.CraftBlockData;
 import org.bukkit.event.block.BlockPhysicsEvent;
@@ -28,7 +36,6 @@ import org.enginehub.linbus.tree.LinCompoundTag;
 
 import javax.annotation.Nullable;
 import java.lang.ref.WeakReference;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -50,8 +57,7 @@ public class PaperweightFaweWorldNativeAccess implements WorldNativeAccess<Level
     private final PaperweightFaweAdapter paperweightFaweAdapter;
     private final WeakReference<Level> level;
     private final AtomicInteger lastTick;
-    private final Set<CachedChange> cachedChanges = new HashSet<>();
-    private final Set<IntPair> cachedChunksToSend = new HashSet<>();
+    private final FlushingPartitionedCache<IntPair, CachedChange, Set<CachedChange>> cache;
     private SideEffectSet sideEffectSet;
 
     public PaperweightFaweWorldNativeAccess(PaperweightFaweAdapter paperweightFaweAdapter, WeakReference<Level> level) {
@@ -59,7 +65,29 @@ public class PaperweightFaweWorldNativeAccess implements WorldNativeAccess<Level
         this.level = level;
         // Use the actual tick as minecraft-defined so we don't try to force blocks into the world when the server's already lagging.
         //  - With the caveat that we don't want to have too many cached changed (1024) so we'd flush those at 1024 anyway.
-        this.lastTick = new AtomicInteger(MinecraftServer.currentTick);
+        this.lastTick = new AtomicInteger();
+        if (!FoliaSupport.isFolia()) {
+            this.lastTick.set(Bukkit.getCurrentTick());
+        }
+        this.cache = new FlushingPartitionedCache<>(
+                cachedChange -> new IntPair(cachedChange.blockPos.getX() >> 4, cachedChange.blockPos.getZ() >> 4),
+                HashSet::new,
+                (chunk, changes) -> {
+                    // TODO (folia) only send chunks based on ticks? Need to make sure everything actually flushed in the end
+                    /*boolean nextTick = true;
+                    if (!FoliaSupport.isFolia()) {
+                        int currentTick = MinecraftServer.currentTick;
+                        nextTick = lastTick.get() > currentTick;
+                        if (nextTick) {
+                            lastTick.set(currentTick);
+                        }
+                    }*/
+                    flushAsync(chunk, changes, true);
+                },
+                2048,
+                16
+        );
+
     }
 
     private Level getLevel() {
@@ -95,22 +123,13 @@ public class PaperweightFaweWorldNativeAccess implements WorldNativeAccess<Level
             LevelChunk levelChunk, BlockPos blockPos,
             net.minecraft.world.level.block.state.BlockState blockState
     ) {
-        int currentTick = MinecraftServer.currentTick;
-        if (Fawe.isMainThread()) {
+        if (PaperweightPlatformAdapter.isTickThreadFor(levelChunk)) {
             return levelChunk.setBlockState(blockPos, blockState,
                     this.sideEffectSet != null && this.sideEffectSet.shouldApply(SideEffect.UPDATE)
             );
         }
         // Since FAWE is.. Async we need to do it on the main thread (wooooo.. :( )
-        cachedChanges.add(new CachedChange(levelChunk, blockPos, blockState));
-        cachedChunksToSend.add(new IntPair(levelChunk.locX, levelChunk.locZ));
-        boolean nextTick = lastTick.get() > currentTick;
-        if (nextTick || cachedChanges.size() >= 1024) {
-            if (nextTick) {
-                lastTick.set(currentTick);
-            }
-            flushAsync(nextTick);
-        }
+        cache.insert(new CachedChange(levelChunk, blockPos, blockState));
         return blockState;
     }
 
@@ -233,16 +252,7 @@ public class PaperweightFaweWorldNativeAccess implements WorldNativeAccess<Level
         getLevel().onBlockStateChange(blockPos, oldState, newState);
     }
 
-    private synchronized void flushAsync(final boolean sendChunks) {
-        final Set<CachedChange> changes = Set.copyOf(cachedChanges);
-        cachedChanges.clear();
-        final Set<IntPair> toSend;
-        if (sendChunks) {
-            toSend = Set.copyOf(cachedChunksToSend);
-            cachedChunksToSend.clear();
-        } else {
-            toSend = Collections.emptySet();
-        }
+    private synchronized void flushAsync(IntPair chunk, Set<CachedChange> changes, final boolean sendChunks) {
         Runnable runnable = () -> {
             changes.forEach(cc -> cc.levelChunk.setBlockState(cc.blockPos, cc.blockState,
                     sideEffectSet != null && sideEffectSet.shouldApply(SideEffect.UPDATE)
@@ -250,30 +260,18 @@ public class PaperweightFaweWorldNativeAccess implements WorldNativeAccess<Level
             if (!sendChunks) {
                 return;
             }
-            for (IntPair chunk : toSend) {
-                PaperweightPlatformAdapter.sendChunk(chunk, getLevel().getWorld().getHandle(), chunk.x(), chunk.z());
-            }
+            PaperweightPlatformAdapter.sendChunk(chunk, getLevel().getWorld().getHandle(), chunk.x(), chunk.z());
         };
-        TaskManager.taskManager().async(() -> TaskManager.taskManager().sync(runnable));
+        TaskManager.taskManager().async(
+                () -> PaperweightPlatformAdapter.task(runnable, getLevel().getWorld().getHandle(), chunk.x(), chunk.z())
+        );
     }
+
 
     @Override
     public synchronized void flush() {
-        Runnable runnable = () -> {
-            cachedChanges.forEach(cc -> cc.levelChunk.setBlockState(cc.blockPos, cc.blockState,
-                    sideEffectSet != null && sideEffectSet.shouldApply(SideEffect.UPDATE)
-            ));
-            for (IntPair chunk : cachedChunksToSend) {
-                PaperweightPlatformAdapter.sendChunk(chunk, getLevel().getWorld().getHandle(), chunk.x(), chunk.z());
-            }
-        };
-        if (Fawe.isMainThread()) {
-            runnable.run();
-        } else {
-            TaskManager.taskManager().sync(runnable);
-        }
-        cachedChanges.clear();
-        cachedChunksToSend.clear();
+        this.cache.flush();
+        this.cache.flush();
     }
 
     private record CachedChange(

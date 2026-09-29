@@ -22,6 +22,7 @@ package com.sk89q.worldedit.bukkit.adapter.impl.v26_2;
 import com.fastasyncworldedit.bukkit.adapter.BukkitBlockMaterial;
 import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v26_2.PaperweightGetBlocks;
+import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v26_2.PlatformCompat;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.EmptyBlockGetter;
 import net.minecraft.world.level.block.Block;
@@ -38,7 +39,7 @@ public class PaperweightBlockMaterial extends BukkitBlockMaterial<Block, BlockSt
     }
 
     public PaperweightBlockMaterial(Block block, BlockState blockState) {
-        super(block, blockState, blockState.asBlockData());
+        super(block, blockState, PlatformCompat.fromData(blockState));
     }
 
     @Override

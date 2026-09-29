@@ -98,7 +98,7 @@ public class PaperweightFaweWorldNativeAccess implements WorldNativeAccess<Level
             net.minecraft.world.level.block.state.BlockState blockState
     ) {
         int currentTick = MinecraftServer.currentTick;
-        if (Fawe.isMainThread()) {
+        if (PaperweightPlatformAdapter.isTickThreadFor(levelChunk)) {
             return levelChunk.setBlockState(blockPos, blockState,
                     this.sideEffectSet.shouldApply(SideEffect.UPDATE) ? 0 : 512
             );
