@@ -858,9 +858,9 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
             public @Nullable MutableFullBlockChange populate(@NotNull final MutableFullBlockChange change) {
                 try {
                     posDel.read(is, change);
-                    idDel.readCombined(is, change);
                     change.x += originX;
                     change.z += originZ;
+                    idDel.readCombined(is, change);
                     return change;
                 } catch (EOFException ignored) {
                 } catch (Exception e) {
@@ -900,9 +900,9 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
             public @Nullable MutableBlockChange populate(@NotNull final MutableBlockChange change) {
                 try {
                     posDel.read(is, change);
-                    idDel.readCombined(is, change, dir);
                     change.x += originX;
                     change.z += originZ;
+                    idDel.readCombined(is, change, dir);
                     return change;
                 } catch (EOFException ignored) {
                 } catch (Exception e) {
@@ -1057,8 +1057,10 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
                 MutableFullBlockChange change = new MutableFullBlockChange(null, 0, false);
                 for (int i = 0; i < amount; i++) {
                     posDel.read(fis, change);
+                    change.x += ox;
+                    change.z += oz;
                     idDel.readCombined(fis, change);
-                    summary.add(change.x + ox, change.z + oz, change.to);
+                    summary.add(change.x, change.z, change.to);
                 }
             }
         } catch (EOFException ignored) {
