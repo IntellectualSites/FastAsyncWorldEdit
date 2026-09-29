@@ -3,7 +3,6 @@ package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_21_11;
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.math.IntPair;
 import com.fastasyncworldedit.core.util.TaskManager;
-import com.fastasyncworldedit.core.util.task.RunnableVal;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.internal.block.BlockStateIdAccess;
 import com.sk89q.worldedit.internal.wna.WorldNativeAccess;
@@ -99,7 +98,7 @@ public class PaperweightFaweWorldNativeAccess implements WorldNativeAccess<Level
             net.minecraft.world.level.block.state.BlockState blockState
     ) {
         int currentTick = MinecraftServer.currentTick;
-        if (Fawe.isTickThread()) {
+        if (Fawe.isMainThread()) {
             return levelChunk.setBlockState(blockPos, blockState,
                     this.sideEffectSet.shouldApply(SideEffect.UPDATE) ? 0 : 512
             );
@@ -247,42 +246,34 @@ public class PaperweightFaweWorldNativeAccess implements WorldNativeAccess<Level
         } else {
             toSend = Collections.emptySet();
         }
-        RunnableVal<Object> runnableVal = new RunnableVal<>() {
-            @Override
-            public void run(Object value) {
-                changes.forEach(cc -> cc.levelChunk.setBlockState(cc.blockPos, cc.blockState,
-                        sideEffectSet.shouldApply(SideEffect.UPDATE) ? 0 : 512
-                ));
-                if (!sendChunks) {
-                    return;
-                }
-                for (IntPair chunk : toSend) {
-                    PaperweightPlatformAdapter.sendChunk(chunk, getLevel().getWorld().getHandle(), chunk.x(), chunk.z());
-                }
+        Runnable runnable = () -> {
+            changes.forEach(cc -> cc.levelChunk.setBlockState(cc.blockPos, cc.blockState,
+                    sideEffectSet.shouldApply(SideEffect.UPDATE) ? 0 : 512
+            ));
+            if (!sendChunks) {
+                return;
+            }
+            for (IntPair chunk : toSend) {
+                PaperweightPlatformAdapter.sendChunk(chunk, getLevel().getWorld().getHandle(), chunk.x(), chunk.z());
             }
         };
-        // we don't support Folia on that version, we can run this globally
-        TaskManager.taskManager().async(() -> TaskManager.taskManager().syncGlobal(runnableVal));
+        TaskManager.taskManager().async(() -> TaskManager.taskManager().sync(runnable));
     }
 
     @Override
     public synchronized void flush() {
-        RunnableVal<Object> runnableVal = new RunnableVal<>() {
-            @Override
-            public void run(Object value) {
-                cachedChanges.forEach(cc -> cc.levelChunk.setBlockState(cc.blockPos, cc.blockState,
-                        sideEffectSet.shouldApply(SideEffect.UPDATE) ? 0 : 512
-                ));
-                for (IntPair chunk : cachedChunksToSend) {
-                    PaperweightPlatformAdapter.sendChunk(chunk, getLevel().getWorld().getHandle(), chunk.x(), chunk.z());
-                }
+        Runnable runnable = () -> {
+            cachedChanges.forEach(cc -> cc.levelChunk.setBlockState(cc.blockPos, cc.blockState,
+                    sideEffectSet.shouldApply(SideEffect.UPDATE) ? 0 : 512
+            ));
+            for (IntPair chunk : cachedChunksToSend) {
+                PaperweightPlatformAdapter.sendChunk(chunk, getLevel().getWorld().getHandle(), chunk.x(), chunk.z());
             }
         };
-        if (Fawe.isTickThread()) {
-            runnableVal.run();
+        if (Fawe.isMainThread()) {
+            runnable.run();
         } else {
-            // we don't support Folia on that version, we can run this globally
-            TaskManager.taskManager().syncGlobal(runnableVal);
+            TaskManager.taskManager().sync(runnable);
         }
         cachedChanges.clear();
         cachedChunksToSend.clear();

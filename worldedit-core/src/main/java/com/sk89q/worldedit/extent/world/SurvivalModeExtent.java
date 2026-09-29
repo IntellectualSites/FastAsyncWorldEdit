@@ -20,14 +20,11 @@
 package com.sk89q.worldedit.extent.world;
 
 import com.fastasyncworldedit.core.util.TaskManager;
-import com.fastasyncworldedit.core.util.task.RunnableVal;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.Vector3;
-import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.World;
@@ -104,13 +101,11 @@ public class SurvivalModeExtent extends AbstractDelegateExtent {
             boolean canSet = super.setBlock(location, block);
             if (canSet) {
                 final Vector3 position = location.toVector3();
-                TaskManager.taskManager().syncAt(new RunnableVal<>() {
-                    @Override
-                    public void run(Object value) {
-                        for (BaseItemStack stack : drops) {
-                            world.dropItem(position, stack);
-                        }
+                TaskManager.taskManager().syncAt(() -> {
+                    for (BaseItemStack stack : drops) {
+                        world.dropItem(position, stack);
                     }
+                    return null;
                 }, new Location(world, position));
 
                 return true;

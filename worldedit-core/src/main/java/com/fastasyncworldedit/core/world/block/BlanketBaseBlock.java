@@ -1,8 +1,10 @@
 package com.fastasyncworldedit.core.world.block;
 
 import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.worldedit.util.concurrency.LazyReference;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
+import org.enginehub.linbus.tree.LinCompoundTag;
 
 import javax.annotation.Nonnull;
 
@@ -15,6 +17,11 @@ public final class BlanketBaseBlock extends BaseBlock {
         super(blockState);
     }
 
+    public BlanketBaseBlock(BlockState blockState, @Nonnull LinCompoundTag tile) {
+        super(blockState, LazyReference.computed(tile));
+    }
+
+    @Deprecated
     public BlanketBaseBlock(BlockState blockState, @Nonnull CompoundTag tile) {
         super(blockState, tile);
     }

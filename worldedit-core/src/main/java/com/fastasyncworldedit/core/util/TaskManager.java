@@ -3,7 +3,6 @@ package com.fastasyncworldedit.core.util;
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.queue.implementation.QueueHandler;
-import com.fastasyncworldedit.core.util.task.RunnableVal;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.util.Location;
@@ -253,16 +252,6 @@ public abstract class TaskManager {
         }
     }
 
-    /**
-     * Quickly run a task on the main thread, and wait for execution to finish.
-     */
-    public <T> T sync(@Nonnull final RunnableVal<T> function) {
-        return sync((Supplier<T>) function);
-    }
-
-    /**
-     * Quickly run a task on the main thread, and wait for execution to finish.
-     */
     public <T> T sync(final Supplier<T> function) {
         if (Fawe.isMainThread()) {
             return function.get();
@@ -272,6 +261,13 @@ public abstract class TaskManager {
         } catch (InterruptedException | ExecutionException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public void sync(@Nonnull final Runnable runnable) {
+        sync((Supplier<Void>) () -> {
+            runnable.run();
+            return null;
+        });
     }
 
     public <T> T syncAt(Supplier<T> supplier, Location context) {

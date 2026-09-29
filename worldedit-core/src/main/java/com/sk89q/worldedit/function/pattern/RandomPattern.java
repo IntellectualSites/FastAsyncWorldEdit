@@ -63,13 +63,9 @@ public class RandomPattern extends AbstractPattern {
      */
     public RandomPattern(SimpleRandom random, RandomPattern parent) {
         this.random = random;
-        this.weights = new ArrayList<>(parent.weights);
-        this.collection = RandomCollection.of(weights);
-    }
-
-    private RandomPattern(SimpleRandom random, List<RandomCollection.Weighted<Pattern>> weights) {
-        this.random = random;
-        this.weights = weights;
+        this.weights = parent.weights.stream()
+                .map(weighted -> new RandomCollection.Weighted<>(weighted.value().fork(), weighted.weight()))
+                .collect(Collectors.toCollection(ArrayList::new));
         this.collection = RandomCollection.of(weights);
     }
     //FAWE end
@@ -102,19 +98,17 @@ public class RandomPattern extends AbstractPattern {
 
     @Override
     public BaseBlock applyBlock(BlockVector3 position) {
-        return collection.next(this.random, position.getBlockX(), position.getBlockY(), position.getBlockZ()).applyBlock(position);
+        return collection.next(this.random, position.x(), position.y(), position.z()).applyBlock(position);
     }
 
     @Override
     public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
-        return collection.next(this.random, get.getBlockX(), get.getBlockY(), get.getBlockZ()).apply(extent, get, set);
+        return collection.next(this.random, get.x(), get.y(), get.z()).apply(extent, get, set);
     }
 
     @Override
     public Pattern fork() {
-        List<RandomCollection.Weighted<Pattern>> newWeights = new ArrayList<>();
-        this.weights.forEach((w) -> newWeights.add(new RandomCollection.Weighted<>(w.value().fork(), w.weight())));
-        return new RandomPattern(this.random, newWeights);
+        return new RandomPattern(this.random, this);
     }
 
     //FAWE end

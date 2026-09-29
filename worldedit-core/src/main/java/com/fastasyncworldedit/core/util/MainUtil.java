@@ -9,8 +9,6 @@ import com.fastasyncworldedit.core.internal.io.AbstractDelegateOutputStream;
 import com.fastasyncworldedit.core.internal.io.FaweInputStream;
 import com.fastasyncworldedit.core.internal.io.FaweOutputStream;
 import com.fastasyncworldedit.core.regions.RegionWrapper;
-import com.fastasyncworldedit.core.util.task.RunnableVal;
-import com.fastasyncworldedit.core.util.task.RunnableVal2;
 import com.github.luben.zstd.ZstdInputStream;
 import com.github.luben.zstd.ZstdOutputStream;
 import com.sk89q.jnbt.CompoundTag;
@@ -119,12 +117,7 @@ public class MainUtil {
 
     public static long getTotalSize(Path path) {
         final AtomicLong size = new AtomicLong(0);
-        traverse(path, new RunnableVal2<>() {
-            @Override
-            public void run(Path path, BasicFileAttributes attrs) {
-                size.addAndGet(attrs.size());
-            }
-        });
+        traverse(path, (path1, attrs) -> size.addAndGet(attrs.size()));
         return size.get();
     }
 
@@ -359,17 +352,44 @@ public class MainUtil {
         return new FaweInputStream(new FastBufferedInputStream(is));
     }
 
-    public static URL upload(UUID uuid, String file, String extension, @Nonnull final RunnableVal<OutputStream> writeTask) {
+    /**
+     * Uploads a file to the configured web interface, using {@code Settings.settings().WEB.URL} as the
+     * destination and delegating the actual write to {@code writeTask}.
+     *
+     * @param uuid      the identifier to upload under; a random one is generated if {@code null}, and
+     *                  {@code null} also selects the "upload" endpoint rather than "save"
+     * @param file      the base filename to report to the server, without extension; defaults to {@code "plot"}
+     * @param extension the file extension to report to the server, may be {@code null}
+     * @param writeTask callback that writes the file content to the stream it is given
+     * @return the resulting download URL if the upload succeeded, otherwise {@code null}
+     * @since 3.0.0
+     */
+    public static URL upload(UUID uuid, String file, String extension, @Nonnull final Consumer<OutputStream> writeTask) {
         return upload(Settings.settings().WEB.URL, uuid != null, uuid != null ? uuid.toString() : null, file, extension, writeTask);
     }
 
+    /**
+     * Uploads a file to a web interface as a multipart/form-data POST request.
+     *
+     * @param urlStr    the base URL of the web interface; {@code "upload.php"} or {@code "save.php"} is appended
+     *                  depending on {@code save}
+     * @param save      if {@code true}, POSTs to the "save" endpoint instead of "upload"
+     * @param uuid      the identifier to upload under; a random one is generated if {@code null}
+     * @param file      the base filename to report to the server, without extension; defaults to {@code "plot"}
+     * @param extension the file extension to report to the server, may be {@code null}
+     * @param writeTask callback that writes the file content to the multipart body; the stream it receives must
+     *                  not be closed by the callback, as it is reused to close out the multipart request
+     *                  afterward
+     * @return the resulting download URL if the server responded {@code 200}, otherwise {@code null}
+     * @since 3.0.0
+     */
     public static URL upload(
             String urlStr,
             boolean save,
             String uuid,
             String file,
             String extension,
-            @Nonnull final RunnableVal<OutputStream> writeTask
+            @Nonnull final Consumer<OutputStream> writeTask
     ) {
         String filename = (file == null ? "plot" : file) + (extension != null ? "." + extension : "");
         uuid = uuid == null ? UUID.randomUUID().toString() : uuid;
@@ -408,8 +428,7 @@ public class MainUtil {
                     public void close() {
                     } // Don't close
                 };
-                writeTask.value = nonClosable;
-                writeTask.run();
+                writeTask.accept(nonClosable);
                 nonClosable.flush();
                 writer.append(crlf).flush();
                 writer.append("--").append(boundary).append("--").append(crlf).flush();
@@ -775,9 +794,19 @@ public class MainUtil {
     }
 
     /**
-     * The int[] will be in the form: [chunkx, chunkz, pos1x, pos1z, pos2x, pos2z, isedge] and will represent the bottom and top parts of the chunk
+     * Iterates every chunk overlapping a region, invoking {@code task} once per chunk with the chunk's
+     * coordinates and the bounds of the region within that chunk.
+     *
+     * <p>The array passed to {@code task} is populated as
+     * {@code [chunkX, chunkZ, pos1x, pos1z, pos2x, pos2z, isEdge]}, where {@code pos1}/{@code pos2} describe the
+     * bottom and top corners of the region clipped to the current chunk, and {@code isEdge} is {@code 1} if the
+     * chunk is only partially covered by the region.
+     *
+     * @param region the region to iterate chunks over
+     * @param task   callback invoked once per overlapping chunk; the array it receives is reused across calls
+     * @since 3.0.0
      */
-    public static void chunkTaskSync(RegionWrapper region, final RunnableVal<int[]> task) {
+    public static void chunkTaskSync(RegionWrapper region, final Consumer<int[]> task) {
         final int p1x = region.minX;
         final int p1z = region.minZ;
         final int p2x = region.maxX;
@@ -786,33 +815,33 @@ public class MainUtil {
         final int bcz = p1z >> 4;
         final int tcx = p2x >> 4;
         final int tcz = p2z >> 4;
-        task.value = new int[7];
+        final int[] value = new int[7];
         for (int x = bcx; x <= tcx; x++) {
             for (int z = bcz; z <= tcz; z++) {
-                task.value[0] = x;
-                task.value[1] = z;
-                task.value[2] = task.value[0] << 4;
-                task.value[3] = task.value[1] << 4;
-                task.value[4] = task.value[2] + 15;
-                task.value[5] = task.value[3] + 15;
-                task.value[6] = 0;
-                if (task.value[0] == bcx) {
-                    task.value[2] = p1x;
-                    task.value[6] = 1;
+                value[0] = x;
+                value[1] = z;
+                value[2] = value[0] << 4;
+                value[3] = value[1] << 4;
+                value[4] = value[2] + 15;
+                value[5] = value[3] + 15;
+                value[6] = 0;
+                if (value[0] == bcx) {
+                    value[2] = p1x;
+                    value[6] = 1;
                 }
-                if (task.value[0] == tcx) {
-                    task.value[4] = p2x;
-                    task.value[6] = 1;
+                if (value[0] == tcx) {
+                    value[4] = p2x;
+                    value[6] = 1;
                 }
-                if (task.value[1] == bcz) {
-                    task.value[3] = p1z;
-                    task.value[6] = 1;
+                if (value[1] == bcz) {
+                    value[3] = p1z;
+                    value[6] = 1;
                 }
-                if (task.value[1] == tcz) {
-                    task.value[5] = p2z;
-                    task.value[6] = 1;
+                if (value[1] == tcz) {
+                    value[5] = p2z;
+                    value[6] = 1;
                 }
-                task.run();
+                task.accept(value);
             }
         }
     }

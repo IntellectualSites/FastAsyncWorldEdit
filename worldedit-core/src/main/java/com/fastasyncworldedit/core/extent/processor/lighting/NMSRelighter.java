@@ -7,7 +7,6 @@ import com.fastasyncworldedit.core.queue.IQueueExtent;
 import com.fastasyncworldedit.core.queue.implementation.chunk.ChunkHolder;
 import com.fastasyncworldedit.core.util.MathMan;
 import com.fastasyncworldedit.core.util.TaskManager;
-import com.fastasyncworldedit.core.util.task.RunnableVal;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.DirectionalProperty;
@@ -904,12 +903,10 @@ public class NMSRelighter implements Relighter {
             finished.set(true);
         } else {
             // fine to sync global, starlight is required for Folia
-            TaskManager.taskManager().syncGlobal(new RunnableVal<>() {
-                @Override
-                public void run(Object value) {
-                    queue.flush();
-                    finished.set(true);
-                }
+            TaskManager.taskManager().syncGlobal(() -> {
+                queue.flush();
+                finished.set(true);
+                return null;
             });
         }
     }
@@ -919,29 +916,29 @@ public class NMSRelighter implements Relighter {
     }
 
     public synchronized void sendChunks() {
-        RunnableVal<Object> runnable = new RunnableVal<>() {
-            @Override
-            public void run(Object value) {
-                Iterator<Map.Entry<Long, Integer>> iter = chunksToSend.entrySet().iterator();
-                while (iter.hasNext()) {
-                    Map.Entry<Long, Integer> entry = iter.next();
-                    long pair = entry.getKey();
-                    int bitMask = entry.getValue();
-                    int x = MathMan.unpairIntX(pair);
-                    int z = MathMan.unpairIntY(pair);
-                    ChunkHolder<?> chunk = (ChunkHolder<?>) queue.getOrCreateChunk(x, z);
-                    chunk.setBitMask(bitMask);
-                    chunk.flushLightToGet();
-                    Fawe.platform().getPlatformAdapter().sendChunk(chunk.getOrCreateGet(), bitMask, true);
-                    iter.remove();
-                }
-                finished.set(true);
+        Runnable runnable = () -> {
+            Iterator<Map.Entry<Long, Integer>> iter = chunksToSend.entrySet().iterator();
+            while (iter.hasNext()) {
+                Map.Entry<Long, Integer> entry = iter.next();
+                long pair = entry.getKey();
+                int bitMask = entry.getValue();
+                int x = MathMan.unpairIntX(pair);
+                int z = MathMan.unpairIntY(pair);
+                ChunkHolder<?> chunk = (ChunkHolder<?>) queue.getOrCreateChunk(x, z);
+                chunk.setBitMask(bitMask);
+                chunk.flushLightToGet();
+                Fawe.platform().getPlatformAdapter().sendChunk(chunk.getOrCreateGet(), bitMask, true);
+                iter.remove();
             }
+            finished.set(true);
         };
         if (Settings.settings().LIGHTING.ASYNC) {
             runnable.run();
         } else {
-            TaskManager.taskManager().syncGlobal(runnable);
+            TaskManager.taskManager().syncGlobal(() -> {
+                runnable.run();
+                return null;
+            });
         }
     }
 

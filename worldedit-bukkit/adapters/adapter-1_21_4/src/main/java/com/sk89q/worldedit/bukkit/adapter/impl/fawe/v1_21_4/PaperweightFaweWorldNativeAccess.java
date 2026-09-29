@@ -4,7 +4,6 @@ import com.fastasyncworldedit.core.math.IntPair;
 import com.fastasyncworldedit.core.util.FoliaSupport;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.fastasyncworldedit.core.util.collection.FlushingPartitionedCache;
-import com.fastasyncworldedit.core.util.task.RunnableVal;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.internal.block.BlockStateIdAccess;
 import com.sk89q.worldedit.internal.wna.WorldNativeAccess;
@@ -254,20 +253,17 @@ public class PaperweightFaweWorldNativeAccess implements WorldNativeAccess<Level
     }
 
     private synchronized void flushAsync(IntPair chunk, Set<CachedChange> changes, final boolean sendChunks) {
-        RunnableVal<Object> runnableVal = new RunnableVal<>() {
-            @Override
-            public void run(Object value) {
-                changes.forEach(cc -> cc.levelChunk.setBlockState(cc.blockPos, cc.blockState,
-                        sideEffectSet != null && sideEffectSet.shouldApply(SideEffect.UPDATE)
-                ));
-                if (!sendChunks) {
-                    return;
-                }
-                PaperweightPlatformAdapter.sendChunk(chunk, getLevel().getWorld().getHandle(), chunk.x(), chunk.z());
+        Runnable runnable = () -> {
+            changes.forEach(cc -> cc.levelChunk.setBlockState(cc.blockPos, cc.blockState,
+                    sideEffectSet != null && sideEffectSet.shouldApply(SideEffect.UPDATE)
+            ));
+            if (!sendChunks) {
+                return;
             }
+            PaperweightPlatformAdapter.sendChunk(chunk, getLevel().getWorld().getHandle(), chunk.x(), chunk.z());
         };
         TaskManager.taskManager().async(
-                () -> PaperweightPlatformAdapter.task(runnableVal, getLevel().getWorld().getHandle(), chunk.x(), chunk.z())
+                () -> PaperweightPlatformAdapter.task(runnable, getLevel().getWorld().getHandle(), chunk.x(), chunk.z())
         );
     }
 
