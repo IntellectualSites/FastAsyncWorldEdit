@@ -83,7 +83,7 @@ public class AnvilChunk18 implements Chunk {
                 continue;
             }
 
-            var sectionTag = ((CompoundTag) rawSectionTag).toLinTag();;
+            var sectionTag = ((CompoundTag) rawSectionTag).toLinTag();
             Object yValue = sectionTag.value().get("Y").value(); // sometimes a byte, sometimes an int
             if (!(yValue instanceof Number)) {
                 throw new InvalidFormatException("Y is not numeric: " + yValue);
