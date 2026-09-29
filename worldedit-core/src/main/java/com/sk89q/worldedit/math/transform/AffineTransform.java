@@ -265,11 +265,11 @@ public class AffineTransform implements Transform, Serializable {
     }
 
     public AffineTransform translate(Vector3 vec) {
-        return translate(vec.getX(), vec.getY(), vec.getZ());
+        return translate(vec.x(), vec.y(), vec.z());
     }
 
     public AffineTransform translate(BlockVector3 vec) {
-        return translate(vec.getX(), vec.getY(), vec.getZ());
+        return translate(vec.x(), vec.y(), vec.z());
     }
 
     public AffineTransform translate(double x, double y, double z) {
@@ -315,29 +315,29 @@ public class AffineTransform implements Transform, Serializable {
     }
 
     public AffineTransform scale(Vector3 vec) {
-        return scale(vec.getX(), vec.getY(), vec.getZ());
+        return scale(vec.x(), vec.y(), vec.z());
     }
 
     //FAWE start
     public boolean isScaled(Vector3 vector) {
-        boolean flip = vector.getX() != 0 && m00 < 0;
-        if (vector.getY() != 0 && m11 < 0) {
+        boolean flip = vector.x() != 0 && m00 < 0;
+        if (vector.y() != 0 && m11 < 0) {
             flip = !flip;
         }
-        if (vector.getZ() != 0 && m22 < 0) {
+        if (vector.z() != 0 && m22 < 0) {
             flip = !flip;
         }
         if (flip) {
             return true;
         }
         // Check for flip-and-rotate
-        if (vector.getX() != 0 && vector.getY() != 0 && ((m01 < 0 && m10 < 0) || (m01 > 0 && m10 > 0))) {
+        if (vector.x() != 0 && vector.y() != 0 && ((m01 < 0 && m10 < 0) || (m01 > 0 && m10 > 0))) {
             flip = true;
         }
-        if (vector.getX() != 0 && vector.getZ() != 0 && ((m02 < 0 && m20 < 0) || (m02 > 0 && m20 > 0))) {
+        if (vector.x() != 0 && vector.z() != 0 && ((m02 < 0 && m20 < 0) || (m02 > 0 && m20 > 0))) {
             flip = !flip;
         }
-        if (vector.getY() != 0 && vector.getZ() != 0 && ((m12 < 0 && m21 < 0) || (m12 > 0 && m21 > 0))) {
+        if (vector.y() != 0 && vector.z() != 0 && ((m12 < 0 && m21 < 0) || (m12 > 0 && m21 > 0))) {
             flip = !flip;
         }
         return flip;
@@ -346,9 +346,9 @@ public class AffineTransform implements Transform, Serializable {
 
     @Override
     public Vector3 apply(Vector3 vector) {
-        double x = (vector.getX() * m00 + vector.getY() * m01 + vector.getZ() * m02 + m03);
-        double y = (vector.getX() * m10 + vector.getY() * m11 + vector.getZ() * m12 + m13);
-        double z = (vector.getX() * m20 + vector.getY() * m21 + vector.getZ() * m22 + m23);
+        double x = (vector.x() * m00 + vector.y() * m01 + vector.z() * m02 + m03);
+        double y = (vector.x() * m10 + vector.y() * m11 + vector.z() * m12 + m13);
+        double z = (vector.x() * m20 + vector.y() * m21 + vector.z() * m22 + m23);
         vector = vector.mutX(x);
         vector = vector.mutY(y);
         vector = vector.mutZ(z);

@@ -129,7 +129,7 @@ public class ImageUtil {
 
     public static void scaleAlpha(BufferedImage image, double alphaScale) {
         int[] raw = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
-        int defined = MathMan.clamp((int) (255 * alphaScale), 0, 255) << 24;
+        int defined = Math.clamp((int) (255 * alphaScale), 0, 255) << 24;
         for (int i = 0; i < raw.length; i++) {
             int color = raw[i];
             int alpha = color >> 24 & 0xFF;
@@ -140,7 +140,7 @@ public class ImageUtil {
                     raw[i] = (color & 0x00FFFFFF) + defined;
                     continue;
                 default:
-                    alpha = MathMan.clamp((int) (alpha * alphaScale), 0, 255);
+                    alpha = Math.clamp((int) (alpha * alphaScale), 0, 255);
                     raw[i] = (color & 0x00FFFFFF) + (alpha << 24);
             }
         }
@@ -176,8 +176,8 @@ public class ImageUtil {
     }
 
     public static BufferedImage load(URI uri) throws InputParseException {
-        try {
-            return MainUtil.readImage(getInputStream(uri));
+        try (final InputStream stream = getInputStream(uri)) {
+            return MainUtil.readImage(stream);
         } catch (IOException e) {
             throw new InputParseException(TextComponent.of(e.getMessage()));
         }
@@ -190,7 +190,7 @@ public class ImageUtil {
                 File file = new File(uri.getPath());
                 return new FileInputStream(file);
             }
-            return new URL(uriStr).openStream();
+            return MainUtil.readImageStream(uri);
         } catch (IOException e) {
             throw new InputParseException(TextComponent.of(e.getMessage()));
         }

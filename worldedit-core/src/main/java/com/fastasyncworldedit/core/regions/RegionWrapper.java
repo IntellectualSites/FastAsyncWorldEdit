@@ -44,12 +44,12 @@ public class RegionWrapper extends CuboidRegion {
 
     public RegionWrapper(final BlockVector3 pos1, final BlockVector3 pos2) {
         super(pos1, pos2);
-        this.minX = Math.min(pos1.getBlockX(), pos2.getBlockX());
-        this.minZ = Math.min(pos1.getBlockZ(), pos2.getBlockZ());
-        this.maxX = Math.max(pos1.getBlockX(), pos2.getBlockX());
-        this.maxZ = Math.max(pos1.getBlockZ(), pos2.getBlockZ());
-        this.minY = Math.min(pos1.getBlockY(), pos2.getBlockY());
-        this.maxY = Math.max(pos1.getBlockY(), pos2.getBlockY());
+        this.minX = Math.min(pos1.x(), pos2.x());
+        this.minZ = Math.min(pos1.z(), pos2.z());
+        this.maxX = Math.max(pos1.x(), pos2.x());
+        this.maxZ = Math.max(pos1.z(), pos2.z());
+        this.minY = Math.min(pos1.y(), pos2.y());
+        this.maxY = Math.max(pos1.y(), pos2.y());
     }
 
     public static RegionWrapper GLOBAL() {
@@ -61,12 +61,12 @@ public class RegionWrapper extends CuboidRegion {
         super.recalculate();
         BlockVector3 pos1 = getMinimumPoint();
         BlockVector3 pos2 = getMaximumPoint();
-        this.minX = Math.min(pos1.getBlockX(), pos2.getBlockX());
-        this.minZ = Math.min(pos1.getBlockZ(), pos2.getBlockZ());
-        this.maxX = Math.max(pos1.getBlockX(), pos2.getBlockX());
-        this.maxZ = Math.max(pos1.getBlockZ(), pos2.getBlockZ());
-        this.minY = Math.min(pos1.getBlockY(), pos2.getBlockY());
-        this.maxY = Math.max(pos1.getBlockY(), pos2.getBlockY());
+        this.minX = Math.min(pos1.x(), pos2.x());
+        this.minZ = Math.min(pos1.z(), pos2.z());
+        this.maxX = Math.max(pos1.x(), pos2.x());
+        this.maxZ = Math.max(pos1.z(), pos2.z());
+        this.minY = Math.min(pos1.y(), pos2.y());
+        this.maxY = Math.max(pos1.y(), pos2.y());
     }
 
     @Override

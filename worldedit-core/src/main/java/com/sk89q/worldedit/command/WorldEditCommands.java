@@ -22,6 +22,8 @@ package com.sk89q.worldedit.command;
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.FaweVersion;
 import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.configuration.Settings;
+import com.fastasyncworldedit.core.limit.FaweLimit;
 import com.fastasyncworldedit.core.util.UpdateNotification;
 import com.intellectualsites.paster.IncendoPaster;
 import com.sk89q.worldedit.LocalSession;
@@ -73,8 +75,7 @@ public class WorldEditCommands {
     public void version(Actor actor) {
         //FAWE start - use own, minimized message that doesn't print "Platforms" and "Capabilities"
         FaweVersion fVer = Fawe.instance().getVersion();
-        String fVerStr = fVer == null ? "unknown" : "-" + fVer.build;
-        actor.print(TextComponent.of("FastAsyncWorldEdit" + fVerStr));
+        actor.print(TextComponent.of(fVer == null ? "FastAsyncWorldEdit-unknown" : fVer.toString()));
         actor.print(TextComponent.of("Authors: Empire92, MattBDev, IronApollo, dordsor21 and NotMyFault"));
         actor.print(TextComponent.of("Wiki: https://intellectualsites.github.io/fastasyncworldedit-documentation/")
                 .clickEvent(ClickEvent.openUrl("https://intellectualsites.github.io/fastasyncworldedit-documentation/")));
@@ -97,6 +98,8 @@ public class WorldEditCommands {
                 .getConfiguration()));
         //FAWE start
         Fawe.instance().setupConfigs();
+        FaweLimit.MAX.CONFIRM_LARGE =
+                Settings.settings().LIMITS.get("default").CONFIRM_LARGE || Settings.settings().GENERAL.LIMIT_UNLIMITED_CONFIRMS;
         //FAWE end
         actor.print(Caption.of("worldedit.reload.config"));
     }

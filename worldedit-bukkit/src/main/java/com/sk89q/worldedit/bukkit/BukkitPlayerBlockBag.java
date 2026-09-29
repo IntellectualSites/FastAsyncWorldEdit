@@ -192,6 +192,9 @@ public class BukkitPlayerBlockBag extends BlockBag implements SlottableBlockBag 
     @Override
     public BaseItem getItem(int slot) {
         loadInventory();
+        if (items[slot] == null) {
+            return null;
+        }
         return BukkitAdapter.adapt(items[slot]);
     }
 

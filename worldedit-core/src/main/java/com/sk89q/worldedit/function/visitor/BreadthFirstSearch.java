@@ -305,10 +305,10 @@ public abstract class BreadthFirstSearch implements Operation {
                         if (loadCount > Settings.settings().QUEUE.PRELOAD_CHUNK_COUNT) {
                             break outer;
                         }
-                        int x = from.getBlockX() + direction.getBlockX();
-                        int z = from.getBlockZ() + direction.getBlockX();
+                        int x = from.x() + direction.x();
+                        int z = from.z() + direction.x();
                         if (cx != (cx = x >> 4) || cz != (cz = z >> 4)) {
-                            int y = from.getBlockY() + direction.getBlockY();
+                            int y = from.y() + direction.y();
                             if (y < singleQueue.getMinY() || y > singleQueue.getMaxY()) {
                                 continue;
                             }
@@ -320,7 +320,7 @@ public abstract class BreadthFirstSearch implements Operation {
                     }
                 }
                 for (BlockVector3 chunk : chunkLoadSet) {
-                    singleQueue.addChunkLoad(chunk.getBlockX(), chunk.getBlockZ());
+                    singleQueue.addChunkLoad(chunk.x(), chunk.z());
                 }
             }
             for (BlockVector3 from : queue) {
@@ -329,12 +329,12 @@ public abstract class BreadthFirstSearch implements Operation {
                 }
                 for (int i = 0, j = 0; i < dirs.length && j < maxBranch; i++) {
                     BlockVector3 direction = dirs[i];
-                    int y = from.getBlockY() + direction.getY();
+                    int y = from.y() + direction.y();
                     if (y < minY || y > maxY) {
                         continue;
                     }
-                    int x = from.getBlockX() + direction.getX();
-                    int z = from.getBlockZ() + direction.getZ();
+                    int x = from.x() + direction.x();
+                    int z = from.z() + direction.z();
                     if (!visited.contains(x, y, z)) {
                         if (isVisitable(from, mutable.setComponents(x, y, z))) {
                             j++;

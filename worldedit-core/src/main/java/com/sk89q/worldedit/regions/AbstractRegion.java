@@ -20,8 +20,6 @@
 package com.sk89q.worldedit.regions;
 
 import com.fastasyncworldedit.core.math.BlockVectorSet;
-import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
@@ -109,10 +107,10 @@ public abstract class AbstractRegion extends AbstractSet<BlockVector3> implement
 
         final List<BlockVector2> points = new ArrayList<>(4);
 
-        points.add(BlockVector2.at(min.getX(), min.getZ()));
-        points.add(BlockVector2.at(min.getX(), max.getZ()));
-        points.add(BlockVector2.at(max.getX(), max.getZ()));
-        points.add(BlockVector2.at(max.getX(), min.getZ()));
+        points.add(BlockVector2.at(min.x(), min.z()));
+        points.add(BlockVector2.at(min.x(), max.z()));
+        points.add(BlockVector2.at(max.x(), max.z()));
+        points.add(BlockVector2.at(max.x(), min.z()));
 
         return points;
     }
@@ -122,9 +120,9 @@ public abstract class AbstractRegion extends AbstractSet<BlockVector3> implement
         BlockVector3 min = getMinimumPoint();
         BlockVector3 max = getMaximumPoint();
 
-        return (max.getX() - min.getX() + 1L)
-                * (max.getY() - min.getY() + 1L)
-                * (max.getZ() - min.getZ() + 1L);
+        return (max.x() - min.x() + 1L)
+                * (max.y() - min.y() + 1L)
+                * (max.z() - min.z() + 1L);
     }
 
     /**
@@ -137,7 +135,7 @@ public abstract class AbstractRegion extends AbstractSet<BlockVector3> implement
         BlockVector3 min = getMinimumPoint();
         BlockVector3 max = getMaximumPoint();
 
-        return max.getX() - min.getX() + 1;
+        return max.x() - min.x() + 1;
     }
 
     /**
@@ -150,7 +148,7 @@ public abstract class AbstractRegion extends AbstractSet<BlockVector3> implement
         BlockVector3 min = getMinimumPoint();
         BlockVector3 max = getMaximumPoint();
 
-        return max.getY() - min.getY() + 1;
+        return max.y() - min.y() + 1;
     }
 
     /**
@@ -163,7 +161,7 @@ public abstract class AbstractRegion extends AbstractSet<BlockVector3> implement
         BlockVector3 min = getMinimumPoint();
         BlockVector3 max = getMaximumPoint();
 
-        return max.getZ() - min.getZ() + 1;
+        return max.z() - min.z() + 1;
     }
 
     /**
@@ -179,12 +177,12 @@ public abstract class AbstractRegion extends AbstractSet<BlockVector3> implement
         final BlockVector3 maxBlock = getMaximumPoint();
 
         //FAWE start
-        final BlockVector2 min = BlockVector2.at(minBlock.getX() >> 4, minBlock.getZ() >> 4);
-        final BlockVector2 max = BlockVector2.at(maxBlock.getX() >> 4, maxBlock.getZ() >> 4);
+        final BlockVector2 min = BlockVector2.at(minBlock.x() >> 4, minBlock.z() >> 4);
+        final BlockVector2 max = BlockVector2.at(maxBlock.x() >> 4, maxBlock.z() >> 4);
         //FAWE end
 
-        for (int X = min.getBlockX(); X <= max.getBlockX(); ++X) {
-            for (int Z = min.getBlockZ(); Z <= max.getBlockZ(); ++Z) {
+        for (int X = min.x(); X <= max.x(); ++X) {
+            for (int Z = min.z(); Z <= max.z(); ++Z) {
                 if (containsChunk(X, Z)) {
                     chunks.add(BlockVector2.at(X, Z));
                 }
@@ -201,9 +199,9 @@ public abstract class AbstractRegion extends AbstractSet<BlockVector3> implement
         final BlockVector3 min = getMinimumPoint();
         final BlockVector3 max = getMaximumPoint();
 
-        for (int x = min.getBlockX(); x <= max.getBlockX(); ++x) {
-            for (int y = min.getBlockY(); y <= max.getBlockY(); ++y) {
-                for (int z = min.getBlockZ(); z <= max.getBlockZ(); ++z) {
+        for (int x = min.x(); x <= max.x(); ++x) {
+            for (int y = min.y(); y <= max.y(); ++y) {
+                for (int z = min.z(); z <= max.z(); ++z) {
                     if (!contains(BlockVector3.at(x, y, z))) {
                         continue;
                     }

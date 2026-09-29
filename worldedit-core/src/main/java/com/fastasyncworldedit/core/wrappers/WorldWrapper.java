@@ -1,5 +1,6 @@
 package com.fastasyncworldedit.core.wrappers;
 
+import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.implementation.packet.ChunkPacket;
 import com.fastasyncworldedit.core.util.ExtentTraverser;
@@ -36,9 +37,13 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
+import com.sk89q.worldedit.world.generation.ConfiguredFeatureType;
+import com.sk89q.worldedit.world.generation.StructureType;
+import com.sk89q.worldedit.world.generation.TreeType;
 import com.sk89q.worldedit.world.weather.WeatherType;
 
 import javax.annotation.Nullable;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -93,6 +98,11 @@ public class WorldWrapper extends AbstractWorld {
     }
 
     @Override
+    public Path getStoragePath() {
+        return parent.getStoragePath();
+    }
+
+    @Override
     public int getMaxY() {
         return parent.getMaxY();
     }
@@ -132,12 +142,10 @@ public class WorldWrapper extends AbstractWorld {
         return parent.playEffect(position, type, data);
     }
 
-    //FAWE start - allow block break effect of non-legacy blocks
     @Override
     public boolean playBlockBreakEffect(Vector3 position, BlockType type) {
         return parent.playBlockBreakEffect(position, type);
     }
-    //FAWE end
 
     @Override
     public boolean queueBlockBreakEffect(Platform server, BlockVector3 position, BlockType blockType, double priority) {
@@ -187,8 +195,8 @@ public class WorldWrapper extends AbstractWorld {
     }
 
     @Override
-    public boolean setTile(int x, int y, int z, CompoundTag tile) throws WorldEditException {
-        return parent.setTile(x, y, z, tile);
+    public boolean tile(int x, int y, int z, FaweCompoundTag tile) throws WorldEditException {
+        return parent.tile(x, y, z, tile);
     }
 
     @Override
@@ -206,12 +214,10 @@ public class WorldWrapper extends AbstractWorld {
         return parent.getName();
     }
 
-    //FAWE start - allow history to read an unloaded world's name
     @Override
     public String getNameUnsafe() {
         return parent.getNameUnsafe();
     }
-    //FAWE end
 
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block, boolean notifyAndLight) throws
@@ -261,14 +267,17 @@ public class WorldWrapper extends AbstractWorld {
         }, new Location(this, pt.toVector3()));
     }
 
-    //FAWE start
     @Override
     public Collection<BaseItemStack> getBlockDrops(final BlockVector3 position) {
         return TaskManager.taskManager().syncAt(
                 () -> parent.getBlockDrops(position),
                 new Location(this, position.toVector3()));
     }
-    //FAWE end
+
+    @Override
+    public boolean canPlaceAt(final BlockVector3 position, final BlockState blockState) {
+        return parent.canPlaceAt(position, blockState);
+    }
 
     @Override
     public boolean regenerate(Region region, EditSession session) {
@@ -288,6 +297,22 @@ public class WorldWrapper extends AbstractWorld {
         } catch (MaxChangedBlocksException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public boolean generateTree(final TreeType type, final EditSession editSession, final BlockVector3 position) throws
+            MaxChangedBlocksException {
+        return parent.generateTree(type, editSession, position);
+    }
+
+    @Override
+    public boolean generateStructure(final StructureType type, final EditSession editSession, final BlockVector3 position) {
+        return parent.generateStructure(type, editSession, position);
+    }
+
+    @Override
+    public boolean generateFeature(final ConfiguredFeatureType type, final EditSession editSession, final BlockVector3 position) {
+        return parent.generateFeature(type, editSession, position);
     }
 
     @Override

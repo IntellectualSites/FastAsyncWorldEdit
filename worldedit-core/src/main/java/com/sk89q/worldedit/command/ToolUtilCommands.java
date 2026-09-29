@@ -154,7 +154,7 @@ public class ToolUtilCommands {
             @Arg(desc = "The size of the brush")
                     int size
     ) throws WorldEditException {
-        we.checkMaxBrushRadius(size);
+        we.checkMaxBrushRadius(size, player);
 
         session.getBrushTool(player).setSize(size);
         player.print(Caption.of("worldedit.tool.size.set"));

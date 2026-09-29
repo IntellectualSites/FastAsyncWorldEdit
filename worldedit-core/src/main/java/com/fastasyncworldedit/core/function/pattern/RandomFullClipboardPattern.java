@@ -1,7 +1,10 @@
 package com.fastasyncworldedit.core.function.pattern;
 
+import com.fastasyncworldedit.core.math.MutableBlockVector3;
+import com.fastasyncworldedit.core.math.transform.MutatingOperationTransformHolder;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.pattern.AbstractPattern;
 import com.sk89q.worldedit.function.pattern.Pattern;
@@ -9,6 +12,8 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.math.transform.Transform;
+import com.sk89q.worldedit.regions.CuboidRegion;
+import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.world.block.BaseBlock;
 
@@ -23,6 +28,7 @@ public class RandomFullClipboardPattern extends AbstractPattern {
     private final boolean randomRotate;
     private final boolean randomFlip;
     private final Vector3 flipVector = Vector3.at(1, 0, 0).multiply(-2).add(1, 1, 1);
+    private final BlockVector3 size;
 
     /**
      * Create a new {@link Pattern} instance
@@ -34,6 +40,12 @@ public class RandomFullClipboardPattern extends AbstractPattern {
     public RandomFullClipboardPattern(List<ClipboardHolder> clipboards, boolean randomRotate, boolean randomFlip) {
         checkNotNull(clipboards);
         this.clipboards = clipboards;
+        MutableBlockVector3 mut = new MutableBlockVector3();
+        clipboards.stream().flatMap(c -> c.getClipboards().stream()).map(c -> {
+            Region region = c.getRegion();
+            return region.getMaximumPoint().subtract(c.getOrigin().getMinimum(region.getMinimumPoint()));
+        }).forEach(mut::getMaximum);
+        this.size = mut.toImmutable();
         this.randomRotate = randomRotate;
         this.randomFlip = randomFlip;
     }
@@ -54,8 +66,9 @@ public class RandomFullClipboardPattern extends AbstractPattern {
         Clipboard clipboard = holder.getClipboard();
         Transform newTransform = holder.getTransform();
         if (newTransform.isIdentity()) {
-            clipboard.paste(extent, set, false);
+            clipboard.paste(extent, set, false, true, false);
         } else {
+            newTransform = MutatingOperationTransformHolder.transform(newTransform, true);
             clipboard.paste(extent, set, false, newTransform);
         }
         return true;
@@ -64,6 +77,11 @@ public class RandomFullClipboardPattern extends AbstractPattern {
     @Override
     public BaseBlock applyBlock(BlockVector3 position) {
         throw new IllegalStateException("Incorrect use. This pattern can only be applied to an extent!");
+    }
+
+    @Override
+    public BlockVector3 size() {
+        return size;
     }
 
 }

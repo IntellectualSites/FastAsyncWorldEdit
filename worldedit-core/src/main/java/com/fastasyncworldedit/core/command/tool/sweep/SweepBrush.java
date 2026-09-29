@@ -79,13 +79,13 @@ public class SweepBrush implements Brush, ResettableTool {
         Clipboard clipboard = holder.getClipboard();
 
         BlockVector3 dimensions = clipboard.getDimensions();
-        double quality = Math.max(dimensions.getBlockX(), dimensions.getBlockZ());
+        double quality = Math.max(dimensions.x(), dimensions.z());
 
         AffineTransform transform = new AffineTransform();
 
         ClipboardSpline spline = new ClipboardSpline(editSession, holder, interpol, transform, nodes.size());
 
-        if (dimensions.getBlockX() > dimensions.getBlockZ()) {
+        if (dimensions.x() > dimensions.z()) {
             spline.setDirection(Vector2.at(0, 1));
         }
 

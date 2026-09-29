@@ -58,6 +58,48 @@ public class LocalBlockVectorSet implements BlockVector3Set {
         this.set = new SparseBitSet();
     }
 
+    /**
+     * New wrapped LocalBlockVectorSet allowing "upgrading" to a {@link BlockVectorSet} as necessary
+     *
+     * @param set existing {@link LocalBlockVectorSet} to wrap
+     * @since 2.13.0
+     */
+    public static BlockVector3Set wrap(LocalBlockVectorSet set) {
+        return new BlockVector3SetHolder(set);
+    }
+
+    /**
+     * New wrapped LocalBlockVectorSet allowing "upgrading" to a {@link BlockVectorSet} as necessary
+     *
+     * @since 2.13.0
+     */
+    public static BlockVector3Set wrapped() {
+        return new BlockVector3SetHolder(new LocalBlockVectorSet());
+    }
+
+    /**
+     * New wrapped LocalBlockVectorSet with initial offset allowing "upgrading" to a {@link BlockVectorSet} as necessary
+     *
+     * @param x x offset
+     * @param z z offset
+     * @since 2.13.0
+     */
+    public static BlockVector3Set wrapped(int x, int z) {
+        return new BlockVector3SetHolder(new LocalBlockVectorSet(x, z));
+    }
+
+    /**
+     * New wrapped LocalBlockVectorSet with initial offset allowing "upgrading" to a {@link BlockVectorSet} as necessary
+     *
+     * @param x x offset
+     * @param y y offset
+     * @param z z offset
+     * @since 2.13.0
+     */
+    public static BlockVector3Set wrapped(int x, int y, int z) {
+        return new BlockVector3SetHolder(new LocalBlockVectorSet(x, y, z));
+    }
+
     private LocalBlockVectorSet(int x, int y, int z, SparseBitSet set) {
         this.offsetX = x;
         this.offsetY = y;
@@ -75,6 +117,18 @@ public class LocalBlockVectorSet implements BlockVector3Set {
         return set.isEmpty();
     }
 
+    public int offsetX() {
+        return offsetX;
+    }
+
+    public int offsetY() {
+        return offsetY;
+    }
+
+    public int offsetZ() {
+        return offsetZ;
+    }
+
     /**
      * If the set contains a position
      *
@@ -90,24 +144,26 @@ public class LocalBlockVectorSet implements BlockVector3Set {
     @Override
     public boolean contains(Object o) {
         if (o instanceof BlockVector3 v) {
-            return contains(v.getBlockX(), v.getBlockY(), v.getBlockZ());
+            return contains(v.x(), v.y(), v.z());
         }
         return false;
     }
 
+    /**
+     * @deprecated use {@link LocalBlockVectorSet#copy()}
+     */
     @Override
+    @Deprecated(forRemoval = true, since = "2.13.0")
     public LocalBlockVectorSet clone() {
+        return copy();
+    }
+
+    @Override
+    public LocalBlockVectorSet copy() {
         return new LocalBlockVectorSet(offsetX, offsetY, offsetZ, set.clone());
     }
 
-    /**
-     * If a radius is contained by the set
-     *
-     * @param x      x radius center
-     * @param y      y radius center
-     * @param z      z radius center
-     * @return if radius is contained by the set
-     */
+    @Override
     public boolean containsRadius(int x, int y, int z, int radius) {
         if (radius <= 0) {
             return contains(x, y, z);
@@ -130,9 +186,11 @@ public class LocalBlockVectorSet implements BlockVector3Set {
             return false;
         }
         for (int xx = -radius; xx <= radius; xx++) {
+            int rx = x + xx;
             for (int yy = -radius; yy <= radius; yy++) {
+                int ry = y + yy;
                 for (int zz = -radius; zz <= radius; zz++) {
-                    if (contains(x + xx, y + yy, z + zz)) {
+                    if (contains(rx, ry, z + zz)) {
                         return true;
                     }
                 }
@@ -141,27 +199,13 @@ public class LocalBlockVectorSet implements BlockVector3Set {
         return false;
     }
 
-    /**
-     * Set the offset applied to values when storing and reading to keep the values within -1024 to 1023. Uses default y offset
-     * of 128 to allow -64 -> 320 world height use.
-     *
-     * @param x x offset
-     * @param z z offset
-     */
+    @Override
     public void setOffset(int x, int z) {
         this.offsetX = x;
         this.offsetZ = z;
     }
 
-    /**
-     * Set the offset applied to values when storing and reading to keep the x and z values within -1024 to 1023. Y values
-     * require keeping withing -256 and 255.
-     *
-     * @param x x offset
-     * @param y y offset
-     * @param z z offset
-     * @since 2.2.0
-     */
+    @Override
     public void setOffset(int x, int y, int z) {
         this.offsetX = x;
         this.offsetY = y;
@@ -232,8 +276,8 @@ public class LocalBlockVectorSet implements BlockVector3Set {
 
     @Nonnull
     @Override
-    public Object[] toArray() {
-        return toArray((Object[]) null);
+    public BlockVector3[] toArray() {
+        return toArray(new BlockVector3[0]);
     }
 
     @SuppressWarnings("unchecked")
@@ -300,7 +344,7 @@ public class LocalBlockVectorSet implements BlockVector3Set {
         int relZ = z - offsetZ;
         int relY = y - offsetY;
         if (relX > 1023 || relX < -1024 || relZ > 1023 || relZ < -1024 || relY < -256 || relY > 255) {
-            throw new UnsupportedOperationException(
+            throw new IndexOutOfBoundsException(
                     "LocalVectorSet can only contain vectors within 1024 blocks (cuboid) of the first entry. Attempted to set " +
                             "block at " + x + ", " + y + ", " + z + ". With origin " + offsetX + " " + offsetY + " " + offsetZ);
         }
@@ -321,14 +365,14 @@ public class LocalBlockVectorSet implements BlockVector3Set {
      */
     @Override
     public boolean add(BlockVector3 vector) {
-        return add(vector.getBlockX(), vector.getBlockY(), vector.getBlockZ());
+        return add(vector.x(), vector.y(), vector.z());
     }
 
     private int getIndex(BlockVector3 vector) {
         return MathMan.tripleSearchCoords(
-                vector.getBlockX() - offsetX,
-                vector.getBlockY() - offsetY,
-                vector.getBlockZ() - offsetZ
+                vector.x() - offsetX,
+                vector.y() - offsetY,
+                vector.z() - offsetZ
         );
     }
 
@@ -361,7 +405,7 @@ public class LocalBlockVectorSet implements BlockVector3Set {
     public boolean remove(Object o) {
         if (o instanceof BlockVector3) {
             BlockVector3 v = (BlockVector3) o;
-            return remove(v.getBlockX(), v.getBlockY(), v.getBlockZ());
+            return remove(v.x(), v.y(), v.z());
         }
         return false;
     }
@@ -448,9 +492,132 @@ public class LocalBlockVectorSet implements BlockVector3Set {
         set.clear();
     }
 
+    public boolean isInitialised() {
+        return offsetX != Integer.MAX_VALUE && offsetZ != Integer.MAX_VALUE;
+    }
+
     public interface BlockVectorSetVisitor {
 
         void run(int x, int y, int z, int index);
+
+    }
+
+    private static class BlockVector3SetHolder implements BlockVector3Set {
+
+        BlockVector3Set set;
+
+        private BlockVector3SetHolder(BlockVector3Set set) {
+            this.set = set;
+        }
+
+        @Override
+        public boolean add(int x, int y, int z) {
+            try {
+                return set.add(x, y, z);
+            } catch (IndexOutOfBoundsException e) {
+                if (set instanceof LocalBlockVectorSet localBlockVectorSet) {
+                    set = new BlockVectorSet(localBlockVectorSet);
+                    return set.add(x, y, z);
+                } else {
+                    throw e;
+                }
+            }
+        }
+
+        @Override
+        public boolean contains(int x, int y, int z) {
+            return set.contains(x, y, z);
+        }
+
+        @Override
+        public void setOffset(int x, int z) {
+            set.setOffset(x, z);
+        }
+
+        @Override
+        public void setOffset(int x, int y, int z) {
+            set.setOffset(x, y, z);
+        }
+
+        @Override
+        public boolean containsRadius(int x, int y, int z, int radius) {
+            return set.containsRadius(x, y, z, radius);
+        }
+
+        @Override
+        public int size() {
+            return set.size();
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return set.isEmpty();
+        }
+
+        @Override
+        public boolean contains(Object o) {
+            return set.contains(o);
+        }
+
+        @Override
+        public @Nonnull Iterator<BlockVector3> iterator() {
+            return set.iterator();
+        }
+
+        @Override
+        public @Nonnull Object[] toArray() {
+            return set.toArray();
+        }
+
+        @Override
+        public @Nonnull <T> T[] toArray(@Nonnull T[] a) {
+            return set.toArray(a);
+        }
+
+        @Override
+        public boolean add(BlockVector3 blockVector3) {
+            return add(blockVector3.x(), blockVector3.y(), blockVector3.z());
+        }
+
+        @Override
+        public boolean remove(Object o) {
+            return set.remove(o);
+        }
+
+        @Override
+        public boolean containsAll(@Nonnull Collection<?> c) {
+            return set.containsAll(c);
+        }
+
+        @Override
+        public boolean addAll(@Nonnull Collection<? extends BlockVector3> c) {
+            boolean result = false;
+            for (BlockVector3 vector : c) {
+                result |= add(vector);
+            }
+            return result;
+        }
+
+        @Override
+        public boolean retainAll(@Nonnull Collection<?> c) {
+            return set.retainAll(c);
+        }
+
+        @Override
+        public boolean removeAll(@Nonnull Collection<?> c) {
+            return set.removeAll(c);
+        }
+
+        @Override
+        public void clear() {
+            set.clear();
+        }
+
+        @Override
+        public BlockVector3SetHolder copy() {
+            BlockVector3Set copied = set.copy();
+            return new BlockVector3SetHolder(copied);
+        }
 
     }
 

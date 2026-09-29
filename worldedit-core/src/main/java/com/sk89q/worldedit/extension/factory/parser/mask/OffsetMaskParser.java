@@ -44,7 +44,7 @@ public class OffsetMaskParser extends InputParser<Mask> implements AliasedParser
     }
 
     @Override
-    public Stream<String> getSuggestions(String input) {
+    public Stream<String> getSuggestions(String input, ParserContext context) {
         if (input.isEmpty()) {
             return Stream.of(">", "<");
         }
@@ -52,7 +52,7 @@ public class OffsetMaskParser extends InputParser<Mask> implements AliasedParser
         if (firstChar != '>' && firstChar != '<') {
             return Stream.empty();
         }
-        return worldEdit.getMaskFactory().getSuggestions(input.substring(1)).stream().map(s -> firstChar + s);
+        return worldEdit.getMaskFactory().getSuggestions(input.substring(1), context).stream().map(s -> firstChar + s);
     }
 
     @Override

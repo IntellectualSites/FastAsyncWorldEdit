@@ -200,6 +200,7 @@ public class ConsumeBindings extends Bindings {
     public BaseBlock baseBlock(Actor actor, String argument) {
         ParserContext parserContext = new ParserContext();
         parserContext.setActor(actor);
+        parserContext.setTryLegacy(actor.getLimit().ALLOW_LEGACY);
         if (actor instanceof Entity) {
             Extent extent = ((Entity) actor).getExtent();
             if (extent instanceof World) {

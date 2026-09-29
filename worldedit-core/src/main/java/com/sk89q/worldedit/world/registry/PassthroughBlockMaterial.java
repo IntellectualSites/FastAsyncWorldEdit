@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.world.registry;
 
+import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.sk89q.jnbt.CompoundTag;
 
 import javax.annotation.Nullable;
@@ -168,5 +169,11 @@ public class PassthroughBlockMaterial implements BlockMaterial {
     public CompoundTag getDefaultTile() {
         return blockMaterial.getDefaultTile();
     }
+
+    @Override
+    public @Nullable FaweCompoundTag defaultTile() {
+        return blockMaterial.defaultTile();
+    }
+
     //FAWE end
 }

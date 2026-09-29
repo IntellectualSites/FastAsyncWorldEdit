@@ -21,11 +21,11 @@ public class BiomeCopy implements RegionFunction {
 
     @Override
     public boolean apply(BlockVector3 position) throws WorldEditException {
-        int x = position.getBlockX();
-        int y = position.getBlockY();
-        int z = position.getBlockZ();
-        if (x != mutableVector.getBlockX() || z != mutableVector.getBlockZ() || y != mutableVector
-                .getBlockY()) {
+        int x = position.x();
+        int y = position.y();
+        int z = position.z();
+        if (x != mutableVector.x() || z != mutableVector.z() || y != mutableVector
+                .y()) {
             mutableVector.setComponents(x, y, z);
             return destination.setBiome(mutableVector, source.getBiome(mutableVector));
         }

@@ -36,6 +36,17 @@ public class FoliaTaskManager extends TaskManager {
     private final AtomicInteger idCounter = new AtomicInteger();
 
     @Override
+    public int repeat(@NotNull final Runnable runnable, final int interval) {
+        Bukkit.getGlobalRegionScheduler().runAtFixedRate(
+                WorldEditPlugin.getInstance(),
+                asConsumer(runnable),
+                interval,
+                interval
+        );
+        return idCounter.getAndIncrement();
+    }
+
+    @Override
     public int repeatAsync(@NotNull final Runnable runnable, final int interval) {
         // TODO (folia) return some kind of own ScheduledTask instead of int
         Bukkit.getAsyncScheduler().runAtFixedRate(

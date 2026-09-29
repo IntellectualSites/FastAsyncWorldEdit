@@ -21,12 +21,38 @@ public class OreGen implements Resource {
     private final Extent extent;
     private final Mask mask;
     private final MutableBlockVector3 mutable = new MutableBlockVector3();
+    private final boolean triangular;
 
     private final double ONE_2 = 1 / 2F;
     private final double ONE_8 = 1 / 8F;
     private final double ONE_16 = 1 / 16F;
 
     public OreGen(Extent extent, Mask mask, Pattern pattern, int size, int minY, int maxY) {
+        this(extent, mask, pattern, size, minY, maxY, false);
+    }
+
+    /**
+     * Generate ore-like deposits with the given pattern and settings
+     *
+     * @param extent             Extent to write to
+     * @param mask               mask of where to place
+     * @param pattern            pattern to place
+     * @param size               maximum size of deposits
+     * @param minY               min Y to consider generation from (important for triangular generation)
+     * @param maxY               max Y to consider generation from (important for triangular generation)
+     * @param triangular         if a triangular distribution of ores should be used (rather than flat)
+     * @throws WorldEditException on error
+     * @since 2.14.3
+     */
+    public OreGen(
+            Extent extent,
+            Mask mask,
+            Pattern pattern,
+            int size,
+            int minY,
+            int maxY,
+            boolean triangular
+    ) {
         this.maxSize = size;
         this.maxSizeO8 = size * ONE_8;
         this.maxSizeO16 = size * ONE_16;
@@ -36,11 +62,20 @@ public class OreGen implements Resource {
         this.mask = mask;
         this.pattern = pattern;
         this.extent = extent;
+        this.triangular = triangular;
     }
 
     @Override
     public boolean spawn(Random rand, int x, int z) throws WorldEditException {
-        int y = rand.nextInt(maxY - minY) + minY;
+        int y;
+        if (this.triangular) {
+            int range = maxY - minY;
+            int mid = range / 2;
+            int upperMid = range - mid;
+            y = minY + rand.nextInt(mid) + rand.nextInt(upperMid);
+        } else {
+            y = rand.nextInt(maxY - minY) + minY;
+        }
         if (!mask.test(mutable.setComponents(x, y, z))) {
             return false;
         }

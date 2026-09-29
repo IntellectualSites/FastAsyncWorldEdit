@@ -71,11 +71,11 @@ public class MathMan {
     }
 
     public static int clamp(int check, int min, int max) {
-        return check > max ? max : (Math.max(check, min));
+        return Math.clamp(check, min, max);
     }
 
     public static float clamp(float check, float min, float max) {
-        return check > max ? max : Math.max(check, min);
+        return Math.clamp(check, min, max);
     }
 
     public static double hypot(final double... pars) {
@@ -434,6 +434,20 @@ public class MathMan {
 
     public static boolean isPowerOfTwo(int a) {
         return (a & a - 1) == 0;
+    }
+
+    /**
+     * Calculates the size an array needs to fit all elements, given that
+     * multiple elements can be stored in a single index.
+     *
+     * @param bitsPerEntry    the number of bits a single element occupies in the array
+     * @param numberOfEntries the number of elements to store in the array
+     * @return the size of the array needed to store the elements
+     * @since 2.14.1
+     */
+    public static int longArrayLength(int bitsPerEntry, int numberOfEntries) {
+        int entriesPerLong = Long.SIZE / bitsPerEntry;
+        return Math.ceilDiv(numberOfEntries, entriesPerLong);
     }
 
 }

@@ -3,6 +3,7 @@ package com.fastasyncworldedit.core.util;
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.queue.implementation.QueueHandler;
+import com.fastasyncworldedit.core.util.task.RunnableVal;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.util.Location;
@@ -12,6 +13,7 @@ import org.apache.logging.log4j.Logger;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Collection;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -45,6 +47,15 @@ public abstract class TaskManager {
         }
         return INSTANCE;
     }
+
+    /**
+     * Run a repeating task on the main thread.
+     *
+     * @param runnable the task to run
+     * @param interval in ticks
+     * @return the task id number
+     */
+    public abstract int repeat(@Nonnull final Runnable runnable, final int interval);
 
     /**
      * Run a repeating task asynchronously.
@@ -239,6 +250,27 @@ public abstract class TaskManager {
             run.run();
         } else {
             Fawe.instance().getQueueHandler().sync(run);
+        }
+    }
+
+    /**
+     * Quickly run a task on the main thread, and wait for execution to finish.
+     */
+    public <T> T sync(@Nonnull final RunnableVal<T> function) {
+        return sync((Supplier<T>) function);
+    }
+
+    /**
+     * Quickly run a task on the main thread, and wait for execution to finish.
+     */
+    public <T> T sync(final Supplier<T> function) {
+        if (Fawe.isMainThread()) {
+            return function.get();
+        }
+        try {
+            return Fawe.instance().getQueueHandler().sync(function).get();
+        } catch (InterruptedException | ExecutionException e) {
+            throw new RuntimeException(e);
         }
     }
 

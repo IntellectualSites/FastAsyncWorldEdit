@@ -19,10 +19,10 @@ public abstract class CuboidRegionFilter implements RegionFilter {
     public abstract void calculateRegions();
 
     public void add(BlockVector2 pos1, BlockVector2 pos2) {
-        int ccx1 = pos1.getBlockX() >> 9;
-        int ccz1 = pos1.getBlockZ() >> 9;
-        int ccx2 = pos2.getBlockX() >> 9;
-        int ccz2 = pos2.getBlockZ() >> 9;
+        int ccx1 = pos1.x() >> 9;
+        int ccz1 = pos1.z() >> 9;
+        int ccx2 = pos2.x() >> 9;
+        int ccz2 = pos2.z() >> 9;
         for (int x = ccx1; x <= ccx2; x++) {
             for (int z = ccz1; z <= ccz2; z++) {
                 if (!occupiedRegions.containsKey(x, z)) {
@@ -39,10 +39,10 @@ public abstract class CuboidRegionFilter implements RegionFilter {
                 }
             }
         }
-        int cx1 = pos1.getBlockX() >> 4;
-        int cz1 = pos1.getBlockZ() >> 4;
-        int cx2 = pos2.getBlockX() >> 4;
-        int cz2 = pos2.getBlockZ() >> 4;
+        int cx1 = pos1.x() >> 4;
+        int cz1 = pos1.z() >> 4;
+        int cx2 = pos2.x() >> 4;
+        int cz2 = pos2.z() >> 4;
         for (int chunkZ = cz1; chunkZ <= cz2; chunkZ++) {
             for (int chunkX = cx1; chunkX <= cx2; chunkX++) {
                 unoccupiedChunks.remove(chunkX, chunkZ);

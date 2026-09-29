@@ -20,6 +20,9 @@
 package com.sk89q.worldedit.internal.command.exception;
 
 import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.exception.BrushRadiusLimitException;
+import com.fastasyncworldedit.core.exception.OutsideWorldBoundsException;
+import com.fastasyncworldedit.core.exception.RadiusLimitException;
 import com.fastasyncworldedit.core.internal.exception.FaweException;
 import com.google.common.collect.ImmutableList;
 import com.sk89q.worldedit.DisallowedItemException;
@@ -133,6 +136,23 @@ public class WorldEditExceptionConverter extends ExceptionConverterHelper {
                 e
         );
     }
+
+    //FAWE start
+    @ExceptionMatch
+    public void convert(BrushRadiusLimitException e) throws CommandException {
+        throw newCommandException(Caption.of("fawe.error.limit.max-brush-radius", TextComponent.of(e.getMaxRadius())), e);
+    }
+
+    @ExceptionMatch
+    public void convert(RadiusLimitException e) throws CommandException {
+        throw newCommandException(Caption.of("fawe.error.limit.max-radius", TextComponent.of(e.getMaxRadius())), e);
+    }
+
+    @ExceptionMatch
+    public void convert(OutsideWorldBoundsException e) throws CommandException {
+        throw newCommandException(Caption.of("fawe.cancel.reason.world.limit", TextComponent.of(e.y())), e);
+    }
+    //FAWE end
 
     @ExceptionMatch
     public void convert(UnknownDirectionException e) throws CommandException {

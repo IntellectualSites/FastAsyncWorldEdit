@@ -106,6 +106,11 @@ public class Triangle {
     }
 
     @Override
+    public Triangle clone() {
+        return new Triangle(vertices[0], vertices[1], vertices[2]);
+    }
+
+    @Override
     public String toString() {
         return tag + "(" + this.vertices[0] + "," + this.vertices[1] + "," + this.vertices[2] + ")";
     }

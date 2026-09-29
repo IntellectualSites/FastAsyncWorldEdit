@@ -19,17 +19,16 @@
 
 package com.sk89q.jnbt;
 
-import com.sk89q.worldedit.util.nbt.IntBinaryTag;
+import com.fastasyncworldedit.core.jnbt.NumberTag;
+import org.enginehub.linbus.tree.LinIntTag;
 
 /**
  * The {@code TAG_Int} tag.
  *
- * @deprecated Use {@link IntBinaryTag}.
+ * @deprecated Use {@link LinIntTag}.
  */
 @Deprecated
-public final class IntTag extends Tag {
-
-    private final IntBinaryTag innerTag;
+public final class IntTag extends NumberTag<LinIntTag> {
 
     /**
      * Creates the tag with an empty name.
@@ -37,23 +36,16 @@ public final class IntTag extends Tag {
      * @param value the value of the tag
      */
     public IntTag(int value) {
-        super();
-        this.innerTag = IntBinaryTag.of(value);
+        this(LinIntTag.of(value));
     }
 
-    public IntTag(IntBinaryTag adventureTag) {
-        super();
-        this.innerTag = adventureTag;
-    }
-
-    @Override
-    public IntBinaryTag asBinaryTag() {
-        return this.innerTag;
+    public IntTag(LinIntTag tag) {
+        super(tag);
     }
 
     @Override
     public Integer getValue() {
-        return innerTag.value();
+        return linTag.value();
     }
 
     //FAWE start

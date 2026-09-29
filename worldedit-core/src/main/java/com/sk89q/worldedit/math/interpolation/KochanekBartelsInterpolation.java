@@ -164,10 +164,10 @@ public class KochanekBartelsInterpolation implements Interpolation {
         //FAWE start
         double r2 = remainder * remainder;
         double r3 = r2 * remainder;
-        mutable.mutX((a.getX() * r3 + b.getX() * r2 + c.getX() * remainder + d.getX()));
-        mutable.mutY((a.getY() * r3 + b.getY() * r2 + c.getY() * remainder + d.getY()));
-        mutable.mutZ((a.getZ() * r3 + b.getZ() * r2 + c.getZ() * remainder + d.getZ()));
-        return Vector3.at(mutable.getX(), mutable.getY(), mutable.getZ());
+        mutable.mutX((a.x() * r3 + b.x() * r2 + c.x() * remainder + d.x()));
+        mutable.mutY((a.y() * r3 + b.y() * r2 + c.y() * remainder + d.y()));
+        mutable.mutZ((a.z() * r3 + b.z() * r2 + c.z() * remainder + d.z()));
+        return Vector3.at(mutable.x(), mutable.y(), mutable.z());
         //FAWE end
     }
 

@@ -23,7 +23,7 @@ public class AdjacentAnyMask extends AbstractMask implements ResettableMask {
     }
 
     AdjacentAnyMask(CachedMask mask, int minY, int maxY) {
-        this.mask = CachedMask.cache(mask);
+        this.mask = mask;
         mutable = new MutableBlockVector3();
         this.minY = minY;
         this.maxY = maxY;
@@ -44,9 +44,9 @@ public class AdjacentAnyMask extends AbstractMask implements ResettableMask {
     }
 
     public BlockVector3 direction(BlockVector3 v) {
-        int x = v.getBlockX();
-        int y = v.getBlockY();
-        int z = v.getBlockZ();
+        int x = v.x();
+        int y = v.y();
+        int z = v.z();
         if (mask.test(mutable.setComponents(x + 1, y, z))) {
             return mutable.setComponents(1, 0, 0);
         } else if (mask.test(mutable.setComponents(x - 1, y, z))) {

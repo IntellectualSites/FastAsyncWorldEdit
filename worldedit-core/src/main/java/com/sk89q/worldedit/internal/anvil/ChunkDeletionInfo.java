@@ -45,7 +45,7 @@ public class ChunkDeletionInfo {
                 return chunks.size();
             }
             final BlockVector2 dist = maxChunk.subtract(minChunk).add(1, 1);
-            return dist.getBlockX() * dist.getBlockZ();
+            return dist.x() * dist.z();
         }
 
     }

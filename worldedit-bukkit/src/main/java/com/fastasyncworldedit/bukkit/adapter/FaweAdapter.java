@@ -5,7 +5,9 @@ import com.fastasyncworldedit.core.util.TaskManager;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
+import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.util.TreeGenerator;
 import org.bukkit.Material;
 import org.bukkit.TreeType;
@@ -36,6 +38,12 @@ public abstract class FaweAdapter<TAG, SERVER_LEVEL> extends CachedBukkitAdapter
     private static final MethodHandle CAPTURED_BLOCK_STATES;
     private static final MethodHandle GET_CURRENT_WORLD_DATA;
 
+    protected final BukkitImplAdapter<TAG> parent;
+    protected int[] ibdToOrdinal = null;
+    protected int[] ordinalToIbdID = null;
+    protected boolean initialised = false;
+    protected Map<String, List<Property<?>>> allBlockProperties = null;
+
     static {
         VarHandle captureTreeGeneration = null;
         VarHandle captureBlockStates = null;
@@ -62,6 +70,15 @@ public abstract class FaweAdapter<TAG, SERVER_LEVEL> extends CachedBukkitAdapter
         CAPTURE_BLOCK_STATES = captureBlockStates;
         CAPTURED_BLOCK_STATES = capturedBlockStates;
         GET_CURRENT_WORLD_DATA = getCurrentWorldData;
+    }
+
+    protected FaweAdapter(final BukkitImplAdapter<TAG> parent) {
+        this.parent = parent;
+    }
+
+    @Override
+    public void initializeRegistries() {
+        parent.initializeRegistries();
     }
 
     @Override
@@ -103,6 +120,25 @@ public abstract class FaweAdapter<TAG, SERVER_LEVEL> extends CachedBukkitAdapter
         }
         return true;
     }
+
+    public void mapFromGlobalPalette(char[] data) {
+        assert data.length == 4096;
+        ensureInit();
+        for (int i = 0; i < 4096; i++) {
+            data[i] = (char) this.ibdToOrdinal[data[i]];
+        }
+    }
+
+    public void mapWithPalette(char[] data, char[] paletteToOrdinal) {
+        for (int i = 0; i < 4096; i++) {
+            char paletteVal = data[i];
+            char val = paletteToOrdinal[paletteVal];
+            assert val != Character.MAX_VALUE;
+            data[i] = val;
+        }
+    }
+
+    protected abstract void ensureInit();
 
     private void preCaptureStatesCommon(SERVER_LEVEL serverLevel) {
         if (FoliaSupport.isFolia()) {

@@ -1,5 +1,6 @@
 package com.fastasyncworldedit.core.extent.filter.block;
 
+import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
@@ -80,17 +81,17 @@ public class ArrayFilterBlock extends AbstractExtentFilterBlock {
     }
 
     @Override
-    public int getX() {
+    public int x() {
         return x;
     }
 
     @Override
-    public int getY() {
+    public int y() {
         return (heights[index] & 0xFF) + yOffset;
     }
 
     @Override
-    public int getZ() {
+    public int z() {
         return z;
     }
 
@@ -106,18 +107,23 @@ public class ArrayFilterBlock extends AbstractExtentFilterBlock {
     }
 
     @Override
+    public boolean tile(final int x, final int y, final int z, final FaweCompoundTag tile) throws WorldEditException {
+        return false; // class is unused + deprecated, do not care about impl
+    }
+
+    @Override
     public boolean setBiome(int x, int y, int z, BiomeType biome) {
         return getExtent().setBiome(x, y, z, biome);
     }
 
     @Override
     public void setBiome(final BiomeType biome) {
-        getExtent().setBiome(getX(), getY(), getZ(), biome);
+        getExtent().setBiome(x(), y(), z(), biome);
     }
 
     @Override
     public BiomeType getBiome() {
-        return getExtent().getBiomeType(getX(), getY(), getZ());
+        return getExtent().getBiomeType(x(), y(), z());
     }
 
 }

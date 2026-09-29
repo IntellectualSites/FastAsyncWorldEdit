@@ -23,11 +23,16 @@ import com.sk89q.util.StringUtil;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.factory.parser.DefaultBlockParser;
 import com.sk89q.worldedit.extension.input.InputParseException;
+import com.sk89q.worldedit.extension.input.NoMatchException;
 import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.internal.registry.AbstractFactory;
+import com.sk89q.worldedit.internal.registry.InputParser;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.block.BaseBlock;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -66,5 +71,22 @@ public class BlockFactory extends AbstractFactory<BaseBlock> {
         }
         return blocks;
     }
+
+    //FAWE start
+    @Override
+    public BaseBlock parseFromInput(String input, ParserContext context) throws InputParseException {
+        BaseBlock match;
+
+        for (InputParser<BaseBlock> parser : parsers) {
+            match = parser.parseFromInput(input, context);
+
+            if (match != null) {
+                return match;
+            }
+        }
+
+        throw new NoMatchException(TranslatableComponent.of("worldedit.error.no-match", TextComponent.of(input)));
+    }
+    //FAWE end
 
 }

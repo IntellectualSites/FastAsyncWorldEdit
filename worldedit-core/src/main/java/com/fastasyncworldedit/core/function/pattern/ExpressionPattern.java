@@ -50,7 +50,7 @@ public class ExpressionPattern extends AbstractPattern {
             if (expression.getEnvironment() instanceof WorldEditExpressionEnvironment) {
                 ((WorldEditExpressionEnvironment) expression.getEnvironment()).setCurrentBlock(vector.toVector3());
             }
-            double combined = expression.evaluate(vector.getX(), vector.getY(), vector.getZ());
+            double combined = expression.evaluate(vector.x(), vector.y(), vector.z());
             return BlockState.getFromOrdinal((int) combined).toBaseBlock();
         } catch (EvaluationException e) {
             e.printStackTrace();

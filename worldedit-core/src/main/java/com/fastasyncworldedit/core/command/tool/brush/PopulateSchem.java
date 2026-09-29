@@ -24,7 +24,8 @@ public record PopulateSchem(Mask mask, List<ClipboardHolder> clipboards, int rar
         CuboidRegion cuboid = new CuboidRegion(
                 editSession.getWorld(),
                 position.subtract(size1, size1, size1),
-                position.add(size1, size1, size1)
+                position.add(size1, size1, size1),
+                true
         );
         try {
             editSession.addSchems(cuboid, mask, clipboards, rarity, randomRotate);

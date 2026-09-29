@@ -64,9 +64,6 @@ public class AsyncPreloader implements Preloader, Runnable {
         MutablePair<World, Set<BlockVector2>> existing = cancelAndGet(actor);
         try {
             Region region = session.getSelection(world);
-            if (region == null) {
-                return;
-            }
             if (existing == null) {
                 update.put(
                         actor.getUniqueId(),
@@ -111,8 +108,8 @@ public class AsyncPreloader implements Preloader, Runnable {
                 while (chunksIter.hasNext() && pair.getValue() == chunks) { // Ensure the queued load is still valid
                     BlockVector2 chunk = chunksIter.next();
                     if (Settings.settings().REGION_RESTRICTIONS_OPTIONS.RESTRICT_TO_SAFE_RANGE) {
-                        int x = chunk.getX();
-                        int z = chunk.getZ();
+                        int x = chunk.x();
+                        int z = chunk.z();
                         // if any chunk coord is outside 30 million blocks
                         if (x > 1875000 || z > 1875000 || x < -1875000 || z < -1875000) {
                             continue;
@@ -130,7 +127,7 @@ public class AsyncPreloader implements Preloader, Runnable {
     }
 
     private void queueLoad(World world, BlockVector2 chunk) {
-        world.checkLoadedChunk(BlockVector3.at(chunk.getX() << 4, 0, chunk.getZ() << 4));
+        world.checkLoadedChunk(BlockVector3.at(chunk.x() << 4, 0, chunk.z() << 4));
     }
 
 }

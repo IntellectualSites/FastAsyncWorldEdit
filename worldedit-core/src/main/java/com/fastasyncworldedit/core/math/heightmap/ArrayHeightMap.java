@@ -38,8 +38,8 @@ public class ArrayHeightMap extends ScalableHeightMap {
 
     @Override
     public double getHeight(int x, int z) {
-        x = (int) Math.max(0, Math.min(width - 1, (x + size) * rx));
-        z = (int) Math.max(0, Math.min(length - 1, (z + size) * rz));
+        x = (int) Math.clamp((x + size) * rx, 0, width - 1);
+        z = (int) Math.clamp((z + size) * rz, 0, length - 1);
         return (height[x][z] * size) / scale;
 
     }

@@ -4,7 +4,9 @@ public record IntPair(int x, int z) {
 
     @Override
     public int hashCode() {
-        return (x << 16) | (z & 0xFFFF);
+        int i = 1664525 * x + 1013904223;
+        int j = 1664525 * (z ^ -559038737) + 1013904223;
+        return i ^ j;
     }
 
     @Override

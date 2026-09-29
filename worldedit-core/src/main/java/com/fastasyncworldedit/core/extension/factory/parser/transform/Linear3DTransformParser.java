@@ -23,9 +23,9 @@ public class Linear3DTransformParser extends RichParser<ResettableExtent> {
     }
 
     @Override
-    protected Stream<String> getSuggestions(String argumentInput, int index) {
+    protected Stream<String> getSuggestions(String argumentInput, int index, ParserContext context) {
         if (index == 0) {
-            return worldEdit.getTransformFactory().getSuggestions(argumentInput).stream();
+            return worldEdit.getTransformFactory().getSuggestions(argumentInput, context).stream();
         }
         return Stream.empty();
     }

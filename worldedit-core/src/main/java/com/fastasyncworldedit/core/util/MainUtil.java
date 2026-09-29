@@ -33,7 +33,9 @@ import net.jpountz.lz4.LZ4BlockOutputStream;
 import net.jpountz.lz4.LZ4Compressor;
 import net.jpountz.lz4.LZ4Factory;
 import net.jpountz.lz4.LZ4FastDecompressor;
+import net.jpountz.xxhash.XXHashFactory;
 import org.apache.logging.log4j.Logger;
+import org.enginehub.linbus.tree.LinCompoundTag;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -102,6 +104,7 @@ public class MainUtil {
     private static final HttpClient HTTP_CLIENT = HttpClient.newBuilder()
             .followRedirects(HttpClient.Redirect.NORMAL)
             .build();
+    private static final int LZ4_DEFAULT_SEED = 0x9747b28c;
 
     public static List<String> filter(String prefix, List<String> suggestions) {
         if (prefix.isEmpty()) {
@@ -217,7 +220,7 @@ public class MainUtil {
 //        } else if (changeSet instanceof CPUOptimizedChangeSet) {
 //            return changeSet.size() + 32;
         } else if (changeSet != null) {
-            return changeSet.size() * 128L;
+            return changeSet.longSize() * 128; // Approx
         } else {
             return 0;
         }
@@ -298,14 +301,27 @@ public class MainUtil {
         LZ4Factory factory = LZ4Factory.fastestInstance();
         int fastAmount = 1 + ((amount - 1) % 3);
         for (int i = 0; i < fastAmount; i++) {
-            os = new LZ4BlockOutputStream(os, buffer, factory.fastCompressor());
+            // (syncFlush can't be provided without providing explicit Checksum instance)
+            //noinspection resource - default LZ4 implementation doesn't close Checksum
+            os = new LZ4BlockOutputStream(
+                    os, buffer, factory.fastCompressor(),
+                    XXHashFactory.fastestInstance().newStreamingHash32(LZ4_DEFAULT_SEED).asChecksum(), true
+            );
         }
         int highAmount = amount > 3 ? 1 : 0;
         for (int i = 0; i < highAmount; i++) {
             if (amount == 9) {
-                os = new LZ4BlockOutputStream(os, buffer, factory.highCompressor(17));
+                //noinspection resource - default LZ4 implementation doesn't close Checksum
+                os = new LZ4BlockOutputStream(
+                        os, buffer, factory.highCompressor(17),
+                        XXHashFactory.fastestInstance().newStreamingHash32(LZ4_DEFAULT_SEED).asChecksum(), true
+                );
             } else {
-                os = new LZ4BlockOutputStream(os, buffer, factory.highCompressor());
+                //noinspection resource - default LZ4 implementation doesn't close Checksum
+                os = new LZ4BlockOutputStream(
+                        os, buffer, factory.highCompressor(),
+                        XXHashFactory.fastestInstance().newStreamingHash32(LZ4_DEFAULT_SEED).asChecksum(), true
+                );
             }
         }
         os = new FastBufferedOutputStream(os, buffer);
@@ -424,10 +440,12 @@ public class MainUtil {
      * @param y   New Y coordinate
      * @param z   New Z coordinate
      * @return New tag
+     * @deprecated use {@link NbtUtils#withPosition} instead
      */
     @Nonnull
+    @Deprecated(forRemoval = true, since = "2.11.2")
     public static CompoundTag setPosition(@Nonnull CompoundTag tag, int x, int y, int z) {
-        Map<String, Tag> value = new HashMap<>(tag.getValue());
+        Map<String, Tag<?, ?>> value = new HashMap<>(tag.getValue());
         value.put("x", new IntTag(x));
         value.put("y", new IntTag(y));
         value.put("z", new IntTag(z));
@@ -440,19 +458,21 @@ public class MainUtil {
      * @param tag    Tag to copy
      * @param entity Entity
      * @return New tag
+     * @deprecated use {@link NbtUtils#withEntityInfo(LinCompoundTag, Entity)} instead
      */
     @Nonnull
+    @Deprecated(forRemoval = true, since = "2.11.2")
     public static CompoundTag setEntityInfo(@Nonnull CompoundTag tag, @Nonnull Entity entity) {
-        Map<String, Tag> map = new HashMap<>(tag.getValue());
-        map.put("Id", new StringTag(entity.getState().getType().getId()));
+        Map<String, Tag<?, ?>> map = new HashMap<>(tag.getValue());
+        map.put("Id", new StringTag(entity.getState().getType().id()));
         ListTag pos = (ListTag) map.get("Pos");
         if (pos != null) {
             Location loc = entity.getLocation();
             // Create a copy, because the list is immutable...
             List<Tag> posList = new ArrayList<>(pos.getValue());
-            posList.set(0, new DoubleTag(loc.getX()));
-            posList.set(1, new DoubleTag(loc.getY()));
-            posList.set(2, new DoubleTag(loc.getZ()));
+            posList.set(0, new DoubleTag(loc.x()));
+            posList.set(1, new DoubleTag(loc.y()));
+            posList.set(2, new DoubleTag(loc.z()));
             map.put("Pos", new ListTag(pos.getType(), posList));
         }
         return new CompoundTag(map);
@@ -554,8 +574,15 @@ public class MainUtil {
     }
 
     public static BufferedImage readImage(URL url) throws IOException {
+        try (final InputStream stream = readImageStream(url.toURI())) {
+            return readImage(stream);
+        } catch (URISyntaxException e) {
+            throw new IOException("failed to parse url to uri reference", e);
+        }
+    }
+
+    public static InputStream readImageStream(final URI uri) throws IOException {
         try {
-            final URI uri = url.toURI();
             HttpRequest.Builder requestBuilder = HttpRequest.newBuilder(uri).GET();
 
             if (uri.getHost().equalsIgnoreCase("i.imgur.com")) {
@@ -566,16 +593,13 @@ public class MainUtil {
                     requestBuilder.build(),
                     HttpResponse.BodyHandlers.ofInputStream()
             );
-            try (final InputStream body = response.body()) {
-                if (response.statusCode() > 299) {
-                    throw new IOException("Expected 2xx as response code, but received " + response.statusCode());
-                }
-                return readImage(body);
+            final InputStream body = response.body();
+            if (response.statusCode() > 299) {
+                throw new IOException("Expected 2xx as response code, but received " + response.statusCode());
             }
+            return body;
         } catch (InterruptedException e) {
             throw new IOException("request was interrupted", e);
-        } catch (URISyntaxException e) {
-            throw new IOException("failed to parse url to uri reference", e);
         }
     }
 
@@ -697,7 +721,7 @@ public class MainUtil {
 
     public static File resolve(File dir, String filename, @Nullable ClipboardFormat format, boolean allowDir) {
         if (format != null) {
-            if (!filename.matches(".*\\.[\\w].*")) {
+            if (!filename.matches(".*\\.\\w.*")) {
                 filename = filename + "." + format.getPrimaryFileExtension();
             }
             return MainUtil.resolveRelative(new File(dir, filename));
@@ -705,6 +729,12 @@ public class MainUtil {
         if (allowDir) {
             File file = MainUtil.resolveRelative(new File(dir, filename));
             if (file.exists() && file.isDirectory()) {
+                return file;
+            }
+        }
+        if (filename.matches(".*\\.\\w.*")) {
+            File file = MainUtil.resolveRelative(new File(dir, filename));
+            if (file.exists()) {
                 return file;
             }
         }

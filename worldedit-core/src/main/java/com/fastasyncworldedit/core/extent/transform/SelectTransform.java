@@ -27,11 +27,11 @@ public abstract class SelectTransform extends ResettableExtent {
     public abstract AbstractDelegateExtent getExtent(int x, int z);
 
     public Extent getExtent(BlockVector3 pos) {
-        return getExtent(pos.getBlockX(), pos.getBlockY(), pos.getBlockZ());
+        return getExtent(pos.x(), pos.y(), pos.z());
     }
 
     public Extent getExtent(BlockVector2 pos) {
-        return getExtent(pos.getBlockX(), pos.getBlockZ());
+        return getExtent(pos.x(), pos.z());
     }
 
     @Override

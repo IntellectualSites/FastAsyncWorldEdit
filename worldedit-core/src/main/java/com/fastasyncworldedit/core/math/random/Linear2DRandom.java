@@ -6,7 +6,7 @@ import static java.lang.Math.floorDiv;
 /**
  * A {@link SimpleRandom} that deterministically maps coordinates
  * to values.
- * @since TODO
+ * @since 2.9.2
  */
 public class Linear2DRandom implements SimpleRandom {
     private final int xScale;

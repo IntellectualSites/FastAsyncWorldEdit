@@ -19,7 +19,7 @@
 
 package com.sk89q.worldedit.session.request;
 
-import com.sk89q.jnbt.CompoundTag;
+import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.BaseEntity;
@@ -119,8 +119,8 @@ public class RequestExtent implements Extent {
 
     //FAWE start
     @Override
-    public boolean setTile(int x, int y, int z, CompoundTag tile) throws WorldEditException {
-        return getExtent().setTile(x, y, z, tile);
+    public boolean tile(int x, int y, int z, FaweCompoundTag tile) throws WorldEditException {
+        return getExtent().tile(x, y, z, tile);
     }
 
     @Override

@@ -59,13 +59,13 @@ public abstract class ArbitraryShape {
         BlockVector3 min = extent.getMinimumPoint();
         BlockVector3 max = extent.getMaximumPoint();
 
-        cacheOffsetX = min.getBlockX() - 1;
-        cacheOffsetY = min.getBlockY() - 1;
-        cacheOffsetZ = min.getBlockZ() - 1;
+        cacheOffsetX = min.x() - 1;
+        cacheOffsetY = min.y() - 1;
+        cacheOffsetZ = min.z() - 1;
 
-        cacheSizeX = max.getX() - cacheOffsetX + 2;
-        cacheSizeY = max.getY() - cacheOffsetY + 2;
-        cacheSizeZ = max.getZ() - cacheOffsetZ + 2;
+        cacheSizeX = max.x() - cacheOffsetX + 2;
+        cacheSizeY = max.y() - cacheOffsetY + 2;
+        cacheSizeZ = max.z() - cacheOffsetZ + 2;
 
         cache = new byte[cacheSizeX * cacheSizeY * cacheSizeZ];
     }
@@ -98,9 +98,9 @@ public abstract class ArbitraryShape {
         int affected = 0;
 
         for (BlockVector3 position : getExtent()) {
-            int x = position.getBlockX();
-            int y = position.getBlockY();
-            int z = position.getBlockZ();
+            int x = position.x();
+            int y = position.y();
+            int z = position.z();
 
             if (!hollow) {
                 BaseBlock material = getMaterial(x, y, z, pattern.applyBlock(position));

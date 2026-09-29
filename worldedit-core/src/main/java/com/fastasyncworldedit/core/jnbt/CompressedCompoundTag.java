@@ -19,7 +19,7 @@ public abstract class CompressedCompoundTag<T> extends CompoundTag {
     }
 
     @Override
-    public Map<String, Tag> getValue() {
+    public Map<String, Tag<?, ?>> getValue() {
         if (in != null) {
             decompress();
         }
@@ -36,8 +36,8 @@ public abstract class CompressedCompoundTag<T> extends CompoundTag {
         try (NBTInputStream nbtIn = new NBTInputStream(adapt(in))) {
             in = null;
             CompoundTag tag = (CompoundTag) nbtIn.readTag();
-            Map<String, Tag> value = tag.getValue();
-            Map<String, Tag> raw = super.getValue();
+            Map<String, Tag<?, ?>> value = tag.getValue();
+            Map<String, Tag<?, ?>> raw = super.getValue();
             raw.putAll(value);
         } catch (IOException e) {
             throw new RuntimeException(e);

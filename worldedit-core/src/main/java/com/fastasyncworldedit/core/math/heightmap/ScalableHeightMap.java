@@ -56,22 +56,22 @@ public class ScalableHeightMap implements HeightMap {
 
     public static ScalableHeightMap fromClipboard(Clipboard clipboard, int minY, int maxY) {
         BlockVector3 dim = clipboard.getDimensions();
-        char[][] heightArray = new char[dim.getBlockX()][dim.getBlockZ()];
-        int clipMinX = clipboard.getMinimumPoint().getBlockX();
-        int clipMinZ = clipboard.getMinimumPoint().getBlockZ();
-        int clipMinY = clipboard.getMinimumPoint().getBlockY();
-        int clipMaxY = clipboard.getMaximumPoint().getBlockY();
+        char[][] heightArray = new char[dim.x()][dim.z()];
+        int clipMinX = clipboard.getMinimumPoint().x();
+        int clipMinZ = clipboard.getMinimumPoint().z();
+        int clipMinY = clipboard.getMinimumPoint().y();
+        int clipMaxY = clipboard.getMaximumPoint().y();
         int clipHeight = clipMaxY - clipMinY + 1;
         HashSet<IntPair> visited = new HashSet<>();
         MutableBlockVector3 bv = new MutableBlockVector3();
         for (BlockVector3 pos : clipboard.getRegion()) {
-            IntPair pair = new IntPair(pos.getBlockX(), pos.getBlockZ());
+            IntPair pair = new IntPair(pos.x(), pos.z());
             if (visited.contains(pair)) {
                 continue;
             }
             visited.add(pair);
-            int xx = pos.getBlockX();
-            int zz = pos.getBlockZ();
+            int xx = pos.x();
+            int zz = pos.z();
             int highestY = clipMinY;
             bv.setComponents(pos);
             for (int y = clipMinY; y <= clipMaxY; y++) {

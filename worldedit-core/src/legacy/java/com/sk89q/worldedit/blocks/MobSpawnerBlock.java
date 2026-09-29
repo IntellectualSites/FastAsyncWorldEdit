@@ -28,7 +28,6 @@ import com.sk89q.jnbt.NBTUtils;
 import com.sk89q.jnbt.ShortTag;
 import com.sk89q.jnbt.StringTag;
 import com.sk89q.jnbt.Tag;
-import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.storage.InvalidFormatException;
 
@@ -42,7 +41,7 @@ import java.util.Map;
  *         deprecated for removal without replacement
  */
 @Deprecated(forRemoval = true)
-public class MobSpawnerBlock extends BaseBlock {
+public class MobSpawnerBlock extends LegacyBaseBlockWrapper {
 
     private String mobType;
     private short delay = -1;
@@ -114,6 +113,7 @@ public class MobSpawnerBlock extends BaseBlock {
     }
 
     @Override
+    @Deprecated
     public boolean hasNbtData() {
         return true;
     }
@@ -124,8 +124,9 @@ public class MobSpawnerBlock extends BaseBlock {
     }
 
     @Override
+    @Deprecated
     public CompoundTag getNbtData() {
-        Map<String, Tag> values = new HashMap<>();
+        Map<String, Tag<?, ?>> values = new HashMap<>();
         values.put("Delay", new ShortTag(delay));
         values.put("SpawnCount", new ShortTag(spawnCount));
         values.put("SpawnRange", new ShortTag(spawnRange));
@@ -165,12 +166,13 @@ public class MobSpawnerBlock extends BaseBlock {
     }
 
     @Override
+    @Deprecated
     public void setNbtData(CompoundTag rootTag) {
         if (rootTag == null) {
             return;
         }
 
-        Map<String, Tag> values = rootTag.getValue();
+        Map<String, Tag<?, ?>> values = rootTag.getValue();
 
         Tag t = values.get("id");
         if (!(t instanceof StringTag) || !((StringTag) t).getValue().equals(getNbtId())) {
@@ -184,7 +186,7 @@ public class MobSpawnerBlock extends BaseBlock {
         try {
             spawnDataTag = NBTUtils.getChildTag(values, "SpawnData", CompoundTag.class);
             mobType = spawnDataTag.getString("id");
-            if (mobType.equals("")) {
+            if (mobType.isEmpty()) {
                 throw new InvalidFormatException("No spawn id.");
             }
             this.mobType = mobType;

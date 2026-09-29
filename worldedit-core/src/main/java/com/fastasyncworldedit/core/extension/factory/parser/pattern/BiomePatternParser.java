@@ -45,16 +45,16 @@ public class BiomePatternParser extends RichParser<Pattern> {
 
     // overridden to provide $<biome> too
     @Override
-    public Stream<String> getSuggestions(String input) {
+    public Stream<String> getSuggestions(String input, ParserContext context) {
         if (input.startsWith(BIOME_PREFIX)) {
             return BiomeType.REGISTRY.getSuggestions(input.substring(1)).map(biome -> BIOME_PREFIX + biome);
         } else {
-            return super.getSuggestions(input);
+            return super.getSuggestions(input, context);
         }
     }
 
     @Override
-    protected Stream<String> getSuggestions(String argumentInput, int index) {
+    protected Stream<String> getSuggestions(String argumentInput, int index, ParserContext context) {
         if (index == 0) {
             return BiomeType.REGISTRY.getSuggestions(argumentInput);
         }

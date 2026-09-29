@@ -1,7 +1,6 @@
 package com.fastasyncworldedit.core.function.pattern;
 
 import com.fastasyncworldedit.core.math.MutableBlockVector3;
-import com.fastasyncworldedit.core.queue.Filter;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.pattern.AbstractPattern;
@@ -25,15 +24,15 @@ public class NoZPattern extends AbstractPattern {
 
     @Override
     public BaseBlock applyBlock(BlockVector3 pos) {
-        mutable.mutX(pos.getX());
-        mutable.mutY(pos.getY());
+        mutable.mutX(pos.x());
+        mutable.mutY(pos.y());
         return pattern.applyBlock(mutable);
     }
 
     @Override
     public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
-        mutable.mutX(get.getX());
-        mutable.mutY(get.getY());
+        mutable.mutX(get.x());
+        mutable.mutY(get.y());
         return pattern.apply(extent, mutable, set);
     }
 

@@ -28,7 +28,7 @@ public class TypeSwapPatternParser extends RichParser<Pattern> {
     }
 
     @Override
-    public Stream<String> getSuggestions(String argumentInput, int index) {
+    public Stream<String> getSuggestions(String argumentInput, int index, ParserContext context) {
         if (index > 2) {
             return Stream.empty();
         }

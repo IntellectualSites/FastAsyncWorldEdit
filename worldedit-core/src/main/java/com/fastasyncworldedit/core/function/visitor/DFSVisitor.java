@@ -64,13 +64,13 @@ public abstract class DFSVisitor implements Operation {
         IntTriple[] array = new IntTriple[directions.size()];
         for (int i = 0; i < array.length; i++) {
             BlockVector3 dir = directions.get(i);
-            array[i] = new IntTriple(dir.getBlockX(), dir.getBlockY(), dir.getBlockZ());
+            array[i] = new IntTriple(dir.x(), dir.y(), dir.z());
         }
         return array;
     }
 
     public void visit(final BlockVector3 pos) {
-        Node node = new Node(pos.getBlockX(), pos.getBlockY(), pos.getBlockZ());
+        Node node = new Node(pos.x(), pos.y(), pos.z());
         if (!this.hashQueue.contains(node)) {
             isVisitable(pos, pos); // Ignore this, just to initialize mask on this point
             queue.addFirst(new NodePair(null, node, 0));
@@ -102,7 +102,7 @@ public abstract class DFSVisitor implements Operation {
                 mutable2.mutY(from.getY() + direction.y());
                 mutable2.mutZ(from.getZ() + direction.z());
                 if (isVisitable(mutable, mutable2)) {
-                    Node adjacent = new Node(mutable2.getBlockX(), mutable2.getBlockY(), mutable2.getBlockZ());
+                    Node adjacent = new Node(mutable2.x(), mutable2.y(), mutable2.z());
                     if (!adjacent.equals(current.from)) {
                         AtomicInteger adjacentCount = visited.get(adjacent);
                         if (adjacentCount == null) {

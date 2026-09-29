@@ -4,6 +4,7 @@ import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.extension.factory.parser.RichParser;
 import com.fastasyncworldedit.core.extent.clipboard.MultiClipboardHolder;
 import com.fastasyncworldedit.core.function.pattern.RandomFullClipboardPattern;
+import com.google.common.base.Function;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.command.util.SuggestionHelper;
 import com.sk89q.worldedit.extension.input.InputParseException;
@@ -33,7 +34,7 @@ public class RandomFullClipboardPatternParser extends RichParser<Pattern> {
     }
 
     @Override
-    protected Stream<String> getSuggestions(String argumentInput, int index) {
+    protected Stream<String> getSuggestions(String argumentInput, int index, ParserContext context) {
         switch (index) {
             case 0:
                 if (argumentInput.equals("#") || argumentInput.equals("#c")) {

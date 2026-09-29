@@ -40,8 +40,8 @@ public class BlocksMaskParser extends InputParser<Mask> {
     }
 
     @Override
-    public Stream<String> getSuggestions(String input) {
-        return worldEdit.getBlockFactory().getSuggestions(input).stream();
+    public Stream<String> getSuggestions(String input, ParserContext context) {
+        return worldEdit.getBlockFactory().getSuggestions(input, context).stream();
     }
 
     @Override
@@ -49,6 +49,7 @@ public class BlocksMaskParser extends InputParser<Mask> {
         ParserContext tempContext = new ParserContext(context);
         tempContext.setRestricted(false);
         tempContext.setPreferringWildcard(true);
+        tempContext.setTryLegacy(context.isTryingLegacy());
         try {
             Set<BaseBlock> holders = worldEdit.getBlockFactory().parseFromListInput(component, tempContext);
             if (holders.isEmpty()) {

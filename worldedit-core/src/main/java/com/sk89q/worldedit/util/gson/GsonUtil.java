@@ -19,10 +19,12 @@
 
 package com.sk89q.worldedit.util.gson;
 
+import com.fastasyncworldedit.core.util.gson.BaseItemAdapter;
 import com.fastasyncworldedit.core.util.gson.ItemTypeAdapter;
 import com.fastasyncworldedit.core.util.gson.RegionSelectorAdapter;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.RegionSelector;
@@ -48,6 +50,7 @@ public final class GsonUtil {
         //FAWE start
         gsonBuilder.registerTypeAdapter(RegionSelector.class, new RegionSelectorAdapter());
         gsonBuilder.registerTypeAdapter(ItemType.class, new ItemTypeAdapter());
+        gsonBuilder.registerTypeAdapter(BaseItem.class, new BaseItemAdapter());
         //FAWE end
         return gsonBuilder;
     }

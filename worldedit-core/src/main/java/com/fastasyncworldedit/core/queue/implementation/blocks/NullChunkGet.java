@@ -2,10 +2,13 @@ package com.fastasyncworldedit.core.queue.implementation.blocks;
 
 import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.extent.processor.heightmap.HeightMapType;
+import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.fastasyncworldedit.core.queue.IBlocks;
+import com.fastasyncworldedit.core.queue.IChunk;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.IChunkSet;
-import com.sk89q.jnbt.CompoundTag;
+import com.fastasyncworldedit.core.queue.IQueueExtent;
+import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
@@ -15,6 +18,7 @@ import com.sk89q.worldedit.world.block.BlockTypes;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
@@ -48,23 +52,23 @@ public final class NullChunkGet implements IChunkGet {
         return BlockTypes.AIR.getDefaultState();
     }
 
-    @Nonnull
-    public Map<BlockVector3, CompoundTag> getTiles() {
+    @Override
+    public Map<BlockVector3, FaweCompoundTag> tiles() {
         return Collections.emptyMap();
     }
 
-    @Nullable
-    public CompoundTag getTile(int x, int y, int z) {
+    @Override
+    public @Nullable FaweCompoundTag tile(final int x, final int y, final int z) {
         return null;
     }
 
-    @Nullable
-    public Set<CompoundTag> getEntities() {
-        return null;
+    @Override
+    public Collection<FaweCompoundTag> entities() {
+        return Collections.emptyList();
     }
 
     @Nullable
-    public CompoundTag getEntity(@Nonnull UUID uuid) {
+    public Set<Entity> getFullEntities() {
         return null;
     }
 
@@ -110,6 +114,16 @@ public final class NullChunkGet implements IChunkGet {
         return 0;
     }
 
+    @Override
+    public int getX() {
+        return 0;
+    }
+
+    @Override
+    public int getZ() {
+        return 0;
+    }
+
     public boolean trim(boolean aggressive) {
         return true;
     }
@@ -119,7 +133,12 @@ public final class NullChunkGet implements IChunkGet {
     }
 
     @Nullable
-    public <T extends Future<T>> T call(@Nonnull IChunkSet set, @Nonnull Runnable finalize) {
+    public <T extends Future<T>> T call(IQueueExtent<? extends IChunk> owner, @Nonnull IChunkSet set, @Nonnull Runnable finalize) {
+        return null;
+    }
+
+    @Override
+    public @Nullable FaweCompoundTag entity(final UUID uuid) {
         return null;
     }
 

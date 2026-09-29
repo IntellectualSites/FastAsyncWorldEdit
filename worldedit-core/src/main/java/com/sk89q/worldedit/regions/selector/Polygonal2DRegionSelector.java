@@ -96,8 +96,8 @@ public class Polygonal2DRegionSelector implements RegionSelector, CUIRegion {
                 return;
             }
 
-            final int minY = oldRegion.getMinimumPoint().getBlockY();
-            final int maxY = oldRegion.getMaximumPoint().getBlockY();
+            final int minY = oldRegion.getMinimumPoint().y();
+            final int maxY = oldRegion.getMaximumPoint().y();
 
             List<BlockVector2> points = oldRegion.polygonize(Integer.MAX_VALUE);
 
@@ -118,7 +118,7 @@ public class Polygonal2DRegionSelector implements RegionSelector, CUIRegion {
         checkNotNull(points);
 
         final BlockVector2 pos2D = points.get(0);
-        pos1 = BlockVector3.at(pos2D.getX(), minY, pos2D.getZ());
+        pos1 = BlockVector3.at(pos2D.x(), minY, pos2D.z());
         region = new Polygonal2DRegion(world, points, minY, maxY);
     }
 
@@ -142,7 +142,7 @@ public class Polygonal2DRegionSelector implements RegionSelector, CUIRegion {
         pos1 = position;
         region = new Polygonal2DRegion(region.getWorld());
         region.addPoint(position);
-        region.expandY(position.getBlockY());
+        region.expandY(position.y());
 
         return true;
     }
@@ -153,7 +153,7 @@ public class Polygonal2DRegionSelector implements RegionSelector, CUIRegion {
             final List<BlockVector2> points = region.getPoints();
 
             final BlockVector2 lastPoint = points.get(region.size() - 1);
-            if (lastPoint.getBlockX() == position.getBlockX() && lastPoint.getBlockZ() == position.getBlockZ()) {
+            if (lastPoint.x() == position.x() && lastPoint.z() == position.z()) {
                 return false;
             }
 
@@ -165,7 +165,7 @@ public class Polygonal2DRegionSelector implements RegionSelector, CUIRegion {
         }
 
         region.addPoint(position);
-        region.expandY(position.getBlockY());
+        region.expandY(position.y());
 
         return true;
     }
@@ -228,7 +228,7 @@ public class Polygonal2DRegionSelector implements RegionSelector, CUIRegion {
     @Override
     public void learnChanges() {
         BlockVector2 pt = region.getPoints().get(0);
-        pos1 = BlockVector3.at(pt.getBlockX(), region.getMinimumPoint().getBlockY(), pt.getBlockZ());
+        pos1 = BlockVector3.at(pt.x(), region.getMinimumPoint().y(), pt.z());
     }
 
     @Override

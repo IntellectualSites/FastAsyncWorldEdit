@@ -8,14 +8,44 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class RandomTextureUtil extends CachedTextureUtil {
 
-    public RandomTextureUtil(TextureUtil parent) throws FileNotFoundException {
-        super(parent);
-    }
-
     private int index;
     private final int[] biomeMixBuffer = new int[3];
     private final Int2ObjectOpenHashMap<Integer> offsets = new Int2ObjectOpenHashMap<>();
     private final Int2ObjectOpenHashMap<int[]> biomeMixes = new Int2ObjectOpenHashMap<>();
+
+    public RandomTextureUtil(TextureUtil parent) throws FileNotFoundException {
+        super(parent);
+    }
+
+    /**
+     * Create a new instance
+     *
+     * @param parent        parent {@link TextureUtil}
+     * @param colorBlockMap color block map to (copy and) use
+     * @param colorBiomeMap color biome map to (copy and) use
+     * @param colorLayerMap color layer map to (copy and) use
+     * @throws FileNotFoundException
+     * @since 2.13.0
+     */
+    private RandomTextureUtil(
+            TextureUtil parent,
+            Int2ObjectOpenHashMap<BlockType> colorBlockMap,
+            Int2ObjectOpenHashMap<Integer> colorBiomeMap,
+            Int2ObjectOpenHashMap<BlockType[]> colorLayerMap
+    ) throws FileNotFoundException {
+        super(parent, colorBlockMap, colorBiomeMap, colorLayerMap);
+    }
+
+    @Override
+    public TextureUtil fork() {
+        try {
+            // I don't think we should copy the "randomness" from this existing pattern?
+            return new RandomTextureUtil(parent, colorBlockMap, colorBiomeMap, colorLayerMap);
+        } catch (FileNotFoundException e) {
+            // This should never happen
+            throw new RuntimeException(e);
+        }
+    }
 
     protected int addRandomColor(int c1, int c2) {
         int red1 = (c1 >> 16) & 0xFF;
@@ -24,9 +54,9 @@ public class RandomTextureUtil extends CachedTextureUtil {
         byte red2 = (byte) (c2 >> 16);
         byte green2 = (byte) (c2 >> 8);
         byte blue2 = (byte) (c2 >> 0);
-        int red = MathMan.clamp(red1 + random(red2), 0, 255);
-        int green = MathMan.clamp(green1 + random(green2), 0, 255);
-        int blue = MathMan.clamp(blue1 + random(blue2), 0, 255);
+        int red = Math.clamp(red1 + random(red2), 0, 255);
+        int green = Math.clamp(green1 + random(green2), 0, 255);
+        int blue = Math.clamp(blue1 + random(blue2), 0, 255);
         return (red << 16) + (green << 8) + (blue << 0) + (255 << 24);
     }
 

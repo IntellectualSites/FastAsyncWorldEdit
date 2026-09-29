@@ -62,17 +62,17 @@ public class ImageBrushMask extends AbstractExtentMask {
     @Override
     public boolean test(BlockVector3 vector) {
         if (solid.test(vector)) {
-            int dx = vector.getBlockX() - center.getBlockX();
-            int dy = vector.getBlockY() - center.getBlockY();
-            int dz = vector.getBlockZ() - center.getBlockZ();
+            int dx = vector.x() - center.x();
+            int dy = vector.y() - center.y();
+            int dz = vector.z() - center.z();
 
             Vector3 pos1 = transform.apply(mutable.setComponents(dx - 0.5, dy - 0.5, dz - 0.5));
-            int x1 = (int) (pos1.getX() * scale + centerImageX);
-            int z1 = (int) (pos1.getZ() * scale + centerImageZ);
+            int x1 = (int) (pos1.x() * scale + centerImageX);
+            int z1 = (int) (pos1.z() * scale + centerImageZ);
 
             Vector3 pos2 = transform.apply(mutable.setComponents(dx + 0.5, dy + 0.5, dz + 0.5));
-            int x2 = (int) (pos2.getX() * scale + centerImageX);
-            int z2 = (int) (pos2.getZ() * scale + centerImageZ);
+            int x2 = (int) (pos2.x() * scale + centerImageX);
+            int z2 = (int) (pos2.z() * scale + centerImageZ);
             if (x2 < x1) {
                 int tmp = x1;
                 x1 = x2;

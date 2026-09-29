@@ -35,7 +35,7 @@ public abstract class BlockSet extends AbstractRegion {
 
     @Override
     public boolean contains(BlockVector3 obj) {
-        return contains(obj.getX(), obj.getY(), obj.getZ());
+        return contains(obj.x(), obj.y(), obj.z());
     }
 
     protected final int lowestBit(long bitBuffer) {
@@ -71,11 +71,11 @@ public abstract class BlockSet extends AbstractRegion {
 
     @Override
     public boolean add(BlockVector3 p) {
-        return add(p.getX(), p.getY(), p.getZ());
+        return add(p.x(), p.y(), p.z());
     }
 
     public boolean remove(BlockVector3 p) {
-        return remove(p.getX(), p.getY(), p.getZ());
+        return remove(p.x(), p.y(), p.z());
     }
 
     @Override

@@ -26,8 +26,8 @@ public abstract class GenBase {
 
     public void generate(BlockVector2 chunkPos, Extent chunk) throws WorldEditException {
         int i = this.checkAreaSize;
-        int chunkX = chunkPos.getBlockX();
-        int chunkZ = chunkPos.getBlockZ();
+        int chunkX = chunkPos.x();
+        int chunkZ = chunkPos.z();
         for (int x = chunkX - i; x <= chunkX + i; x++) {
             for (int z = chunkZ - i; z <= chunkZ + i; z++) {
                 generateChunk(x, z, chunkPos, chunk);

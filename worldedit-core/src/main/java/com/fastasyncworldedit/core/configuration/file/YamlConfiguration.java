@@ -68,6 +68,7 @@ public class YamlConfiguration extends FileConfiguration {
                 LOGGER.error("Could not read {}\n" + "Renamed to {}", file, dest.getAbsolutePath(), ex);
             } catch (final IOException e) {
                 e.printStackTrace();
+                ex.printStackTrace();
             }
         }
 

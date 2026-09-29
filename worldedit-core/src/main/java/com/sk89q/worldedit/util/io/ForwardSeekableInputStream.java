@@ -19,10 +19,15 @@
 
 package com.sk89q.worldedit.util.io;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.IOException;
 import java.io.InputStream;
 
 public class ForwardSeekableInputStream extends InputStream {
+
+    private static final Logger LOGGER = LogManager.getLogger();
 
     protected InputStream parent;
     protected long position = 0;
@@ -60,7 +65,7 @@ public class ForwardSeekableInputStream extends InputStream {
 
     @Override
     public int read(byte[] b, int off, int len) throws IOException {
-        int read = super.read(b, off, len);
+        int read = parent.read(b, off, len);
         position += read;
         return read;
     }

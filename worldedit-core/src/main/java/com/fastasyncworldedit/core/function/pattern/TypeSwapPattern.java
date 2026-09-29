@@ -79,7 +79,7 @@ public class TypeSwapPattern extends AbstractExtentPattern {
     }
 
     private BlockState getNewBlock(BlockState existing) {
-        String oldId = existing.getBlockType().getId();
+        String oldId = existing.getBlockType().id();
         String newId = oldId;
         if (inputPattern != null) {
             newId = inputPattern.matcher(oldId).replaceAll(outputString);

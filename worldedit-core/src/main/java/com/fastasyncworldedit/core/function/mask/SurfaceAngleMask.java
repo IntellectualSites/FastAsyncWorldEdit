@@ -24,7 +24,7 @@ public class SurfaceAngleMask extends AbstractExtentMask {
     @Override
     public boolean test(BlockVector3 vector) {
         if (!vector.getBlock(getExtent()).isAir() && nextToAir(vector)) {
-            double angle = 1 - getAverageAirDirection(vector.toVector3(), size).getY();
+            double angle = 1 - getAverageAirDirection(vector.toVector3(), size).y();
             return (angle >= (min / 90.0) && angle <= (max / 90.0));
         }
         return false;
@@ -33,7 +33,7 @@ public class SurfaceAngleMask extends AbstractExtentMask {
     @Override
     public boolean test(Extent extent, BlockVector3 vector) {
         if (!vector.getBlock(getExtent()).isAir() && nextToAir(vector)) {
-            double angle = 1 - getAverageAirDirection(vector.toVector3(), size).getY();
+            double angle = 1 - getAverageAirDirection(vector.toVector3(), size).y();
             return (angle >= (min / 90.0) && angle <= (max / 90.0));
         }
         return false;
@@ -44,7 +44,7 @@ public class SurfaceAngleMask extends AbstractExtentMask {
         for (int i = -size; i <= size; i++) {
             for (int j = -size; j <= size; j++) {
                 for (int k = -size; k <= size; k++) {
-                    Vector3 block = Vector3.at(currentLocation.getX(), currentLocation.getY(), currentLocation.getZ()).add(
+                    Vector3 block = Vector3.at(currentLocation.x(), currentLocation.y(), currentLocation.z()).add(
                             0.5,
                             0.5,
                             0.5
@@ -65,13 +65,13 @@ public class SurfaceAngleMask extends AbstractExtentMask {
         double y = 0.0;
         double z = 0.0;
         for (Vector3 vector3 : airDirections) {
-            x += vector3.getX();
-            y += vector3.getY();
-            z += vector3.getZ();
+            x += vector3.x();
+            y += vector3.y();
+            z += vector3.z();
         }
 
         Vector3 averageAirDirection = Vector3.at(x / airDirections.size(), y / airDirections.size(), z / airDirections.size());
-        return (Double.isNaN(averageAirDirection.getY()) ? Vector3.ZERO : averageAirDirection.normalize());
+        return (Double.isNaN(averageAirDirection.y()) ? Vector3.ZERO : averageAirDirection.normalize());
     }
 
     @Override

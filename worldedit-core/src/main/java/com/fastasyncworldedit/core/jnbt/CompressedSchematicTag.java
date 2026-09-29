@@ -1,6 +1,6 @@
 package com.fastasyncworldedit.core.jnbt;
 
-import com.fastasyncworldedit.core.extent.clipboard.io.FastSchematicWriter;
+import com.fastasyncworldedit.core.extent.clipboard.io.FastSchematicWriterV2;
 import com.fastasyncworldedit.core.internal.io.FastByteArrayOutputStream;
 import com.fastasyncworldedit.core.internal.io.FastByteArraysInputStream;
 import com.sk89q.jnbt.NBTOutputStream;
@@ -21,7 +21,7 @@ public class CompressedSchematicTag extends CompressedCompoundTag<Clipboard> {
         FastByteArrayOutputStream blocksOut = new FastByteArrayOutputStream();
         try (LZ4BlockOutputStream lz4out = new LZ4BlockOutputStream(blocksOut)) {
             NBTOutputStream nbtOut = new NBTOutputStream(lz4out);
-            new FastSchematicWriter(nbtOut).write(getSource());
+            new FastSchematicWriterV2(nbtOut).write(getSource());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

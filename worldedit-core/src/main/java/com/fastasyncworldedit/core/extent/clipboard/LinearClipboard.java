@@ -57,6 +57,10 @@ public abstract class LinearClipboard extends SimpleClipboard {
      */
     public abstract void streamBiomes(IntValueReader task);
 
+    /**
+     * @deprecated will be removed as it is unused and uses outdated types
+     */
+    @Deprecated(forRemoval = true, since = "2.12.0")
     public abstract Collection<CompoundTag> getTileEntities();
 
     @Override
@@ -106,7 +110,7 @@ public abstract class LinearClipboard extends SimpleClipboard {
     @Nullable
     @Override
     public Entity createEntity(Location location, BaseEntity entity, UUID uuid) {
-        Map<String, Tag> map = new HashMap<>(entity.getNbtData().getValue());
+        Map<String, Tag<?, ?>> map = new HashMap<>(entity.getNbtData().getValue());
         NBTUtils.addUUIDToMap(map, uuid);
         entity.setNbtData(new CompoundTag(map));
         BlockArrayClipboard.ClipboardEntity ret = new BlockArrayClipboard.ClipboardEntity(location, entity);
@@ -119,7 +123,7 @@ public abstract class LinearClipboard extends SimpleClipboard {
         Iterator<ClipboardEntity> iter = this.entities.iterator();
         while (iter.hasNext()) {
             ClipboardEntity entity = iter.next();
-            UUID entUUID = entity.getState().getNbtData().getUUID();
+            UUID entUUID = entity.getState().getUUID();
             if (uuid.equals(entUUID)) {
                 iter.remove();
                 return;
@@ -136,7 +140,7 @@ public abstract class LinearClipboard extends SimpleClipboard {
     public void removeEntity(Entity entity) {
         if (!(entity instanceof BlockArrayClipboard.ClipboardEntity)) {
             Location loc = entity.getLocation();
-            removeEntity(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ(), entity.getState().getNbtData().getUUID());
+            removeEntity(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ(), entity.getState().getUUID());
         } else {
             this.entities.remove(entity);
         }

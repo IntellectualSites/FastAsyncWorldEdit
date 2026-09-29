@@ -89,13 +89,13 @@ public class ConvexPolyhedralRegion extends AbstractRegion {
     public ConvexPolyhedralRegion(ConvexPolyhedralRegion region) {
         this(region.world);
         vertices.addAll(region.vertices);
-        triangles.addAll(region.triangles);
+        region.triangles.forEach(triangle -> triangles.add(triangle.clone()));
         vertexBacklog.addAll(region.vertexBacklog);
 
         minimumPoint = region.minimumPoint;
         maximumPoint = region.maximumPoint;
         centerAccum = region.centerAccum;
-        lastTriangle = region.lastTriangle;
+        lastTriangle = lastTriangle == null ? null : region.lastTriangle.clone();
     }
 
     /**

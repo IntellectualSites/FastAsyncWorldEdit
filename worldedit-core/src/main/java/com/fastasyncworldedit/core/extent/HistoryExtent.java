@@ -2,6 +2,7 @@ package com.fastasyncworldedit.core.extent;
 
 import com.fastasyncworldedit.core.history.changeset.AbstractChangeSet;
 import com.fastasyncworldedit.core.math.MutableBlockVector3;
+import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
@@ -66,7 +67,7 @@ public final class HistoryExtent extends AbstractDelegateExtent {
 
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 location, B block) throws WorldEditException {
-        return setBlock(location.getBlockX(), location.getBlockY(), location.getBlockZ(), block);
+        return setBlock(location.x(), location.y(), location.z(), block);
     }
 
     @Nullable
@@ -74,7 +75,7 @@ public final class HistoryExtent extends AbstractDelegateExtent {
     public Entity createEntity(Location location, BaseEntity state) {
         final Entity entity = super.createEntity(location, state);
         if (state != null) {
-            this.changeSet.addEntityCreate(state.getNbtData());
+            this.changeSet.addEntityCreate(FaweCompoundTag.of(state.getNbt()));
         }
         return entity;
     }
@@ -84,7 +85,7 @@ public final class HistoryExtent extends AbstractDelegateExtent {
     public Entity createEntity(Location location, BaseEntity state, UUID uuid) {
         final Entity entity = super.createEntity(location, state, uuid);
         if (state != null) {
-            this.changeSet.addEntityCreate(state.getNbtData());
+            this.changeSet.addEntityCreate(FaweCompoundTag.of(state.getNbt()));
         }
         return entity;
     }
@@ -110,8 +111,8 @@ public final class HistoryExtent extends AbstractDelegateExtent {
     @Override
     public boolean setBiome(BlockVector3 position, BiomeType newBiome) {
         BiomeType oldBiome = this.getBiome(position);
-        if (!oldBiome.getId().equals(newBiome.getId())) {
-            this.changeSet.addBiomeChange(position.getBlockX(), position.getBlockY(), position.getBlockZ(), oldBiome, newBiome);
+        if (!oldBiome.id().equals(newBiome.id())) {
+            this.changeSet.addBiomeChange(position.x(), position.y(), position.z(), oldBiome, newBiome);
             return getExtent().setBiome(position, newBiome);
         } else {
             return false;
@@ -121,7 +122,7 @@ public final class HistoryExtent extends AbstractDelegateExtent {
     @Override
     public boolean setBiome(int x, int y, int z, BiomeType newBiome) {
         BiomeType oldBiome = this.getBiome(mutable.setComponents(x, y, z));
-        if (!oldBiome.getId().equals(newBiome.getId())) {
+        if (!oldBiome.id().equals(newBiome.id())) {
             this.changeSet.addBiomeChange(x, y, z, oldBiome, newBiome);
             return getExtent().setBiome(x, y, z, newBiome);
         } else {
@@ -154,11 +155,10 @@ public final class HistoryExtent extends AbstractDelegateExtent {
 
         @Override
         public boolean remove() {
-            final Location location = this.entity.getLocation();
             final BaseEntity state = this.entity.getState();
             final boolean success = this.entity.remove();
             if (state != null && success) {
-                HistoryExtent.this.changeSet.addEntityRemove(state.getNbtData());
+                HistoryExtent.this.changeSet.addEntityRemove(FaweCompoundTag.of(state.getNbt()));
             }
             return success;
         }

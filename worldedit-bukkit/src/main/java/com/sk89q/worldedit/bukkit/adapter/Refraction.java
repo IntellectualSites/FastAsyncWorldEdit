@@ -42,6 +42,10 @@ public class Refraction {
         return IS_MOJANG_MAPPED ? mojangName : spigotName;
     }
 
+    public static boolean isMojangMapped() {
+        return IS_MOJANG_MAPPED;
+    }
+
     private Refraction() {
     }
 

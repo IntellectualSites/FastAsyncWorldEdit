@@ -24,15 +24,15 @@ import com.sk89q.worldedit.registry.Keyed;
 import com.sk89q.worldedit.registry.NamespacedRegistry;
 
 /**
- * Minecraft now has a 'fluid' system. This is a
- * stub class to represent what it may be in the future.
+ * Minecraft now has a 'fluid' system. This is a stub class to represent what it may be in the future.
  */
-//FAWE start - implements RegistryItem
+//FAWE start - implements RegistryItem, not a record (internalId needs mutability)
 public class FluidType implements RegistryItem, Keyed {
 //FAWE end
 
-    public static final NamespacedRegistry<FluidType> REGISTRY = new NamespacedRegistry<>("fluid type");
+    public static final NamespacedRegistry<FluidType> REGISTRY = new NamespacedRegistry<>("fluid type", "fluid_type", "minecraft");
 
+    //FAWE start
     private final String id;
 
     public FluidType(String id) {
@@ -40,10 +40,23 @@ public class FluidType implements RegistryItem, Keyed {
     }
 
     /**
-     * Gets the ID of this block.
+     * Gets the ID of this fluid.
      *
      * @return The id
+     * @since 2.11.0
      */
+    @Override
+    public String id() {
+        return this.id;
+    }
+
+    /**
+     * Gets the ID of this fluid.
+     *
+     * @return The id
+     * @deprecated use {@link #id()}
+     */
+    @Deprecated(forRemoval = true, since = "2.11.0")
     @Override
     public String getId() {
         return this.id;
@@ -67,7 +80,7 @@ public class FluidType implements RegistryItem, Keyed {
 
     @Override
     public String toString() {
-        return getId();
+        return id();
     }
 
     @Override

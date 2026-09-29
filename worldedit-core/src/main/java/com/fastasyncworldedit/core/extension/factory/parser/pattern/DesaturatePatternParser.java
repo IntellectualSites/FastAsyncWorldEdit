@@ -25,7 +25,7 @@ public class DesaturatePatternParser extends RichParser<Pattern> {
     }
 
     @Override
-    public Stream<String> getSuggestions(String argumentInput, int index) {
+    public Stream<String> getSuggestions(String argumentInput, int index, ParserContext context) {
         if (index == 0) {
             return SuggestionHelper.suggestPositiveDoubles(argumentInput);
         }

@@ -15,9 +15,9 @@ public class PlaneMask extends AbstractMask implements ResettableMask {
     public boolean test(BlockVector3 vector) {
         switch (mode) {
             case -1:
-                originX = vector.getBlockX();
-                originY = vector.getBlockY();
-                originZ = vector.getBlockZ();
+                originX = vector.x();
+                originY = vector.y();
+                originZ = vector.z();
                 mode = 0;
                 return true;
             case 0:
@@ -25,13 +25,13 @@ public class PlaneMask extends AbstractMask implements ResettableMask {
             case 2:
             case 4:
                 int original = mode;
-                if (originX != vector.getBlockX()) {
+                if (originX != vector.x()) {
                     mode &= 1;
                 }
-                if (originY != vector.getBlockY()) {
+                if (originY != vector.y()) {
                     mode &= 2;
                 }
-                if (originZ != vector.getBlockZ()) {
+                if (originZ != vector.z()) {
                     mode &= 4;
                 }
                 if (Integer.bitCount(mode) >= 3) {
@@ -39,13 +39,13 @@ public class PlaneMask extends AbstractMask implements ResettableMask {
                     return false;
                 }
             default:
-                if (originX != vector.getBlockX() && (mode & 1) == 0) {
+                if (originX != vector.x() && (mode & 1) == 0) {
                     return false;
                 }
-                if (originZ != vector.getBlockZ() && (mode & 4) == 0) {
+                if (originZ != vector.z() && (mode & 4) == 0) {
                     return false;
                 }
-                return originY == vector.getBlockY() || (mode & 2) != 0;
+                return originY == vector.y() || (mode & 2) != 0;
 
         }
     }

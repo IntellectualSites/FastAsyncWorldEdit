@@ -23,7 +23,7 @@ public class SurfaceAngleMaskParser extends RichParser<Mask> {
     }
 
     @Override
-    protected Stream<String> getSuggestions(String argumentInput, int index) {
+    protected Stream<String> getSuggestions(String argumentInput, int index, ParserContext context) {
         if (index <= 2) {
             return SuggestionHelper.suggestPositiveDoubles(argumentInput);
         }

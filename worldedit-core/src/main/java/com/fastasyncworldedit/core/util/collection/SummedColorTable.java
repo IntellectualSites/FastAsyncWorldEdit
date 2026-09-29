@@ -182,7 +182,7 @@ public class SummedColorTable {
         float factor = this.areaInverses[area - 1];
         float alpha = (totAlpha * factor);
         factor = (factor * 256) / alpha;
-        return (MathMan.clamp(
+        return (Math.clamp(
                 (int) alpha,
                 0,
                 255

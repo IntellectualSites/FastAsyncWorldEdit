@@ -40,20 +40,20 @@ public class LayerBrushMask extends AbstractExtentMask {
             BlockState previous2 = layers[depth - 2];
             for (BlockVector3 dir : BreadthFirstSearch.DEFAULT_DIRECTIONS) {
                 mutable.setComponents(
-                        pos.getBlockX() + dir.getBlockX(),
-                        pos.getBlockY() + dir.getBlockY(),
-                        pos.getBlockZ() + dir.getBlockZ()
+                        pos.x() + dir.x(),
+                        pos.y() + dir.y(),
+                        pos.z() + dir.z()
                 );
                 if (visitor.isVisited(mutable) && editSession.getBlock(
-                        mutable.getBlockX(),
-                        mutable.getBlockY(),
-                        mutable.getBlockZ()
+                        mutable.x(),
+                        mutable.y(),
+                        mutable.z()
                 ) == previous) {
-                    mutable.setComponents(pos.getBlockX() + dir.getBlockX() * 2, pos.getBlockY() + dir.getBlockY() * 2,
-                            pos.getBlockZ() + dir.getBlockZ() * 2
+                    mutable.setComponents(pos.x() + dir.x() * 2, pos.y() + dir.y() * 2,
+                            pos.z() + dir.z() * 2
                     );
                     if (visitor.isVisited(mutable)
-                            && editSession.getBlock(mutable.getBlockX(), mutable.getBlockY(), mutable.getBlockZ()) == previous2) {
+                            && editSession.getBlock(mutable.x(), mutable.y(), mutable.z()) == previous2) {
                         found = true;
                         break;
                     } else {

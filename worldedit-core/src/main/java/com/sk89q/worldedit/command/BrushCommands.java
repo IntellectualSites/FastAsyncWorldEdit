@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.command;
 
 import com.fastasyncworldedit.core.Fawe;
+import com.fastasyncworldedit.core.command.factory.StructureGeneratorFactory;
 import com.fastasyncworldedit.core.command.tool.brush.BlendBall;
 import com.fastasyncworldedit.core.command.tool.brush.BlobBrush;
 import com.fastasyncworldedit.core.command.tool.brush.BrushSettings;
@@ -66,6 +67,7 @@ import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.command.argument.Arguments;
+import com.sk89q.worldedit.command.factory.FeatureGeneratorFactory;
 import com.sk89q.worldedit.command.factory.ReplaceFactory;
 import com.sk89q.worldedit.command.factory.TreeGeneratorFactory;
 import com.sk89q.worldedit.command.tool.BrushTool;
@@ -77,6 +79,7 @@ import com.sk89q.worldedit.command.tool.brush.CylinderBrush;
 import com.sk89q.worldedit.command.tool.brush.GravityBrush;
 import com.sk89q.worldedit.command.tool.brush.HollowCylinderBrush;
 import com.sk89q.worldedit.command.tool.brush.HollowSphereBrush;
+import com.sk89q.worldedit.command.tool.brush.MorphBrush;
 import com.sk89q.worldedit.command.tool.brush.OperationFactoryBrush;
 import com.sk89q.worldedit.command.tool.brush.SmoothBrush;
 import com.sk89q.worldedit.command.tool.brush.SnowSmoothBrush;
@@ -93,6 +96,8 @@ import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.function.Contextual;
 import com.sk89q.worldedit.function.factory.Apply;
 import com.sk89q.worldedit.function.factory.ApplyLayer;
+import com.sk89q.worldedit.function.factory.ApplyRegion;
+import com.sk89q.worldedit.function.factory.BiomeFactory;
 import com.sk89q.worldedit.function.factory.Deform;
 import com.sk89q.worldedit.function.factory.Paint;
 import com.sk89q.worldedit.function.factory.Snow;
@@ -104,17 +109,25 @@ import com.sk89q.worldedit.internal.annotation.ClipboardMask;
 import com.sk89q.worldedit.internal.expression.Expression;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
+import com.sk89q.worldedit.regions.factory.CuboidRegionFactory;
 import com.sk89q.worldedit.regions.factory.CylinderRegionFactory;
+import com.sk89q.worldedit.regions.factory.FixedHeightCuboidRegionFactory;
+import com.sk89q.worldedit.regions.factory.FixedHeightCylinderRegionFactory;
 import com.sk89q.worldedit.regions.factory.RegionFactory;
+import com.sk89q.worldedit.regions.factory.SphereRegionFactory;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.HandSide;
-import com.sk89q.worldedit.util.TreeGenerator;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import com.sk89q.worldedit.world.generation.ConfiguredFeatureType;
+import com.sk89q.worldedit.world.generation.StructureType;
+import com.sk89q.worldedit.world.generation.TreeType;
 import org.anarres.parallelgzip.ParallelGZIPOutputStream;
 import org.enginehub.piston.annotation.Command;
 import org.enginehub.piston.annotation.CommandContainer;
@@ -186,7 +199,10 @@ public class BrushCommands {
             @ArgFlag(name = 'm', desc = "Mask to limit blocks being considered", def = "")
                     Mask mask
     ) throws WorldEditException {
-        worldEdit.checkMaxBrushRadius(radius);
+        worldEdit.checkMaxBrushRadius(
+                radius,
+                context.injectedValue(Key.of(Player.class)).orElseThrow(() -> new IllegalStateException("No player"))
+        );
         checkCommandArgument(minFreqDiff >= 0 && minFreqDiff <= 26, "minFreqDiff not in range 0 <= value <= 26");
         if (mask != null && !(mask instanceof CachedMask)) {
             mask = new CachedMask(mask, false);
@@ -212,7 +228,10 @@ public class BrushCommands {
             @Arg(desc = "fillRec", def = "1")
                     int fillRec
     ) throws WorldEditException {
-        worldEdit.checkMaxBrushRadius(radius);
+        worldEdit.checkMaxBrushRadius(
+                radius,
+                context.injectedValue(Key.of(Player.class)).orElseThrow(() -> new IllegalStateException("No player"))
+        );
         set(context, new ErodeBrush(erodefaces, erodeRec, fillFaces, fillRec), "worldedit.brush.erode").setSize(radius);
     }
 
@@ -234,7 +253,10 @@ public class BrushCommands {
             @Arg(desc = "fillRec", def = "1")
                     int fillRec
     ) throws WorldEditException {
-        worldEdit.checkMaxBrushRadius(radius);
+        worldEdit.checkMaxBrushRadius(
+                radius,
+                context.injectedValue(Key.of(Player.class)).orElseThrow(() -> new IllegalStateException("No player"))
+        );
         set(context, new RaiseBrush(erodefaces, erodeRec, fillFaces, fillRec), "worldedit.brush.pull").setSize(radius);
     }
 
@@ -252,7 +274,10 @@ public class BrushCommands {
             @Arg(name = "filled", desc = "Whether the circle should be filled", def = "false")
                     boolean filled
     ) throws WorldEditException {
-        worldEdit.checkMaxBrushRadius(radius);
+        worldEdit.checkMaxBrushRadius(
+                radius,
+                context.injectedValue(Key.of(Player.class)).orElseThrow(() -> new IllegalStateException("No player"))
+        );
         set(context, new CircleBrush(filled), "worldedit.brush.sphere").setSize(radius).setFill(fill);
     }
 
@@ -276,7 +301,10 @@ public class BrushCommands {
             @Switch(name = 'd', desc = "Apply in depth first order")
                     boolean depthFirst
     ) throws WorldEditException {
-        worldEdit.checkMaxBrushRadius(radius);
+        worldEdit.checkMaxBrushRadius(
+                radius,
+                context.injectedValue(Key.of(Player.class)).orElseThrow(() -> new IllegalStateException("No player"))
+        );
         set(context, new RecurseBrush(depthFirst), "worldedit.brush.recursive").setSize(radius).setFill(fill)
                 .setMask(new IdMask(editSession));
     }
@@ -299,7 +327,10 @@ public class BrushCommands {
             @Switch(name = 'f', desc = "Create a flat line")
                     boolean flat
     ) throws WorldEditException {
-        worldEdit.checkMaxBrushRadius(radius);
+        worldEdit.checkMaxBrushRadius(
+                radius,
+                context.injectedValue(Key.of(Player.class)).orElseThrow(() -> new IllegalStateException("No player"))
+        );
         set(context, new LineBrush(shell, select, flat), "worldedit.brush.line").setSize(radius).setFill(fill);
     }
 
@@ -326,7 +357,10 @@ public class BrushCommands {
                     Expression radius
     )
             throws WorldEditException {
-        worldEdit.checkMaxBrushRadius(radius);
+        worldEdit.checkMaxBrushRadius(
+                radius,
+                context.injectedValue(Key.of(Player.class)).orElseThrow(() -> new IllegalStateException("No player"))
+        );
         player.print(Caption.of("fawe.worldedit.brush.brush.spline", (radius)));
         set(context, new SplineBrush(player), "worldedit.brush.spline").setSize(radius).setFill(fill);
     }
@@ -379,7 +413,10 @@ public class BrushCommands {
             @Switch(name = 'd', desc = "sags the catenary toward the facing direction")
                     boolean facingDirection
     ) throws WorldEditException {
-        worldEdit.checkMaxBrushRadius(radius);
+        worldEdit.checkMaxBrushRadius(
+                radius,
+                context.injectedValue(Key.of(Player.class)).orElseThrow(() -> new IllegalStateException("No player"))
+        );
         set(context, new CatenaryBrush(shell, select, facingDirection, lengthFactor), "worldedit.brush.spline")
                 .setSize(radius).setFill(fill);
     }
@@ -411,7 +448,10 @@ public class BrushCommands {
                     double quality
     ) throws WorldEditException {
         player.print(Caption.of("fawe.worldedit.brush.brush.spline", (radius)));
-        worldEdit.checkMaxBrushRadius(radius);
+        worldEdit.checkMaxBrushRadius(
+                radius,
+                context.injectedValue(Key.of(Player.class)).orElseThrow(() -> new IllegalStateException("No player"))
+        );
         set(context, new SurfaceSpline(tension, bias, continuity, quality), "surfacespline").setSize(radius)
                 .setFill(fill);
     }
@@ -435,10 +475,12 @@ public class BrushCommands {
             @Arg(desc = "double", def = "50")
                     double amplitude
     ) throws WorldEditException {
-        double max = MathMan.max(radius.getX(), radius.getY(), radius.getZ());
-        worldEdit.checkMaxBrushRadius(max);
-        Brush brush =
-                new BlobBrush(radius.divide(max), frequency / 100, amplitude / 100, sphericity / 100);
+        double max = MathMan.max(radius.x(), radius.y(), radius.z());
+        worldEdit.checkMaxBrushRadius(
+                max,
+                context.injectedValue(Key.of(Player.class)).orElseThrow(() -> new IllegalStateException("No player"))
+        );
+        Brush brush = new BlobBrush(radius.divide(max), frequency / 100, amplitude / 100, sphericity / 100);
         set(context, brush, "worldedit.brush.rock").setSize(max).setFill(fill);
     }
 
@@ -459,7 +501,10 @@ public class BrushCommands {
             @Arg(desc = "Lines", def = "10")
                     int count
     ) throws WorldEditException {
-        worldEdit.checkMaxBrushRadius(radius);
+        worldEdit.checkMaxBrushRadius(
+                radius,
+                context.injectedValue(Key.of(Player.class)).orElseThrow(() -> new IllegalStateException("No player"))
+        );
         set(context, new ShatterBrush(count), "worldedit.brush.shatter").setSize(radius).setFill(fill)
                 .setMask(new ExistingBlockMask(editSession));
     }
@@ -490,14 +535,17 @@ public class BrushCommands {
                     boolean randomRotate
     )
             throws WorldEditException, FileNotFoundException {
-        worldEdit.checkMaxBrushRadius(radius);
+        worldEdit.checkMaxBrushRadius(
+                radius,
+                context.injectedValue(Key.of(Player.class)).orElseThrow(() -> new IllegalStateException("No player"))
+        );
         InputStream stream = getHeightmapStream(image);
         HeightBrush brush;
         int minY = player.getWorld().getMinY();
         int maxY = player.getWorld().getMaxY();
         try {
             brush = new StencilBrush(stream, rotation, yscale, onlyWhite,
-                    "#clipboard".equalsIgnoreCase(image)
+                    isClipboard(image)
                             ? session.getClipboard().getClipboard() : null, minY, maxY
             );
         } catch (EmptyClipboardException ignored) {
@@ -526,7 +574,10 @@ public class BrushCommands {
         URL url = new URL(imageURL);
         MainUtil.checkImageHost(url.toURI());
         BufferedImage image = MainUtil.readImage(url);
-        worldEdit.checkMaxBrushRadius(radius);
+        worldEdit.checkMaxBrushRadius(
+                radius,
+                context.injectedValue(Key.of(Player.class)).orElseThrow(() -> new IllegalStateException("No player"))
+        );
         if (yscale != 1) {
             ImageUtil.scaleAlpha(image, yscale);
             alpha = true;
@@ -553,7 +604,10 @@ public class BrushCommands {
             @Arg(desc = "Expression", def = "5")
                     Expression radius
     ) throws WorldEditException {
-        worldEdit.checkMaxBrushRadius(radius);
+        worldEdit.checkMaxBrushRadius(
+                radius,
+                context.injectedValue(Key.of(Player.class)).orElseThrow(() -> new IllegalStateException("No player"))
+        );
         set(context, new SurfaceSphereBrush(), "worldedit.brush.surface").setFill(fill).setSize(radius);
     }
 
@@ -578,7 +632,10 @@ public class BrushCommands {
             @Switch(name = 'o', desc = "Overlay the block")
                     boolean overlay
     ) throws WorldEditException {
-        worldEdit.checkMaxBrushRadius(radius);
+        worldEdit.checkMaxBrushRadius(
+                radius,
+                context.injectedValue(Key.of(Player.class)).orElseThrow(() -> new IllegalStateException("No player"))
+        );
         Brush brush;
         if (overlay) {
             brush = new ScatterOverlayBrush((int) points, (int) distance);
@@ -601,10 +658,10 @@ public class BrushCommands {
     @CommandPermissions("worldedit.brush.populateschematic")
     public void scatterSchemBrush(
             Player player, InjectedValueAccess context,
-            @Arg(desc = "Mask")
-                    Mask mask,
             @Arg(name = "clipboard", desc = "Clipboard uri")
                     String clipboardStr,
+            @Arg(desc = "Mask of block to place on. Defaults to solid blocks.", def = "")
+                    Mask mask,
             @Arg(desc = "Expression", def = "30")
                     Expression radius,
             @Arg(desc = "double", def = "50")
@@ -612,7 +669,10 @@ public class BrushCommands {
             @Switch(name = 'r', desc = "Apply random rotation")
                     boolean rotate
     ) throws WorldEditException {
-        worldEdit.checkMaxBrushRadius(radius);
+        worldEdit.checkMaxBrushRadius(
+                radius,
+                context.injectedValue(Key.of(Player.class)).orElseThrow(() -> new IllegalStateException("No player"))
+        );
         try {
             MultiClipboardHolder clipboards =
                     ClipboardFormats.loadAllFromInput(player, clipboardStr, null, true);
@@ -651,7 +711,10 @@ public class BrushCommands {
                     List<Pattern> patternLayers
     )
             throws WorldEditException {
-        worldEdit.checkMaxBrushRadius(radius);
+        worldEdit.checkMaxBrushRadius(
+                radius,
+                context.injectedValue(Key.of(Player.class)).orElseThrow(() -> new IllegalStateException("No player"))
+        );
         set(context, new LayerBrush(patternLayers.toArray(new Pattern[0])), "worldedit.brush.layer").setSize(radius);
     }
 
@@ -678,7 +741,10 @@ public class BrushCommands {
             @Arg(desc = "boolean", def = "true")
                     boolean solid
     ) throws WorldEditException {
-        worldEdit.checkMaxBrushRadius(radius);
+        worldEdit.checkMaxBrushRadius(
+                radius,
+                context.injectedValue(Key.of(Player.class)).orElseThrow(() -> new IllegalStateException("No player"))
+        );
         set(context, new SplatterBrush((int) points, (int) recursion, solid), "worldedit.brush.splatter").setSize(radius)
                 .setFill(fill);
     }
@@ -711,7 +777,10 @@ public class BrushCommands {
                     boolean print
     )
             throws WorldEditException {
-        worldEdit.checkMaxBrushRadius(radius);
+        worldEdit.checkMaxBrushRadius(
+                radius,
+                context.injectedValue(Key.of(Player.class)).orElseThrow(() -> new IllegalStateException("No player"))
+        );
         set(
                 context,
                 new ScatterCommand((int) points, (int) distance, StringMan.join(commandStr, " "), print),
@@ -838,29 +907,24 @@ public class BrushCommands {
             InjectedValueAccess context
     )
             throws WorldEditException, FileNotFoundException {
-        worldEdit.checkMaxBrushRadius(radius);
+        worldEdit.checkMaxBrushRadius(
+                radius,
+                context.injectedValue(Key.of(Player.class)).orElseThrow(() -> new IllegalStateException("No player"))
+        );
         InputStream stream = getHeightmapStream(image);
         HeightBrush brush;
         int minY = player.getWorld().getMinY();
         int maxY = player.getWorld().getMaxY();
         if (flat) {
-            try {
-                brush = new FlattenBrush(stream, rotation, yscale, layers, smooth,
-                        "#clipboard".equalsIgnoreCase(image)
-                                ? session.getClipboard().getClipboard() : null, shape, minY, maxY
-                );
-            } catch (EmptyClipboardException ignored) {
-                brush = new FlattenBrush(stream, rotation, yscale, layers, smooth, null, shape, minY, maxY);
-            }
+            brush = new FlattenBrush(stream, rotation, yscale, layers, smooth,
+                    isClipboard(image)
+                            ? session.getClipboard().getClipboard() : null, shape, minY, maxY
+            );
         } else {
-            try {
-                brush = new HeightBrush(stream, rotation, yscale, layers, smooth,
-                        "#clipboard".equalsIgnoreCase(image)
-                                ? session.getClipboard().getClipboard() : null, minY, maxY
-                );
-            } catch (EmptyClipboardException ignored) {
-                brush = new HeightBrush(stream, rotation, yscale, layers, smooth, null, minY, maxY);
-            }
+            brush = new HeightBrush(stream, rotation, yscale, layers, smooth,
+                    isClipboard(image)
+                            ? session.getClipboard().getClipboard() : null, minY, maxY
+            );
         }
         if (randomRotate) {
             brush.setRandomRotate(true);
@@ -868,8 +932,12 @@ public class BrushCommands {
         set(context, brush, "worldedit.brush.height").setSize(radius);
     }
 
+    private static boolean isClipboard(String image) {
+        return "#clipboard".equalsIgnoreCase(image);
+    }
+
     private InputStream getHeightmapStream(String filename) throws FileNotFoundException {
-        if (filename == null || "none".equalsIgnoreCase(filename)) {
+        if (filename == null || "none".equalsIgnoreCase(filename) || isClipboard(filename)) {
             return null;
         }
         String filenamePng = filename.endsWith(".png") ? filename : filename + ".png";
@@ -908,7 +976,10 @@ public class BrushCommands {
             @Switch(name = 'a', desc = "Apply auto view based rotation on paste")
                     boolean autoRotate
     ) throws WorldEditException {
-        worldEdit.checkMaxBrushRadius(radius);
+        worldEdit.checkMaxBrushRadius(
+                radius,
+                context.injectedValue(Key.of(Player.class)).orElseThrow(() -> new IllegalStateException("No player"))
+        );
         player.print(Caption.of("fawe.worldedit.brush.brush.copy", (radius)));
 
         set(context, new CopyPastaBrush(player, session, randomRotate, autoRotate), "worldedit.brush.copy").setSize(radius);
@@ -930,12 +1001,15 @@ public class BrushCommands {
                     Expression radius,
             @Arg(desc = "Command to run")
                     List<String> input,
-            @Switch(name = 'p', desc = "Show any printed output")
-                    boolean print
+            @Switch(name = 'h', desc = "Hide any printed output")
+                    boolean hide
     ) throws WorldEditException {
-        worldEdit.checkMaxBrushRadius(radius);
+        worldEdit.checkMaxBrushRadius(
+                radius,
+                context.injectedValue(Key.of(Player.class)).orElseThrow(() -> new IllegalStateException("No player"))
+        );
         String cmd = StringMan.join(input, " ");
-        set(context, new CommandBrush(cmd, print), "worldedit.brush.command").setSize(radius);
+        set(context, new CommandBrush(cmd, !hide), "worldedit.brush.command").setSize(radius);
     }
 
     @Command(
@@ -1042,7 +1116,7 @@ public class BrushCommands {
             String permission
     )
             throws WorldEditException {
-        WorldEdit.getInstance().checkMaxBrushRadius(radius);
+        WorldEdit.getInstance().checkMaxBrushRadius(radius, player);
         BrushTool tool = session.getBrushTool(player);
         tool.setSize(radius);
         tool.setFill(null);
@@ -1115,7 +1189,7 @@ public class BrushCommands {
             @Arg(desc = "The density of the brush", def = "20")
                     double density,
             @Arg(desc = "The type of tree to use")
-                    TreeGenerator.TreeType type
+                    TreeType type
     ) throws WorldEditException {
         setOperationBasedBrush(player, localSession, radius,
                 new Paint(new TreeGeneratorFactory(type), density / 100), shape, "worldedit.brush.forest"
@@ -1197,7 +1271,10 @@ public class BrushCommands {
             @Switch(name = 'f', desc = "Create falling spheres instead")
                     boolean falling
     ) throws WorldEditException {
-        worldEdit.checkMaxBrushRadius(radius);
+        worldEdit.checkMaxBrushRadius(
+                radius,
+                context.injectedValue(Key.of(Player.class)).orElseThrow(() -> new IllegalStateException("No player"))
+        );
         Brush brush;
         if (hollow) {
             brush = new HollowSphereBrush();
@@ -1244,8 +1321,14 @@ public class BrushCommands {
             @Switch(name = 'h', desc = "Create hollow cylinders instead")
                     boolean hollow
     ) throws WorldEditException {
-        worldEdit.checkMaxBrushRadius(radius);
-        worldEdit.checkMaxBrushRadius(height);
+        worldEdit.checkMaxBrushRadius(
+                radius,
+                context.injectedValue(Key.of(Player.class)).orElseThrow(() -> new IllegalStateException("No player"))
+        );
+        worldEdit.checkMaxBrushRadius(
+                height,
+                context.injectedValue(Key.of(Player.class)).orElseThrow(() -> new IllegalStateException("No player"))
+        );
 
         BrushSettings settings;
         if (hollow) {
@@ -1293,9 +1376,18 @@ public class BrushCommands {
 
         BlockVector3 size = clipboard.getDimensions();
 
-        worldEdit.checkMaxBrushRadius(size.getBlockX() / 2D - 1);
-        worldEdit.checkMaxBrushRadius(size.getBlockY() / 2D - 1);
-        worldEdit.checkMaxBrushRadius(size.getBlockZ() / 2D - 1);
+        worldEdit.checkMaxBrushRadius(
+                size.x() / 2D - 1,
+                context.injectedValue(Key.of(Player.class)).orElseThrow(() -> new IllegalStateException("No player"))
+        );
+        worldEdit.checkMaxBrushRadius(
+                size.y() / 2D - 1,
+                context.injectedValue(Key.of(Player.class)).orElseThrow(() -> new IllegalStateException("No player"))
+        );
+        worldEdit.checkMaxBrushRadius(
+                size.z() / 2D - 1,
+                context.injectedValue(Key.of(Player.class)).orElseThrow(() -> new IllegalStateException("No player"))
+        );
 
         set(
                 context,
@@ -1324,11 +1416,14 @@ public class BrushCommands {
                     Mask mask,
             InjectedValueAccess context
     ) throws WorldEditException {
-        worldEdit.checkMaxBrushRadius(radius);
+        worldEdit.checkMaxBrushRadius(
+                radius,
+                context.injectedValue(Key.of(Player.class)).orElseThrow(() -> new IllegalStateException("No player"))
+        );
 
         //FAWE start
         FaweLimit limit = Settings.settings().getLimit(player);
-        iterations = Math.min(limit.MAX_ITERATIONS, iterations);
+        iterations = Math.min(limit.MAX_ITERATIONS.get(), iterations);
         //FAWE end
 
         set(context, new SmoothBrush(iterations, mask), "worldedit.brush.smooth").setSize(radius);
@@ -1359,11 +1454,14 @@ public class BrushCommands {
             @ArgFlag(name = 'm', desc = "The mask of blocks to use for the heightmap")
                     Mask mask, InjectedValueAccess context
     ) throws WorldEditException {
-        worldEdit.checkMaxBrushRadius(radius);
+        worldEdit.checkMaxBrushRadius(
+                radius,
+                context.injectedValue(Key.of(Player.class)).orElseThrow(() -> new IllegalStateException("No player"))
+        );
 
         //FAWE start
         FaweLimit limit = Settings.settings().getLimit(player);
-        iterations = Math.min(limit.MAX_ITERATIONS, iterations);
+        iterations = Math.min(limit.MAX_ITERATIONS.get(), iterations);
         //FAWE end
 
         set(context, new SnowSmoothBrush(iterations, snowBlockCount, mask), "worldedit.brush.snowsmooth").setSize(radius);
@@ -1386,7 +1484,10 @@ public class BrushCommands {
             @Arg(desc = "The radius to extinguish", def = "5")
                     Expression radius
     ) throws WorldEditException {
-        worldEdit.checkMaxBrushRadius(radius);
+        worldEdit.checkMaxBrushRadius(
+                radius,
+                context.injectedValue(Key.of(Player.class)).orElseThrow(() -> new IllegalStateException("No player"))
+        );
 
         set(context, new SphereBrush(), "worldedit.brush.ex").setSize(radius).setFill(BlockTypes.AIR.getDefaultState())
                 .setMask(new SingleBlockTypeMask(editSession, BlockTypes.FIRE));
@@ -1405,7 +1506,10 @@ public class BrushCommands {
             @Switch(name = 'h', desc = "Affect blocks starting at max Y, rather than the target location Y + radius")
                     boolean fromMaxY
     ) throws WorldEditException {
-        worldEdit.checkMaxBrushRadius(radius);
+        worldEdit.checkMaxBrushRadius(
+                radius,
+                context.injectedValue(Key.of(Player.class)).orElseThrow(() -> new IllegalStateException("No player"))
+        );
 
         set(context, new GravityBrush(fromMaxY), "worldedit.brush.gravity").setSize(radius);
     }
@@ -1439,7 +1543,10 @@ public class BrushCommands {
             @Switch(name = 'w', desc = "Also kill water mobs")
                     boolean killWater, InjectedValueAccess context
     ) throws WorldEditException {
-        worldEdit.checkMaxBrushRadius(radius);
+        worldEdit.checkMaxBrushRadius(
+                radius,
+                context.injectedValue(Key.of(Player.class)).orElseThrow(() -> new IllegalStateException("No player"))
+        );
 
         CreatureButcher flags = new CreatureButcher(player);
         flags.or(
@@ -1458,7 +1565,115 @@ public class BrushCommands {
         set(context, new ButcherBrush(flags), "worldedit.brush.butcher").setSize(radius);
     }
 
+    @Command(name = "biome",
+            desc = "Biome brush, sets biomes in the area"
+    )
+    @CommandPermissions("worldedit.brush.biome")
+    public void biome(Player player, LocalSession localSession,
+              @Arg(desc = "The shape of the region")
+                    RegionFactory shape,
+              @Arg(desc = "The size of the brush", def = "5")
+                    double radius,
+              @Arg(desc = "The biome type")
+                    BiomeType biomeType,
+              @Switch(name = 'c', desc = "Whether to set the full column")
+                    boolean column
+    ) throws WorldEditException {
+        if (column) {
+            // Convert this shape factory to a column-based one, if possible
+            if (shape instanceof CylinderRegionFactory || shape instanceof SphereRegionFactory) {
+                // Sphere regions that are Y-expended are just cylinders
+                shape = new FixedHeightCylinderRegionFactory(player.getWorld().getMinY(), player.getWorld().getMaxY());
+            } else if (shape instanceof CuboidRegionFactory) {
+                shape = new FixedHeightCuboidRegionFactory(player.getWorld().getMinY(), player.getWorld().getMaxY());
+            } else {
+                player.printError(TranslatableComponent.of("worldedit.brush.biome.column-supported-types"));
+                return;
+            }
+        }
+
+        setOperationBasedBrush(player, localSession, radius,
+            new ApplyRegion(new BiomeFactory(biomeType)), shape, "worldedit.brush.biome");
+        player.printInfo(TranslatableComponent.of("worldedit.setbiome.warning"));
+    }
+
+    @Command(
+            name = "morph",
+            desc = "Morph brush, morphs blocks in the area"
+    )
+    @CommandPermissions("worldedit.brush.morph")
+    public void morph(Player player, LocalSession session,
+                      @Arg(desc = "The size of the brush", def = "5")
+                      double brushSize,
+                      @Arg(desc = "Minimum number of faces for erosion", def = "3")
+                      int minErodeFaces,
+                      @Arg(desc = "Erode iterations", def = "1")
+                      int numErodeIterations,
+                      @Arg(desc = "Minimum number of faces for dilation", def = "3")
+                      int minDilateFaces,
+                      @Arg(desc = "Dilate iterations", def = "1")
+                      int numDilateIterations) throws WorldEditException {
+        worldEdit.checkMaxBrushRadius(brushSize);
+        BrushTool tool = session.getBrushTool(player.getItemInHand(HandSide.MAIN_HAND).getType());
+        tool.setSize(brushSize);
+        tool.setBrush(new MorphBrush(minErodeFaces, numErodeIterations, minDilateFaces, numDilateIterations), "worldedit.brush.morph");
+
+        player.printInfo(TranslatableComponent.of("worldedit.brush.morph.equip", TextComponent.of((int) brushSize)));
+    }
+
+    @Command(
+            name = "dilate",
+            desc = "Dilate preset for morph brush, dilates blocks in the area"
+    )
+    @CommandPermissions("worldedit.brush.morph")
+    public void dilate(Player player, LocalSession session,
+                       @Arg(desc = "The size of the brush", def = "5")
+                       double brushSize) throws WorldEditException {
+        worldEdit.checkMaxBrushRadius(brushSize);
+        BrushTool tool = session.getBrushTool(player.getItemInHand(HandSide.MAIN_HAND).getType());
+        tool.setSize(brushSize);
+        tool.setBrush(new MorphBrush(5, 1, 2, 1), "worldedit.brush.morph");
+
+        player.printInfo(TranslatableComponent.of("worldedit.brush.morph.equip", TextComponent.of((int) brushSize)));;
+    }
+
+    @Command(
+            name = "feature",
+            desc = "Feature brush, paints Minecraft generation features"
+    )
+    @CommandPermissions("worldedit.brush.feature")
+    public void feature(Player player, LocalSession localSession,
+                        @Arg(desc = "The shape of the region")
+                        RegionFactory shape,
+                        @Arg(desc = "The size of the brush", def = "5")
+                        double radius,
+                        @Arg(desc = "The density of the brush", def = "5")
+                        double density,
+                        @Arg(desc = "The type of feature to use")
+                        ConfiguredFeatureType type) throws WorldEditException {
+        setOperationBasedBrush(player, localSession, radius,
+                new Paint(new FeatureGeneratorFactory(type), density / 100), shape, "worldedit.brush.feature");
+    }
+
     //FAWE start
+    @Command(
+            name = "structure",
+            desc = "Structure brush, paints Minecraft generation structures"
+    )
+    @CommandPermissions("worldedit.brush.feature")
+    public void structure(Player player, LocalSession localSession,
+                        @Arg(desc = "The shape of the region")
+                        RegionFactory shape,
+                        @Arg(desc = "The size of the brush", def = "5")
+                        double radius,
+                        @Arg(desc = "The density of the brush", def = "5")
+                        double density,
+                        @Arg(desc = "The type of feature to use")
+                        StructureType type) throws WorldEditException {
+        setOperationBasedBrush(player, localSession, radius,
+                new Paint(new StructureGeneratorFactory(type), density / 100), shape, "worldedit.brush.structure");
+    }
+
     public BrushSettings process(Player player, Arguments arguments, BrushSettings settings)
             throws WorldEditException {
         LocalSession session = worldEdit.getSessionManager().get(player);
@@ -1502,12 +1717,10 @@ public class BrushCommands {
     }
     //FAWE end
 
-    static void setOperationBasedBrush(
-            Player player, LocalSession session, double radius,
-            Contextual<? extends Operation> factory,
-            RegionFactory shape,
-            String permission
-    ) throws WorldEditException {
+    static void setOperationBasedBrush(Player player, LocalSession session, double radius,
+                                        Contextual<? extends Operation> factory,
+                                        RegionFactory shape,
+                                        String permission) throws WorldEditException {
         WorldEdit.getInstance().checkMaxBrushRadius(radius);
         BrushTool tool = session.getBrushTool(player.getItemInHand(HandSide.MAIN_HAND).getType());
         tool.setSize(radius);

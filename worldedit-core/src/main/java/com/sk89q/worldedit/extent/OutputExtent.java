@@ -21,6 +21,7 @@ package com.sk89q.worldedit.extent;
 
 import com.fastasyncworldedit.core.extent.processor.heightmap.HeightMapType;
 import com.fastasyncworldedit.core.math.MutableBlockVector3;
+import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
@@ -60,7 +61,7 @@ public interface OutputExtent {
      */
     @Deprecated
     default <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 position, T block) throws WorldEditException {
-        return setBlock(position.getX(), position.getY(), position.getZ(), block);
+        return setBlock(position.x(), position.y(), position.z(), block);
     }
 
     // The defaults need to remain for compatibility (the actual implementation still needs to override one of these)
@@ -68,7 +69,24 @@ public interface OutputExtent {
         return setBlock(MutableBlockVector3.get(x, y, z), block);
     }
 
-    boolean setTile(int x, int y, int z, CompoundTag tile) throws WorldEditException;
+    /**
+     * @deprecated use {@link #tile(int, int, int, FaweCompoundTag)} instead
+     */
+    @Deprecated(forRemoval = true, since = "2.11.2")
+    default boolean setTile(int x, int y, int z, CompoundTag tile) throws WorldEditException {
+        return tile(x, y, z, FaweCompoundTag.of(tile.toLinTag()));
+    }
+
+    /**
+     * Sets a tile/block entity at the given location.
+     * @param x the x position
+     * @param y the y position
+     * @param z the z position
+     * @param tile the tile/block entity to set
+     * @return {@code true} if the tile/block entity was placed
+     * @since 2.11.2
+     */
+    boolean tile(int x, int y, int z, FaweCompoundTag tile) throws WorldEditException;
 
     /**
      * Check if this extent fully supports 3D biomes.
@@ -148,7 +166,7 @@ public interface OutputExtent {
      * @param value    light level to set
      */
     default void setBlockLight(BlockVector3 position, int value) {
-        setBlockLight(position.getX(), position.getY(), position.getZ(), value);
+        setBlockLight(position.x(), position.y(), position.z(), value);
     }
 
     default void setBlockLight(int x, int y, int z, int value) {
@@ -161,7 +179,7 @@ public interface OutputExtent {
      * @param value    light level to set
      */
     default void setSkyLight(BlockVector3 position, int value) {
-        setSkyLight(position.getX(), position.getY(), position.getZ(), value);
+        setSkyLight(position.x(), position.y(), position.z(), value);
     }
     //FAWE end
 

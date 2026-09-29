@@ -92,7 +92,7 @@ public interface BlockRegistry {
     //FAWE start
 
     /**
-     * Register all blocks.
+     * Get a collection of all blocks in their default state as string representations.
      */
     default Collection<String> values() {
         return Collections.emptyList();

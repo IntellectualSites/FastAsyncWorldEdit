@@ -20,27 +20,27 @@
 package com.sk89q.jnbt;
 
 
-import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
+import org.enginehub.linbus.tree.LinCompoundTag;
 
 import java.util.Map;
 
 /**
  * Allows detection of the version-specific LazyCompoundTag classes.
  *
- * @deprecated Use {@link CompoundBinaryTag}.
+ * @deprecated Use {@link LinCompoundTag}.
  */
 @Deprecated
 public abstract class LazyCompoundTag extends CompoundTag {
 
-    public LazyCompoundTag(Map<String, Tag> value) {
+    public LazyCompoundTag(Map<String, Tag<?, ?>> value) {
         super(value);
     }
 
-    public LazyCompoundTag(CompoundBinaryTag adventureTag) {
+    public LazyCompoundTag(LinCompoundTag adventureTag) {
         super(adventureTag);
     }
 
     @Override
-    public abstract CompoundBinaryTag asBinaryTag();
+    public abstract LinCompoundTag toLinTag();
 
 }

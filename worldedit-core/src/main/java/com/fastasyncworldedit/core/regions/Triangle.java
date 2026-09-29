@@ -7,9 +7,13 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.polyhedron.Edge;
 
-public class Triangle {
+public class Triangle implements Cloneable {
 
     public static double RADIUS = 0.5;
+
+    private final BlockVector3 pos1;
+    private final BlockVector3 pos2;
+    private final BlockVector3 pos3;
 
     private final double[][] verts = new double[3][3];
     private final double[] center = new double[3];
@@ -28,9 +32,12 @@ public class Triangle {
     private final double b;
 
     public Triangle(BlockVector3 pos1, BlockVector3 pos2, BlockVector3 pos3) {
-        verts[0] = new double[]{pos1.getBlockX(), pos1.getBlockY(), pos1.getBlockZ()};
-        verts[1] = new double[]{pos2.getBlockX(), pos2.getBlockY(), pos2.getBlockZ()};
-        verts[2] = new double[]{pos3.getBlockX(), pos3.getBlockY(), pos3.getBlockZ()};
+        this.pos1 = pos1;
+        this.pos2 = pos2;
+        this.pos3 = pos3;
+        verts[0] = new double[]{pos1.x(), pos1.y(), pos1.z()};
+        verts[1] = new double[]{pos2.x(), pos2.y(), pos2.z()};
+        verts[2] = new double[]{pos3.x(), pos3.y(), pos3.z()};
         radius[0] = RADIUS;
         radius[1] = RADIUS;
         radius[2] = RADIUS;
@@ -72,9 +79,9 @@ public class Triangle {
     }
 
     public boolean contains(BlockVector3 pos) {
-        center[0] = pos.getBlockX() + RADIUS;
-        center[1] = pos.getBlockY() + RADIUS;
-        center[2] = pos.getBlockZ() + RADIUS;
+        center[0] = pos.x() + RADIUS;
+        center[1] = pos.y() + RADIUS;
+        center[2] = pos.z() + RADIUS;
         return overlaps(center, radius, verts);
     }
 
@@ -288,6 +295,11 @@ public class Triangle {
             return false;
         }
         return dot(normal, vmax) >= 0.0f;
+    }
+
+    @Override
+    public Triangle clone() {
+        return new Triangle(pos1, pos2, pos3);
     }
 
 }

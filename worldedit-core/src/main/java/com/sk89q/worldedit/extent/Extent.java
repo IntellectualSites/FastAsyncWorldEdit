@@ -30,6 +30,7 @@ import com.fastasyncworldedit.core.function.generator.GenBase;
 import com.fastasyncworldedit.core.function.generator.OreGen;
 import com.fastasyncworldedit.core.function.generator.Resource;
 import com.fastasyncworldedit.core.function.generator.SchemGen;
+import com.fastasyncworldedit.core.function.pattern.MaskedPattern;
 import com.fastasyncworldedit.core.history.changeset.AbstractChangeSet;
 import com.fastasyncworldedit.core.internal.exception.FaweException;
 import com.fastasyncworldedit.core.math.MutableBlockVector3;
@@ -44,9 +45,13 @@ import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.RegionMaskingFilter;
 import com.sk89q.worldedit.function.block.BlockReplace;
+import com.sk89q.worldedit.function.mask.BlockCategoryMask;
 import com.sk89q.worldedit.function.mask.BlockMask;
 import com.sk89q.worldedit.function.mask.ExistingBlockMask;
 import com.sk89q.worldedit.function.mask.Mask;
+import com.sk89q.worldedit.function.mask.MaskIntersection;
+import com.sk89q.worldedit.function.mask.RegionMask;
+import com.sk89q.worldedit.function.mask.SolidBlockMask;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.pattern.BlockPattern;
@@ -64,6 +69,7 @@ import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
+import com.sk89q.worldedit.world.block.BlockCategories;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
@@ -76,6 +82,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.BiFunction;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -148,9 +155,10 @@ public interface Extent extends InputExtent, OutputExtent {
     }
 
     //FAWE start
+
     /**
      * Create an entity at the given location, forcing a UUID onto the entity
-     *
+     * <p>
      * Only use if you are aware of the consequences of forcing a UUID to an entity.
      *
      * @param entity   the entity
@@ -173,6 +181,18 @@ public interface Extent extends InputExtent, OutputExtent {
      * @param uuid the unique identifier of the entity
      */
     default void removeEntity(int x, int y, int z, UUID uuid) {
+    }
+
+    /**
+     * Removes all entities in the given region.
+     *
+     * @param region the region
+     * @return the number of entities removed
+     */
+    default int removeEntities(Region region) {
+        return this.getEntities(region).stream()
+                .mapToInt(entity -> entity.remove() ? 1 : 0)
+                .sum();
     }
 
     /*
@@ -216,7 +236,7 @@ public interface Extent extends InputExtent, OutputExtent {
      */
 
     /**
-     * Returns the highest solid 'terrain' block.
+     * Returns the highest solid 'terrain' (movement-blocking) block.
      *
      * @param x    the X coordinate
      * @param z    the Z coordinate
@@ -225,6 +245,9 @@ public interface Extent extends InputExtent, OutputExtent {
      * @return height of highest block found or 'minY'
      */
     default int getHighestTerrainBlock(final int x, final int z, int minY, int maxY) {
+        maxY = Math.min(maxY, getMaxY());
+        minY = Math.max(getMinY(), minY);
+
         for (int y = maxY; y >= minY; --y) {
             BlockState block = getBlock(x, y, z);
             if (block.getBlockType().getMaterial().isMovementBlocker()) {
@@ -235,7 +258,7 @@ public interface Extent extends InputExtent, OutputExtent {
     }
 
     /**
-     * Returns the highest solid 'terrain' block.
+     * Returns the highest block matching the given mask.
      *
      * @param x      the X coordinate
      * @param z      the Z coordinate
@@ -245,6 +268,9 @@ public interface Extent extends InputExtent, OutputExtent {
      * @return height of highest block found or 'minY'
      */
     default int getHighestTerrainBlock(final int x, final int z, int minY, int maxY, Mask filter) {
+        if (filter == null) {
+            return getHighestTerrainBlock(x, z, minY, maxY);
+        }
         maxY = Math.min(maxY, getMaxY());
         minY = Math.max(getMinY(), minY);
 
@@ -259,9 +285,7 @@ public interface Extent extends InputExtent, OutputExtent {
     }
 
     /**
-     * Returns the nearest surface layer (up/down from start)
-     * <p>
-     * TODO: Someone understand this..?
+     * Returns the nearest surface layer (up/down from start), where a layer is 1/16th of a block to allow for snow, liquid, etc.
      *
      * @param x    x to search from
      * @param z    y to search from
@@ -271,6 +295,9 @@ public interface Extent extends InputExtent, OutputExtent {
      * @return nearest surface layer
      */
     default int getNearestSurfaceLayer(int x, int z, int y, int minY, int maxY) {
+        maxY = Math.min(maxY, getMaxY());
+        minY = Math.max(getMinY(), minY);
+
         int clearanceAbove = maxY - y;
         int clearanceBelow = y - minY;
         int clearance = Math.min(clearanceAbove, clearanceBelow);
@@ -331,6 +358,9 @@ public interface Extent extends InputExtent, OutputExtent {
      * @return The y value of the nearest terrain block
      */
     default int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY, int failedMin, int failedMax, Mask mask) {
+        maxY = Math.min(maxY, getMaxY());
+        minY = Math.max(getMinY(), minY);
+
         y = Math.max(minY, Math.min(maxY, y));
         int clearanceAbove = maxY - y;
         int clearanceBelow = y - minY;
@@ -438,22 +468,25 @@ public interface Extent extends InputExtent, OutputExtent {
             int failedMax,
             boolean ignoreAir
     ) {
+        maxY = Math.min(maxY, getMaxY());
+        minY = Math.max(getMinY(), minY);
+
         y = Math.max(minY, Math.min(maxY, y));
         int clearanceAbove = maxY - y;
         int clearanceBelow = y - minY;
         int clearance = Math.min(clearanceAbove, clearanceBelow);
         BlockState block = getBlock(x, y, z);
-        boolean state = !block.getBlockType().getMaterial().isMovementBlocker();
+        boolean state = !SolidBlockMask.isSolid(block);
         int offset = state ? 0 : 1;
         for (int d = 0; d <= clearance; d++) {
             int y1 = y + d;
             block = getBlock(x, y1, z);
-            if (block.getMaterial().isMovementBlocker() == state && block.getBlockType() != BlockTypes.__RESERVED__) {
+            if (matchesSolidState(block, state)) {
                 return y1 - offset;
             }
             int y2 = y - d;
             block = getBlock(x, y2, z);
-            if (block.getMaterial().isMovementBlocker() == state && block.getBlockType() != BlockTypes.__RESERVED__) {
+            if (matchesSolidState(block, state)) {
                 return y2 + offset;
             }
         }
@@ -461,14 +494,14 @@ public interface Extent extends InputExtent, OutputExtent {
             if (clearanceAbove < clearanceBelow) {
                 for (int layer = y - clearance - 1; layer >= minY; layer--) {
                     block = getBlock(x, layer, z);
-                    if (block.getMaterial().isMovementBlocker() == state && block.getBlockType() != BlockTypes.__RESERVED__) {
+                    if (matchesSolidState(block, state)) {
                         return layer + offset;
                     }
                 }
             } else {
                 for (int layer = y + clearance + 1; layer <= maxY; layer++) {
                     block = getBlock(x, layer, z);
-                    if (block.getMaterial().isMovementBlocker() == state && block.getBlockType() != BlockTypes.__RESERVED__) {
+                    if (matchesSolidState(block, state)) {
                         return layer - offset;
                     }
                 }
@@ -480,6 +513,10 @@ public interface Extent extends InputExtent, OutputExtent {
             return block.getBlockType().getMaterial().isAir() ? -1 : result;
         }
         return result;
+    }
+
+    private static boolean matchesSolidState(BlockState block, boolean state) {
+        return SolidBlockMask.isSolid(block) == state && block.getBlockType() != BlockTypes.__RESERVED__;
     }
 
     default void addCaves(Region region) throws WorldEditException {
@@ -494,7 +531,7 @@ public interface Extent extends InputExtent, OutputExtent {
 
     default void addSchems(Region region, Mask mask, List<ClipboardHolder> clipboards, int rarity, boolean rotate) throws
             WorldEditException {
-        spawnResource(region, new SchemGen(mask, this, clipboards, rotate), rarity, 1);
+        spawnResource(region, new SchemGen(mask, this, clipboards, rotate, region), rarity, 1);
     }
 
     default void spawnResource(Region region, Resource gen, int rarity, int frequency) throws WorldEditException {
@@ -504,8 +541,8 @@ public interface Extent extends InputExtent, OutputExtent {
                 if (random.nextInt(100) > rarity) {
                     continue;
                 }
-                int x = (chunkPos.getBlockX() << 4) + random.nextInt(16);
-                int z = (chunkPos.getBlockZ() << 4) + random.nextInt(16);
+                int x = (chunkPos.x() << 4) + random.nextInt(16);
+                int z = (chunkPos.z() << 4) + random.nextInt(16);
                 gen.spawn(random, x, z);
             }
         }
@@ -534,9 +571,9 @@ public interface Extent extends InputExtent, OutputExtent {
     default boolean contains(int x, int y, int z) {
         BlockVector3 min = getMinimumPoint();
         BlockVector3 max = getMaximumPoint();
-        return min.getX() <= x && max.getX() >= x
-                && min.getY() <= y && max.getY() >= y
-                && min.getZ() <= z && max.getZ() >= z;
+        return min.x() <= x && max.x() >= x
+                && min.y() <= y && max.y() >= y
+                && min.z() <= z && max.z() >= z;
     }
 
     default void addOre(
@@ -549,23 +586,291 @@ public interface Extent extends InputExtent, OutputExtent {
             int minY,
             int maxY
     ) throws WorldEditException {
-        spawnResource(region, new OreGen(this, mask, material, size, minY, maxY), rarity, frequency);
+        addOre(region, mask, material, size, frequency, rarity, minY, maxY, false);
     }
 
-    //TODO: probably update these for 1.18 etc.
+    /**
+     * Generate ore-like deposits with the given pattern and settings
+     *
+     * @param region     region to generate in
+     * @param mask       mask of where to place
+     * @param material   pattern to place
+     * @param size       maximum size of deposits
+     * @param frequency  number of times to attempt to place a deposit
+     * @param rarity     percentage chance of generating a deposit per attempt
+     * @param minY       min Y to consider generation from (important for triangular generation)
+     * @param maxY       max Y to consider generation from (important for triangular generation)
+     * @param triangular if a triangular distribution of ores should be used (rather than flat)
+     * @throws WorldEditException on error
+     * @since 2.14.3
+     */
+    default void addOre(
+            Region region,
+            Mask mask,
+            Pattern material,
+            int size,
+            int frequency,
+            int rarity,
+            int minY,
+            int maxY,
+            boolean triangular
+    ) throws WorldEditException {
+        spawnResource(
+                region,
+                new OreGen(this, mask, material, size, minY, maxY, triangular),
+                rarity,
+                frequency
+        );
+    }
+
     default void addOres(Region region, Mask mask) throws WorldEditException {
-        addOre(region, mask, BlockTypes.DIRT.getDefaultState(), 33, 10, 100, getMinY(), getMaxY());
-        addOre(region, mask, BlockTypes.GRAVEL.getDefaultState(), 33, 8, 100, getMinY(), getMaxY());
-        addOre(region, mask, BlockTypes.ANDESITE.getDefaultState(), 33, 10, 100, getMinY(), 79);
-        addOre(region, mask, BlockTypes.DIORITE.getDefaultState(), 33, 10, 100, getMinY(), 79);
-        addOre(region, mask, BlockTypes.GRANITE.getDefaultState(), 33, 10, 100, getMinY(), 79);
-        addOre(region, mask, BlockTypes.COAL_ORE.getDefaultState(), 17, 20, 100, 0, 127);
-        addOre(region, mask, BlockTypes.IRON_ORE.getDefaultState(), 9, 20, 100, 0, 63);
-        addOre(region, mask, BlockTypes.GOLD_ORE.getDefaultState(), 9, 2, 100, 0, 31);
-        addOre(region, mask, BlockTypes.REDSTONE_ORE.getDefaultState(), 8, 8, 100, 0, 15);
-        addOre(region, mask, BlockTypes.DIAMOND_ORE.getDefaultState(), 8, 1, 100, 0, 15);
-        addOre(region, mask, BlockTypes.LAPIS_ORE.getDefaultState(), 7, 1, 100, 0, 15);
-        addOre(region, mask, BlockTypes.EMERALD_ORE.getDefaultState(), 5, 1, 100, 4, 31);
+        addOres(region, mask, false, false);
+    }
+
+    /**
+     * Generator a distribution of ore deposits similar to vanilla generation
+     *
+     * @param region                  region to generate in
+     * @param mask                    mask of where to place
+     * @param deepslateBelowZero      if ores should be their deepslate equivalent below zero (overrides deepslateWhereDeepslate)
+     * @param deepslateWhereDeepslate if ores should be their deepslate equivalent if the existing block is deepslate
+     * @throws WorldEditException on error
+     * @since 2.14.3
+     */
+    default void addOres(Region region, Mask mask, boolean deepslateBelowZero, boolean deepslateWhereDeepslate) throws
+            WorldEditException {
+        mask = new MaskIntersection(new RegionMask(region), mask);
+
+        BiFunction<BlockType, BlockType, Pattern> patternFunc;
+
+        if (deepslateBelowZero) {
+            patternFunc = (ore, deepslate_ore) -> new MaskedPattern(
+                    new Mask() {
+
+                        @Override
+                        public boolean test(final BlockVector3 vector) {
+                            return vector.y() < 0;
+                        }
+
+                        @Override
+                        public Mask copy() {
+                            return this;
+                        }
+                    }, deepslate_ore, ore
+            );
+        } else if (deepslateWhereDeepslate) {
+            patternFunc = (ore, deepslate_ore) -> new MaskedPattern(
+                    new BlockCategoryMask(
+                            this,
+                            BlockCategories.DEEPSLATE_ORE_REPLACEABLES
+                    ), deepslate_ore, ore
+            );
+        } else {
+            patternFunc = (ore, deepslate_ore) -> ore;
+        }
+
+        addOre(region, mask, BlockTypes.GRAVEL, 33, 14, 100, getMinY(), getMaxY(), false);
+
+        addOre(region, mask, BlockTypes.ANDESITE, 33, 2, 100, 0, 60, false); // Lower
+        addOre(region, mask, BlockTypes.ANDESITE, 33, 1, 17, 64, 128, false); // Upper
+
+        addOre(region, mask, BlockTypes.DIORITE, 33, 2, 100, 0, 60, false); // Lower
+        addOre(region, mask, BlockTypes.DIORITE, 33, 1, 17, 64, 128, false); // Upper
+
+        addOre(region, mask, BlockTypes.GRANITE, 33, 2, 100, 0, 60, false); // Lower
+        addOre(region, mask, BlockTypes.GRANITE, 33, 1, 17, 64, 128, false); // Upper
+
+        addOre(region, mask, BlockTypes.TUFF, 33, 2, 100, getMinY(), 0, false);
+
+        addOre(region, mask, BlockTypes.DIRT, 33, 7, 100, 0, 160, false);
+
+        addOre( // Lower
+                region,
+                mask,
+                patternFunc.apply(BlockTypes.COAL_ORE, BlockTypes.DEEPSLATE_COAL_ORE),
+                17,
+                20,
+                100,
+                0,
+                192,
+                true
+        );
+        addOre( // Upper
+                region,
+                mask,
+                patternFunc.apply(BlockTypes.COAL_ORE, BlockTypes.DEEPSLATE_COAL_ORE),
+                17,
+                30,
+                100,
+                136,
+                getMaxY(),
+                false
+        );
+
+        addOre(
+                region,
+                mask,
+                patternFunc.apply(BlockTypes.COPPER_ORE, BlockTypes.DEEPSLATE_COPPER_ORE),
+                13,
+                16,
+                100,
+                -16,
+                112,
+                true
+        );
+
+        addOre( // Small
+                region,
+                mask,
+                patternFunc.apply(BlockTypes.IRON_ORE, BlockTypes.DEEPSLATE_IRON_ORE),
+                9,
+                10,
+                100,
+                getMinY(),
+                72,
+                false
+        ); // Middle
+        addOre(
+                region,
+                mask,
+                patternFunc.apply(BlockTypes.IRON_ORE, BlockTypes.DEEPSLATE_IRON_ORE),
+                9,
+                10,
+                100,
+                -24,
+                56,
+                true
+        );
+        addOre( // Upper
+                region,
+                mask,
+                patternFunc.apply(BlockTypes.IRON_ORE, BlockTypes.DEEPSLATE_IRON_ORE),
+                9,
+                90,
+                100,
+                80,
+                384,
+                true
+        );
+
+        addOre( // Lower
+                region,
+                mask,
+                patternFunc.apply(BlockTypes.GOLD_ORE, BlockTypes.DEEPSLATE_GOLD_ORE),
+                9,
+                1,
+                50,
+                -64
+                ,
+                -48,
+                false
+        );
+        addOre(
+                region,
+                mask,
+                patternFunc.apply(BlockTypes.GOLD_ORE, BlockTypes.DEEPSLATE_GOLD_ORE),
+                9,
+                4,
+                100,
+                -64,
+                32,
+                true
+        );
+
+        addOre(
+                region,
+                mask,
+                patternFunc.apply(BlockTypes.REDSTONE_ORE, BlockTypes.DEEPSLATE_REDSTONE_ORE),
+                8,
+                8,
+                100,
+                -32,
+                32,
+                true
+        );
+        addOre(
+                region,
+                mask,
+                patternFunc.apply(BlockTypes.REDSTONE_ORE, BlockTypes.DEEPSLATE_REDSTONE_ORE),
+                8,
+                4,
+                100,
+                getMinY(),
+                15,
+                false
+        );
+
+        int diaMin = getMinY() - 80;
+        int diaMax = getMinY() + 80;
+        addOre(
+                region,
+                mask,
+                patternFunc.apply(BlockTypes.DIAMOND_ORE, BlockTypes.DEEPSLATE_DIAMOND_ORE),
+                5,
+                7,
+                100,
+                diaMin,
+                diaMax,
+                true
+        );
+        addOre( // Medium
+                region,
+                mask,
+                patternFunc.apply(BlockTypes.DIAMOND_ORE, BlockTypes.DEEPSLATE_DIAMOND_ORE),
+                8,
+                2,
+                100,
+                -64,
+                -4,
+                false
+        );
+        addOre( // Large
+                region,
+                mask,
+                patternFunc.apply(BlockTypes.DIAMOND_ORE, BlockTypes.DEEPSLATE_DIAMOND_ORE),
+                23,
+                1,
+                11,
+                diaMin,
+                diaMax,
+                true
+        );
+        addOre( // Buried
+                region,
+                mask,
+                patternFunc.apply(BlockTypes.DIAMOND_ORE, BlockTypes.DEEPSLATE_DIAMOND_ORE),
+                10,
+                4,
+                100,
+                diaMin,
+                diaMax,
+                true
+        );
+
+        addOre(region, mask, patternFunc.apply(BlockTypes.LAPIS_ORE, BlockTypes.DEEPSLATE_LAPIS_ORE), 7, 2, 100, -32, 32, true);
+        addOre( // Buried
+                region,
+                mask,
+                patternFunc.apply(BlockTypes.LAPIS_ORE, BlockTypes.DEEPSLATE_LAPIS_ORE),
+                7,
+                4,
+                100,
+                getMinY(),
+                64,
+                false
+        );
+
+        addOre(
+                region,
+                mask,
+                patternFunc.apply(BlockTypes.EMERALD_ORE, BlockTypes.DEEPSLATE_EMERALD_ORE),
+                5,
+                100,
+                100,
+                -16,
+                480,
+                true
+        );
     }
 
     /**
@@ -665,11 +970,11 @@ public interface Extent extends InputExtent, OutputExtent {
     }
 
     default int getMinY() {
-        return getMinimumPoint().getY();
+        return getMinimumPoint().y();
     }
 
     default int getMaxY() {
-        return getMaximumPoint().getY();
+        return getMaximumPoint().y();
     }
 
     /**
@@ -679,7 +984,7 @@ public interface Extent extends InputExtent, OutputExtent {
      * @return
      */
     default Clipboard lazyCopy(Region region) {
-        WorldCopyClipboard faweClipboard = new WorldCopyClipboard(() -> this, region);
+        WorldCopyClipboard faweClipboard = WorldCopyClipboard.of(this, region);
         faweClipboard.setOrigin(region.getMinimumPoint());
         return faweClipboard;
     }
@@ -723,7 +1028,6 @@ public interface Extent extends InputExtent, OutputExtent {
     default <B extends BlockStateHolder<B>> int setBlocks(Region region, B block) throws MaxChangedBlocksException {
         checkNotNull(region);
         checkNotNull(block);
-        boolean hasNbt = block instanceof BaseBlock && block.hasNbtData();
 
         int changes = 0;
         for (BlockVector3 pos : region) {
@@ -806,7 +1110,7 @@ public interface Extent extends InputExtent, OutputExtent {
         checkNotNull(pattern);
 
         BlockReplace replace = new BlockReplace(this, pattern);
-        RegionMaskingFilter filter = new RegionMaskingFilter(this, mask, replace);
+        RegionMaskingFilter filter = new RegionMaskingFilter(mask, replace);
         //FAWE start > add extent to RegionVisitor to allow chunk preloading
         RegionVisitor visitor = new RegionVisitor(region, filter, this);
         //FAWE end
@@ -832,9 +1136,9 @@ public interface Extent extends InputExtent, OutputExtent {
         Vector3 center = region.getCenter();
         Region centerRegion = new CuboidRegion(
                 this instanceof World ? (World) this : null, // Causes clamping of Y range
-                BlockVector3.at(((int) center.getX()), ((int) center.getY()), ((int) center.getZ())),
-                BlockVector3.at(MathUtils.roundHalfUp(center.getX()),
-                        center.getY(), MathUtils.roundHalfUp(center.getZ())
+                BlockVector3.at(((int) center.x()), ((int) center.y()), ((int) center.z())),
+                BlockVector3.at(MathUtils.roundHalfUp(center.x()),
+                        center.y(), MathUtils.roundHalfUp(center.z())
                 )
         );
         return setBlocks(centerRegion, pattern);
@@ -877,7 +1181,7 @@ public interface Extent extends InputExtent, OutputExtent {
     }
 
     default Extent addPostProcessor(IBatchProcessor processor) {
-        if (processor.getScope() != ProcessorScope.READING_SET_BLOCKS) {
+        if (processor.getScope() != ProcessorScope.READING_BLOCKS) {
             throw new IllegalArgumentException("You cannot alter blocks in a PostProcessor");
         }
         return processor.construct(this);

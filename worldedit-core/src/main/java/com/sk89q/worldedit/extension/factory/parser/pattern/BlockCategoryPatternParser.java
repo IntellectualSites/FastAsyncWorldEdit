@@ -71,7 +71,7 @@ public class BlockCategoryPatternParser extends InputParser<Pattern> implements 
 
         Set<BlockType> blocks = category.getAll();
         if (blocks.isEmpty()) {
-            throw new InputParseException(Caption.of("worldedit.error.empty-tag", TextComponent.of(category.getId())));
+            throw new InputParseException(Caption.of("worldedit.error.empty-tag", TextComponent.of(category.id())));
         }
 
         if (anyState) {

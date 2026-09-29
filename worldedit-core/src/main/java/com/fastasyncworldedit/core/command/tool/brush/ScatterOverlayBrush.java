@@ -2,6 +2,7 @@ package com.fastasyncworldedit.core.command.tool.brush;
 
 import com.fastasyncworldedit.core.math.LocalBlockVectorSet;
 import com.fastasyncworldedit.core.math.MutableBlockVector3;
+import com.fastasyncworldedit.core.util.collection.BlockVector3Set;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.function.pattern.Pattern;
@@ -14,11 +15,29 @@ public class ScatterOverlayBrush extends ScatterBrush {
     }
 
     @Override
-    public void apply(EditSession editSession, LocalBlockVectorSet placed, BlockVector3 pt, Pattern p, double size) throws
+    @Deprecated(forRemoval = true, since = "2.13.0")
+    public void apply(
+            EditSession editSession,
+            LocalBlockVectorSet placed,
+            BlockVector3 position,
+            Pattern p,
+            double size
+    ) throws MaxChangedBlocksException {
+        apply(editSession, LocalBlockVectorSet.wrap(placed), position, p, size);
+    }
+
+    @Override
+    public void apply(
+            EditSession editSession,
+            BlockVector3Set placed,
+            BlockVector3 pt,
+            Pattern p,
+            double size
+    ) throws
             MaxChangedBlocksException {
-        final int x = pt.getBlockX();
-        final int y = pt.getBlockY();
-        final int z = pt.getBlockZ();
+        final int x = pt.x();
+        final int y = pt.y();
+        final int z = pt.z();
         BlockVector3 dir = getDirection(pt);
         if (dir == null) {
             getDir:
@@ -37,7 +56,7 @@ public class ScatterOverlayBrush extends ScatterBrush {
                 return;
             }
         }
-        editSession.setBlock(x + dir.getBlockX(), y + dir.getBlockY(), z + dir.getBlockZ(), p);
+        editSession.setBlock(x + dir.x(), y + dir.y(), z + dir.z(), p);
     }
 
 }

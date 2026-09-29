@@ -9,8 +9,6 @@ import com.fastasyncworldedit.core.queue.IChunkSet;
 import com.sk89q.worldedit.extent.Extent;
 
 import javax.annotation.Nullable;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Future;
 
 public class RelightProcessor implements IBatchProcessor {
 
@@ -54,7 +52,7 @@ public class RelightProcessor implements IBatchProcessor {
 
     @Override
     public ProcessorScope getScope() {
-        return ProcessorScope.READING_SET_BLOCKS;
+        return ProcessorScope.READING_BLOCKS;
     }
 
 }

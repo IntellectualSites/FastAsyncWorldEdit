@@ -3,20 +3,16 @@ package com.fastasyncworldedit.core.history;
 import com.fastasyncworldedit.core.database.DBHandler;
 import com.fastasyncworldedit.core.database.RollbackDatabase;
 import com.fastasyncworldedit.core.history.changeset.SimpleChangeSetSummary;
-import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
-import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.UUID;
 
 public class RollbackOptimizedHistory extends DiskStorageHistory {
-
-    private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     private long time;
 
@@ -58,7 +54,6 @@ public class RollbackOptimizedHistory extends DiskStorageHistory {
         this.blockSize = (int) size;
         this.command = command;
         this.closed = true;
-        LOGGER.info("Size: {}", size);
     }
 
     public long getTime() {
@@ -84,12 +79,12 @@ public class RollbackOptimizedHistory extends DiskStorageHistory {
     }
 
     public void setDimensions(BlockVector3 pos1, BlockVector3 pos2) {
-        this.minX = pos1.getBlockX();
-        this.minY = pos1.getBlockY();
-        this.minZ = pos1.getBlockZ();
-        this.maxX = pos2.getBlockX();
-        this.maxY = pos2.getBlockY();
-        this.maxZ = pos2.getBlockZ();
+        this.minX = pos1.x();
+        this.minY = pos1.y();
+        this.minZ = pos1.z();
+        this.maxX = pos2.x();
+        this.maxY = pos2.y();
+        this.maxZ = pos2.z();
     }
 
     public void setTime(long time) {

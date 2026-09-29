@@ -20,27 +20,41 @@
 package com.sk89q.worldedit.world.biome;
 
 import com.fastasyncworldedit.core.registry.RegistryItem;
+import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.function.pattern.BiomePattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.Keyed;
 import com.sk89q.worldedit.registry.NamespacedRegistry;
+import com.sk89q.worldedit.util.formatting.text.Component;
 
 /**
  * All the types of biomes in the game.
  */
-//FAWE start - RegistryItem
+//FAWE start - RegistryItem + not a record (legacyId + internalId need mutability)
 public class BiomeType implements RegistryItem, Keyed, BiomePattern {
 //FAWE end
 
-    public static final NamespacedRegistry<BiomeType> REGISTRY = new NamespacedRegistry<>("biome type", true);
+    public static final NamespacedRegistry<BiomeType> REGISTRY = new NamespacedRegistry<>("biome type", "biome_type", "minecraft", true);
 
+    //FAWE start
     private final String id;
     private int legacyId = -1;
     private int internalId;
 
-    //FAWE start
     public BiomeType(String id) {
         this.id = id;
+    }
+
+    /**
+     * Gets the ID of this biome.
+     *
+     * @return The id
+     * @since 2.11.0
+     */
+    @Override
+    public String id() {
+        return this.id;
     }
 
     public int getLegacyId() {
@@ -60,13 +74,14 @@ public class BiomeType implements RegistryItem, Keyed, BiomePattern {
     public int getInternalId() {
         return internalId;
     }
-    //FAWE end
 
     /**
      * Gets the ID of this biome.
      *
      * @return The id
+     * @deprecated use {@link #id()}
      */
+    @Deprecated(forRemoval = true, since = "2.11.0")
     @Override
     public String getId() {
         return this.id;
@@ -74,24 +89,27 @@ public class BiomeType implements RegistryItem, Keyed, BiomePattern {
 
     @Override
     public String toString() {
-        return getId();
+        return id();
     }
 
     @Override
     public int hashCode() {
-        //FAWE start - internalId > hashCode
-        return this.internalId; // stop changing this
-        //FAWE end
+        return this.internalId; // stop changing this (ok)
     }
 
     @Override
     public boolean equals(Object obj) {
         return obj instanceof BiomeType && this.id.equals(((BiomeType) obj).id);
     }
+    //FAWE end
 
     @Override
     public BiomeType applyBiome(BlockVector3 position) {
         return this;
     }
 
+    public Component getRichName() {
+        return WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS)
+            .getRegistries().getBiomeRegistry().getRichName(this);
+    }
 }

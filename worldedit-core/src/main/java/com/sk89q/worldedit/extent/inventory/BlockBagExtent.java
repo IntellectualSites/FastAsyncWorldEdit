@@ -104,7 +104,7 @@ public class BlockBagExtent extends AbstractDelegateExtent {
 
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block) throws WorldEditException {
-        return setBlock(position.getX(), position.getY(), position.getZ(), block);
+        return setBlock(position.x(), position.y(), position.z(), block);
     }
 
     @Override

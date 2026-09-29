@@ -23,47 +23,59 @@ import com.fastasyncworldedit.bukkit.FaweBukkit;
 import com.fastasyncworldedit.bukkit.adapter.IBukkitAdapter;
 import com.fastasyncworldedit.bukkit.adapter.NMSRelighterFactory;
 import com.fastasyncworldedit.core.Fawe;
+import com.fastasyncworldedit.core.extent.processor.PlacementStateProcessor;
 import com.fastasyncworldedit.core.extent.processor.lighting.RelighterFactory;
 import com.fastasyncworldedit.core.queue.IBatchProcessor;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.implementation.packet.ChunkPacket;
-import com.sk89q.jnbt.AdventureNBTConverter;
+import com.sk89q.jnbt.LinBusConverter;
 import com.sk89q.jnbt.Tag;
+import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.function.mask.BlockTypeMask;
 import com.sk89q.worldedit.internal.wna.WorldNativeAccess;
+import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.SideEffect;
 import com.sk89q.worldedit.util.formatting.text.Component;
-import com.sk89q.worldedit.util.nbt.BinaryTag;
-import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
 import com.sk89q.worldedit.world.DataFixer;
 import com.sk89q.worldedit.world.RegenOptions;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
+import com.sk89q.worldedit.world.generation.ConfiguredFeatureType;
+import com.sk89q.worldedit.world.generation.StructureType;
+import com.sk89q.worldedit.world.generation.TreeType;
 import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 import org.bukkit.Keyed;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.bukkit.block.Biome;
+import org.bukkit.block.TileState;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.enginehub.linbus.tree.LinCompoundTag;
+import org.enginehub.linbus.tree.LinTag;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -110,7 +122,7 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
     BlockState getBlock(Location location);
 
     /**
-     * Get the block at the given location.
+     * Get the block with NBT data at the given location.
      *
      * @param location the location
      * @return the block
@@ -182,8 +194,21 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
      * @param player  The player
      * @param pos     The position
      * @param nbtData The NBT Data
+     *
+     * @deprecated Only works for structure blocks
      */
-    void sendFakeNBT(Player player, BlockVector3 pos, CompoundBinaryTag nbtData);
+    @Deprecated(since = "2.15.1")
+    void sendFakeNBT(Player player, BlockVector3 pos, LinCompoundTag nbtData);
+
+    /**
+     * Send the given NBT data to the player.
+     *
+     * @param player    The player
+     * @param pos       The position
+     * @param tileState The bukkit tile state
+     * @param nbtData   The NBT Data
+     */
+    void sendFakeNBT(Player player, BlockVector3 pos, TileState tileState, LinCompoundTag nbtData);
 
     /**
      * Make the client think it has operator status.
@@ -280,6 +305,90 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
         throw new UnsupportedOperationException("This adapter does not support clearing block contents.");
     }
 
+    /**
+     * Set the biome at a location.
+     *
+     * @param location the location
+     * @param biome    the new biome
+     */
+    default void setBiome(Location location, BiomeType biome) {
+        throw new UnsupportedOperationException("This adapter does not support custom biomes.");
+    }
+
+    /**
+     * Gets the current biome at a location.
+     *
+     * @param location the location
+     * @return the biome
+     */
+    default BiomeType getBiome(Location location) {
+        throw new UnsupportedOperationException("This adapter does not support custom biomes.");
+    }
+
+    /**
+     * Initialize registries that require NMS access.
+     */
+    default void initializeRegistries() {
+
+    }
+
+    /**
+     * Sends biome updates for the given chunks.
+     *
+     * <p>This doesn't modify biomes at all, it just sends the current state of the biomes
+     * in the world to all of the nearby players, updating the visual representation of the
+     * biomes on their clients.</p>
+     *
+     * @param world  the world
+     * @param chunks a list of chunk coordinates to send biome updates for
+     */
+    default void sendBiomeUpdates(World world, Iterable<BlockVector2> chunks) {
+
+    }
+
+    /**
+     * Generates a Minecraft tree at the given location.
+     *
+     * @param treeType The tree
+     * @param world The world
+     * @param session The EditSession
+     * @param pt The location
+     * @return If it succeeded
+     */
+    default boolean generateTree(TreeType treeType, World world, EditSession session, BlockVector3 pt) throws MaxChangedBlocksException {
+        throw new UnsupportedOperationException("This adapter does not support generating features.");
+    }
+
+    /**
+     * Generates a Minecraft feature at the given location.
+     *
+     * @param feature The feature
+     * @param world   The world
+     * @param session The EditSession
+     * @param pt      The location
+     * @return If it succeeded
+     *
+     * @since 2.14.1
+     */
+    default boolean generateFeature(ConfiguredFeatureType feature, World world, EditSession session, BlockVector3 pt) {
+        throw new UnsupportedOperationException("This adapter does not support generating features.");
+    }
+
+    /**
+     * Generates a Minecraft structure at the given location.
+     *
+     * @param feature The feature
+     * @param world The world
+     * @param session The EditSession
+     * @param pt The location
+     * @return If it succeeded
+     *
+     * @since 2.14.1
+     */
+    default boolean generateStructure(StructureType feature, World world, EditSession session, BlockVector3 pt) {
+        throw new UnsupportedOperationException("This adapter does not support generating features.");
+    }
+
     //FAWE start
     default BlockMaterial getMaterial(BlockType blockType) {
         return getMaterial(blockType.getDefaultState());
@@ -289,13 +398,29 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
         return null;
     }
 
-    @Deprecated
-    default Tag toNative(T foreign) {
-        return AdventureNBTConverter.fromAdventure(toNativeBinary(foreign));
+    /**
+     * Returns an iterable of all blocks in their default state as string representations known to the server.
+     *
+     * @return an iterable containing the default state strings of all valid blocks
+     */
+    default Collection<String> getRegisteredDefaultBlockStates() {
+        ArrayList<String> blocks = new ArrayList<>();
+        for (Material m : Material.values()) {
+            if (!m.isLegacy() && m.isBlock()) {
+                BlockData blockData = m.createBlockData();
+                blocks.add(blockData.getAsString());
+            }
+        }
+        return blocks;
     }
 
-    default BinaryTag toNativeBinary(T foreign) {
-        return toNative(foreign).asBinaryTag();
+    @Deprecated
+    default Tag toNative(T foreign) {
+        return LinBusConverter.toJnbtTag(toNativeLin(foreign));
+    }
+
+    default LinTag<?> toNativeLin(T foreign) {
+        return toNative(foreign).toLinTag();
     }
 
     @Deprecated
@@ -303,14 +428,14 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
         if (foreign == null) {
             return null;
         }
-        return fromNativeBinary(foreign.asBinaryTag());
+        return fromNativeLin(foreign.toLinTag());
     }
 
-    default T fromNativeBinary(BinaryTag foreign) {
+    default T fromNativeLin(LinTag<?> foreign) {
         if (foreign == null) {
             return null;
         }
-        return fromNative(AdventureNBTConverter.fromAdventure(foreign));
+        return fromNative(LinBusConverter.toJnbtTag(foreign));
     }
 
     @Nullable
@@ -359,6 +484,14 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
      * @since 2.1.0
      */
     default IBatchProcessor getTickingPostProcessor() {
+        return null;
+    }
+
+    /**
+     * Returns an {@link PlacementStateProcessor} instance for processing placed blocks to "fix" them.
+     * @since 2.12.3
+     */
+    default PlacementStateProcessor getPlatformPlacementProcessor(Extent extent, BlockTypeMask mask, Region region) {
         return null;
     }
     //FAWE end

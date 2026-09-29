@@ -22,7 +22,7 @@ public class AngleMaskParser extends RichParser<Mask> {
     }
 
     @Override
-    protected Stream<String> getSuggestions(String argumentInput, int index) {
+    protected Stream<String> getSuggestions(String argumentInput, int index, ParserContext context) {
         if (index == 0 || index == 1) {
             return SuggestionHelper.suggestPositiveDoubles(argumentInput).flatMap(s -> Stream.of(s, s + "d"));
         } else if (index > 1 && index <= 1 + flags.length) {

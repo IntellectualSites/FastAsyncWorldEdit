@@ -24,15 +24,15 @@ public class NoXPattern extends AbstractPattern {
 
     @Override
     public BaseBlock applyBlock(BlockVector3 pos) {
-        mutable.mutY(pos.getY());
-        mutable.mutZ(pos.getZ());
+        mutable.mutY(pos.y());
+        mutable.mutZ(pos.z());
         return pattern.applyBlock(mutable);
     }
 
     @Override
     public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
-        mutable.mutY(get.getY());
-        mutable.mutZ(get.getZ());
+        mutable.mutY(get.y());
+        mutable.mutZ(get.z());
         return pattern.apply(extent, mutable, set);
     }
 

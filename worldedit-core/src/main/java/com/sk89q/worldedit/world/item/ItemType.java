@@ -39,22 +39,24 @@ import javax.annotation.Nullable;
 public class ItemType implements RegistryItem, Keyed {
 //FAWE end
 
-    public static final NamespacedRegistry<ItemType> REGISTRY = new NamespacedRegistry<>("item type", true);
+    public static final NamespacedRegistry<ItemType> REGISTRY = new NamespacedRegistry<>("item type", "item_type", "minecraft", true);
 
     private final String id;
-    @SuppressWarnings("deprecation")
+    @SuppressWarnings({"deprecation", "this-escape"})
     private transient final LazyReference<String> name = LazyReference.from(() -> {
         String name = GuavaUtil.firstNonNull(
                 WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS)
                         .getRegistries().getItemRegistry().getName(this),
                 ""
         );
-        return name.isEmpty() ? getId() : name;
+        return name.isEmpty() ? id() : name;
     });
+    @SuppressWarnings("this-escape")
     private transient final LazyReference<Component> richName = LazyReference.from(() ->
             WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS)
                     .getRegistries().getItemRegistry().getRichName(this)
     );
+    @SuppressWarnings("this-escape")
     private transient final LazyReference<ItemMaterial> itemMaterial = LazyReference.from(() ->
             WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS)
                     .getRegistries().getItemRegistry().getMaterial(this)
@@ -74,7 +76,7 @@ public class ItemType implements RegistryItem, Keyed {
     }
 
     @Override
-    public String getId() {
+    public String id() {
         return this.id;
     }
 
@@ -151,7 +153,7 @@ public class ItemType implements RegistryItem, Keyed {
 
     @Override
     public String toString() {
-        return getId();
+        return id();
     }
 
     @Override

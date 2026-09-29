@@ -12,9 +12,9 @@ public class FallingSphere implements Brush {
     @Override
     public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws
             MaxChangedBlocksException {
-        int px = position.getBlockX();
-        int py = position.getBlockY();
-        int pz = position.getBlockZ();
+        int px = position.x();
+        int py = position.y();
+        int pz = position.z();
         int maxY = editSession.getMaxY();
         int minY = editSession.getMinY();
 

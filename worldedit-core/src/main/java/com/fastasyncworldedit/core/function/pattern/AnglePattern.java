@@ -31,9 +31,9 @@ public abstract class AnglePattern extends AbstractPattern {
     }
 
     public <T extends BlockStateHolder<T>> int getSlope(T block, BlockVector3 vector, Extent extent) {
-        int x = vector.getBlockX();
-        int y = vector.getBlockY();
-        int z = vector.getBlockZ();
+        int x = vector.x();
+        int y = vector.y();
+        int z = vector.z();
         if (!block.getBlockType().getMaterial().isMovementBlocker()) {
             return -1;
         }

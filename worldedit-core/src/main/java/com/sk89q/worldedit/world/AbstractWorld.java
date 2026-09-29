@@ -120,7 +120,7 @@ public abstract class AbstractWorld implements World {
             taskId = server.schedule(0, 1, () -> {
                 //FAWE start - access to PriorityQueue is not thread-safe
                 synchronized (effectQueue) {
-                    int max = Math.max(1, Math.min(30, effectQueue.size() / 3));
+                    int max = Math.clamp(effectQueue.size() / 3, 1, 30);
                     for (int i = 0; i < max; ++i) {
                         if (effectQueue.isEmpty()) {
                             return;

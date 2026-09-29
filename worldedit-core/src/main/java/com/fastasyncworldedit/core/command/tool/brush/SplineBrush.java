@@ -130,9 +130,9 @@ public class SplineBrush implements Brush, ResettableTool {
     private Vector3 getCentroid(Collection<BlockVector3> points) {
         MutableVector3 sum = new MutableVector3();
         for (BlockVector3 p : points) {
-            sum.mutX(sum.getX() + p.getX());
-            sum.mutY(sum.getY() + p.getY());
-            sum.mutZ(sum.getZ() + p.getZ());
+            sum.mutX(sum.x() + p.x());
+            sum.mutY(sum.y() + p.y());
+            sum.mutZ(sum.z() + p.z());
         }
         return sum.multiply(1.0 / points.size());
     }

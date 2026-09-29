@@ -19,9 +19,9 @@ public class AdjacentMaskParser extends RichParser<Mask> {
     }
 
     @Override
-    protected Stream<String> getSuggestions(String argumentInput, int index) {
+    protected Stream<String> getSuggestions(String argumentInput, int index, ParserContext context) {
         if (index == 0) {
-            return worldEdit.getMaskFactory().getSuggestions(argumentInput).stream();
+            return worldEdit.getMaskFactory().getSuggestions(argumentInput, context).stream();
         } else if (index == 1 || index == 2) {
             return SuggestionHelper.suggestPositiveDoubles(argumentInput);
         }

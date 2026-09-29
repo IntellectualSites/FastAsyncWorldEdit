@@ -20,7 +20,7 @@ public class SimplexMaskParser extends RichParser<Mask> {
     }
 
     @Override
-    protected Stream<String> getSuggestions(String argumentInput, int index) {
+    protected Stream<String> getSuggestions(String argumentInput, int index, ParserContext context) {
         if (index < 3) {
             return SuggestionHelper.suggestPositiveDoubles(argumentInput);
         }

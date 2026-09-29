@@ -19,11 +19,11 @@
 
 package com.sk89q.worldedit.world;
 
+import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.implementation.blocks.NullChunkGet;
 import com.fastasyncworldedit.core.queue.implementation.packet.ChunkPacket;
 import com.google.common.collect.ImmutableSet;
-import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEditException;
@@ -38,7 +38,6 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.SideEffect;
 import com.sk89q.worldedit.util.SideEffectSet;
-import com.sk89q.worldedit.util.TreeGenerator.TreeType;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BaseBlock;
@@ -78,7 +77,7 @@ public class NullWorld extends AbstractWorld {
     //FAWE end
 
     @Override
-    public String getId() {
+    public String id() {
         return "null";
     }
 
@@ -143,7 +142,7 @@ public class NullWorld extends AbstractWorld {
     }
 
     @Override
-    public boolean generateTree(TreeType type, EditSession editSession, BlockVector3 position) throws MaxChangedBlocksException {
+    public boolean generateTree(com.sk89q.worldedit.world.generation.TreeType type, EditSession editSession, BlockVector3 position) throws MaxChangedBlocksException {
         return false;
     }
 
@@ -184,7 +183,7 @@ public class NullWorld extends AbstractWorld {
 
     @Override
     public BlockState getBlock(BlockVector3 position) {
-        return this.getBlock(position.getBlockX(), position.getBlockY(), position.getBlockZ());
+        return this.getBlock(position.x(), position.y(), position.z());
     }
 
     @Override
@@ -204,7 +203,7 @@ public class NullWorld extends AbstractWorld {
 
     //FAWE start
     @Override
-    public boolean setTile(int x, int y, int z, CompoundTag tile) throws WorldEditException {
+    public boolean tile(int x, int y, int z, FaweCompoundTag tile) throws WorldEditException {
         return false;
     }
     //FAWE end

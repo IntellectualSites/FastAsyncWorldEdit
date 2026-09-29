@@ -2,15 +2,23 @@ package com.fastasyncworldedit.core.queue;
 
 import com.fastasyncworldedit.core.extent.filter.block.ChunkFilterBlock;
 import com.fastasyncworldedit.core.extent.processor.IBatchProcessorHolder;
+import com.fastasyncworldedit.core.internal.simd.SimdSupport;
+import com.fastasyncworldedit.core.internal.simd.VectorizedCharFilterBlock;
+import com.fastasyncworldedit.core.internal.simd.VectorizedFilter;
+import com.fastasyncworldedit.core.queue.implementation.chunk.ChunkHolder;
+import com.fastasyncworldedit.core.queue.implementation.chunk.WrapperChunk;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.util.SideEffectSet;
+import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nullable;
 import java.io.Flushable;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
 /**
@@ -58,7 +66,7 @@ public interface IQueueExtent<T extends IChunk> extends Flushable, Trimable, ICh
     IChunkSet getCachedSet(int chunkX, int chunkZ);
 
     /**
-     * Submit the chunk so that it's changes are applied to the world
+     * Submit the chunk so that its changes are applied to the world
      *
      * @return Future
      */
@@ -77,6 +85,26 @@ public interface IQueueExtent<T extends IChunk> extends Flushable, Trimable, ICh
     void setFastMode(boolean fastMode);
 
     boolean isFastMode();
+
+    /**
+     * Set the side effects to be used with this extent
+     *
+     * @since 2.12.3
+     */
+    void setSideEffectSet(SideEffectSet sideEffectSet);
+
+    /**
+     * Get the side effects to be used with this extent
+     *
+     * @since 2.12.3
+     */
+    SideEffectSet getSideEffectSet();
+
+    /**
+     * Submit a task to the extent to be queued as if it were a chunk
+     */
+    @ApiStatus.Internal
+    <V extends Future<V>> V submitTaskUnchecked(Callable<V> callable);
 
     /**
      * Create a new root IChunk object. Full chunks will be reused, so a more optimized chunk can be
@@ -115,7 +143,7 @@ public interface IQueueExtent<T extends IChunk> extends Flushable, Trimable, ICh
      * A filter block is used to iterate over blocks / positions. Essentially combines BlockVector3,
      * Extent and BlockState functions in a way that avoids lookups.
      */
-    ChunkFilterBlock initFilterBlock();
+    ChunkFilterBlock createFilterBlock();
 
     /**
      * Returns the number of chunks in this queue.
@@ -129,30 +157,59 @@ public interface IQueueExtent<T extends IChunk> extends Flushable, Trimable, ICh
      */
     boolean isEmpty();
 
-    default ChunkFilterBlock apply(ChunkFilterBlock block, Filter filter, Region region, int chunkX, int chunkZ, boolean full) {
-        if (!filter.appliesChunk(chunkX, chunkZ)) {
-            return block;
+    default ChunkFilterBlock apply(
+            @Nullable ChunkFilterBlock block,
+            Filter filter,
+            Region region,
+            int chunkX,
+            int chunkZ,
+            boolean full
+    ) {
+//        if (!filter.appliesChunk(chunkX, chunkZ)) {
+//            return block;
+//        }
+        T initial = this.getOrCreateChunk(chunkX, chunkZ);
+        WrapperChunk<T> chunk = new WrapperChunk<>(initial, () -> this.getOrCreateChunk(chunkX, chunkZ));
+        if (initial instanceof ChunkHolder<?> holder) {
+            holder.setWrapper(chunk);
         }
-        T chunk = this.getOrCreateChunk(chunkX, chunkZ);
 
-        T newChunk = filter.applyChunk(chunk, region);
-        if (newChunk != null) {
-            chunk = newChunk;
-            if (block == null) {
-                block = this.initFilterBlock();
+        IChunk newChunk = filter.applyChunk(chunk, region);
+        if (newChunk == chunk) {
+            newChunk = chunk.get();
+        } else {
+            T c = (T) newChunk;
+            chunk.setWrapped(c);
+            // The IDE lies, it is possible for it to be a ChunkHolder because we're a little loose with our generic types...
+            if (c instanceof ChunkHolder<?> holder) {
+                holder.setWrapper(chunk);
             }
+        }
+        if (newChunk != null) {
+            if (block == null) {
+                if (SimdSupport.useVectorApi() && filter instanceof VectorizedFilter) {
+                    block = new VectorizedCharFilterBlock(this);
+                } else {
+                    block = this.createFilterBlock();
+                }
+            }
+            block.initChunk(chunkX, chunkZ);
             chunk.filterBlocks(filter, block, region, full);
         }
-        this.submit(chunk);
+        // If null, then assume it has already been submitted and the WrapperChunk has therefore been invalidated
+        T toSubmit = chunk.get();
+        if (toSubmit != null) {
+            this.submit(toSubmit);
+        }
         return block;
     }
 
     @Override
-    default <T extends Filter> T apply(Region region, T filter, boolean full) {
+    default <U extends Filter> U apply(Region region, U filter, boolean full) {
         final Set<BlockVector2> chunks = region.getChunks();
         ChunkFilterBlock block = null;
         for (BlockVector2 chunk : chunks) {
-            block = apply(block, filter, region, chunk.getX(), chunk.getZ(), full);
+            block = apply(block, filter, region, chunk.x(), chunk.z(), full);
         }
         flush();
         return filter;

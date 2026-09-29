@@ -31,18 +31,18 @@ public abstract class AbstractFilterBlock extends FilterBlock {
     public abstract Extent getExtent();
 
     @Override
-    public int getX() {
-        return getPosition().getX();
+    public int x() {
+        return getPosition().x();
     }
 
     @Override
-    public int getY() {
-        return getPosition().getY();
+    public int y() {
+        return getPosition().y();
     }
 
     @Override
-    public int getZ() {
-        return getPosition().getZ();
+    public int z() {
+        return getPosition().z();
     }
 
     @Override
@@ -72,12 +72,12 @@ public abstract class AbstractFilterBlock extends FilterBlock {
 
     @Override
     public BlockVector3 getMinimumPoint() {
-        return at(getX(), getY(), getZ());
+        return at(x(), y(), z());
     }
 
     @Override
     public BlockVector3 getMaximumPoint() {
-        return at(getX(), getY(), getZ());
+        return at(x(), y(), z());
     }
 
     @Override
@@ -88,7 +88,7 @@ public abstract class AbstractFilterBlock extends FilterBlock {
     @Override
     public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block)
             throws WorldEditException {
-        if (x == this.getX() && y == this.getY() && z == this.getZ()) {
+        if (x == this.x() && y == this.y() && z == this.z()) {
             setFullBlock(block.toBaseBlock());
             return true;
         }
@@ -97,7 +97,7 @@ public abstract class AbstractFilterBlock extends FilterBlock {
 
     @Override
     public boolean setBiome(int x, int y, int z, BiomeType biome) {
-        if (x == this.getX() && y == this.getY() && z == this.getZ()) {
+        if (x == this.x() && y == this.y() && z == this.z()) {
             setBiome(biome);
             return true;
         }

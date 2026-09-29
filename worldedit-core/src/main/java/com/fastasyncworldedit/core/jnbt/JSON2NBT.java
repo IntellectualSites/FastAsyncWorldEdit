@@ -17,7 +17,6 @@ import com.sk89q.jnbt.Tag;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Stack;
 import java.util.regex.Pattern;
 
@@ -409,7 +408,7 @@ public class JSON2NBT {
         }
 
         public Tag parse() throws NBTException {
-            HashMap<String, Tag> map = new HashMap<>();
+            HashMap<String, Tag<?, ?>> map = new HashMap<>();
 
             for (Any JSON2NBT$any : this.tagList) {
                 map.put(JSON2NBT$any.json, JSON2NBT$any.parse());

@@ -52,10 +52,10 @@ import org.bukkit.inventory.ItemStack;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -83,6 +83,7 @@ public enum BukkitAdapter {
 
     static {
         TO_BLOCK_CONTEXT.setRestricted(false);
+        TO_BLOCK_CONTEXT.setTryLegacy(false);
     }
 
     /**
@@ -240,7 +241,7 @@ public enum BukkitAdapter {
         Vector3 position = location;
         return new org.bukkit.Location(
                 adapt((World) location.getExtent()),
-                position.getX(), position.getY(), position.getZ(),
+                position.x(), position.y(), position.z(),
                 location.getYaw(),
                 location.getPitch()
         );
@@ -258,7 +259,7 @@ public enum BukkitAdapter {
         checkNotNull(position);
         return new org.bukkit.Location(
                 world,
-                position.getX(), position.getY(), position.getZ()
+                position.x(), position.y(), position.z()
         );
     }
 
@@ -274,7 +275,7 @@ public enum BukkitAdapter {
         checkNotNull(position);
         return new org.bukkit.Location(
                 world,
-                position.getX(), position.getY(), position.getZ()
+                position.x(), position.y(), position.z()
         );
     }
 
@@ -290,7 +291,7 @@ public enum BukkitAdapter {
         checkNotNull(location);
         return new org.bukkit.Location(
                 world,
-                location.getX(), location.getY(), location.getZ(),
+                location.x(), location.y(), location.z(),
                 location.getYaw(),
                 location.getPitch()
         );
@@ -366,6 +367,9 @@ public enum BukkitAdapter {
         //FAWE end
     }
 
+    private static final Map<Biome, BiomeType> biomeBiomeTypeCache = new ConcurrentHashMap<>();
+    private static final Map<BiomeType, Biome> biomeTypeBiomeCache = new ConcurrentHashMap<>();
+
     /**
      * Create a WorldEdit BiomeType from a Bukkit one.
      *
@@ -402,8 +406,8 @@ public enum BukkitAdapter {
         //FAWE end
     }
 
-    private static final EnumMap<Material, BlockType> materialBlockTypeCache = new EnumMap<>(Material.class);
-    private static final EnumMap<Material, ItemType> materialItemTypeCache = new EnumMap<>(Material.class);
+    private static final Map<Material, BlockType> materialBlockTypeCache = new ConcurrentHashMap<>();
+    private static final Map<Material, ItemType> materialItemTypeCache = new ConcurrentHashMap<>();
 
     /**
      * Converts a Material to a BlockType.

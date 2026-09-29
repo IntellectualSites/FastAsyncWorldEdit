@@ -50,9 +50,9 @@ public interface ClipboardWriter extends Closeable {
     //FAWE start
     default Tag writeVector(Vector3 vector) {
         List<DoubleTag> list = new ArrayList<>();
-        list.add(new DoubleTag(vector.getX()));
-        list.add(new DoubleTag(vector.getY()));
-        list.add(new DoubleTag(vector.getZ()));
+        list.add(new DoubleTag(vector.x()));
+        list.add(new DoubleTag(vector.y()));
+        list.add(new DoubleTag(vector.z()));
         return new ListTag(DoubleTag.class, list);
     }
 

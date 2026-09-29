@@ -23,6 +23,7 @@ import com.fastasyncworldedit.core.configuration.Caption;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.factory.MaskFactory;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Capability;
@@ -215,6 +216,20 @@ public class ParserContext {
             throw new InputParseException(Caption.of("worldedit.error.missing-actor"));
         }
         return actor;
+    }
+
+    /**
+     * Get the {@link Player} set on this context.
+     *
+     * @return a player
+     * @throws InputParseException thrown if no {@link Actor} is set
+     */
+    public Player requirePlayer() throws InputParseException {
+        Actor actor = getActor();
+        if (!(actor instanceof Player player)) {
+            throw new InputParseException(Caption.of("worldedit.error.missing-player"));
+        }
+        return player;
     }
 
     /**

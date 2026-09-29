@@ -23,9 +23,9 @@ public class WallMask extends AbstractMask {
     public boolean test(BlockVector3 bv) {
         vector.setComponents(bv);
         int count = 0;
-        double x = vector.getX();
-        double y = vector.getY();
-        double z = vector.getZ();
+        double x = vector.x();
+        double y = vector.y();
+        double z = vector.z();
         vector.mutX(x + 1);
         if (mask.test(vector) && ++count == min && max >= 8) {
             vector.mutX(x);

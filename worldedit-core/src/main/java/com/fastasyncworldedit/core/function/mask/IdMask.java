@@ -24,7 +24,9 @@ public class IdMask extends AbstractExtentMask implements ResettableMask {
 
     @Override
     public boolean test(BlockVector3 vector) {
-        return test(getExtent(), vector);
+        int blockID = vector.getBlock(getExtent()).getInternalBlockTypeId();
+        int testId = id.compareAndExchange(-1, blockID);
+        return blockID == testId || testId == -1;
     }
 
     @Override

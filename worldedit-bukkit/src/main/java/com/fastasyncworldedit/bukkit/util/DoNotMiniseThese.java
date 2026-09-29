@@ -1,6 +1,8 @@
 package com.fastasyncworldedit.bukkit.util;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.io.FastBufferedInputStream;
+import it.unimi.dsi.fastutil.io.FastBufferedOutputStream;
 import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.longs.LongArraySet;
 import it.unimi.dsi.fastutil.longs.LongIterator;
@@ -19,5 +21,7 @@ final class DoNotMiniseThese {
     private final LongSet d = null;
     private final Int2ObjectMap<?> e = null;
     private final Object2ObjectArrayMap<?, ?> f = null;
+    private final FastBufferedInputStream g = null;
+    private final FastBufferedOutputStream h = null;
 
 }

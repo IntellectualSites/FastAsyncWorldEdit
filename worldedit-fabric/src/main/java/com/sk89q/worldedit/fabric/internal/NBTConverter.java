@@ -126,7 +126,7 @@ public final class NBTConverter {
 
     public static net.minecraft.nbt.CompoundTag toNative(CompoundTag tag) {
         net.minecraft.nbt.CompoundTag compound = new net.minecraft.nbt.CompoundTag();
-        for (Entry<String, Tag> child : tag.getValue().entrySet()) {
+        for (Entry<String, Tag<?, ?>> child : tag.getValue().entrySet()) {
             compound.put(child.getKey(), toNative(child.getValue()));
         }
         return compound;
@@ -230,7 +230,7 @@ public final class NBTConverter {
 
     public static CompoundTag fromNative(net.minecraft.nbt.CompoundTag other) {
         Set<String> tags = other.getKeys();
-        Map<String, Tag> map = new HashMap<>();
+        Map<String, Tag<?, ?>> map = new HashMap<>();
         for (String tagName : tags) {
             map.put(tagName, fromNative(other.getTag(tagName)));
         }

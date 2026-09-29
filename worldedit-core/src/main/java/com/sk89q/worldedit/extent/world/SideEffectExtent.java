@@ -88,7 +88,7 @@ public class SideEffectExtent extends AbstractDelegateExtent {
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 location, B block) throws WorldEditException {
         if (sideEffectSet.getState(SideEffect.LIGHTING) == SideEffect.State.DELAYED) {
-            dirtyChunks.add(BlockVector2.at(location.getBlockX() >> 4, location.getBlockZ() >> 4));
+            dirtyChunks.add(BlockVector2.at(location.x() >> 4, location.z() >> 4));
         }
         if (postEditSimulation) {
             positions.put(location, world.getBlock(location));

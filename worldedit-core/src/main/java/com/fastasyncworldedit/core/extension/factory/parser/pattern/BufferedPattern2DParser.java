@@ -26,9 +26,9 @@ public class BufferedPattern2DParser extends RichParser<Pattern> {
     }
 
     @Override
-    protected Stream<String> getSuggestions(String argumentInput, int index) {
+    protected Stream<String> getSuggestions(String argumentInput, int index, ParserContext context) {
         if (index == 0) {
-            return this.worldEdit.getPatternFactory().getSuggestions(argumentInput).stream();
+            return this.worldEdit.getPatternFactory().getSuggestions(argumentInput, context).stream();
         }
         return Stream.empty();
     }

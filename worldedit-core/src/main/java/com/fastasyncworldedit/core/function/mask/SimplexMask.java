@@ -19,7 +19,7 @@ public class SimplexMask extends AbstractMask {
 
     @Override
     public boolean test(BlockVector3 vector) {
-        double value = SimplexNoise.noise(vector.getBlockX() * scale, vector.getBlockY() * scale, vector.getBlockZ() * scale);
+        double value = SimplexNoise.noise(vector.x() * scale, vector.y() * scale, vector.z() * scale);
         return value >= min && value <= max;
     }
 

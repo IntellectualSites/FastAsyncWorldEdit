@@ -65,7 +65,7 @@ public class LocationTest {
     public void testGetX() throws Exception {
         World world = mock(World.class);
         Location location = new Location(world, Vector3.at(TEST_VALUE, 0, 0));
-        assertEquals(TEST_VALUE, location.getX(), EPSILON);
+        assertEquals(TEST_VALUE, location.x(), EPSILON);
     }
 
     @Test
@@ -80,17 +80,17 @@ public class LocationTest {
         World world = mock(World.class);
         Location location1 = new Location(world, Vector3.ZERO);
         Location location2 = location1.setX(TEST_VALUE);
-        assertEquals(0, location1.getX(), EPSILON);
-        assertEquals(TEST_VALUE, location2.getX(), EPSILON);
-        assertEquals(0, location2.getY(), EPSILON);
-        assertEquals(0, location2.getZ(), EPSILON);
+        assertEquals(0, location1.x(), EPSILON);
+        assertEquals(TEST_VALUE, location2.x(), EPSILON);
+        assertEquals(0, location2.y(), EPSILON);
+        assertEquals(0, location2.z(), EPSILON);
     }
 
     @Test
     public void testGetY() throws Exception {
         World world = mock(World.class);
         Location location = new Location(world, Vector3.at(0, TEST_VALUE, 0));
-        assertEquals(TEST_VALUE, location.getY(), EPSILON);
+        assertEquals(TEST_VALUE, location.y(), EPSILON);
     }
 
     @Test
@@ -105,17 +105,17 @@ public class LocationTest {
         World world = mock(World.class);
         Location location1 = new Location(world, Vector3.ZERO);
         Location location2 = location1.setY(TEST_VALUE);
-        assertEquals(0, location1.getY(), EPSILON);
-        assertEquals(0, location2.getX(), EPSILON);
-        assertEquals(TEST_VALUE, location2.getY(), EPSILON);
-        assertEquals(0, location2.getZ(), EPSILON);
+        assertEquals(0, location1.y(), EPSILON);
+        assertEquals(0, location2.x(), EPSILON);
+        assertEquals(TEST_VALUE, location2.y(), EPSILON);
+        assertEquals(0, location2.z(), EPSILON);
     }
 
     @Test
     public void testGetZ() throws Exception {
         World world = mock(World.class);
         Location location = new Location(world, Vector3.at(0, 0, TEST_VALUE));
-        assertEquals(TEST_VALUE, location.getZ(), EPSILON);
+        assertEquals(TEST_VALUE, location.z(), EPSILON);
     }
 
     @Test
@@ -130,10 +130,10 @@ public class LocationTest {
         World world = mock(World.class);
         Location location1 = new Location(world, Vector3.ZERO);
         Location location2 = location1.setZ(TEST_VALUE);
-        assertEquals(0, location1.getZ(), EPSILON);
-        assertEquals(0, location2.getX(), EPSILON);
-        assertEquals(0, location2.getY(), EPSILON);
-        assertEquals(TEST_VALUE, location2.getZ(), EPSILON);
+        assertEquals(0, location1.z(), EPSILON);
+        assertEquals(0, location2.x(), EPSILON);
+        assertEquals(0, location2.y(), EPSILON);
+        assertEquals(TEST_VALUE, location2.z(), EPSILON);
     }
 
     @RepeatedTest(value = 5)
@@ -141,7 +141,7 @@ public class LocationTest {
         World world = mock(World.class);
         long start = System.currentTimeMillis();
         BlockVector3 location1 = BlockVector3.ZERO;
-        BlockVector3.at(location1.getX() + 10, location1.getY() + 10, location1.getZ() + 10);
+        BlockVector3.at(location1.x() + 10, location1.y() + 10, location1.z() + 10);
         System.out.println(System.currentTimeMillis() - start + " ms");
     }
 

@@ -22,19 +22,15 @@ package com.sk89q.worldedit.entity;
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.configuration.Settings;
-import com.fastasyncworldedit.core.extent.clipboard.DiskOptimizedClipboard;
 import com.fastasyncworldedit.core.internal.exception.FaweClipboardVersionMismatchException;
 import com.fastasyncworldedit.core.regions.FaweMaskManager;
 import com.fastasyncworldedit.core.util.MainUtil;
-import com.sk89q.worldedit.EmptyClipboardException;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.extension.platform.Actor;
-import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
-import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.internal.util.DeprecationUtil;
@@ -43,7 +39,6 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.RegionSelector;
-import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.util.Location;
@@ -339,13 +334,24 @@ public interface Player extends Entity, Actor {
      * Sends a fake block to the client.
      *
      * <p>
-     * This block isn't real.
+     * This change is client-side only and will not actually change the world in any way.
      * </p>
      *
      * @param pos   The position of the block
      * @param block The block to send, null to reset
      */
     <B extends BlockStateHolder<B>> void sendFakeBlock(BlockVector3 pos, @Nullable B block);
+
+    /**
+     * Make the client think it has operator status.
+     *
+     * <p>
+     * This change is client-side only and will not actually grant the player operator status.
+     * </p>
+     *
+     * @since 2.15.4
+     */
+    void sendFakeOP();
 
     //FAWE start
     /**
@@ -428,11 +434,12 @@ public interface Player extends Entity, Actor {
         if (Settings.settings().CLIPBOARD.USE_DISK && Settings.settings().CLIPBOARD.DELETE_ON_LOGOUT) {
             session.deleteClipboardOnDisk();
         } else if (Settings.settings().CLIPBOARD.USE_DISK) {
-            Fawe.instance().getClipboardExecutor().submit(getUniqueId(), () -> session.setClipboard(null));
+            Fawe.instance().submitUUIDKeyQueuedTask(getUniqueId(), () -> session.setClipboard(null));
         } else if (Settings.settings().CLIPBOARD.DELETE_ON_LOGOUT) {
             session.setClipboard(null);
         }
-        if (Settings.settings().HISTORY.DELETE_ON_LOGOUT) {
+        if (!Settings.settings().HISTORY.USE_DISK && Settings.settings().HISTORY.DELETE_ON_LOGOUT
+                || Settings.settings().HISTORY.USE_DISK && Settings.settings().HISTORY.DELETE_DISK_ON_LOGOUT) {
             session.clearHistory();
         }
     }
@@ -440,32 +447,8 @@ public interface Player extends Entity, Actor {
     void sendTitle(Component title, Component sub);
 
     /**
-     * Loads any history items from disk: - Should already be called if history on disk is enabled.
+     * Loads clipboard file from disk if it exists
      */
-    default void loadClipboardFromDisk() {
-        File file = MainUtil.getFile(
-                Fawe.platform().getDirectory(),
-                Settings.settings().PATHS.CLIPBOARD + File.separator + getUniqueId() + ".bd"
-        );
-        try {
-            getSession().loadClipboardFromDisk(file);
-        } catch (FaweClipboardVersionMismatchException e) {
-            print(e.getComponent());
-        } catch (RuntimeException e) {
-            print(Caption.of("fawe.error.clipboard.invalid"));
-            e.printStackTrace();
-            print(Caption.of("fawe.error.stacktrace"));
-            print(Caption.of("fawe.error.clipboard.load.failure"));
-            print(Caption.of("fawe.error.clipboard.invalid.info", file.getName(), file.length()));
-            print(Caption.of("fawe.error.stacktrace"));
-        } catch (Exception e) {
-            print(Caption.of("fawe.error.clipboard.invalid"));
-            e.printStackTrace();
-            print(Caption.of("fawe.error.stacktrace"));
-            print(Caption.of("fawe.error.no-failure"));
-            print(Caption.of("fawe.error.clipboard.invalid.info", file.getName(), file.length()));
-            print(Caption.of("fawe.error.stacktrace"));
-        }
-    }
+    void loadClipboardFromDisk();
     //FAWE end
 }

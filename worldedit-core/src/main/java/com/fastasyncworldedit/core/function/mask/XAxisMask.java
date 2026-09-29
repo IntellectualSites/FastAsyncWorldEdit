@@ -16,9 +16,9 @@ public class XAxisMask extends AbstractMask implements ResettableMask {
     @Override
     public boolean test(BlockVector3 vector) {
         if (layer == -1) {
-            layer = vector.getBlockX();
+            layer = vector.x();
         }
-        return vector.getBlockX() == layer;
+        return vector.x() == layer;
     }
 
     @Override

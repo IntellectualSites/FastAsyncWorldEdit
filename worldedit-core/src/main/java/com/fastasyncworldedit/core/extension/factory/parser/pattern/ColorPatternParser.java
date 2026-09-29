@@ -26,7 +26,7 @@ public class ColorPatternParser extends RichParser<Pattern> {
     }
 
     @Override
-    public Stream<String> getSuggestions(String argumentInput, int index) {
+    public Stream<String> getSuggestions(String argumentInput, int index, ParserContext context) {
         if (index > 4) {
             return Stream.empty();
         }
@@ -42,10 +42,10 @@ public class ColorPatternParser extends RichParser<Pattern> {
             ));
         }
         Color color = new Color(
-                MathMan.clamp(Integer.parseInt(input[0]), 0, 255),
-                MathMan.clamp(Integer.parseInt(input[1]), 0, 255),
-                MathMan.clamp(Integer.parseInt(input[2]), 0, 255),
-                MathMan.clamp(Integer.parseInt(input[3]), 0, 255)
+                Math.clamp(Integer.parseInt(input[0]), 0, 255),
+                Math.clamp(Integer.parseInt(input[1]), 0, 255),
+                Math.clamp(Integer.parseInt(input[2]), 0, 255),
+                Math.clamp(Integer.parseInt(input[3]), 0, 255)
         );
         return context.requireSession().getTextureUtil().getNearestBlock(color.getRGB());
     }

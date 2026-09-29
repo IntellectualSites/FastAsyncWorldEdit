@@ -1,6 +1,7 @@
 package com.fastasyncworldedit.core.history.changeset;
 
 import com.fastasyncworldedit.core.configuration.Settings;
+import com.fastasyncworldedit.core.history.change.ChangePopulator;
 import com.fastasyncworldedit.core.history.change.MutableBiomeChange;
 import com.fastasyncworldedit.core.history.change.MutableBlockChange;
 import com.fastasyncworldedit.core.history.change.MutableEntityChange;
@@ -10,6 +11,7 @@ import com.fastasyncworldedit.core.history.change.BlockPositionChange;
 import com.fastasyncworldedit.core.internal.exception.FaweSmallEditUnsupportedException;
 import com.fastasyncworldedit.core.internal.io.FaweInputStream;
 import com.fastasyncworldedit.core.internal.io.FaweOutputStream;
+import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.fastasyncworldedit.core.util.MainUtil;
 import com.fastasyncworldedit.core.util.MathMan;
 import com.sk89q.jnbt.CompoundTag;
@@ -22,14 +24,25 @@ import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayDeque;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Queue;
+import java.util.concurrent.Exchanger;
+import java.util.function.BiConsumer;
 
 /**
  * FAWE stream ChangeSet offering support for extended-height worlds
@@ -38,10 +51,17 @@ import java.util.NoSuchElementException;
 public abstract class FaweStreamChangeSet extends AbstractChangeSet {
 
     public static final int HEADER_SIZE = 9;
-    private static final int version = 1;
+    private static final int VERSION = 2;
+    // equivalent to Short#MIN_VALUE three times stored with [(x) & 0xff, ((rx) >> 8) & 0xff]
+    private static final byte[] MAGIC_NEW_RELATIVE = new byte[]{0, (byte) 128, 0, (byte) 128, 0, (byte) 128};
     private int mode;
     private final int compression;
     private final int minY;
+
+    protected long blockSize;
+    private int originX;
+    private int originZ;
+    private int version;
 
     protected FaweStreamIdDelegate idDel;
     protected FaweStreamPositionDelegate posDel;
@@ -75,7 +95,11 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
 
         void write(OutputStream out, int x, int y, int z) throws IOException;
 
-        void read(FaweInputStream in, BlockPositionChange change) throws IOException;
+        int readX(FaweInputStream in) throws IOException;
+
+        int readY(FaweInputStream in) throws IOException;
+
+        int readZ(FaweInputStream in) throws IOException;
 
     }
 
@@ -163,11 +187,19 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
                 }
 
                 @Override
-                public void read(final FaweInputStream in, final BlockPositionChange change) throws IOException {
+                public int readX(FaweInputStream in) throws IOException {
                     in.readFully(buffer);
-                    change.x = lx = lx + ((((buffer[1] & 0xFF) | ((MathMan.unpair16x(buffer[3])) << 8)) << 20) >> 20);
-                    change.y = (ly = ly + buffer[0]) & 0xFF;
-                    change.z = lz = lz + ((((buffer[2] & 0xFF) | ((MathMan.unpair16y(buffer[3])) << 8)) << 20) >> 20);
+                    return lx = lx + ((((buffer[1] & 0xFF) | ((MathMan.unpair16x(buffer[3])) << 8)) << 20) >> 20);
+                }
+
+                @Override
+                public int readY(FaweInputStream in) {
+                    return (ly = ly + buffer[0]) & 0xFF;
+                }
+
+                @Override
+                public int readZ(FaweInputStream in) {
+                    return lz = lz + ((((buffer[2] & 0xFF) | ((MathMan.unpair16y(buffer[3])) << 8)) << 20) >> 20);
                 }
 
             };
@@ -183,6 +215,20 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
                     int rx = -lx + (lx = x);
                     int ry = -ly + (ly = y);
                     int rz = -lz + (lz = z);
+                    // Use LE/GE to ensure we don't accidentally write MAGIC_NEW_RELATIVE
+                    if (rx >= Short.MAX_VALUE || rz >= Short.MAX_VALUE || rx <= Short.MIN_VALUE || rz <= Short.MIN_VALUE) {
+                        stream.write(MAGIC_NEW_RELATIVE);
+                        stream.write((byte) (x >> 24));
+                        stream.write((byte) (x >> 16));
+                        stream.write((byte) (x >> 8));
+                        stream.write((byte) (x));
+                        stream.write((byte) (z >> 24));
+                        stream.write((byte) (z >> 16));
+                        stream.write((byte) (z >> 8));
+                        stream.write((byte) (z));
+                        rx = 0;
+                        rz = 0;
+                    }
                     stream.write((rx) & 0xff);
                     stream.write(((rx) >> 8) & 0xff);
                     stream.write((rz) & 0xff);
@@ -192,11 +238,25 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
                 }
 
                 @Override
-                public void read(final FaweInputStream in, final BlockPositionChange change) throws IOException {
-                    in.readFully(buffer);
-                    change.x = lx = lx + ((buffer[0] & 0xFF) | (buffer[1] << 8));
-                    change.z = lz = lz + ((buffer[2] & 0xFF) | (buffer[3]) << 8);
-                    change.y = ly = ly + ((buffer[4] & 0xFF) | (buffer[5]) << 8);
+                public int readX(FaweInputStream is) throws IOException {
+                    is.readFully(buffer);
+                    // Don't break reading version 1 history (just in case)
+                    if (version == 2 && Arrays.equals(buffer, MAGIC_NEW_RELATIVE)) {
+                        lx = ((is.read() << 24) + (is.read() << 16) + (is.read() << 8) + is.read());
+                        lz = ((is.read() << 24) + (is.read() << 16) + (is.read() << 8) + is.read());
+                        is.readFully(buffer);
+                    }
+                    return lx = lx + ((buffer[0] & 0xFF) | (buffer[1] << 8));
+                }
+
+                @Override
+                public int readY(FaweInputStream is) throws IOException {
+                    return ly = ly + ((buffer[4] & 0xFF) | (buffer[5]) << 8);
+                }
+
+                @Override
+                public int readZ(FaweInputStream is) throws IOException {
+                    return lz = lz + ((buffer[2] & 0xFF) | (buffer[3]) << 8);
                 }
             };
         }
@@ -205,7 +265,7 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
     public void writeHeader(OutputStream os, int x, int y, int z) throws IOException {
         os.write(mode);
         // Allows for version detection of history in case of changes to format.
-        os.write(version);
+        os.write(VERSION);
         setOrigin(x, z);
         os.write((byte) (x >> 24));
         os.write((byte) (x >> 16));
@@ -221,8 +281,8 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
     public void readHeader(InputStream is) throws IOException {
         // skip mode
         int mode = is.read();
-        int version = is.read();
-        if (version != FaweStreamChangeSet.version) {
+        version = is.read();
+        if (version != 1 && version != VERSION) { // version 1 is fine
             throw new UnsupportedOperationException(String.format("Version %s history not supported!", version));
         }
         // origin
@@ -249,10 +309,15 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
     }
 
     @Override
-    public int size() {
+    public long longSize() {
         // Flush so we can accurately get the size
         flush();
         return blockSize;
+    }
+
+    @Override
+    public int size() {
+        return (int) longSize();
     }
 
     public abstract int getCompressedSize();
@@ -286,11 +351,6 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
     public abstract NBTInputStream getTileCreateIS() throws IOException;
 
     public abstract NBTInputStream getTileRemoveIS() throws IOException;
-
-    protected int blockSize;
-
-    private int originX;
-    private int originZ;
 
     public void setOrigin(int x, int z) {
         originX = x;
@@ -336,7 +396,7 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
             os.write((byte) (z));
             // only need to store biomes in the 4x4x4 chunks so only need one byte for y still (signed byte -128 -> 127)
             //  means -512 -> 508. Add 128 to avoid negative value casting.
-            os.write((byte) (y + 32));
+            os.write((byte) (y + 128));
             os.writeVarInt(from.getInternalId());
             os.writeVarInt(to.getInternalId());
         } catch (IOException e) {
@@ -345,56 +405,44 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
     }
 
     @Override
-    public void addTileCreate(CompoundTag tag) {
-        if (tag == null) {
-            return;
-        }
+    public void addTileCreate(final FaweCompoundTag tag) {
         blockSize++;
         try {
             NBTOutputStream nbtos = getTileCreateOS();
-            nbtos.writeTag(tag);
+            nbtos.writeTag(new CompoundTag(tag.linTag()));
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     @Override
-    public void addTileRemove(CompoundTag tag) {
-        if (tag == null) {
-            return;
-        }
+    public void addTileRemove(final FaweCompoundTag tag) {
         blockSize++;
         try {
             NBTOutputStream nbtos = getTileRemoveOS();
-            nbtos.writeTag(tag);
+            nbtos.writeTag(new CompoundTag(tag.linTag()));
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     @Override
-    public void addEntityRemove(CompoundTag tag) {
-        if (tag == null) {
-            return;
-        }
+    public void addEntityRemove(final FaweCompoundTag tag) {
         blockSize++;
         try {
             NBTOutputStream nbtos = getEntityRemoveOS();
-            nbtos.writeTag(tag);
+            nbtos.writeTag(new CompoundTag(tag.linTag()));
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     @Override
-    public void addEntityCreate(CompoundTag tag) {
-        if (tag == null) {
-            return;
-        }
+    public void addEntityCreate(final FaweCompoundTag tag) {
         blockSize++;
         try {
             NBTOutputStream nbtos = getEntityCreateOS();
-            nbtos.writeTag(tag);
+            nbtos.writeTag(new CompoundTag(tag.linTag()));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -411,14 +459,13 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
 
             public MutableBlockChange read() {
                 try {
-                    posDel.read(is, change);
-                    change.x += originX;
-                    change.z += originZ;
+                    change.x = posDel.readX(is) + originX;
+                    change.y = posDel.readY(is);
+                    change.z = posDel.readZ(is) + originZ;
                     idDel.readCombined(is, change, dir);
                     return change;
                 } catch (EOFException ignored) {
                 } catch (Exception e) {
-                    e.printStackTrace();
                     e.printStackTrace();
                 }
                 try {
@@ -475,7 +522,6 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
                 } catch (EOFException ignored) {
                 } catch (Exception e) {
                     e.printStackTrace();
-                    e.printStackTrace();
                 }
                 try {
                     is.close();
@@ -521,21 +567,23 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
 
     public Iterator<MutableFullBlockChange> getFullBlockIterator(BlockBag blockBag, int inventory, final boolean dir) throws
             IOException {
-        final FaweInputStream is = new FaweInputStream(getBlockIS());
+        final FaweInputStream is = getBlockIS();
+        if (is == null) {
+            return Collections.emptyIterator();
+        }
         final MutableFullBlockChange change = new MutableFullBlockChange(blockBag, inventory, dir);
         return new Iterator<MutableFullBlockChange>() {
             private MutableFullBlockChange last = read();
 
             public MutableFullBlockChange read() {
                 try {
-                    posDel.read(is, change);
-                    change.x += originX;
-                    change.z += originZ;
+                    change.x = posDel.readX(is) + originX;
+                    change.y = posDel.readY(is);
+                    change.z = posDel.readZ(is) + originZ;
                     idDel.readCombined(is, change);
                     return change;
                 } catch (EOFException ignored) {
                 } catch (Exception e) {
-                    e.printStackTrace();
                     e.printStackTrace();
                 }
                 try {
@@ -667,6 +715,286 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
     }
 
     @Override
+    public ChangeExchangeCoordinator getCoordinatedChanges(BlockBag blockBag, int mode, boolean dir) {
+        try {
+            return coordinatedChanges(blockBag, mode, dir);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private ChangeExchangeCoordinator coordinatedChanges(final BlockBag blockBag, final int mode, boolean dir) throws IOException {
+        close();
+        var tileCreate = tileChangePopulator(getTileCreateIS(), true);
+        var tileRemove = tileChangePopulator(getTileRemoveIS(), false);
+
+        var entityCreate = entityChangePopulator(getEntityCreateIS(), true);
+        var entityRemove = entityChangePopulator(getEntityRemoveIS(), false);
+
+        var blockChange = blockBag != null && mode > 0 ? fullBlockChangePopulator(blockBag, mode, dir) : blockChangePopulator(dir);
+
+        var biomeChange = biomeChangePopulator(dir);
+
+        Queue<ChangePopulator<?>> populators = new ArrayDeque<>(List.of(
+                tileCreate,
+                tileRemove,
+                entityCreate,
+                entityRemove,
+                blockChange,
+                biomeChange
+        ));
+        BiConsumer<Exchanger<Change[]>, Change[]> task = (exchanger, array) -> {
+            while (fillArray(array, populators)) {
+                try {
+                    array = exchanger.exchange(array);
+                } catch (InterruptedException e) {
+                    return;
+                }
+            }
+        };
+        return new ChangeExchangeCoordinator(task);
+    }
+
+    private boolean fillArray(Change[] changes, Queue<ChangePopulator<?>> populators) {
+        ChangePopulator<?> populator = populators.peek();
+        if (populator == null) {
+            return false;
+        }
+        for (int i = 0; i < changes.length; i++) {
+            Change change = changes[i];
+            do {
+                change = populator.updateOrCreate(change);
+                if (change == null) {
+                    populators.remove();
+                    populator = populators.peek();
+                    if (populator == null) {
+                        changes[i] = null; // mark end
+                        return true; // still needs to consume the elements of the current round
+                    }
+                } else {
+                    break;
+                }
+            } while (true);
+            changes[i] = change;
+        }
+        return true;
+    }
+
+    private static abstract class CompoundTagPopulator<C extends Change> implements ChangePopulator<C> {
+        private final NBTInputStream inputStream;
+
+        private CompoundTagPopulator(final NBTInputStream stream) {
+            inputStream = stream;
+        }
+
+        @Override
+        public @Nullable C populate(final @NotNull C change) {
+            try {
+                write(change, (CompoundTag) inputStream.readTag());
+                return change;
+            } catch (Exception ignored) {
+            }
+            try {
+                inputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        protected abstract void write(C change, CompoundTag tag);
+    }
+
+    private ChangePopulator<MutableTileChange> tileChangePopulator(NBTInputStream is, boolean create) {
+        if (is == null) {
+            return ChangePopulator.empty();
+        }
+        class Populator extends CompoundTagPopulator<MutableTileChange> {
+
+            private Populator() {
+                super(is);
+            }
+
+            @Override
+            public @NotNull MutableTileChange create() {
+                return new MutableTileChange(null, create);
+            }
+
+            @Override
+            protected void write(final MutableTileChange change, final CompoundTag tag) {
+                change.tag = tag;
+                change.create = create;
+            }
+
+            @Override
+            public boolean accepts(final Change change) {
+                return change instanceof MutableTileChange;
+            }
+
+        }
+        return new Populator();
+    }
+    private ChangePopulator<MutableEntityChange> entityChangePopulator(NBTInputStream is, boolean create) {
+        if (is == null) {
+            return ChangePopulator.empty();
+        }
+        class Populator extends CompoundTagPopulator<MutableEntityChange> {
+
+            private Populator() {
+                super(is);
+            }
+
+            @Override
+            public @NotNull MutableEntityChange create() {
+                return new MutableEntityChange(null, create);
+            }
+
+            @Override
+            protected void write(final MutableEntityChange change, final CompoundTag tag) {
+                change.tag = tag;
+                change.create = create;
+            }
+
+            @Override
+            public boolean accepts(final Change change) {
+                return change instanceof MutableEntityChange;
+            }
+
+        }
+        return new Populator();
+    }
+
+    private ChangePopulator<MutableFullBlockChange> fullBlockChangePopulator(BlockBag blockBag, int mode, boolean dir) throws
+            IOException {
+        final FaweInputStream is = getBlockIS();
+        if (is == null) {
+            return ChangePopulator.empty();
+        }
+        class Populator implements ChangePopulator<MutableFullBlockChange> {
+
+            @Override
+            public @NotNull MutableFullBlockChange create() {
+                return new MutableFullBlockChange(blockBag, mode, dir);
+            }
+
+            @Override
+            public @Nullable MutableFullBlockChange populate(@NotNull final MutableFullBlockChange change) {
+                try {
+                    change.x = posDel.readX(is) + originX;
+                    change.y = posDel.readY(is);
+                    change.z = posDel.readZ(is) + originZ;
+                    idDel.readCombined(is, change);
+                    return change;
+                } catch (EOFException ignored) {
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                try {
+                    is.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+
+            @Override
+            public boolean accepts(final Change change) {
+                return change instanceof MutableFullBlockChange;
+            }
+
+        }
+        return new Populator();
+
+    }
+
+    private ChangePopulator<MutableBlockChange> blockChangePopulator(boolean dir) throws IOException {
+        final FaweInputStream is = getBlockIS();
+        if (is == null) {
+            return ChangePopulator.empty();
+        }
+        class Populator implements ChangePopulator<MutableBlockChange> {
+
+            @Override
+            public @NotNull MutableBlockChange create() {
+                return new MutableBlockChange(0, 0, 0, BlockTypes.AIR.getInternalId());
+            }
+
+            @Override
+            public @Nullable MutableBlockChange populate(@NotNull final MutableBlockChange change) {
+                try {
+                    change.x = posDel.readX(is) + originX;
+                    change.y = posDel.readY(is);
+                    change.z = posDel.readZ(is) + originZ;
+                    idDel.readCombined(is, change, dir);
+                    return change;
+                } catch (EOFException ignored) {
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                try {
+                    is.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+
+            @Override
+            public boolean accepts(final Change change) {
+                return change instanceof MutableBlockChange;
+            }
+
+        }
+        return new Populator();
+    }
+
+    private ChangePopulator<MutableBiomeChange> biomeChangePopulator(boolean dir) throws IOException {
+        final FaweInputStream is = getBiomeIS();
+        if (is == null) {
+            return ChangePopulator.empty();
+        }
+        class Populator implements ChangePopulator<MutableBiomeChange> {
+
+            @Override
+            public @NotNull MutableBiomeChange create() {
+                return new MutableBiomeChange();
+            }
+
+            @Override
+            public @Nullable MutableBiomeChange populate(@NotNull final MutableBiomeChange change) {
+                try {
+                    int int1 = is.read();
+                    if (int1 != -1) {
+                        int x = ((int1 << 24) + (is.read() << 16) + (is.read() << 8) + is.read()) << 2;
+                        int z = ((is.read() << 24) + (is.read() << 16) + (is.read() << 8) + is.read()) << 2;
+                        int y = (is.read() - 128) << 2;
+                        int from = is.readVarInt();
+                        int to = is.readVarInt();
+                        change.setBiome(x, y, z, from, to);
+                        return change;
+                    }
+                } catch (EOFException ignored) {
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                try {
+                    is.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+
+            @Override
+            public boolean accepts(final Change change) {
+                return change instanceof MutableBiomeChange;
+            }
+
+        }
+        return new Populator();
+    }
+
+    @Override
     public Iterator<Change> getIterator(final boolean dir) {
         try {
             close();
@@ -744,13 +1072,18 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
             return summary;
         }
         try (FaweInputStream fis = getBlockIS()) {
+            if (fis == null) {
+                return summary;
+            }
             if (!shallow) {
                 int amount = (Settings.settings().HISTORY.BUFFER_SIZE - HEADER_SIZE) / 9;
                 MutableFullBlockChange change = new MutableFullBlockChange(null, 0, false);
                 for (int i = 0; i < amount; i++) {
-                    posDel.read(fis, change);
+                    int x = posDel.readX(fis) + ox;
+                    int y = posDel.readY(fis);
+                    int z = posDel.readZ(fis) + oz;
                     idDel.readCombined(fis, change);
-                    summary.add(change.x + ox, change.z + oz, change.to);
+                    summary.add(x, z, change.to);
                 }
             }
         } catch (EOFException ignored) {

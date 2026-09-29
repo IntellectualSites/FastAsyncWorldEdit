@@ -25,7 +25,7 @@ public class AngleColorPatternParser extends RichParser<Pattern> {
     }
 
     @Override
-    public Stream<String> getSuggestions(String argumentInput, int index) {
+    public Stream<String> getSuggestions(String argumentInput, int index, ParserContext context) {
         if (index != 0) {
             return Stream.empty();
         }

@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.extent.clipboard.io;
 
 import com.sk89q.jnbt.Tag;
+import org.enginehub.linbus.tree.LinCompoundTag;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
@@ -27,16 +28,19 @@ import java.util.Map;
 
 /**
  * Base class for NBT schematic readers.
+ *
+ * @deprecated These utility methods are provided by {@link LinCompoundTag} now.
  */
+@Deprecated
 public abstract class NBTSchematicReader implements ClipboardReader {
 
-    protected static <T extends Tag> T requireTag(Map<String, Tag> items, String key, Class<T> expected) throws IOException {
+    protected static <T extends Tag<?, ?>> T requireTag(Map<String, Tag<?, ?>> items, String key, Class<T> expected) throws IOException {
         if (!items.containsKey(key)) {
             throw new IOException("Schematic file is missing a \"" + key + "\" tag of type "
                     + expected.getName());
         }
 
-        Tag tag = items.get(key);
+        Tag<?, ?> tag = items.get(key);
         if (!expected.isInstance(tag)) {
             throw new IOException(key + " tag is not of tag type " + expected.getName() + ", got "
                     + tag.getClass().getName() + " instead");
@@ -46,12 +50,12 @@ public abstract class NBTSchematicReader implements ClipboardReader {
     }
 
     @Nullable
-    protected static <T extends Tag> T getTag(Map<String, Tag> items, String key, Class<T> expected) {
+    protected static <T extends Tag<?, ?>> T getTag(Map<String, Tag<?, ?>> items, String key, Class<T> expected) {
         if (!items.containsKey(key)) {
             return null;
         }
 
-        Tag test = items.get(key);
+        Tag<?, ?> test = items.get(key);
         if (!expected.isInstance(test)) {
             return null;
         }

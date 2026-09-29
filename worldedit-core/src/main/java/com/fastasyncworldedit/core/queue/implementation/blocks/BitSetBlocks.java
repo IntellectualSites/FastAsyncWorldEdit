@@ -2,10 +2,11 @@ package com.fastasyncworldedit.core.queue.implementation.blocks;
 
 import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.extent.processor.heightmap.HeightMapType;
+import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.fastasyncworldedit.core.queue.IChunkSet;
 import com.fastasyncworldedit.core.util.collection.MemBlockSet;
-import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.util.SideEffectSet;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
@@ -13,6 +14,7 @@ import com.sk89q.worldedit.world.block.BlockTypesCache;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
@@ -25,13 +27,25 @@ public class BitSetBlocks implements IChunkSet {
     private final int minSectionPosition;
     private final int maxSectionPosition;
     private final int layers;
+    private final int chunkX;
+    private final int chunkZ;
 
+    /**
+     * @deprecated use {@link BitSetBlocks#BitSetBlocks(BlockState, int, int, int, int)}
+     */
+    @Deprecated(forRemoval = true, since = "2.13.0")
     public BitSetBlocks(BlockState blockState, int minSectionPosition, int maxSectionPosition) {
+        this(blockState, minSectionPosition, maxSectionPosition, 0, 0);
+    }
+
+    public BitSetBlocks(BlockState blockState, int minSectionPosition, int maxSectionPosition, int chunkX, int chunkZ) {
         this.row = new MemBlockSet.RowZ(minSectionPosition, maxSectionPosition);
         this.blockState = blockState;
         this.minSectionPosition = minSectionPosition;
         this.maxSectionPosition = maxSectionPosition;
         this.layers = maxSectionPosition - minSectionPosition + 1;
+        this.chunkX = chunkX;
+        this.chunkZ = chunkZ;
     }
 
     @Override
@@ -74,7 +88,7 @@ public class BitSetBlocks implements IChunkSet {
     }
 
     @Override
-    public boolean setTile(int x, int y, int z, CompoundTag tile) {
+    public boolean tile(final int x, final int y, final int z, final FaweCompoundTag tag) {
         return false;
     }
 
@@ -107,7 +121,7 @@ public class BitSetBlocks implements IChunkSet {
     }
 
     @Override
-    public void setEntity(CompoundTag tag) {
+    public void entity(final FaweCompoundTag tag) {
     }
 
     @Override
@@ -181,18 +195,18 @@ public class BitSetBlocks implements IChunkSet {
     }
 
     @Override
-    public Map<BlockVector3, CompoundTag> getTiles() {
+    public Map<BlockVector3, FaweCompoundTag> tiles() {
         return Collections.emptyMap();
     }
 
     @Override
-    public CompoundTag getTile(int x, int y, int z) {
+    public @Nullable FaweCompoundTag tile(final int x, final int y, final int z) {
         return null;
     }
 
     @Override
-    public Set<CompoundTag> getEntities() {
-        return Collections.emptySet();
+    public Collection<FaweCompoundTag> entities() {
+        return Collections.emptyList();
     }
 
     @Override
@@ -212,6 +226,16 @@ public class BitSetBlocks implements IChunkSet {
     }
 
     @Override
+    public void setSideEffectSet(SideEffectSet sideEffectSet) {
+
+    }
+
+    @Override
+    public SideEffectSet getSideEffectSet() {
+        return SideEffectSet.none();
+    }
+
+    @Override
     public int getSectionCount() {
         return layers;
     }
@@ -224,6 +248,16 @@ public class BitSetBlocks implements IChunkSet {
     @Override
     public int getMinSectionPosition() {
         return maxSectionPosition;
+    }
+
+    @Override
+    public int getX() {
+        return chunkX;
+    }
+
+    @Override
+    public int getZ() {
+        return chunkZ;
     }
 
     @Override

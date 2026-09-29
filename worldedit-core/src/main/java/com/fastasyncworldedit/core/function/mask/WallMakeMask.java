@@ -14,12 +14,13 @@ public class WallMakeMask implements Mask {
 
     @Override
     public boolean test(BlockVector3 position) {
-        int x = position.getBlockX();
-        int z = position.getBlockZ();
-        return !region.contains(x, z + 1) || !region.contains(x, z - 1) || !region.contains(x + 1, z) || !region.contains(
-                x - 1,
-                z
-        );
+        int x = position.x();
+        int y = position.y();
+        int z = position.z();
+        return !region.contains(x, y, z + 1) ||
+                !region.contains(x, y, z - 1) ||
+                !region.contains(x + 1, y, z) ||
+                !region.contains(x - 1, y, z);
     }
 
     @Override

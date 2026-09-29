@@ -21,7 +21,11 @@ package com.sk89q.worldedit.command;
 
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.extent.clipboard.URIClipboardHolder;
+import com.fastasyncworldedit.core.extent.filter.ForkedFilter;
+import com.fastasyncworldedit.core.extent.filter.MaskFilter;
+import com.fastasyncworldedit.core.extent.filter.block.FilterBlock;
 import com.fastasyncworldedit.core.function.mask.IdMask;
+import com.fastasyncworldedit.core.queue.Filter;
 import com.fastasyncworldedit.core.regions.selector.FuzzyRegionSelector;
 import com.fastasyncworldedit.core.regions.selector.PolyhedralRegionSelector;
 import com.fastasyncworldedit.core.util.MaskTraverser;
@@ -30,6 +34,7 @@ import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.command.argument.SelectorChoice;
 import com.sk89q.worldedit.command.tool.NavigationWand;
@@ -38,17 +43,22 @@ import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.command.util.Logging;
 import com.sk89q.worldedit.entity.Player;
+import com.sk89q.worldedit.extension.input.InputParseException;
+import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Locatable;
 import com.sk89q.worldedit.extension.platform.permission.ActorSelectorLimits;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.block.BlockDistributionCounter;
 import com.sk89q.worldedit.function.mask.Mask;
+import com.sk89q.worldedit.function.mask.MaskIntersection;
+import com.sk89q.worldedit.function.mask.RegionMask;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.visitor.RegionVisitor;
 import com.sk89q.worldedit.internal.annotation.Direction;
 import com.sk89q.worldedit.internal.annotation.MultiDirection;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.RegionOperationException;
 import com.sk89q.worldedit.regions.RegionSelector;
@@ -76,8 +86,6 @@ import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
-import com.sk89q.worldedit.world.item.ItemType;
-import com.sk89q.worldedit.world.item.ItemTypes;
 import com.sk89q.worldedit.world.storage.ChunkStore;
 import org.enginehub.piston.annotation.Command;
 import org.enginehub.piston.annotation.CommandContainer;
@@ -262,12 +270,12 @@ public class SelectionCommands {
 
             actor.print(Caption.of(
                     "worldedit.chunk.selected-multiple",
-                    TextComponent.of(minChunk.getBlockX()),
-                    TextComponent.of(minChunk.getBlockY()),
-                    TextComponent.of(minChunk.getBlockZ()),
-                    TextComponent.of(maxChunk.getBlockX()),
-                    TextComponent.of(maxChunk.getBlockY()),
-                    TextComponent.of(maxChunk.getBlockZ())
+                    TextComponent.of(minChunk.x()),
+                    TextComponent.of(minChunk.y()),
+                    TextComponent.of(minChunk.z()),
+                    TextComponent.of(maxChunk.x()),
+                    TextComponent.of(maxChunk.y()),
+                    TextComponent.of(maxChunk.z())
             ));
         } else {
             BlockVector3 minChunk;
@@ -290,9 +298,9 @@ public class SelectionCommands {
 
             actor.print(Caption.of(
                     "worldedit.chunk.selected",
-                    TextComponent.of(minChunk.getBlockX()),
-                    TextComponent.of(minChunk.getBlockY()),
-                    TextComponent.of(minChunk.getBlockZ())
+                    TextComponent.of(minChunk.x()),
+                    TextComponent.of(minChunk.y()),
+                    TextComponent.of(minChunk.z())
             ));
         }
 
@@ -325,22 +333,28 @@ public class SelectionCommands {
         //FAWE start
         session.loadDefaults(player, true);
         //FAWE end
-        String wandId = navWand ? session.getNavWandItem() : session.getWandItem();
-        if (wandId == null) {
-            wandId = navWand ? we.getConfiguration().navigationWand : we.getConfiguration().wandItem;
+        BaseItem wand = navWand ? session.getNavWandBaseItem() : session.getWandBaseItem();
+        if (wand == null) {
+            String wandId = navWand ? we.getConfiguration().navigationWand : we.getConfiguration().wandItem;
+            //FAWE start - allow item NBT
+            ParserContext parserContext = new ParserContext();
+            parserContext.setActor(player);
+            parserContext.setSession(session);
+            try {
+                wand = WorldEdit.getInstance().getItemFactory().parseFromInput(wandId, parserContext);
+            } catch (InputParseException e) {
+                player.print(Caption.of("worldedit.wand.invalid"));
+                return;
+            }
         }
-        ItemType itemType = ItemTypes.parse(wandId);
-        if (itemType == null) {
-            player.print(Caption.of("worldedit.wand.invalid"));
-            return;
-        }
-        player.giveItem(new BaseItemStack(itemType, 1));
+        player.giveItem(new BaseItemStack(wand.getType(), wand.getNbtReference(), 1));
+        //FAWE end
         //FAWE start - instance-iate session
         if (navWand) {
-            session.setTool(itemType, NavigationWand.INSTANCE);
+            session.setTool(wand, NavigationWand.INSTANCE);
             player.print(Caption.of("worldedit.wand.navwand.info"));
         } else {
-            session.setTool(itemType, SelectionWand.INSTANCE);
+            session.setTool(wand, SelectionWand.INSTANCE);
             player.print(Caption.of("worldedit.wand.selwand.info"));
             //FAWE end
         }
@@ -502,6 +516,112 @@ public class SelectionCommands {
     }
 
     @Command(
+            name = "/trim",
+            desc = "Minimize the selection to encompass matching blocks"
+    )
+    @Logging(REGION)
+    @CommandPermissions("worldedit.selection.trim")
+    public void trim(Actor actor, World world, LocalSession session, EditSession editSession,
+                     @Arg(desc = "Mask of blocks to keep within the selection", def = "#existing")
+                         Mask mask) throws WorldEditException {
+        //FAWE start
+        // Avoid checking blocks outside the original region but within the cuboid region
+        Region originalRegion = session.getSelection(world);
+        new MaskTraverser(mask).setNewExtent(editSession);
+
+        // Result region will be cuboid
+        final CuboidRegion region = originalRegion.getBoundingBox();
+
+        // subtract offset to determine if there was any change later
+        final BlockVector3 min = region.getMinimumPoint().subtract(BlockVector3.ONE);
+        final BlockVector3 max = region.getMaximumPoint();
+
+        class TrimFilter extends ForkedFilter<TrimFilter> {
+            private int minX;
+            private int minY;
+            private int minZ;
+            private int maxX;
+            private int maxY;
+            private int maxZ;
+
+            public TrimFilter(final BlockVector3 min, final BlockVector3 max) {
+                super(null);
+                this.minX = max.x();
+                this.minY = max.y();
+                this.minZ = max.z();
+                this.maxX = min.x();
+                this.maxY = min.y();
+                this.maxZ = min.z();
+            }
+
+            public TrimFilter(
+                    final TrimFilter root,
+                    final int minX,
+                    final int minY,
+                    final int minZ,
+                    final int maxX,
+                    final int maxY,
+                    final int maxZ
+            ) {
+                super(root);
+                this.minX = minX;
+                this.minY = minY;
+                this.minZ = minZ;
+                this.maxX = maxX;
+                this.maxY = maxY;
+                this.maxZ = maxZ;
+            }
+
+            @Override
+            public void applyBlock(final FilterBlock block) {
+                this.minX = Math.min(this.minX, block.x());
+                this.maxX = Math.max(this.maxX, block.x());
+                this.minY = Math.min(this.minY, block.y());
+                this.maxY = Math.max(this.maxY, block.y());
+                this.minZ = Math.min(this.minZ, block.z());
+                this.maxZ = Math.max(this.maxZ, block.z());
+            }
+
+            @Override
+            public TrimFilter init() {
+                return new TrimFilter(this, this.minX, this.minY, this.minZ, this.maxX, this.maxY, this.maxZ);
+            }
+
+            @Override
+            public void join(final TrimFilter filter) {
+                this.minX = Math.min(this.minX, filter.minX);
+                this.maxX = Math.max(this.maxX, filter.maxX);
+                this.minY = Math.min(this.minY, filter.minY);
+                this.maxY = Math.max(this.maxY, filter.maxY);
+                this.minZ = Math.min(this.minZ, filter.minZ);
+                this.maxZ = Math.max(this.maxZ, filter.maxZ);
+            }
+
+        }
+        TrimFilter result = editSession.apply(region, new MaskFilter<>(new TrimFilter(min, max), mask), true).getParent();
+
+        final CuboidRegionSelector selector;
+        final BlockVector3 newMin = BlockVector3.at(result.minX, result.minY, result.minZ);
+        final BlockVector3 newMax = BlockVector3.at(result.maxX, result.maxY, result.maxZ);
+
+        // If anything was found, then all variables are guaranteed to be set to something inside the region
+        if (newMax.equals(min)) {
+            throw new StopExecutionException(Caption.of("worldedit.trim.no-blocks"));
+        }
+        if (session.getRegionSelector(world) instanceof ExtendingCuboidRegionSelector) {
+            selector = new ExtendingCuboidRegionSelector(world, newMin, newMax);
+        } else {
+            selector = new CuboidRegionSelector(world, newMin, newMax);
+        }
+        //FAWE end
+        session.setRegionSelector(world, selector);
+
+        session.getRegionSelector(world).learnChanges();
+        session.getRegionSelector(world).explainRegionAdjust(actor, session);
+        actor.print(Caption.of("worldedit.trim.trim"));
+    }
+
+    @Command(
             name = "/size",
             desc = "Get information about the selection"
     )
@@ -538,10 +658,10 @@ public class SelectionCommands {
                         .subtract(region.getMinimumPoint()).add(1, 1, 1);
                 BlockVector3 origin = clipboard.getOrigin();
 
-                String sizeStr = size.getBlockX() + "*" + size.getBlockY() + "*" + size.getBlockZ();
-                String originStr = origin.getBlockX() + "," + origin.getBlockY() + "," + origin.getBlockZ();
+                String sizeStr = size.x() + "*" + size.y() + "*" + size.z();
+                String originStr = origin.x() + "," + origin.y() + "," + origin.z();
 
-                long numBlocks = ((long) size.getBlockX() * size.getBlockY() * size.getBlockZ());
+                long numBlocks = ((long) size.x() * size.y() * size.z());
                 actor.print(Caption.of(
                         "worldedit.size.offset",
                         TextComponent.of(name),
@@ -832,7 +952,7 @@ public class SelectionCommands {
                 toolTip = TextComponent.of(state.getAsString());
                 blockName = blockName.append(TextComponent.of("*"));
             } else {
-                toolTip = TextComponent.of(blockType.getId());
+                toolTip = TextComponent.of(blockType.id());
             }
             blockName = blockName.hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, toolTip));
             line.append(blockName);

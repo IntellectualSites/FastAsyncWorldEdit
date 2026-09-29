@@ -22,20 +22,24 @@ package com.sk89q.worldedit.command;
 import com.fastasyncworldedit.core.FaweAPI;
 import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.extent.processor.lighting.RelightMode;
 import com.fastasyncworldedit.core.limit.FaweLimit;
 import com.fastasyncworldedit.core.util.MaskTraverser;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
+import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.command.util.Logging;
 import com.sk89q.worldedit.command.util.annotation.Confirm;
 import com.sk89q.worldedit.command.util.annotation.Preload;
+import com.sk89q.worldedit.command.util.annotation.SynchronousSettingExpected;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.function.GroundFunction;
 import com.sk89q.worldedit.function.generator.FloraGenerator;
 import com.sk89q.worldedit.function.mask.ExistingBlockMask;
@@ -64,13 +68,13 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.RegionOperationException;
 import com.sk89q.worldedit.regions.Regions;
 import com.sk89q.worldedit.util.Location;
-import com.sk89q.worldedit.util.TreeGenerator.TreeType;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.world.RegenOptions;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import com.sk89q.worldedit.world.generation.TreeType;
 import org.enginehub.piston.annotation.Command;
 import org.enginehub.piston.annotation.CommandContainer;
 import org.enginehub.piston.annotation.param.Arg;
@@ -132,6 +136,7 @@ public class RegionCommands {
     @CommandPermissions("worldedit.region.set")
     @Logging(REGION)
     @Preload(Preload.PreloadCheck.PRELOAD)
+    @Confirm(Confirm.Processor.REGION)
     public void air(Actor actor, EditSession editSession, @Selection Region region) throws WorldEditException {
         set(actor, editSession, region, BlockTypes.AIR);
     }
@@ -157,6 +162,7 @@ public class RegionCommands {
             desc = "Get the light at a position"
     )
     @CommandPermissions("worldedit.light.fix")
+    @Confirm(Confirm.Processor.REGION)
     public void fixLighting(Actor actor, LocalSession session, @Selection Region selection) throws WorldEditException {
         int count = FaweAPI.fixLighting(session.getSelectionWorld(), selection, null, RelightMode.ALL);
         actor.print(Caption.of("fawe.info.lighting.propagate.selection", count));
@@ -168,6 +174,7 @@ public class RegionCommands {
             desc = "Removing lighting in a selection"
     )
     @CommandPermissions("worldedit.light.remove")
+    @Confirm(Confirm.Processor.REGION)
     public void removeLighting(Actor actor, LocalSession session, @Selection Region selection) {
         int count = FaweAPI.fixLighting(session.getSelectionWorld(), selection, null, RelightMode.NONE);
         actor.print(Caption.of("fawe.info.updated.lighting.selection", count));
@@ -203,6 +210,7 @@ public class RegionCommands {
             desc = "Set block lighting in a selection"
     )
     @CommandPermissions("worldedit.light.set")
+    @Confirm(Confirm.Processor.REGION)
     public void setlighting(Actor actor, EditSession editSession, @Selection Region region) {
         actor.print(Caption.of("fawe.info.light-blocks"));
     }
@@ -213,6 +221,7 @@ public class RegionCommands {
             desc = "Set sky lighting in a selection"
     )
     @CommandPermissions("worldedit.light.set")
+    @Confirm(Confirm.Processor.REGION)
     public void setskylighting(Actor actor, @Selection Region region) {
         actor.print(Caption.of("fawe.info.light-blocks"));
     }
@@ -224,13 +233,15 @@ public class RegionCommands {
     )
     @CommandPermissions("worldedit.region.line")
     @Logging(REGION)
+    @Confirm(Confirm.Processor.REGION)
+    @SynchronousSettingExpected
     public int line(
             Actor actor, EditSession editSession,
             @Selection Region region,
             @Arg(desc = "The pattern of blocks to place")
                     Pattern pattern,
             @Arg(desc = "The thickness of the line", def = "0")
-                    int thickness,
+                    double thickness,
             @Switch(name = 'h', desc = "Generate only a shell")
                     boolean shell
     ) throws WorldEditException {
@@ -256,13 +267,14 @@ public class RegionCommands {
     @CommandPermissions("worldedit.region.curve")
     @Logging(REGION)
     @Confirm(Confirm.Processor.REGION)
+    @SynchronousSettingExpected
     public int curve(
             Actor actor, EditSession editSession,
             @Selection Region region,
             @Arg(desc = "The pattern of blocks to place")
                     Pattern pattern,
             @Arg(desc = "The thickness of the curve", def = "0")
-                    int thickness,
+                    double thickness,
             @Switch(name = 'h', desc = "Generate only a shell")
                     boolean shell
     ) throws WorldEditException {
@@ -314,6 +326,7 @@ public class RegionCommands {
     @CommandPermissions("worldedit.region.overlay")
     @Logging(REGION)
     @Confirm(Confirm.Processor.REGION)
+    @SynchronousSettingExpected // TODO improve using filter/chunk-based-placement
     public int overlay(
             Actor actor, EditSession editSession, @Selection Region region,
             @Arg(desc = "The pattern of blocks to overlay")
@@ -332,6 +345,7 @@ public class RegionCommands {
     @Logging(REGION)
     @Preload(Preload.PreloadCheck.PRELOAD)
     @Confirm(Confirm.Processor.REGION)
+    @SynchronousSettingExpected // TODO improve using filter/chunk-based-placement
     public void lay(
             Actor actor,
             EditSession editSession,
@@ -350,8 +364,8 @@ public class RegionCommands {
         int affected = 0;
         while (iter.hasNext()) {
             BlockVector2 pos = iter.next();
-            int x = pos.getBlockX();
-            int z = pos.getBlockZ();
+            int x = pos.x();
+            int z = pos.z();
             //FAWE start - world min/maxY
             y = editSession.getNearestSurfaceTerrainBlock(x, z, y, minY, maxY);
             //FAWE end
@@ -368,6 +382,8 @@ public class RegionCommands {
     )
     @Logging(REGION)
     @CommandPermissions("worldedit.region.center")
+    @Confirm(Confirm.Processor.REGION)
+    @SynchronousSettingExpected
     public int center(
             Actor actor, EditSession editSession, @Selection Region region,
             @Arg(desc = "The pattern of blocks to set")
@@ -385,6 +401,8 @@ public class RegionCommands {
     @CommandPermissions("worldedit.region.naturalize")
     @Logging(REGION)
     @Confirm(Confirm.Processor.REGION)
+    @SynchronousSettingExpected // TODO improve using filter/chunk-based-placement
+    @Preload(Preload.PreloadCheck.PRELOAD)
     public int naturalize(Actor actor, EditSession editSession, @Selection Region region) throws WorldEditException {
         int affected = editSession.naturalizeCuboidBlocks(region);
         actor.print(Caption.of("worldedit.naturalize.naturalized", TextComponent.of(affected)));
@@ -436,6 +454,7 @@ public class RegionCommands {
     @Logging(REGION)
     @Preload(Preload.PreloadCheck.PRELOAD)
     @Confirm(Confirm.Processor.REGION)
+    @SynchronousSettingExpected
     public int smooth(
             Actor actor, EditSession editSession, @Selection Region region,
             @Arg(desc = "# of iterations to perform", def = "1")
@@ -448,10 +467,10 @@ public class RegionCommands {
         //FAWE end
         BlockVector3 min = region.getMinimumPoint();
         BlockVector3 max = region.getMaximumPoint();
-        long volume = (((long) max.getX() - (long) min.getX() + 1) * ((long) max.getY() - (long) min.getY() + 1) * ((long) max.getZ() - (long) min
-                .getZ() + 1));
+        long volume = (((long) max.x() - (long) min.x() + 1) * ((long) max.y() - (long) min.y() + 1) * ((long) max.z() - (long) min
+                .z() + 1));
         FaweLimit limit = actor.getLimit();
-        if (volume >= limit.MAX_CHECKS) {
+        if (volume >= limit.MAX_CHECKS.get()) {
             throw FaweCache.MAX_CHECKS;
         }
         int affected;
@@ -509,6 +528,7 @@ public class RegionCommands {
     @CommandPermissions("worldedit.region.snowsmooth")
     @Logging(REGION)
     @Preload(Preload.PreloadCheck.PRELOAD)
+    @SynchronousSettingExpected
     @Confirm(Confirm.Processor.REGION)
     public int snowSmooth(
             Actor actor, EditSession editSession, @Selection Region region,
@@ -535,6 +555,7 @@ public class RegionCommands {
     @CommandPermissions("worldedit.region.move")
     @Logging(ORIENTATION_REGION)
     @Preload(Preload.PreloadCheck.PRELOAD)
+    @SynchronousSettingExpected
     @Confirm(Confirm.Processor.REGION)
     public int move(
             Actor actor, World world, EditSession editSession, LocalSession session,
@@ -582,7 +603,7 @@ public class RegionCommands {
                 session.getRegionSelector(world).learnChanges();
                 session.getRegionSelector(world).explainRegionAdjust(actor, session);
             } catch (RegionOperationException e) {
-                actor.printError(TextComponent.of(e.getMessage()));
+                actor.printError(e.getRichMessage());
             }
         }
 
@@ -598,6 +619,7 @@ public class RegionCommands {
     @CommandPermissions("worldedit.region.fall")
     @Logging(ORIENTATION_REGION)
     @Preload(Preload.PreloadCheck.PRELOAD)
+    @SynchronousSettingExpected
     @Confirm(Confirm.Processor.REGION)
     public void fall(
             Actor actor, EditSession editSession,
@@ -617,6 +639,8 @@ public class RegionCommands {
     )
     @CommandPermissions("worldedit.region.stack")
     @Preload(Preload.PreloadCheck.PRELOAD)
+    @Confirm(Confirm.Processor.REGION)
+    @SynchronousSettingExpected
     @Logging(ORIENTATION_REGION)
     public int stack(
             Actor actor, World world, EditSession editSession, LocalSession session,
@@ -626,7 +650,7 @@ public class RegionCommands {
                     int count,
             @Arg(desc = "How far to move the contents each stack", def = Offset.FORWARD)
             @Offset
-                    BlockVector3 direction,
+                    BlockVector3 offset,
             @Switch(name = 's', desc = "Shift the selection to the last stacked copy")
                     boolean moveSelection,
             @Switch(name = 'a', desc = "Ignore air blocks")
@@ -635,6 +659,8 @@ public class RegionCommands {
                     boolean copyEntities,
             @Switch(name = 'b', desc = "Also copy biomes")
                     boolean copyBiomes,
+            @Switch(name = 'r', desc = "Use block units")
+                    boolean blockUnits,
             @ArgFlag(name = 'm', desc = "Set the include mask, non-matching blocks become air")
                     Mask mask
     ) throws WorldEditException {
@@ -654,19 +680,24 @@ public class RegionCommands {
             combinedMask = mask;
         }
 
-        int affected = editSession.stackCuboidRegion(region, direction, count, copyEntities, copyBiomes, combinedMask);
+        int affected;
+        if (blockUnits) {
+            affected = editSession.stackRegionBlockUnits(region, offset, count, copyEntities, copyBiomes, combinedMask);
+        } else {
+            affected = editSession.stackCuboidRegion(region, offset, count, copyEntities, copyBiomes, combinedMask);
+        }
 
         if (moveSelection) {
             try {
                 final BlockVector3 size = region.getMaximumPoint().subtract(region.getMinimumPoint()).add(1, 1, 1);
-
-                final BlockVector3 shiftVector = direction.multiply(size).multiply(count);
+                final BlockVector3 shiftSize = blockUnits ? offset : offset.multiply(size);
+                final BlockVector3 shiftVector = shiftSize.multiply(count);
                 region.shift(shiftVector);
 
                 session.getRegionSelector(world).learnChanges();
                 session.getRegionSelector(world).explainRegionAdjust(actor, session);
             } catch (RegionOperationException e) {
-                actor.printError(TextComponent.of(e.getMessage()));
+                actor.printError(e.getRichMessage());
             }
         }
 
@@ -682,6 +713,7 @@ public class RegionCommands {
     )
     @CommandPermissions("worldedit.regen")
     @Logging(REGION)
+    @SynchronousSettingExpected
     @Confirm(Confirm.Processor.REGION)
     void regenerate(
             Actor actor, World world, LocalSession session, EditSession editSession,
@@ -715,6 +747,9 @@ public class RegionCommands {
             session.setSourceMask(mask);
             //FAWE end
         }
+        if (actor instanceof Player && Settings.settings().GENERAL.UNSTUCK_ON_GENERATE) {
+            ((Player) actor).findFreePosition();
+        }
         if (success) {
             actor.print(Caption.of("worldedit.regen.regenerated"));
         } else {
@@ -733,6 +768,7 @@ public class RegionCommands {
     @CommandPermissions("worldedit.region.deform")
     @Logging(ALL)
     @Preload(Preload.PreloadCheck.PRELOAD)
+    @SynchronousSettingExpected
     @Confirm(Confirm.Processor.REGION)
     public int deform(
             Actor actor, LocalSession session, EditSession editSession,
@@ -768,13 +804,13 @@ public class RegionCommands {
             zero = max.add(min).divide(2);
             unit = max.subtract(zero);
 
-            if (unit.getX() == 0) {
+            if (unit.x() == 0) {
                 unit = unit.withX(1.0);
             }
-            if (unit.getY() == 0) {
+            if (unit.y() == 0) {
                 unit = unit.withY(1.0);
             }
-            if (unit.getZ() == 0) {
+            if (unit.z() == 0) {
                 unit = unit.withZ(1.0);
             }
         }
@@ -788,7 +824,7 @@ public class RegionCommands {
                     String.join(" ", expression),
                     session.getTimeout()
             );
-            if (actor instanceof Player) {
+            if (actor instanceof Player && Settings.settings().GENERAL.UNSTUCK_ON_GENERATE) {
                 ((Player) actor).findFreePosition();
             }
             actor.print(Caption.of("worldedit.deform.deformed", TextComponent.of(affected)));
@@ -810,6 +846,7 @@ public class RegionCommands {
     @CommandPermissions("worldedit.region.hollow")
     @Logging(REGION)
     @Preload(Preload.PreloadCheck.PRELOAD)
+    @SynchronousSettingExpected
     @Confirm(Confirm.Processor.REGION)
     public int hollow(
             Actor actor, EditSession editSession,
@@ -844,6 +881,7 @@ public class RegionCommands {
     @CommandPermissions("worldedit.region.forest")
     @Logging(REGION)
     @Preload(Preload.PreloadCheck.PRELOAD)
+    @SynchronousSettingExpected
     @Confirm(Confirm.Processor.REGION)
     public int forest(
             Actor actor, EditSession editSession, @Selection Region region,
@@ -865,6 +903,7 @@ public class RegionCommands {
     @CommandPermissions("worldedit.region.flora")
     @Logging(REGION)
     @Preload(Preload.PreloadCheck.PRELOAD)
+    @SynchronousSettingExpected
     @Confirm(Confirm.Processor.REGION)
     public int flora(
             Actor actor, EditSession editSession, @Selection Region region,
@@ -885,5 +924,34 @@ public class RegionCommands {
         actor.print(Caption.of("worldedit.flora.created", TextComponent.of(affected)));
         return affected;
     }
+
+    //FAWE start - block "fixing"
+    @Command(
+            name = "/fixblocks",
+            aliases = {"/updateblocks", "/fixconnect"},
+            desc = "\"Fixes\" all blocks in the region to the correct shape/connections based on surrounding blocks"
+    )
+    @CommandPermissions("worldedit.region.fixblocks")
+    @Logging(REGION)
+    @Confirm(Confirm.Processor.REGION)
+    @Preload(Preload.PreloadCheck.PRELOAD)
+    public int fixblocks(
+            Actor actor, EditSession editSession, @Selection Region region
+    ) {
+        int affected = editSession.setBlocks(
+                region,
+                WorldEdit
+                        .getInstance()
+                        .getPlatformManager()
+                        .queryCapability(Capability.WORLD_EDITING)
+                        .getPlatformPlacementProcessor(editSession, null, region)
+        );
+        if (affected != 0) {
+            actor.print(Caption.of("worldedit.set.done", TextComponent.of(affected)));
+
+        }
+        return affected;
+    }
+    //FAWE end
 
 }

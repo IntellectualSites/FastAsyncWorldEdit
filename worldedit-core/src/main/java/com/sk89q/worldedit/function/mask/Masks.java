@@ -211,15 +211,7 @@ public final class Masks {
 
     }
 
-    //FAWE start - protected > private
-    protected static class NegatedMask implements Mask {
-
-        //FAWE end
-        protected final Mask mask;
-
-        private NegatedMask(Mask mask) {
-            this.mask = mask;
-        }
+    protected record NegatedMask(Mask mask) implements Mask {
 
         @Override
         public boolean test(BlockVector3 vector) {
@@ -245,13 +237,7 @@ public final class Masks {
 
     }
 
-    private static class NegatedMask2D implements Mask2D {
-
-        private final Mask2D mask;
-
-        private NegatedMask2D(Mask2D mask) {
-            this.mask = mask;
-        }
+    private record NegatedMask2D(Mask2D mask) implements Mask2D {
 
         @Override
         public boolean test(BlockVector2 vector) {

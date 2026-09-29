@@ -21,12 +21,9 @@ import com.sk89q.worldedit.internal.registry.AbstractFactory;
 import com.sk89q.worldedit.internal.registry.InputParser;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class TransformFactory extends AbstractFactory<ResettableExtent> {
-
-    private final RichTransformParser richTransformParser;
 
     /**
      * Create a new factory.
@@ -34,9 +31,7 @@ public class TransformFactory extends AbstractFactory<ResettableExtent> {
      * @param worldEdit the WorldEdit instance
      */
     public TransformFactory(WorldEdit worldEdit) {
-        super(worldEdit, new NullTransformParser(worldEdit));
-
-        richTransformParser = new RichTransformParser(worldEdit);
+        super(worldEdit, new NullTransformParser(worldEdit), new RichTransformParser(worldEdit));
 
         // split and parse each sub-transform
         register(new RandomTransformParser(worldEdit));
@@ -51,68 +46,7 @@ public class TransformFactory extends AbstractFactory<ResettableExtent> {
     }
 
     @Override
-    public ResettableExtent parseFromInput(String input, ParserContext context) throws InputParseException {
-        List<ResettableExtent> transforms = new ArrayList<>();
-
-        for (String component : input.split(" ")) {
-            if (component.isEmpty()) {
-                continue;
-            }
-
-            ResettableExtent match = richTransformParser.parseFromInput(component, context);
-            if (match != null) {
-                transforms.add(match);
-                continue;
-            }
-            parseFromParsers(context, transforms, component);
-        }
-
-        return getResettableExtent(input, transforms);
-    }
-
-    private void parseFromParsers(
-            final ParserContext context,
-            final List<ResettableExtent> transforms,
-            final String component
-    ) {
-        ResettableExtent match = null;
-        for (InputParser<ResettableExtent> parser : getParsers()) {
-            match = parser.parseFromInput(component, context);
-
-            if (match != null) {
-                break;
-            }
-        }
-        if (match == null) {
-            throw new NoMatchException(Caption.of("worldedit.error.no-match", TextComponent.of(component)));
-        }
-        transforms.add(match);
-    }
-
-    /**
-     * Parses a transform without considering parsing through the {@link RichTransformParser}, therefore not accepting
-     * "richer" parsing where &amp; and , are used. Exists to prevent stack overflows.
-     *
-     * @param input   input string
-     * @param context input context
-     * @return parsed result
-     * @throws InputParseException if no result found
-     */
-    public ResettableExtent parseWithoutRich(String input, ParserContext context) throws InputParseException {
-        List<ResettableExtent> transforms = new ArrayList<>();
-
-        for (String component : input.split(" ")) {
-            if (component.isEmpty()) {
-                continue;
-            }
-
-            parseFromParsers(context, transforms, component);
-        }
-
-        return getResettableExtent(input, transforms);
-    }
-
-    private ResettableExtent getResettableExtent(final String input, final List<ResettableExtent> transforms) {
+    protected ResettableExtent getParsed(final String input, final List<ResettableExtent> transforms) {
         switch (transforms.size()) {
             case 0:
                 throw new NoMatchException(Caption.of("worldedit.error.no-match", TextComponent.of(input)));

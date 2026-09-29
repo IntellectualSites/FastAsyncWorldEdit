@@ -50,7 +50,9 @@ public class BufferedPattern extends AbstractPattern implements ResettablePatter
         this.pattern = parent;
         this.timer = Fawe.instance().getTimer();
         // Assume brush is used if no region provided, i.e. unlikely to required BlockVectorSet
-        set = region == null ? new LocalBlockVectorSet() : BlockVector3Set.getAppropriateVectorSet(region);
+        set = region == null
+            ? LocalBlockVectorSet.wrapped()
+            : BlockVector3Set.getAppropriateVectorSet(region);
     }
 
     @Override

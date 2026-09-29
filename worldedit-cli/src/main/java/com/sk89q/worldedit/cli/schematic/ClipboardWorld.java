@@ -19,10 +19,10 @@
 
 package com.sk89q.worldedit.cli.schematic;
 
+import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.implementation.packet.ChunkPacket;
 import com.google.common.collect.ImmutableSet;
-import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEditException;
@@ -41,13 +41,13 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.SideEffect;
 import com.sk89q.worldedit.util.SideEffectSet;
-import com.sk89q.worldedit.util.TreeGenerator;
 import com.sk89q.worldedit.world.AbstractWorld;
 import com.sk89q.worldedit.world.RegenOptions;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.generation.TreeType;
 
 import javax.annotation.Nullable;
 import java.io.File;
@@ -85,7 +85,7 @@ public class ClipboardWorld extends AbstractWorld implements Clipboard, CLIWorld
     //FAWE end
 
     @Override
-    public String getId() {
+    public String id() {
         return getName().replace(" ", "_").toLowerCase(Locale.ROOT);
     }
 
@@ -141,8 +141,7 @@ public class ClipboardWorld extends AbstractWorld implements Clipboard, CLIWorld
     }
 
     @Override
-    public boolean generateTree(TreeGenerator.TreeType type, EditSession editSession, BlockVector3 position)
-            throws MaxChangedBlocksException {
+    public boolean generateTree(TreeType type, EditSession editSession, BlockVector3 position) throws MaxChangedBlocksException {
         return false;
     }
 
@@ -193,7 +192,7 @@ public class ClipboardWorld extends AbstractWorld implements Clipboard, CLIWorld
     }
 
     @Override
-    public boolean setTile(int x, int y, int z, CompoundTag tile) throws WorldEditException {
+    public boolean tile(int x, int y, int z, FaweCompoundTag tile) throws WorldEditException {
         return false;
     }
 

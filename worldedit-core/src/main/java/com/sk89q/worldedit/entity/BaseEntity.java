@@ -21,12 +21,18 @@ package com.sk89q.worldedit.entity;
 
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.util.concurrency.LazyReference;
-import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
 import com.sk89q.worldedit.world.NbtValued;
 import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.entity.EntityTypes;
+import org.enginehub.linbus.tree.LinCompoundTag;
+import org.enginehub.linbus.tree.LinIntArrayTag;
+import org.enginehub.linbus.tree.LinLongTag;
+import org.enginehub.linbus.tree.LinTag;
 
 import javax.annotation.Nullable;
+
+import java.util.Map;
+import java.util.UUID;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -47,7 +53,7 @@ public class BaseEntity implements NbtValued {
 
     private final EntityType type;
     @Nullable
-    private LazyReference<CompoundBinaryTag> nbtData;
+    private LazyReference<LinCompoundTag> nbtData;
 
     /**
      * Create a new base entity.
@@ -56,6 +62,7 @@ public class BaseEntity implements NbtValued {
      * @param nbtData NBT data
      * @deprecated Use {@link BaseEntity#BaseEntity(EntityType, LazyReference)}
      */
+    @SuppressWarnings("this-escape")
     @Deprecated
     public BaseEntity(EntityType type, CompoundTag nbtData) {
         this(type);
@@ -68,7 +75,7 @@ public class BaseEntity implements NbtValued {
      * @param type    the entity type
      * @param nbtData NBT data
      */
-    public BaseEntity(EntityType type, LazyReference<CompoundBinaryTag> nbtData) {
+    public BaseEntity(EntityType type, LazyReference<LinCompoundTag> nbtData) {
         this(type);
         setNbtReference(nbtData);
     }
@@ -87,6 +94,7 @@ public class BaseEntity implements NbtValued {
      *
      * @param other the object to clone
      */
+    @SuppressWarnings("this-escape")
     public BaseEntity(BaseEntity other) {
         checkNotNull(other);
         this.type = other.getType();
@@ -95,12 +103,12 @@ public class BaseEntity implements NbtValued {
 
     @Nullable
     @Override
-    public LazyReference<CompoundBinaryTag> getNbtReference() {
+    public LazyReference<LinCompoundTag> getNbtReference() {
         return nbtData;
     }
 
     @Override
-    public void setNbtReference(@Nullable LazyReference<CompoundBinaryTag> nbtData) {
+    public void setNbtReference(@Nullable LazyReference<LinCompoundTag> nbtData) {
         this.nbtData = nbtData;
     }
 
@@ -116,6 +124,33 @@ public class BaseEntity implements NbtValued {
     //FAWE start
     public BaseEntity(CompoundTag tag) {
         this(EntityTypes.parse(tag.getString("Id")), tag);
+    }
+
+    /**
+     * Attempt to retrieve the entity's UUID from its NBT tag
+     *
+     * @return entity UUID if possible to retrieve
+     * @since 2.14.1
+     */
+    @Nullable
+    public UUID getUUID() {
+        LinCompoundTag tag = getNbt();
+        if (tag == null) {
+            return null;
+        }
+        Map<String, LinTag<?>> value = tag.value();
+        if (value.get("UUID") instanceof LinIntArrayTag intArrayTag) {
+            int[] arr = intArrayTag.value();
+            return new UUID((long) arr[0] << 32 | (arr[1] & 0xFFFFFFFFL), (long) arr[2] << 32 | (arr[3] & 0xFFFFFFFFL));
+        } else if (value.get("UUIDMost") instanceof LinLongTag longTag) {
+            return new UUID(longTag.value(), ((LinLongTag) value.get("UUIDLeast")).value());
+        } else if (value.get("WorldUUIDMost") instanceof LinLongTag longTag) {
+            return new UUID(longTag.value(), ((LinLongTag) value.get("WorldUUIDLeast")).value());
+        } else if (value.get("PersistentIDMSB") instanceof LinLongTag longTag) {
+            return new UUID(longTag.value(), ((LinLongTag) value.get("PersistentIDLSB")).value());
+        } else {
+            return null;
+        }
     }
     //FAWE end
 

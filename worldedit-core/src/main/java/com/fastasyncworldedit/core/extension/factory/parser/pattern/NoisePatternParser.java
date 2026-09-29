@@ -36,12 +36,12 @@ public abstract class NoisePatternParser extends RichParser<Pattern> {
     }
 
     @Override
-    protected Stream<String> getSuggestions(String argumentInput, int index) {
+    protected Stream<String> getSuggestions(String argumentInput, int index, ParserContext context) {
         if (index == 0) {
             return SuggestionHelper.suggestPositiveDoubles(argumentInput);
         }
         if (index == 1) {
-            return worldEdit.getPatternFactory().getSuggestions(argumentInput).stream();
+            return worldEdit.getPatternFactory().getSuggestions(argumentInput, context).stream();
         }
         return Stream.empty();
     }

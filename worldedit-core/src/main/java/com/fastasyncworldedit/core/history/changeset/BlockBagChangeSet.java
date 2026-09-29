@@ -1,8 +1,6 @@
 package com.fastasyncworldedit.core.history.changeset;
 
 import com.fastasyncworldedit.core.FaweCache;
-import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.extent.inventory.BlockBagException;
 import com.sk89q.worldedit.extent.inventory.UnplaceableBlockException;
@@ -68,9 +66,9 @@ public class BlockBagChangeSet extends AbstractDelegateChangeSet {
 
     @Override
     public void add(BlockVector3 loc, BaseBlock from, BaseBlock to) {
-        int x = loc.getBlockX();
-        int y = loc.getBlockY();
-        int z = loc.getBlockZ();
+        int x = loc.x();
+        int y = loc.y();
+        int z = loc.z();
         add(x, y, z, from, to);
     }
 
@@ -107,15 +105,6 @@ public class BlockBagChangeSet extends AbstractDelegateChangeSet {
         BlockType typeTo = BlockTypes.getFromStateId(combinedTo);
         check(typeFrom, typeTo);
         super.add(x, y, z, combinedFrom, combinedTo);
-    }
-
-    @Override
-    public void addTileCreate(CompoundTag nbt) {
-        if (nbt.containsKey("items")) {
-            Map<String, Tag> map = new HashMap<>(nbt.getValue());
-            map.remove("items");
-        }
-        super.addTileCreate(nbt);
     }
 
 }

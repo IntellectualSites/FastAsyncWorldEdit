@@ -38,6 +38,7 @@ import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.command.util.Logging;
 import com.sk89q.worldedit.command.util.annotation.Confirm;
 import com.sk89q.worldedit.command.util.annotation.Preload;
+import com.sk89q.worldedit.command.util.annotation.SynchronousSettingExpected;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.function.mask.Mask;
@@ -52,17 +53,19 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldedit.util.TreeGenerator.TreeType;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockType;
+import com.sk89q.worldedit.world.generation.ConfiguredFeatureType;
+import com.sk89q.worldedit.world.generation.StructureType;
+import com.sk89q.worldedit.world.generation.TreeType;
 import org.enginehub.piston.annotation.Command;
 import org.enginehub.piston.annotation.CommandContainer;
 import org.enginehub.piston.annotation.param.Arg;
 import org.enginehub.piston.annotation.param.Switch;
 import org.jetbrains.annotations.Range;
 
-import java.awt.RenderingHints;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -104,6 +107,7 @@ public class GenerationCommands {
     )
     @CommandPermissions("worldedit.generation.cylinder")
     @Logging(PLACEMENT)
+    @SynchronousSettingExpected
     public int hcyl(
             Actor actor, LocalSession session, EditSession editSession,
             @Arg(desc = "The pattern of blocks to generate")
@@ -130,9 +134,9 @@ public class GenerationCommands {
                 return 0;
             }
         }
-        worldEdit.checkMaxRadius(radiusX);
-        worldEdit.checkMaxRadius(radiusZ);
-        worldEdit.checkMaxRadius(height);
+        worldEdit.checkMaxRadius(radiusX, actor);
+        worldEdit.checkMaxRadius(radiusZ, actor);
+        worldEdit.checkMaxRadius(height, actor);
 
         if (thickness > radiusX || thickness > radiusZ) {
             actor.print(Caption.of("worldedit.hcyl.thickness-too-large"));
@@ -152,6 +156,7 @@ public class GenerationCommands {
     )
     @CommandPermissions("worldedit.generation.cylinder")
     @Logging(PLACEMENT)
+    @SynchronousSettingExpected
     public int cyl(
             Actor actor, LocalSession session, EditSession editSession,
             @Arg(desc = "The pattern of blocks to generate")
@@ -178,12 +183,15 @@ public class GenerationCommands {
             }
         }
 
-        worldEdit.checkMaxRadius(radiusX);
-        worldEdit.checkMaxRadius(radiusZ);
-        worldEdit.checkMaxRadius(height);
+        worldEdit.checkMaxRadius(radiusX, actor);
+        worldEdit.checkMaxRadius(radiusZ, actor);
+        worldEdit.checkMaxRadius(height, actor);
 
         BlockVector3 pos = session.getPlacementPosition(actor);
         int affected = editSession.makeCylinder(pos, pattern, radiusX, radiusZ, height, !hollow);
+        if (actor instanceof Player && Settings.settings().GENERAL.UNSTUCK_ON_GENERATE) {
+            ((Player) actor).findFreePosition();
+        }
         actor.print(Caption.of("worldedit.cyl.created", TextComponent.of(affected)));
         return affected;
     }
@@ -194,6 +202,7 @@ public class GenerationCommands {
     )
     @CommandPermissions("worldedit.generation.cone")
     @Logging(PLACEMENT)
+    @SynchronousSettingExpected
     public int cone(Actor actor, LocalSession session, EditSession editSession,
            @Arg(desc = "The pattern of blocks to generate")
                Pattern pattern,
@@ -221,12 +230,15 @@ public class GenerationCommands {
             }
         }
 
-        worldEdit.checkMaxRadius(radiusX);
-        worldEdit.checkMaxRadius(radiusZ);
-        worldEdit.checkMaxRadius(height);
+        worldEdit.checkMaxRadius(radiusX, actor);
+        worldEdit.checkMaxRadius(radiusZ, actor);
+        worldEdit.checkMaxRadius(height, actor);
 
         BlockVector3 pos = session.getPlacementPosition(actor);
         int affected = editSession.makeCone(pos, pattern, radiusX, radiusZ, height, !hollow, thickness);
+        if (actor instanceof Player && Settings.settings().GENERAL.UNSTUCK_ON_GENERATE) {
+            ((Player) actor).findFreePosition();
+        }
         actor.printInfo(Caption.of("worldedit.cone.created", TextComponent.of(affected)));
         return affected;
     }
@@ -237,6 +249,7 @@ public class GenerationCommands {
     )
     @CommandPermissions("worldedit.generation.sphere")
     @Logging(PLACEMENT)
+    @SynchronousSettingExpected
     public int hsphere(
             Actor actor, LocalSession session, EditSession editSession,
             @Arg(desc = "The pattern of blocks to generate")
@@ -256,6 +269,7 @@ public class GenerationCommands {
     )
     @CommandPermissions("worldedit.generation.sphere")
     @Logging(PLACEMENT)
+    @SynchronousSettingExpected
     public int sphere(
             Actor actor, LocalSession session, EditSession editSession,
             @Arg(desc = "The pattern of blocks to generate")
@@ -284,16 +298,16 @@ public class GenerationCommands {
             }
         }
 
-        worldEdit.checkMaxRadius(radiusX);
-        worldEdit.checkMaxRadius(radiusY);
-        worldEdit.checkMaxRadius(radiusZ);
+        worldEdit.checkMaxRadius(radiusX, actor);
+        worldEdit.checkMaxRadius(radiusY, actor);
+        worldEdit.checkMaxRadius(radiusZ, actor);
         BlockVector3 pos = session.getPlacementPosition(actor);
         if (raised) {
             pos = pos.add(0, (int) radiusY, 0);
         }
 
         int affected = editSession.makeSphere(pos, pattern, radiusX, radiusY, radiusZ, !hollow);
-        if (actor instanceof Player) {
+        if (actor instanceof Player && Settings.settings().GENERAL.UNSTUCK_ON_GENERATE) {
             ((Player) actor).findFreePosition();
         }
         actor.print(Caption.of("worldedit.sphere.created", TextComponent.of(affected)));
@@ -307,6 +321,7 @@ public class GenerationCommands {
     )
     @CommandPermissions("worldedit.generation.forest")
     @Logging(POSITION)
+    @SynchronousSettingExpected
     public int forestGen(
             Actor actor, LocalSession session, EditSession editSession,
             @Arg(desc = "The size of the forest, in blocks", def = "10")
@@ -317,7 +332,7 @@ public class GenerationCommands {
                     double density
     ) throws WorldEditException {
         checkCommandArgument(0 <= density && density <= 100, "Density must be between 0 and 100");
-        worldEdit.checkMaxRadius(size);
+        worldEdit.checkMaxRadius(size, actor);
         density /= 100;
         int affected = editSession.makeForest(session.getPlacementPosition(actor), size, density, type);
         actor.print(Caption.of("worldedit.forestgen.created", TextComponent.of(affected)));
@@ -331,6 +346,7 @@ public class GenerationCommands {
     )
     @CommandPermissions("worldedit.generation.pumpkins")
     @Logging(POSITION)
+    @SynchronousSettingExpected
     public int pumpkins(
             Actor actor, LocalSession session, EditSession editSession,
             @Arg(desc = "The size of the patch", def = "10")
@@ -339,10 +355,57 @@ public class GenerationCommands {
                     double density
     ) throws WorldEditException {
         checkCommandArgument(0 <= density && density <= 100, "Density must be between 0 and 100");
-        worldEdit.checkMaxRadius(size);
+        worldEdit.checkMaxRadius(size, actor);
         int affected = editSession.makePumpkinPatches(session.getPlacementPosition(actor), size, density);
         actor.print(Caption.of("worldedit.pumpkins.created", TextComponent.of(affected)));
         return affected;
+    }
+
+    @Command(
+            name = "/feature",
+            //FAWE start
+            aliases = {"/placefeature"},
+            //FAWE end
+            desc = "Generate Minecraft features"
+    )
+    @Logging(PLACEMENT)
+    @CommandPermissions("worldedit.generation.feature")
+    public int feature(
+            Actor actor, LocalSession session, EditSession editSession,
+            @Arg(desc = "Type of feature to place")
+            ConfiguredFeatureType feature
+    ) throws WorldEditException {
+        //FAWE start
+        int affected = editSession.generateFeature(feature, session.getPlacementPosition(actor));
+
+        if (affected == 0) {
+            actor.print(Caption.of("worldedit.generate.feature.failed"));
+        } else {
+            actor.print(Caption.of("worldedit.feature.created", TextComponent.of(affected)));
+        }
+        return affected;
+        //FAWE end
+    }
+
+    @Command(
+            name = "/structure",
+            desc = "Generate Minecraft structures"
+    )
+    @CommandPermissions("worldedit.generation.structure")
+    @Logging(POSITION)
+    public int structure(Actor actor, LocalSession session, EditSession editSession,
+                        @Arg(desc = "The structure")
+                        StructureType feature) throws WorldEditException {
+        //FAWE start
+        int affected = editSession.generateStructure(feature, session.getPlacementPosition(actor));
+
+        if (affected > 0) {
+            actor.printInfo(Caption.of("worldedit.structure.created", TextComponent.of(affected)));
+        } else {
+            actor.printError(Caption.of("worldedit.generate.structure.failed"));
+        }
+        return affected;
+        //FAWE end
     }
 
     @Command(
@@ -351,6 +414,7 @@ public class GenerationCommands {
     )
     @CommandPermissions("worldedit.generation.pyramid")
     @Logging(PLACEMENT)
+    @SynchronousSettingExpected
     public int hollowPyramid(
             Actor actor, LocalSession session, EditSession editSession,
             @Arg(desc = "The pattern of blocks to set")
@@ -367,6 +431,7 @@ public class GenerationCommands {
     )
     @CommandPermissions("worldedit.generation.pyramid")
     @Logging(PLACEMENT)
+    @SynchronousSettingExpected
     public int pyramid(
             Actor actor, LocalSession session, EditSession editSession,
             @Arg(desc = "The pattern of blocks to set")
@@ -376,10 +441,10 @@ public class GenerationCommands {
             @Switch(name = 'h', desc = "Make a hollow pyramid")
                     boolean hollow
     ) throws WorldEditException {
-        worldEdit.checkMaxRadius(size);
+        worldEdit.checkMaxRadius(size, actor);
         BlockVector3 pos = session.getPlacementPosition(actor);
         int affected = editSession.makePyramid(pos, pattern, size, !hollow);
-        if (actor instanceof Player) {
+        if (actor instanceof Player && Settings.settings().GENERAL.UNSTUCK_ON_GENERATE) {
             ((Player) actor).findFreePosition();
         }
         actor.print(Caption.of("worldedit.pyramid.created", TextComponent.of(affected)));
@@ -394,6 +459,7 @@ public class GenerationCommands {
     )
     @CommandPermissions("worldedit.generation.shape")
     @Logging(ALL)
+    @SynchronousSettingExpected
     @Confirm(Confirm.Processor.REGION)
     public int generate(
             Actor actor, LocalSession session, EditSession editSession,
@@ -434,13 +500,13 @@ public class GenerationCommands {
             zero = max.add(min).multiply(0.5);
             unit = max.subtract(zero);
 
-            if (unit.getX() == 0) {
+            if (unit.x() == 0) {
                 unit = unit.withX(1.0);
             }
-            if (unit.getY() == 0) {
+            if (unit.y() == 0) {
                 unit = unit.withY(1.0);
             }
-            if (unit.getZ() == 0) {
+            if (unit.z() == 0) {
                 unit = unit.withZ(1.0);
             }
         }
@@ -457,7 +523,7 @@ public class GenerationCommands {
                     hollow,
                     session.getTimeout()
             );
-            if (actor instanceof Player) {
+            if (actor instanceof Player && Settings.settings().GENERAL.UNSTUCK_ON_GENERATE) {
                 ((Player) actor).findFreePosition();
             }
             actor.print(Caption.of("worldedit.generate.created", TextComponent.of(affected)));
@@ -480,6 +546,7 @@ public class GenerationCommands {
     @CommandPermissions("worldedit.generation.shape.biome")
     @Logging(ALL)
     @Preload(Preload.PreloadCheck.PRELOAD)
+    @SynchronousSettingExpected
     @Confirm(Confirm.Processor.REGION)
     public int generateBiome(
             Actor actor, LocalSession session, EditSession editSession,
@@ -520,13 +587,13 @@ public class GenerationCommands {
             zero = max.add(min).multiply(0.5);
             unit = max.subtract(zero);
 
-            if (unit.getX() == 0) {
+            if (unit.x() == 0) {
                 unit = unit.withX(1.0);
             }
-            if (unit.getY() == 0) {
+            if (unit.y() == 0) {
                 unit = unit.withY(1.0);
             }
-            if (unit.getZ() == 0) {
+            if (unit.z() == 0) {
                 unit = unit.withZ(1.0);
             }
         }
@@ -558,6 +625,7 @@ public class GenerationCommands {
     @CommandPermissions("worldedit.generation.caves")
     @Logging(PLACEMENT)
     @Preload(Preload.PreloadCheck.PRELOAD)
+    @SynchronousSettingExpected
     @Confirm(Confirm.Processor.REGION)
     public void caves(
             Actor actor, LocalSession session, EditSession editSession, @Selection Region region,
@@ -596,16 +664,19 @@ public class GenerationCommands {
     @CommandPermissions("worldedit.generation.ore")
     @Logging(PLACEMENT)
     @Preload(Preload.PreloadCheck.PRELOAD)
+    @SynchronousSettingExpected
     @Confirm(Confirm.Processor.REGION)
     public void ores(
             Actor actor,
             LocalSession session,
             EditSession editSession,
             @Selection Region region,
-            @Arg(desc = "Mask") Mask mask
+            @Arg(desc = "Mask") Mask mask,
+            @Switch(name = 'b', desc = "Make all ores deepslate equivalent for y<0") boolean deepslateBelowZero,
+            @Switch(name = 'd', desc = "Make all ores deepslate equivalent when placed into deepslate, tuff, etc.") boolean deepslateWhereDeepslate
     ) throws WorldEditException {
         new MaskTraverser(mask).setNewExtent(editSession);
-        editSession.addOres(region, mask);
+        editSession.addOres(region, mask, deepslateBelowZero, deepslateWhereDeepslate);
         actor.print(Caption.of("fawe.worldedit.visitor.visitor.block", editSession.getBlockChangeCount()));
     }
 
@@ -615,6 +686,7 @@ public class GenerationCommands {
             desc = "Generate an image"
     )
     @CommandPermissions("worldedit.generation.image")
+    @SynchronousSettingExpected
     @Logging(PLACEMENT)
     public void image(
             Actor actor,
@@ -630,7 +702,7 @@ public class GenerationCommands {
         MainUtil.checkImageHost(url.toURI());
         if (dimensions != null) {
             checkCommandArgument(
-                    (long) dimensions.getX() * dimensions.getZ() <= Settings.settings().WEB.MAX_IMAGE_SIZE,
+                    (long) dimensions.x() * dimensions.z() <= Settings.settings().WEB.MAX_IMAGE_SIZE,
                     Caption.of("fawe.error.image-dimensions", Settings.settings().WEB.MAX_IMAGE_SIZE)
             );
         }
@@ -638,7 +710,7 @@ public class GenerationCommands {
         Future<BufferedImage> future = executor.submit(() -> {
             BufferedImage image = MainUtil.readImage(url);
             if (dimensions != null) {
-                image = ImageUtil.getScaledInstance(image, dimensions.getBlockX(), dimensions.getBlockZ(),
+                image = ImageUtil.getScaledInstance(image, dimensions.x(), dimensions.z(),
                         RenderingHints.VALUE_INTERPOLATION_BILINEAR, false
                 );
             }
@@ -662,8 +734,8 @@ public class GenerationCommands {
         CuboidRegion region = new CuboidRegion(pos1, pos2);
         final BufferedImage finalImage = image;
         RegionVisitor visitor = new RegionVisitor(region, pos -> {
-            int x = pos.getBlockX() - pos1.getBlockX();
-            int z = pos.getBlockZ() - pos1.getBlockZ();
+            int x = pos.x() - pos1.x();
+            int z = pos.z() - pos1.z();
             int color = finalImage.getRGB(x, z);
             BlockType block = tu.getNearestBlock(color);
             if (block != null) {
@@ -679,6 +751,7 @@ public class GenerationCommands {
     @CommandPermissions("worldedit.generation.ore")
     @Logging(PLACEMENT)
     @Preload(Preload.PreloadCheck.PRELOAD)
+    @SynchronousSettingExpected
     @Confirm(Confirm.Processor.REGION)
     public void ore(
             Actor actor,
@@ -713,8 +786,9 @@ public class GenerationCommands {
             desc = "Creates a distorted sphere"
     )
     @Logging(PLACEMENT)
+    @SynchronousSettingExpected
     @CommandPermissions("worldedit.generation.blob")
-    public int blobBrush(
+    public int blob(
             Actor actor, LocalSession session, EditSession editSession,
             @Arg(desc = "Pattern")
                     Pattern pattern,
@@ -729,8 +803,8 @@ public class GenerationCommands {
             @Arg(desc = "double", def = "50")
                     double amplitude
     ) throws WorldEditException {
-        double max = MathMan.max(radius.getX(), radius.getY(), radius.getZ());
-        worldEdit.checkMaxRadius(max);
+        double max = MathMan.max(radius.x(), radius.y(), radius.z());
+        worldEdit.checkMaxRadius(max, actor);
         BlockVector3 pos = session.getPlacementPosition(actor);
         int affected = editSession.makeBlob(
                 pos,
@@ -741,10 +815,10 @@ public class GenerationCommands {
                 radius.divide(max),
                 sphericity / 100
         );
-        if (actor instanceof Player) {
+        if (actor instanceof Player && Settings.settings().GENERAL.UNSTUCK_ON_GENERATE) {
             ((Player) actor).findFreePosition();
         }
-        actor.print(Caption.of("worldedit.sphere.created", TextComponent.of(affected)));
+        actor.print(Caption.of("worldedit.blob.created", TextComponent.of(affected)));
         return affected;
     }
     //FAWE end

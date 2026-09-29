@@ -40,4 +40,15 @@ public interface Brush {
      */
     void build(EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws MaxChangedBlocksException;
 
+    //FAWE start
+    /**
+     * If this brush is expected to set blocks synchronously, i.e. from one thread (at a time)
+     *
+     * @since 2.12.0
+     */
+    default boolean setsSynchronously() {
+        return true;
+    }
+    //FAWE end
+
 }

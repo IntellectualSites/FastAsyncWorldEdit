@@ -21,6 +21,8 @@ package com.sk89q.jnbt;
 
 import com.fastasyncworldedit.core.jnbt.streamer.StreamDelegate;
 import com.fastasyncworldedit.core.jnbt.streamer.ValueReader;
+import org.enginehub.linbus.stream.LinBinaryIO;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.io.Closeable;
 import java.io.DataInputStream;
@@ -44,8 +46,9 @@ import java.util.Map;
  * https://minecraft.gamepedia.com/NBT_format</a>.
  * </p>
  *
- * @deprecated JNBT is being removed for adventure-nbt in WorldEdit 8.
+ * @deprecated JNBT is being removed for lin-bus in WorldEdit 8, use {@link LinBinaryIO} instead
  */
+@SuppressWarnings("removal")
 @Deprecated(forRemoval = true)
 public final class NBTInputStream implements Closeable {
 
@@ -77,7 +80,6 @@ public final class NBTInputStream implements Closeable {
      * Reads an NBT tag from the stream.
      *
      * @return The tag that was read.
-     * @throws IOException if an I/O error occurs.
      */
     public NamedTag readNamedTag() throws IOException {
         return readNamedTag(0);
@@ -571,7 +573,7 @@ public final class NBTInputStream implements Closeable {
      * @return the tag
      * @throws IOException if an I/O error occurs.
      */
-    private Tag readTagPayload(int type, int depth) throws IOException {
+    public Tag readTagPayload(int type, int depth) throws IOException { //FAWE - public
         switch (type) {
             case NBTConstants.TYPE_END:
                 if (depth == 0) {
@@ -617,7 +619,7 @@ public final class NBTInputStream implements Closeable {
 
                 return new ListTag(NBTUtils.getTypeClass(childType), tagList);
             case NBTConstants.TYPE_COMPOUND:
-                Map<String, Tag> tagMap = new HashMap<>();
+                Map<String, Tag<?, ?>> tagMap = new HashMap<>();
                 while (true) {
                     NamedTag namedTag = readNamedTag(depth + 1);
                     Tag tag = namedTag.getTag();
@@ -692,6 +694,13 @@ public final class NBTInputStream implements Closeable {
                 throw new IllegalArgumentException("CANNOT REMOVE");
             }
         };
+    }
+    //FAWE end
+
+    //FAWE start - make underlying stream accessible (for soft migration reasons)
+    @ApiStatus.Internal
+    public DataInputStream dataInputStream() {
+        return this.is;
     }
     //FAWE end
 

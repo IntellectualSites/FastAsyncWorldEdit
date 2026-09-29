@@ -89,10 +89,10 @@ public class HeightMap {
         this.maxSessionY = session.getMaxY();
         //FAWE end
 
-        int minX = region.getMinimumPoint().getBlockX();
-        int minY = region.getMinimumPoint().getBlockY();
-        int minZ = region.getMinimumPoint().getBlockZ();
-        int maxY = region.getMaximumPoint().getBlockY();
+        int minX = region.getMinimumPoint().x();
+        int minY = region.getMinimumPoint().y();
+        int minZ = region.getMinimumPoint().z();
+        int maxY = region.getMaximumPoint().y();
 
         // Store current heightmap data
         data = new int[width * height];
@@ -100,14 +100,14 @@ public class HeightMap {
         //FAWE start
         if (layers) {
             BlockVector3 min = region.getMinimumPoint();
-            int bx = min.getBlockX();
-            int bz = min.getBlockZ();
+            int bx = min.x();
+            int bz = min.z();
             Iterator<BlockVector2> flat = Regions.asFlatRegion(region).asFlatRegion().iterator();
             int layer = session.getMinY();
             while (flat.hasNext()) {
                 BlockVector2 pos = flat.next();
-                int x = pos.getBlockX();
-                int z = pos.getBlockZ();
+                int x = pos.x();
+                int z = pos.z();
                 layer = session.getNearestSurfaceLayer(x, z, (layer + 7) >> 3, session.getMinY(), maxY);
                 data[(z - bz) * width + (x - bx)] = layer;
             }
@@ -169,10 +169,10 @@ public class HeightMap {
         checkNotNull(data);
 
         BlockVector3 min = region.getMinimumPoint();
-        int originX = min.getBlockX();
-        int originZ = min.getBlockZ();
+        int originX = min.x();
+        int originZ = min.z();
 
-        int maxY = region.getMaximumPoint().getBlockY();
+        int maxY = region.getMaximumPoint().y();
 
         BlockState fillerAir = BlockTypes.AIR.getDefaultState();
 
@@ -261,11 +261,11 @@ public class HeightMap {
         checkNotNull(data);
 
         BlockVector3 min = region.getMinimumPoint();
-        int originX = min.getBlockX();
-        int originY = min.getBlockY();
-        int originZ = min.getBlockZ();
+        int originX = min.x();
+        int originY = min.y();
+        int originZ = min.z();
 
-        int maxY = region.getMaximumPoint().getBlockY();
+        int maxY = region.getMaximumPoint().y();
         BlockState fillerAir = BlockTypes.AIR.getDefaultState();
 
         int blocksChanged = 0;

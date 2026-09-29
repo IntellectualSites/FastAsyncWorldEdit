@@ -30,6 +30,7 @@ import com.fastasyncworldedit.core.extension.factory.parser.pattern.DarkenPatter
 import com.fastasyncworldedit.core.extension.factory.parser.pattern.DesaturatePatternParser;
 import com.fastasyncworldedit.core.extension.factory.parser.pattern.ExistingPatternParser;
 import com.fastasyncworldedit.core.extension.factory.parser.pattern.ExpressionPatternParser;
+import com.fastasyncworldedit.core.extension.factory.parser.pattern.HotbarPatternParser;
 import com.fastasyncworldedit.core.extension.factory.parser.pattern.LightenPatternParser;
 import com.fastasyncworldedit.core.extension.factory.parser.pattern.Linear2DPatternParser;
 import com.fastasyncworldedit.core.extension.factory.parser.pattern.Linear3DPatternParser;
@@ -42,8 +43,6 @@ import com.fastasyncworldedit.core.extension.factory.parser.pattern.OffsetPatter
 import com.fastasyncworldedit.core.extension.factory.parser.pattern.PerlinPatternParser;
 import com.fastasyncworldedit.core.extension.factory.parser.pattern.RandomFullClipboardPatternParser;
 import com.fastasyncworldedit.core.extension.factory.parser.pattern.RandomOffsetPatternParser;
-import com.fastasyncworldedit.core.extension.factory.parser.pattern.TypeSwapPatternParser;
-import com.sk89q.worldedit.extension.factory.parser.pattern.RandomPatternParser;
 import com.fastasyncworldedit.core.extension.factory.parser.pattern.RelativePatternParser;
 import com.fastasyncworldedit.core.extension.factory.parser.pattern.RichPatternParser;
 import com.fastasyncworldedit.core.extension.factory.parser.pattern.RidgedMultiFractalPatternParser;
@@ -51,11 +50,13 @@ import com.fastasyncworldedit.core.extension.factory.parser.pattern.SaturatePatt
 import com.fastasyncworldedit.core.extension.factory.parser.pattern.SimplexPatternParser;
 import com.fastasyncworldedit.core.extension.factory.parser.pattern.SolidRandomOffsetPatternParser;
 import com.fastasyncworldedit.core.extension.factory.parser.pattern.SurfaceRandomOffsetPatternParser;
+import com.fastasyncworldedit.core.extension.factory.parser.pattern.TypeSwapPatternParser;
 import com.fastasyncworldedit.core.extension.factory.parser.pattern.VoronoiPatternParser;
 import com.fastasyncworldedit.core.math.random.TrueRandom;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.factory.parser.pattern.BlockCategoryPatternParser;
 import com.sk89q.worldedit.extension.factory.parser.pattern.ClipboardPatternParser;
+import com.sk89q.worldedit.extension.factory.parser.pattern.RandomPatternParser;
 import com.sk89q.worldedit.extension.factory.parser.pattern.RandomStatePatternParser;
 import com.sk89q.worldedit.extension.factory.parser.pattern.SingleBlockPatternParser;
 import com.sk89q.worldedit.extension.factory.parser.pattern.TypeOrStateApplyingPatternParser;
@@ -65,10 +66,8 @@ import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.function.pattern.RandomPattern;
 import com.sk89q.worldedit.internal.registry.AbstractFactory;
-import com.sk89q.worldedit.internal.registry.InputParser;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -80,20 +79,14 @@ import java.util.List;
  */
 public final class PatternFactory extends AbstractFactory<Pattern> {
 
-    //FAWE start - rich pattern parsing
-    private final RichPatternParser richPatternParser;
-    //FAWE end
-
     /**
      * Create a new instance.
      *
      * @param worldEdit the WorldEdit instance
      */
     public PatternFactory(WorldEdit worldEdit) {
-        super(worldEdit, new SingleBlockPatternParser(worldEdit));
-
         //FAWE start - rich pattern parsing
-        richPatternParser = new RichPatternParser(worldEdit);
+        super(worldEdit, new SingleBlockPatternParser(worldEdit), new RichPatternParser(worldEdit));
         //FAWE end
 
         // split and parse each sub-pattern
@@ -116,6 +109,7 @@ public final class PatternFactory extends AbstractFactory<Pattern> {
         register(new DesaturatePatternParser(worldEdit));
         register(new ExistingPatternParser(worldEdit));
         register(new ExpressionPatternParser(worldEdit));
+        register(new HotbarPatternParser(worldEdit));
         register(new LightenPatternParser(worldEdit));
         register(new Linear2DPatternParser(worldEdit));
         register(new Linear3DPatternParser(worldEdit));
@@ -136,75 +130,17 @@ public final class PatternFactory extends AbstractFactory<Pattern> {
         register(new SurfaceRandomOffsetPatternParser(worldEdit));
         register(new TypeSwapPatternParser(worldEdit));
         register(new VoronoiPatternParser(worldEdit));
-        //FAWE end
-    }
-
-    @Override
-    public Pattern parseFromInput(String input, ParserContext context) throws InputParseException {
-        List<Pattern> patterns = new ArrayList<>();
-
-        for (String component : input.split(" ")) {
-            if (component.isEmpty()) {
-                continue;
-            }
-
-            //FAWE start - rich pattern parsing
-            Pattern match = richPatternParser.parseFromInput(component, context);
-            if (match != null) {
-                patterns.add(match);
-                continue;
-            }
-            parseFromParsers(context, patterns, component);
-            //FAWE end
-        }
-
-        return getPattern(input, patterns);
     }
 
     //FAWE start - rich pattern parsing
-    private void parseFromParsers(
-            final ParserContext context,
-            final List<Pattern> patterns,
-            final String component
-    ) {
-        Pattern match = null;
-        for (InputParser<Pattern> parser : getParsers()) {
-            match = parser.parseFromInput(component, context);
 
-            if (match != null) {
-                break;
-            }
-        }
-        if (match == null) {
-            throw new NoMatchException(Caption.of("worldedit.error.no-match", TextComponent.of(component)));
-        }
-        patterns.add(match);
+    @Override
+    public Pattern parseFromInput(String input, ParserContext context) throws InputParseException {
+        return super.parseFromInput(input, context);
     }
 
-    /**
-     * Parses a pattern without considering parsing through the {@link RichPatternParser}, therefore not accepting
-     * "richer" parsing where &amp; and , are used. Exists to prevent stack overflows.
-     *
-     * @param input   input string
-     * @param context input context
-     * @return parsed result
-     * @throws InputParseException if no result found
-     */
-    public Pattern parseWithoutRich(String input, ParserContext context) throws InputParseException {
-        List<Pattern> patterns = new ArrayList<>();
-
-        for (String component : input.split(" ")) {
-            if (component.isEmpty()) {
-                continue;
-            }
-
-            parseFromParsers(context, patterns, component);
-        }
-
-        return getPattern(input, patterns);
-    }
-
-    private Pattern getPattern(final String input, final List<Pattern> patterns) {
+    @Override
+    protected Pattern getParsed(final String input, final List<Pattern> patterns) {
         switch (patterns.size()) {
             case 0:
                 throw new NoMatchException(Caption.of("worldedit.error.no-match", TextComponent.of(input)));

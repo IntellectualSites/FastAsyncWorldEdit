@@ -3,7 +3,6 @@ package com.fastasyncworldedit.core.history.change;
 import com.fastasyncworldedit.core.util.MathMan;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.DoubleTag;
-import com.sk89q.jnbt.LongTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.BaseEntity;
@@ -52,7 +51,7 @@ public class MutableEntityChange implements Change {
 
     @SuppressWarnings({"unchecked"})
     public void delete(UndoContext context) {
-        Map<String, Tag> map = tag.getValue();
+        Map<String, Tag<?, ?>> map = tag.getValue();
         UUID uuid = tag.getUUID();
         if (uuid == null) {
             LOGGER.info("Skipping entity without uuid.");
@@ -66,7 +65,7 @@ public class MutableEntityChange implements Change {
     }
 
     public void create(UndoContext context) {
-        Map<String, Tag> map = tag.getValue();
+        Map<String, Tag<?, ?>> map = tag.getValue();
         Tag posTag = map.get("Pos");
         if (posTag == null) {
             LOGGER.warn("Missing pos tag: {}", tag);

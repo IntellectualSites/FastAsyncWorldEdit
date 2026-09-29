@@ -2,9 +2,11 @@ package com.fastasyncworldedit.core.extent.clipboard;
 
 import com.fastasyncworldedit.core.jnbt.streamer.IntValueReader;
 import com.fastasyncworldedit.core.math.IntTriple;
+import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.IntTag;
 import com.sk89q.jnbt.Tag;
+import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.biome.BiomeType;
@@ -41,7 +43,7 @@ public class CPUOptimizedClipboard extends LinearClipboard {
 
     @Override
     public boolean setBiome(BlockVector3 position, BiomeType biome) {
-        return setBiome(position.getX(), position.getY(), position.getZ(), biome);
+        return setBiome(position.x(), position.y(), position.z(), biome);
     }
 
     @Override
@@ -92,7 +94,7 @@ public class CPUOptimizedClipboard extends LinearClipboard {
 
     @Override
     public BiomeType getBiome(BlockVector3 position) {
-        return getBiome(getBiomeIndex(position.getX(), position.getY(), position.getZ()));
+        return getBiome(getBiomeIndex(position.x(), position.y(), position.z()));
     }
 
     public void convertTilesToIndex() {
@@ -152,7 +154,7 @@ public class CPUOptimizedClipboard extends LinearClipboard {
     public Collection<CompoundTag> getTileEntities() {
         convertTilesToIndex();
         nbtMapIndex.replaceAll((index, tag) -> {
-            Map<String, Tag> values = new HashMap<>(tag.getValue());
+            Map<String, Tag<?, ?>> values = new HashMap<>(tag.getValue());
             if (!values.containsKey("x")) {
                 int y = index / getArea();
                 index -= y * getArea();
@@ -175,8 +177,14 @@ public class CPUOptimizedClipboard extends LinearClipboard {
         return true;
     }
 
+    @Override
+    public boolean tile(final int x, final int y, final int z, final FaweCompoundTag tile) throws WorldEditException {
+        // TODO replace
+        return setTile(x, y, z, new CompoundTag(tile.linTag()));
+    }
+
     private boolean setTile(int index, CompoundTag tag) {
-        final Map<String, Tag> values = new HashMap<>(tag.getValue());
+        final Map<String, Tag<?, ?>> values = new HashMap<>(tag.getValue());
         values.remove("x");
         values.remove("y");
         values.remove("z");

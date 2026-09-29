@@ -10,7 +10,6 @@ import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.ThreadLocalRandom;
 
 public interface HeightMap {
@@ -45,7 +44,7 @@ public interface HeightMap {
             boolean layers
     ) throws MaxChangedBlocksException {
         BlockVector3 top = session.getMaximumPoint();
-        int maxY = top.getBlockY();
+        int maxY = top.y();
         Location min = new Location(session.getWorld(), pos.subtract(size, size, size).toVector3());
         BlockVector3 max = pos.add(size, maxY, size);
         Region region = new CuboidRegion(session.getWorld(), min.toBlockPoint(), max);
@@ -81,9 +80,9 @@ public interface HeightMap {
         int maxY = session.getMaxY();
         int minY = session.getMinY();
         int diameter = 2 * size + 1;
-        int centerX = pos.getBlockX();
-        int centerZ = pos.getBlockZ();
-        int centerY = pos.getBlockY();
+        int centerX = pos.x();
+        int centerZ = pos.z();
+        int centerY = pos.y();
         int[] oldData = new int[diameter * diameter];
         int[] newData = new int[oldData.length];
         if (layers) { // Pixel accuracy
@@ -92,7 +91,7 @@ public interface HeightMap {
         }
         if (towards) {
             double sizePowInv = 1d / Math.pow(size, yscale);
-            int targetY = pos.getBlockY();
+            int targetY = pos.y();
             int tmpY = targetY;
             for (int x = -size; x <= size; x++) {
                 int xx = centerX + x;
@@ -133,7 +132,7 @@ public interface HeightMap {
                 }
             }
         } else {
-            int height = pos.getBlockY();
+            int height = pos.y();
             for (int x = -size; x <= size; x++) {
                 int xx = centerX + x;
                 for (int z = -size; z <= size; z++) {

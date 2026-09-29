@@ -28,10 +28,9 @@ import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.transform.Transform;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.Direction.Flag;
-import com.sk89q.worldedit.util.nbt.BinaryTag;
-import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
-import com.sk89q.worldedit.util.nbt.NumberBinaryTag;
 import com.sk89q.worldedit.world.block.BaseBlock;
+import org.enginehub.linbus.tree.LinCompoundTag;
+import org.enginehub.linbus.tree.LinTag;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -88,14 +87,13 @@ public class ExtentBlockCopy implements RegionFunction {
      * @return a new state or the existing one
      */
     private BaseBlock transformNbtData(BaseBlock state) {
-        //FAWE start - Replace CompoundTag with CompoundBinaryTag
-        CompoundBinaryTag tag = state.getNbt();
+        LinCompoundTag tag = state.getNbt();
 
         if (tag != null) {
             // Handle blocks which store their rotation in NBT
-            BinaryTag rotTag = tag.get("Rot");
-            if (rotTag instanceof NumberBinaryTag) {
-                int rot = ((NumberBinaryTag) rotTag).intValue();
+            LinTag<?> rotTag = tag.value().get("Rot");
+            if (rotTag.value() instanceof Number number) {
+                int rot = number.intValue();
 
                 Direction direction = MCDirections.fromRotation(rot);
 
@@ -105,8 +103,9 @@ public class ExtentBlockCopy implements RegionFunction {
 
                     if (newDirection != null) {
                         return state.toBaseBlock(
-                                tag.putByte("Rot", (byte) MCDirections.toRotation(newDirection))
-                                //FAWE end
+                            tag.toBuilder()
+                                .putByte("Rot", (byte) MCDirections.toRotation(newDirection))
+                                .build()
                         );
                     }
                 }

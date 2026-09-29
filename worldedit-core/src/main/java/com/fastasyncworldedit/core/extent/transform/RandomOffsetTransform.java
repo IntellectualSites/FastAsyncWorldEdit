@@ -34,9 +34,9 @@ public class RandomOffsetTransform extends ResettableExtent {
 
     @Override
     public boolean setBiome(BlockVector3 position, BiomeType biome) {
-        int x = position.getBlockX() + random.nextInt(1 + (dx << 1)) - dx;
-        int y = position.getBlockY() + random.nextInt(1 + (dy << 1)) - dy;
-        int z = position.getBlockZ() + random.nextInt(1 + (dz << 1)) - dz;
+        int x = position.x() + random.nextInt(1 + (dx << 1)) - dx;
+        int y = position.y() + random.nextInt(1 + (dy << 1)) - dy;
+        int z = position.z() + random.nextInt(1 + (dz << 1)) - dz;
         if (!getExtent().contains(x, y, z)) {
             return false;
         }
@@ -57,9 +57,9 @@ public class RandomOffsetTransform extends ResettableExtent {
     @Override
     public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 pos, T block)
             throws WorldEditException {
-        int x = pos.getBlockX() + random.nextInt(1 + (dx << 1)) - dx;
-        int y = pos.getBlockY() + random.nextInt(1 + (dy << 1)) - dy;
-        int z = pos.getBlockZ() + random.nextInt(1 + (dz << 1)) - dz;
+        int x = pos.x() + random.nextInt(1 + (dx << 1)) - dx;
+        int y = pos.y() + random.nextInt(1 + (dy << 1)) - dy;
+        int z = pos.z() + random.nextInt(1 + (dz << 1)) - dz;
         if (!getExtent().contains(x, y, z)) {
             return false;
         }

@@ -70,17 +70,17 @@ public abstract class SimpleClipboard implements Clipboard {
 
     @Override
     public final int getWidth() {
-        return size.getBlockX();
+        return size.x();
     }
 
     @Override
     public final int getHeight() {
-        return size.getBlockY();
+        return size.y();
     }
 
     @Override
     public final int getLength() {
-        return size.getBlockZ();
+        return size.z();
     }
 
     @Override

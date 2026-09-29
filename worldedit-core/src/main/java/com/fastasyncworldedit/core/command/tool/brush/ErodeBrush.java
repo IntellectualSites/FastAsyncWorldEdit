@@ -63,9 +63,9 @@ public class ErodeBrush implements Brush {
         Clipboard buffer1 = new CPUOptimizedClipboard(region);
         Clipboard buffer2 = new CPUOptimizedClipboard(region);
 
-        final int bx = target.getBlockX();
-        final int by = target.getBlockY();
-        final int bz = target.getBlockZ();
+        final int bx = target.x();
+        final int by = target.y();
+        final int bz = target.z();
 
         for (int x = -brushSize, relx = 0; x <= brushSize && relx < buffer1.getWidth(); x++, relx++) {
             int x0 = x + bx;
@@ -106,7 +106,7 @@ public class ErodeBrush implements Brush {
 
         for (BlockVector3 pos : finalBuffer) {
             BlockState block = pos.getBlock(finalBuffer);
-            es.setBlock(pos.getX() + bx - brushSize, pos.getY() + by - brushSize, pos.getZ() + bz - brushSize, block);
+            es.setBlock(pos.x() + bx - brushSize, pos.y() + by - brushSize, pos.z() + bz - brushSize, block);
         }
     }
 
@@ -139,9 +139,9 @@ public class ErodeBrush implements Brush {
                     int highest = 1;
                     for (BlockVector3 offs : FACES_TO_CHECK) {
                         BaseBlock next = current.getFullBlock(
-                                relx + offs.getBlockX(),
-                                rely + offs.getBlockY(),
-                                relz + offs.getBlockZ()
+                                relx + offs.x(),
+                                rely + offs.y(),
+                                relz + offs.z()
                         );
                         if (!next.getBlockType().getMaterial().isMovementBlocker()) {
                             continue;
@@ -190,9 +190,9 @@ public class ErodeBrush implements Brush {
                     int total = 0;
                     for (BlockVector3 offs : FACES_TO_CHECK) {
                         BaseBlock next = current.getFullBlock(
-                                relx + offs.getBlockX(),
-                                rely + offs.getBlockY(),
-                                relz + offs.getBlockZ()
+                                relx + offs.x(),
+                                rely + offs.y(),
+                                relz + offs.z()
                         );
                         if (next.getMaterial().isMovementBlocker()) {
                             continue;

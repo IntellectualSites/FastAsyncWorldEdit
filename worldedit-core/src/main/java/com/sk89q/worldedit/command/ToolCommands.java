@@ -19,10 +19,11 @@
 
 package com.sk89q.worldedit.command;
 
+import com.fastasyncworldedit.core.command.tool.FeaturePlacer;
+import com.fastasyncworldedit.core.command.tool.StructurePlacer;
 import com.fastasyncworldedit.core.command.tool.brush.InspectBrush;
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.google.common.collect.Collections2;
-import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
@@ -50,12 +51,14 @@ import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.internal.command.CommandRegistrationHandler;
 import com.sk89q.worldedit.internal.command.CommandUtil;
 import com.sk89q.worldedit.util.HandSide;
-import com.sk89q.worldedit.util.TreeGenerator;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.generation.ConfiguredFeatureType;
+import com.sk89q.worldedit.world.generation.StructureType;
+import com.sk89q.worldedit.world.generation.TreeType;
 import org.enginehub.piston.CommandManager;
 import org.enginehub.piston.CommandManagerService;
 import org.enginehub.piston.CommandMetadata;
@@ -149,7 +152,7 @@ public class ToolCommands {
             throws InvalidToolBindException {
         //FAWE start
         isBrush = session.getTool(player) instanceof BrushTool;
-        session.setTool(player.getItemInHand(HandSide.MAIN_HAND).getType(), null);
+        session.setTool(player.getItemInHand(HandSide.MAIN_HAND), null);
         //FAWE end
         player.print(Caption.of(isBrush ? "worldedit.brush.none.equip" : "worldedit.tool.none.equip"));
     }
@@ -163,7 +166,7 @@ public class ToolCommands {
             String translationKey
     ) throws InvalidToolBindException {
         BaseItemStack itemStack = player.getItemInHand(HandSide.MAIN_HAND);
-        session.setTool(itemStack.getType(), tool);
+        session.setTool(itemStack, tool);
         player.print(Caption.of(translationKey, itemStack.getRichName()));
         sendUnbindInstruction(player, UNBIND_COMMAND_COMPONENT);
     }
@@ -239,10 +242,40 @@ public class ToolCommands {
     public void tree(
             Player player, LocalSession session,
             @Arg(desc = "Type of tree to generate", def = "tree")
-                    TreeGenerator.TreeType type
+                    TreeType type
     ) throws WorldEditException {
         setTool(player, session, new TreePlanter(type), "worldedit.tool.tree.equip");
     }
+
+    //FAWE start
+    @Command(
+            name = "featureplacer",
+            aliases = {"/featureplacer", "featuretool", "/featuretool"},
+            desc = "Feature placer tool"
+    )
+    @CommandPermissions("worldedit.tool.feature")
+    public void feature(
+            Player player, LocalSession session,
+            @Arg(desc = "Type of feature to place")
+            ConfiguredFeatureType feature
+    ) throws WorldEditException {
+        setTool(player, session, new FeaturePlacer(feature), "worldedit.tool.feature.equip");
+    }
+
+    @Command(
+            name = "structureplacer",
+            aliases = {"/structureplacer", "structuretool", "/structuretool"},
+            desc = "Structure placer tool"
+    )
+    @CommandPermissions("worldedit.tool.structure")
+    public void structure(
+            Player player, LocalSession session,
+            @Arg(desc = "Type of structure to place")
+            StructureType feature
+    ) throws WorldEditException {
+        setTool(player, session, new StructurePlacer(feature), "worldedit.tool.structure.equip");
+    }
+    //FAWE end
 
     @Command(
             name = "stacker",
@@ -297,10 +330,11 @@ public class ToolCommands {
                     int range
     ) throws WorldEditException {
 
-        LocalConfiguration config = we.getConfiguration();
-
-        if (range > config.maxSuperPickaxeSize) {
-            player.print(Caption.of("worldedit.tool.superpickaxe.max-range", TextComponent.of(config.maxSuperPickaxeSize)));
+        if (range > player.getLimit().MAX_SUPER_PICKAXE_SIZE) {
+            player.print(Caption.of(
+                    "worldedit.tool.superpickaxe.max-range",
+                    TextComponent.of(player.getLimit().MAX_SUPER_PICKAXE_SIZE)
+            ));
             return;
         }
         setTool(player, session, new FloodFillTool(range, pattern), "worldedit.tool.floodfill.equip");

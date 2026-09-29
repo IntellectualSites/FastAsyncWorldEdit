@@ -3,6 +3,7 @@ package com.fastasyncworldedit.core.command.tool.brush;
 import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.math.LocalBlockVectorSet;
 import com.fastasyncworldedit.core.util.StringMan;
+import com.fastasyncworldedit.core.util.collection.BlockVector3Set;
 import com.fastasyncworldedit.core.wrappers.AsyncPlayer;
 import com.fastasyncworldedit.core.wrappers.LocationMaskedPlayerWrapper;
 import com.fastasyncworldedit.core.wrappers.SilentPlayerWrapper;
@@ -31,9 +32,21 @@ public class ScatterCommand extends ScatterBrush {
     }
 
     @Override
+    @Deprecated(forRemoval = true, since = "2.13.0")
     public void apply(
             EditSession editSession,
             LocalBlockVectorSet placed,
+            BlockVector3 position,
+            Pattern p,
+            double size
+    ) throws MaxChangedBlocksException {
+        apply(editSession, LocalBlockVectorSet.wrap(placed), position, p, size);
+    }
+
+    @Override
+    public void apply(
+            EditSession editSession,
+            BlockVector3Set placed,
             BlockVector3 position,
             Pattern pattern,
             double size
@@ -45,9 +58,9 @@ public class ScatterCommand extends ScatterBrush {
                 position.subtract(radius, radius, radius),
                 position.add(radius, radius, radius)
         );
-        String replaced = command.replace("{x}", Integer.toString(position.getBlockX()))
-                .replace("{y}", Integer.toString(position.getBlockY()))
-                .replace("{z}", Integer.toString(position.getBlockZ()))
+        String replaced = command.replace("{x}", Integer.toString(position.x()))
+                .replace("{y}", Integer.toString(position.y()))
+                .replace("{z}", Integer.toString(position.z()))
                 .replace("{world}", editSession.getWorld().getName())
                 .replace("{size}", Integer.toString(radius));
 

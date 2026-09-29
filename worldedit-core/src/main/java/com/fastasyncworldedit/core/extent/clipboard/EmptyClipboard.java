@@ -1,7 +1,7 @@
 package com.fastasyncworldedit.core.extent.clipboard;
 
 import com.fastasyncworldedit.core.extent.processor.heightmap.HeightMapType;
-import com.sk89q.jnbt.CompoundTag;
+import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
@@ -84,7 +84,8 @@ public final class EmptyClipboard implements Clipboard {
         return false;
     }
 
-    public boolean setTile(int x, int y, int z, @Nonnull CompoundTag tile) throws WorldEditException {
+    @Override
+    public boolean tile(final int x, final int y, final int z, final FaweCompoundTag tile) throws WorldEditException {
         return false;
     }
 

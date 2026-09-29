@@ -112,9 +112,9 @@ public class PropertiesConfiguration extends LocalConfiguration {
         logFile = getString("log-file", logFile);
         logFormat = getString("log-format", logFormat);
         registerHelp = getBool("register-help", registerHelp);
-        wandItem = getString("wand-item", wandItem).toLowerCase(Locale.ROOT);
+        wandItem = getString("wand-item", wandItem);
         try {
-            wandItem = LegacyMapper.getInstance().getItemFromLegacy(Integer.parseInt(wandItem)).getId();
+            wandItem = LegacyMapper.getInstance().getItemFromLegacy(Integer.parseInt(wandItem)).id();
         } catch (Throwable ignored) {
         }
         superPickaxeDrop = getBool("super-pickaxe-drop-items", superPickaxeDrop);
@@ -122,9 +122,9 @@ public class PropertiesConfiguration extends LocalConfiguration {
         useInventory = getBool("use-inventory", useInventory);
         useInventoryOverride = getBool("use-inventory-override", useInventoryOverride);
         useInventoryCreativeOverride = getBool("use-inventory-creative-override", useInventoryCreativeOverride);
-        navigationWand = getString("nav-wand-item", navigationWand).toLowerCase(Locale.ROOT);
+        navigationWand = getString("nav-wand-item", navigationWand);
         try {
-            navigationWand = LegacyMapper.getInstance().getItemFromLegacy(Integer.parseInt(navigationWand)).getId();
+            navigationWand = LegacyMapper.getInstance().getItemFromLegacy(Integer.parseInt(navigationWand)).id();
         } catch (Throwable ignored) {
         }
         navigationWandMaxDistance = getInt("nav-wand-distance", navigationWandMaxDistance);
@@ -136,6 +136,14 @@ public class PropertiesConfiguration extends LocalConfiguration {
         scriptsDir = getString("craftscript-dir", scriptsDir);
         butcherDefaultRadius = getInt("butcher-default-radius", butcherDefaultRadius);
         butcherMaxRadius = getInt("butcher-max-radius", butcherMaxRadius);
+
+        //FAWE start
+        MAX_RADIUS = maxRadius;
+        MAX_BRUSH_RADIUS = maxBrushRadius;
+        MAX_SUPER_RADIUS = maxSuperPickaxeSize;
+        MAX_BUTCHER_RADIUS = butcherMaxRadius;
+        //FAWE end
+
         allowSymlinks = getBool("allow-symbolic-links", allowSymlinks);
         serverSideCUI = getBool("server-side-cui", serverSideCUI);
         extendedYLimit = getBool("extended-y-limit", extendedYLimit);

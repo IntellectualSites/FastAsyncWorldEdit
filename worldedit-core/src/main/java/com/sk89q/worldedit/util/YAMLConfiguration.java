@@ -58,7 +58,7 @@ public class YAMLConfiguration extends LocalConfiguration {
 
         profile = config.getBoolean("debug", profile);
         traceUnflushedSessions = config.getBoolean("debugging.trace-unflushed-sessions", traceUnflushedSessions);
-        wandItem = convertLegacyItem(config.getString("wand-item", wandItem)).toLowerCase(Locale.ROOT);
+        wandItem = convertLegacyItem(config.getString("wand-item", wandItem));
 
         defaultChangeLimit = Math.max(-1, config.getInt(
                 "limits.max-blocks-changed.default", defaultChangeLimit));
@@ -95,6 +95,13 @@ public class YAMLConfiguration extends LocalConfiguration {
         butcherDefaultRadius = Math.max(-1, config.getInt("limits.butcher-radius.default", butcherDefaultRadius));
         butcherMaxRadius = Math.max(-1, config.getInt("limits.butcher-radius.maximum", butcherMaxRadius));
 
+        //FAWE start
+        MAX_RADIUS = maxRadius;
+        MAX_BRUSH_RADIUS = maxBrushRadius;
+        MAX_SUPER_RADIUS = maxSuperPickaxeSize;
+        MAX_BUTCHER_RADIUS = butcherMaxRadius;
+        //FAWE end
+
         disallowedBlocks = config.getStringList("limits.disallowed-blocks", Lists.newArrayList(getDefaultDisallowedBlocks()))
                 .stream()
                 .map(s -> s.contains(":") ? s.toLowerCase(Locale.ROOT) : ("minecraft:" + s).toLowerCase(Locale.ROOT))
@@ -123,7 +130,7 @@ public class YAMLConfiguration extends LocalConfiguration {
                 useInventoryCreativeOverride
         );
 
-        navigationWand = convertLegacyItem(config.getString("navigation-wand.item", navigationWand)).toLowerCase(Locale.ROOT);
+        navigationWand = convertLegacyItem(config.getString("navigation-wand.item", navigationWand));
         navigationWandMaxDistance = config.getInt("navigation-wand.max-distance", navigationWandMaxDistance);
         navigationUseGlass = config.getBoolean("navigation.use-glass", navigationUseGlass);
 

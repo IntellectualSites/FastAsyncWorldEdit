@@ -89,13 +89,13 @@ public class OffsetMask2D extends AbstractMask2D {
     //FAWE start
     @Override
     public boolean test(BlockVector2 vector) {
-        mutableBlockVector2.setComponents(vector.getX() + offset.getX(), vector.getZ() + offset.getZ());
+        mutableBlockVector2.setComponents(vector.x() + offset.x(), vector.z() + offset.z());
         return getMask().test(mutableBlockVector2);
     }
 
     @Override
     public Mask2D copy2D() {
-        return new OffsetMask2D(mask.copy2D(), BlockVector2.at(offset.getX(), offset.getZ()));
+        return new OffsetMask2D(mask.copy2D(), BlockVector2.at(offset.x(), offset.z()));
     }
     //FAWE end
 

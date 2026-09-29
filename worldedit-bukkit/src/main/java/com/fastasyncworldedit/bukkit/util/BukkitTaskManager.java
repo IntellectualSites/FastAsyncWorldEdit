@@ -22,6 +22,11 @@ public class BukkitTaskManager extends TaskManager {
     }
 
     @Override
+    public int repeat(@Nonnull final Runnable runnable, final int interval) {
+        return this.plugin.getServer().getScheduler().scheduleSyncRepeatingTask(this.plugin, runnable, interval, interval);
+    }
+
+    @Override
     public int repeatAsync(@Nonnull final Runnable runnable, final int interval) {
         return this.plugin.getServer().getScheduler().scheduleAsyncRepeatingTask(this.plugin, runnable, interval, interval);
     }
@@ -70,20 +75,20 @@ public class BukkitTaskManager extends TaskManager {
 
     @Override
     public <T> T syncAt(final Supplier<T> supplier, final World world, final int chunkX, final int chunkZ) {
-        return sync(supplier);
+        return syncNow(supplier);
     }
 
     @Override
     public <T> T syncWith(final Supplier<T> supplier, final Player context) {
-        return sync(supplier);
+        return syncNow(supplier);
     }
 
     @Override
     public <T> T syncGlobal(final Supplier<T> supplier) {
-        return sync(supplier);
+        return syncNow(supplier);
     }
 
-    private <T> T sync(final Supplier<T> supplier) {
+    private <T> T syncNow(final Supplier<T> supplier) {
         if (Fawe.isTickThread()) {
             return supplier.get();
         }

@@ -83,18 +83,18 @@ public abstract class AbstractSingleFilterBlock extends FilterBlock {
 
     @Override
     public BlockVector3 getMinimumPoint() {
-        return at(getX(), getY(), getZ());
+        return at(x(), y(), z());
     }
 
     @Override
     public BlockVector3 getMaximumPoint() {
-        return at(getX(), getY(), getZ());
+        return at(x(), y(), z());
     }
 
     @Override
     public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block)
             throws WorldEditException {
-        if (x == this.getX() && y == this.getY() && z == this.getZ()) {
+        if (x == this.x() && y == this.y() && z == this.z()) {
             setFullBlock(block.toBaseBlock());
             return true;
         }

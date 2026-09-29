@@ -1,7 +1,6 @@
 package com.fastasyncworldedit.bukkit.util;
 
 import com.google.common.collect.ComparisonChain;
-import io.papermc.lib.PaperLib;
 import org.bukkit.Bukkit;
 
 import javax.annotation.Nonnull;
@@ -73,8 +72,11 @@ public class MinecraftVersion implements Comparable<MinecraftVersion> {
         int major;
         int minor;
         int release;
-        if (PaperLib.isPaper()) {
-            String[] parts = Bukkit.getMinecraftVersion().split(Pattern.quote("."));
+        if (PaperSupport.isPaper()) {
+            // Snapshots, pre-releases, release candidates have a space after the version.
+            // Let's ignore that here
+            String minecraftVersion = Bukkit.getMinecraftVersion().split(" ")[0];
+            String[] parts = minecraftVersion.split(Pattern.quote("."));
             if (parts.length != 2 && parts.length != 3) {
                 throw new IllegalStateException("Failed to determine minecraft version!");
             }
@@ -82,13 +84,23 @@ public class MinecraftVersion implements Comparable<MinecraftVersion> {
             minor = Integer.parseInt(parts[1]);
             release = parts.length == 3 ? Integer.parseInt(parts[2]) : 0; // e.g. 1.18
         } else {
-            String[] parts = getPackageVersion().split("_");
-            if (parts.length != 3) {
-                throw new IllegalStateException("Failed to determine minecraft version!");
+            String packageVersion = getPackageVersion();
+            String[] parts = packageVersion.split("_");
+            if (parts.length == 3 && parts[0].startsWith("v") && parts[2].startsWith("R")) {
+                major = Integer.parseInt(parts[0].substring(1));
+                minor = Integer.parseInt(parts[1]);
+                release = Integer.parseInt(parts[2].substring(1));
+            } else {
+                // Newer servers may expose unversioned CraftBukkit packages (e.g. "craftbukkit").
+                String version = Bukkit.getServer().getBukkitVersion().split("-")[0];
+                String[] dotted = version.split(Pattern.quote("."));
+                if (dotted.length != 2 && dotted.length != 3) {
+                    throw new IllegalStateException("Failed to determine minecraft version!");
+                }
+                major = Integer.parseInt(dotted[0]);
+                minor = Integer.parseInt(dotted[1]);
+                release = dotted.length == 3 ? Integer.parseInt(dotted[2]) : 0;
             }
-            major = Integer.parseInt(parts[0].substring(1));
-            minor = Integer.parseInt(parts[1]);
-            release = Integer.parseInt(parts[2].substring(1));
         }
         return new MinecraftVersion(major, minor, release);
     }
@@ -101,7 +113,15 @@ public class MinecraftVersion implements Comparable<MinecraftVersion> {
      */
     private static String getPackageVersion() {
         String fullPackagePath = Bukkit.getServer().getClass().getPackage().getName();
-        return fullPackagePath.substring(fullPackagePath.lastIndexOf('.') + 1);
+        if (fullPackagePath.contains(".")) {
+            String token = fullPackagePath.substring(fullPackagePath.lastIndexOf('.') + 1);
+            // Keep legacy behavior only for versioned CraftBukkit package names (e.g. v1_21_R7).
+            if (token.startsWith("v") && token.contains("_R")) {
+                return token;
+            }
+        }
+        String version = Bukkit.getServer().getBukkitVersion();
+        return version.split("-")[0];
     }
 
     /**

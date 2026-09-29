@@ -14,9 +14,9 @@ public class YAxisMask extends AbstractMask implements ResettableMask {
     @Override
     public boolean test(BlockVector3 vector) {
         if (layer == -1) {
-            layer = vector.getBlockY();
+            layer = vector.y();
         }
-        return vector.getBlockY() == layer;
+        return vector.y() == layer;
     }
 
     @Override
