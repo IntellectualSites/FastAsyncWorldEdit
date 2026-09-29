@@ -257,7 +257,11 @@ public class PaperweightFaweWorldNativeAccess implements WorldNativeAccess<Level
                 PaperweightPlatformAdapter.sendChunk(chunk, getLevel().getWorld().getHandle(), chunk.x(), chunk.z());
             }
         };
-        TaskManager.taskManager().async(() -> TaskManager.taskManager().sync(runnable));
+        // we don't support Folia on that version, we can run this globally
+        TaskManager.taskManager().async(() -> TaskManager.taskManager().syncGlobal(() -> {
+            runnable.run();
+            return null;
+        }));
     }
 
     @Override
@@ -270,10 +274,14 @@ public class PaperweightFaweWorldNativeAccess implements WorldNativeAccess<Level
                 PaperweightPlatformAdapter.sendChunk(chunk, getLevel().getWorld().getHandle(), chunk.x(), chunk.z());
             }
         };
-        if (Fawe.isMainThread()) {
+        if (Fawe.isTickThread()) {
             runnable.run();
         } else {
-            TaskManager.taskManager().sync(runnable);
+            // we don't support Folia on that version, we can run this globally
+            TaskManager.taskManager().syncGlobal(() -> {
+                runnable.run();
+                return null;
+            });
         }
         cachedChanges.clear();
         cachedChunksToSend.clear();

@@ -224,6 +224,12 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
                 @Override
                 public void read(final FaweInputStream in, final BlockPositionChange change) throws IOException {
                     in.readFully(buffer);
+                    // Keep compatibility with version 2 history that may switch relative origins mid-stream.
+                    if (version == 2 && Arrays.equals(buffer, MAGIC_NEW_RELATIVE)) {
+                        lx = ((in.read() << 24) + (in.read() << 16) + (in.read() << 8) + in.read());
+                        lz = ((in.read() << 24) + (in.read() << 16) + (in.read() << 8) + in.read());
+                        in.readFully(buffer);
+                    }
                     change.x = lx = lx + ((buffer[0] & 0xFF) | (buffer[1] << 8));
                     change.z = lz = lz + ((buffer[2] & 0xFF) | (buffer[3]) << 8);
                     change.y = ly = ly + ((buffer[4] & 0xFF) | (buffer[5]) << 8);
