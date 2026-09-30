@@ -17,15 +17,22 @@ public final class FoliaSupport {
 
         }
         IS_FOLIA = isFolia;
-        Class<?> tickThreadClass = String.class; // thread will never be instance of String
+        Class<?> tickThreadClass = null;
         if (IS_FOLIA) {
-            try {
-                tickThreadClass = Class.forName("io.papermc.paper.util.TickThread");
-            } catch (ClassNotFoundException e) {
-                throw new AssertionError(e);
+            String[] candidates = {
+                "ca.spottedleaf.moonrise.common.util.TickThread",
+                "io.papermc.paper.util.TickThread",
+                "io.papermc.paper.threadedregions.TickThread"
+            };
+            for (String candidate : candidates) {
+                try {
+                    tickThreadClass = Class.forName(candidate);
+                    break;
+                } catch (ClassNotFoundException ignored) {
+                }
             }
         }
-        TICK_THREAD_CLASS = tickThreadClass;
+        TICK_THREAD_CLASS = tickThreadClass != null ? tickThreadClass : Void.class;
     }
 
     public static boolean isFolia() {
