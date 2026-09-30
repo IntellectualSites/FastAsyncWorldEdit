@@ -4,6 +4,7 @@ import com.fastasyncworldedit.core.queue.IChunk;
 import com.fastasyncworldedit.core.queue.IChunkCache;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.implementation.SingleThreadQueueExtent;
+import com.fastasyncworldedit.core.util.FoliaSupport;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
@@ -103,11 +104,14 @@ public abstract class Regenerator {
 
     private void copyToWorld() {
         createSource();
-        final long timeoutPerTick = TimeUnit.MILLISECONDS.toNanos(10);
-        int taskId = TaskManager.taskManager().repeat(() -> {
-            final long startTime = System.nanoTime();
-            runTasks(() -> System.nanoTime() - startTime < timeoutPerTick);
-        }, 1);
+        int taskId = -1;
+        if (!FoliaSupport.isFolia()) {
+            final long timeoutPerTick = TimeUnit.MILLISECONDS.toNanos(10);
+            taskId = TaskManager.taskManager().repeat(() -> {
+                final long startTime = System.nanoTime();
+                runTasks(() -> System.nanoTime() - startTime < timeoutPerTick);
+            }, 1);
+        }
         //Setting Blocks
         boolean genbiomes = options.shouldRegenBiomes();
         boolean hasBiome = options.hasBiomeType();
@@ -126,7 +130,9 @@ public abstract class Regenerator {
             });
         }
         target.setBlocks(region, pattern);
-        TaskManager.taskManager().cancel(taskId);
+        if (taskId != -1) {
+            TaskManager.taskManager().cancel(taskId);
+        }
     }
 
     private abstract class ChunkwisePattern implements Pattern {

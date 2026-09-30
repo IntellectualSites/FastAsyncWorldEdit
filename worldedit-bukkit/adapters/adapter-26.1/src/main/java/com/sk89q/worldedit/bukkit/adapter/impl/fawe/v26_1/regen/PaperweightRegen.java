@@ -2,6 +2,7 @@ package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v26_1.regen;
 
 import com.fastasyncworldedit.bukkit.adapter.Regenerator;
 import com.fastasyncworldedit.bukkit.util.PaperSupport;
+import com.fastasyncworldedit.core.util.FoliaSupport;
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.queue.IChunkCache;
 import com.fastasyncworldedit.core.queue.IChunkGet;
@@ -98,10 +99,16 @@ public class PaperweightRegen extends Regenerator {
 
     @Override
     protected void runTasks(final BooleanSupplier shouldKeepTicking) {
-        while (shouldKeepTicking.getAsBoolean()) {
-            if (!this.freshWorld.getChunkSource().pollTask()) {
-                return;
+        if (FoliaSupport.isFolia()) {
+            return;
+        }
+        try {
+            while (shouldKeepTicking.getAsBoolean()) {
+                if (!this.freshWorld.getChunkSource().pollTask()) {
+                    return;
+                }
             }
+        } catch (Throwable ignored) {
         }
     }
 
