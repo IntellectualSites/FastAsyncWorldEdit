@@ -27,6 +27,8 @@ public class BukkitReflectionUtils {
         if (pas.length == 5) {
             final String verB = pas[3];
             preClassB = "org.bukkit.craftbukkit." + verB;
+        } else {
+            preClassB = "org.bukkit.craftbukkit";
         }
         try {
             final Method getHandle = bukkitServerClass.getDeclaredMethod("getHandle");
@@ -36,6 +38,8 @@ public class BukkitReflectionUtils {
             if (pas.length == 5) {
                 final String verM = pas[3];
                 preClassM = "net.minecraft.server." + verM;
+            } else {
+                preClassM = "net.minecraft.server";
             }
         } catch (final Exception e) {
             e.printStackTrace();
@@ -43,17 +47,32 @@ public class BukkitReflectionUtils {
     }
 
     public static Class<?> getNmsClass(final String name) {
-        final String className = "net.minecraft.server." + getVersion() + "." + name;
-        return ReflectionUtils.getClass(className);
+        String ver = getVersion();
+        if (ver != null && !ver.isEmpty() && !ver.equals("craftbukkit")) {
+            Class<?> clazz = ReflectionUtils.getClass("net.minecraft.server." + ver + "." + name);
+            if (clazz != null) {
+                return clazz;
+            }
+        }
+        return ReflectionUtils.getClass("net.minecraft.server." + name);
     }
 
     public static Class<?> getCbClass(final String name) {
-        final String className = "org.bukkit.craftbukkit." + getVersion() + "." + name;
-        return ReflectionUtils.getClass(className);
+        String ver = getVersion();
+        if (ver != null && !ver.isEmpty() && !ver.equals("craftbukkit")) {
+            Class<?> clazz = ReflectionUtils.getClass("org.bukkit.craftbukkit." + ver + "." + name);
+            if (clazz != null) {
+                return clazz;
+            }
+        }
+        return ReflectionUtils.getClass("org.bukkit.craftbukkit." + name);
     }
 
     public static String getVersion() {
         final String packageName = Bukkit.getServer().getClass().getPackage().getName();
+        if (packageName.equals("org.bukkit.craftbukkit")) {
+            return "";
+        }
         return packageName.substring(packageName.lastIndexOf('.') + 1);
     }
 

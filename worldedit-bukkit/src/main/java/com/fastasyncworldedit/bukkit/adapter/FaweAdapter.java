@@ -140,7 +140,7 @@ public abstract class FaweAdapter<TAG, SERVER_LEVEL> extends CachedBukkitAdapter
 
     protected abstract void ensureInit();
 
-    private void preCaptureStatesCommon(SERVER_LEVEL serverLevel) {
+    protected void preCaptureStatesCommon(SERVER_LEVEL serverLevel) {
         if (FoliaSupport.isFolia()) {
             preCaptureStatesFolia(serverLevel);
         } else {
@@ -148,7 +148,7 @@ public abstract class FaweAdapter<TAG, SERVER_LEVEL> extends CachedBukkitAdapter
         }
     }
 
-    private List<BlockState> getCapturedBlockStatesCopyCommon(SERVER_LEVEL serverLevel) {
+    protected List<BlockState> getCapturedBlockStatesCopyCommon(SERVER_LEVEL serverLevel) {
         if (FoliaSupport.isFolia()) {
             return getCapturedBlockStatesCopyFolia(serverLevel);
         } else {
@@ -156,7 +156,7 @@ public abstract class FaweAdapter<TAG, SERVER_LEVEL> extends CachedBukkitAdapter
         }
     }
 
-    private void postCaptureBlockStatesCommon(SERVER_LEVEL serverLevel) {
+    protected void postCaptureBlockStatesCommon(SERVER_LEVEL serverLevel) {
         if (FoliaSupport.isFolia()) {
             postCaptureBlockStatesFolia(serverLevel);
         } else {

@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.bukkit;
 
+import com.fastasyncworldedit.core.util.FoliaSupport;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.entity.BaseEntity;
@@ -32,6 +33,7 @@ import org.bukkit.entity.EntityType;
 
 import javax.annotation.Nullable;
 import java.lang.ref.WeakReference;
+import java.util.function.Supplier;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -100,6 +102,15 @@ public class BukkitEntity implements Entity {
 
             BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
             if (adapter != null) {
+                if (FoliaSupport.isFolia()) {
+                    org.bukkit.Location loc = entity.getLocation();
+                    return TaskManager.taskManager().syncAt(
+                            () -> adapter.getEntity(entity),
+                            BukkitAdapter.adapt(loc.getWorld()),
+                            loc.getBlockX() >> 4,
+                            loc.getBlockZ() >> 4
+                    );
+                }
                 return adapter.getEntity(entity);
             } else {
                 return null;
@@ -111,21 +122,28 @@ public class BukkitEntity implements Entity {
 
     @Override
     public boolean remove() {
-        // synchronize the whole method, not just the remove operation as we always need to synchronize and
-        // can make sure the entity reference was not invalidated in the few milliseconds between the next available tick (lol)
-        return TaskManager.taskManager().sync(() -> {
-            org.bukkit.entity.Entity entity = entityRef.get();
-            if (entity != null) {
-                try {
-                    entity.remove();
-                } catch (UnsupportedOperationException e) {
-                    return false;
-                }
-                return entity.isDead();
-            } else {
-                return true;
+        org.bukkit.entity.Entity entity = entityRef.get();
+        if (entity == null) {
+            return true;
+        }
+        Supplier<Boolean> removeAction = () -> {
+            try {
+                entity.remove();
+            } catch (UnsupportedOperationException e) {
+                return false;
             }
-        });
+            return entity.isDead();
+        };
+        if (FoliaSupport.isFolia()) {
+            org.bukkit.Location loc = entity.getLocation();
+            return TaskManager.taskManager().syncAt(
+                    removeAction,
+                    BukkitAdapter.adapt(loc.getWorld()),
+                    loc.getBlockX() >> 4,
+                    loc.getBlockZ() >> 4
+            );
+        }
+        return TaskManager.taskManager().sync(removeAction);
     }
 
     @SuppressWarnings("unchecked")
