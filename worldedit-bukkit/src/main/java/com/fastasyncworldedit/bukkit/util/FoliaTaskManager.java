@@ -41,13 +41,21 @@ public class FoliaTaskManager extends TaskManager {
 
     @Override
     public int repeat(@NotNull final Runnable runnable, final int interval) {
-        Bukkit.getGlobalRegionScheduler().runAtFixedRate(
+        int id = idCounter.getAndIncrement();
+        ScheduledTask task = Bukkit.getGlobalRegionScheduler().runAtFixedRate(
                 WorldEditPlugin.getInstance(),
-                asConsumer(runnable),
+                scheduledTask -> {
+                    if (scheduledTask.isCancelled()) {
+                        tasks.remove(id);
+                        return;
+                    }
+                    runnable.run();
+                },
                 interval,
                 interval
         );
-        return idCounter.getAndIncrement();
+        tasks.put(id, task);
+        return id;
     }
 
     @Override

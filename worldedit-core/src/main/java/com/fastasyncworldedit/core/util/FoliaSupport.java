@@ -17,12 +17,12 @@ public final class FoliaSupport {
 
         }
         IS_FOLIA = isFolia;
-        Class<?> tickThreadClass = null;
+        Class<?> tickThreadClass = Void.class;
         if (IS_FOLIA) {
             String[] candidates = {
-                "ca.spottedleaf.moonrise.common.util.TickThread",
-                "io.papermc.paper.util.TickThread",
-                "io.papermc.paper.threadedregions.TickThread"
+                "ca.spottedleaf.moonrise.common.util.TickThread", // Moonrise internals (Paper pre-1.21.4)
+                "io.papermc.paper.util.TickThread",               // Paper 1.21.4+
+                "io.papermc.paper.threadedregions.TickThread"      // Folia (legacy)
             };
             for (String candidate : candidates) {
                 try {
@@ -32,7 +32,7 @@ public final class FoliaSupport {
                 }
             }
         }
-        TICK_THREAD_CLASS = tickThreadClass != null ? tickThreadClass : Void.class;
+        TICK_THREAD_CLASS = tickThreadClass;
     }
 
     public static boolean isFolia() {
