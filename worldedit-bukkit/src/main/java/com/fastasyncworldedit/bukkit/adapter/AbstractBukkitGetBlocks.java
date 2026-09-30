@@ -10,12 +10,15 @@ import com.fastasyncworldedit.core.queue.IChunkSet;
 import com.fastasyncworldedit.core.queue.IQueueExtent;
 import com.fastasyncworldedit.core.queue.implementation.QueueHandler;
 import com.fastasyncworldedit.core.queue.implementation.blocks.CharGetBlocks;
+import com.fastasyncworldedit.core.util.FoliaSupport;
 import com.fastasyncworldedit.core.util.MemUtil;
 import com.fastasyncworldedit.core.util.task.FaweThreadUtil;
+import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import org.apache.logging.log4j.Logger;
+import org.bukkit.Bukkit;
 
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -141,6 +144,17 @@ public abstract class AbstractBukkitGetBlocks<ServerLevel, LevelChunk> extends C
         }
     }
 
+    protected org.bukkit.World getBukkitWorld() {
+        if (serverLevel instanceof org.bukkit.World world) {
+            return world;
+        }
+        try {
+            return (org.bukkit.World) serverLevel.getClass().getMethod("getWorld").invoke(serverLevel);
+        } catch (Throwable ignored) {
+            return null;
+        }
+    }
+
     protected <T extends Future<T>> T handleCallFinalizer(
             final List<Runnable> syncTasks,
             final Runnable callback,
@@ -148,6 +162,43 @@ public abstract class AbstractBukkitGetBlocks<ServerLevel, LevelChunk> extends C
     ) throws
             Exception {
         if (!syncTasks.isEmpty()) {
+            if (FoliaSupport.isFolia()) {
+                org.bukkit.World bukkitWorld = getBukkitWorld();
+                if (bukkitWorld != null) {
+                    CompletableFuture<Future<?>> future = new CompletableFuture<>();
+                    Runnable action = () -> {
+                        try {
+                            for (Runnable task : syncTasks) {
+                                if (task != null) {
+                                    task.run();
+                                }
+                            }
+                            if (callback != null) {
+                                callback.run();
+                            } else if (finalizer != null) {
+                                finalizer.run();
+                            }
+                            future.complete(CompletableFuture.completedFuture(null));
+                        } catch (Throwable e) {
+                            LOGGER.error("Error performing final chunk calling at {},{}", chunkX, chunkZ, e);
+                            future.completeExceptionally(e);
+                        }
+                    };
+                    if (Bukkit.isOwnedByCurrentRegion(bukkitWorld, chunkX, chunkZ)) {
+                        action.run();
+                    } else {
+                        Bukkit.getRegionScheduler().run(
+                                WorldEditPlugin.getInstance(),
+                                bukkitWorld,
+                                chunkX,
+                                chunkZ,
+                                scheduledTask -> action.run()
+                        );
+                    }
+                    //noinspection unchecked
+                    return (T) (Future) future;
+                }
+            }
             QueueHandler queueHandler = Fawe.instance().getQueueHandler();
 
             // Chain the sync tasks and the callback
