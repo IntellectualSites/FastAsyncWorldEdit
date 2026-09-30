@@ -100,7 +100,17 @@ public class BukkitEntity implements Entity {
 
             BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
             if (adapter != null) {
-                return adapter.getEntity(entity);
+                org.bukkit.Location loc = entity.getLocation();
+                org.bukkit.World world = loc.getWorld();
+                if (world == null) {
+                    return null;
+                }
+                return TaskManager.taskManager().syncAt(
+                        () -> adapter.getEntity(entity),
+                        BukkitAdapter.adapt(world),
+                        loc.getBlockX() >> 4,
+                        loc.getBlockZ() >> 4
+                );
             } else {
                 return null;
             }
@@ -111,21 +121,35 @@ public class BukkitEntity implements Entity {
 
     @Override
     public boolean remove() {
+        org.bukkit.entity.Entity entity = entityRef.get();
+        if (entity == null) {
+            return true;
+        }
+        org.bukkit.Location loc = entity.getLocation();
+        org.bukkit.World world = loc.getWorld();
+        if (world == null) {
+            return true;
+        }
         // synchronize the whole method, not just the remove operation as we always need to synchronize and
         // can make sure the entity reference was not invalidated in the few milliseconds between the next available tick (lol)
-        return TaskManager.taskManager().sync(() -> {
-            org.bukkit.entity.Entity entity = entityRef.get();
-            if (entity != null) {
-                try {
-                    entity.remove();
-                } catch (UnsupportedOperationException e) {
-                    return false;
-                }
-                return entity.isDead();
-            } else {
-                return true;
-            }
-        });
+        return TaskManager.taskManager().syncAt(
+                () -> {
+                    org.bukkit.entity.Entity ent = entityRef.get();
+                    if (ent != null) {
+                        try {
+                            ent.remove();
+                        } catch (UnsupportedOperationException e) {
+                            return false;
+                        }
+                        return ent.isDead();
+                    } else {
+                        return true;
+                    }
+                },
+                BukkitAdapter.adapt(world),
+                loc.getBlockX() >> 4,
+                loc.getBlockZ() >> 4
+        );
     }
 
     @SuppressWarnings("unchecked")
