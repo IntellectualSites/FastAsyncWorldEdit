@@ -11,6 +11,7 @@ import com.fastasyncworldedit.core.queue.IQueueChunk;
 import com.fastasyncworldedit.core.queue.IQueueExtent;
 import com.fastasyncworldedit.core.queue.Trimable;
 import com.fastasyncworldedit.core.queue.implementation.chunk.ChunkCache;
+import com.fastasyncworldedit.core.util.FoliaSupport;
 import com.fastasyncworldedit.core.util.MemUtil;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.fastasyncworldedit.core.util.collection.CleanableThreadLocal;
@@ -27,6 +28,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -351,6 +353,18 @@ public abstract class QueueHandler implements Trimable, Runnable {
             run.run();
             return Futures.immediateFuture(value);
         }
+        if (FoliaSupport.isFolia()) {
+            CompletableFuture<T> future = new CompletableFuture<>();
+            TaskManager.taskManager().taskGlobal(() -> {
+                try {
+                    run.run();
+                    future.complete(value);
+                } catch (Throwable t) {
+                    future.completeExceptionally(t);
+                }
+            });
+            return future;
+        }
         final FutureTask<T> result = new FutureTask<>(run, value);
         queue.add(result);
         notifySync(queue);
@@ -362,6 +376,18 @@ public abstract class QueueHandler implements Trimable, Runnable {
             run.run();
             return Futures.immediateCancelledFuture();
         }
+        if (FoliaSupport.isFolia()) {
+            CompletableFuture<T> future = new CompletableFuture<>();
+            TaskManager.taskManager().taskGlobal(() -> {
+                try {
+                    run.run();
+                    future.complete(null);
+                } catch (Throwable t) {
+                    future.completeExceptionally(t);
+                }
+            });
+            return future;
+        }
         final FutureTask<T> result = new FutureTask<>(run, null);
         queue.add(result);
         notifySync(queue);
@@ -372,6 +398,17 @@ public abstract class QueueHandler implements Trimable, Runnable {
         if (Fawe.isMainThread()) {
             return Futures.immediateFuture(call.call());
         }
+        if (FoliaSupport.isFolia()) {
+            CompletableFuture<T> future = new CompletableFuture<>();
+            TaskManager.taskManager().taskGlobal(() -> {
+                try {
+                    future.complete(call.call());
+                } catch (Throwable t) {
+                    future.completeExceptionally(t);
+                }
+            });
+            return future;
+        }
         final FutureTask<T> result = new FutureTask<>(call);
         queue.add(result);
         notifySync(queue);
@@ -381,6 +418,17 @@ public abstract class QueueHandler implements Trimable, Runnable {
     private <T> Future<T> sync(Supplier<T> call, Queue<FutureTask> queue) {
         if (Fawe.isMainThread()) {
             return Futures.immediateFuture(call.get());
+        }
+        if (FoliaSupport.isFolia()) {
+            CompletableFuture<T> future = new CompletableFuture<>();
+            TaskManager.taskManager().taskGlobal(() -> {
+                try {
+                    future.complete(call.get());
+                } catch (Throwable t) {
+                    future.completeExceptionally(t);
+                }
+            });
+            return future;
         }
         final FutureTask<T> result = new FutureTask<>(call::get);
         queue.add(result);
