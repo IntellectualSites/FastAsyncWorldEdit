@@ -48,22 +48,32 @@ public abstract class TaskManager {
     }
 
     /**
+     * A scheduled task that can be cancelled.
+     *
+     * @since TODO
+     */
+    @FunctionalInterface
+    public interface Task {
+        void cancel();
+    }
+
+    /**
      * Run a repeating task on the main thread.
      *
      * @param runnable the task to run
      * @param interval in ticks
-     * @return the task id number
+     * @return the task instance
      */
-    public abstract int repeat(@Nonnull final Runnable runnable, final int interval);
+    public abstract Task repeat(@Nonnull final Runnable runnable, final int interval);
 
     /**
      * Run a repeating task asynchronously.
      *
      * @param runnable the task to run
      * @param interval in ticks
-     * @return the task id number
+     * @return the task instance
      */
-    public abstract int repeatAsync(@Nonnull final Runnable runnable, final int interval);
+    public abstract Task repeatAsync(@Nonnull final Runnable runnable, final int interval);
 
     /**
      * Run a task asynchronously.
@@ -204,12 +214,7 @@ public abstract class TaskManager {
      */
     public abstract void laterAsync(@Nonnull final Runnable runnable, final int delay);
 
-    /**
-     * Cancel a task.
-     *
-     * @param task the id of the task to cancel
-     */
-    public abstract void cancel(final int task);
+
 
     /**
      * @deprecated Deprecated without replacement as unused internally, and poor implementation of what it's designed to do.

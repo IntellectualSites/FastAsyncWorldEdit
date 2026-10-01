@@ -12,12 +12,9 @@ import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.invoke.MethodHandle;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -36,46 +33,27 @@ public class FoliaTaskManager extends TaskManager {
         }
     }
 
-    private final AtomicInteger idCounter = new AtomicInteger(1);
-    private final Map<Integer, ScheduledTask> tasks = new ConcurrentHashMap<>();
-
     @Override
-    public int repeat(@NotNull final Runnable runnable, final int interval) {
-        int id = idCounter.getAndIncrement();
+    public Task repeat(@NotNull final Runnable runnable, final int interval) {
         ScheduledTask task = Bukkit.getGlobalRegionScheduler().runAtFixedRate(
                 WorldEditPlugin.getInstance(),
-                scheduledTask -> {
-                    if (scheduledTask.isCancelled()) {
-                        tasks.remove(id);
-                        return;
-                    }
-                    runnable.run();
-                },
+                scheduledTask -> runnable.run(),
                 interval,
                 interval
         );
-        tasks.put(id, task);
-        return id;
+        return task::cancel;
     }
 
     @Override
-    public int repeatAsync(@NotNull final Runnable runnable, final int interval) {
-        int id = idCounter.getAndIncrement();
+    public Task repeatAsync(@NotNull final Runnable runnable, final int interval) {
         ScheduledTask task = Bukkit.getAsyncScheduler().runAtFixedRate(
                 WorldEditPlugin.getInstance(),
-                scheduledTask -> {
-                    if (scheduledTask.isCancelled()) {
-                        tasks.remove(id);
-                        return;
-                    }
-                    runnable.run();
-                },
+                scheduledTask -> runnable.run(),
                 ticksToMs(interval),
                 ticksToMs(interval),
                 TimeUnit.MILLISECONDS
         );
-        tasks.put(id, task);
-        return id;
+        return task::cancel;
     }
 
     @Override
@@ -140,15 +118,7 @@ public class FoliaTaskManager extends TaskManager {
         );
     }
 
-    @Override
-    public void cancel(final int task) {
-        if (task != -1) {
-            ScheduledTask scheduledTask = tasks.remove(task);
-            if (scheduledTask != null) {
-                scheduledTask.cancel();
-            }
-        }
-    }
+
 
     @Override
     public <T> T syncAt(final Supplier<T> supplier, final World world, final int chunkX, final int chunkZ) {

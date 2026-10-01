@@ -138,7 +138,8 @@ public class BukkitServerInterface extends AbstractPlatform implements MultiUser
     @Override
     public int schedule(long delay, long period, Runnable task) {
         if (FoliaSupport.isFolia()) {
-            return TaskManager.taskManager().repeat(task, (int) Math.max(1, period));
+            TaskManager.taskManager().repeat(task, (int) Math.max(1, period));
+            return 1;
         }
         return Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, task, delay, period);
     }
