@@ -79,7 +79,10 @@ public class FoliaTaskManager extends TaskManager {
 
     @Override
     public void later(@NotNull final Runnable runnable, final Location location, final int delay) {
-        if (delay <= 0) {
+        if (delay < 0) {
+            throw new IllegalArgumentException("delay must not be negative");
+        }
+        if (delay == 0) {
             task(runnable, (World) location.getExtent(), location.getBlockX() >> 4, location.getBlockZ() >> 4);
             return;
         }
@@ -93,7 +96,10 @@ public class FoliaTaskManager extends TaskManager {
 
     @Override
     public void laterGlobal(@NotNull final Runnable runnable, final int delay) {
-        if (delay <= 0) {
+        if (delay < 0) {
+            throw new IllegalArgumentException("delay must not be negative");
+        }
+        if (delay == 0) {
             taskGlobal(runnable);
             return;
         }
@@ -106,7 +112,10 @@ public class FoliaTaskManager extends TaskManager {
 
     @Override
     public void laterAsync(@NotNull final Runnable runnable, final int delay) {
-        if (delay <= 0) {
+        if (delay < 0) {
+            throw new IllegalArgumentException("delay must not be negative");
+        }
+        if (delay == 0) {
             async(runnable);
             return;
         }
