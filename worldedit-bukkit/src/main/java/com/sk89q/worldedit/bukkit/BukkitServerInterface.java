@@ -270,6 +270,9 @@ public class BukkitServerInterface extends AbstractPlatform implements MultiUser
 
     @Override
     public long getTickCount() {
+        if (FoliaSupport.isFolia()) {
+            return super.getTickCount();
+        }
         if (PaperSupport.isPaper()) {
             return Bukkit.getCurrentTick();
         }
