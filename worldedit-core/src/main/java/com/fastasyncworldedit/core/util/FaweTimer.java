@@ -9,7 +9,7 @@ public class FaweTimer implements Runnable {
     private long lastPoll = System.currentTimeMillis();
     private long tickStart = System.currentTimeMillis();
     private final long tickInterval = 5;
-    private long tick;
+    private volatile long tick;
     private long tickMod;
 
     @Override

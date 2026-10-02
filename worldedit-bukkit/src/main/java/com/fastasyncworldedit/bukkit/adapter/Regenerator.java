@@ -104,7 +104,7 @@ public abstract class Regenerator {
     private void copyToWorld() {
         createSource();
         final long timeoutPerTick = TimeUnit.MILLISECONDS.toNanos(10);
-        int taskId = TaskManager.taskManager().repeat(() -> {
+        TaskManager.Task task = TaskManager.taskManager().repeat(() -> {
             final long startTime = System.nanoTime();
             runTasks(() -> System.nanoTime() - startTime < timeoutPerTick);
         }, 1);
@@ -126,7 +126,7 @@ public abstract class Regenerator {
             });
         }
         target.setBlocks(region, pattern);
-        TaskManager.taskManager().cancel(taskId);
+        task.cancel();
     }
 
     private abstract class ChunkwisePattern implements Pattern {
