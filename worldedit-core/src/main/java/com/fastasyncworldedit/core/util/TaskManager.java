@@ -8,6 +8,7 @@ import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.World;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -49,9 +50,13 @@ public abstract class TaskManager {
 
     /**
      * A scheduled task that can be cancelled.
+     * <p>
+     * This interface is not intended for implementation by third parties.
+     * </p>
      *
      * @since TODO
      */
+    @ApiStatus.NonExtendable
     @FunctionalInterface
     public interface Task {
         void cancel();
