@@ -35,9 +35,9 @@ public class FoliaTaskManager extends TaskManager {
 
     @Override
     public Task repeat(@NotNull final Runnable runnable, final int interval) {
-        ScheduledTask task = Bukkit.getGlobalRegionScheduler().runAtFixedRate(
+        final ScheduledTask task = Bukkit.getGlobalRegionScheduler().runAtFixedRate(
                 WorldEditPlugin.getInstance(),
-                scheduledTask -> runnable.run(),
+                asConsumer(runnable),
                 interval,
                 interval
         );
@@ -46,11 +46,12 @@ public class FoliaTaskManager extends TaskManager {
 
     @Override
     public Task repeatAsync(@NotNull final Runnable runnable, final int interval) {
-        ScheduledTask task = Bukkit.getAsyncScheduler().runAtFixedRate(
+        final long period = ticksToMs(interval);
+        final ScheduledTask task = Bukkit.getAsyncScheduler().runAtFixedRate(
                 WorldEditPlugin.getInstance(),
-                scheduledTask -> runnable.run(),
-                ticksToMs(interval),
-                ticksToMs(interval),
+                asConsumer(runnable),
+                period,
+                period,
                 TimeUnit.MILLISECONDS
         );
         return task::cancel;
@@ -126,8 +127,6 @@ public class FoliaTaskManager extends TaskManager {
                 TimeUnit.MILLISECONDS
         );
     }
-
-
 
     @Override
     public <T> T syncAt(final Supplier<T> supplier, final World world, final int chunkX, final int chunkZ) {

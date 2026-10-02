@@ -219,8 +219,6 @@ public abstract class TaskManager {
      */
     public abstract void laterAsync(@Nonnull final Runnable runnable, final int delay);
 
-
-
     /**
      * @deprecated Deprecated without replacement as unused internally, and poor implementation of what it's designed to do.
      */

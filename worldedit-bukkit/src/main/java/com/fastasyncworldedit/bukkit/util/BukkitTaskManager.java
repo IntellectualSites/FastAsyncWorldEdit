@@ -66,8 +66,6 @@ public class BukkitTaskManager extends TaskManager {
         this.plugin.getServer().getScheduler().runTaskLaterAsynchronously(this.plugin, runnable, delay);
     }
 
-
-
     @Override
     public <T> T syncAt(final Supplier<T> supplier, final World world, final int chunkX, final int chunkZ) {
         return syncNow(supplier);
