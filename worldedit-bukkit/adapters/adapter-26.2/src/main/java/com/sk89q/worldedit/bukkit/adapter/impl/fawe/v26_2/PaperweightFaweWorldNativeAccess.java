@@ -209,7 +209,7 @@ public class PaperweightFaweWorldNativeAccess implements WorldNativeAccess<Level
             if (craftWorld != null) {
                 BlockPhysicsEvent event = new BlockPhysicsEvent(
                         craftWorld.getBlockAt(blockPos.getX(), blockPos.getY(), blockPos.getZ()),
-                        newState.asBlockData()
+                        PlatformCompat.fromData(newState)
                 );
                 level.getCraftServer().getPluginManager().callEvent(event);
                 if (event.isCancelled()) {
