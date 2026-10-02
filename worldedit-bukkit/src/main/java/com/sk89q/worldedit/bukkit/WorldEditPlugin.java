@@ -88,11 +88,11 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.jar.Attributes;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -117,7 +117,7 @@ public class WorldEditPlugin extends JavaPlugin {
     private BukkitPermissionAttachmentManager permissionAttachmentManager;
     // Fawe start
     private BukkitCommandSender bukkitConsoleCommandSender;
-    private final HashMap<Player, BukkitPlayer> playerCache = new HashMap<>();
+    private final ConcurrentHashMap<Player, BukkitPlayer> playerCache = new ConcurrentHashMap<>();
     // Fawe end
 
     @Override
@@ -614,36 +614,28 @@ public class WorldEditPlugin extends JavaPlugin {
         if (wePlayer != null) {
             return wePlayer;
         }
-        synchronized (playerCache) {
-            BukkitPlayer bukkitPlayer = getCachedPlayer(player);
-            if (bukkitPlayer == null) {
-                bukkitPlayer = new BukkitPlayer(this, player);
-                playerCache.put(player, bukkitPlayer);
-            }
-            return bukkitPlayer;
+        BukkitPlayer bukkitPlayer = getCachedPlayer(player);
+        if (bukkitPlayer == null) {
+            bukkitPlayer = new BukkitPlayer(this, player);
+            playerCache.put(player, bukkitPlayer);
         }
+        return bukkitPlayer;
         //FAWE end
     }
 
     //FAWE start
     BukkitPlayer getCachedPlayer(Player player) {
-        synchronized (playerCache) {
-            return playerCache.get(player);
-        }
+        return playerCache.get(player);
     }
 
     BukkitPlayer reCachePlayer(Player player) {
         BukkitPlayer wePlayer = new BukkitPlayer(this, player);
-        synchronized (playerCache) {
-            playerCache.put(player, wePlayer);
-        }
+        playerCache.put(player, wePlayer);
         return wePlayer;
     }
 
     void removeCachedPlayer(Player player) {
-        synchronized (playerCache) {
-            playerCache.remove(player);
-        }
+        playerCache.remove(player);
     }
     //FAWE end
 
