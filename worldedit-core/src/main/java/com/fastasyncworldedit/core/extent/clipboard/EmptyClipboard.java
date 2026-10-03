@@ -46,6 +46,11 @@ public final class EmptyClipboard implements Clipboard {
     public void removeEntity(@Nonnull Entity entity) {
     }
 
+    @Override
+    public boolean supportsParallelAccess() {
+        return true;
+    }
+
     @Nonnull
     public BlockVector3 getMinimumPoint() {
         return BlockVector3.ZERO;

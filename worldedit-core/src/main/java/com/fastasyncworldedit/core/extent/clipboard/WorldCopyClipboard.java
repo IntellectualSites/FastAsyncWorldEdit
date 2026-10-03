@@ -103,6 +103,11 @@ public class WorldCopyClipboard extends ReadOnlyClipboard {
     }
 
     @Override
+    public boolean supportsParallelAccess() {
+        return true;
+    }
+
+    @Override
     public void paste(Extent toExtent, BlockVector3 to, boolean pasteAir, boolean pasteEntities, boolean pasteBiomes) {
         boolean close = false;
         if (toExtent instanceof World) {
