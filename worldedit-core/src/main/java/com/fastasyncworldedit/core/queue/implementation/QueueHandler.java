@@ -14,6 +14,7 @@ import com.fastasyncworldedit.core.queue.implementation.chunk.ChunkCache;
 import com.fastasyncworldedit.core.util.MemUtil;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.fastasyncworldedit.core.util.collection.CleanableThreadLocal;
+import com.fastasyncworldedit.core.util.task.FaweBasicThreadFactory;
 import com.fastasyncworldedit.core.util.task.FaweForkJoinWorkerThreadFactory;
 import com.fastasyncworldedit.core.wrappers.WorldWrapper;
 import com.google.common.util.concurrent.Futures;
@@ -33,6 +34,7 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
+import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
@@ -78,6 +80,26 @@ public abstract class QueueHandler implements Trimable, Runnable {
      */
     private final ThreadPoolExecutor blockingExecutor = FaweCache.INSTANCE.newBlockingExecutor(
             "FAWE QueueHandler Blocking Executor - %d");
+    /**
+     * Executor for edit "completion" tasks, e.g. sending updated chunks to players and running the caller-supplied
+     * finalizer. Completion tasks form the tail of the future chains waited on when flushing a
+     * {@link com.fastasyncworldedit.core.queue.implementation.SingleThreadQueueExtent}, so they must be guaranteed to run
+     * even while the primary and secondary pools are saturated with (possibly blocked) edit tasks. This executor grows on
+     * demand instead of queueing behind a bounded set of workers, preventing thread-starvation deadlocks when edits are
+     * performed on the secondary pool (e.g. by plugins submitting whole edits via {@link #async(Runnable)}).
+     * <p>
+     * Submission cannot be rejected: if a worker cannot be started (executor shutdown, or the JVM being unable to create
+     * further threads) the task runs on the submitting thread rather than throwing, preserving the guarantee above.
+     */
+    private final ThreadPoolExecutor completionExecutor = new ThreadPoolExecutor(
+            0,
+            Integer.MAX_VALUE,
+            60L,
+            TimeUnit.SECONDS,
+            new SynchronousQueue<>(),
+            new FaweBasicThreadFactory("FAWE Completion Executor - %d"),
+            new ThreadPoolExecutor.CallerRunsPolicy()
+    );
     /**
      * Queue for tasks to be completed on the main thread. These take priority of tasks submitted to syncWhenFree queue
      */
@@ -253,6 +275,24 @@ public abstract class QueueHandler implements Trimable, Runnable {
      */
     public ForkJoinTask submit(Runnable run) {
         return forkJoinPoolPrimary.submit(run);
+    }
+
+    /**
+     * Run an edit-completion task, e.g. sending an updated chunk to players, on the dedicated completion executor.
+     * Unlike {@link #async(Runnable)}, tasks submitted here are guaranteed to begin execution even if
+     * the primary and secondary pools are saturated or blocked, as edit flushes block on the futures returned here.
+     * Completion tasks must therefore never block on other FAWE futures themselves.
+     * <p>
+     * Internal API usage only.
+     *
+     * @param run   Runnable to run
+     * @param value Value to return when done
+     * @param <T>   Value type
+     * @return Future for the submitted task
+     */
+    @ApiStatus.Internal
+    public <T> Future<T> completion(Runnable run, T value) {
+        return completionExecutor.submit(run, value);
     }
 
     /**
