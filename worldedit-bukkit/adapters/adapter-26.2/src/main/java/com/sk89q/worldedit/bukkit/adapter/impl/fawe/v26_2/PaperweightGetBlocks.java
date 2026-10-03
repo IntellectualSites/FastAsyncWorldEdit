@@ -787,16 +787,14 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
             LinCompoundTag tag,
             Map<UUID, LinCompoundTag> collector
     ) {
-        UUID fresh = UUID.randomUUID();
-        int[] uuidInts = {
-                (int) (fresh.getMostSignificantBits() >> 32),
-                (int) fresh.getMostSignificantBits(),
-                (int) (fresh.getLeastSignificantBits() >> 32),
-                (int) fresh.getLeastSignificantBits()
-        };
-
         LinCompoundTag.Builder builder = tag.toBuilder();
-        builder.putIntArray("UUID", uuidInts);
+
+        UUID uuid = UUID.randomUUID();
+        Map<String, LinTag<?>> uuidData = new HashMap<>();
+        NbtUtils.addUUIDToMap(uuidData, uuid);
+        for (String key : uuidData.keySet()) {
+            builder.put(key, uuidData.get(key));
+        }
 
         LinListTag<LinCompoundTag> passengers = tag.findListTag("Passengers", LinTagType.compoundTag());
         if (passengers != null) {
@@ -808,7 +806,7 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
         }
 
         LinCompoundTag finalTag = builder.build();
-        collector.put(fresh, finalTag);
+        collector.put(uuid, finalTag);
         return finalTag;
     }
 
