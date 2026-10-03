@@ -783,8 +783,9 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
         }
     }
 
-    private LinCompoundTag randomizePassengerUuidsInTag(LinCompoundTag tag,
-                                                        Map<UUID, LinCompoundTag> collector
+    private LinCompoundTag randomizePassengerUuidsInTag(
+            LinCompoundTag tag,
+            Map<UUID, LinCompoundTag> collector
     ) {
         UUID fresh = UUID.randomUUID();
         int[] uuidInts = {
@@ -811,9 +812,10 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
         return finalTag;
     }
 
-    private boolean addNoEvents(Entity entity,
-                                ServerLevel nmsWorld,
-                                Runnable onError
+    private boolean addNoEvents(
+            Entity entity,
+            ServerLevel nmsWorld,
+            Runnable onError
     ) {
         entity.spawnReason = CreatureSpawnEvent.SpawnReason.CUSTOM;
         entity.generation = false;
@@ -823,8 +825,7 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
                 onError.run();
             }
             return status;
-        }
-        else {
+        } else {
             // Not paper
             try {
                 return PaperweightPlatformAdapter.getEntitySectionManager(nmsWorld).addNewEntity(entity);
@@ -837,20 +838,21 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
         return false;
     }
 
-    private void addPassengersRecursive(Entity parent,
-                                        boolean noEvents,
-                                        ServerLevel nmsWorld,
-                                        String vehicleId,
-                                        List<FaweCompoundTag> newRecords,
-                                        Runnable onError,
-                                        Map<UUID, LinCompoundTag> passengerTagsByUuid
+    private void addPassengersRecursive(
+            Entity parent,
+            boolean noEvents,
+            ServerLevel nmsWorld,
+            String vehicleId,
+            List<FaweCompoundTag> newRecords,
+            Runnable onError,
+            Map<UUID, LinCompoundTag> passengerTagsByUuid
     ) {
         for (Entity passenger : new ArrayList<>(parent.getPassengers())) { // snapshot, load already attached them
             boolean added = noEvents
                     ? addNoEvents(passenger, nmsWorld, onError)
                     : nmsWorld.addFreshEntity(passenger, CreatureSpawnEvent.SpawnReason.CUSTOM);
             if (!added) {
-                LOGGER.warn("Error creating passenger `{}` for vehicle `{}`", passenger.getType(), vehicleId);
+                LOGGER.warn("Error creating passenger of type `{}` for vehicle type `{}` at {}", passenger.getType(), vehicleId, parent.position());
                 passenger.stopRiding();
                 continue;
             }
