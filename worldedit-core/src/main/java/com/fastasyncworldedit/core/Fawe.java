@@ -139,7 +139,9 @@ public class Fawe {
         }, 0);
         TaskManager.taskManager().repeatAsync(MemUtil::checkAndSetApproachingLimit, 1);
 
-        TaskManager.taskManager().repeat(timer, 1);
+        if (!FoliaSupport.isFolia()) {
+            TaskManager.taskManager().repeat(timer, 1);
+        }
         uuidKeyQueuedExecutorService = new KeyQueuedExecutorService<>(new ThreadPoolExecutor(
                 1,
                 Settings.settings().QUEUE.PARALLEL_THREADS,
