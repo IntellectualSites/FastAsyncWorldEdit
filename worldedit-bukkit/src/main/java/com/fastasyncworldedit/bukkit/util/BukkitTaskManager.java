@@ -22,18 +22,18 @@ public class BukkitTaskManager extends TaskManager {
     }
 
     @Override
-    public int repeat(@Nonnull final Runnable runnable, final int interval) {
-        return this.plugin.getServer().getScheduler().scheduleSyncRepeatingTask(this.plugin, runnable, interval, interval);
+    public Task repeat(@Nonnull final Runnable runnable, final int interval) {
+        return this.plugin.getServer().getScheduler().runTaskTimer(this.plugin, runnable, interval, interval)::cancel;
     }
 
     @Override
-    public int repeatAsync(@Nonnull final Runnable runnable, final int interval) {
-        return this.plugin.getServer().getScheduler().scheduleAsyncRepeatingTask(this.plugin, runnable, interval, interval);
+    public Task repeatAsync(@Nonnull final Runnable runnable, final int interval) {
+        return this.plugin.getServer().getScheduler().runTaskTimerAsynchronously(this.plugin, runnable, interval, interval)::cancel;
     }
 
     @Override
     public void async(@Nonnull final Runnable runnable) {
-        this.plugin.getServer().getScheduler().runTaskAsynchronously(this.plugin, runnable).getTaskId();
+        this.plugin.getServer().getScheduler().runTaskAsynchronously(this.plugin, runnable);
     }
 
     @Override
@@ -64,13 +64,6 @@ public class BukkitTaskManager extends TaskManager {
     @Override
     public void laterAsync(@Nonnull final Runnable runnable, final int delay) {
         this.plugin.getServer().getScheduler().runTaskLaterAsynchronously(this.plugin, runnable, delay);
-    }
-
-    @Override
-    public void cancel(final int task) {
-        if (task != -1) {
-            Bukkit.getScheduler().cancelTask(task);
-        }
     }
 
     @Override

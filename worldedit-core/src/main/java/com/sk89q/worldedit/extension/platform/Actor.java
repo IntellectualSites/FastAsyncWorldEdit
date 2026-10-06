@@ -23,6 +23,7 @@ import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.entity.MapMetadatable;
 import com.fastasyncworldedit.core.limit.FaweLimit;
+import com.fastasyncworldedit.core.util.FoliaSupport;
 import com.fastasyncworldedit.core.util.task.InterruptableCondition;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.internal.cui.CUIEvent;
@@ -219,6 +220,10 @@ public interface Actor extends Identifiable, SessionOwner, Subject, MapMetadatab
     }
 
     default boolean checkAction() {
+        if (FoliaSupport.isFolia()) {
+            // TODO (folia) rely on region tick information rather than global ticks
+            return true;
+        }
         long time = getMeta("faweActionTick", Long.MIN_VALUE);
         long tick = Fawe.instance().getTimer().getTick();
         setMeta("faweActionTick", tick);
