@@ -23,7 +23,6 @@ import com.fastasyncworldedit.bukkit.util.MinecraftVersion;
 import com.fastasyncworldedit.bukkit.util.PaperSupport;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.util.FoliaSupport;
-import com.fastasyncworldedit.core.util.TaskManager;
 import com.fastasyncworldedit.core.extent.processor.PlacementStateProcessor;
 import com.fastasyncworldedit.core.extent.processor.lighting.RelighterFactory;
 import com.fastasyncworldedit.core.queue.IBatchProcessor;
@@ -138,10 +137,13 @@ public class BukkitServerInterface extends AbstractPlatform implements MultiUser
     @Override
     public int schedule(long delay, long period, Runnable task) {
         if (FoliaSupport.isFolia()) {
-            TaskManager.taskManager().repeat(task, (int) Math.max(1, period));
+            Bukkit.getGlobalRegionScheduler().runAtFixedRate(plugin, scheduledTask -> task.run(), delay, period);
+            // TODO Paper doesn't appear to have a concept of task IDs, so return 1 here for now.
+            //  We may want to store these tasks and map them to our own IDs to cancel them later.
             return 1;
+        } else {
+            return Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, task, delay, period);
         }
-        return Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, task, delay, period);
     }
 
     @Override

@@ -19,17 +19,10 @@ public final class FoliaSupport {
         IS_FOLIA = isFolia;
         Class<?> tickThreadClass = Void.class;
         if (IS_FOLIA) {
-            String[] candidates = {
-                "ca.spottedleaf.moonrise.common.util.TickThread", // Moonrise internals (Paper pre-1.21.4)
-                "io.papermc.paper.util.TickThread",               // Paper 1.21.4+
-                "io.papermc.paper.threadedregions.TickThread"      // Folia (legacy)
-            };
-            for (String candidate : candidates) {
-                try {
-                    tickThreadClass = Class.forName(candidate);
-                    break;
-                } catch (ClassNotFoundException ignored) {
-                }
+            try {
+                tickThreadClass = Class.forName("ca.spottedleaf.moonrise.common.util.TickThread");
+            } catch (ClassNotFoundException e) {
+                throw new AssertionError(e);
             }
         }
         TICK_THREAD_CLASS = tickThreadClass;
