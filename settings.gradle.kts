@@ -65,5 +65,4 @@ listOf("bukkit", "core", "cli").forEach {
 }
 include("worldedit-libs:core:ap")
 
-
 // enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")

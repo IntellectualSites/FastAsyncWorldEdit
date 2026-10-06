@@ -25,6 +25,8 @@ import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.Vector3;
+import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import org.enginehub.linbus.tree.LinCompoundTag;
@@ -98,11 +100,13 @@ public class SurvivalModeExtent extends AbstractDelegateExtent {
             Collection<BaseItemStack> drops = world.getBlockDrops(location);
             boolean canSet = super.setBlock(location, block);
             if (canSet) {
-                TaskManager.taskManager().sync(() -> {
+                final Vector3 position = location.toVector3();
+                TaskManager.taskManager().syncAt(() -> {
                     for (BaseItemStack stack : drops) {
-                        world.dropItem(location.toVector3(), stack);
+                        world.dropItem(position, stack);
                     }
-                });
+                    return null;
+                }, new Location(world, position));
 
                 return true;
             } else {

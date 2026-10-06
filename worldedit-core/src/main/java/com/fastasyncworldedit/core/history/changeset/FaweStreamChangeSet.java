@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayDeque;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -224,6 +225,12 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
                 @Override
                 public void read(final FaweInputStream in, final BlockPositionChange change) throws IOException {
                     in.readFully(buffer);
+                    // Keep compatibility with version 2 history that may switch relative origins mid-stream.
+                    if (version == 2 && Arrays.equals(buffer, MAGIC_NEW_RELATIVE)) {
+                        lx = ((in.read() << 24) + (in.read() << 16) + (in.read() << 8) + in.read());
+                        lz = ((in.read() << 24) + (in.read() << 16) + (in.read() << 8) + in.read());
+                        in.readFully(buffer);
+                    }
                     change.x = lx = lx + ((buffer[0] & 0xFF) | (buffer[1] << 8));
                     change.z = lz = lz + ((buffer[2] & 0xFF) | (buffer[3]) << 8);
                     change.y = ly = ly + ((buffer[4] & 0xFF) | (buffer[5]) << 8);
@@ -851,9 +858,9 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
             public @Nullable MutableFullBlockChange populate(@NotNull final MutableFullBlockChange change) {
                 try {
                     posDel.read(is, change);
-                    idDel.readCombined(is, change);
                     change.x += originX;
                     change.z += originZ;
+                    idDel.readCombined(is, change);
                     return change;
                 } catch (EOFException ignored) {
                 } catch (Exception e) {
@@ -893,9 +900,9 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
             public @Nullable MutableBlockChange populate(@NotNull final MutableBlockChange change) {
                 try {
                     posDel.read(is, change);
-                    idDel.readCombined(is, change, dir);
                     change.x += originX;
                     change.z += originZ;
+                    idDel.readCombined(is, change, dir);
                     return change;
                 } catch (EOFException ignored) {
                 } catch (Exception e) {
@@ -1050,8 +1057,10 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
                 MutableFullBlockChange change = new MutableFullBlockChange(null, 0, false);
                 for (int i = 0; i < amount; i++) {
                     posDel.read(fis, change);
+                    change.x += ox;
+                    change.z += oz;
                     idDel.readCombined(fis, change);
-                    summary.add(change.x + ox, change.z + oz, change.to);
+                    summary.add(change.x, change.z, change.to);
                 }
             }
         } catch (EOFException ignored) {

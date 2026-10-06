@@ -252,7 +252,7 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
     public Collection<String> getRegisteredDefaultBlockStates() {
         ArrayList<String> states = new ArrayList<>();
         for (final Block block : BuiltInRegistries.BLOCK) {
-            states.add(block.defaultBlockState().asBlockData().getAsString());
+            states.add(PlatformCompat.fromData(block.defaultBlockState()).getAsString());
         }
         return states;
     }

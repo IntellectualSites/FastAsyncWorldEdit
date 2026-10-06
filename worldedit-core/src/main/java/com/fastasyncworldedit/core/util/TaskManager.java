@@ -3,18 +3,20 @@ package com.fastasyncworldedit.core.util;
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.queue.implementation.QueueHandler;
+import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
+import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.world.World;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public abstract class TaskManager {
@@ -47,21 +49,36 @@ public abstract class TaskManager {
     }
 
     /**
+     * A scheduled task that can be cancelled.
+     * <p>
+     * This interface is not intended for implementation by third parties.
+     * </p>
+     *
+     * @since TODO
+     */
+    @ApiStatus.NonExtendable
+    @FunctionalInterface
+    public interface Task {
+        void cancel();
+    }
+
+    /**
      * Run a repeating task on the main thread.
      *
      * @param runnable the task to run
      * @param interval in ticks
+     * @return the task instance
      */
-    public abstract int repeat(@Nonnull final Runnable runnable, final int interval);
+    public abstract Task repeat(@Nonnull final Runnable runnable, final int interval);
 
     /**
      * Run a repeating task asynchronously.
      *
      * @param runnable the task to run
      * @param interval in ticks
-     * @return the task id number
+     * @return the task instance
      */
-    public abstract int repeatAsync(@Nonnull final Runnable runnable, final int interval);
+    public abstract Task repeatAsync(@Nonnull final Runnable runnable, final int interval);
 
     /**
      * Run a task asynchronously.
@@ -75,7 +92,13 @@ public abstract class TaskManager {
      *
      * @param runnable the task to run
      */
-    public abstract void task(@Nonnull final Runnable runnable);
+    public void task(@Nonnull final Runnable runnable, @Nonnull Location location) {
+        task(runnable, (World) location.getExtent(), location.getBlockX() >> 4, location.getBlockZ() >> 4);
+    }
+
+    public abstract void task(@Nonnull final Runnable runnable, @Nonnull World world, int chunkX, int chunkZ);
+
+    public abstract void taskGlobal(Runnable runnable);
 
     /**
      * Get the public ForkJoinPool.
@@ -159,6 +182,7 @@ public abstract class TaskManager {
     /**
      * Disable async catching for a specific task.
      */
+    @Deprecated
     public void runUnsafe(Runnable run) {
         QueueHandler queue = Fawe.instance().getQueueHandler();
         queue.startUnsafe(Fawe.isMainThread());
@@ -171,66 +195,21 @@ public abstract class TaskManager {
     }
 
     /**
-     * Run a task on the current thread or asynchronously.
-     * - If it's already the main thread, it will just call run()
+     * Run a task later on the ticking thread at the given location.
      *
      * @param runnable the task to run
-     * @param async    whether the task should run on the main thread
+     * @param location the location context to run at
+     * @param delay    in ticks
      */
-    public void taskNow(@Nonnull final Runnable runnable, boolean async) {
-        if (async) {
-            async(runnable);
-        } else {
-            runnable.run();
-        }
-    }
+    public abstract void later(@Nonnull final Runnable runnable, Location location, final int delay);
 
     /**
-     * Run a task as soon as possible on the main thread.
-     * - Non blocking if not calling from the main thread
-     *
-     * @param runnable the task to run
-     */
-    public void taskNowMain(@Nonnull final Runnable runnable) {
-        if (Fawe.isMainThread()) {
-            runnable.run();
-        } else {
-            task(runnable);
-        }
-    }
-
-    /**
-     * Run a task as soon as possible not on the main thread.
-     *
-     * @param runnable the task to run
-     * @see Fawe#isMainThread()
-     */
-    public void taskNowAsync(@Nonnull final Runnable runnable) {
-        taskNow(runnable, Fawe.isMainThread());
-    }
-
-    /**
-     * Run a task on the main thread at the next tick or now async.
-     *
-     * @param runnable the task to run.
-     * @param async    whether the task should run on the main thread
-     */
-    public void taskSoonMain(@Nonnull final Runnable runnable, boolean async) {
-        if (async) {
-            async(runnable);
-        } else {
-            task(runnable);
-        }
-    }
-
-
-    /**
-     * Run a task later on the main thread.
+     * Run a task later on the global tick thread.
      *
      * @param runnable the task to run
      * @param delay    in ticks
      */
-    public abstract void later(@Nonnull final Runnable runnable, final int delay);
+    public abstract void laterGlobal(@Nonnull final Runnable runnable, final int delay);
 
     /**
      * Run a task later asynchronously.
@@ -239,41 +218,6 @@ public abstract class TaskManager {
      * @param delay    in ticks
      */
     public abstract void laterAsync(@Nonnull final Runnable runnable, final int delay);
-
-    /**
-     * Cancel a task.
-     *
-     * @param task the id of the task to cancel
-     */
-    public abstract void cancel(final int task);
-
-    /**
-     * Break up a task and run it in fragments of 5ms.<br>
-     * - Each task will run on the main thread.<br>
-     *
-     * @param objects  the list of objects to run the task for
-     * @param task     the task to run on each object
-     * @param whenDone when the object task completes
-     * @since 3.0.0
-     */
-    public <T> void objectTask(Collection<T> objects, final Consumer<T> task, final Runnable whenDone) {
-        final Iterator<T> iterator = objects.iterator();
-        task(new Runnable() {
-            @Override
-            public void run() {
-                long start = System.currentTimeMillis();
-                boolean hasNext;
-                while ((hasNext = iterator.hasNext()) && System.currentTimeMillis() - start < 5) {
-                    task.accept(iterator.next());
-                }
-                if (!hasNext) {
-                    later(whenDone, 1);
-                } else {
-                    later(this, 1);
-                }
-            }
-        });
-    }
 
     /**
      * @deprecated Deprecated without replacement as unused internally, and poor implementation of what it's designed to do.
@@ -307,6 +251,7 @@ public abstract class TaskManager {
         }
     }
 
+    @Deprecated
     public void taskWhenFree(@Nonnull Runnable run) {
         if (Fawe.isMainThread()) {
             run.run();
@@ -315,27 +260,6 @@ public abstract class TaskManager {
         }
     }
 
-    /**
-     * Run a task on the main thread when the TPS is high enough, and wait for execution to finish.
-     * - Useful if you need to access something from the Bukkit API from another thread<br>
-     * - Usually wait time is around 25ms<br>
-     */
-    public <T> T syncWhenFree(@Nonnull final Supplier<T> supplier) {
-        if (Fawe.isMainThread()) {
-            return supplier.get();
-        }
-        try {
-            return Fawe.instance().getQueueHandler().sync(supplier).get();
-        } catch (InterruptedException | ExecutionException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    /**
-     * Quickly run a task on the main thread, and wait for execution to finish.
-     * - Useful if you need to access something from the Bukkit API from another thread<br>
-     * - Usually wait time is around 25ms<br>
-     */
     public <T> T sync(final Supplier<T> function) {
         if (Fawe.isMainThread()) {
             return function.get();
@@ -347,18 +271,21 @@ public abstract class TaskManager {
         }
     }
 
-    /**
-     * Quickly run a task on the main thread, and wait for execution to finish.
-     * - Useful if you need to access something from the Bukkit API from another thread<br>
-     * - Usually wait time is around 25ms
-     *
-     * @since 3.0.0
-     */
     public void sync(@Nonnull final Runnable runnable) {
         sync((Supplier<Void>) () -> {
             runnable.run();
             return null;
         });
     }
+
+    public <T> T syncAt(Supplier<T> supplier, Location context) {
+        return syncAt(supplier, (World) context.getExtent(), context.getBlockX() >> 4, context.getBlockZ() >> 4);
+    }
+
+    public abstract  <T> T syncAt(Supplier<T> supplier, World world, int chunkX, int chunkZ);
+
+    public abstract <T> T syncWith(Supplier<T> supplier, Player context);
+
+    public abstract <T> T syncGlobal(Supplier<T> supplier);
 
 }

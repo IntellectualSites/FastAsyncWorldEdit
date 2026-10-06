@@ -902,9 +902,11 @@ public class NMSRelighter implements Relighter {
             queue.flush();
             finished.set(true);
         } else {
-            TaskManager.taskManager().sync(() -> {
+            // fine to sync global, starlight is required for Folia
+            TaskManager.taskManager().syncGlobal(() -> {
                 queue.flush();
                 finished.set(true);
+                return null;
             });
         }
     }
@@ -933,7 +935,10 @@ public class NMSRelighter implements Relighter {
         if (Settings.settings().LIGHTING.ASYNC) {
             runnable.run();
         } else {
-            TaskManager.taskManager().sync(runnable);
+            TaskManager.taskManager().syncGlobal(() -> {
+                runnable.run();
+                return null;
+            });
         }
     }
 

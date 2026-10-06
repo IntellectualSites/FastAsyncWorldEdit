@@ -66,12 +66,12 @@ public class BukkitBlockCommandSender extends AbstractCommandBlockActor {
     @Deprecated
     public void printRaw(String msg) {
         //FAWE start - ensure executed on main thread
-        TaskManager.taskManager().sync(() -> {
+        TaskManager.taskManager().syncAt(() -> {
             for (String part : msg.split("\n")) {
                 sender.sendMessage(part);
             }
             return null;
-        });
+        }, getLocation());
         //FAWE end
     }
 
@@ -79,12 +79,12 @@ public class BukkitBlockCommandSender extends AbstractCommandBlockActor {
     @Deprecated
     public void print(String msg) {
         //FAWE start - ensure executed on main thread
-        TaskManager.taskManager().sync(() -> {
+        TaskManager.taskManager().syncAt(() -> {
             for (String part : msg.split("\n")) {
                 print(TextComponent.of(part, TextColor.LIGHT_PURPLE));
             }
             return null;
-        });
+        }, getLocation());
         //FAWE end
     }
 
@@ -92,12 +92,12 @@ public class BukkitBlockCommandSender extends AbstractCommandBlockActor {
     @Deprecated
     public void printDebug(String msg) {
         //FAWE start - ensure executed on main thread
-        TaskManager.taskManager().sync(() -> {
+        TaskManager.taskManager().syncAt(() -> {
             for (String part : msg.split("\n")) {
                 print(TextComponent.of(part, TextColor.GRAY));
             }
             return null;
-        });
+        }, getLocation());
         //FAWE end
     }
 
@@ -105,22 +105,22 @@ public class BukkitBlockCommandSender extends AbstractCommandBlockActor {
     @Deprecated
     public void printError(String msg) {
         //FAWE start - ensure executed on main thread
-        TaskManager.taskManager().sync(() -> {
+        TaskManager.taskManager().syncAt(() -> {
             for (String part : msg.split("\n")) {
                 print(TextComponent.of(part, TextColor.RED));
             }
             return null;
-        });
+        }, getLocation());
         //FAWE end
     }
 
     @Override
     public void print(Component component) {
         //FAWE start - ensure executed on main thread
-        TaskManager.taskManager().sync(() -> {
+        TaskManager.taskManager().syncAt(() -> {
             TextAdapter.sendMessage(sender, WorldEditText.format(component, getLocale()));
             return null;
-        });
+        }, getLocation());
         //FAWE end
     }
 
