@@ -10,7 +10,7 @@ plugins {
     id("xyz.jpenilla.run-paper") version "3.1.0"
 }
 
-val rootVersion: String = (extra.properties["rootVersion"] as? String) ?: "2.15.5"
+val rootVersion: String = (extra.properties["rootVersion"] as? String) ?: "2.16.1"
 val snapshot: String = (extra.properties["snapshot"] as? String) ?: "SNAPSHOT"
 var revision: String = (extra.properties["revision"] as? String) ?: ""
 var buildNumber: String = (extra.properties["buildNumber"] as? String) ?: ""
@@ -102,7 +102,7 @@ allprojects {
 }
 
 val supportedVersions: List<String> = listOf("1.21", "1.21.1", "1.21.4", "1.21.5",
-        "1.21.8", "1.21.10", "1.21.11", "26.1.2", "26.2")
+        "1.21.8", "1.21.10", "1.21.11", "26.1.2", "26.2", "26.3")
 
 tasks {
     supportedVersions.forEach {

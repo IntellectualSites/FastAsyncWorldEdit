@@ -59,6 +59,8 @@ public final class BiomeTypes {
     @Nullable
     public static final BiomeType CRIMSON_FOREST = get("minecraft:crimson_forest");
     @Nullable
+    public static final BiomeType DAPPLED_FOREST = get("minecraft:dappled_forest");
+    @Nullable
     public static final BiomeType DARK_FOREST = get("minecraft:dark_forest");
     @Nullable
     @Deprecated
