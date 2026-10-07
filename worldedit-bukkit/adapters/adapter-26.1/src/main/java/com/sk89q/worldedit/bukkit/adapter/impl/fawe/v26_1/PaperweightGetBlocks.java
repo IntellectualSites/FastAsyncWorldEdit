@@ -31,6 +31,8 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.IdMap;
 import net.minecraft.core.Registry;
 import net.minecraft.core.SectionPos;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.BitStorage;
@@ -640,6 +642,8 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
             if (entities != null && !entities.isEmpty()) {
 
                 syncTasks.add(() -> {
+                    List<FaweCompoundTag> newPassengerRecords = new ArrayList<>();
+                    Map<UUID, LinCompoundTag> passengerTagsByUuid = new HashMap<>();
                     Iterator<FaweCompoundTag> iterator = entities.iterator();
                     while (iterator.hasNext()) {
                         final FaweCompoundTag nativeTag = iterator.next();
@@ -660,50 +664,65 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
 
                         EntityType<?> type = EntityType.byString(id).orElse(null);
                         if (type != null) {
-                            Entity entity = type.create(nmsWorld, EntitySpawnReason.COMMAND);
-                            if (entity != null) {
-                                final LinCompoundTag.Builder toLoadComponentBuilder = linTag.toBuilder();
-                                for (final String name : Constants.NO_COPY_ENTITY_NBT_FIELDS) {
-                                    toLoadComponentBuilder.remove(name);
+                            Runnable onError = () -> LOGGER.warn(
+                                    "Error creating entity of type `{}` in world `{}` at location `{},{},{}`",
+                                    id,
+                                    nmsWorld.getWorld().getName(),
+                                    x,
+                                    y,
+                                    z
+                            );
+
+                            final LinCompoundTag.Builder toLoadComponentBuilder = linTag.toBuilder();
+                            for (final String name : Constants.NO_COPY_ENTITY_NBT_FIELDS) {
+                                toLoadComponentBuilder.remove(name);
+                            }
+
+                            // NEW: rewrite passenger UUIDs in the tag itself, before it's ever loaded
+                            LinListTag<LinCompoundTag> passengers = linTag.findListTag("Passengers", LinTagType.compoundTag());
+                            if (passengers != null) {
+                                List<LinCompoundTag> rewritten = new ArrayList<>();
+                                for (LinCompoundTag passengerTag : passengers.value()) {
+                                    rewritten.add(PaperweightPlatformAdapter.randomizePassengerUuidsInTag(passengerTag, passengerTagsByUuid));
                                 }
-                                ValueInput input = createInput(toLoadComponentBuilder.build());
-                                entity.load(input);
-                                entity.absSnapTo(x, y, z, yaw, pitch);
-                                entity.setUUID(NbtUtils.uuid(nativeTag));
-                                Runnable onError = () -> LOGGER.warn(
-                                        "Error creating entity of type `{}` in world `{}` at location `{},{},{}`",
-                                        id,
-                                        nmsWorld.getWorld().getName(),
-                                        x,
-                                        y,
-                                        z
-                                );
-                                if (!set.getSideEffectSet().shouldApply(SideEffect.ENTITY_EVENTS)) {
-                                    entity.spawnReason = CreatureSpawnEvent.SpawnReason.CUSTOM;
-                                    entity.generation = false;
-                                    if (PaperSupport.isPaper()) {
-                                        if (!nmsWorld.moonrise$getEntityLookup().addNewEntity(entity, false)) {
-                                            onError.run();
-                                        }
-                                        continue;
+                                toLoadComponentBuilder.put("Passengers", LinListTag.of(LinTagType.compoundTag(), rewritten));
+                            }
+
+                            ValueInput input = createInput(toLoadComponentBuilder.build());
+
+                            Entity createdEntity = EntityType.loadEntityRecursive(
+                                    type,
+                                    input,
+                                    nmsWorld,
+                                    EntitySpawnReason.COMMAND,
+                                    (loadedEntity) -> {
+                                        loadedEntity.absSnapTo(x, y, z, yaw, pitch);
+                                        return loadedEntity;
                                     }
-                                    // Not paper
-                                    try {
-                                        PaperweightPlatformAdapter.getEntitySectionManager(nmsWorld).addNewEntity(entity);
-                                        continue;
-                                    } catch (IllegalAccessException e) {
-                                        // Fallback
-                                        LOGGER.warn("Error bypassing entity events on spawn on Spigot", e);
-                                    }
-                                }
-                                if (!nmsWorld.addFreshEntity(entity, CreatureSpawnEvent.SpawnReason.CUSTOM)) {
+                            );
+
+                            if (createdEntity == null) {
+                                onError.run();
+                                iterator.remove();
+                            } else {
+                                createdEntity.setUUID(NbtUtils.uuid(nativeTag)); // NEW — restore parity with the recorded UUID
+
+                                boolean noEvents = !set.getSideEffectSet().shouldApply(SideEffect.ENTITY_EVENTS);
+                                boolean added = noEvents
+                                        ? PaperweightPlatformAdapter.addNoEvents(createdEntity, nmsWorld, onError)
+                                        : nmsWorld.addFreshEntity(createdEntity, CreatureSpawnEvent.SpawnReason.CUSTOM);
+
+                                if (!added) {
                                     onError.run();
-                                    // Unsuccessful create should not be saved to history
-                                    iterator.remove();
+                                    iterator.remove(); // vehicle failed — matches reviewer's exact request
+                                    continue;
                                 }
+
+                                PaperweightPlatformAdapter.addPassengersRecursive(createdEntity, noEvents, nmsWorld, id, newPassengerRecords, onError, passengerTagsByUuid);
                             }
                         }
                     }
+                    entities.addAll(newPassengerRecords);
                 });
             }
 
