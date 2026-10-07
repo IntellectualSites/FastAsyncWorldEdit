@@ -683,7 +683,7 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
                             if (passengers != null) {
                                 List<LinCompoundTag> rewritten = new ArrayList<>();
                                 for (LinCompoundTag passengerTag : passengers.value()) {
-                                    rewritten.add(randomizePassengerUuidsInTag(passengerTag, passengerTagsByUuid));
+                                    rewritten.add(PaperweightPlatformAdapter.randomizePassengerUuidsInTag(passengerTag, passengerTagsByUuid));
                                 }
                                 toLoadComponentBuilder.put("Passengers", LinListTag.of(LinTagType.compoundTag(), rewritten));
                             }
@@ -709,7 +709,7 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
 
                                 boolean noEvents = !set.getSideEffectSet().shouldApply(SideEffect.ENTITY_EVENTS);
                                 boolean added = noEvents
-                                        ? addNoEvents(createdEntity, nmsWorld, onError)
+                                        ? PaperweightPlatformAdapter.addNoEvents(createdEntity, nmsWorld, onError)
                                         : nmsWorld.addFreshEntity(createdEntity, CreatureSpawnEvent.SpawnReason.CUSTOM);
 
                                 if (!added) {
@@ -718,7 +718,7 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
                                     continue;
                                 }
 
-                                addPassengersRecursive(createdEntity, noEvents, nmsWorld, id, newPassengerRecords, onError, passengerTagsByUuid);
+                                PaperweightPlatformAdapter.addPassengersRecursive(createdEntity, noEvents, nmsWorld, id, newPassengerRecords, onError, passengerTagsByUuid);
                             }
                         }
                     }
@@ -783,95 +783,7 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
         }
     }
 
-    private LinCompoundTag randomizePassengerUuidsInTag(
-            LinCompoundTag tag,
-            Map<UUID, LinCompoundTag> collector
-    ) {
-        LinCompoundTag.Builder builder = tag.toBuilder();
 
-        UUID uuid = UUID.randomUUID();
-        Map<String, LinTag<?>> uuidData = new HashMap<>();
-        NbtUtils.addUUIDToMap(uuidData, uuid);
-        for (String key : uuidData.keySet()) {
-            builder.put(key, uuidData.get(key));
-        }
-
-        LinListTag<LinCompoundTag> passengers = tag.findListTag("Passengers", LinTagType.compoundTag());
-        if (passengers != null) {
-            List<LinCompoundTag> rewritten = new ArrayList<>();
-            for (LinCompoundTag passengerTag : passengers.value()) {
-                rewritten.add(randomizePassengerUuidsInTag(passengerTag, collector)); // recurse for nested riders
-            }
-            builder.put("Passengers", LinListTag.of(LinTagType.compoundTag(), rewritten));
-        }
-
-        LinCompoundTag finalTag = builder.build();
-        collector.put(uuid, finalTag);
-        return finalTag;
-    }
-
-    private boolean addNoEvents(
-            Entity entity,
-            ServerLevel nmsWorld,
-            Runnable onError
-    ) {
-        entity.spawnReason = CreatureSpawnEvent.SpawnReason.CUSTOM;
-        entity.generation = false;
-        if (PaperSupport.isPaper()) {
-            boolean status = nmsWorld.moonrise$getEntityLookup().addNewEntity(entity, false);
-            if (!status) {
-                onError.run();
-            }
-            return status;
-        } else {
-            // Not paper
-            try {
-                return PaperweightPlatformAdapter.getEntitySectionManager(nmsWorld).addNewEntity(entity);
-            } catch (IllegalAccessException e) {
-                // Fallback
-                LOGGER.warn("Error bypassing entity events on spawn on Spigot", e);
-            }
-        }
-
-        return false;
-    }
-
-    private void addPassengersRecursive(
-            Entity parent,
-            boolean noEvents,
-            ServerLevel nmsWorld,
-            String vehicleId,
-            List<FaweCompoundTag> newRecords,
-            Runnable onError,
-            Map<UUID, LinCompoundTag> passengerTagsByUuid
-    ) {
-        for (Entity passenger : new ArrayList<>(parent.getPassengers())) { // snapshot, load already attached them
-            boolean added = noEvents
-                    ? addNoEvents(passenger, nmsWorld, onError)
-                    : nmsWorld.addFreshEntity(passenger, CreatureSpawnEvent.SpawnReason.CUSTOM);
-            if (!added) {
-                LOGGER.warn("Error creating passenger of type `{}` for vehicle type `{}` at {}", passenger.getType(), vehicleId, parent.position());
-                passenger.stopRiding();
-                continue;
-            }
-
-            LinCompoundTag sourceTag = passengerTagsByUuid.get(passenger.getUUID());
-            if (sourceTag != null) {
-                newRecords.add(buildEntityRecordFromTag(sourceTag, passenger.getType()));
-            } else {
-                LOGGER.warn("No recorded tag found for passenger `{}` — history entry skipped", passenger.getUUID());
-            }
-
-            addPassengersRecursive(passenger, noEvents, nmsWorld, vehicleId, newRecords, onError, passengerTagsByUuid);
-        }
-    }
-
-    private FaweCompoundTag buildEntityRecordFromTag(LinCompoundTag sourceTag, EntityType<?> type) {
-        LinCompoundTag withId = sourceTag.toBuilder()
-                .putString("Id", BuiltInRegistries.ENTITY_TYPE.getKey(type).toString())
-                .build();
-        return FaweCompoundTag.of(withId);
-    }
 
     private void updateGet(
             LevelChunk nmsChunk,
