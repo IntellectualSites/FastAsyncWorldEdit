@@ -31,8 +31,6 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.IdMap;
 import net.minecraft.core.Registry;
 import net.minecraft.core.SectionPos;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.BitStorage;
@@ -662,10 +660,7 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
                         final float pitch = rotTag.get(1).valueAsFloat();
                         final String id = idTag.value();
 
-                        EntityType<?> type = serverLevel.registryAccess()
-                                .lookupOrThrow(Registries.ENTITY_TYPE)
-                                .getOptional(Identifier.parse(id))
-                                .orElse(null);
+                        EntityType<?> type = EntityType.byString(id).orElse(null);
                         if (type != null) {
                             Runnable onError = () -> LOGGER.warn(
                                     "Error creating entity of type `{}` in world `{}` at location `{},{},{}`",
