@@ -651,6 +651,8 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
                 }
 
                 syncTasks[1] = () -> {
+                    List<FaweCompoundTag> newPassengerRecords = new ArrayList<>();
+                    Map<UUID, LinCompoundTag> passengerTagsByUuid = new HashMap<>();
                     Iterator<FaweCompoundTag> iterator = entities.iterator();
                     while (iterator.hasNext()) {
                         final FaweCompoundTag nativeTag = iterator.next();
@@ -671,49 +673,61 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
 
                         EntityType<?> type = EntityType.byString(id).orElse(null);
                         if (type != null) {
-                            Entity entity = type.create(nmsWorld);
-                            if (entity != null) {
-                                final CompoundTag tag = (CompoundTag) adapter.fromNativeLin(linTag);
-                                for (final String name : Constants.NO_COPY_ENTITY_NBT_FIELDS) {
-                                    tag.remove(name);
+                            Runnable onError = () -> LOGGER.warn(
+                                    "Error creating entity of type `{}` in world `{}` at location `{},{},{}`",
+                                    id,
+                                    nmsWorld.getWorld().getName(),
+                                    x,
+                                    y,
+                                    z
+                            );
+
+                            final LinCompoundTag.Builder toLoadComponentBuilder = linTag.toBuilder();
+                            for (final String name : Constants.NO_COPY_ENTITY_NBT_FIELDS) {
+                                toLoadComponentBuilder.remove(name);
+                            }
+
+                            // NEW: rewrite passenger UUIDs in the tag itself, before it's ever loaded
+                            LinListTag<LinCompoundTag> passengers = linTag.findListTag("Passengers", LinTagType.compoundTag());
+                            if (passengers != null) {
+                                List<LinCompoundTag> rewritten = new ArrayList<>();
+                                for (LinCompoundTag passengerTag : passengers.value()) {
+                                    rewritten.add(PaperweightPlatformAdapter.randomizePassengerUuidsInTag(passengerTag, passengerTagsByUuid));
                                 }
-                                entity.load(tag);
-                                entity.absMoveTo(x, y, z, yaw, pitch);
-                                entity.setUUID(NbtUtils.uuid(nativeTag));
-                                Runnable onError = () -> LOGGER.warn(
-                                        "Error creating entity of type `{}` in world `{}` at location `{},{},{}`",
-                                        id,
-                                        nmsWorld.getWorld().getName(),
-                                        x,
-                                        y,
-                                        z
-                                );
-                                if (!set.getSideEffectSet().shouldApply(SideEffect.ENTITY_EVENTS)) {
-                                    entity.spawnReason = CreatureSpawnEvent.SpawnReason.CUSTOM;
-                                    entity.generation = false;
-                                    if (PaperSupport.isPaper()) {
-                                        if (!nmsWorld.moonrise$getEntityLookup().addNewEntity(entity)) {
-                                            onError.run();
-                                        }
-                                        continue;
+                                toLoadComponentBuilder.put("Passengers", LinListTag.of(LinTagType.compoundTag(), rewritten));
+                            }
+
+                            Entity createdEntity = EntityType.loadEntityRecursive(
+                                    (CompoundTag) adapter.fromNativeLin(toLoadComponentBuilder.build()),
+                                    nmsWorld,
+                                    (loadedEntity) -> {
+                                        loadedEntity.absMoveTo(x, y, z, yaw, pitch);
+                                        return loadedEntity;
                                     }
-                                    // Not paper
-                                    try {
-                                        PaperweightPlatformAdapter.getEntitySectionManager(nmsWorld).addNewEntity(entity);
-                                        continue;
-                                    } catch (IllegalAccessException e) {
-                                        // Fallback
-                                        LOGGER.warn("Error bypassing entity events on spawn on Spigot", e);
-                                    }
-                                }
-                                if (!nmsWorld.addFreshEntity(entity, CreatureSpawnEvent.SpawnReason.CUSTOM)) {
+                            );
+
+                            if (createdEntity == null) {
+                                onError.run();
+                                iterator.remove();
+                            } else {
+                                createdEntity.setUUID(NbtUtils.uuid(nativeTag)); // NEW — restore parity with the recorded UUID
+
+                                boolean noEvents = !set.getSideEffectSet().shouldApply(SideEffect.ENTITY_EVENTS);
+                                boolean added = noEvents
+                                        ? PaperweightPlatformAdapter.addNoEvents(createdEntity, nmsWorld, onError)
+                                        : nmsWorld.addFreshEntity(createdEntity, CreatureSpawnEvent.SpawnReason.CUSTOM);
+
+                                if (!added) {
                                     onError.run();
-                                    // Unsuccessful create should not be saved to history
-                                    iterator.remove();
+                                    iterator.remove(); // vehicle failed — matches reviewer's exact request
+                                    continue;
                                 }
+
+                                PaperweightPlatformAdapter.addPassengersRecursive(createdEntity, noEvents, nmsWorld, id, newPassengerRecords, onError, passengerTagsByUuid);
                             }
                         }
                     }
+                    entities.addAll(newPassengerRecords);
                 };
             }
 
