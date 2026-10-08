@@ -1,11 +1,10 @@
 package com.fastasyncworldedit.bukkit.adapter;
 
-import com.destroystokyo.paper.util.SneakyThrow;
-import com.fastasyncworldedit.bukkit.util.BukkitReflectionUtils;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldedit.bukkit.adapter.Refraction;
 import com.sk89q.worldedit.entity.Entity;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.regions.Region;
+import org.apache.logging.log4j.Logger;
 import org.bukkit.World;
 
 import java.lang.invoke.MethodHandle;
@@ -25,14 +24,19 @@ import static java.lang.invoke.MethodType.methodType;
 
 public class BukkitFoliaAdapter {
 
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
     private static final MethodHandle GET_ENTITIES = createEntitiesGetter();
 
     @SuppressWarnings("unchecked")
     public static List<Entity> getEntities(World world, Region region) {
+        if (GET_ENTITIES == null) {
+            return List.of();
+        }
         try {
             return (List<Entity>) GET_ENTITIES.invoke(world, region);
         } catch (Throwable t) {
-            throw new RuntimeException(t);
+            LOGGER.error("Failed to retrieve entities on Folia", t);
+            return List.of();
         }
     }
 
@@ -40,21 +44,29 @@ public class BukkitFoliaAdapter {
     private static MethodHandle createEntitiesGetter() {
         try {
             MethodHandles.Lookup lookup = MethodHandles.lookup();
-            Class<?> craftWorldClass = BukkitReflectionUtils.getCbClass("CraftWorld");
-            Class<?> serverLevel = Class.forName(Refraction.pickName("net.minecraft.server.level.ServerLevel", "net.minecraft.server.level.WorldServer"));
-            Class<?> craftEntity = BukkitReflectionUtils.getCbClass("entity.CraftEntity");
+            Class<?> craftWorldClass = Class.forName("org.bukkit.craftbukkit.CraftWorld");
+            Class<?> serverLevel = Class.forName("net.minecraft.server.level.ServerLevel");
+            Class<?> craftEntity = Class.forName("org.bukkit.craftbukkit.entity.CraftEntity");
             Class<?> nmsEntityClass = Class.forName("net.minecraft.world.entity.Entity");
-            Class<?> nmsBlockPosClass = Class.forName(Refraction.pickName("net.minecraft.core.BlockPos", "net.minecraft.core.BlockPosition"));
-            Class<?> entityLookup = Class.forName("io.papermc.paper.chunk.system.entity.EntityLookup");
+            Class<?> nmsBlockPosClass = Class.forName("net.minecraft.core.BlockPos");
+            Class<?> entityLookup = Class.forName("ca.spottedleaf.moonrise.patches.chunk_system.level.entity.EntityLookup");
+
+            MethodHandle getEntityLookup;
+            try {
+                getEntityLookup = lookup.findVirtual(serverLevel, "moonrise$getEntityLookup", methodType(entityLookup));
+            } catch (NoSuchMethodException e) {
+                getEntityLookup = lookup.findVirtual(serverLevel, "getEntityLookup", methodType(entityLookup));
+            }
+
             MethodHandle getHandle = lookup.findVirtual(craftWorldClass, "getHandle", methodType(serverLevel));
-            MethodHandle getEntityLookup = lookup.findVirtual(serverLevel, "getEntityLookup", methodType(entityLookup));
-            MethodHandle getAll = lookup.findVirtual(entityLookup, Refraction.pickName("getAll", "a"), methodType(Iterable.class));
+            MethodHandle getAll = lookup.findVirtual(entityLookup, "getAll", methodType(Iterable.class));
             MethodHandle getEntities = filterReturnValue(filterReturnValue(getHandle, getEntityLookup), getAll);
             MethodHandle regionContainsXYZ = lookup.findVirtual(Region.class, "contains", methodType(boolean.class, int.class, int.class, int.class));
-            MethodHandle blockPos = lookup.findVirtual(nmsEntityClass, Refraction.pickName("blockPosition", "dm"), methodType(nmsBlockPosClass));
-            MethodHandle getX = lookup.findVirtual(nmsBlockPosClass, Refraction.pickName("getX", "u"), methodType(int.class));
-            MethodHandle getY = lookup.findVirtual(nmsBlockPosClass, Refraction.pickName("getY", "v"), methodType(int.class));
-            MethodHandle getZ = lookup.findVirtual(nmsBlockPosClass, Refraction.pickName("getZ", "w"), methodType(int.class));
+            MethodHandle blockPos = lookup.findVirtual(nmsEntityClass, "blockPosition", methodType(nmsBlockPosClass));
+            MethodHandle getX = lookup.findVirtual(nmsBlockPosClass, "getX", methodType(int.class));
+            MethodHandle getY = lookup.findVirtual(nmsBlockPosClass, "getY", methodType(int.class));
+            MethodHandle getZ = lookup.findVirtual(nmsBlockPosClass, "getZ", methodType(int.class));
+
             MethodHandle regionContainsBPBPBP = filterArguments(regionContainsXYZ, 1, getX, getY, getZ);
             MethodHandle regionContainsBlockPos = permuteArguments(regionContainsBPBPBP, methodType(boolean.class, nmsBlockPosClass, Region.class), 1, 0, 0, 0);
             MethodHandle isInRegion = dropArguments(filterArguments(regionContainsBlockPos, 0, blockPos), 0, ArrayList.class);
@@ -73,7 +85,7 @@ public class BukkitFoliaAdapter {
             MethodHandle iterate = iteratedLoop(null, newArrayListHandle, dropArguments(ifInRegion, 2, Iterable.class));
             return filterArguments(iterate, 0, getEntities);
         } catch (Throwable t) {
-            SneakyThrow.sneaky(t);
+            LOGGER.error("Failed to create Folia entities getter", t);
             return null;
         }
     }
