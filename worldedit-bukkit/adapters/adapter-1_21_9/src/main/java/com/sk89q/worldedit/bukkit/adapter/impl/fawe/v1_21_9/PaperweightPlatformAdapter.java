@@ -11,7 +11,9 @@ import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.math.BitArrayUnstretched;
 import com.fastasyncworldedit.core.math.IntPair;
+import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.fastasyncworldedit.core.util.MathMan;
+import com.fastasyncworldedit.core.util.NbtUtils;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.mojang.serialization.DataResult;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
@@ -27,6 +29,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.IdMap;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
 import net.minecraft.server.MinecraftServer;
@@ -39,6 +42,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.util.ProblemReporter;
 import net.minecraft.util.ThreadingDetector;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.biome.Biome;
@@ -59,6 +63,11 @@ import net.minecraft.world.level.storage.ValueInput;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Chunk;
 import org.bukkit.craftbukkit.CraftChunk;
+import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.enginehub.linbus.tree.LinCompoundTag;
+import org.enginehub.linbus.tree.LinListTag;
+import org.enginehub.linbus.tree.LinTag;
+import org.enginehub.linbus.tree.LinTagType;
 
 import javax.annotation.Nullable;
 import java.lang.invoke.MethodHandle;
@@ -67,13 +76,7 @@ import java.lang.invoke.MethodType;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Semaphore;
@@ -722,6 +725,96 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
     static PersistentEntitySectionManager<Entity> getEntitySectionManager(ServerLevel level) throws IllegalAccessException {
         //noinspection unchecked
         return (PersistentEntitySectionManager<Entity>) (SERVER_LEVEL_ENTITY_MANAGER.get(level));
+    }
+
+    static LinCompoundTag randomizePassengerUuidsInTag(
+            LinCompoundTag tag,
+            Map<UUID, LinCompoundTag> collector
+    ) {
+        LinCompoundTag.Builder builder = tag.toBuilder();
+
+        UUID uuid = UUID.randomUUID();
+        Map<String, LinTag<?>> uuidData = new HashMap<>();
+        NbtUtils.addUUIDToMap(uuidData, uuid);
+        for (String key : uuidData.keySet()) {
+            builder.put(key, uuidData.get(key));
+        }
+
+        LinListTag<LinCompoundTag> passengers = tag.findListTag("Passengers", LinTagType.compoundTag());
+        if (passengers != null) {
+            List<LinCompoundTag> rewritten = new ArrayList<>();
+            for (LinCompoundTag passengerTag : passengers.value()) {
+                rewritten.add(randomizePassengerUuidsInTag(passengerTag, collector)); // recurse for nested riders
+            }
+            builder.put("Passengers", LinListTag.of(LinTagType.compoundTag(), rewritten));
+        }
+
+        LinCompoundTag finalTag = builder.build();
+        collector.put(uuid, finalTag);
+        return finalTag;
+    }
+
+    static boolean addNoEvents(
+            Entity entity,
+            ServerLevel nmsWorld,
+            Runnable onError
+    ) {
+        entity.spawnReason = CreatureSpawnEvent.SpawnReason.CUSTOM;
+        entity.generation = false;
+        if (PaperSupport.isPaper()) {
+            boolean status = nmsWorld.moonrise$getEntityLookup().addNewEntity(entity, false);
+            if (!status) {
+                onError.run();
+            }
+            return status;
+        } else {
+            // Not paper
+            try {
+                return PaperweightPlatformAdapter.getEntitySectionManager(nmsWorld).addNewEntity(entity);
+            } catch (IllegalAccessException e) {
+                // Fallback
+                LOGGER.warn("Error bypassing entity events on spawn on Spigot", e);
+            }
+        }
+
+        return false;
+    }
+
+    static void addPassengersRecursive(
+            Entity parent,
+            boolean noEvents,
+            ServerLevel nmsWorld,
+            String vehicleId,
+            List<FaweCompoundTag> newRecords,
+            Runnable onError,
+            Map<UUID, LinCompoundTag> passengerTagsByUuid
+    ) {
+        for (Entity passenger : new ArrayList<>(parent.getPassengers())) { // snapshot, load already attached them
+            boolean added = noEvents
+                    ? addNoEvents(passenger, nmsWorld, onError)
+                    : nmsWorld.addFreshEntity(passenger, CreatureSpawnEvent.SpawnReason.CUSTOM);
+            if (!added) {
+                LOGGER.warn("Error creating passenger of type `{}` for vehicle type `{}` at {}", passenger.getType(), vehicleId, parent.position());
+                passenger.stopRiding();
+                continue;
+            }
+
+            LinCompoundTag sourceTag = passengerTagsByUuid.get(passenger.getUUID());
+            if (sourceTag != null) {
+                newRecords.add(buildEntityRecordFromTag(sourceTag, passenger.getType()));
+            } else {
+                LOGGER.warn("No recorded tag found for passenger `{}` — history entry skipped", passenger.getUUID());
+            }
+
+            addPassengersRecursive(passenger, noEvents, nmsWorld, vehicleId, newRecords, onError, passengerTagsByUuid);
+        }
+    }
+
+    static FaweCompoundTag buildEntityRecordFromTag(LinCompoundTag sourceTag, EntityType<?> type) {
+        LinCompoundTag withId = sourceTag.toBuilder()
+                .putString("Id", BuiltInRegistries.ENTITY_TYPE.getKey(type).toString())
+                .build();
+        return FaweCompoundTag.of(withId);
     }
 
 }

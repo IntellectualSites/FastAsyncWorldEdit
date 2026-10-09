@@ -126,6 +126,9 @@ public interface IChunkExtent<T extends IChunk> extends Extent {
     @Override
     default Entity createEntity(Location location, BaseEntity entity, UUID uuid) {
         final IChunk chunk = getOrCreateChunk(location.getBlockX() >> 4, location.getBlockZ() >> 4);
+        if (entity.getNbt() == null) {
+            return null; // don't attempt to spawn "empty" entity
+        }
         Map<String, LinTag<?>> map = new HashMap<>(entity.getNbt().value()); //do not modify original entity data
         map.put("Id", LinStringTag.of(entity.getType().getName()));
 
