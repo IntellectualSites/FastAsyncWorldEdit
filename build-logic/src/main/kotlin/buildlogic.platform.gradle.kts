@@ -19,9 +19,10 @@ tasks.named<ShadowJar>("shadowJar") {
     archiveClassifier.set("dist")
     relocate("com.sk89q.jchronic", "com.sk89q.worldedit.jchronic")
     val jchronic = stringyLibs.getLibrary("jchronic").get()
+    val platformName = project.name.replace("worldedit-", "")
     dependencies {
         include(project(":worldedit-libs:core"))
-        include(project(":worldedit-libs:${project.name.replace("worldedit-", "")}"))
+        include(project(":worldedit-libs:$platformName"))
         include(project(":worldedit-core"))
         include(dependency(jchronic))
         exclude(dependency("com.google.code.findbugs:jsr305"))
