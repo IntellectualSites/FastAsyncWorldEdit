@@ -614,10 +614,7 @@ public class WorldEditPlugin extends JavaPlugin {
         if (wePlayer != null) {
             return wePlayer;
         }
-        BukkitPlayer bukkitPlayer = getCachedPlayer(player);
-        if (bukkitPlayer == null) {
-            bukkitPlayer = new BukkitPlayer(this, player);
-            playerCache.put(player, bukkitPlayer);
+        BukkitPlayer bukkitPlayer = playerCache.computeIfAbsent(player, key -> new BukkitPlayer(this, key));
         }
         return bukkitPlayer;
         //FAWE end
