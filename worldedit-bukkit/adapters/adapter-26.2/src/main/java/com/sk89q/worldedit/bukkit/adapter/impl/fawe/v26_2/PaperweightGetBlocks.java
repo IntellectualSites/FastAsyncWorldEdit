@@ -567,8 +567,8 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
                                     this::load,
                                     setArr,
                                     adapter,
-                                    serverLevel.registryAccess(),
-                                    serverLevel.palettedContainerFactory().blockStatesStrategy(),
+                                    nmsChunk.registryAccess(),
+                                    nmsChunk.palettedContainerFactory().blockStatesStrategy(),
                                     biomeData != null ? biomeData : (PalettedContainer<Holder<Biome>>) existingSection.getBiomes()
                             );
                         }
@@ -678,7 +678,7 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
                             final float pitch = rotTag.get(1).valueAsFloat();
                             final String id = idTag.value();
 
-                            EntityType<?> type = serverLevel.registryAccess()
+                            EntityType<?> type = nmsChunk.registryAccess()
                                     .lookupOrThrow(Registries.ENTITY_TYPE)
                                     .getOptional(Identifier.parse(id))
                                     .orElse(null);
