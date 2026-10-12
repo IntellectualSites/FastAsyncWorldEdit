@@ -2,9 +2,7 @@ package com.fastasyncworldedit.bukkit.adapter;
 
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.entity.Entity;
-import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.regions.Region;
-import org.apache.logging.log4j.Logger;
 import org.bukkit.World;
 
 import java.lang.invoke.MethodHandle;
@@ -24,19 +22,16 @@ import static java.lang.invoke.MethodType.methodType;
 
 public class BukkitFoliaAdapter {
 
-    private static final Logger LOGGER = LogManagerCompat.getLogger();
     private static final MethodHandle GET_ENTITIES = createEntitiesGetter();
 
     @SuppressWarnings("unchecked")
     public static List<Entity> getEntities(World world, Region region) {
-        if (GET_ENTITIES == null) {
-            return List.of();
-        }
         try {
             return (List<Entity>) GET_ENTITIES.invoke(world, region);
+        } catch (RuntimeException | Error e) {
+            throw e;
         } catch (Throwable t) {
-            LOGGER.error("Failed to retrieve entities on Folia", t);
-            return List.of();
+            throw new AssertionError(t);
         }
     }
 
@@ -79,9 +74,8 @@ public class BukkitFoliaAdapter {
             MethodHandle ifInRegion = guardWithTest(isInRegion, ifTrue, ifFalse);
             MethodHandle iterate = iteratedLoop(null, newArrayListHandle, dropArguments(ifInRegion, 2, Iterable.class));
             return filterArguments(iterate, 0, getEntities);
-        } catch (Throwable t) {
-            LOGGER.error("Failed to create Folia entities getter", t);
-            return null;
+        } catch (Exception e) {
+            throw new ExceptionInInitializerError(e);
         }
     }
     // @formatter:on
