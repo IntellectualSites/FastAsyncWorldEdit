@@ -16,7 +16,7 @@ worldguard-bukkit = "7.0.17"
 griefprevention = "18.0.0"
 griefdefender = "2.1.0-SNAPSHOT"
 residence = "6.0.2.3"
-towny = "0.103.2.10"
+towny = "0.103.2.11"
 plotsquared = "7.6.0"
 
 # Third party
@@ -59,7 +59,7 @@ grgit = "5.3.3"
 shadow = "9.5.1"
 paperweight = "2.0.0-SNAPSHOT"
 codecov = "0.3.0"
-jqwik = "1.10.1"
+jqwik = "1.10.2"
 
 # Minimum versions we apply to make dependencies support newer Java
 minimumAsm = "9.7"
