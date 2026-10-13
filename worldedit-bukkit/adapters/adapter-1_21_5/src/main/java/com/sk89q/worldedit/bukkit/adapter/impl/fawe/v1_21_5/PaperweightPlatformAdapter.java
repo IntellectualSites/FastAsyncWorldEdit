@@ -757,10 +757,9 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             } catch (IllegalAccessException e) {
                 // Fallback
                 LOGGER.warn("Error bypassing entity events on spawn on Spigot", e);
+                return nmsWorld.addFreshEntity(entity, CreatureSpawnEvent.SpawnReason.CUSTOM);
             }
         }
-
-        return false;
     }
 
     static void addPassengersRecursive(
