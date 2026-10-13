@@ -24,11 +24,7 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Holder;
-import net.minecraft.core.IdMap;
-import net.minecraft.core.Registry;
-import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.*;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
@@ -42,7 +38,6 @@ import net.minecraft.util.Mth;
 import net.minecraft.util.ProblemReporter;
 import net.minecraft.util.ThreadingDetector;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.biome.Biome;
@@ -64,10 +59,7 @@ import org.apache.logging.log4j.Logger;
 import org.bukkit.Chunk;
 import org.bukkit.craftbukkit.CraftChunk;
 import org.bukkit.event.entity.CreatureSpawnEvent;
-import org.enginehub.linbus.tree.LinCompoundTag;
-import org.enginehub.linbus.tree.LinListTag;
-import org.enginehub.linbus.tree.LinTag;
-import org.enginehub.linbus.tree.LinTagType;
+import org.enginehub.linbus.tree.*;
 
 import javax.annotation.Nullable;
 import java.lang.invoke.MethodHandle;
@@ -93,6 +85,9 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
 
     public static final Field fieldStorage;
     public static final Field fieldPalette;
+
+    public static final String PASSENGER_RECORD = "FAWE_PassengerRecord";
+    public static final String SOURCE_UUID = "FAWE_SourceUuid";
 
     private static final MethodHandle palettedContainerUnpackSpigot;
 
@@ -729,11 +724,22 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
 
     static LinCompoundTag randomizePassengerUuidsInTag(
             LinCompoundTag tag,
-            Map<UUID, LinCompoundTag> collector
+            Map<UUID, LinCompoundTag> collector,
+            Map<UUID, UUID> reusedUuids // original (copy-time) UUID -> UUID recorded by an earlier flush
     ) {
         LinCompoundTag.Builder builder = tag.toBuilder();
 
-        UUID uuid = UUID.randomUUID();
+        LinIntArrayTag originalTag = tag.findTag("UUID", LinTagType.intArrayTag());
+        UUID original = originalTag == null ? null : UUIDUtil.uuidFromIntArray(originalTag.value());
+
+        UUID uuid = original != null && reusedUuids.containsKey(original)
+                ? reusedUuids.remove(original)   // redo: same UUID as the first paste
+                : UUID.randomUUID();             // first paste: avoid colliding with the source entity
+
+        if (originalTag != null) {
+            builder.putIntArray(SOURCE_UUID, originalTag.value()); // remember P0 on the record
+        }
+
         Map<String, LinTag<?>> uuidData = new HashMap<>();
         NbtUtils.addUUIDToMap(uuidData, uuid);
         for (String key : uuidData.keySet()) {
@@ -744,7 +750,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         if (passengers != null) {
             List<LinCompoundTag> rewritten = new ArrayList<>();
             for (LinCompoundTag passengerTag : passengers.value()) {
-                rewritten.add(randomizePassengerUuidsInTag(passengerTag, collector)); // recurse for nested riders
+                rewritten.add(randomizePassengerUuidsInTag(passengerTag, collector, reusedUuids)); // recurse for nested riders
             }
             builder.put("Passengers", LinListTag.of(LinTagType.compoundTag(), rewritten));
         }
@@ -801,7 +807,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
 
             LinCompoundTag sourceTag = passengerTagsByUuid.get(passenger.getUUID());
             if (sourceTag != null) {
-                newRecords.add(buildEntityRecordFromTag(sourceTag, passenger.getType()));
+                newRecords.add(buildEntityRecordFromTag(sourceTag, passenger));
             } else {
                 LOGGER.warn("No recorded tag found for passenger `{}` — history entry skipped", passenger.getUUID());
             }
@@ -810,11 +816,22 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         }
     }
 
-    static FaweCompoundTag buildEntityRecordFromTag(LinCompoundTag sourceTag, EntityType<?> type) {
-        LinCompoundTag withId = sourceTag.toBuilder()
-                .putString("Id", BuiltInRegistries.ENTITY_TYPE.getKey(type).toString())
+    static FaweCompoundTag buildEntityRecordFromTag(LinCompoundTag sourceTag, Entity passenger) {
+        LinCompoundTag record = sourceTag.toBuilder()
+                .putString("Id", BuiltInRegistries.ENTITY_TYPE.getKey(passenger.getType()).toString())
+                .put("Pos", LinListTag.of(LinTagType.doubleTag(), List.of(
+                        LinDoubleTag.of(passenger.getX()),
+                        LinDoubleTag.of(passenger.getY()),
+                        LinDoubleTag.of(passenger.getZ())
+                )))
+                .put("Rotation", LinListTag.of(LinTagType.floatTag(), List.of(
+                        LinFloatTag.of(passenger.getYRot()),
+                        LinFloatTag.of(passenger.getXRot())
+                )))
+                .putByte(PASSENGER_RECORD, (byte) 1)
                 .build();
-        return FaweCompoundTag.of(withId);
+
+        return FaweCompoundTag.of(record);
     }
 
 }

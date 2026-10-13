@@ -27,11 +27,7 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import io.papermc.paper.event.block.BeaconDeactivatedEvent;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Holder;
-import net.minecraft.core.IdMap;
-import net.minecraft.core.Registry;
-import net.minecraft.core.SectionPos;
+import net.minecraft.core.*;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.IntTag;
 import net.minecraft.server.level.ServerLevel;
@@ -63,12 +59,7 @@ import org.bukkit.World;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.block.CraftBlock;
 import org.bukkit.event.entity.CreatureSpawnEvent;
-import org.enginehub.linbus.tree.LinCompoundTag;
-import org.enginehub.linbus.tree.LinDoubleTag;
-import org.enginehub.linbus.tree.LinFloatTag;
-import org.enginehub.linbus.tree.LinListTag;
-import org.enginehub.linbus.tree.LinStringTag;
-import org.enginehub.linbus.tree.LinTagType;
+import org.enginehub.linbus.tree.*;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -641,11 +632,33 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
             if (entities != null && !entities.isEmpty()) {
                 syncTasks.add(() -> {
                     List<FaweCompoundTag> newPassengerRecords = new ArrayList<>();
+
+                    Map<UUID, UUID> reusedUuids = new HashMap<>();
+                    for (FaweCompoundTag t : entities) {
+                        LinCompoundTag lt = t.linTag();
+                        if (lt.findTag(PaperweightPlatformAdapter.PASSENGER_RECORD, LinTagType.byteTag()) == null) {
+                            continue;
+                        }
+                        LinIntArrayTag source = lt.findTag(PaperweightPlatformAdapter.SOURCE_UUID, LinTagType.intArrayTag());
+                        if (source != null) {
+                            reusedUuids.put(UUIDUtil.uuidFromIntArray(source.value()), NbtUtils.uuid(t));
+                        }
+                    }
+
                     Map<UUID, LinCompoundTag> passengerTagsByUuid = new HashMap<>();
                     Iterator<FaweCompoundTag> iterator = entities.iterator();
+
                     while (iterator.hasNext()) {
                         final FaweCompoundTag nativeTag = iterator.next();
                         final LinCompoundTag linTag = nativeTag.linTag();
+
+                        if (linTag.findTag(PaperweightPlatformAdapter.PASSENGER_RECORD, LinTagType.byteTag()) != null) {
+                            // Replayed passenger record (redo). The vehicle's own tag already recreates this
+                            // passenger, and addPassengersRecursive will record the new instance below.
+                            iterator.remove();
+                            continue;
+                        }
+
                         final LinStringTag idTag = linTag.findTag("Id", LinTagType.stringTag());
                         final LinListTag<LinDoubleTag> posTag = linTag.findListTag("Pos", LinTagType.doubleTag());
                         final LinListTag<LinFloatTag> rotTag = linTag.findListTag("Rotation", LinTagType.floatTag());
@@ -681,7 +694,7 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
                             if (passengers != null) {
                                 List<LinCompoundTag> rewritten = new ArrayList<>();
                                 for (LinCompoundTag passengerTag : passengers.value()) {
-                                    rewritten.add(PaperweightPlatformAdapter.randomizePassengerUuidsInTag(passengerTag, passengerTagsByUuid));
+                                    rewritten.add(PaperweightPlatformAdapter.randomizePassengerUuidsInTag(passengerTag, passengerTagsByUuid, reusedUuids));
                                 }
                                 toLoadComponentBuilder.put("Passengers", LinListTag.of(LinTagType.compoundTag(), rewritten));
                             }
