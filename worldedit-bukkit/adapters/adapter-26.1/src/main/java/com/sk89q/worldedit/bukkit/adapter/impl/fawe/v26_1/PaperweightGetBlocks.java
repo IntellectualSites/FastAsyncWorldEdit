@@ -726,10 +726,10 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
                 }
 
                 if (!tilesToInit.isEmpty()) {
-                    PaperweightPlatformAdapter.setPostProcessing(levelChunk, tilesToInit);
+                    PaperweightPlatformAdapter.setPostProcessing(nmsChunk, tilesToInit);
                     syncTasks.add(() -> {
-                        tilesToInit.forEach((pos, tag) -> levelChunk.getBlockEntity(pos));
-                        PaperweightPlatformAdapter.clearPostProcessing(levelChunk, true);
+                        tilesToInit.forEach((pos, tag) -> nmsChunk.getBlockEntity(pos));
+                        PaperweightPlatformAdapter.clearPostProcessing(nmsChunk, true);
                     });
                 }
 
