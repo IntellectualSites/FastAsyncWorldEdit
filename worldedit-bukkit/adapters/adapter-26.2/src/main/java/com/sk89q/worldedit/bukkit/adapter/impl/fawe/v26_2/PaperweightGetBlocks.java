@@ -572,8 +572,8 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
                                     this::load,
                                     setArr,
                                     adapter,
-                                    nmsChunk.registryAccess(),
-                                    nmsChunk.palettedContainerFactory().blockStatesStrategy(),
+                                    nmsWorld.registryAccess(),
+                                    nmsWorld.palettedContainerFactory().blockStatesStrategy(),
                                     biomeData != null ? biomeData : (PalettedContainer<Holder<Biome>>) existingSection.getBiomes()
                             );
                         }
@@ -683,7 +683,7 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
                             final float pitch = rotTag.get(1).valueAsFloat();
                             final String id = idTag.value();
 
-                            EntityType<?> type = nmsChunk.registryAccess()
+                            EntityType<?> type = nmsWorld.registryAccess()
                                     .lookupOrThrow(Registries.ENTITY_TYPE)
                                     .getOptional(Identifier.parse(id))
                                     .orElse(null);
@@ -736,10 +736,10 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
                 }
 
                 if (!tilesToInit.isEmpty()) {
-                    PaperweightPlatformAdapter.setPostProcessing(levelChunk, tilesToInit);
+                    PaperweightPlatformAdapter.setPostProcessing(nmsChunk, tilesToInit);
                     syncTasks.add(() -> {
-                        tilesToInit.forEach((pos, tag) -> levelChunk.getBlockEntity(pos));
-                        PaperweightPlatformAdapter.clearPostProcessing(levelChunk, true);
+                        tilesToInit.forEach((pos, tag) -> nmsChunk.getBlockEntity(pos));
+                        PaperweightPlatformAdapter.clearPostProcessing(nmsChunk, true);
                     });
                 }
 
