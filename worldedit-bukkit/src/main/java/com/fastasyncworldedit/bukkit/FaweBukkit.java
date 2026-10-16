@@ -15,6 +15,7 @@ import com.fastasyncworldedit.bukkit.util.ItemUtil;
 import com.fastasyncworldedit.bukkit.util.PaperSupport;
 import com.fastasyncworldedit.core.FAWEPlatformAdapterImpl;
 import com.fastasyncworldedit.core.Fawe;
+import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.IFawe;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.queue.implementation.QueueHandler;
@@ -70,7 +71,7 @@ public class FaweBukkit implements IFawe, Listener {
             } catch (Throwable e) {
                 LOGGER.error("Brush Listener Failed", e);
             }
-            if (PaperSupport.isPaper() && Settings.settings().EXPERIMENTAL.DYNAMIC_CHUNK_RENDERING > 1) {
+            if (PaperSupport.isPaper() && Settings.settings().experimental().dynamicChunkRendering() > 1) {
                 new RenderListener(plugin);
             }
         } catch (final Throwable e) {
@@ -86,8 +87,7 @@ public class FaweBukkit implements IFawe, Listener {
         // Registered delayed Event Listeners
         TaskManager.taskManager().task(() -> {
             // Fix for ProtocolSupport
-            Settings.settings().PROTOCOL_SUPPORT_FIX =
-                    Bukkit.getPluginManager().isPluginEnabled("ProtocolSupport");
+            FaweCache.INSTANCE.setProtocolSupportFix(Bukkit.getPluginManager().isPluginEnabled("ProtocolSupport"));
 
             // This class
             Bukkit.getPluginManager().registerEvents(FaweBukkit.this, FaweBukkit.this.plugin);
@@ -97,7 +97,7 @@ public class FaweBukkit implements IFawe, Listener {
         });
 
         // Warn if small-edits are enabled with extended world heights
-        if (Settings.settings().HISTORY.SMALL_EDITS) {
+        if (Settings.settings().history().smallEdits()) {
             LOGGER.warn("Small-edits enabled (maximum y range of 0 -> 256) with 1.18+ world heights. Are you sure?");
         }
     }
@@ -123,7 +123,7 @@ public class FaweBukkit implements IFawe, Listener {
             try {
                 this.itemUtil = tmp = new ItemUtil();
             } catch (Throwable e) {
-                Settings.settings().EXPERIMENTAL.PERSISTENT_BRUSHES = false;
+                Settings.override(Settings.Experimental::persistentBrushes, false);
                 LOGGER.error("Persistent Brushes Failed", e);
             }
         }

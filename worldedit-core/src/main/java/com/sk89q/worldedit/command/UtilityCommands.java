@@ -141,7 +141,7 @@ public class UtilityCommands {
             @Arg(name = "max", desc = "int", def = "200") int max
     ) throws IOException {
         actor.print(TextComponent.of("Please wait while we generate the minified heightmaps."));
-        File srcFolder = MainUtil.getFile(Fawe.platform().getDirectory(), Settings.settings().PATHS.HEIGHTMAP);
+        File srcFolder = MainUtil.getFile(Fawe.platform().getDirectory(), Settings.settings().paths().heightmap());
 
         File webSrc = new File(Fawe.platform().getDirectory(), "web" + File.separator + "heightmap");
         File minImages = new File(webSrc, "images" + File.separator + "min");
@@ -977,7 +977,7 @@ public class UtilityCommands {
         String dirFilter = File.separator;
 
         boolean listMine = false;
-        boolean listGlobal = !Settings.settings().PATHS.PER_PLAYER_SCHEMATICS;
+        boolean listGlobal = !Settings.settings().paths().perPlayerSchematics();
         if (len > 0) {
             for (String arg : args) {
                 switch (arg.toLowerCase(Locale.ROOT)) {

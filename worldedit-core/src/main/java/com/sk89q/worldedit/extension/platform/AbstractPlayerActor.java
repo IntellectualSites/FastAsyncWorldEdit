@@ -546,7 +546,7 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
 
         File file = MainUtil.getFile(
                 Fawe.platform().getDirectory(),
-                Settings.settings().PATHS.CLIPBOARD + File.separator + getUniqueId() + ".bd"
+                Settings.settings().paths().clipboard() + File.separator + getUniqueId() + ".bd"
         );
         try {
             Future<?> fut = Fawe.instance().submitUUIDKeyQueuedTask(getUniqueId(), () -> {

@@ -46,7 +46,7 @@ public class ChunkListener9 extends ChunkListener {
                 event.setCancelled(true);
                 return;
             }
-            if (System.currentTimeMillis() - physStart > Settings.settings().TICK_LIMITER.PHYSICS_MS) {
+            if (System.currentTimeMillis() - physStart > Settings.settings().tickLimiter().physicsMs()) {
                 physCancelPair = pair;
                 event.setCancelled(true);
                 return;
@@ -61,7 +61,7 @@ public class ChunkListener9 extends ChunkListener {
             return;
         }
         if ((++physSkip & 1023) == 0) {
-            if (System.currentTimeMillis() - physStart > Settings.settings().TICK_LIMITER.PHYSICS_MS) {
+            if (System.currentTimeMillis() - physStart > Settings.settings().tickLimiter().physicsMs()) {
                 Block block = event.getBlock();
                 int cx = block.getX() >> 4;
                 int cz = block.getZ() >> 4;
