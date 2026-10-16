@@ -203,16 +203,13 @@ public class Settings extends Config {
                 limit.SKIP_ENTITY_SPAWN_EVENTS |= newLimit.SKIP_CREATURE_SPAWN_EVENTS;
 
                 if (limit.DISALLOWED_BLOCKS == null) {
-                    limit.DISALLOWED_BLOCKS = newLimit.DISALLOWED_BLOCKS.isEmpty() ? Collections.emptySet() : new HashSet<>(
+                    limit.DISALLOWED_BLOCKS = newLimit.DISALLOWED_BLOCKS.isEmpty() ? Collections.emptySet() : namespaced(
                             newLimit.DISALLOWED_BLOCKS);
                 } else if (limit.DISALLOWED_BLOCKS.isEmpty() || newLimit.DISALLOWED_BLOCKS.isEmpty()) {
                     limit.DISALLOWED_BLOCKS = Collections.emptySet();
                 } else {
                     limit.DISALLOWED_BLOCKS = new HashSet<>(limit.DISALLOWED_BLOCKS);
-                    limit.DISALLOWED_BLOCKS.retainAll(newLimit.DISALLOWED_BLOCKS
-                            .stream()
-                            .map(s -> s.contains(":") ? s.toLowerCase(Locale.ROOT) : ("minecraft:" + s).toLowerCase(Locale.ROOT))
-                            .collect(Collectors.toSet()));
+                    limit.DISALLOWED_BLOCKS.retainAll(namespaced(newLimit.DISALLOWED_BLOCKS));
                     if (limit.DISALLOWED_BLOCKS.isEmpty()) {
                         limit.DISALLOWED_BLOCKS = Collections.emptySet();
                     }
@@ -281,6 +278,15 @@ public class Settings extends Config {
             }
         }
         return limit;
+    }
+
+    /**
+     * {@return the blocks in lower case, with the {@code minecraft} namespace added to those that have none}
+     */
+    private static Set<String> namespaced(List<String> blocks) {
+        return blocks.stream()
+                .map(s -> (s.contains(":") ? s : "minecraft:" + s).toLowerCase(Locale.ROOT))
+                .collect(Collectors.toSet());
     }
 
     @Comment("Enable or disable core components")
