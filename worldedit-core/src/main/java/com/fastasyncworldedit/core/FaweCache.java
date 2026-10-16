@@ -75,6 +75,9 @@ public enum FaweCache implements Trimable {
 
     public final int BLOCKS_PER_LAYER = 4096;
 
+    // ProtocolSupport cannot read sections that use fewer than 4 bits per entry
+    private boolean protocolSupportFix;
+
     public final char[] EMPTY_CHAR_4096 = new char[4096];
 
     private final IdentityHashMap<Class<? extends IChunkSet>, Pool<? extends IChunkSet>> REGISTERED_POOLS = new IdentityHashMap<>();
@@ -295,6 +298,15 @@ public enum FaweCache implements Trimable {
     private final CleanableThreadLocal<Palette> PALETTE_CACHE = new CleanableThreadLocal<>(Palette::new);
 
     /**
+     * Sets if chunk sections should always use at least 4 bits per entry, which ProtocolSupport requires.
+     *
+     * @since TODO
+     */
+    public void setProtocolSupportFix(boolean protocolSupportFix) {
+        this.protocolSupportFix = protocolSupportFix;
+    }
+
+    /**
      * Convert raw char array to palette
      * @return palette
      */
@@ -353,7 +365,7 @@ public enum FaweCache implements Trimable {
 
             // BlockStates
             int bitsPerEntry = MathMan.log2nlz(num_palette - 1);
-            if (Settings.settings().PROTOCOL_SUPPORT_FIX || num_palette != 1) {
+            if (protocolSupportFix || num_palette != 1) {
                 bitsPerEntry = Math.max(bitsPerEntry, 4); // Protocol support breaks <4 bits per entry
             } else {
                 bitsPerEntry = Math.max(bitsPerEntry, 1); // For some reason minecraft needs 4096 bits to store 0 entries
@@ -437,7 +449,7 @@ public enum FaweCache implements Trimable {
 
             // BlockStates
             int bitsPerEntry = MathMan.log2nlz(num_palette - 1);
-            if (Settings.settings().PROTOCOL_SUPPORT_FIX || num_palette != 1) {
+            if (protocolSupportFix || num_palette != 1) {
                 bitsPerEntry = Math.max(bitsPerEntry, 4); // Protocol support breaks <4 bits per entry
             } else {
                 bitsPerEntry = Math.max(bitsPerEntry, 1); // For some reason minecraft needs 4096 bits to store 0 entries
@@ -644,7 +656,7 @@ public enum FaweCache implements Trimable {
      * @since 2.9.0
      */
     public ThreadPoolExecutor newBlockingExecutor(String name, Logger logger) {
-        int nThreads = Settings.settings().QUEUE.PARALLEL_THREADS;
+        int nThreads = Settings.settings().queue().parallelThreads();
         LinkedBlockingQueue<Runnable> queue = new LinkedBlockingQueue<>();
         return new ThreadPoolExecutor(
                 nThreads,
@@ -689,7 +701,7 @@ public enum FaweCache implements Trimable {
                             lastException = hash;
                             logger.catching(throwable);
                             count = 0;
-                        } else if (count < Settings.settings().QUEUE.PARALLEL_THREADS) {
+                        } else if (count < Settings.settings().queue().parallelThreads()) {
                             logger.warn(throwable.getMessage());
                             count++;
                         }

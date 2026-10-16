@@ -26,7 +26,6 @@ import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.util.report.Unreported;
-import com.sk89q.worldedit.world.registry.LegacyMapper;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
@@ -39,10 +38,9 @@ import java.io.OutputStream;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Locale;
+import java.util.List;
 import java.util.Properties;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Simple LocalConfiguration that loads settings using
@@ -91,72 +89,38 @@ public class PropertiesConfiguration extends LocalConfiguration {
 
         loadExtra();
 
-        profile = getBool("profile", profile);
-        traceUnflushedSessions = getBool("trace-unflushed-sessions", traceUnflushedSessions);
-        disallowedBlocks = getStringSet("disallowed-blocks", getDefaultDisallowedBlocks())
-                .stream()
-                .map(s -> s.contains(":") ? s.toLowerCase(Locale.ROOT) : ("minecraft:" + s).toLowerCase(Locale.ROOT))
-                .collect(Collectors.toSet());
-        defaultChangeLimit = getInt("default-max-changed-blocks", defaultChangeLimit);
-        maxChangeLimit = getInt("max-changed-blocks", maxChangeLimit);
-        defaultVerticalHeight = getInt("default-vertical-height", defaultVerticalHeight);
-        defaultMaxPolygonalPoints = getInt("default-max-polygon-points", defaultMaxPolygonalPoints);
-        maxPolygonalPoints = getInt("max-polygon-points", maxPolygonalPoints);
-        defaultMaxPolyhedronPoints = getInt("default-max-polyhedron-points", defaultMaxPolyhedronPoints);
-        maxPolyhedronPoints = getInt("max-polyhedron-points", maxPolyhedronPoints);
-        shellSaveType = getString("shell-save-type", shellSaveType);
-        maxRadius = getInt("max-radius", maxRadius);
-        maxSuperPickaxeSize = getInt("max-super-pickaxe-size", maxSuperPickaxeSize);
-        maxBrushRadius = getInt("max-brush-radius", maxBrushRadius);
-        logCommands = getBool("log-commands", logCommands);
-        logFile = getString("log-file", logFile);
-        logFormat = getString("log-format", logFormat);
-        registerHelp = getBool("register-help", registerHelp);
-        wandItem = getString("wand-item", wandItem);
-        try {
-            wandItem = LegacyMapper.getInstance().getItemFromLegacy(Integer.parseInt(wandItem)).id();
-        } catch (Throwable ignored) {
-        }
-        superPickaxeDrop = getBool("super-pickaxe-drop-items", superPickaxeDrop);
-        superPickaxeManyDrop = getBool("super-pickaxe-many-drop-items", superPickaxeManyDrop);
-        useInventory = getBool("use-inventory", useInventory);
-        useInventoryOverride = getBool("use-inventory-override", useInventoryOverride);
-        useInventoryCreativeOverride = getBool("use-inventory-creative-override", useInventoryCreativeOverride);
-        navigationWand = getString("nav-wand-item", navigationWand);
-        try {
-            navigationWand = LegacyMapper.getInstance().getItemFromLegacy(Integer.parseInt(navigationWand)).id();
-        } catch (Throwable ignored) {
-        }
-        navigationWandMaxDistance = getInt("nav-wand-distance", navigationWandMaxDistance);
-        navigationUseGlass = getBool("nav-use-glass", navigationUseGlass);
-        scriptTimeout = getInt("scripting-timeout", scriptTimeout);
-        calculationTimeout = getInt("calculation-timeout", calculationTimeout);
-        maxCalculationTimeout = getInt("max-calculation-timeout", maxCalculationTimeout);
-        saveDir = getString("schematic-save-dir", saveDir);
-        scriptsDir = getString("craftscript-dir", scriptsDir);
-        butcherDefaultRadius = getInt("butcher-default-radius", butcherDefaultRadius);
-        butcherMaxRadius = getInt("butcher-max-radius", butcherMaxRadius);
+        //FAWE start - the options are declared once, in LocalConfiguration
+        loadOptions(new OptionSource() {
+            @Override
+            public boolean getBoolean(String path, String property, boolean def) {
+                return property == null ? def : getBool(property, def);
+            }
 
-        //FAWE start
-        MAX_RADIUS = maxRadius;
-        MAX_BRUSH_RADIUS = maxBrushRadius;
-        MAX_SUPER_RADIUS = maxSuperPickaxeSize;
-        MAX_BUTCHER_RADIUS = butcherMaxRadius;
+            @Override
+            public int getInt(String path, String property, int def) {
+                return property == null ? def : PropertiesConfiguration.this.getInt(property, def);
+            }
+
+            @Override
+            public String getString(String path, String property, String def) {
+                return property == null ? def : PropertiesConfiguration.this.getString(property, def);
+            }
+
+            @Override
+            public List<String> getStringList(String path, String property, List<String> def) {
+                return property == null ? def : List.copyOf(getStringSet(property, def.toArray(String[]::new)));
+            }
+        });
         //FAWE end
-
-        allowSymlinks = getBool("allow-symbolic-links", allowSymlinks);
-        serverSideCUI = getBool("server-side-cui", serverSideCUI);
-        extendedYLimit = getBool("extended-y-limit", extendedYLimit);
-        setDefaultLocaleName(getString("default-locale", defaultLocaleName));
-        commandBlockSupport = getBool("command-block-support", commandBlockSupport);
 
         LocalSession.MAX_HISTORY_SIZE = Math.max(15, getInt("history-size", 15));
 
-        String snapshotsDir = getString("snapshots-dir", "");
-        boolean experimentalSnapshots = getBool("snapshots-experimental", false);
-        initializeSnapshotConfiguration(snapshotsDir, experimentalSnapshots);
-
-        path.getParentFile().mkdirs();
+        //FAWE start - a path without a parent is in the working directory, which exists
+        File parent = path.getParentFile();
+        if (parent != null) {
+            parent.mkdirs();
+        }
+        //FAWE end
         try (OutputStream output = new FileOutputStream(path)) {
             properties.store(output, "Don't put comments; they get removed");
         } catch (IOException e) {
@@ -270,7 +234,7 @@ public class PropertiesConfiguration extends LocalConfiguration {
             return set;
         } else {
             Set<Integer> set = new HashSet<>();
-            String[] parts = val.split(",");
+            String[] parts = val.split(",", 0);
             for (String part : parts) {
                 try {
                     int v = Integer.parseInt(part.trim());
@@ -298,11 +262,12 @@ public class PropertiesConfiguration extends LocalConfiguration {
             Set<String> set = new HashSet<>();
             String[] parts = val.split(",");
             for (String part : parts) {
-                try {
-                    String v = part.trim();
+                //FAWE start - an empty value is an empty set, not a set with an empty entry
+                String v = part.trim();
+                if (!v.isEmpty()) {
                     set.add(v);
-                } catch (NumberFormatException ignored) {
                 }
+                //FAWE end
             }
             return set;
         }

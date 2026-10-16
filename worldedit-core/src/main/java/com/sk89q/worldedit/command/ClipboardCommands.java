@@ -422,7 +422,7 @@ public class ClipboardCommands {
                     url = null;
                 }
             } else {
-                if (Settings.settings().WEB.URL.isEmpty()) {
+                if (Settings.settings().web().url().isEmpty()) {
                     actor.print(Caption.of("fawe.error.setting.disable", "web.url"));
                     return;
                 }

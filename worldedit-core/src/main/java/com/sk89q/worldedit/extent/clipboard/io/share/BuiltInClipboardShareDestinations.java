@@ -98,11 +98,11 @@ public enum BuiltInClipboardShareDestinations implements ClipboardShareDestinati
         public Consumer<Actor> share(final ClipboardShareMetadata metadata, final ShareOutputProvider serializer) throws
                 Exception {
             if (uploader == null) {
-                uploader = new ArkitektonikaSchematicUploader(Settings.settings().WEB.ARKITEKTONIKA_BACKEND_URL);
+                uploader = new ArkitektonikaSchematicUploader(Settings.settings().web().arkitektonikaBackendUrl());
             }
             final ArkitektonikaResponse response = uploader.uploadBlocking(metadata, serializer);
-            final String downloadUrl = Settings.settings().WEB.ARKITEKTONIKA_DOWNLOAD_URL.replace("{key}", response.downloadKey());
-            final String deletionUrl = Settings.settings().WEB.ARKITEKTONIKA_DELETE_URL.replace("{key}", response.deletionKey());
+            final String downloadUrl = Settings.settings().web().arkitektonikaDownloadUrl().replace("{key}", response.downloadKey());
+            final String deletionUrl = Settings.settings().web().arkitektonikaDeleteUrl().replace("{key}", response.deletionKey());
             return actor -> {
                 actor.print(Caption.of(
                         "worldedit.schematic.share.response.arkitektonika.download",

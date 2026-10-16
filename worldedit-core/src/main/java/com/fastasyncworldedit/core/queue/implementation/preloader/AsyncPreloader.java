@@ -74,7 +74,7 @@ public class AsyncPreloader implements Preloader, Runnable {
                 existing.setKey(world);
                 existing.setValue(ImmutableSet.copyOf(Iterables.limit(
                         region.getChunks(),
-                        Settings.settings().QUEUE.PRELOAD_CHUNK_COUNT
+                        Settings.settings().queue().preloadChunkCount()
                 )));
             }
             synchronized (update) {
@@ -107,7 +107,7 @@ public class AsyncPreloader implements Preloader, Runnable {
                 Iterator<BlockVector2> chunksIter = chunks.iterator();
                 while (chunksIter.hasNext() && pair.getValue() == chunks) { // Ensure the queued load is still valid
                     BlockVector2 chunk = chunksIter.next();
-                    if (Settings.settings().REGION_RESTRICTIONS_OPTIONS.RESTRICT_TO_SAFE_RANGE) {
+                    if (Settings.settings().regionRestrictionsOptions().restrictToSafeRange()) {
                         int x = chunk.x();
                         int z = chunk.z();
                         // if any chunk coord is outside 30 million blocks

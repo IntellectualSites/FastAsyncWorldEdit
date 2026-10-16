@@ -481,7 +481,7 @@ public class ForwardExtentCopy implements Operation {
             extent = clip.getExtent();
         }
         IQueueExtent<IQueueChunk> queue = null;
-        if (Settings.settings().EXPERIMENTAL.IMPROVED_ENTITY_EDITS && new ExtentTraverser<>(source).findAndGet(Clipboard.class) == null) {
+        if (Settings.settings().experimental().improvedEntityEdits() && new ExtentTraverser<>(source).findAndGet(Clipboard.class) == null) {
             ParallelQueueExtent parallel = new ExtentTraverser<>(extent).findAndGet(ParallelQueueExtent.class);
             if (parallel != null) {
                 queue = parallel.getExtent();
@@ -491,7 +491,7 @@ public class ForwardExtentCopy implements Operation {
             if (queue == null) {
                 LOGGER.warn("Could not find IQueueExtent from `" + source.getClass().getName() +
                         "` instance for entity retrieval, OncePerChunkExtent will not work.");
-                if (Settings.settings().ENABLED_COMPONENTS.DEBUG) {
+                if (Settings.settings().enabledComponents().debug()) {
                     ExtentTraverser.printNestedExtents(source);
                 }
             }

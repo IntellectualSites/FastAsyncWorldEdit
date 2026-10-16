@@ -625,7 +625,7 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
                             entityRemoves.remove(uuid);
                         }
                     }
-                    if (Settings.settings().EXPERIMENTAL.REMOVE_ENTITY_FROM_WORLD_ON_CHUNK_FAIL) {
+                    if (Settings.settings().experimental().removeEntityFromWorldOnChunkFail()) {
                         for (UUID uuid : entityRemoves) {
                             Entity entity = nmsWorld.getEntities().get(uuid);
                             if (entity != null) {
@@ -758,7 +758,7 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
                     // send to player
                     if (!set
                             .getSideEffectSet()
-                            .shouldApply(SideEffect.LIGHTING) || !Settings.settings().LIGHTING.DELAY_PACKET_SENDING || finalMask == 0 && biomes != null) {
+                            .shouldApply(SideEffect.LIGHTING) || !Settings.settings().lighting().delayPacketSending() || finalMask == 0 && biomes != null) {
                         this.send();
                     }
                     if (finalizer != null) {

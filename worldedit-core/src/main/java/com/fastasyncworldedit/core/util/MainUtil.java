@@ -227,7 +227,7 @@ public class MainUtil {
     }
 
     public static FaweOutputStream getCompressedOS(OutputStream os, int amount) throws IOException {
-        return getCompressedOS(os, amount, Settings.settings().HISTORY.BUFFER_SIZE);
+        return getCompressedOS(os, amount, Settings.settings().history().bufferSize());
     }
 
     private static final LZ4Factory FACTORY = LZ4Factory.fastestInstance();
@@ -329,7 +329,7 @@ public class MainUtil {
     }
 
     public static FaweInputStream getCompressedIS(InputStream is) throws IOException {
-        return getCompressedIS(is, Settings.settings().HISTORY.BUFFER_SIZE);
+        return getCompressedIS(is, Settings.settings().history().bufferSize());
     }
 
     public static FaweInputStream getCompressedIS(InputStream is, int buffer) throws IOException {
@@ -360,7 +360,7 @@ public class MainUtil {
     }
 
     public static URL upload(UUID uuid, String file, String extension, @Nonnull final RunnableVal<OutputStream> writeTask) {
-        return upload(Settings.settings().WEB.URL, uuid != null, uuid != null ? uuid.toString() : null, file, extension, writeTask);
+        return upload(Settings.settings().web().url(), uuid != null, uuid != null ? uuid.toString() : null, file, extension, writeTask);
     }
 
     public static URL upload(
@@ -608,25 +608,25 @@ public class MainUtil {
     }
 
     public static void checkImageHost(URI uri) throws IOException {
-        if (Settings.settings().WEB.ALLOWED_IMAGE_HOSTS.contains("*")) {
+        if (Settings.settings().web().allowedImageHosts().contains("*")) {
             return;
         }
         String host = uri.getHost();
-        if (Settings.settings().WEB.ALLOWED_IMAGE_HOSTS.stream().anyMatch(host::equalsIgnoreCase)) {
+        if (Settings.settings().web().allowedImageHosts().stream().anyMatch(host::equalsIgnoreCase)) {
             return;
         }
         throw new IOException(String.format(
                 "Host `%s` not allowed! Whitelisted image hosts are: %s",
                 host,
-                StringMan.join(Settings.settings().WEB.ALLOWED_IMAGE_HOSTS, ", ")
+                StringMan.join(Settings.settings().web().allowedImageHosts(), ", ")
         ));
     }
 
     public static BufferedImage toRGB(BufferedImage src) {
         if (src == null) {
             return src;
-        } else if ((long) src.getWidth() * src.getHeight() > Settings.settings().WEB.MAX_IMAGE_SIZE) {
-            throw new FaweException(Caption.of("fawe.web.image.load.size.too-large", Settings.settings().WEB.MAX_IMAGE_SIZE));
+        } else if ((long) src.getWidth() * src.getHeight() > Settings.settings().web().maxImageSize()) {
+            throw new FaweException(Caption.of("fawe.web.image.load.size.too-large", Settings.settings().web().maxImageSize()));
         }
         BufferedImage img = new BufferedImage(src.getWidth(), src.getHeight(), BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2d = img.createGraphics();

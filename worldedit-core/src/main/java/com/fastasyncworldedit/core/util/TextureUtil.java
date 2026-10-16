@@ -351,7 +351,7 @@ public class TextureUtil implements TextureHolder {
      * Do not use. Use {@link Fawe#getTextureUtil()}
      */
     public TextureUtil() throws FileNotFoundException {
-        this(MainUtil.getFile(Fawe.platform().getDirectory(), Settings.settings().PATHS.TEXTURES));
+        this(MainUtil.getFile(Fawe.platform().getDirectory(), Settings.settings().paths().textures()));
     }
 
     /**
@@ -362,7 +362,7 @@ public class TextureUtil implements TextureHolder {
         if (!folder.exists()) {
             try {
                 LOGGER.info("Downloading asset jar from Mojang, please wait...");
-                new File(Fawe.platform().getDirectory() + "/" + Settings.settings().PATHS.TEXTURES + "/").mkdirs();
+                new File(Fawe.platform().getDirectory() + "/" + Settings.settings().paths().textures() + "/").mkdirs();
 
                 try {
                     VersionMetadata metadata = getLatestVersion();
@@ -371,7 +371,7 @@ public class TextureUtil implements TextureHolder {
 
                     Path out = Path.of(
                             Fawe.platform().getDirectory().getPath(),
-                            Settings.settings().PATHS.TEXTURES,
+                            Settings.settings().paths().textures(),
                             metadata.version() + ".jar"
                     );
                     // Copy resource to local fs

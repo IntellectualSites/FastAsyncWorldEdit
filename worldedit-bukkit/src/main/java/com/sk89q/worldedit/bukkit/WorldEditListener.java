@@ -103,7 +103,7 @@ public class WorldEditListener implements Listener {
         if ((session = WorldEdit.getInstance().getSessionManager().getIfPresent(player)) != null) {
             session.loadDefaults(player, true);
         }
-        if (Settings.settings().ENABLED_COMPONENTS.NOTIFY_UPDATE_INGAME) {
+        if (Settings.settings().enabledComponents().notifyUpdateIngame()) {
             UpdateNotification.doUpdateNotification(player);
         }
     }

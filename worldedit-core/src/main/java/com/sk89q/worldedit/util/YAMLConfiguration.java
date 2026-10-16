@@ -19,7 +19,6 @@
 
 package com.sk89q.worldedit.util;
 
-import com.google.common.collect.Lists;
 import com.sk89q.util.yaml.YAMLProcessor;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
@@ -28,9 +27,7 @@ import com.sk89q.worldedit.util.report.Unreported;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Locale;
-import java.util.stream.Collectors;
+import java.util.List;
 
 /**
  * A less simple implementation of {@link LocalConfiguration}
@@ -56,111 +53,32 @@ public class YAMLConfiguration extends LocalConfiguration {
             logger.warn("Error loading WorldEdit configuration", e);
         }
 
-        profile = config.getBoolean("debug", profile);
-        traceUnflushedSessions = config.getBoolean("debugging.trace-unflushed-sessions", traceUnflushedSessions);
-        wandItem = convertLegacyItem(config.getString("wand-item", wandItem));
+        //FAWE start - the options are declared once, in LocalConfiguration
+        loadOptions(new OptionSource() {
+            @Override
+            public boolean getBoolean(String path, String property, boolean def) {
+                return config.getBoolean(path, def);
+            }
 
-        defaultChangeLimit = Math.max(-1, config.getInt(
-                "limits.max-blocks-changed.default", defaultChangeLimit));
-        maxChangeLimit = Math.max(
-                -1,
-                config.getInt("limits.max-blocks-changed.maximum", maxChangeLimit)
-        );
+            @Override
+            public int getInt(String path, String property, int def) {
+                return config.getInt(path, def);
+            }
 
-        defaultVerticalHeight = Math.max(
-                1,
-                config.getInt("limits.vertical-height.default", defaultVerticalHeight)
-        );
+            @Override
+            public String getString(String path, String property, String def) {
+                return config.getString(path, def);
+            }
 
-        defaultMaxPolygonalPoints = Math.max(
-                -1,
-                config.getInt("limits.max-polygonal-points.default", defaultMaxPolygonalPoints)
-        );
-        maxPolygonalPoints = Math.max(
-                -1,
-                config.getInt("limits.max-polygonal-points.maximum", maxPolygonalPoints)
-        );
-
-        defaultMaxPolyhedronPoints = Math.max(
-                -1,
-                config.getInt("limits.max-polyhedron-points.default", defaultMaxPolyhedronPoints)
-        );
-        maxPolyhedronPoints = Math.max(-1, config.getInt("limits.max-polyhedron-points.maximum", maxPolyhedronPoints));
-
-        maxRadius = Math.max(-1, config.getInt("limits.max-radius", maxRadius));
-        maxBrushRadius = config.getInt("limits.max-brush-radius", maxBrushRadius);
-        maxSuperPickaxeSize = Math.max(1, config.getInt(
-                "limits.max-super-pickaxe-size", maxSuperPickaxeSize));
-
-        butcherDefaultRadius = Math.max(-1, config.getInt("limits.butcher-radius.default", butcherDefaultRadius));
-        butcherMaxRadius = Math.max(-1, config.getInt("limits.butcher-radius.maximum", butcherMaxRadius));
-
-        //FAWE start
-        MAX_RADIUS = maxRadius;
-        MAX_BRUSH_RADIUS = maxBrushRadius;
-        MAX_SUPER_RADIUS = maxSuperPickaxeSize;
-        MAX_BUTCHER_RADIUS = butcherMaxRadius;
+            @Override
+            public List<String> getStringList(String path, String property, List<String> def) {
+                return config.getStringList(path, def);
+            }
+        });
         //FAWE end
 
-        disallowedBlocks = config.getStringList("limits.disallowed-blocks", Lists.newArrayList(getDefaultDisallowedBlocks()))
-                .stream()
-                .map(s -> s.contains(":") ? s.toLowerCase(Locale.ROOT) : ("minecraft:" + s).toLowerCase(Locale.ROOT))
-                .collect(Collectors.toSet());
-        allowedDataCycleBlocks = new HashSet<>(config.getStringList("limits.allowed-data-cycle-blocks", null));
-
-        registerHelp = config.getBoolean("register-help", true);
-        logCommands = config.getBoolean("logging.log-commands", logCommands);
-        logFile = config.getString("logging.file", logFile);
-        logFormat = config.getString("logging.format", logFormat);
-
-        superPickaxeDrop = config.getBoolean(
-                "super-pickaxe.drop-items",
-                superPickaxeDrop
-        );
-        superPickaxeManyDrop = config.getBoolean(
-                "super-pickaxe.many-drop-items", superPickaxeManyDrop);
-
-        useInventory = config.getBoolean("use-inventory.enable", useInventory);
-        useInventoryOverride = config.getBoolean(
-                "use-inventory.allow-override",
-                useInventoryOverride
-        );
-        useInventoryCreativeOverride = config.getBoolean(
-                "use-inventory.creative-mode-overrides",
-                useInventoryCreativeOverride
-        );
-
-        navigationWand = convertLegacyItem(config.getString("navigation-wand.item", navigationWand));
-        navigationWandMaxDistance = config.getInt("navigation-wand.max-distance", navigationWandMaxDistance);
-        navigationUseGlass = config.getBoolean("navigation.use-glass", navigationUseGlass);
-
-        scriptTimeout = config.getInt("scripting.timeout", scriptTimeout);
-        scriptsDir = config.getString("scripting.dir", scriptsDir);
-
-        calculationTimeout = config.getInt("calculation.timeout", calculationTimeout);
-        maxCalculationTimeout = config.getInt("calculation.max-timeout", maxCalculationTimeout);
-
-        saveDir = config.getString("saving.dir", saveDir);
-
-        allowSymlinks = config.getBoolean("files.allow-symbolic-links", false);
         LocalSession.MAX_HISTORY_SIZE = Math.max(0, config.getInt("history.size", 15));
         SessionManager.EXPIRATION_GRACE = config.getInt("history.expiration", 10) * 60 * 1000;
-
-        showHelpInfo = config.getBoolean("show-help-on-first-use", true);
-        serverSideCUI = config.getBoolean("server-side-cui", true);
-
-        String snapshotsDir = config.getString("snapshots.directory", "");
-        boolean experimentalSnapshots = config.getBoolean("snapshots.experimental", false);
-        initializeSnapshotConfiguration(snapshotsDir, experimentalSnapshots);
-
-        String type = config.getString("shell-save-type", "").trim();
-        shellSaveType = type.isEmpty() ? null : type;
-
-        extendedYLimit = config.getBoolean("compat.extended-y-limit", false);
-
-        setDefaultLocaleName(config.getString("default-locale", defaultLocaleName));
-
-        commandBlockSupport = config.getBoolean("command-block-support", false);
     }
 
     public void unload() {

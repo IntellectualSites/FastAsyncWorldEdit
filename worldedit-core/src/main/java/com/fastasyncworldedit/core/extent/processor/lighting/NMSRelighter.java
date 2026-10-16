@@ -83,7 +83,7 @@ public class NMSRelighter implements Relighter {
         this.maxY = queue.getMaxY();
         this.minY = queue.getMinY();
         this.yLongPerCol = (maxY - minY + 1) >> 6;
-        this.relightMode = relightMode != null ? relightMode : RelightMode.valueOf(Settings.settings().LIGHTING.MODE);
+        this.relightMode = relightMode != null ? relightMode : RelightMode.valueOf(Settings.settings().lighting().mode());
         this.lightingLock = new ReentrantLock();
     }
 
@@ -899,7 +899,7 @@ public class NMSRelighter implements Relighter {
             chunk.setBitMask(bitMask);
             iter.remove();
         }
-        if (Settings.settings().LIGHTING.ASYNC) {
+        if (Settings.settings().lighting().async()) {
             queue.flush();
             finished.set(true);
         } else {
@@ -937,7 +937,7 @@ public class NMSRelighter implements Relighter {
                 finished.set(true);
             }
         };
-        if (Settings.settings().LIGHTING.ASYNC) {
+        if (Settings.settings().lighting().async()) {
             runnable.run();
         } else {
             TaskManager.taskManager().sync(runnable);

@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 /**
  * Represents a configuration node.
@@ -495,6 +496,28 @@ public class YAMLNode {
         }
     }
 
+    //FAWE start - share the handling of typed lists
+    private <T> List<T> getTypedList(String path, List<T> def, Function<Object, T> converter) {
+        List<Object> raw = getList(path);
+        if (raw == null) {
+            if (writeDefaults && def != null) {
+                setProperty(path, def);
+            }
+            return def != null ? def : new ArrayList<>();
+        }
+
+        List<T> list = new ArrayList<>();
+        for (Object o : raw) {
+            T value = o == null ? null : converter.apply(o);
+            if (value != null) {
+                list.add(value);
+            }
+        }
+
+        return list;
+    }
+    //FAWE end
+
     /**
      * Gets a list of Strings. Non-valid entries will not be in the list.
      * There will be no null slots. If the list is not defined, the
@@ -508,24 +531,9 @@ public class YAMLNode {
      * @return list of Strings
      */
     public List<String> getStringList(String path, List<String> def) {
-        List<Object> raw = getList(path);
-        if (raw == null) {
-            if (writeDefaults && def != null) {
-                setProperty(path, def);
-            }
-            return def != null ? def : new ArrayList<>();
-        }
-
-        List<String> list = new ArrayList<>();
-        for (Object o : raw) {
-            if (o == null) {
-                continue;
-            }
-
-            list.add(o.toString());
-        }
-
-        return list;
+        //FAWE start - share the handling of typed lists
+        return getTypedList(path, def, Object::toString);
+        //FAWE end
     }
 
     /**
@@ -540,23 +548,9 @@ public class YAMLNode {
      * @return list of Integers
      */
     public List<Integer> getIntList(String path, List<Integer> def) {
-        List<Object> raw = getList(path);
-        if (raw == null) {
-            if (writeDefaults && def != null) {
-                setProperty(path, def);
-            }
-            return def != null ? def : new ArrayList<>();
-        }
-
-        List<Integer> list = new ArrayList<>();
-        for (Object o : raw) {
-            Integer i = castInt(o);
-            if (i != null) {
-                list.add(i);
-            }
-        }
-
-        return list;
+        //FAWE start - share the handling of typed lists
+        return getTypedList(path, def, YAMLNode::castInt);
+        //FAWE end
     }
 
     /**
@@ -571,23 +565,9 @@ public class YAMLNode {
      * @return list of Doubles
      */
     public List<Double> getDoubleList(String path, List<Double> def) {
-        List<Object> raw = getList(path);
-        if (raw == null) {
-            if (writeDefaults && def != null) {
-                setProperty(path, def);
-            }
-            return def != null ? def : new ArrayList<>();
-        }
-
-        List<Double> list = new ArrayList<>();
-        for (Object o : raw) {
-            Double i = castDouble(o);
-            if (i != null) {
-                list.add(i);
-            }
-        }
-
-        return list;
+        //FAWE start - share the handling of typed lists
+        return getTypedList(path, def, YAMLNode::castDouble);
+        //FAWE end
     }
 
     /**
@@ -602,23 +582,9 @@ public class YAMLNode {
      * @return list of Booleans
      */
     public List<Boolean> getBooleanList(String path, List<Boolean> def) {
-        List<Object> raw = getList(path);
-        if (raw == null) {
-            if (writeDefaults && def != null) {
-                setProperty(path, def);
-            }
-            return def != null ? def : new ArrayList<>();
-        }
-
-        List<Boolean> list = new ArrayList<>();
-        for (Object o : raw) {
-            Boolean tetsu = castBoolean(o);
-            if (tetsu != null) {
-                list.add(tetsu);
-            }
-        }
-
-        return list;
+        //FAWE start - share the handling of typed lists
+        return getTypedList(path, def, YAMLNode::castBoolean);
+        //FAWE end
     }
 
     /**
@@ -817,6 +783,11 @@ public class YAMLNode {
                 return;
             }
 
+            //FAWE start - there is nothing to remove if the path does not lead to a node
+            if (!(o instanceof Map)) {
+                return;
+            }
+            //FAWE end
             node = (Map<String, Object>) o;
         }
     }

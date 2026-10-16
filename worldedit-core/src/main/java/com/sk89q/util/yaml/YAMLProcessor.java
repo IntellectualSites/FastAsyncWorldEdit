@@ -265,9 +265,11 @@ public class YAMLProcessor extends YAMLNode {
     public void setComment(String key, String... comment) {
         if (comment != null && comment.length > 0) {
             for (int i = 0; i < comment.length; ++i) {
-                if (!comment[i].matches("^" + COMMENT_CHAR + " ?")) {
+                //FAWE start - do not prefix lines that already are comments
+                if (comment[i].isEmpty() || comment[i].charAt(0) != COMMENT_CHAR) {
                     comment[i] = COMMENT_CHAR + " " + comment[i];
                 }
+                //FAWE end
             }
             String s = StringUtil.joinString(comment, LINE_BREAK);
             comments.put(key, s);

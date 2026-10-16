@@ -20,7 +20,6 @@
 package com.sk89q.worldedit;
 
 import com.fastasyncworldedit.core.function.mask.BlockMaskBuilder;
-import com.google.common.collect.Lists;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extent.NullExtent;
 import com.sk89q.worldedit.function.mask.BlockMask;
@@ -29,22 +28,23 @@ import com.sk89q.worldedit.util.formatting.component.TextUtils;
 import com.sk89q.worldedit.util.io.file.ArchiveNioSupports;
 import com.sk89q.worldedit.util.logging.LogFormat;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
-import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 import com.sk89q.worldedit.world.snapshot.SnapshotRepository;
 import com.sk89q.worldedit.world.snapshot.experimental.SnapshotDatabase;
 import com.sk89q.worldedit.world.snapshot.experimental.fs.FileSystemSnapshotDatabase;
 import org.apache.logging.log4j.Logger;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Represents WorldEdit's configuration.
@@ -63,6 +63,9 @@ public abstract class LocalConfiguration {
     public boolean traceUnflushedSessions = true;
     public Set<String> disallowedBlocks = new HashSet<>();
     protected BlockMask disallowedBlocksMask;
+    //FAWE start - the blocks the mask was built from, to notice when a reload replaces them
+    private Set<String> disallowedBlocksMaskSource;
+    //FAWE end
     /**
      * @deprecated Use actor's limit {@link com.fastasyncworldedit.core.limit.FaweLimit#MAX_CHANGES}
      */
@@ -130,96 +133,195 @@ public abstract class LocalConfiguration {
     public String defaultLocaleName = "default";
     public Locale defaultLocale = Locale.getDefault();
 
-    protected String[] getDefaultDisallowedBlocks() {
-        List<BlockType> blockTypes = Lists.newArrayList(
-                /* FAWE start
-                BlockTypes.OAK_SAPLING,
-                BlockTypes.JUNGLE_SAPLING,
-                BlockTypes.DARK_OAK_SAPLING,
-                BlockTypes.SPRUCE_SAPLING,
-                BlockTypes.BIRCH_SAPLING,
-                BlockTypes.ACACIA_SAPLING,
-                BlockTypes.BLACK_BED,
-                BlockTypes.BLUE_BED,
-                BlockTypes.BROWN_BED,
-                BlockTypes.CYAN_BED,
-                BlockTypes.GRAY_BED,
-                BlockTypes.GREEN_BED,
-                BlockTypes.LIGHT_BLUE_BED,
-                BlockTypes.LIGHT_GRAY_BED,
-                BlockTypes.LIME_BED,
-                BlockTypes.MAGENTA_BED,
-                BlockTypes.ORANGE_BED,
-                BlockTypes.PINK_BED,
-                BlockTypes.PURPLE_BED,
-                BlockTypes.RED_BED,
-                BlockTypes.WHITE_BED,
-                BlockTypes.YELLOW_BED,
-                BlockTypes.POWERED_RAIL,
-                BlockTypes.DETECTOR_RAIL,
-                BlockTypes.GRASS,
-                BlockTypes.DEAD_BUSH,
-                BlockTypes.MOVING_PISTON,
-                BlockTypes.PISTON_HEAD,
-                BlockTypes.SUNFLOWER,
-                BlockTypes.ROSE_BUSH,
-                BlockTypes.DANDELION,
-                BlockTypes.POPPY,
-                BlockTypes.BROWN_MUSHROOM,
-                BlockTypes.RED_MUSHROOM,
-                BlockTypes.TNT,
-                BlockTypes.TORCH,
-                BlockTypes.FIRE,
-                BlockTypes.REDSTONE_WIRE,
-                BlockTypes.WHEAT,
-                BlockTypes.POTATOES,
-                BlockTypes.CARROTS,
-                BlockTypes.MELON_STEM,
-                BlockTypes.PUMPKIN_STEM,
-                BlockTypes.BEETROOTS,
-                BlockTypes.RAIL,
-                BlockTypes.LEVER,
-                BlockTypes.REDSTONE_TORCH,
-                BlockTypes.REDSTONE_WALL_TORCH,
-                BlockTypes.REPEATER,
-                BlockTypes.COMPARATOR,
-                BlockTypes.STONE_BUTTON,
-                BlockTypes.BIRCH_BUTTON,
-                BlockTypes.ACACIA_BUTTON,
-                BlockTypes.DARK_OAK_BUTTON,
-                BlockTypes.JUNGLE_BUTTON,
-                BlockTypes.OAK_BUTTON,
-                BlockTypes.SPRUCE_BUTTON,
-                BlockTypes.CACTUS,
-                BlockTypes.SUGAR_CANE,
-                // ores and stuff
-                BlockTypes.BEDROCK
-                FAWE end*/
-        );
-        return blockTypes.stream().filter(Objects::nonNull).map(BlockType::id).toArray(String[]::new);
+    //FAWE Start - Remove the default blocks and change the return type to List to allow for more flexibility in the future
+    protected List<String> getDefaultDisallowedBlocks() {
+        return Collections.emptyList();
     }
+    // FAWE End
 
     /**
      * Load the configuration.
      */
     public abstract void load();
 
+    //FAWE start - declare each option once for every file format
+    /**
+     * Where the values of the options come from. An option is looked up under its path in a YAML configuration or, on
+     * platforms configured through a properties file, under its property key.
+     *
+     * @since TODO
+     */
+    protected interface OptionSource {
+
+        /**
+         * Get the value of an option.
+         *
+         * @param path     the dot-separated path of the option in a YAML configuration
+         * @param property the key of the option in a properties file, or null if it has none
+         * @param def      the value to use if the option is not set
+         * @return the value
+         */
+        boolean getBoolean(String path, @Nullable String property, boolean def);
+
+        /**
+         * Get the value of an option.
+         *
+         * @see #getBoolean(String, String, boolean)
+         */
+        int getInt(String path, @Nullable String property, int def);
+
+        /**
+         * Get the value of an option.
+         *
+         * @see #getBoolean(String, String, boolean)
+         */
+        String getString(String path, @Nullable String property, String def);
+
+        /**
+         * Get the value of an option.
+         *
+         * @see #getBoolean(String, String, boolean)
+         */
+        List<String> getStringList(String path, @Nullable String property, List<String> def);
+
+    }
+
+    /**
+     * Read the options that all platforms share. An option that is not set keeps its current value.
+     *
+     * @param source where to read the options from
+     * @since TODO
+     */
+    protected void loadOptions(OptionSource source) {
+        profile = source.getBoolean("debug", "profile", profile);
+        traceUnflushedSessions = source.getBoolean(
+                "debugging.trace-unflushed-sessions",
+                "trace-unflushed-sessions",
+                traceUnflushedSessions
+        );
+        wandItem = convertLegacyItem(source.getString("wand-item", "wand-item", wandItem));
+
+        defaultChangeLimit = Math.max(
+                -1,
+                source.getInt("limits.max-blocks-changed.default", "default-max-changed-blocks", defaultChangeLimit)
+        );
+        maxChangeLimit = Math.max(-1, source.getInt("limits.max-blocks-changed.maximum", "max-changed-blocks", maxChangeLimit));
+        defaultVerticalHeight = Math.max(
+                1,
+                source.getInt("limits.vertical-height.default", "default-vertical-height", defaultVerticalHeight)
+        );
+        defaultMaxPolygonalPoints = Math.max(
+                -1,
+                source.getInt("limits.max-polygonal-points.default", "default-max-polygon-points", defaultMaxPolygonalPoints)
+        );
+        maxPolygonalPoints = Math.max(
+                -1,
+                source.getInt("limits.max-polygonal-points.maximum", "max-polygon-points", maxPolygonalPoints)
+        );
+        defaultMaxPolyhedronPoints = Math.max(
+                -1,
+                source.getInt("limits.max-polyhedron-points.default", "default-max-polyhedron-points", defaultMaxPolyhedronPoints)
+        );
+        maxPolyhedronPoints = Math.max(
+                -1,
+                source.getInt("limits.max-polyhedron-points.maximum", "max-polyhedron-points", maxPolyhedronPoints)
+        );
+        maxRadius = Math.max(-1, source.getInt("limits.max-radius", "max-radius", maxRadius));
+        maxBrushRadius = source.getInt("limits.max-brush-radius", "max-brush-radius", maxBrushRadius);
+        maxSuperPickaxeSize = Math.max(
+                1,
+                source.getInt("limits.max-super-pickaxe-size", "max-super-pickaxe-size", maxSuperPickaxeSize)
+        );
+        butcherDefaultRadius = Math.max(
+                -1,
+                source.getInt("limits.butcher-radius.default", "butcher-default-radius", butcherDefaultRadius)
+        );
+        butcherMaxRadius = Math.max(-1, source.getInt("limits.butcher-radius.maximum", "butcher-max-radius", butcherMaxRadius));
+        // Inelegant but required to transfer to FAWE limits as defaults
+        MAX_RADIUS = maxRadius;
+        MAX_BRUSH_RADIUS = maxBrushRadius;
+        MAX_SUPER_RADIUS = maxSuperPickaxeSize;
+        MAX_BUTCHER_RADIUS = butcherMaxRadius;
+
+        disallowedBlocks = source
+                .getStringList("limits.disallowed-blocks", "disallowed-blocks", getDefaultDisallowedBlocks())
+                .stream()
+                .map(s -> s.contains(":") ? s.toLowerCase(Locale.ROOT) : ("minecraft:" + s).toLowerCase(Locale.ROOT))
+                .collect(Collectors.toSet());
+        allowedDataCycleBlocks = new HashSet<>(source.getStringList("limits.allowed-data-cycle-blocks", null, List.of()));
+
+        registerHelp = source.getBoolean("register-help", "register-help", registerHelp);
+        logCommands = source.getBoolean("logging.log-commands", "log-commands", logCommands);
+        logFile = source.getString("logging.file", "log-file", logFile);
+        logFormat = source.getString("logging.format", "log-format", logFormat);
+
+        superPickaxeDrop = source.getBoolean("super-pickaxe.drop-items", "super-pickaxe-drop-items", superPickaxeDrop);
+        superPickaxeManyDrop = source.getBoolean(
+                "super-pickaxe.many-drop-items",
+                "super-pickaxe-many-drop-items",
+                superPickaxeManyDrop
+        );
+
+        useInventory = source.getBoolean("use-inventory.enable", "use-inventory", useInventory);
+        useInventoryOverride = source.getBoolean("use-inventory.allow-override", "use-inventory-override", useInventoryOverride);
+        useInventoryCreativeOverride = source.getBoolean(
+                "use-inventory.creative-mode-overrides",
+                "use-inventory-creative-override",
+                useInventoryCreativeOverride
+        );
+
+        navigationWand = convertLegacyItem(source.getString("navigation-wand.item", "nav-wand-item", navigationWand));
+        navigationWandMaxDistance = source.getInt("navigation-wand.max-distance", "nav-wand-distance", navigationWandMaxDistance);
+        navigationUseGlass = source.getBoolean("navigation.use-glass", "nav-use-glass", navigationUseGlass);
+
+        scriptTimeout = source.getInt("scripting.timeout", "scripting-timeout", scriptTimeout);
+        scriptsDir = source.getString("scripting.dir", "craftscript-dir", scriptsDir);
+
+        calculationTimeout = source.getInt("calculation.timeout", "calculation-timeout", calculationTimeout);
+        maxCalculationTimeout = source.getInt("calculation.max-timeout", "max-calculation-timeout", maxCalculationTimeout);
+
+        saveDir = source.getString("saving.dir", "schematic-save-dir", saveDir);
+
+        allowSymlinks = source.getBoolean("files.allow-symbolic-links", "allow-symbolic-links", allowSymlinks);
+        showHelpInfo = source.getBoolean("show-help-on-first-use", null, showHelpInfo);
+        serverSideCUI = source.getBoolean("server-side-cui", "server-side-cui", serverSideCUI);
+
+        initializeSnapshotConfiguration(
+                source.getString("snapshots.directory", "snapshots-dir", ""),
+                source.getBoolean("snapshots.experimental", "snapshots-experimental", false)
+        );
+
+        String type = source.getString("shell-save-type", "shell-save-type", "").trim();
+        shellSaveType = type.isEmpty() ? null : type;
+
+        extendedYLimit = source.getBoolean("compat.extended-y-limit", "extended-y-limit", extendedYLimit);
+        setDefaultLocaleName(source.getString("default-locale", "default-locale", defaultLocaleName));
+        commandBlockSupport = source.getBoolean("command-block-support", "command-block-support", commandBlockSupport);
+    }
+    //FAWE end
+
     public boolean checkDisallowedBlocks(BlockStateHolder holder) {
-        if (disallowedBlocks.isEmpty()) {
+        //FAWE start - rebuild the mask when the blocks were replaced, e.g. by a reload
+        Set<String> blocks = disallowedBlocks;
+        if (blocks.isEmpty()) {
             return false;
         }
-        if (disallowedBlocksMask == null) {
+        BlockMask mask = disallowedBlocksMask;
+        if (mask == null || disallowedBlocksMaskSource != blocks) {
             BlockMaskBuilder builder = new BlockMaskBuilder();
-            for (String blockRegex : disallowedBlocks) {
+            for (String blockRegex : blocks) {
                 try {
                     builder.addRegex(blockRegex);
                 } catch (InputParseException e) {
-                    e.printStackTrace();
+                    LOGGER.warn("Invalid disallowed block '{}'", blockRegex, e);
                 }
             }
-            disallowedBlocksMask = builder.build(new NullExtent());
+            mask = builder.build(new NullExtent());
+            disallowedBlocksMask = mask;
+            disallowedBlocksMaskSource = blocks;
         }
-        return disallowedBlocksMask.test(holder.toImmutableState());
+        return mask.test(holder.toImmutableState());
+        //FAWE end
     }
 
     /**

@@ -71,7 +71,7 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
     private int lastException = Integer.MIN_VALUE;
     private int exceptionCount = 0;
     private SideEffectSet sideEffectSet = SideEffectSet.defaults();
-    private int targetSize = Settings.settings().QUEUE.TARGET_SIZE;
+    private int targetSize = Settings.settings().queue().targetSize();
 
     public SingleThreadQueueExtent() {
     }
@@ -175,7 +175,7 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
         this.setPostProcessor(EmptyBatchProcessor.getInstance());
         this.world = null;
         this.faweExceptionReasonsUsed = new boolean[FaweException.Type.values().length];
-        this.targetSize = Settings.settings().QUEUE.TARGET_SIZE;
+        this.targetSize = Settings.settings().queue().targetSize();
     }
 
     /**
@@ -287,7 +287,7 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
             if (aggressive) {
                 pollSubmissions(0, aggressive);
             } else {
-                pollSubmissions(Settings.settings().QUEUE.PARALLEL_THREADS, aggressive);
+                pollSubmissions(Settings.settings().queue().parallelThreads(), aggressive);
             }
         }
         synchronized (this) {
@@ -323,7 +323,7 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
             return lastChunk;
         }
         final long pair = MathMan.pairInt(x, z);
-        if (!processGet(x, z) || (Settings.settings().REGION_RESTRICTIONS_OPTIONS.RESTRICT_TO_SAFE_RANGE
+        if (!processGet(x, z) || (Settings.settings().regionRestrictionsOptions().restrictToSafeRange()
                 && (x > 1875000 || z > 1875000 || x < -1875000 || z < -1875000))) {
             // don't store as last chunk, not worth it
             return NullChunk.getInstance();
@@ -340,7 +340,7 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
             // If queueing is enabled AND either of the following
             //  - memory is low & queue size > num threads + 8
             //  - queue size > target size and primary queue has less than num threads submissions
-            int targetSize = lowMem ? Settings.settings().QUEUE.PARALLEL_THREADS + 8 : this.targetSize;
+            int targetSize = lowMem ? Settings.settings().queue().parallelThreads() + 8 : this.targetSize;
             if (enabledQueue && size > targetSize && (lowMem || Fawe.instance().getQueueHandler().isUnderutilized())) {
                 IQueueChunk toSubmit = chunks.removeFirst();
                 this.lastChunk.compareAndExchange(toSubmit, null);
@@ -376,15 +376,15 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
     }
 
     /**
-     * Define a region to be "preloaded" to the number of chunks provided by {@link Settings.QUEUE#PRELOAD_CHUNK_COUNT}
+     * Define a region to be "preloaded" to the number of chunks provided by {@link Settings.Queue#preloadChunkCount()}
      *
      * @param region region of chunks
      */
     public void preload(Region region) {
-        if (Settings.settings().QUEUE.PRELOAD_CHUNK_COUNT > 1) {
+        if (Settings.settings().queue().preloadChunkCount() > 1) {
             int loadCount = 0;
             for (BlockVector2 from : region.getChunks()) {
-                if (loadCount >= Settings.settings().QUEUE.PRELOAD_CHUNK_COUNT) {
+                if (loadCount >= Settings.settings().queue().preloadChunkCount()) {
                     break;
                 }
                 loadCount++;
@@ -429,7 +429,7 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
                                     lastException = hash;
                                     exceptionCount = 0;
                                     LOGGER.catching(e);
-                                } else if (exceptionCount < Settings.settings().QUEUE.PARALLEL_THREADS) {
+                                } else if (exceptionCount < Settings.settings().queue().parallelThreads()) {
                                     exceptionCount++;
                                     LOGGER.warn(message);
                                 }
@@ -469,7 +469,7 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
                     lastException = hash;
                     exceptionCount = 0;
                     LOGGER.catching(e);
-                } else if (exceptionCount < Settings.settings().QUEUE.PARALLEL_THREADS) {
+                } else if (exceptionCount < Settings.settings().queue().parallelThreads()) {
                     exceptionCount++;
                     LOGGER.warn(message);
                 }
@@ -487,7 +487,7 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
                     this.lastChunk.compareAndExchange(chunk, null);
                     final Future future = submitUnchecked(chunk);
                     if (future != null && !future.isDone()) {
-                        pollSubmissions(Settings.settings().QUEUE.PARALLEL_THREADS, true);
+                        pollSubmissions(Settings.settings().queue().parallelThreads(), true);
                         submissions.add(future);
                     }
                 }
