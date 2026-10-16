@@ -63,6 +63,9 @@ public abstract class LocalConfiguration {
     public boolean traceUnflushedSessions = true;
     public Set<String> disallowedBlocks = new HashSet<>();
     protected BlockMask disallowedBlocksMask;
+    //FAWE start - the blocks the mask was built from, to notice when a reload replaces them
+    private Set<String> disallowedBlocksMaskSource;
+    //FAWE end
     /**
      * @deprecated Use actor's limit {@link com.fastasyncworldedit.core.limit.FaweLimit#MAX_CHANGES}
      */
@@ -205,21 +208,27 @@ public abstract class LocalConfiguration {
     public abstract void load();
 
     public boolean checkDisallowedBlocks(BlockStateHolder holder) {
-        if (disallowedBlocks.isEmpty()) {
+        //FAWE start - rebuild the mask when the blocks were replaced, e.g. by a reload
+        Set<String> blocks = disallowedBlocks;
+        if (blocks.isEmpty()) {
             return false;
         }
-        if (disallowedBlocksMask == null) {
+        BlockMask mask = disallowedBlocksMask;
+        if (mask == null || disallowedBlocksMaskSource != blocks) {
             BlockMaskBuilder builder = new BlockMaskBuilder();
-            for (String blockRegex : disallowedBlocks) {
+            for (String blockRegex : blocks) {
                 try {
                     builder.addRegex(blockRegex);
                 } catch (InputParseException e) {
-                    e.printStackTrace();
+                    LOGGER.warn("Invalid disallowed block '{}'", blockRegex, e);
                 }
             }
-            disallowedBlocksMask = builder.build(new NullExtent());
+            mask = builder.build(new NullExtent());
+            disallowedBlocksMask = mask;
+            disallowedBlocksMaskSource = blocks;
         }
-        return disallowedBlocksMask.test(holder.toImmutableState());
+        return mask.test(holder.toImmutableState());
+        //FAWE end
     }
 
     /**
