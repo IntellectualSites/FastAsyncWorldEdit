@@ -99,7 +99,7 @@ public class WorldEditCommands {
         //FAWE start
         Fawe.instance().setupConfigs();
         FaweLimit.MAX.CONFIRM_LARGE =
-                Settings.settings().LIMITS.get("default").CONFIRM_LARGE || Settings.settings().GENERAL.LIMIT_UNLIMITED_CONFIRMS;
+                Settings.settings().defaultLimits().confirmLarge() || Settings.settings().general().limitUnlimitedConfirms();
         //FAWE end
         actor.print(Caption.of("worldedit.reload.config"));
     }

@@ -97,7 +97,7 @@ public class WEManager {
      * @return array of allowed regions if whitelist, else of disallowed regions.
      */
     public Region[] getMask(Player player, FaweMaskManager.MaskType type, final boolean isWhitelist) {
-        if (!Settings.settings().REGION_RESTRICTIONS || player.hasPermission("fawe.bypass.regions")) {
+        if (!Settings.settings().regionRestrictions() || player.hasPermission("fawe.bypass.regions")) {
             return new Region[]{RegionWrapper.GLOBAL()};
         }
         Location loc = player.getLocation();
@@ -125,7 +125,7 @@ public class WEManager {
                             inMask |= region.contains(loc.toBlockPoint());
                             regions.add(region);
                         } else {
-                            if (Settings.settings().ENABLED_COMPONENTS.DEBUG) {
+                            if (Settings.settings().enabledComponents().debug()) {
                                 player.printDebug(Caption.of("fawe.error.region-mask-invalid", mask.getClass().getSimpleName()));
                             }
                             removed = true;

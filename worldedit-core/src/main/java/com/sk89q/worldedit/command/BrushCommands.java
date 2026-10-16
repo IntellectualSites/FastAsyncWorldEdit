@@ -943,7 +943,7 @@ public class BrushCommands {
         String filenamePng = filename.endsWith(".png") ? filename : filename + ".png";
         File file = new File(
                 Fawe.platform().getDirectory(),
-                Settings.settings().PATHS.HEIGHTMAP + File.separator + filenamePng
+                Settings.settings().paths().heightmap() + File.separator + filenamePng
         );
         if (file.exists()) {
             return new FileInputStream(file);
