@@ -155,15 +155,7 @@ public class MultiRegionExtent extends FaweRegionExtent {
                 }
             }
         }
-        if (!result || disallowed == null) {
-            return result;
-        }
-        for (Region region : disallowed) {
-            if (region.containsChunk(chunkX, chunkZ)) {
-                return false;
-            }
-        }
-        return true;
+        return result;
     }
 
     @Override
