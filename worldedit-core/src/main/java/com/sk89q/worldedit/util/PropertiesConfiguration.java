@@ -300,6 +300,11 @@ public class PropertiesConfiguration extends LocalConfiguration {
             for (String part : parts) {
                 try {
                     String v = part.trim();
+                    //FAWE start - an empty value is an empty set, not a set with an empty entry
+                    if (v.isEmpty()) {
+                        continue;
+                    }
+                    //FAWE end
                     set.add(v);
                 } catch (NumberFormatException ignored) {
                 }

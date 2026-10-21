@@ -163,6 +163,9 @@ public class YAMLConfiguration extends LocalConfiguration {
         commandBlockSupport = config.getBoolean("command-block-support", false);
     }
 
+    //FAWE start - unload does nothing, here or upstream, so it is deprecated to keep it unused
+    @Deprecated
+    //FAWE end
     public void unload() {
     }
 
