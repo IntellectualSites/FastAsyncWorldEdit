@@ -355,7 +355,6 @@ public class Fawe {
             settings = Settings.load(file);
             loaded = true;
         } catch (Throwable e) {
-            // The settings in use are kept and the file is left alone, as it may only be unreadable for now
             LOGGER.error("Failed to load config.", e);
         }
         if (settings.queue().targetSize() < 4 * settings.queue().parallelThreads()) {
