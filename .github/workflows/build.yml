@@ -69,8 +69,8 @@ jobs:
       - name: Archive Artifacts
         uses: actions/upload-artifact@v7
         with:
-          name: FastAsyncWorldEdit-Bukkit-SNAPSHOT
-          path: worldedit-bukkit/build/libs/FastAsyncWorldEdit-*.jar
+          name: FastAsyncWorldEdit-SNAPSHOT
+          path: worldedit-bukkit/build/libs/FastAsyncWorldEdit-Paper-*.jar
       - name: Publish to Modrinth
         if: ${{ runner.os == 'Linux' && env.STATUS == 'release' && github.event_name == 'push' && github.ref == 'refs/heads/main'}}
         run: ./gradlew publishMods
