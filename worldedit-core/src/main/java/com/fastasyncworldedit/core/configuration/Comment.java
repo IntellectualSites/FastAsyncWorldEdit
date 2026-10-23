@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 /**
  * Lines written above an option in the configuration file, or above a section when placed on the section's record.
  *
- * @since TODO
+ * @since 3.0.0
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.RECORD_COMPONENT, ElementType.TYPE})
