@@ -89,7 +89,7 @@ public class DiskOptimizedClipboard extends LinearClipboard {
                 region.getDimensions(),
                 MainUtil.getFile(
                         Fawe.instance() != null ? Fawe.platform().getDirectory() : new File("."),
-                        Settings.settings().PATHS.CLIPBOARD + File.separator + uuid + ".bd"
+                        Settings.settings().paths().clipboard() + File.separator + uuid + ".bd"
                 )
         );
         setOffset(region.getMinimumPoint());
@@ -109,7 +109,7 @@ public class DiskOptimizedClipboard extends LinearClipboard {
                 dimensions,
                 MainUtil.getFile(
                         Fawe.platform() != null ? Fawe.platform().getDirectory() : new File("."),
-                        Settings.settings().PATHS.CLIPBOARD + File.separator + UUID.randomUUID() + ".bd"
+                        Settings.settings().paths().clipboard() + File.separator + UUID.randomUUID() + ".bd"
                 )
         );
     }
@@ -199,7 +199,7 @@ public class DiskOptimizedClipboard extends LinearClipboard {
                 readBiomeStatusFromHeader();
                 int nbtCount = readNBTSavedCountFromHeader();
                 int entitiesCount = readEntitiesSavedCountFromHeader();
-                if (Settings.settings().CLIPBOARD.SAVE_CLIPBOARD_NBT_TO_DISK && (nbtCount + entitiesCount > 0)) {
+                if (Settings.settings().clipboard().saveClipboardNbtToDisk() && (nbtCount + entitiesCount > 0)) {
                     loadNBTFromFileFooter(nbtCount, entitiesCount, biomeLength);
                 }
             } else if (canHaveBiomes && braf.length() - headerSize == ((long) getVolume() << 1) + biomeLength) {
@@ -310,7 +310,7 @@ public class DiskOptimizedClipboard extends LinearClipboard {
     private void init() throws IOException {
         if (this.fileChannel == null) {
             this.fileChannel = braf.getChannel();
-            if (Settings.settings().CLIPBOARD.LOCK_CLIPBOARD_FILE) {
+            if (Settings.settings().clipboard().lockClipboardFile()) {
                 try {
                     FileLock lock = this.fileChannel.lock();
                     LOCK_HOLDER_CACHE.put(file.getName(), new LockHolder(lock));
@@ -516,7 +516,7 @@ public class DiskOptimizedClipboard extends LinearClipboard {
         try {
             if (byteBuffer != null) {
                 if (headerSize >= VERSION_2_HEADER_SIZE) {
-                    if (Settings.settings().CLIPBOARD.SAVE_CLIPBOARD_NBT_TO_DISK) {
+                    if (Settings.settings().clipboard().saveClipboardNbtToDisk()) {
                         try {
                             writeNBTToDisk();
                         } catch (Exception e) {
@@ -560,7 +560,7 @@ public class DiskOptimizedClipboard extends LinearClipboard {
             ByteArrayOutputStream baOS = new ByteArrayOutputStream();
             try (NBTOutputStream nbtOS = new NBTOutputStream(MainUtil.getCompressedOS(
                     baOS,
-                    Settings.settings().CLIPBOARD.COMPRESSION_LEVEL
+                    Settings.settings().clipboard().compressionLevel()
             ))) {
                 if (!nbtMap.isEmpty()) {
                     try {

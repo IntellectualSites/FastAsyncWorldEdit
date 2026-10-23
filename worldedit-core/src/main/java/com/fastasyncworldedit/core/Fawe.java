@@ -34,6 +34,7 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
 import java.lang.management.MemoryPoolMXBean;
 import java.lang.management.MemoryUsage;
+import java.nio.file.Path;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -105,20 +106,20 @@ public class Fawe {
          */
         this.setupConfigs();
         FaweLimit.MAX.CONFIRM_LARGE =
-                Settings.settings().LIMITS.get("default").CONFIRM_LARGE || Settings.settings().GENERAL.LIMIT_UNLIMITED_CONFIRMS;
+                Settings.settings().defaultLimits().confirmLarge() || Settings.settings().general().limitUnlimitedConfirms();
         TaskManager.IMP = this.implementation.getTaskManager();
 
         TaskManager.taskManager().async(() -> {
             MainUtil.deleteOlder(
                     MainUtil.getFile(this.implementation
-                            .getDirectory(), Settings.settings().PATHS.HISTORY),
-                    TimeUnit.DAYS.toMillis(Settings.settings().HISTORY.DELETE_AFTER_DAYS),
+                            .getDirectory(), Settings.settings().paths().history()),
+                    TimeUnit.DAYS.toMillis(Settings.settings().history().deleteAfterDays()),
                     false
             );
             MainUtil.deleteOlder(
                     MainUtil.getFile(this.implementation
-                            .getDirectory(), Settings.settings().PATHS.CLIPBOARD),
-                    TimeUnit.DAYS.toMillis(Settings.settings().CLIPBOARD.DELETE_AFTER_DAYS),
+                            .getDirectory(), Settings.settings().paths().clipboard()),
+                    TimeUnit.DAYS.toMillis(Settings.settings().clipboard().deleteAfterDays()),
                     false
             );
         });
@@ -141,7 +142,7 @@ public class Fawe {
         TaskManager.taskManager().repeat(timer, 1);
         uuidKeyQueuedExecutorService = new KeyQueuedExecutorService<>(new ThreadPoolExecutor(
                 1,
-                Settings.settings().QUEUE.PARALLEL_THREADS,
+                Settings.settings().queue().parallelThreads(),
                 0L,
                 TimeUnit.MILLISECONDS,
                 new LinkedBlockingQueue<>(),
@@ -332,8 +333,10 @@ public class Fawe {
     public void setupConfigs() {
         MainUtil.copyFile(MainUtil.getJarFile(), "lang/strings.json", null);
         // Setting up config.yml
-        File file = new File(this.implementation.getDirectory(), "config.yml");
-        Settings.settings().PLATFORM = implementation.getPlatform().replace("\"", "");
+        Path file = this.implementation.getDirectory().toPath().resolve("config.yml");
+        String date = null;
+        String build = null;
+        String commit = null;
         try (InputStream stream = getClass().getResourceAsStream("/fawe.properties");
              BufferedReader br = new BufferedReader(new InputStreamReader(stream))) {
             String versionString = br.readLine();
@@ -341,29 +344,28 @@ public class Fawe {
             String dateString = br.readLine();
             br.close();
             this.version = FaweVersion.tryParse(versionString, commitString, dateString);
-            Settings.settings().DATE = new Date(100 + version.year, version.month, version.day).toString();
-            Settings.settings().BUILD = "https://ci.athion.net/job/FastAsyncWorldEdit/" + version.build;
-            Settings.settings().COMMIT = "https://github.com/IntellectualSites/FastAsyncWorldEdit/commit/" + Integer.toHexString(version.hash);
+            date = new Date(100 + version.year, version.month, version.day).toString();
+            build = "https://ci.athion.net/job/FastAsyncWorldEdit/" + version.build;
+            commit = "https://github.com/IntellectualSites/FastAsyncWorldEdit/commit/" + Integer.toHexString(version.hash);
         } catch (Throwable ignored) {
         }
+        Settings settings = Settings.settings();
+        boolean loaded = false;
         try {
-            Settings.settings().reload(file);
+            settings = Settings.load(file);
+            loaded = true;
         } catch (Throwable e) {
             LOGGER.error("Failed to load config.", e);
         }
-        Settings.settings().QUEUE.TARGET_SIZE = Math.max(
-                Settings.settings().QUEUE.TARGET_SIZE,
-                Settings.settings().QUEUE.PARALLEL_THREADS
-        );
-        if (Settings.settings().QUEUE.TARGET_SIZE < 4 * Settings.settings().QUEUE.PARALLEL_THREADS) {
+        if (settings.queue().targetSize() < 4 * settings.queue().parallelThreads()) {
             LOGGER.error(
                     "queue.target-size is {}, and queue.parallel_threads is {}. It is HIGHLY recommended that queue" +
                             ".target-size be at least four times queue.parallel-threads or greater.",
-                    Settings.settings().QUEUE.TARGET_SIZE,
-                    Settings.settings().QUEUE.PARALLEL_THREADS
+                    settings.queue().targetSize(),
+                    settings.queue().parallelThreads()
             );
         }
-        if (Settings.settings().HISTORY.DELETE_DISK_ON_LOGOUT && Settings.settings().HISTORY.USE_DATABASE) {
+        if (settings.history().deleteDiskOnLogout() && settings.history().useDatabase()) {
             LOGGER.warn("""
                     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                     !!!                                                                !!!
@@ -393,14 +395,22 @@ public class Fawe {
             assert (Zstd.decompress(ob, compressed) == 0);
             LOGGER.info("ZSTD Compression Binding loaded successfully");
         } catch (Throwable e) {
-            if (Settings.settings().CLIPBOARD.COMPRESSION_LEVEL > 6 || Settings.settings().HISTORY.COMPRESSION_LEVEL > 6) {
-                Settings.settings().CLIPBOARD.COMPRESSION_LEVEL = Math.min(6, Settings.settings().CLIPBOARD.COMPRESSION_LEVEL);
-                Settings.settings().HISTORY.COMPRESSION_LEVEL = Math.min(6, Settings.settings().HISTORY.COMPRESSION_LEVEL);
+            if (settings.clipboard().compressionLevel() > 6 || settings.history().compressionLevel() > 6) {
+                settings = settings
+                        .with(Settings.Clipboard::compressionLevel, Math.min(6, settings.clipboard().compressionLevel()))
+                        .with(Settings.History::compressionLevel, Math.min(6, settings.history().compressionLevel()));
                 LOGGER.error("ZSTD Compression Binding Not Found.\n"
                         + "FAWE will still work but compression won't work as well.", e);
             }
         }
-        Settings.settings().save(file);
+        Settings.set(settings);
+        if (loaded) {
+            try {
+                settings.save(file, new Settings.BuildInfo(date, build, commit, implementation.getPlatform()));
+            } catch (IOException e) {
+                LOGGER.error("Failed to save config file: {}", file, e);
+            }
+        }
     }
 
     public WorldEdit getWorldEdit() {
@@ -408,7 +418,7 @@ public class Fawe {
     }
 
     private void setupMemoryListener() {
-        if (Settings.settings().MAX_MEMORY_PERCENT < 1 || Settings.settings().MAX_MEMORY_PERCENT > 99) {
+        if (Settings.settings().maxMemoryPercent() < 1 || Settings.settings().maxMemoryPercent() > 99) {
             return;
         }
         try {
@@ -438,7 +448,7 @@ public class Fawe {
                     if (max < 0) {
                         continue;
                     }
-                    final long alert = (max * Settings.settings().MAX_MEMORY_PERCENT) / 100;
+                    final long alert = (max * Settings.settings().maxMemoryPercent()) / 100;
                     mp.setCollectionUsageThreshold(alert);
                 }
             }
