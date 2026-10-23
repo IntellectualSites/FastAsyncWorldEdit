@@ -79,7 +79,7 @@ public class HistorySubCommands {
     public synchronized void rerun(
             Player player, World world, RollbackDatabase database,
             @ArgFlag(name = 'u', desc = "String user", def = "me")
-                    UUID other,
+                    Player other,
             @ArgFlag(name = 'r', def = "0", desc = "radius")
             @Range(from = 0, to = Integer.MAX_VALUE)
                     int radius,
@@ -100,7 +100,7 @@ public class HistorySubCommands {
     public synchronized void rollback(
             Player player, World world, RollbackDatabase database,
             @ArgFlag(name = 'u', desc = "String user", def = "")
-                    UUID other,
+                    Player other,
             @ArgFlag(name = 'r', def = "0", desc = "radius")
             @Range(from = 0, to = Integer.MAX_VALUE)
                     int radius,
@@ -118,13 +118,13 @@ public class HistorySubCommands {
         checkCommandArgument(timeDiff > 0, "Time must be >= 0");
 
         if (other == null) {
-            other = player.getUniqueId();
+            other = player;
         }
-        if (!other.equals(player.getUniqueId())) {
+        if (!other.equals(player)) {
             player.checkPermission("worldedit.history.undo.other");
         }
-        if (other == Identifiable.EVERYONE) {
-            other = null;
+        if (other.getUniqueId() == Identifiable.EVERYONE) {
+            return;
         }
         Location origin = player.getLocation();
         BlockVector3 bot = origin.toBlockPoint().subtract(radius, radius, radius);
@@ -139,9 +139,9 @@ public class HistorySubCommands {
         //            finalQueue = SetQueue.IMP.getNewQueue(fp.getWorld(), true, false);
         //        }
         int count = 0;
-        UUID finalOther = other;
+        UUID finalOther = other.getUniqueId();
         long minTime = System.currentTimeMillis() - timeDiff;
-        for (Supplier<RollbackOptimizedHistory> supplier : database.getEdits(other, minTime, bot, top, !restore, restore)) {
+        for (Supplier<RollbackOptimizedHistory> supplier : database.getEdits(other.getUniqueId(), minTime, bot, top, !restore, restore)) {
             count++;
             RollbackOptimizedHistory edit = supplier.get();
             if (restore) {
@@ -225,11 +225,11 @@ public class HistorySubCommands {
     public synchronized void summary(
             Player player, RollbackDatabase database, Arguments arguments,
             @Arg(desc = "Player uuid/name")
-                    UUID other,
+                    Player other,
             @Arg(desc = "edit index")
                     Integer index
     ) throws WorldEditException, ExecutionException, InterruptedException {
-        RollbackOptimizedHistory edit = database.getEdit(other, index).get();
+        RollbackOptimizedHistory edit = database.getEdit(other.getUniqueId(), index).get();
         if (edit == null) {
             player.print(Caption.of("fawe.worldedit.schematic.schematic.none"));
             return;
@@ -295,7 +295,7 @@ public class HistorySubCommands {
         );
         Component distr = TextComponent
                 .of("/history distr")
-                .clickEvent(ClickEvent.suggestCommand("//history distr " + other + " " + index));
+                .clickEvent(ClickEvent.suggestCommand("//history distr " + other.getUniqueId() + " " + index));
         TextComponentProducer content = new TextComponentProducer().append(header).newline().append(body).newline().append(distr);
         player.print(content.create());
     }
@@ -372,7 +372,7 @@ public class HistorySubCommands {
     public synchronized void find(
             Player player, World world, RollbackDatabase database, Arguments arguments,
             @ArgFlag(name = 'u', def = "", desc = "String user")
-                    UUID other,
+                    Player other,
             @ArgFlag(name = 'r', def = "0", desc = "radius")
             @Range(from = 0, to = Integer.MAX_VALUE)
                     Integer radius,
@@ -399,13 +399,13 @@ public class HistorySubCommands {
 
         if (page == null || history == null) {
             if (other == null) {
-                other = player.getUniqueId();
+                other = player;
             }
-            if (!other.equals(player.getUniqueId())) {
+            if (!other.equals(player)) {
                 player.checkPermission("worldedit.history.undo.other");
             }
-            if (other == Identifiable.EVERYONE) {
-                other = null;
+            if (other.getUniqueId() == Identifiable.EVERYONE) {
+                return;
             }
 
             BlockVector3 bot = origin.toBlockPoint().subtract(radius, radius, radius);
@@ -414,7 +414,7 @@ public class HistorySubCommands {
             top = top.clampY(world.getMinY(), world.getMaxY());
 
             long minTime = System.currentTimeMillis() - timeDiff;
-            Iterable<Supplier<RollbackOptimizedHistory>> edits = database.getEdits(other, minTime, bot, top, false, false);
+            Iterable<Supplier<RollbackOptimizedHistory>> edits = database.getEdits(other.getUniqueId(), minTime, bot, top, false, false);
             history = Lists.newArrayList(edits);
             player.setMeta(pageCommand, new SoftReference<>(history));
             page = 1;
@@ -436,7 +436,7 @@ public class HistorySubCommands {
     public void distr(
             Player player, LocalSession session, RollbackDatabase database, Arguments arguments,
             @Arg(desc = "Player uuid/name")
-                    UUID other,
+                    Player other,
             @Arg(desc = "edit index")
                     Integer index,
             @ArgFlag(name = 'p', desc = "Page to view.", def = "")
@@ -446,7 +446,7 @@ public class HistorySubCommands {
         Reference<PaginationBox> cached = player.getMeta(pageCommand);
         PaginationBox pages = cached == null ? null : cached.get();
         if (page == null || pages == null) {
-            RollbackOptimizedHistory edit = database.getEdit(other, index).get();
+            RollbackOptimizedHistory edit = database.getEdit(other.getUniqueId(), index).get();
             SimpleChangeSetSummary summary = edit.summarize(RegionWrapper.GLOBAL(), false);
             if (summary != null) {
                 List<Countable<BlockState>> distr = summary.getBlockDistributionWithData();
@@ -478,7 +478,7 @@ public class HistorySubCommands {
     public void list(
             Player player, LocalSession session, RollbackDatabase database, Arguments arguments,
             @Arg(desc = "Player uuid/name")
-                    UUID other,
+                    Player other,
             @ArgFlag(name = 'p', desc = "Page to view.", def = "")
                     Integer page
     ) {
