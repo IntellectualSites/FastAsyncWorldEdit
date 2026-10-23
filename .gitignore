@@ -36,3 +36,6 @@ worldedit-core/src/main/resources/lang/*
 .DS_Store
 ### Run server ignore
 run-*
+
+### AI assistant local guidance (not tracked)
+CLAUDE.md
