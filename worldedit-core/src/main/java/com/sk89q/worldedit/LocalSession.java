@@ -130,6 +130,7 @@ public class LocalSession implements TextureHolder {
     private RegionSelector selector = new CuboidRegionSelector();
     //FAWE end
     private transient boolean placeAtPos1 = false;
+    private transient int lastRandomPasteRotation = -1;
     //FAWE start
     private final transient List<Object> history = Collections.synchronizedList(new LinkedList<>() {
         @Override
@@ -1102,6 +1103,27 @@ public class LocalSession implements TextureHolder {
 
     public boolean isPlaceAtPos1() {
         return placeAtPos1;
+    }
+
+    /**
+     * Get the rotation, in quarter turns around the y-axis, that the last randomly rotated paste used.
+     *
+     * @return the last rotation in the range {@code [0, 3]}, or {@code -1} if no such paste has happened yet
+     * @since TODO
+     */
+    public int getLastRandomPasteRotation() {
+        return lastRandomPasteRotation;
+    }
+
+    /**
+     * Set the rotation, in quarter turns around the y-axis, that the last randomly rotated paste used, so that the next one
+     * can avoid repeating it.
+     *
+     * @param lastRandomPasteRotation the rotation in the range {@code [0, 3]}, or {@code -1} to forget the previous one
+     * @since TODO
+     */
+    public void setLastRandomPasteRotation(int lastRandomPasteRotation) {
+        this.lastRandomPasteRotation = lastRandomPasteRotation;
     }
 
     /**
