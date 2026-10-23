@@ -159,10 +159,13 @@ public abstract class AbstractBukkitGetBlocks<ServerLevel, LevelChunk> extends C
                             task.run();
                         }
                     }
+                    // Completion executor, not the secondary pool: this future is the tail of the chain blocked on in
+                    // SingleThreadQueueExtent flushes. If it required a free secondary-pool worker, edits running *on* the
+                    // secondary pool (e.g. plugins submitting via QueueHandler#async) could starve it and deadlock.
                     if (callback != null) {
-                        return queueHandler.async(callback, null);
+                        return queueHandler.completion(callback, null);
                     } else if (finalizer != null) {
-                        return queueHandler.async(finalizer, null);
+                        return queueHandler.completion(finalizer, null);
                     }
                     return null;
                 } catch (Throwable e) {
