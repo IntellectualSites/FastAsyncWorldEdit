@@ -308,6 +308,7 @@ public class ClipboardCommands {
         }
         final Mask firstSourceMask = mask != null ? mask : sourceMask;
         final Mask finalMask = MaskIntersection.of(firstSourceMask, new RegionMask(allowedRegion)).optimize();
+        new MaskTraverser(finalMask).setNewExtent(editSession);
         if (finalMask != Masks.alwaysTrue()) {
             copy.setSourceMask(finalMask);
         }
