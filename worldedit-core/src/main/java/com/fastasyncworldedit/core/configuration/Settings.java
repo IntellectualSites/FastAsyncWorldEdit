@@ -6,6 +6,7 @@ import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.ApiStatus;
 import org.yaml.snakeyaml.error.YAMLException;
 
 import javax.annotation.Nullable;
@@ -73,7 +74,7 @@ public record Settings(
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
     // Written to the file for people reading it, never read back
-    private static final List<String> INFORMATION = List.of("issues", "wiki", "date", "build", "commit", "platform");
+    private static final List<String> INFORMATION = List.of("issues", "wiki", "platform");
 
     // Not volatile: settings are immutable, so a thread that has not yet seen a reload reads the previous ones, whole
     private static Settings instance = defaults();
@@ -98,8 +99,10 @@ public record Settings(
     /**
      * Puts settings into use.
      *
-     * @since TODO
+     * @apiNote This is an internal method, use with care. It is not thread-safe and does not check the settings are valid.
+     * @since 3.0.0
      */
+    @ApiStatus.Internal
     public static void set(Settings settings) {
         instance = Objects.requireNonNull(settings);
     }
@@ -110,7 +113,7 @@ public record Settings(
      * @param option a reference to the accessor of the option, e.g. {@code Settings.Queue::parallelThreads}
      * @param value  the new value
      * @throws IllegalArgumentException if the option is not given as a reference to its accessor
-     * @since TODO
+     * @since 3.0.0
      */
     public static <S extends Record> void override(Option.Bool<S> option, boolean value) {
         overrideOption(option, value);
@@ -118,7 +121,7 @@ public record Settings(
 
     /**
      * @see #override(Option.Bool, boolean)
-     * @since TODO
+     * @since 3.0.0
      */
     public static <S extends Record> void override(Option.Int<S> option, int value) {
         overrideOption(option, value);
@@ -126,7 +129,7 @@ public record Settings(
 
     /**
      * @see #override(Option.Bool, boolean)
-     * @since TODO
+     * @since 3.0.0
      */
     public static <S extends Record> void override(Option.Text<S> option, String value) {
         overrideOption(option, value);
@@ -134,7 +137,7 @@ public record Settings(
 
     /**
      * @see #override(Option.Bool, boolean)
-     * @since TODO
+     * @since 3.0.0
      */
     public static <S extends Record> void override(Option.List<S> option, List<String> value) {
         overrideOption(option, value);
@@ -142,7 +145,7 @@ public record Settings(
 
     /**
      * @see #override(Option.Bool, boolean)
-     * @since TODO
+     * @since 3.0.0
      */
     public static <S extends Record, E extends Enum<E>> void override(Option.Choice<S, E> option, E value) {
         overrideOption(option, value);
@@ -157,7 +160,7 @@ public record Settings(
      * <p>
      * These are the {@link Default} of each option, apart from the few below that depend on where FAWE runs.
      *
-     * @since TODO
+     * @since 3.0.0
      */
     public static Settings defaults() {
         int processors = Math.max(1, Runtime.getRuntime().availableProcessors());
@@ -182,7 +185,7 @@ public record Settings(
      * @param file the file, which does not need to exist
      * @return the settings
      * @throws IOException if the file exists but cannot be read
-     * @since TODO
+     * @since 3.0.0
      */
     public static Settings load(Path file) throws IOException {
         Settings defaults = defaults();
@@ -229,6 +232,10 @@ public record Settings(
         if (tree.get("queue.parallel-threads") instanceof Integer threads && threads > 0) {
             tree.putIfAbsent("queue.thread-target-size-percent", Queue.threadTargetSizePercent(threads));
         }
+        // 3.0.0 stopped writing the date, build and commit of the running build, which were never read
+        tree.remove("date");
+        tree.remove("build");
+        tree.remove("commit");
     }
 
     private static void moveIntoLimits(ConfigTree tree, String from, String option) {
@@ -249,13 +256,21 @@ public record Settings(
     /**
      * Writes the settings to a file, replacing what is in it.
      *
-     * @param file  the file
-     * @param build information about the running build to put at the top of the file
-     * @since TODO
+     * @param file     the file
+     * @param platform the platform FAWE is running on, put at the top of the file, or null if it is not known
+     * @since 3.0.0
      */
-    public void save(Path file, BuildInfo build) throws IOException {
+    public void save(Path file, @Nullable String platform) throws IOException {
         ConfigYaml.Writer out = new ConfigYaml.Writer();
-        build.writeTo(out);
+        String[] values = {
+                "https://github.com/IntellectualSites/FastAsyncWorldEdit/issues",
+                "https://intellectualsites.github.io/fastasyncworldedit-documentation/",
+                platform
+        };
+        out.comments(0, List.of("These first 3 aren't configurable"));
+        for (int i = 0; i < INFORMATION.size(); i++) {
+            out.key(0, INFORMATION.get(i)).scalar(values[i]);
+        }
         ConfigMapper.write(this, true, out);
         ConfigYaml.write(file, out);
     }
@@ -267,7 +282,7 @@ public record Settings(
      * @param value  the new value
      * @return the changed settings, which are not in use until passed to {@link #set(Settings)}
      * @throws IllegalArgumentException if the option is not given as a reference to its accessor
-     * @since TODO
+     * @since 3.0.0
      */
     public <S extends Record> Settings with(Option.Bool<S> option, boolean value) {
         return with(ConfigMapper.pathOf(Settings.class, option), value);
@@ -275,7 +290,7 @@ public record Settings(
 
     /**
      * @see #with(Option.Bool, boolean)
-     * @since TODO
+     * @since 3.0.0
      */
     public <S extends Record> Settings with(Option.Int<S> option, int value) {
         return with(ConfigMapper.pathOf(Settings.class, option), value);
@@ -283,7 +298,7 @@ public record Settings(
 
     /**
      * @see #with(Option.Bool, boolean)
-     * @since TODO
+     * @since 3.0.0
      */
     public <S extends Record> Settings with(Option.Text<S> option, String value) {
         return with(ConfigMapper.pathOf(Settings.class, option), value);
@@ -291,7 +306,7 @@ public record Settings(
 
     /**
      * @see #with(Option.Bool, boolean)
-     * @since TODO
+     * @since 3.0.0
      */
     public <S extends Record> Settings with(Option.List<S> option, List<String> value) {
         return with(ConfigMapper.pathOf(Settings.class, option), value);
@@ -299,7 +314,7 @@ public record Settings(
 
     /**
      * @see #with(Option.Bool, boolean)
-     * @since TODO
+     * @since 3.0.0
      */
     public <S extends Record, E extends Enum<E>> Settings with(Option.Choice<S, E> option, E value) {
         return with(ConfigMapper.pathOf(Settings.class, option), value);
@@ -318,7 +333,7 @@ public record Settings(
     /**
      * {@return the limit group that applies to actors without a permission for any other group}
      *
-     * @since TODO
+     * @since 3.0.0
      */
     public Limits defaultLimits() {
         return limits.get(DEFAULT_LIMIT);
@@ -329,30 +344,10 @@ public record Settings(
      *
      * @param actor the actor
      * @return a new limit
+     * @since 3.0.0
      */
     public FaweLimit getLimit(Actor actor) {
         return LimitResolver.resolve(limits, actor);
-    }
-
-    /**
-     * Information about the running build that is written at the top of the file. Parts that are not known are null.
-     *
-     * @since TODO
-     */
-    public record BuildInfo(@Nullable String date, @Nullable String build, @Nullable String commit, @Nullable String platform) {
-
-        private void writeTo(ConfigYaml.Writer out) {
-            String[] values = {
-                    "https://github.com/IntellectualSites/FastAsyncWorldEdit/issues",
-                    "https://intellectualsites.github.io/fastasyncworldedit-documentation/",
-                    date, build, commit, platform
-            };
-            out.comments(0, List.of("These first 6 aren't configurable"));
-            for (int i = 0; i < INFORMATION.size(); i++) {
-                out.key(0, INFORMATION.get(i)).scalar(values[i]);
-            }
-        }
-
     }
 
     @Comment("Enable or disable core components")
@@ -489,7 +484,7 @@ public record Settings(
             // Depends on where FAWE runs, see Settings#defaults()
             int maxButcherRadius,
             @Comment({
-                    "Blockstates include Banner, Beacon, BrewingStand, Chest, CommandBlock,",
+                    "BlockStates include Banner, Beacon, BrewingStand, Chest, CommandBlock,",
                     "CreatureSpawner, Dispenser, Dropper, EndGateway, Furnace, Hopper, Jukebox,",
                     "NoteBlock, Sign, Skull, Structure"
             })

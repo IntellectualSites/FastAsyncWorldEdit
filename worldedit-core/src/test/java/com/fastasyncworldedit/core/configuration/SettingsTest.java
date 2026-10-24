@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SettingsTest {
 
-    private static final Settings.BuildInfo BUILD = new Settings.BuildInfo("DATE", "BUILD", "COMMIT", "TEST");
+    private static final String PLATFORM = "TEST";
 
     @TempDir
     Path directory;
@@ -52,7 +52,7 @@ class SettingsTest {
                 .with("limits.default.max-super-pickaxe-size", 0)
                 .with("limits.default.max-brush-radius", 0)
                 .with("limits.default.max-butcher-radius", 0);
-        settings.save(file(), BUILD);
+        settings.save(file(), PLATFORM);
 
         String expected;
         try (InputStream resource = SettingsTest.class.getResourceAsStream("config.yml")) {
@@ -70,7 +70,7 @@ class SettingsTest {
                 .with("region-restrictions-options.mode", "owner")
                 .with("limits.default.max-changes", Long.MAX_VALUE)
                 .with("limits.default.strip-nbt", List.of("Items", " padded ", "a: b", "- c"));
-        settings.save(file(), BUILD);
+        settings.save(file(), PLATFORM);
 
         assertEquals(settings, Settings.load(file()));
         assertEquals(FaweMaskManager.MaskType.OWNER, settings.regionRestrictionsOptions().mode());
@@ -90,7 +90,7 @@ class SettingsTest {
                   "a: b":
                     max-radius: 4
                 """);
-        settings.save(file(), BUILD);
+        settings.save(file(), PLATFORM);
 
         Settings loaded = Settings.load(file());
         assertEquals(settings, loaded);
@@ -105,11 +105,11 @@ class SettingsTest {
 
     @Test
     void unchangedFileIsNotRewritten() throws IOException {
-        Settings.defaults().save(file(), BUILD);
+        Settings.defaults().save(file(), PLATFORM);
         FileTime longAgo = FileTime.fromMillis(1_000_000_000_000L);
         Files.setLastModifiedTime(file(), longAgo);
 
-        Settings.load(file()).save(file(), BUILD);
+        Settings.load(file()).save(file(), PLATFORM);
 
         assertEquals(longAgo, Files.getLastModifiedTime(file()));
     }
@@ -117,12 +117,12 @@ class SettingsTest {
     @Test
     void changedFileIsRewrittenAndMissingDirectoriesAreCreated() throws IOException {
         Path nested = directory.resolve("plugins").resolve("FastAsyncWorldEdit").resolve("config.yml");
-        Settings.defaults().save(nested, BUILD);
+        Settings.defaults().save(nested, PLATFORM);
         assertEquals(Settings.defaults(), Settings.load(nested));
 
         // Same length, different content: only comparing the bytes tells them apart
         Settings changed = Settings.defaults().with(Settings.Clipboard::compressionLevel, 2);
-        changed.save(nested, BUILD);
+        changed.save(nested, PLATFORM);
         assertEquals(changed, Settings.load(nested));
     }
 

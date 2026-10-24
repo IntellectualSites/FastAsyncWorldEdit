@@ -25,7 +25,6 @@ import javax.annotation.Nullable;
 import javax.management.InstanceAlreadyExistsException;
 import javax.management.NotificationEmitter;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,7 +34,6 @@ import java.lang.management.MemoryMXBean;
 import java.lang.management.MemoryPoolMXBean;
 import java.lang.management.MemoryUsage;
 import java.nio.file.Path;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.Callable;
@@ -333,10 +331,7 @@ public class Fawe {
     public void setupConfigs() {
         MainUtil.copyFile(MainUtil.getJarFile(), "lang/strings.json", null);
         // Setting up config.yml
-        Path file = this.implementation.getDirectory().toPath().resolve("config.yml");
-        String date = null;
-        String build = null;
-        String commit = null;
+        Path file = this.implementation.getPath().resolve("config.yml");
         try (InputStream stream = getClass().getResourceAsStream("/fawe.properties");
              BufferedReader br = new BufferedReader(new InputStreamReader(stream))) {
             String versionString = br.readLine();
@@ -344,9 +339,6 @@ public class Fawe {
             String dateString = br.readLine();
             br.close();
             this.version = FaweVersion.tryParse(versionString, commitString, dateString);
-            date = new Date(100 + version.year, version.month, version.day).toString();
-            build = "https://ci.athion.net/job/FastAsyncWorldEdit/" + version.build;
-            commit = "https://github.com/IntellectualSites/FastAsyncWorldEdit/commit/" + Integer.toHexString(version.hash);
         } catch (Throwable ignored) {
         }
         Settings settings = Settings.settings();
@@ -407,7 +399,7 @@ public class Fawe {
         Settings.set(settings);
         if (loaded) {
             try {
-                settings.save(file, new Settings.BuildInfo(date, build, commit, implementation.getPlatform()));
+                settings.save(file, implementation.getPlatform());
             } catch (IOException e) {
                 LOGGER.error("Failed to save config file: {}", file, e);
             }

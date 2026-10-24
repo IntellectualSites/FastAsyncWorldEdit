@@ -26,6 +26,8 @@ import java.util.function.Function;
  * enum, {@code List<String>}, another configuration record (a section) or {@code Map<String, R>} with {@code R} a
  * configuration record (named groups sharing one layout). A component named {@code parallelThreads} is stored under
  * {@code parallel-threads}, in declaration order, below the lines of its {@link Comment}.
+ *
+ * @since 3.0.0
  */
 final class ConfigMapper {
 

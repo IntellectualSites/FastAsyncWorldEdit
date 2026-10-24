@@ -1,9 +1,6 @@
-# These first 6 aren't configurable
+# These first 3 aren't configurable
 issues: "https://github.com/IntellectualSites/FastAsyncWorldEdit/issues"
 wiki: "https://intellectualsites.github.io/fastasyncworldedit-documentation/"
-date: "DATE"
-build: "BUILD"
-commit: "COMMIT"
 platform: "TEST"
 # Set true to enable WorldEdit restrictions per region (e.g. PlotSquared or WorldGuard).
 # To be allowed to WorldEdit in a region, users need the appropriate
@@ -274,7 +271,7 @@ paths:
   # Multiple servers can use the same clipboards
   #  - Use a shared directory or NFS/Samba
   clipboard: "clipboard"
-  # Each player has his or her own sub directory for schematics
+  # Each player has their own sub directory for schematics
   per-player-schematics: false
 
 # Region restriction settings
