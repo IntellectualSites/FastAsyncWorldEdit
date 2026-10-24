@@ -72,7 +72,7 @@ public class FaweBukkit implements IFawe, Listener {
             } catch (Throwable e) {
                 LOGGER.error("Brush Listener Failed", e);
             }
-            if (PaperSupport.isPaper() && Settings.settings().experimental().dynamicChunkRendering() > 1) {
+            if (Settings.settings().experimental().dynamicChunkRendering() > 1) {
                 new RenderListener(plugin);
             }
         } catch (final Throwable e) {
