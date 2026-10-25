@@ -40,11 +40,13 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Represents WorldEdit's configuration.
@@ -62,9 +64,12 @@ public abstract class LocalConfiguration {
     public boolean profile = false;
     public boolean traceUnflushedSessions = true;
     public Set<String> disallowedBlocks = new HashSet<>();
-    protected BlockMask disallowedBlocksMask;
-    //FAWE start - the blocks the mask was built from, to notice when a reload replaces them
-    private Set<String> disallowedBlocksMaskSource;
+    //FAWE start - the mask and the blocks it was built from, replaced together so threads never mix them up
+    private volatile DisallowedBlocksMask disallowedBlocksMask;
+
+    private record DisallowedBlocksMask(Set<String> blocks, BlockMask mask) {
+
+    }
     //FAWE end
     /**
      * @deprecated Use actor's limit {@link com.fastasyncworldedit.core.limit.FaweLimit#MAX_CHANGES}
@@ -213,8 +218,9 @@ public abstract class LocalConfiguration {
         if (blocks.isEmpty()) {
             return false;
         }
-        BlockMask mask = disallowedBlocksMask;
-        if (mask == null || disallowedBlocksMaskSource != blocks) {
+        DisallowedBlocksMask cached = disallowedBlocksMask;
+        // Threads rebuilding at once may store an older mask last, which the next call notices and rebuilds
+        if (cached == null || cached.blocks() != blocks) {
             BlockMaskBuilder builder = new BlockMaskBuilder();
             for (String blockRegex : blocks) {
                 try {
@@ -223,13 +229,30 @@ public abstract class LocalConfiguration {
                     LOGGER.warn("Invalid disallowed block '{}'", blockRegex, e);
                 }
             }
-            mask = builder.build(new NullExtent());
-            disallowedBlocksMask = mask;
-            disallowedBlocksMaskSource = blocks;
+            cached = new DisallowedBlocksMask(blocks, builder.build(new NullExtent()));
+            disallowedBlocksMask = cached;
         }
-        return mask.test(holder.toImmutableState());
+        return cached.mask().test(holder.toImmutableState());
         //FAWE end
     }
+
+    //FAWE start - shared by the loaders, so neither reads a blank entry as "minecraft:"
+    /**
+     * Turns the disallowed blocks of a configuration file into {@link #disallowedBlocks}: entries are trimmed and lower
+     * case, blank ones are skipped, and those without a namespace are in {@code minecraft}.
+     *
+     * @param entries the entries as written in the file
+     * @return a new set, so that {@link #checkDisallowedBlocks(BlockStateHolder)} notices the change
+     * @since TODO
+     */
+    protected static Set<String> parseDisallowedBlocks(Collection<String> entries) {
+        return entries.stream()
+                .map(String::trim)
+                .filter(entry -> !entry.isEmpty())
+                .map(entry -> (entry.contains(":") ? entry : "minecraft:" + entry).toLowerCase(Locale.ROOT))
+                .collect(Collectors.toSet());
+    }
+    //FAWE end
 
     /**
      * Get the working directory to work from.

@@ -2,7 +2,11 @@ package com.sk89q.worldedit.util;
 
 import com.sk89q.util.yaml.YAMLProcessor;
 import com.sk89q.worldedit.LocalConfiguration;
+import com.sk89q.worldedit.LocalSession;
+import com.sk89q.worldedit.session.SessionManager;
 import org.apache.logging.log4j.LogManager;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.api.parallel.Execution;
@@ -27,6 +31,34 @@ class ConfigurationLoadingTest {
 
     @TempDir
     Path directory;
+
+    // The statics the loaders write, put back after each test so later test classes see what they would have
+    private int maxRadius;
+    private int maxSuperRadius;
+    private int maxBrushRadius;
+    private int maxButcherRadius;
+    private int maxHistorySize;
+    private int expirationGrace;
+
+    @BeforeEach
+    void saveStatics() {
+        maxRadius = LocalConfiguration.MAX_RADIUS;
+        maxSuperRadius = LocalConfiguration.MAX_SUPER_RADIUS;
+        maxBrushRadius = LocalConfiguration.MAX_BRUSH_RADIUS;
+        maxButcherRadius = LocalConfiguration.MAX_BUTCHER_RADIUS;
+        maxHistorySize = LocalSession.MAX_HISTORY_SIZE;
+        expirationGrace = SessionManager.EXPIRATION_GRACE;
+    }
+
+    @AfterEach
+    void restoreStatics() {
+        LocalConfiguration.MAX_RADIUS = maxRadius;
+        LocalConfiguration.MAX_SUPER_RADIUS = maxSuperRadius;
+        LocalConfiguration.MAX_BRUSH_RADIUS = maxBrushRadius;
+        LocalConfiguration.MAX_BUTCHER_RADIUS = maxButcherRadius;
+        LocalSession.MAX_HISTORY_SIZE = maxHistorySize;
+        SessionManager.EXPIRATION_GRACE = expirationGrace;
+    }
 
     private LocalConfiguration yaml(String content) throws IOException {
         Path file = directory.resolve("worldedit-config.yml");
@@ -120,6 +152,16 @@ class ConfigurationLoadingTest {
         config.load();
 
         assertEquals(Set.of(), config.disallowedBlocks);
+    }
+
+    @Test
+    void blankYamlEntriesAreSkipped() throws IOException {
+        LocalConfiguration config = yaml("""
+                limits:
+                  disallowed-blocks: ["", "  ", " TNT "]
+                """);
+
+        assertEquals(Set.of("minecraft:tnt"), config.disallowedBlocks);
     }
 
 }
