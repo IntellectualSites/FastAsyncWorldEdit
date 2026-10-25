@@ -388,7 +388,7 @@ public record Settings(
             })
             @Default("clipboard")
             String clipboard,
-            @Comment("Each player has his or her own sub directory for schematics")
+            @Comment("Each player has their own sub directory for schematics")
             @Default("false")
             boolean perPlayerSchematics
     ) {
