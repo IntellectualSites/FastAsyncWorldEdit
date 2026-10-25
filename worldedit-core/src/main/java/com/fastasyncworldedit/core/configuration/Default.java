@@ -16,7 +16,7 @@ import java.lang.annotation.Target;
  * only be worked out at runtime has none. It is given its value where the defaults of the whole configuration are
  * created, such as {@link Settings#defaults()}.
  *
- * @since TODO
+ * @since 3.0.0
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.RECORD_COMPONENT)

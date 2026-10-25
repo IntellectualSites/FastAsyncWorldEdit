@@ -203,6 +203,20 @@ class SettingsTest {
     }
 
     @Test
+    void schematicLimitsMoveIntoTheDefaultGroupWhenOnlyOtherGroupsExist() throws IOException {
+        Settings settings = load("""
+                experimental:
+                  per-player-file-size-limit: 123
+                limits:
+                  vip:
+                    max-changes: -1
+                """);
+
+        assertEquals(123, settings.limits().get("vip").schemFileSizeLimit());
+        assertEquals(123, settings.defaultLimits().schemFileSizeLimit());
+    }
+
+    @Test
     void newerOptionsWinOverTheOnesTheyReplaced() throws IOException {
         Settings settings = load("""
                 queue:
@@ -226,6 +240,17 @@ class SettingsTest {
 
         Settings.load(file());
         assertEquals(broken, Files.readString(directory.resolve("config.yml_broken_0")));
+    }
+
+    @Test
+    void aFileWithNothingToReadGivesTheFallback() throws IOException {
+        Settings inUse = Settings.defaults().with(Settings.Clipboard::compressionLevel, 2);
+
+        assertEquals(inUse, Settings.load(file(), inUse));
+
+        Files.writeString(file(), "queue:\n  parallel-threads: [1,\n", StandardCharsets.UTF_8);
+        assertEquals(inUse, Settings.load(file(), inUse));
+        assertTrue(Files.exists(directory.resolve("config.yml_broken")));
     }
 
     @Test

@@ -344,7 +344,8 @@ public class Fawe {
         Settings settings = Settings.settings();
         boolean loaded = false;
         try {
-            settings = Settings.load(file);
+            // A broken file keeps the settings in use, which are then saved over it
+            settings = Settings.load(file, settings);
             loaded = true;
         } catch (Throwable e) {
             // The settings in use are kept and the file is left alone, as it may only be unreadable for now
@@ -381,6 +382,7 @@ public class Fawe {
             LOGGER.error("LZ4 Compression Binding Not Found.\n"
                     + "FAWE will still work but compression will be slower.", e);
         }
+        Settings inUse = settings;
         try {
             byte[] in = new byte[0];
             byte[] compressed = Zstd.compress(in);
@@ -389,14 +391,15 @@ public class Fawe {
             LOGGER.info("ZSTD Compression Binding loaded successfully");
         } catch (Throwable e) {
             if (settings.clipboard().compressionLevel() > 6 || settings.history().compressionLevel() > 6) {
-                settings = settings
+                // Only for this run: the file keeps the configured levels for when ZSTD is available again
+                inUse = settings
                         .with(Settings.Clipboard::compressionLevel, Math.min(6, settings.clipboard().compressionLevel()))
                         .with(Settings.History::compressionLevel, Math.min(6, settings.history().compressionLevel()));
                 LOGGER.error("ZSTD Compression Binding Not Found.\n"
                         + "FAWE will still work but compression won't work as well.", e);
             }
         }
-        Settings.set(settings);
+        Settings.set(inUse);
         if (loaded) {
             try {
                 settings.save(file, implementation.getPlatform());

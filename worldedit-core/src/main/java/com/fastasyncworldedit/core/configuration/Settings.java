@@ -188,17 +188,36 @@ public record Settings(
      * @since 3.0.0
      */
     public static Settings load(Path file) throws IOException {
-        Settings defaults = defaults();
+        return load(file, defaults());
+    }
+
+    /**
+     * Reads settings from a file without putting them into use, or gives others if the file has none to read.
+     * <p>
+     * Options the file does not set, or sets to something unusable, take their default. A file that does not exist gives
+     * the fallback, and so does a file that is not valid YAML, after it is copied to a file next to it ending in
+     * {@code _broken}. Passing the settings in use keeps them when a reload finds the file broken.
+     *
+     * @param file     the file, which does not need to exist
+     * @param fallback the settings to give if the file does not exist or is not valid YAML
+     * @return the settings
+     * @throws IOException if the file exists but cannot be read
+     * @since 3.0.0
+     */
+    public static Settings load(Path file, Settings fallback) throws IOException {
+        Objects.requireNonNull(fallback);
         if (Files.notExists(file)) {
-            return defaults;
+            return fallback;
         }
         Map<String, Object> tree;
         try {
             tree = ConfigYaml.read(file);
         } catch (YAMLException e) {
-            LOGGER.error("Could not read {}, it was copied to {} and the defaults are used", file, ConfigYaml.backup(file), e);
-            return defaults;
+            LOGGER.error("Could not read {}, it was copied to {} and the settings in use are kept",
+                    file, ConfigYaml.backup(file), e);
+            return fallback;
         }
+        Settings defaults = defaults();
         INFORMATION.forEach(tree::remove);
         migrate(new ConfigTree(tree));
         List<String> problems = new ArrayList<>();
@@ -243,9 +262,11 @@ public record Settings(
         if (value == null) {
             return;
         }
+        // The default group gets it too when the file has other groups but not that one, as it is otherwise unlimited
+        tree.putIfAbsent("limits." + DEFAULT_LIMIT + "." + option, value);
         Map<String, Object> groups = tree.section("limits");
-        if (groups == null || groups.isEmpty()) {
-            tree.putIfAbsent("limits." + DEFAULT_LIMIT + "." + option, value);
+        if (groups == null) {
+            // Not a section, which binding reports
             return;
         }
         for (String group : groups.keySet()) {
