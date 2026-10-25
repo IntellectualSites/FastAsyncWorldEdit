@@ -151,7 +151,7 @@ public record Settings(
         overrideOption(option, value);
     }
 
-    private static synchronized void overrideOption(Option<?> option, Object value) {
+    private static synchronized void overrideOption(Option option, Object value) {
         instance = instance.with(ConfigMapper.pathOf(Settings.class, option), value);
     }
 

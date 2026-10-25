@@ -239,7 +239,7 @@ final class ConfigMapper {
      * @throws IllegalArgumentException if the argument is not a reference to an accessor of an option, or the option is
      *                                  in a named group
      */
-    static String pathOf(Class<? extends Record> root, Option<?> option) {
+    static String pathOf(Class<? extends Record> root, Option option) {
         String path = null;
         try {
             // A serializable method reference can describe itself, which is the only way to learn what it refers to
