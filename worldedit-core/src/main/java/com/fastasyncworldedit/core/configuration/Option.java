@@ -5,9 +5,9 @@ import java.io.Serializable;
 /**
  * An option of {@code config.yml}, given as a method reference to change it with {@link Settings#with} or
  * {@link Settings#override}.
- * <pre>{@code
+ * <code>{@code
  * settings = settings.with(Settings.Queue::parallelThreads, 4);
- * }</pre>
+ * }</code>
  * <p>
  * Unlike a path such as {@code queue.parallel-threads}, a method reference is checked by the compiler: the option must
  * exist and the value must have its type, so renaming or removing an option breaks the build instead of failing when

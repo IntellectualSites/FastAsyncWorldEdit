@@ -9,7 +9,6 @@ import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.ApiStatus;
 import org.yaml.snakeyaml.error.YAMLException;
 
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -277,18 +276,16 @@ public record Settings(
     /**
      * Writes the settings to a file, replacing what is in it.
      *
-     * @param file     the file
-     * @param platform the platform FAWE is running on, put at the top of the file, or null if it is not known
+     * @param file the file
      * @since 3.0.0
      */
-    public void save(Path file, @Nullable String platform) throws IOException {
+    public void save(Path file) throws IOException {
         ConfigYaml.Writer out = new ConfigYaml.Writer();
         String[] values = {
                 "https://github.com/IntellectualSites/FastAsyncWorldEdit/issues",
-                "https://intellectualsites.github.io/fastasyncworldedit-documentation/",
-                platform
+                "https://intellectualsites.github.io/fastasyncworldedit-documentation/"
         };
-        out.comments(0, List.of("These first 3 aren't configurable"));
+        out.comments(0, List.of("These first 2 aren't configurable"));
         for (int i = 0; i < INFORMATION.size(); i++) {
             out.key(0, INFORMATION.get(i)).scalar(values[i]);
         }

@@ -402,7 +402,7 @@ public class Fawe {
         Settings.set(inUse);
         if (loaded) {
             try {
-                settings.save(file, implementation.getPlatform());
+                settings.save(file);
             } catch (IOException e) {
                 LOGGER.error("Failed to save config file: {}", file, e);
             }
