@@ -28,7 +28,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Reads and writes the YAML files behind the configuration records.
  * <p>
- * Files are read with SnakeYAML and written by {@link Writer}.
+ * Files are read with SnakeYAML and written by {@link Writer} for improved writing speeds.
  */
 final class ConfigYaml {
 
