@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.bukkit.adapter.impl.v26_1;
 
+import com.fastasyncworldedit.bukkit.util.PaperSupport;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -66,7 +67,6 @@ import com.sk89q.worldedit.world.generation.ConfiguredFeatureType;
 import com.sk89q.worldedit.world.generation.StructureType;
 import com.sk89q.worldedit.world.generation.TreeType;
 import com.sk89q.worldedit.world.item.ItemType;
-import io.papermc.lib.PaperLib;
 import io.papermc.paper.world.PaperWorldLoader;
 import io.papermc.paper.world.saveddata.PaperWorldPDC;
 import net.minecraft.SharedConstants;
@@ -142,9 +142,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.World.Environment;
+import org.bukkit.block.TileState;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.craftbukkit.CraftWorld;
+import org.bukkit.craftbukkit.block.CraftBlockEntityState;
 import org.bukkit.craftbukkit.block.data.CraftBlockData;
 import org.bukkit.craftbukkit.entity.CraftEntity;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
@@ -228,7 +230,10 @@ public final class PaperweightAdapter implements BukkitImplAdapter<Tag> {
         var unused = CraftServer.class.cast(Bukkit.getServer());
 
         int dataVersion = SharedConstants.getCurrentVersion().dataVersion().version();
-        if (dataVersion != Constants.DATA_VERSION_MC_26_1 && dataVersion != Constants.DATA_VERSION_MC_26_1_1 && dataVersion != Constants.DATA_VERSION_MC_26_1_2) {
+        if (dataVersion < Constants.DATA_VERSION_MC_26_1 || dataVersion > Constants.DATA_VERSION_MC_26_1_2) {
+            if (dataVersion <= Constants.DATA_VERSION_MC_1_21_11 || dataVersion > Constants.DATA_VERSION_MC_26_1_2) {
+                throw new RuntimeException("Force prevent this loading on <=1.21.11 or >26.1.2");
+            }
             logger.warning(WRONG_VERSION);
         }
 
@@ -619,6 +624,19 @@ public final class PaperweightAdapter implements BukkitImplAdapter<Tag> {
     }
 
     @Override
+    public void sendFakeNBT(Player player, BlockVector3 pos, TileState tileState, LinCompoundTag nbtData) {
+        CraftBlockEntityState<?> craftState = (CraftBlockEntityState<?>) tileState;
+
+        CompoundTag vanillaNBT = (net.minecraft.nbt.CompoundTag) fromNative(nbtData);
+
+        ((CraftPlayer) player).getHandle().connection.send(new ClientboundBlockEntityDataPacket(
+            new BlockPos(pos.x(), pos.y(), pos.z()),
+            craftState.getBlockEntity().getType(),
+            vanillaNBT
+        ));
+    }
+
+    @Override
     public void sendFakeOP(Player player) {
         ((CraftPlayer) player).getHandle().connection.send(new ClientboundEntityEventPacket(
                 ((CraftPlayer) player).getHandle(), (byte) 28
@@ -728,7 +746,7 @@ public final class PaperweightAdapter implements BukkitImplAdapter<Tag> {
     }
 
     private void doRegen(World bukkitWorld, Region region, Extent extent, RegenOptions options) throws Exception {
-        if (!PaperLib.isPaper()) {
+        if (!PaperSupport.isPaper()) {
             throw new UnsupportedOperationException("Regen requires Paper");
         }
 

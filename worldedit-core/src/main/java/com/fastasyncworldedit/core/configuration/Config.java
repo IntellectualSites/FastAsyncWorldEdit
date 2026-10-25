@@ -298,7 +298,7 @@ public class Config {
     private void save(PrintWriter writer, Class<?> clazz, final Object instance, int indent, String parentNode) {
         try {
             String CTRF = System.lineSeparator();
-            String spacing = StringMan.repeat(" ", indent);
+            String spacing = " ".repeat(indent);
             for (Field field : clazz.getFields()) {
                 if (field.getAnnotation(Ignore.class) != null) {
                     continue;
@@ -350,8 +350,8 @@ public class Config {
                     }
                 }
                 Create create = field.getAnnotation(Create.class);
+                Object value = field.get(instance);
                 if (create != null) {
-                    Object value = field.get(instance);
                     setAccessible(field);
                     if (indent == 0) {
                         writer.write(CTRF);
@@ -369,10 +369,8 @@ public class Config {
                     }
                     save(writer, current, value, indent + 2, parentNode == null ? node : parentNode + "." + node);
                 } else {
-                    writer.write(spacing + toNodeName(field.getName() + ": ") + toYamlString(
-                            field.get(instance),
-                            spacing
-                    ) + CTRF);
+                    String separator = value instanceof List<?> list && !list.isEmpty() ? ":" : ": ";
+                    writer.write(spacing + toNodeName(field.getName()) + separator + toYamlString(value, spacing) + CTRF);
                 }
             }
         } catch (Throwable e) {

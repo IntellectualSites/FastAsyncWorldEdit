@@ -81,7 +81,7 @@ public class ScaleTransform extends ResettableExtent {
         double sy = vector3.y();
         double sz = vector3.z();
         double ex = sx + dx;
-        double ey = Math.max(minY, Math.min(maxy, sy + dy));
+        double ey = Math.clamp(sy + dy, minY, maxy);
         double ez = sz + dz;
         for (pos.mutY(sy); pos.y() < ey; pos.mutY(pos.y() + 1)) {
             for (pos.mutZ(sz); pos.z() < ez; pos.mutZ(pos.z() + 1)) {
@@ -105,7 +105,7 @@ public class ScaleTransform extends ResettableExtent {
         double sy = vector3.y();
         double sz = vector3.z();
         double ex = sx + dx;
-        double ey = Math.max(minY, Math.min(maxy, sy + dy));
+        double ey = Math.clamp(sy + dy, minY, maxy);
         double ez = sz + dz;
         for (pos.mutY(sy); pos.y() < ey; pos.mutY(pos.y() + 1)) {
             for (pos.mutZ(sz); pos.z() < ez; pos.mutZ(pos.z() + 1)) {
@@ -154,7 +154,7 @@ public class ScaleTransform extends ResettableExtent {
         double sy = vector3.y();
         double sz = vector3.z();
         double ex = sx + dx;
-        double ey = Math.max(minY, Math.min(maxy, sy + dy));
+        double ey = Math.clamp(sy + dy, minY, maxy);
         double ez = sz + dz;
         for (pos.mutY(sy); pos.y() < ey; pos.mutY(pos.y() + 1)) {
             for (pos.mutZ(sz); pos.z() < ez; pos.mutZ(pos.z() + 1)) {

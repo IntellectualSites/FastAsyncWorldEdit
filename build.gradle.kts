@@ -1,28 +1,33 @@
-import org.ajoberstar.grgit.Grgit
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
 import org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED
-import java.time.format.DateTimeFormatter
 import xyz.jpenilla.runpaper.task.RunServer
 
 plugins {
     alias(libs.plugins.codecov)
     jacoco
     id("buildlogic.common")
-    id("com.gradleup.nmcp.aggregation") version "1.6.1"
-    id("xyz.jpenilla.run-paper") version "3.0.2"
+    id("com.gradleup.nmcp.aggregation") version "1.6.2"
+    id("xyz.jpenilla.run-paper") version "3.1.0"
 }
 
-val rootVersion: String = (extra.properties["rootVersion"] as? String) ?: "2.15.4"
+val rootVersion: String = (extra.properties["rootVersion"] as? String) ?: "2.16.2"
 val snapshot: String = (extra.properties["snapshot"] as? String) ?: "SNAPSHOT"
 var revision: String = (extra.properties["revision"] as? String) ?: ""
 var buildNumber: String = (extra.properties["buildNumber"] as? String) ?: ""
 var date: String = (extra.properties["date"] as? String) ?: ""
 
-val git: Grgit = Grgit.open {
-    dir = File("$rootDir/.git")
-}
-date = git.head().dateTime.format(DateTimeFormatter.ofPattern("yy.MM.dd"))
-revision = "-${git.head().abbreviatedId}"
+// Get Git metadata during build setup using the Git CLI.
+// This replaces Grgit/JGit so the build stays compatible with Gradle's configuration cache.
+// The result is recorded as a build input and can be reused without re-running Git each time.
+// We keep the short hash length the same as before for consistency.
+fun gitOutput(vararg args: String): String =
+    providers.exec {
+        commandLine("git", *args)
+        workingDir = rootDir
+    }.standardOutput.asText.get().trim()
+
+date = gitOutput("show", "-s", "--format=%cd", "--date=format:%y.%m.%d", "HEAD")
+revision = "-" + gitOutput("rev-parse", "--short=7", "HEAD")
     buildNumber = if (project.hasProperty("buildnumber")) {
         snapshot + "-" + (project.findProperty("buildnumber") as? String ?: "")
     } else {
@@ -35,12 +40,11 @@ extra.set("revision", revision)
 extra.set("buildNumber", buildNumber)
 extra.set("date", date)
 
-version = String.format("%s-%s", rootVersion, buildNumber)
+version = String.format("%s-%s", rootVersion, snapshot)
 
 if (!project.hasProperty("gitCommitHash")) {
-    pluginManager.apply("org.ajoberstar.grgit")
     ext["gitCommitHash"] = try {
-        extensions.getByName<Grgit>("grgit").head()?.abbreviatedId
+        gitOutput("rev-parse", "--short=7", "HEAD")
     } catch (e: Exception) {
         logger.warn("Error getting commit hash", e)
 
@@ -82,25 +86,23 @@ codecov {
 }
 
 allprojects {
-    gradle.projectsEvaluated {
-        tasks.withType<JavaCompile>().configureEach {
-            options.compilerArgs.addAll(arrayOf("-Xmaxerrs", "1000"))
-        }
-        tasks.withType<Test>().configureEach {
-            maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).takeIf { it > 0 } ?: 1
-            testLogging {
-                events(FAILED)
-                exceptionFormat = FULL
-                showExceptions = true
-                showCauses = true
-                showStackTraces = true
-            }
+    tasks.withType<JavaCompile>().configureEach {
+        options.compilerArgs.addAll(arrayOf("-Xmaxerrs", "1000"))
+    }
+    tasks.withType<Test>().configureEach {
+        maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).takeIf { it > 0 } ?: 1
+        testLogging {
+            events(FAILED)
+            exceptionFormat = FULL
+            showExceptions = true
+            showCauses = true
+            showStackTraces = true
         }
     }
 }
 
 val supportedVersions: List<String> = listOf("1.21", "1.21.1", "1.21.4", "1.21.5",
-        "1.21.8", "1.21.10", "1.21.11", "26.1.2", "26.2")
+        "1.21.8", "1.21.10", "1.21.11", "26.1.2", "26.2", "26.3")
 
 tasks {
     supportedVersions.forEach {

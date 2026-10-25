@@ -3,6 +3,7 @@ package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v26_2;
 import com.fastasyncworldedit.bukkit.adapter.AbstractBukkitGetBlocks;
 import com.fastasyncworldedit.bukkit.adapter.DelegateSemaphore;
 import com.fastasyncworldedit.bukkit.adapter.NativeEntityFunctionSet;
+import com.fastasyncworldedit.bukkit.util.PaperSupport;
 import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.extent.processor.heightmap.HeightMapType;
@@ -24,7 +25,6 @@ import com.sk89q.worldedit.util.SideEffect;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
-import io.papermc.lib.PaperLib;
 import io.papermc.paper.event.block.BeaconDeactivatedEvent;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
@@ -46,10 +46,9 @@ import net.minecraft.world.level.block.entity.BeaconBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.DataLayer;
-import net.minecraft.world.level.chunk.HashMapPalette;
+import net.minecraft.world.level.chunk.GlobalPalette;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.LevelChunkSection;
-import net.minecraft.world.level.chunk.LinearPalette;
 import net.minecraft.world.level.chunk.Palette;
 import net.minecraft.world.level.chunk.PalettedContainer;
 import net.minecraft.world.level.chunk.PalettedContainerRO;
@@ -360,7 +359,7 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
                 int ordinal = set.getBlock(lx, ly, lz).getOrdinal();
                 if (ordinal != BlockTypesCache.ReservedIDs.__RESERVED__) {
                     BlockEntity tile = entry.getValue();
-                    if (PaperLib.isPaper() && tile instanceof BeaconBlockEntity) {
+                    if (PaperSupport.isPaper() && tile instanceof BeaconBlockEntity) {
                         if (beacons == null) {
                             beacons = new ArrayList<>();
                         }
@@ -686,7 +685,7 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
                                 if (!set.getSideEffectSet().shouldApply(SideEffect.ENTITY_EVENTS)) {
                                     entity.spawnReason = CreatureSpawnEvent.SpawnReason.CUSTOM;
                                     entity.generation = false;
-                                    if (PaperLib.isPaper()) {
+                                    if (PaperSupport.isPaper()) {
                                         if (!nmsWorld.moonrise$getEntityLookup().addNewEntity(entity, false)) {
                                             onError.run();
                                         }
@@ -851,7 +850,7 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
                 new BitArrayUnstretched(bitsPerEntry, 4096, blockStates).toRaw(data);
 
                 int num_palette;
-                if (palette instanceof LinearPalette || palette instanceof HashMapPalette) {
+                if (!(palette instanceof GlobalPalette)) {
                     num_palette = palette.getSize();
                 } else {
                     // The section's palette is the global block palette.
@@ -1049,7 +1048,7 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
                             dataObject);
                     int paletteSize;
 
-                    if (palette instanceof LinearPalette || palette instanceof HashMapPalette) {
+                    if (!(palette instanceof GlobalPalette)) {
                         paletteSize = palette.getSize();
                     } else {
                         super.trim(false, i);

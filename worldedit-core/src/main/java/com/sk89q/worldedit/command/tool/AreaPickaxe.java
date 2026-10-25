@@ -49,6 +49,7 @@ public class AreaPickaxe implements BlockTool {
         return player.hasPermission("worldedit.superpickaxe.area");
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public boolean actPrimary(Platform server, LocalConfiguration config, Player player, LocalSession session, Location clicked) {
         int ox = clicked.getBlockX();
