@@ -5,7 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * Dotted-path access to a parsed configuration file, used to move old options to their current place before the file is
+ * Dotted-path access to a parsed configuration file, used to move old settings to their current place before the file is
  * mapped onto the configuration records.
  */
 final class ConfigTree {

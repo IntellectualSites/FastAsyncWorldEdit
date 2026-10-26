@@ -16,15 +16,16 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
 
 /**
  * Maps configuration records to and from YAML.
  * <p>
- * A configuration record may declare components of type {@code boolean}, {@code int}, {@code long}, {@link String}, an
+ * A configuration record may declare settings of type {@code boolean}, {@code int}, {@code long}, {@link String}, an
  * enum, {@code List<String>}, another configuration record (a section) or {@code Map<String, R>} with {@code R} a
- * configuration record (multiple groups sharing one layout). A component named {@code parallelThreads} is stored under
+ * configuration record (multiple groups sharing one layout). A setting named {@code parallelThreads} is stored under
  * {@code parallel-threads}, in declaration order, below the lines of its {@link Comment}.
  *
  * @since 3.0.0
@@ -45,7 +46,7 @@ final class ConfigMapper {
      * Creates a record from the {@link Default} values of its settings.
      *
      * @param computed the defaults of the settings that have no {@link Default} because their value is only known at
-     *                 runtime, by dotted path. The settings in each group are addressed without repeating the group name,
+     *                 runtime, by dotted path. The settings in each group are addressed without the group name,
      *                 e.g. {@code limits.max-radius}, and apply to each one
      * @throws IllegalArgumentException if a setting has neither kind of default or a computed default has no setting
      */
@@ -66,14 +67,14 @@ final class ConfigMapper {
             Entry entry = schema.entries.get(i);
             String entryPath = path.isEmpty() ? entry.key : path + "." + entry.key;
             values[i] = switch (entry.kind) {
-                case SECTION -> defaults(entry.type, entryPath, computed, unused);
+                case SECTION -> defaults(entry.requireType(), entryPath, computed, unused);
                 case GROUPS -> {
                     if (entry.defaultValue == null) {
-                        throw new IllegalArgumentException(entryPath + " needs a @Default naming its groups");
+                        throw new IllegalArgumentException(entryPath + " needs a @Default with its group names");
                     }
                     Map<String, Record> groups = new LinkedHashMap<>();
                     for (String name : (List<String>) entry.defaultValue) {
-                        groups.put(name, defaults(entry.type, entryPath, computed, unused));
+                        groups.put(name, defaults(entry.requireType(), entryPath, computed, unused));
                     }
                     yield Collections.unmodifiableMap(groups);
                 }
@@ -184,13 +185,13 @@ final class ConfigMapper {
             case STRING -> isText(value) ? value.toString() : null;
             case ENUM -> {
                 if (value instanceof String name) {
-                    for (Object constant : entry.type.getEnumConstants()) {
+                    for (Object constant : entry.requireType().getEnumConstants()) {
                         if (((Enum<?>) constant).name().equalsIgnoreCase(name)) {
                             yield constant;
                         }
                     }
                 }
-                yield entry.type.isInstance(value) ? value : null;
+                yield entry.requireType().isInstance(value) ? value : null;
             }
             case STRINGS -> {
                 if (!(value instanceof List<?> list)) {
@@ -237,38 +238,48 @@ final class ConfigMapper {
      * @param root   the record of the whole configuration
      * @param option a reference to the accessor of the setting, e.g. {@code Settings.Queue::parallelThreads}
      * @throws IllegalArgumentException if the argument is not a reference to a setting accessor, or the setting is in a
-     *                                  group with a name
+     *                                  group
      */
     static String pathOf(Class<? extends Record> root, Option option) {
-        String path = null;
+        SerializedLambda reference;
         try {
             // A serializable method reference can describe itself, which is the only way to learn what it refers to
             Method writeReplace = option.getClass().getDeclaredMethod("writeReplace");
             writeReplace.setAccessible(true);
-            SerializedLambda reference = (SerializedLambda) writeReplace.invoke(option);
-            path = pathOf(root, reference.getImplClass(), reference.getImplMethodName(), "");
-        } catch (ReflectiveOperationException | RuntimeException ignored) {
-            // Not a method reference, reported below
+            reference = (SerializedLambda) writeReplace.invoke(option);
+        } catch (ReflectiveOperationException | ClassCastException e) {
+            // Only lambdas and method references can describe themselves, so this is a class implementing Option
+            throw new IllegalArgumentException("Use a method reference for the setting, like "
+                    + "Settings.Queue::parallelThreads. A class implementing Option is not allowed.", e);
         }
+        String path = pathOf(root, reference.getImplClass(), reference.getImplMethodName(), "");
         if (path == null) {
-            throw new IllegalArgumentException("Use a method reference for the setting, like Settings.Queue::parallelThreads." +
-                    " A lambda or anonymous class is not allowed.");
+            throw new IllegalArgumentException(reference.getImplClass().replace('/', '.') + "::"
+                    + reference.getImplMethodName() + " is not a setting. Use a method reference for the setting, like "
+                    + "Settings.Queue::parallelThreads. A lambda is not allowed.");
         }
         return path;
     }
 
+    /**
+     * @return the path of the setting, or null if no record reached from {@code type} declares it
+     * @throws IllegalArgumentException if the setting is in a group
+     */
     @Nullable
     private static String pathOf(Class<?> type, String internalName, String accessor, String path) {
         boolean declares = type.getName().replace('.', '/').equals(internalName);
         for (Entry entry : SCHEMAS.get(type).entries) {
             String entryPath = path.isEmpty() ? entry.key : path + "." + entry.key;
-            if (entry.kind == Kind.SECTION) {
-                assert entry.type != null;
-                String found = pathOf(entry.type, internalName, accessor, entryPath);
+            if (entry.kind == Kind.SECTION || entry.kind == Kind.GROUPS) {
+                String found = pathOf(entry.requireType(), internalName, accessor, entryPath);
+                if (found != null && entry.kind == Kind.GROUPS) {
+                    throw new IllegalArgumentException(found + " is in a group, which a method reference cannot name. "
+                            + "Use its path instead, e.g. " + entryPath + ".<group>" + found.substring(entryPath.length()));
+                }
                 if (found != null) {
                     return found;
                 }
-            } else if (declares && entry.kind != Kind.GROUPS && entry.component.getName().equals(accessor)) {
+            } else if (declares && entry.component.getName().equals(accessor)) {
                 return entryPath;
             }
         }
@@ -504,7 +515,14 @@ final class ConfigMapper {
         }
 
         String expected() {
-            return kind == Kind.ENUM ? kind.expected + Arrays.toString(type.getEnumConstants()) : kind.expected;
+            return kind == Kind.ENUM ? kind.expected + Arrays.toString(requireType().getEnumConstants()) : kind.expected;
+        }
+
+        /**
+         * Gets the {@link #type} of an enum, section or groups entry, which always has one.
+         */
+        Class<?> requireType() {
+            return Objects.requireNonNull(type);
         }
 
     }

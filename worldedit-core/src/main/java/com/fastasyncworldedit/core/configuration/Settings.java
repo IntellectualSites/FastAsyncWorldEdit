@@ -20,14 +20,14 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * The options of FAWE's {@code config.yml}.
+ * The settings of FAWE's {@code config.yml}.
  * <p>
  * Settings are immutable. Loading or changing them creates a new instance, which takes effect once passed to
  * {@link #set(Settings)}, so always read through {@link #settings()} rather than keeping hold of an instance or one of
  * its sections.
  * <p>
- * Each record is a section of the file and each component an option, stored under the component's name in kebab case
- * and in declaration order. A new option only needs a component with a {@link Comment} and a {@link Default}.
+ * Each record is a section of the file and each component a setting, stored under the component's name in kebab case
+ * and in declaration order. A new setting only needs a component with a {@link Comment} and a {@link Default}.
  */
 public record Settings(
         @Comment({
@@ -73,7 +73,7 @@ public record Settings(
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
     // Written to the file for people reading it, never read back
-    private static final List<String> INFORMATION = List.of("issues", "wiki", "platform");
+    private static final List<String> INFORMATION = List.of("issues", "wiki");
 
     // Not volatile: settings are immutable, so a thread that has not yet seen a reload reads the previous ones, whole
     private static Settings instance = defaults();
@@ -107,11 +107,11 @@ public record Settings(
     }
 
     /**
-     * Changes one option of the settings in use, until the configuration is next loaded. The file is not changed.
+     * Changes one of the settings in use, until the configuration is next loaded. The file is not changed.
      *
-     * @param option a reference to the accessor of the option, e.g. {@code Settings.Queue::parallelThreads}
+     * @param option a reference to the accessor of the setting, e.g. {@code Settings.Queue::parallelThreads}
      * @param value  the new value
-     * @throws IllegalArgumentException if the option is not given as a reference to its accessor
+     * @throws IllegalArgumentException if the setting is not given as a reference to its accessor
      * @since 3.0.0
      */
     public static <S extends Record> void override(Option.Bool<S> option, boolean value) {
@@ -157,7 +157,7 @@ public record Settings(
     /**
      * {@return the settings of a new installation}
      * <p>
-     * These are the {@link Default} of each option, apart from the few below that depend on where FAWE runs.
+     * These are the {@link Default} of each setting, apart from the few below that depend on where FAWE runs.
      *
      * @since 3.0.0
      */
@@ -178,7 +178,7 @@ public record Settings(
     /**
      * Reads settings from a file without putting them into use.
      * <p>
-     * Options the file does not set, or sets to something unusable, take their default. A file that is not valid YAML is
+     * Settings the file leaves out, or sets to something unusable, take their default. A file that is not valid YAML is
      * copied to a file next to it ending in {@code _broken} and the defaults are returned.
      *
      * @param file the file, which does not need to exist
@@ -193,7 +193,7 @@ public record Settings(
     /**
      * Reads settings from a file without putting them into use, or gives others if the file has none to read.
      * <p>
-     * Options the file does not set, or sets to something unusable, take their default. A file that does not exist gives
+     * Settings the file leaves out, or sets to something unusable, take their default. A file that does not exist gives
      * the fallback, and so does a file that is not valid YAML, after it is copied to a file next to it ending in
      * {@code _broken}. Passing the settings in use keeps them when a reload finds the file broken.
      *
@@ -228,7 +228,7 @@ public record Settings(
     }
 
     /**
-     * Moves options of older versions to where they are now, for files that have not been saved since.
+     * Moves settings of older versions to where they are now, for files that have not been saved since.
      */
     private static void migrate(ConfigTree tree) {
         // 2.10.0 split the update notification toggle into three
@@ -250,7 +250,8 @@ public record Settings(
         if (tree.get("queue.parallel-threads") instanceof Integer threads && threads > 0) {
             tree.putIfAbsent("queue.thread-target-size-percent", Queue.threadTargetSizePercent(threads));
         }
-        // 3.0.0 stopped writing the date, build and commit of the running build, which were never read
+        // 3.0.0 stopped writing the platform, date, build and commit of the running build, which were never read
+        tree.remove("platform");
         tree.remove("date");
         tree.remove("build");
         tree.remove("commit");
@@ -294,12 +295,12 @@ public record Settings(
     }
 
     /**
-     * Creates a copy of the settings with one option changed.
+     * Creates a copy of the settings with one of them changed.
      *
-     * @param option a reference to the accessor of the option, e.g. {@code Settings.Queue::parallelThreads}
+     * @param option a reference to the accessor of the setting, e.g. {@code Settings.Queue::parallelThreads}
      * @param value  the new value
      * @return the changed settings, which are not in use until passed to {@link #set(Settings)}
-     * @throws IllegalArgumentException if the option is not given as a reference to its accessor
+     * @throws IllegalArgumentException if the setting is not given as a reference to its accessor
      * @since 3.0.0
      */
     public <S extends Record> Settings with(Option.Bool<S> option, boolean value) {
@@ -339,10 +340,10 @@ public record Settings(
     }
 
     /**
-     * Creates a copy of the settings with the option at a path of the file changed, e.g. {@code limits.default.max-radius}.
-     * This reaches the options of limit groups, which {@link Option} cannot name.
+     * Creates a copy of the settings with the one at a path of the file changed, e.g. {@code limits.default.max-radius}.
+     * This reaches the settings of limit groups, which {@link Option} cannot name.
      *
-     * @throws IllegalArgumentException if there is no such option or the value does not suit it
+     * @throws IllegalArgumentException if there is no such setting or the value does not suit it
      */
     Settings with(String path, Object value) {
         return ConfigMapper.with(this, path, value);

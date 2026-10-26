@@ -23,8 +23,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SettingsTest {
 
-    private static final String PLATFORM = "TEST";
-
     @TempDir
     Path directory;
 
@@ -38,7 +36,7 @@ class SettingsTest {
     }
 
     /**
-     * Guards the names, order, comments and defaults of every option. If this fails because an option was added or
+     * Guards the names, order, comments and defaults of every setting. If this fails because a setting was added or
      * changed on purpose, update {@code config.yml} in the test resources to match.
      */
     @Test
@@ -298,9 +296,29 @@ class SettingsTest {
         assertEquals(List.of("example.com"), settings.web().allowedImageHosts());
         assertEquals(FaweMaskManager.MaskType.OWNER, settings.regionRestrictionsOptions().mode());
         assertEquals(defaults.history().bufferSize(), settings.history().bufferSize());
-        // A lambda does not say which accessor it calls, and an accessor does not say which limit group is meant
-        assertThrows(IllegalArgumentException.class, () -> defaults.with((Settings.Queue queue) -> queue.pool(), false));
-        assertThrows(IllegalArgumentException.class, () -> defaults.with(Settings.Limits::maxRadius, 5));
+        // A lambda does not say which accessor it calls, a class cannot describe itself at all, and an accessor does not
+        // say which limit group is meant
+        IllegalArgumentException lambda = assertThrows(
+                IllegalArgumentException.class,
+                () -> defaults.with((Settings.Queue queue) -> queue.pool(), false)
+        );
+        assertTrue(lambda.getMessage().contains("is not a setting"), lambda::getMessage);
+        Option.Bool<Settings.Queue> implemented = new Option.Bool<>() {
+            @Override
+            public boolean get(Settings.Queue section) {
+                return section.pool();
+            }
+        };
+        IllegalArgumentException implementation = assertThrows(
+                IllegalArgumentException.class,
+                () -> defaults.with(implemented, false)
+        );
+        assertTrue(implementation.getMessage().contains("class implementing Option"), implementation::getMessage);
+        IllegalArgumentException group = assertThrows(
+                IllegalArgumentException.class,
+                () -> defaults.with(Settings.Limits::maxRadius, 5)
+        );
+        assertTrue(group.getMessage().contains("limits.<group>.max-radius"), group::getMessage);
     }
 
     @Test
