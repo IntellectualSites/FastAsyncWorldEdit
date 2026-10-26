@@ -29,8 +29,6 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.util.HashSet;
-import java.util.Locale;
-import java.util.stream.Collectors;
 
 /**
  * A less simple implementation of {@link LocalConfiguration}
@@ -102,10 +100,10 @@ public class YAMLConfiguration extends LocalConfiguration {
         MAX_BUTCHER_RADIUS = butcherMaxRadius;
         //FAWE end
 
-        disallowedBlocks = config.getStringList("limits.disallowed-blocks", Lists.newArrayList(getDefaultDisallowedBlocks()))
-                .stream()
-                .map(s -> s.contains(":") ? s.toLowerCase(Locale.ROOT) : ("minecraft:" + s).toLowerCase(Locale.ROOT))
-                .collect(Collectors.toSet());
+        //FAWE start - blank entries are skipped
+        disallowedBlocks = parseDisallowedBlocks(
+                config.getStringList("limits.disallowed-blocks", Lists.newArrayList(getDefaultDisallowedBlocks())));
+        //FAWE end
         allowedDataCycleBlocks = new HashSet<>(config.getStringList("limits.allowed-data-cycle-blocks", null));
 
         registerHelp = config.getBoolean("register-help", true);
