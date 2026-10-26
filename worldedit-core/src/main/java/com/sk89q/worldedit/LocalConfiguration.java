@@ -65,7 +65,8 @@ public abstract class LocalConfiguration {
     public boolean traceUnflushedSessions = true;
     public Set<String> disallowedBlocks = new HashSet<>();
     //FAWE start - the mask and the blocks it was built from, replaced together so threads never mix them up
-    private volatile DisallowedBlocksMask disallowedBlocksMask;
+    // The record's fields are final, so a thread that sees the record also sees the mask and blocks it was built with
+    private DisallowedBlocksMask disallowedBlocksMask;
 
     private record DisallowedBlocksMask(Set<String> blocks, BlockMask mask) {
 
