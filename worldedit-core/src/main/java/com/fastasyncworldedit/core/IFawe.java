@@ -8,11 +8,18 @@ import com.fastasyncworldedit.core.util.image.ImageViewer;
 import com.sk89q.worldedit.entity.Player;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.UUID;
 
 public interface IFawe {
 
+    Path getPath();
+
+    /**
+     * @deprecated for removal. Use {@link #getPath()} instead.
+     */
+    @Deprecated(forRemoval = true) //TODO remove for v3. Create a migration path on v2
     File getDirectory();
 
     TaskManager getTaskManager();

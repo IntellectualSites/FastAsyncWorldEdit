@@ -6,9 +6,9 @@ import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.ApiStatus;
 import org.yaml.snakeyaml.error.YAMLException;
 
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -20,14 +20,14 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * The options of FAWE's {@code config.yml}.
+ * The settings of FAWE's {@code config.yml}.
  * <p>
  * Settings are immutable. Loading or changing them creates a new instance, which takes effect once passed to
  * {@link #set(Settings)}, so always read through {@link #settings()} rather than keeping hold of an instance or one of
  * its sections.
  * <p>
- * Each record is a section of the file and each component an option, stored under the component's name in kebab case
- * and in declaration order. A new option only needs a component with a {@link Comment} and a {@link Default}.
+ * Each record is a section of the file and each component a setting, stored under the component's name in kebab case
+ * and in declaration order. A new setting only needs a component with a {@link Comment} and a {@link Default}.
  */
 public record Settings(
         @Comment({
@@ -73,7 +73,7 @@ public record Settings(
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
     // Written to the file for people reading it, never read back
-    private static final List<String> INFORMATION = List.of("issues", "wiki", "date", "build", "commit", "platform");
+    private static final List<String> INFORMATION = List.of("issues", "wiki");
 
     // Not volatile: settings are immutable, so a thread that has not yet seen a reload reads the previous ones, whole
     private static Settings instance = defaults();
@@ -98,19 +98,21 @@ public record Settings(
     /**
      * Puts settings into use.
      *
-     * @since TODO
+     * @apiNote This is an internal method, use with care. It is not thread-safe and does not check the settings are valid.
+     * @since 3.0.0
      */
+    @ApiStatus.Internal
     public static void set(Settings settings) {
         instance = Objects.requireNonNull(settings);
     }
 
     /**
-     * Changes one option of the settings in use, until the configuration is next loaded. The file is not changed.
+     * Changes one of the settings in use, until the configuration is next loaded. The file is not changed.
      *
-     * @param option a reference to the accessor of the option, e.g. {@code Settings.Queue::parallelThreads}
+     * @param option a reference to the accessor of the setting, e.g. {@code Settings.Queue::parallelThreads}
      * @param value  the new value
-     * @throws IllegalArgumentException if the option is not given as a reference to its accessor
-     * @since TODO
+     * @throws IllegalArgumentException if the setting is not given as a reference to its accessor
+     * @since 3.0.0
      */
     public static <S extends Record> void override(Option.Bool<S> option, boolean value) {
         overrideOption(option, value);
@@ -118,7 +120,7 @@ public record Settings(
 
     /**
      * @see #override(Option.Bool, boolean)
-     * @since TODO
+     * @since 3.0.0
      */
     public static <S extends Record> void override(Option.Int<S> option, int value) {
         overrideOption(option, value);
@@ -126,7 +128,7 @@ public record Settings(
 
     /**
      * @see #override(Option.Bool, boolean)
-     * @since TODO
+     * @since 3.0.0
      */
     public static <S extends Record> void override(Option.Text<S> option, String value) {
         overrideOption(option, value);
@@ -134,7 +136,7 @@ public record Settings(
 
     /**
      * @see #override(Option.Bool, boolean)
-     * @since TODO
+     * @since 3.0.0
      */
     public static <S extends Record> void override(Option.List<S> option, List<String> value) {
         overrideOption(option, value);
@@ -142,22 +144,22 @@ public record Settings(
 
     /**
      * @see #override(Option.Bool, boolean)
-     * @since TODO
+     * @since 3.0.0
      */
     public static <S extends Record, E extends Enum<E>> void override(Option.Choice<S, E> option, E value) {
         overrideOption(option, value);
     }
 
-    private static synchronized void overrideOption(Option<?> option, Object value) {
+    private static synchronized void overrideOption(Option option, Object value) {
         instance = instance.with(ConfigMapper.pathOf(Settings.class, option), value);
     }
 
     /**
      * {@return the settings of a new installation}
      * <p>
-     * These are the {@link Default} of each option, apart from the few below that depend on where FAWE runs.
+     * These are the {@link Default} of each setting, apart from the few below that depend on where FAWE runs.
      *
-     * @since TODO
+     * @since 3.0.0
      */
     public static Settings defaults() {
         int processors = Math.max(1, Runtime.getRuntime().availableProcessors());
@@ -176,26 +178,45 @@ public record Settings(
     /**
      * Reads settings from a file without putting them into use.
      * <p>
-     * Options the file does not set, or sets to something unusable, take their default. A file that is not valid YAML is
+     * Settings the file leaves out, or sets to something unusable, take their default. A file that is not valid YAML is
      * copied to a file next to it ending in {@code _broken} and the defaults are returned.
      *
      * @param file the file, which does not need to exist
      * @return the settings
      * @throws IOException if the file exists but cannot be read
-     * @since TODO
+     * @since 3.0.0
      */
     public static Settings load(Path file) throws IOException {
-        Settings defaults = defaults();
+        return load(file, defaults());
+    }
+
+    /**
+     * Reads settings from a file without putting them into use, or gives others if the file has none to read.
+     * <p>
+     * Settings the file leaves out, or sets to something unusable, take their default. A file that does not exist gives
+     * the fallback, and so does a file that is not valid YAML, after it is copied to a file next to it ending in
+     * {@code _broken}. Passing the settings in use keeps them when a reload finds the file broken.
+     *
+     * @param file     the file, which does not need to exist
+     * @param fallback the settings to give if the file does not exist or is not valid YAML
+     * @return the settings
+     * @throws IOException if the file exists but cannot be read
+     * @since 3.0.0
+     */
+    public static Settings load(Path file, Settings fallback) throws IOException {
+        Objects.requireNonNull(fallback);
         if (Files.notExists(file)) {
-            return defaults;
+            return fallback;
         }
         Map<String, Object> tree;
         try {
             tree = ConfigYaml.read(file);
         } catch (YAMLException e) {
-            LOGGER.error("Could not read {}, it was copied to {} and the defaults are used", file, ConfigYaml.backup(file), e);
-            return defaults;
+            LOGGER.error("Could not read {}, it was copied to {} and the settings in use are kept",
+                    file, ConfigYaml.backup(file), e);
+            return fallback;
         }
+        Settings defaults = defaults();
         INFORMATION.forEach(tree::remove);
         migrate(new ConfigTree(tree));
         List<String> problems = new ArrayList<>();
@@ -207,7 +228,7 @@ public record Settings(
     }
 
     /**
-     * Moves options of older versions to where they are now, for files that have not been saved since.
+     * Moves settings of older versions to where they are now, for files that have not been saved since.
      */
     private static void migrate(ConfigTree tree) {
         // 2.10.0 split the update notification toggle into three
@@ -229,6 +250,11 @@ public record Settings(
         if (tree.get("queue.parallel-threads") instanceof Integer threads && threads > 0) {
             tree.putIfAbsent("queue.thread-target-size-percent", Queue.threadTargetSizePercent(threads));
         }
+        // 3.0.0 stopped writing the platform, date, build and commit of the running build, which were never read
+        tree.remove("platform");
+        tree.remove("date");
+        tree.remove("build");
+        tree.remove("commit");
     }
 
     private static void moveIntoLimits(ConfigTree tree, String from, String option) {
@@ -236,9 +262,11 @@ public record Settings(
         if (value == null) {
             return;
         }
+        // The default group gets it too when the file has other groups but not that one, as it is otherwise unlimited
+        tree.putIfAbsent("limits." + DEFAULT_LIMIT + "." + option, value);
         Map<String, Object> groups = tree.section("limits");
-        if (groups == null || groups.isEmpty()) {
-            tree.putIfAbsent("limits." + DEFAULT_LIMIT + "." + option, value);
+        if (groups == null) {
+            // Not a section, which binding reports
             return;
         }
         for (String group : groups.keySet()) {
@@ -249,25 +277,31 @@ public record Settings(
     /**
      * Writes the settings to a file, replacing what is in it.
      *
-     * @param file  the file
-     * @param build information about the running build to put at the top of the file
-     * @since TODO
+     * @param file the file
+     * @since 3.0.0
      */
-    public void save(Path file, BuildInfo build) throws IOException {
+    public void save(Path file) throws IOException {
         ConfigYaml.Writer out = new ConfigYaml.Writer();
-        build.writeTo(out);
+        String[] values = {
+                "https://github.com/IntellectualSites/FastAsyncWorldEdit/issues",
+                "https://intellectualsites.github.io/fastasyncworldedit-documentation/"
+        };
+        out.comments(0, List.of("These first 2 aren't configurable"));
+        for (int i = 0; i < INFORMATION.size(); i++) {
+            out.key(0, INFORMATION.get(i)).scalar(values[i]);
+        }
         ConfigMapper.write(this, true, out);
         ConfigYaml.write(file, out);
     }
 
     /**
-     * Creates a copy of the settings with one option changed.
+     * Creates a copy of the settings with one of them changed.
      *
-     * @param option a reference to the accessor of the option, e.g. {@code Settings.Queue::parallelThreads}
+     * @param option a reference to the accessor of the setting, e.g. {@code Settings.Queue::parallelThreads}
      * @param value  the new value
      * @return the changed settings, which are not in use until passed to {@link #set(Settings)}
-     * @throws IllegalArgumentException if the option is not given as a reference to its accessor
-     * @since TODO
+     * @throws IllegalArgumentException if the setting is not given as a reference to its accessor
+     * @since 3.0.0
      */
     public <S extends Record> Settings with(Option.Bool<S> option, boolean value) {
         return with(ConfigMapper.pathOf(Settings.class, option), value);
@@ -275,7 +309,7 @@ public record Settings(
 
     /**
      * @see #with(Option.Bool, boolean)
-     * @since TODO
+     * @since 3.0.0
      */
     public <S extends Record> Settings with(Option.Int<S> option, int value) {
         return with(ConfigMapper.pathOf(Settings.class, option), value);
@@ -283,7 +317,7 @@ public record Settings(
 
     /**
      * @see #with(Option.Bool, boolean)
-     * @since TODO
+     * @since 3.0.0
      */
     public <S extends Record> Settings with(Option.Text<S> option, String value) {
         return with(ConfigMapper.pathOf(Settings.class, option), value);
@@ -291,7 +325,7 @@ public record Settings(
 
     /**
      * @see #with(Option.Bool, boolean)
-     * @since TODO
+     * @since 3.0.0
      */
     public <S extends Record> Settings with(Option.List<S> option, List<String> value) {
         return with(ConfigMapper.pathOf(Settings.class, option), value);
@@ -299,17 +333,17 @@ public record Settings(
 
     /**
      * @see #with(Option.Bool, boolean)
-     * @since TODO
+     * @since 3.0.0
      */
     public <S extends Record, E extends Enum<E>> Settings with(Option.Choice<S, E> option, E value) {
         return with(ConfigMapper.pathOf(Settings.class, option), value);
     }
 
     /**
-     * Creates a copy of the settings with the option at a path of the file changed, e.g. {@code limits.default.max-radius}.
-     * This reaches the options of limit groups, which {@link Option} cannot name.
+     * Creates a copy of the settings with the one at a path of the file changed, e.g. {@code limits.default.max-radius}.
+     * This reaches the settings of limit groups, which {@link Option} cannot name.
      *
-     * @throws IllegalArgumentException if there is no such option or the value does not suit it
+     * @throws IllegalArgumentException if there is no such setting or the value does not suit it
      */
     Settings with(String path, Object value) {
         return ConfigMapper.with(this, path, value);
@@ -318,7 +352,7 @@ public record Settings(
     /**
      * {@return the limit group that applies to actors without a permission for any other group}
      *
-     * @since TODO
+     * @since 3.0.0
      */
     public Limits defaultLimits() {
         return limits.get(DEFAULT_LIMIT);
@@ -329,30 +363,10 @@ public record Settings(
      *
      * @param actor the actor
      * @return a new limit
+     * @since 3.0.0
      */
     public FaweLimit getLimit(Actor actor) {
         return LimitResolver.resolve(limits, actor);
-    }
-
-    /**
-     * Information about the running build that is written at the top of the file. Parts that are not known are null.
-     *
-     * @since TODO
-     */
-    public record BuildInfo(@Nullable String date, @Nullable String build, @Nullable String commit, @Nullable String platform) {
-
-        private void writeTo(ConfigYaml.Writer out) {
-            String[] values = {
-                    "https://github.com/IntellectualSites/FastAsyncWorldEdit/issues",
-                    "https://intellectualsites.github.io/fastasyncworldedit-documentation/",
-                    date, build, commit, platform
-            };
-            out.comments(0, List.of("These first 6 aren't configurable"));
-            for (int i = 0; i < INFORMATION.size(); i++) {
-                out.key(0, INFORMATION.get(i)).scalar(values[i]);
-            }
-        }
-
     }
 
     @Comment("Enable or disable core components")
@@ -393,7 +407,7 @@ public record Settings(
             })
             @Default("clipboard")
             String clipboard,
-            @Comment("Each player has his or her own sub directory for schematics")
+            @Comment("Each player has their own sub directory for schematics")
             @Default("false")
             boolean perPlayerSchematics
     ) {
@@ -489,7 +503,7 @@ public record Settings(
             // Depends on where FAWE runs, see Settings#defaults()
             int maxButcherRadius,
             @Comment({
-                    "Blockstates include Banner, Beacon, BrewingStand, Chest, CommandBlock,",
+                    "BlockStates include Banner, Beacon, BrewingStand, Chest, CommandBlock,",
                     "CreatureSpawner, Dispenser, Dropper, EndGateway, Furnace, Hopper, Jukebox,",
                     "NoteBlock, Sign, Skull, Structure"
             })
@@ -804,7 +818,6 @@ public record Settings(
             boolean anvilQueueMode,
             @Comment({
                     "[SAFE] Dynamically increase the number of chunks rendered",
-                    " - Requires Paper",
                     " - Set your server view distance to 1 (spigot.yml, server.properties)",
                     " - Based on tps and player movement",
                     " - Note: If entities become hidden, increase the server view distance to 3"

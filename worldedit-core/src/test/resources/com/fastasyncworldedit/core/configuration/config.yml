@@ -1,10 +1,6 @@
-# These first 6 aren't configurable
+# These first 2 aren't configurable
 issues: "https://github.com/IntellectualSites/FastAsyncWorldEdit/issues"
 wiki: "https://intellectualsites.github.io/fastasyncworldedit-documentation/"
-date: "DATE"
-build: "BUILD"
-commit: "COMMIT"
-platform: "TEST"
 # Set true to enable WorldEdit restrictions per region (e.g. PlotSquared or WorldGuard).
 # To be allowed to WorldEdit in a region, users need the appropriate
 # fawe.<plugin>  permission. See the Permissions page for supported region plugins.
@@ -128,7 +124,6 @@ experimental:
   #  - IMPROPER USE CAN CAUSE WORLD CORRUPTION!
   anvil-queue-mode: false
   # [SAFE] Dynamically increase the number of chunks rendered
-  #  - Requires Paper
   #  - Set your server view distance to 1 (spigot.yml, server.properties)
   #  - Based on tps and player movement
   #  - Note: If entities become hidden, increase the server view distance to 3
@@ -274,7 +269,7 @@ paths:
   # Multiple servers can use the same clipboards
   #  - Use a shared directory or NFS/Samba
   clipboard: "clipboard"
-  # Each player has his or her own sub directory for schematics
+  # Each player has their own sub directory for schematics
   per-player-schematics: false
 
 # Region restriction settings
@@ -341,7 +336,7 @@ limits:
     max-brush-radius: 0
     # Max allowed butcher radius
     max-butcher-radius: 0
-    # Blockstates include Banner, Beacon, BrewingStand, Chest, CommandBlock,
+    # BlockStates include Banner, Beacon, BrewingStand, Chest, CommandBlock,
     # CreatureSpawner, Dispenser, Dropper, EndGateway, Furnace, Hopper, Jukebox,
     # NoteBlock, Sign, Skull, Structure
     max-blockstates: 1337

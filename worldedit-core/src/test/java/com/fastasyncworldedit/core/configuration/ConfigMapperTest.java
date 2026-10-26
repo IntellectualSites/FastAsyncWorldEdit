@@ -222,8 +222,8 @@ class ConfigMapperTest {
         assertEquals(7, problems.size(), problems::toString);
         assertTrue(problems.contains("enabled: expected true or false but found \"yes please\", using true"), problems::toString);
         assertTrue(problems.contains("mode: expected one of [FAST, SAFE] but found \"slow\", using FAST"), problems::toString);
-        assertTrue(problems.contains("inner.extra: unknown option, it will be removed"), problems::toString);
-        assertTrue(problems.contains("gone: unknown option, it will be removed"), problems::toString);
+        assertTrue(problems.contains("inner.extra: unknown setting, it will be removed"), problems::toString);
+        assertTrue(problems.contains("gone: unknown setting, it will be removed"), problems::toString);
     }
 
     @Test
@@ -253,14 +253,14 @@ class ConfigMapperTest {
 
     @Test
     void defaultsThatCannotBeUsedAreRejected() {
-        // A value that does not suit the type of its option
+        // A value that does not suit the type of its setting
         assertThrows(IllegalArgumentException.class, () -> ConfigMapper.defaults(BadDefault.class, Map.of()));
         assertThrows(IllegalArgumentException.class, () -> ConfigMapper.defaults(BadNumber.class, Map.of()));
         assertThrows(IllegalArgumentException.class, () -> ConfigMapper.defaults(TwoValues.class, Map.of()));
-        // An option with no default at all
+        // A setting with no default at all
         assertThrows(IllegalArgumentException.class, () -> ConfigMapper.defaults(NoDefault.class, Map.of()));
         assertThrows(IllegalArgumentException.class, () -> ConfigMapper.defaults(NoDefault.class, Map.of("count", "one")));
-        // A computed default for an option that does not exist or already has a default
+        // A computed default for a setting that does not exist or already has a default
         assertThrows(
                 IllegalArgumentException.class,
                 () -> ConfigMapper.defaults(NoDefault.class, Map.of("count", 1, "gone", 2))

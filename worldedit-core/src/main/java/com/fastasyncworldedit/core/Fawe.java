@@ -25,7 +25,6 @@ import javax.annotation.Nullable;
 import javax.management.InstanceAlreadyExistsException;
 import javax.management.NotificationEmitter;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,7 +34,6 @@ import java.lang.management.MemoryMXBean;
 import java.lang.management.MemoryPoolMXBean;
 import java.lang.management.MemoryUsage;
 import java.nio.file.Path;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.Callable;
@@ -333,10 +331,7 @@ public class Fawe {
     public void setupConfigs() {
         MainUtil.copyFile(MainUtil.getJarFile(), "lang/strings.json", null);
         // Setting up config.yml
-        Path file = this.implementation.getDirectory().toPath().resolve("config.yml");
-        String date = null;
-        String build = null;
-        String commit = null;
+        Path file = this.implementation.getPath().resolve("config.yml");
         try (InputStream stream = getClass().getResourceAsStream("/fawe.properties");
              BufferedReader br = new BufferedReader(new InputStreamReader(stream))) {
             String versionString = br.readLine();
@@ -344,15 +339,13 @@ public class Fawe {
             String dateString = br.readLine();
             br.close();
             this.version = FaweVersion.tryParse(versionString, commitString, dateString);
-            date = new Date(100 + version.year, version.month, version.day).toString();
-            build = "https://ci.athion.net/job/FastAsyncWorldEdit/" + version.build;
-            commit = "https://github.com/IntellectualSites/FastAsyncWorldEdit/commit/" + Integer.toHexString(version.hash);
         } catch (Throwable ignored) {
         }
         Settings settings = Settings.settings();
         boolean loaded = false;
         try {
-            settings = Settings.load(file);
+            // A broken file keeps the settings in use, which are then saved over it
+            settings = Settings.load(file, settings);
             loaded = true;
         } catch (Throwable e) {
             // The settings in use are kept and the file is left alone, as it may only be unreadable for now
@@ -389,6 +382,7 @@ public class Fawe {
             LOGGER.error("LZ4 Compression Binding Not Found.\n"
                     + "FAWE will still work but compression will be slower.", e);
         }
+        Settings inUse = settings;
         try {
             byte[] in = new byte[0];
             byte[] compressed = Zstd.compress(in);
@@ -397,17 +391,18 @@ public class Fawe {
             LOGGER.info("ZSTD Compression Binding loaded successfully");
         } catch (Throwable e) {
             if (settings.clipboard().compressionLevel() > 6 || settings.history().compressionLevel() > 6) {
-                settings = settings
+                // Only for this run: the file keeps the configured levels for when ZSTD is available again
+                inUse = settings
                         .with(Settings.Clipboard::compressionLevel, Math.min(6, settings.clipboard().compressionLevel()))
                         .with(Settings.History::compressionLevel, Math.min(6, settings.history().compressionLevel()));
                 LOGGER.error("ZSTD Compression Binding Not Found.\n"
                         + "FAWE will still work but compression won't work as well.", e);
             }
         }
-        Settings.set(settings);
+        Settings.set(inUse);
         if (loaded) {
             try {
-                settings.save(file, new Settings.BuildInfo(date, build, commit, implementation.getPlatform()));
+                settings.save(file);
             } catch (IOException e) {
                 LOGGER.error("Failed to save config file: {}", file, e);
             }

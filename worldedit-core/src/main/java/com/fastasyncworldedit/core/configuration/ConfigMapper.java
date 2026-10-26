@@ -16,16 +16,19 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
 
 /**
  * Maps configuration records to and from YAML.
  * <p>
- * A configuration record may declare components of type {@code boolean}, {@code int}, {@code long}, {@link String}, an
+ * A configuration record may declare settings of type {@code boolean}, {@code int}, {@code long}, {@link String}, an
  * enum, {@code List<String>}, another configuration record (a section) or {@code Map<String, R>} with {@code R} a
- * configuration record (named groups sharing one layout). A component named {@code parallelThreads} is stored under
+ * configuration record (multiple groups sharing one layout). A setting named {@code parallelThreads} is stored under
  * {@code parallel-threads}, in declaration order, below the lines of its {@link Comment}.
+ *
+ * @since 3.0.0
  */
 final class ConfigMapper {
 
@@ -40,18 +43,18 @@ final class ConfigMapper {
     }
 
     /**
-     * Creates a record from the {@link Default} of its options.
+     * Creates a record from the {@link Default} values of its settings.
      *
-     * @param computed the defaults of the options that have no {@link Default} because their value is only known at
-     *                 runtime, by dotted path. The options of named groups are addressed without the name of a group,
-     *                 e.g. {@code limits.max-radius}, and apply to each of them
-     * @throws IllegalArgumentException if an option has neither kind of default or a computed default has no option
+     * @param computed the defaults of the settings that have no {@link Default} because their value is only known at
+     *                 runtime, by dotted path. The settings in each group are addressed without the group name,
+     *                 e.g. {@code limits.max-radius}, and apply to each one
+     * @throws IllegalArgumentException if a setting has neither kind of default or a computed default has no setting
      */
     static <R extends Record> R defaults(Class<R> type, Map<String, Object> computed) {
         Set<String> unused = new LinkedHashSet<>(computed.keySet());
         R defaults = type.cast(defaults(type, "", computed, unused));
         if (!unused.isEmpty()) {
-            throw new IllegalArgumentException("No options without a @Default at " + unused);
+            throw new IllegalArgumentException("No settings without a @Default at " + unused);
         }
         return defaults;
     }
@@ -64,14 +67,14 @@ final class ConfigMapper {
             Entry entry = schema.entries.get(i);
             String entryPath = path.isEmpty() ? entry.key : path + "." + entry.key;
             values[i] = switch (entry.kind) {
-                case SECTION -> defaults(entry.type, entryPath, computed, unused);
+                case SECTION -> defaults(entry.requireType(), entryPath, computed, unused);
                 case GROUPS -> {
                     if (entry.defaultValue == null) {
-                        throw new IllegalArgumentException(entryPath + " needs a @Default naming its groups");
+                        throw new IllegalArgumentException(entryPath + " needs a @Default with its group names");
                     }
                     Map<String, Record> groups = new LinkedHashMap<>();
                     for (String name : (List<String>) entry.defaultValue) {
-                        groups.put(name, defaults(entry.type, entryPath, computed, unused));
+                        groups.put(name, defaults(entry.requireType(), entryPath, computed, unused));
                     }
                     yield Collections.unmodifiableMap(groups);
                 }
@@ -92,13 +95,13 @@ final class ConfigMapper {
     }
 
     /**
-     * Creates a record from a parsed file. Options that are missing or hold a value of the wrong type keep the value
+     * Creates a record from a parsed file. Settings that are missing or hold a value of the wrong type keep the value
      * they have in {@code defaults}.
      *
      * @param tree     the parsed file, see {@link ConfigYaml#read}
      * @param defaults values for everything the file does not set. A group of a {@code Map<String, R>} component that
-     *                 the file adds takes its missing options from the first group of the defaults
-     * @param problems receives a line for each value that was rejected and each option that is not known
+     *                 the file adds takes its missing settings from the first group of the defaults
+     * @param problems receives a line for each value that was rejected and each setting that is not known
      */
     static <R extends Record> R bind(Map<String, Object> tree, R defaults, List<String> problems) {
         return bind(tree, defaults, "", problems);
@@ -139,7 +142,7 @@ final class ConfigMapper {
             };
         }
         for (Object key : unknown) {
-            problems.add((path.isEmpty() ? "" : path + ".") + key + ": unknown option, it will be removed");
+            problems.add((path.isEmpty() ? "" : path + ".") + key + ": unknown setting, it will be removed");
         }
         return (R) schema.create(values);
     }
@@ -182,13 +185,13 @@ final class ConfigMapper {
             case STRING -> isText(value) ? value.toString() : null;
             case ENUM -> {
                 if (value instanceof String name) {
-                    for (Object constant : entry.type.getEnumConstants()) {
+                    for (Object constant : entry.requireType().getEnumConstants()) {
                         if (((Enum<?>) constant).name().equalsIgnoreCase(name)) {
                             yield constant;
                         }
                     }
                 }
-                yield entry.type.isInstance(value) ? value : null;
+                yield entry.requireType().isInstance(value) ? value : null;
             }
             case STRINGS -> {
                 if (!(value instanceof List<?> list)) {
@@ -220,52 +223,63 @@ final class ConfigMapper {
     }
 
     /**
-     * Copies a record with one option replaced.
+     * Copies a record with one setting replaced.
      *
-     * @param path the dotted path of the option as written in the file, e.g. {@code queue.parallel-threads}
-     * @throws IllegalArgumentException if there is no such option or the value does not fit it
+     * @param path the dotted path of the setting as written in the file, e.g. {@code queue.parallel-threads}
+     * @throws IllegalArgumentException if there is no such setting or the value does not fit it
      */
     static <R extends Record> R with(R record, String path, Object value) {
         return with(record, path, 0, value);
     }
 
     /**
-     * Finds the dotted path of the option an accessor reference names.
+     * Finds the dotted path the accessor reference points to.
      *
      * @param root   the record of the whole configuration
-     * @param option a reference to the accessor of the option, e.g. {@code Settings.Queue::parallelThreads}
-     * @throws IllegalArgumentException if the argument is not a reference to an accessor of an option, or the option is
-     *                                  in a named group
+     * @param option a reference to the accessor of the setting, e.g. {@code Settings.Queue::parallelThreads}
+     * @throws IllegalArgumentException if the argument is not a reference to a setting accessor, or the setting is in a
+     *                                  group
      */
-    static String pathOf(Class<? extends Record> root, Option<?> option) {
-        String path = null;
+    static String pathOf(Class<? extends Record> root, Option option) {
+        SerializedLambda reference;
         try {
             // A serializable method reference can describe itself, which is the only way to learn what it refers to
             Method writeReplace = option.getClass().getDeclaredMethod("writeReplace");
             writeReplace.setAccessible(true);
-            SerializedLambda reference = (SerializedLambda) writeReplace.invoke(option);
-            path = pathOf(root, reference.getImplClass(), reference.getImplMethodName(), "");
-        } catch (ReflectiveOperationException | RuntimeException ignored) {
-            // Not a method reference, reported below
+            reference = (SerializedLambda) writeReplace.invoke(option);
+        } catch (ReflectiveOperationException | ClassCastException e) {
+            // Only lambdas and method references can describe themselves, so this is a class implementing Option
+            throw new IllegalArgumentException("Use a method reference for the setting, like "
+                    + "Settings.Queue::parallelThreads. A class implementing Option is not allowed.", e);
         }
+        String path = pathOf(root, reference.getImplClass(), reference.getImplMethodName(), "");
         if (path == null) {
-            throw new IllegalArgumentException("An option is named by a reference to its accessor, such as "
-                    + "Settings.Queue::parallelThreads, and cannot be in a named group");
+            throw new IllegalArgumentException(reference.getImplClass().replace('/', '.') + "::"
+                    + reference.getImplMethodName() + " is not a setting. Use a method reference for the setting, like "
+                    + "Settings.Queue::parallelThreads. A lambda is not allowed.");
         }
         return path;
     }
 
+    /**
+     * @return the path of the setting, or null if no record reached from {@code type} declares it
+     * @throws IllegalArgumentException if the setting is in a group
+     */
     @Nullable
     private static String pathOf(Class<?> type, String internalName, String accessor, String path) {
         boolean declares = type.getName().replace('.', '/').equals(internalName);
         for (Entry entry : SCHEMAS.get(type).entries) {
             String entryPath = path.isEmpty() ? entry.key : path + "." + entry.key;
-            if (entry.kind == Kind.SECTION) {
-                String found = pathOf(entry.type, internalName, accessor, entryPath);
+            if (entry.kind == Kind.SECTION || entry.kind == Kind.GROUPS) {
+                String found = pathOf(entry.requireType(), internalName, accessor, entryPath);
+                if (found != null && entry.kind == Kind.GROUPS) {
+                    throw new IllegalArgumentException(found + " is in a group, which a method reference cannot name. "
+                            + "Use its path instead, e.g. " + entryPath + ".<group>" + found.substring(entryPath.length()));
+                }
                 if (found != null) {
                     return found;
                 }
-            } else if (declares && entry.kind != Kind.GROUPS && entry.component.getName().equals(accessor)) {
+            } else if (declares && entry.component.getName().equals(accessor)) {
                 return entryPath;
             }
         }
@@ -305,7 +319,7 @@ final class ConfigMapper {
             }
         }
         if (!found) {
-            throw new IllegalArgumentException("Unknown option " + path);
+            throw new IllegalArgumentException("Unknown setting " + path);
         }
         return (R) schema.create(values);
     }
@@ -364,7 +378,7 @@ final class ConfigMapper {
     }
 
     /**
-     * An option or section of a configuration record.
+     * A setting or section of a configuration record.
      *
      * @param type         the enum of an {@link Kind#ENUM} entry or the record of a {@link Kind#SECTION} or
      *                     {@link Kind#GROUPS} entry, otherwise null
@@ -501,7 +515,14 @@ final class ConfigMapper {
         }
 
         String expected() {
-            return kind == Kind.ENUM ? kind.expected + Arrays.toString(type.getEnumConstants()) : kind.expected;
+            return kind == Kind.ENUM ? kind.expected + Arrays.toString(requireType().getEnumConstants()) : kind.expected;
+        }
+
+        /**
+         * Gets the {@link #type} of an enum, section or groups entry, which always has one.
+         */
+        Class<?> requireType() {
+            return Objects.requireNonNull(type);
         }
 
     }

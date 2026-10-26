@@ -43,6 +43,7 @@ import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.plugin.Plugin;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -71,7 +72,7 @@ public class FaweBukkit implements IFawe, Listener {
             } catch (Throwable e) {
                 LOGGER.error("Brush Listener Failed", e);
             }
-            if (PaperSupport.isPaper() && Settings.settings().experimental().dynamicChunkRendering() > 1) {
+            if (Settings.settings().experimental().dynamicChunkRendering() > 1) {
                 new RenderListener(plugin);
             }
         } catch (final Throwable e) {
@@ -110,6 +111,11 @@ public class FaweBukkit implements IFawe, Listener {
     @Override
     public synchronized ImageViewer getImageViewer(com.sk89q.worldedit.entity.Player player) {
         throw new UnsupportedOperationException("No longer supported.");
+    }
+
+    @Override
+    public Path getPath() {
+        return plugin.getDataPath();
     }
 
     @Override

@@ -75,8 +75,9 @@ public enum FaweCache implements Trimable {
 
     public final int BLOCKS_PER_LAYER = 4096;
 
-    // ProtocolSupport cannot read sections that use fewer than 4 bits per entry
-    private boolean protocolSupportFix;
+    // ProtocolSupport cannot read sections that use fewer than 4 bits per entry. Volatile as it is set on the main thread
+    // and read by the threads packing chunk sections
+    private volatile boolean protocolSupportFix;
 
     public final char[] EMPTY_CHAR_4096 = new char[4096];
 
@@ -300,7 +301,7 @@ public enum FaweCache implements Trimable {
     /**
      * Sets if chunk sections should always use at least 4 bits per entry, which ProtocolSupport requires.
      *
-     * @since TODO
+     * @since 3.0.0
      */
     public void setProtocolSupportFix(boolean protocolSupportFix) {
         this.protocolSupportFix = protocolSupportFix;

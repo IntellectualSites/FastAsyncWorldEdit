@@ -23,8 +23,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SettingsTest {
 
-    private static final Settings.BuildInfo BUILD = new Settings.BuildInfo("DATE", "BUILD", "COMMIT", "TEST");
-
     @TempDir
     Path directory;
 
@@ -38,7 +36,7 @@ class SettingsTest {
     }
 
     /**
-     * Guards the names, order, comments and defaults of every option. If this fails because an option was added or
+     * Guards the names, order, comments and defaults of every setting. If this fails because a setting was added or
      * changed on purpose, update {@code config.yml} in the test resources to match.
      */
     @Test
@@ -52,7 +50,7 @@ class SettingsTest {
                 .with("limits.default.max-super-pickaxe-size", 0)
                 .with("limits.default.max-brush-radius", 0)
                 .with("limits.default.max-butcher-radius", 0);
-        settings.save(file(), BUILD);
+        settings.save(file());
 
         String expected;
         try (InputStream resource = SettingsTest.class.getResourceAsStream("config.yml")) {
@@ -70,7 +68,7 @@ class SettingsTest {
                 .with("region-restrictions-options.mode", "owner")
                 .with("limits.default.max-changes", Long.MAX_VALUE)
                 .with("limits.default.strip-nbt", List.of("Items", " padded ", "a: b", "- c"));
-        settings.save(file(), BUILD);
+        settings.save(file());
 
         assertEquals(settings, Settings.load(file()));
         assertEquals(FaweMaskManager.MaskType.OWNER, settings.regionRestrictionsOptions().mode());
@@ -90,7 +88,7 @@ class SettingsTest {
                   "a: b":
                     max-radius: 4
                 """);
-        settings.save(file(), BUILD);
+        settings.save(file());
 
         Settings loaded = Settings.load(file());
         assertEquals(settings, loaded);
@@ -105,11 +103,11 @@ class SettingsTest {
 
     @Test
     void unchangedFileIsNotRewritten() throws IOException {
-        Settings.defaults().save(file(), BUILD);
+        Settings.defaults().save(file());
         FileTime longAgo = FileTime.fromMillis(1_000_000_000_000L);
         Files.setLastModifiedTime(file(), longAgo);
 
-        Settings.load(file()).save(file(), BUILD);
+        Settings.load(file()).save(file());
 
         assertEquals(longAgo, Files.getLastModifiedTime(file()));
     }
@@ -117,12 +115,12 @@ class SettingsTest {
     @Test
     void changedFileIsRewrittenAndMissingDirectoriesAreCreated() throws IOException {
         Path nested = directory.resolve("plugins").resolve("FastAsyncWorldEdit").resolve("config.yml");
-        Settings.defaults().save(nested, BUILD);
+        Settings.defaults().save(nested);
         assertEquals(Settings.defaults(), Settings.load(nested));
 
         // Same length, different content: only comparing the bytes tells them apart
         Settings changed = Settings.defaults().with(Settings.Clipboard::compressionLevel, 2);
-        changed.save(nested, BUILD);
+        changed.save(nested);
         assertEquals(changed, Settings.load(nested));
     }
 
@@ -203,6 +201,20 @@ class SettingsTest {
     }
 
     @Test
+    void schematicLimitsMoveIntoTheDefaultGroupWhenOnlyOtherGroupsExist() throws IOException {
+        Settings settings = load("""
+                experimental:
+                  per-player-file-size-limit: 123
+                limits:
+                  vip:
+                    max-changes: -1
+                """);
+
+        assertEquals(123, settings.limits().get("vip").schemFileSizeLimit());
+        assertEquals(123, settings.defaultLimits().schemFileSizeLimit());
+    }
+
+    @Test
     void newerOptionsWinOverTheOnesTheyReplaced() throws IOException {
         Settings settings = load("""
                 queue:
@@ -226,6 +238,17 @@ class SettingsTest {
 
         Settings.load(file());
         assertEquals(broken, Files.readString(directory.resolve("config.yml_broken_0")));
+    }
+
+    @Test
+    void aFileWithNothingToReadGivesTheFallback() throws IOException {
+        Settings inUse = Settings.defaults().with(Settings.Clipboard::compressionLevel, 2);
+
+        assertEquals(inUse, Settings.load(file(), inUse));
+
+        Files.writeString(file(), "queue:\n  parallel-threads: [1,\n", StandardCharsets.UTF_8);
+        assertEquals(inUse, Settings.load(file(), inUse));
+        assertTrue(Files.exists(directory.resolve("config.yml_broken")));
     }
 
     @Test
@@ -273,9 +296,29 @@ class SettingsTest {
         assertEquals(List.of("example.com"), settings.web().allowedImageHosts());
         assertEquals(FaweMaskManager.MaskType.OWNER, settings.regionRestrictionsOptions().mode());
         assertEquals(defaults.history().bufferSize(), settings.history().bufferSize());
-        // A lambda does not say which accessor it calls, and an accessor does not say which limit group is meant
-        assertThrows(IllegalArgumentException.class, () -> defaults.with((Settings.Queue queue) -> queue.pool(), false));
-        assertThrows(IllegalArgumentException.class, () -> defaults.with(Settings.Limits::maxRadius, 5));
+        // A lambda does not say which accessor it calls, a class cannot describe itself at all, and an accessor does not
+        // say which limit group is meant
+        IllegalArgumentException lambda = assertThrows(
+                IllegalArgumentException.class,
+                () -> defaults.with((Settings.Queue queue) -> queue.pool(), false)
+        );
+        assertTrue(lambda.getMessage().contains("is not a setting"), lambda::getMessage);
+        Option.Bool<Settings.Queue> implemented = new Option.Bool<>() {
+            @Override
+            public boolean get(Settings.Queue section) {
+                return section.pool();
+            }
+        };
+        IllegalArgumentException implementation = assertThrows(
+                IllegalArgumentException.class,
+                () -> defaults.with(implemented, false)
+        );
+        assertTrue(implementation.getMessage().contains("class implementing Option"), implementation::getMessage);
+        IllegalArgumentException group = assertThrows(
+                IllegalArgumentException.class,
+                () -> defaults.with(Settings.Limits::maxRadius, 5)
+        );
+        assertTrue(group.getMessage().contains("limits.<group>.max-radius"), group::getMessage);
     }
 
     @Test
