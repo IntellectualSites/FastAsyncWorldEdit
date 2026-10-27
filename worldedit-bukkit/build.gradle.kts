@@ -47,7 +47,7 @@ val localImplementation = configurations.create("localImplementation") {
 configurations["compileOnly"].extendsFrom(localImplementation)
 configurations["testImplementation"].extendsFrom(localImplementation)
 
-val adapters = configurations.create("adapters") {
+val adaptersMojmap = configurations.create("adapters") {
     description = "Adapters to include in the JAR (Mojmap)"
     isCanBeConsumed = false
     isCanBeResolved = true
@@ -134,7 +134,7 @@ tasks.named<Copy>("processResources") {
 
 tasks.named<ShadowJar>("shadowJar") {
     archiveFileName.set("${rootProject.name}-Paper-${project.version}.${archiveExtension.getOrElse("jar")}")
-    configurations.add(adapters)
+    configurations.add(adaptersMojmap)
     manifest {
         attributes(
             "paperweight-mappings-namespace" to "mojang"
@@ -209,7 +209,7 @@ publishMods {
     }
 
     val mojmapPaperVersions = listOf("1.21.4", "1.21.5", "1.21.6", "1.21.7", "1.21.8", "1.21.9", "1.21.10",
-            "1.21.11", "26.1", "26.1.1", "26.1.2", "26.2")
+            "1.21.11", "26.1", "26.1.1", "26.1.2", "26.2", "26.3")
 
     modrinth {
         from(common)
