@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Works out the limit of an actor from the limit groups they have permission for.
@@ -74,11 +75,9 @@ final class LimitResolver {
      * {@return the blocks with the default namespace added where there is none, in lower case}
      */
     private static Set<String> namespaced(List<String> blocks) {
-        Set<String> result = new HashSet<>();
-        for (String block : blocks) {
-            result.add((block.contains(":") ? block : "minecraft:" + block).toLowerCase(Locale.ROOT));
-        }
-        return Set.copyOf(result);
+        return blocks.stream()
+                .map(block -> (block.contains(":") ? block : "minecraft:" + block).toLowerCase(Locale.ROOT))
+                .collect(Collectors.toUnmodifiableSet());
     }
 
     /**
