@@ -48,6 +48,7 @@ import java.util.PriorityQueue;
  */
 public abstract class AbstractWorld implements World {
 
+    @Deprecated
     private final PriorityQueue<QueuedEffect> effectQueue = new PriorityQueue<>();
     private int taskId = -1;
 
@@ -102,6 +103,7 @@ public abstract class AbstractWorld implements World {
     public void fixLighting(Iterable<BlockVector2> chunks) {
     }
 
+    @Deprecated
     @Override
     public boolean playEffect(Vector3 position, int type, int data) {
         return false;
@@ -114,6 +116,7 @@ public abstract class AbstractWorld implements World {
     }
     //FAWE end
 
+    @Deprecated
     @Override
     public boolean queueBlockBreakEffect(Platform server, BlockVector3 position, BlockType blockType, double priority) {
         if (taskId == -1) {
@@ -180,6 +183,7 @@ public abstract class AbstractWorld implements World {
     public void setWeather(WeatherType weatherType, long duration) {
     }
 
+    @Deprecated
     private class QueuedEffect implements Comparable<QueuedEffect> {
 
         private final Vector3 position;
@@ -192,6 +196,7 @@ public abstract class AbstractWorld implements World {
             this.priority = priority;
         }
 
+        @Deprecated
         //FAWE start - allow block break effect of non-legacy blocks
         public void play() {
             playBlockBreakEffect(position, blockType);
