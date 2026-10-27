@@ -23,8 +23,25 @@ public abstract class ReadOnlyClipboard extends SimpleClipboard {
 
     public final Region region;
 
+    /**
+     * New {@link ReadOnlyClipboard} instance for the given region with max volume of {@link Integer#MAX_VALUE}. Initial offset
+     * is the clipboard minimum point.
+     *
+     * @param region dimensions of this clipboard instance.
+     */
     public ReadOnlyClipboard(Region region) {
-        super(region);
+        this(region, Integer.MAX_VALUE);
+    }
+
+    /**
+     * New {@link ReadOnlyClipboard} instance for the given region with the given maximum volume.
+     *
+     * @param region  dimensions of this clipboard instance.
+     * @param maxSize maximum allowable size of the clipboard. A value of -1 implies infinite volume.
+     * @since TODO
+     */
+    public ReadOnlyClipboard(Region region, long maxSize) {
+        super(region, maxSize);
         this.region = region.clone();
     }
 
