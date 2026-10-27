@@ -6,8 +6,8 @@ plugins {
     alias(libs.plugins.codecov)
     jacoco
     id("buildlogic.common")
-    id("com.gradleup.nmcp.aggregation") version "1.6.1"
-    id("xyz.jpenilla.run-paper") version "3.0.2"
+    id("com.gradleup.nmcp.aggregation") version "1.6.2"
+    id("xyz.jpenilla.run-paper") version "3.1.0"
 }
 
 val rootVersion: String = (extra.properties["rootVersion"] as? String) ?: "3.0.0"
@@ -102,7 +102,7 @@ allprojects {
 }
 
 val supportedVersions: List<String> = listOf("1.21", "1.21.1", "1.21.4", "1.21.5",
-        "1.21.8", "1.21.10", "1.21.11", "26.1.2", "26.2")
+        "1.21.8", "1.21.10", "1.21.11", "26.1.2", "26.2", "26.3")
 
 tasks {
     supportedVersions.forEach {
