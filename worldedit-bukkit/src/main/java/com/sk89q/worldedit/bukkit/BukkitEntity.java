@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.bukkit;
 
+import com.fastasyncworldedit.core.util.FoliaSupport;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.entity.BaseEntity;
@@ -28,10 +29,15 @@ import com.sk89q.worldedit.entity.metadata.EntityProperties;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.NullWorld;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.EntityType;
 
 import javax.annotation.Nullable;
 import java.lang.ref.WeakReference;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
+import java.util.function.Supplier;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -93,39 +99,51 @@ public class BukkitEntity implements Entity {
     @Override
     public BaseEntity getState() {
         org.bukkit.entity.Entity entity = entityRef.get();
-        if (entity != null) {
-            if (entity instanceof Player) {
-                return null;
-            }
-
-            BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
-            if (adapter != null) {
-                return adapter.getEntity(entity);
-            } else {
-                return null;
-            }
-        } else {
+        if (entity == null || entity instanceof Player) {
             return null;
         }
+
+        BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
+        if (adapter == null) {
+            return null;
+        }
+        return syncEntity(entity, () -> adapter.getEntity(entity));
     }
 
     @Override
     public boolean remove() {
-        // synchronize the whole method, not just the remove operation as we always need to synchronize and
-        // can make sure the entity reference was not invalidated in the few milliseconds between the next available tick (lol)
-        return TaskManager.taskManager().sync(() -> {
-            org.bukkit.entity.Entity entity = entityRef.get();
-            if (entity != null) {
-                try {
-                    entity.remove();
-                } catch (UnsupportedOperationException e) {
-                    return false;
-                }
-                return entity.isDead();
-            } else {
-                return true;
+        org.bukkit.entity.Entity entity = entityRef.get();
+        if (entity == null) {
+            return true;
+        }
+        Boolean result = syncEntity(entity, () -> {
+            try {
+                entity.remove();
+            } catch (UnsupportedOperationException e) {
+                return false;
             }
+            return entity.isDead();
         });
+        return result != null ? result : true;
+    }
+
+    private static <T> T syncEntity(org.bukkit.entity.Entity entity, Supplier<T> supplier) {
+        if (FoliaSupport.isFolia()) {
+            if (Bukkit.isOwnedByCurrentRegion(entity)) {
+                return supplier.get();
+            }
+            FutureTask<T> task = new FutureTask<>(supplier::get);
+            entity.getScheduler().execute(WorldEditPlugin.getInstance(), task, () -> task.cancel(false), 0);
+            try {
+                return task.get();
+            } catch (CancellationException e) {
+                return null;
+            } catch (InterruptedException | ExecutionException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            return TaskManager.taskManager().sync(supplier);
+        }
     }
 
     @SuppressWarnings("unchecked")
