@@ -158,7 +158,7 @@ class ConfigMapperTest {
         List<String> samples = new ArrayList<>(List.of(
                 "", " ", "a: b", "- c", "# d", "\"quoted\"", "back\\slash", "tab\there", "two\nlines", "cr\rlf\r\n",
                 "\u0000\u0007\u001b\u007f", "\u0085   ﻿", "café 日本 😀", "\ud800 lone",
-                "true", "null", "123", "~", "&anchor", "*alias", "!tag", "%directive", "@at", "`tick`", "{}", "[]"
+                "true", "on", "off", "yes", "no", "null", "123", "~", "&anchor", "*alias", "!tag", "%directive", "@at", "`tick`", "{}", "[]"
         ));
         Random random = new Random(42);
         for (int i = 0; i < 2000; i++) {

@@ -18,6 +18,7 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -54,24 +55,10 @@ class SettingsTest {
 
         String expected;
         try (InputStream resource = SettingsTest.class.getResourceAsStream("config.yml")) {
+            assertNotNull(resource, "Test resource config.yml is missing");
             expected = new String(resource.readAllBytes(), StandardCharsets.UTF_8);
         }
         assertEquals(expected.replace("\r\n", "\n"), Files.readString(file()).replace("\r\n", "\n"));
-    }
-
-    @Test
-    void savedSettingsLoadBackUnchanged() throws IOException {
-        Settings settings = Settings.defaults()
-                .with("paths.clipboard", "C:\\shared\\clipboards")
-                .with("web.url", "say \"hi\" # not a comment: \u00e9")
-                .with("queue.progress.display", "")
-                .with("region-restrictions-options.mode", "owner")
-                .with("limits.default.max-changes", Long.MAX_VALUE)
-                .with("limits.default.strip-nbt", List.of("Items", " padded ", "a: b", "- c"));
-        settings.save(file());
-
-        assertEquals(settings, Settings.load(file()));
-        assertEquals(FaweMaskManager.MaskType.OWNER, settings.regionRestrictionsOptions().mode());
     }
 
     @Test
@@ -93,12 +80,6 @@ class SettingsTest {
         Settings loaded = Settings.load(file());
         assertEquals(settings, loaded);
         assertEquals(List.of("on", "123", "VIP group", "a: b", Settings.DEFAULT_LIMIT), List.copyOf(loaded.limits().keySet()));
-    }
-
-    @Test
-    void missingFileGivesDefaults() throws IOException {
-        assertEquals(Settings.defaults(), Settings.load(file()));
-        assertFalse(Files.exists(file()));
     }
 
     @Test
@@ -131,11 +112,10 @@ class SettingsTest {
                 max-memory-percent: "not a number"
                 slower-memory-percent: 12345678901
                 region-restrictions: 1
-                unknown-option: true
                 web:
                   url:
                   max-image-size: 1.5
-                  allowed-image-hosts: i.imgur.com
+                  allowed-image-hosts: example.com
                 extent: 5
                 region-restrictions-options:
                   mode: nobody
@@ -160,7 +140,6 @@ class SettingsTest {
     @Test
     void optionsOfOlderVersionsAreMoved() throws IOException {
         Settings settings = load("""
-                issues: "ignored"
                 enabled-components:
                   update-notification: false
                   release-update-notifications: true

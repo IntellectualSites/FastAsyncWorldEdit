@@ -36,7 +36,7 @@ final class LimitResolver {
         this.source = limits;
         List<Group> ordered = new ArrayList<>(limits.size());
         Group fallback = null;
-        for (Map.Entry<String, Settings.Limits> entry : limits.entrySet()) {
+        for (var entry : limits.entrySet()) {
             Group group = new Group(entry.getKey(), entry.getValue());
             if (group.fallback) {
                 fallback = group;
@@ -183,7 +183,7 @@ final class LimitResolver {
                     );
                     continue;
                 }
-                List<Property<?>> properties = BlockTypesCache
+                var properties = BlockTypesCache
                         .getAllProperties()
                         .get(entry.substring(0, open).toLowerCase(Locale.ROOT));
                 if (properties == null) {

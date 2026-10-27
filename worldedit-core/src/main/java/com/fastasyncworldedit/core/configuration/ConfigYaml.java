@@ -56,7 +56,7 @@ final class ConfigYaml {
 
     private static Map<String, Object> stringKeyed(Map<?, ?> map) {
         Map<String, Object> result = new LinkedHashMap<>();
-        for (Map.Entry<?, ?> entry : map.entrySet()) {
+        for (var entry : map.entrySet()) {
             Object value = entry.getValue();
             result.put(String.valueOf(entry.getKey()), value instanceof Map<?, ?> child ? stringKeyed(child) : value);
         }
@@ -314,7 +314,7 @@ final class ConfigYaml {
         }
 
         /**
-         * Writes text as is, as UTF-8. A lone surrogate becomes {@code ?}, as {@link String#getBytes} would make it.
+         * Writes text as is, as UTF-8. A lone surrogate becomes {@code ?}, as {@link String#getBytes()} would make it.
          */
         private void text(String text) {
             // At most three bytes per character, as a character outside the BMP takes two
@@ -369,11 +369,18 @@ final class ConfigYaml {
             length += encoded.length;
         }
 
+        /**
+         * Appends a single byte to the current output buffer after reserving space for it.
+         */
         private void put(int b) {
             reserve(1);
             raw(b);
         }
 
+        /**
+         * Ensures the internal buffer can hold at least {@code count} more bytes.
+         * If the current buffer is too small, it is expanded to keep the writer efficient.
+         */
         private void reserve(int count) {
             if (length + count > bytes.length) {
                 bytes = Arrays.copyOf(bytes, Math.max(bytes.length * 2, length + count));

@@ -164,7 +164,7 @@ final class ConfigMapper {
         }
         Record template = defaults.values().iterator().next();
         Map<String, Record> result = new LinkedHashMap<>();
-        for (Map.Entry<?, ?> group : groups.entrySet()) {
+        for (var group : groups.entrySet()) {
             String name = String.valueOf(group.getKey());
             result.put(name, bind(group.getValue(), template, path + "." + name, problems));
         }

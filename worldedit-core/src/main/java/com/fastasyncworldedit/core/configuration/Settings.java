@@ -682,7 +682,6 @@ public record Settings(
             @Comment({
                     "If history should be enabled by default for plugins using WorldEdit:",
                     " - It is faster to have disabled",
-                    " - It is faster to have disabled",
                     " - Use of the FAWE API will not be effected"
             })
             @Default("true")
@@ -811,15 +810,9 @@ public record Settings(
             @Default("128")
             int undoBatchSize,
             @Comment({
-                    "[UNSAFE] Directly modify the region files. (OBSOLETE - USE ANVIL COMMANDS)",
-                    " - IMPROPER USE CAN CAUSE WORLD CORRUPTION!"
-            })
-            @Default("false")
-            boolean anvilQueueMode,
-            @Comment({
                     "[SAFE] Dynamically increase the number of chunks rendered",
                     " - Set your server view distance to 1 (spigot.yml, server.properties)",
-                    " - Based on tps and player movement",
+                    " - Based on TPS and player movement",
                     " - Note: If entities become hidden, increase the server view distance to 3"
             })
             @Default("-1")

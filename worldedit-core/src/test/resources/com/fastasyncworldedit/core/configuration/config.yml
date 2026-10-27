@@ -120,12 +120,9 @@ experimental:
   #  - Larger numbers might reduce overhead but increase latency for edits with only few changes.
   #  - 0 means undo operations are not batched.
   undo-batch-size: 128
-  # [UNSAFE] Directly modify the region files. (OBSOLETE - USE ANVIL COMMANDS)
-  #  - IMPROPER USE CAN CAUSE WORLD CORRUPTION!
-  anvil-queue-mode: false
   # [SAFE] Dynamically increase the number of chunks rendered
   #  - Set your server view distance to 1 (spigot.yml, server.properties)
-  #  - Based on tps and player movement
+  #  - Based on TPS and player movement
   #  - Note: If entities become hidden, increase the server view distance to 3
   dynamic-chunk-rendering: -1
   # Allows brushes to be persistent (default: true)
@@ -248,7 +245,6 @@ history:
   # Delete history on disk on logout
   delete-disk-on-logout: false
   # If history should be enabled by default for plugins using WorldEdit:
-  #  - It is faster to have disabled
   #  - It is faster to have disabled
   #  - Use of the FAWE API will not be effected
   enable-for-console: true

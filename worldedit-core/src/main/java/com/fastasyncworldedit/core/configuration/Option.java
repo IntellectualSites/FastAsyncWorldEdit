@@ -10,8 +10,7 @@ import java.io.Serializable;
  * }</code>
  * <p>
  * Unlike a path such as {@code queue.parallel-threads}, a method reference is checked by the compiler: the setting must
- * exist and the value must have its type, so renaming or removing a setting breaks the build instead of failing when
- * it runs.
+ * exist and the value must have its type, so renaming or removing a setting is caught at compile-time instead of runtime.
  * <p>
  * Pass a method reference, not a lambda. The setting is found from the name of the method, which a lambda does not
  * have, so passing a lambda throws an {@link IllegalArgumentException}. Settings of a limit group, such as
