@@ -576,7 +576,7 @@ public class LocalBlockVectorSet implements BlockVector3Set {
 
         @Override
         public boolean add(BlockVector3 blockVector3) {
-            return set.add(blockVector3);
+            return add(blockVector3.x(), blockVector3.y(), blockVector3.z());
         }
 
         @Override
@@ -591,7 +591,11 @@ public class LocalBlockVectorSet implements BlockVector3Set {
 
         @Override
         public boolean addAll(@Nonnull Collection<? extends BlockVector3> c) {
-            return set.addAll(c);
+            boolean result = false;
+            for (BlockVector3 vector : c) {
+                result |= add(vector);
+            }
+            return result;
         }
 
         @Override

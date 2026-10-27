@@ -230,7 +230,10 @@ public final class PaperweightAdapter implements BukkitImplAdapter<Tag> {
         var unused = CraftServer.class.cast(Bukkit.getServer());
 
         int dataVersion = SharedConstants.getCurrentVersion().dataVersion().version();
-        if (dataVersion != Constants.DATA_VERSION_MC_26_1 && dataVersion != Constants.DATA_VERSION_MC_26_1_1 && dataVersion != Constants.DATA_VERSION_MC_26_1_2) {
+        if (dataVersion < Constants.DATA_VERSION_MC_26_1 || dataVersion > Constants.DATA_VERSION_MC_26_1_2) {
+            if (dataVersion <= Constants.DATA_VERSION_MC_1_21_11 || dataVersion > Constants.DATA_VERSION_MC_26_1_2) {
+                throw new RuntimeException("Force prevent this loading on <=1.21.11 or >26.1.2");
+            }
             logger.warning(WRONG_VERSION);
         }
 
