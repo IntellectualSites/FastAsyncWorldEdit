@@ -1,0 +1,400 @@
+# These first 2 aren't configurable
+issues: "https://github.com/IntellectualSites/FastAsyncWorldEdit/issues"
+wiki: "https://intellectualsites.github.io/fastasyncworldedit-documentation/"
+# Set true to enable WorldEdit restrictions per region (e.g. PlotSquared or WorldGuard).
+# To be allowed to WorldEdit in a region, users need the appropriate
+# fawe.<plugin>  permission. See the Permissions page for supported region plugins.
+region-restrictions: true
+# FAWE will cancel non admin edits when memory consumption exceeds this %
+#  - Bypass with `/wea` or `//fast` or `fawe.bypass`
+#  - Disable with 100 or -1.
+max-memory-percent: 95
+# When percent memory usage reaches this threshold some aspects of editing will be slowed down:
+#  - FAWE-Asynchronous chunk loading when writing changes (see queue.async-chunk-load-write)
+slower-memory-percent: 80
+
+# Enable or disable core components
+enabled-components:
+  commands: true
+  # Show additional information in console. It helps us at IntellectualSites to find out more about an issue.
+  # Leave it off if you don't need it, it can spam your console.
+  debug: false
+  # Whether or not FAWE should notify you on startup about new available snapshots.
+  snapshot-update-notifications: true
+  # Whether or not FAWE should notify you on startup about new releases.
+  release-update-notifications: true
+  # Whether or not FAWE should notify you for updates (snapshot / release) on join (with the required permission)
+  notify-update-ingame: true
+
+clipboard:
+  # Store the clipboard on disk instead of memory
+  #  - Will be slightly slower
+  #  - Uses 2 bytes per block
+  use-disk: true
+  # Compress the clipboard to reduce the size:
+  #  - TODO: Buffered random access with compression is not implemented on disk yet
+  #  - 0 = No compression
+  #  - 1 = Fast compression
+  #  - 2-17 = Slower compression
+  #  - levels over 6 require ZSTD 1.4.8+ to be installed to the system
+  compression-level: 1
+  # Number of days to keep history on disk before deleting it
+  delete-after-days: 1
+  # If a player's clipboard should be deleted upon logout
+  delete-on-logout: false
+  # Allows NBT stored in a clipboard to be written to disk
+  #  - Requires clipboard.use-disk to be enabled
+  save-clipboard-nbt-to-disk: true
+  # Apply a file lock on the clipboard file (only relevant if clipboad.on-disk is enabled)
+  #  - Prevents other processes using the file whilst in use by FAWE
+  #  - This extends to other servers, useful if you have multiple servers using a unified clipboard folder
+  #  - May run into issues where a file lock is not correctly lifted
+  lock-clipboard-file: false
+
+lighting:
+  # If packet sending should be delayed until relight is finished
+  delay-packet-sending: true
+  async: true
+  # The relighting mode to use:
+  #  - 0 = None (Do no relighting)
+  #  - 1 = Optimal (Relight changed light sources and changed blocks)
+  #  - 2 = All (Slowly relight every blocks)
+  mode: 1
+  # If existing lighting should be removed before relighting
+  remove-first: true
+
+# Generic tick limiter (not necessarily WorldEdit related, but useful to stop abuse)
+tick-limiter:
+  # Enable the limiter
+  enabled: false
+  # The interval in ticks
+  interval: 20
+  # Max falling blocks per interval (per chunk)
+  falling: 64
+  # Max physics per interval (excluding redstone)
+  physics-ms: 10
+  # Max item spawns per interval (per chunk)
+  items: 256
+
+# Web/HTTP connection related settings
+web:
+  # The web interface for clipboards
+  #  - All schematics are anonymous and private
+  #  - Downloads can be deleted by the user
+  #  - Supports clipboard uploads, downloads and saves
+  url: "https://schem.intellectualsites.com/fawe/"
+  # The url of the backend server (Arkitektonika)
+  arkitektonika-backend-url: "https://api.schematic.cloud/"
+  # The url used to generate a download link from.
+  # {key} will be replaced with the generated key
+  arkitektonika-download-url: "https://schematic.cloud/download/{key}"
+  # The url used to generate a deletion link from.
+  # {key} will be replaced with the generated key
+  arkitektonika-delete-url: "https://schematic.cloud/delete/{key}"
+  # The maximum amount of time in seconds the plugin can attempt to load images for.
+  max-image-load-time: 5
+  # The maximum size (width x length) an image being loaded can be.
+  #  - 8294400 is 3840x2160
+  max-image-size: 8294400
+  # Whitelist of hostnames to allow images to be downloaded from
+  #  - Adding '*' to the list will allow any host, but this is NOT advisable
+  #  - Crash exploits exist with malformed images
+  #  - See: https://medium.com/chargebee-engineering/perils-of-parsing-pixel-flood-attack-on-java-imageio-a97aeb06637d
+  allowed-image-hosts:
+  - "i.imgur.com"
+
+extent:
+  # Don't bug console when these plugins slow down WorldEdit operations
+  #  - You'll see a message in console or ingame if you need to change this option
+  allowed-plugins:
+  - "com.example.ExamplePlugin"
+  # Should debug messages be sent when third party extents are used?
+  debug: true
+
+# Experimental options, use at your own risk
+#  - UNSAFE = Can cause permanent damage to the server
+#  - SAFE = Can be buggy but unlikely to cause any damage
+experimental:
+  # Undo operation batch size
+  #  - The size defines the number of changes read at once.
+  #  - Larger numbers might reduce overhead but increase latency for edits with only few changes.
+  #  - 0 means undo operations are not batched.
+  undo-batch-size: 128
+  # [SAFE] Dynamically increase the number of chunks rendered
+  #  - Set your server view distance to 1 (spigot.yml, server.properties)
+  #  - Based on TPS and player movement
+  #  - Note: If entities become hidden, increase the server view distance to 3
+  dynamic-chunk-rendering: -1
+  # Allows brushes to be persistent (default: true)
+  persistent-brushes: true
+  # [SAFE] Keep entities that are positioned in non-air blocks when editing an area (default: true)
+  #  - Might cause client-side FPS lag in some situations
+  #  - Requires fast-placement to be true
+  keep-entities-in-blocks: true
+  # [SAFE] Attempt to remove entities from the world if they were not present in the expected chunk (default: true)
+  #  - Sometimes an entity may have moved into a different chunk to that which FAWE expected
+  #  - This option allows FAWE to attempt to remove the entity, even if present in a different chunk
+  #  - If the entity is in an unloaded or partially loaded chunk, this will fail
+  #  - If an entity cannot be removed, it is possible duplicate entities may be created when using undo and/or redo
+  remove-entity-from-world-on-chunk-fail: true
+  # [SAFE] Perform operations involving entities on chunk load
+  #  - Allows entities that might not otherwise be captured due to unloaded chunks to be captured
+  #  - Main use-case is copying larger areas with entities
+  improved-entity-edits: true
+  # Increased debug logging for brush actions and processor setup
+  other: false
+  # Allow fluids placed by FAWE to tick (flow). This could cause the big lags.
+  # This has no effect on existing blocks one way or the other.
+  # Changes due to fluid flow will not be tracked by history, thus may have unintended consequences
+  allow-tick-fluids: false
+  # Whether FAWE should use the incubator Vector API to accelerate some operations
+  use-vector-api: false
+
+# This relates to how FAWE places chunks
+queue:
+  progress:
+    # Display constant titles about the progress of a user's edit
+    #  - false = disabled
+    #  - title = Display progress titles
+    #  - chat = Display progress in chat
+    #  - Currently not implemented
+    display: "false"
+    # How often edit progress is displayed
+    interval: 1
+    # Delay sending progress in milliseconds (so quick edits don't spam)
+    delay: 5000
+  # This should equal the number of processors you have
+  parallel-threads: 16
+  # When doing edits that effect more than this many chunks:
+  #  - FAWE will start placing before all calculations are finished
+  #  - A larger value will use slightly less CPU time
+  #  - A smaller value will reduce memory usage
+  #  - A value too small may break some operations (deform?)
+  #  - Values smaller than the configured parallel-threads are not accepted
+  #  - It is recommended this option be at least 4x greater than parallel-threads
+  target-size: 128
+  # Increase or decrease queue intensity (ms) [-50,50]:
+  #     0 = balance of performance / stability
+  #     -10 = Allocate 10ms less for chunk placement
+  # Too high can cause lag spikes (you might be okay with this)
+  # Too low will result in slow edits
+  extra-time-ms: 0
+  # Loading the right amount of chunks beforehand can speed up operations
+  #  - Low values may result in FAWE waiting on requests to the main thread
+  #  - Higher values use more memory and isn't noticeably faster
+  #  - A good (relatively) safe way to set this is
+  #  - Use 128 x GB of RAM / number of players expected to be using WE at the same time
+  #  - Paper and derivatives only. (requires delay-chunk-unloads-by to be set).
+  preload-chunk-count: 512
+  # If pooling is enabled (reduces GC, higher memory usage)
+  #  - Enable to improve performance at the expense of memory
+  pool: true
+  # If chunk loading for writing edits to the world should be performed asynchronously to FAWE
+  #  - Enable to improve performance at the expense of memory
+  #  - If experience out of memory crashed, disable this or reduce slower-memory-percent
+  async-chunk-load-write: true
+  # Percentage of queue.target-size to use per thread in multi-threaded operations
+  #  - Minimum of 100 / queue.parallel-threads (queue.target-size split across threads)
+  #  - Maximum of 100 (queue.target-size per thread)
+  #  - Higher performance at the expense of memory
+  #  - I.e. target-size=400, parallel-threads=8 and threads-target-size=25 means target-size of 100 per thread
+  #  - Defaults to 100 * 2 / parallel-threads
+  thread-target-size-percent: 12
+
+history:
+  # Should history be saved on disk:
+  #  - Frees up a lot of memory
+  #  - Persists restarts
+  #  - Unlimited undo
+  #  - Does not affect edit performance if `combine-stages`
+  use-disk: true
+  # Use a database to store disk storage summaries:
+  #  - Enables inspection and rollback
+  #  - Does not impact performance
+  use-database: true
+  # Record history with dispatching:
+  #  - Much faster as it avoids duplicate block checks
+  #  - Slightly worse compression since dispatch order is different
+  combine-stages: true
+  # Do not wait for a chunk's history to save before sending it
+  #  - Undo/redo commands will wait until the history has been written to disk before executing
+  #  - Requires combine-stages = true
+  send-before-history: true
+  # Higher compression reduces the size of history at the expense of CPU
+  # 0 = Uncompressed byte array (fastest)
+  # 1 = 1 pass fast compressor (default)
+  # 2 = 2 x fast
+  # 3 = 3 x fast
+  # 4 = 1 x medium, 1 x fast
+  # 5 = 1 x medium, 2 x fast
+  # 6 = 1 x medium, 3 x fast
+  # 7 = 1 x high, 1 x medium, 1 x fast
+  # 8 = 1 x high, 1 x medium, 2 x fast
+  # 9 = 1 x high, 1 x medium, 3 x fast (best compression)
+  # NOTE: If using disk, do some compression (3+) as smaller files save faster
+  #  - levels over 6 require ZSTD 1.4.8+ to be installed to the system
+  compression-level: 3
+  # The buffer size for compression:
+  #  - Larger = better ratio but uses more upfront memory
+  #  - Must be in the range [64, 33554432]
+  buffer-size: 531441
+  # Delete history on disk after a number of days
+  delete-after-days: 7
+  # Delete history in memory on logout (does not effect disk)
+  delete-on-logout: true
+  # Delete history on disk on logout
+  delete-disk-on-logout: false
+  # If history should be enabled by default for plugins using WorldEdit:
+  #  - It is faster to have disabled
+  #  - Use of the FAWE API will not be effected
+  enable-for-console: true
+  # Should redo information be stored:
+  #  - History is about 20% larger
+  #  - Enables use of /redo
+  store-redo: true
+  # Assumes all edits are smaller than 4096x256x4096:
+  #  - Reduces history size by ~10%
+  small-edits: false
+
+# Paths for various directories
+paths:
+  # Put any minecraft or mod jars for FAWE to be aware of block textures
+  textures: "textures"
+  heightmap: "heightmap"
+  history: "history"
+  # Multiple servers can use the same clipboards
+  #  - Use a shared directory or NFS/Samba
+  clipboard: "clipboard"
+  # Each player has their own sub directory for schematics
+  per-player-schematics: false
+
+# Region restriction settings
+region-restrictions-options:
+  # What type of users are allowed to WorldEdit in a region
+  #  - MEMBER = Players added to a region
+  #  - OWNER = Players who own the region
+  mode: "MEMBER"
+  # Allow region blacklists.
+  #  - Currently only implemented for WorldGuard
+  #  - see region-restrictions-options.worldguard-region-blacklist
+  allow-blacklists: false
+  # List of plugin mask managers that should be exclusive. Exclusive managers are not
+  # checked for edit restrictions if another manager already allowed an edit, and further
+  # managers are not checked if an exclusive manager allows an edit.
+  #  - May be useful to add PlotSquared if using both P2 and WorldGuard on a server
+  #  - Some custom-implementations in other plugins may override this setting
+  exclusive-managers:
+  - "ExamplePlugin"
+  # If a worldguard-protected world should be considered as a region blacklist.
+  #  - This will create a blacklist of regions where an edit cannot operate.
+  #  - Useful for a "freebuild" worlds with few protected areas.
+  #  - May cause performance loss with large numbers of protected areas.
+  #  - Requires region-restrictions-options.allow-blacklists be true.
+  #  - Will still search for current allowed regions to limit the edit to.
+  #  - Any blacklist regions are likely to override any internal allowed regions.
+  worldguard-region-blacklist: false
+  # Restrict all edits to within the safe chunk limits of +/- 30 million blocks
+  #  - Edits outside this range may induce crashing
+  #  - Forcefully prevents any edit outside this range
+  restrict-to-safe-range: true
+
+general:
+  # If the player should be relocated/unstuck when a generation command would bury them
+  unstuck-on-generate: true
+  # If unlimited limits should still require /confirm on large. Defaults to limits.default.confirm-large otherwise.
+  limit-unlimited-confirms: true
+  # If unlimited limits should skip sending creature spawn events. Using //fast will still disable spawn events.
+  limit-unlimited-skips-creature-spawn-events: true
+
+# The "default" limit group affects those without a specific limit permission.
+# To grant someone different limits, copy the default limits group
+# and give it a different name (e.g. newbie). Then give the user the limit
+# permission node with that limit name (e.g. fawe.limit.newbie  )
+limits:
+  default:
+    # Max actions that can be run concurrently (i.e. commands)
+    max-actions: 1
+    # Max number of block changes (e.g. by `//set stone`).
+    max-changes: 50000000
+    # Max number of blocks checked (e.g. `//count stone` which doesn't change blocks)
+    max-checks: 50000000
+    # Number of times a change can fail (e.g. if the player can't access that region)
+    max-fails: 50000000
+    # Allowed brush iterations (e.g. `//brush smooth`)
+    max-iterations: 1000
+    # Max allowed entities (e.g. cows)
+    max-entities: 1337
+    # Max allowed radius (e.g. for //sphere)
+    max-radius: 0
+    # Max allowed superpickaxe size
+    max-super-pickaxe-size: 0
+    # Max allowed brush radius
+    max-brush-radius: 0
+    # Max allowed butcher radius
+    max-butcher-radius: 0
+    # BlockStates include Banner, Beacon, BrewingStand, Chest, CommandBlock,
+    # CreatureSpawner, Dispenser, Dropper, EndGateway, Furnace, Hopper, Jukebox,
+    # NoteBlock, Sign, Skull, Structure
+    max-blockstates: 1337
+    # Maximum size of the player's history in Megabytes:
+    #  - History on disk or memory will be deleted
+    max-history-mb: -1
+    # Sets a maximum limit (in kb) for the size of a player's schematics directory (per-player mode only)
+    # Set to -1 to disable
+    schem-file-size-limit: -1
+    # Sets a maximum limit for the amount of schematics in a player's schematics directory (per-player mode only)
+    # Set to -1 to disable
+    schem-file-num-limit: -1
+    # Maximum time in milliseconds //calc can execute
+    max-expression-ms: 50
+    # Cinematic block placement:
+    #  - Adds a delay to block placement (nanoseconds/block)
+    #  - Having an artificial delay will use more CPU/Memory
+    speed-reduction: 0
+    # Place chunks instead of individual blocks:
+    #  - Disabling this will negatively impact performance
+    #  - Only disable this for compatibility or cinematic placement
+    fast-placement: true
+    # Should WorldEdit use inventory?
+    # 0 = No inventory usage (creative)
+    # 1 = Inventory for removing and placing (freebuild)
+    # 2 = Inventory for placing (survival)
+    inventory-mode: 0
+    # Should large edits require confirmation (>16384 chunks)
+    confirm-large: true
+    # If undo and redo commands should be restricted to allowed regions
+    #  - Prevents scenarios where players can delete/reset a region, and then continue to undo/redo on it
+    restrict-history-to-regions: true
+    # List of nbt tags to strip from blocks, e.g. Items
+    strip-nbt: []
+    # If the disallowed blocks listed in worldedit-config.yml should be disallowed in all edits,
+    # not just where blocks patterns are used.
+    #  - Can prevent blocks being pasted from clipboards, etc.
+    #  - If fast-placement is disabled, this may cause edits to be slower.
+    universal-disallowed-blocks: true
+    # If legacy, numerical block IDs should be able to be used (i.e. 12:2).
+    allow-legacy: true
+    # If sending creature spawn events should be skipped upon creation.
+    #  - Will not work when setting entities directly to a world, rather than using an EditSession(Builder)
+    #  - Setting fast-placement to false forces writing directly to the world (for example).
+    skip-creature-spawn-events: false
+    # List of blocks to deny use of. Can be either an entire block type or a block with a specific property value.
+    # Where block properties are specified, any blockstate with the property will be disallowed (e.g. all directions
+    # of a waterlogged fence). For blocking/remapping of all occurrences of a property like waterlogged, see
+    # remap-properties below.
+    # To generate a blank list, substitute the default content with a set of square brackets [] instead.
+    # The 'worldedit.anyblock' permission is not considered here.
+    # Example block property blocking:
+    #  - "minecraft:conduit[waterlogged=true]"
+    #  - "minecraft:piston[extended=false,facing=west]"
+    #  - "minecraft:wheat[age=7]"
+    disallowed-blocks:
+    - "minecraft:wheat"
+    - "minecraft:fire"
+    - "minecraft:redstone_wire"
+    # List of block properties that should be remapped if used in an edit. Entries should take the form
+    # "property_name[value1_old:value1_new,value2_old:value2_new]". For example:
+    #  - "waterlogged[true:false]"
+    #  - "age[7:4,6:4,5:4]"
+    #  - "extended[true:false]"
+    remap-properties: []

@@ -191,7 +191,7 @@ public class FaweAPI {
         if (!file.exists() || file.isDirectory()) {
             throw new IllegalArgumentException("Not a file!");
         }
-        if (Settings.settings().HISTORY.USE_DISK) {
+        if (Settings.settings().history().useDisk()) {
             throw new IllegalArgumentException("History on disk not enabled!");
         }
         if (!file.getName().toLowerCase(Locale.ROOT).endsWith(".bd")) {
@@ -224,7 +224,7 @@ public class FaweAPI {
      * @param radius   - The radius from the origin of the edit
      * @param timediff - The max age of the file in milliseconds
      * @param shallow  - If shallow is true, FAWE will only read the first {@link
-     *                 Settings.HISTORY#BUFFER_SIZE} bytes to obtain history info
+     *                 Settings.History#bufferSize()} bytes to obtain history info
      * @return a list of DiskStorageHistory Objects
      */
     public static List<DiskStorageHistory> getBDFiles(Location origin, UUID user, int radius, long timediff, boolean shallow) {
@@ -232,7 +232,7 @@ public class FaweAPI {
         if (!(extent instanceof World world)) {
             throw new IllegalArgumentException("Origin is not a valid world");
         }
-        File history = MainUtil.getFile(Fawe.platform().getDirectory(), Settings.settings().PATHS.HISTORY + File.separator + world.getName());
+        File history = MainUtil.getFile(Fawe.platform().getDirectory(), Settings.settings().paths().history() + File.separator + world.getName());
         if (!history.exists()) {
             return new ArrayList<>();
         }
@@ -356,7 +356,7 @@ public class FaweAPI {
             World unwrapped = WorldWrapper.unwrap(world);
             if (unwrapped instanceof IQueueExtent) {
                 queue = (IQueueExtent) unwrapped;
-            } else if (Settings.settings().QUEUE.PARALLEL_THREADS > 1) {
+            } else if (Settings.settings().queue().parallelThreads() > 1) {
                 ParallelQueueExtent parallel = new ParallelQueueExtent(
                         Fawe.instance().getQueueHandler(),
                         world,
@@ -380,7 +380,7 @@ public class FaweAPI {
                 }
             }
             if (mode != RelightMode.NONE) {
-                if (Settings.settings().LIGHTING.REMOVE_FIRST) {
+                if (Settings.settings().lighting().removeFirst()) {
                     relighter.removeAndRelight(true);
                 } else {
                     relighter.fixSkyLighting();

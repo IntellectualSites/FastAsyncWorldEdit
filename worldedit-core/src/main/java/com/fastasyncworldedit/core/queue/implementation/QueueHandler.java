@@ -48,12 +48,12 @@ public abstract class QueueHandler implements Trimable, Runnable {
      * time utilising CPU.
      */
     private final ForkJoinPool forkJoinPoolPrimary = new ForkJoinPool(
-            Settings.settings().QUEUE.PARALLEL_THREADS,
+            Settings.settings().queue().parallelThreads(),
             new FaweForkJoinWorkerThreadFactory("FAWE Fork Join Pool Primary - %s"),
             null,
             false,
-            Settings.settings().QUEUE.PARALLEL_THREADS,
-            Settings.settings().QUEUE.PARALLEL_THREADS,
+            Settings.settings().queue().parallelThreads(),
+            Settings.settings().queue().parallelThreads(),
             0,
             pool -> true,
             60,
@@ -67,7 +67,7 @@ public abstract class QueueHandler implements Trimable, Runnable {
      * @see #getForkJoinPoolSecondary() the full task contract and the reasoning behind it
      */
     private final ForkJoinPool forkJoinPoolSecondary = new ForkJoinPool(
-            Settings.settings().QUEUE.PARALLEL_THREADS,
+            Settings.settings().queue().parallelThreads(),
             new FaweForkJoinWorkerThreadFactory("FAWE Fork Join Pool Secondary - %s"),
             null,
             false
@@ -140,7 +140,7 @@ public abstract class QueueHandler implements Trimable, Runnable {
 
     private long getAllocate() {
         long now = System.currentTimeMillis();
-        double targetTPS = 18 - Math.max(Settings.settings().QUEUE.EXTRA_TIME_MS * 0.05, 0);
+        double targetTPS = 18 - Math.max(Settings.settings().queue().extraTimeMs() * 0.05, 0);
         long diff = 50 + this.last - (this.last = now);
         long absDiff = Math.abs(diff);
         if (diff == 0) {

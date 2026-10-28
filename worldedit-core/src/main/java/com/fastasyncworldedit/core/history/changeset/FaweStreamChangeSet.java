@@ -63,7 +63,7 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
     protected FaweStreamPositionDelegate posDel;
 
     public FaweStreamChangeSet(World world) {
-        this(world, Settings.settings().HISTORY.COMPRESSION_LEVEL, Settings.settings().HISTORY.STORE_REDO, Settings.settings().HISTORY.SMALL_EDITS);
+        this(world, Settings.settings().history().compressionLevel(), Settings.settings().history().storeRedo(), Settings.settings().history().smallEdits());
     }
 
     public FaweStreamChangeSet(World world, int compression, boolean storeRedo, boolean smallLoc) {
@@ -1046,7 +1046,7 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
                 return summary;
             }
             if (!shallow) {
-                int amount = (Settings.settings().HISTORY.BUFFER_SIZE - HEADER_SIZE) / 9;
+                int amount = (Settings.settings().history().bufferSize() - HEADER_SIZE) / 9;
                 MutableFullBlockChange change = new MutableFullBlockChange(null, 0, false);
                 for (int i = 0; i < amount; i++) {
                     posDel.read(fis, change);
