@@ -97,7 +97,7 @@ web:
   #  - 8294400 is 3840x2160
   max-image-size: 8294400
   # Whitelist of hostnames to allow images to be downloaded from
-  #  - Adding '*' to the list will allow any host, but this is NOT adviseable
+  #  - Adding '*' to the list will allow any host, but this is NOT advisable
   #  - Crash exploits exist with malformed images
   #  - See: https://medium.com/chargebee-engineering/perils-of-parsing-pixel-flood-attack-on-java-imageio-a97aeb06637d
   allowed-image-hosts:
