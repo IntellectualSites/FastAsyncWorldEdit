@@ -572,7 +572,7 @@ public record Settings(
             })
             @Default("true")
             boolean universalDisallowedBlocks,
-            @Comment("If legacy, mumerical, blocks IDs should be able to be used (i.e. 12:2).")
+            @Comment("If legacy, numerical block IDs should be able to be used (i.e. 12:2).")
             @Default("true")
             boolean allowLegacy,
             @Comment({
