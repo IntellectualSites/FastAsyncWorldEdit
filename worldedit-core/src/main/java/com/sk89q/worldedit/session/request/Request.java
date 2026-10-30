@@ -172,6 +172,19 @@ public final class Request {
         //FAWE end
     }
 
+    //FAWE start
+
+    /**
+     * Check if the current thread has a request, without creating one.
+     *
+     * @return true if the current thread has a request
+     * @since TODO
+     */
+    public static boolean hasRequest() {
+        return requests.containsKey(Thread.currentThread());
+    }
+    //FAWE end
+
     /**
      * Check if the current request object is still valid. Invalid requests may contain outdated values.
      *
