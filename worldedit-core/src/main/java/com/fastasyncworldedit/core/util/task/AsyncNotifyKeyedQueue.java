@@ -1,6 +1,7 @@
 package com.fastasyncworldedit.core.util.task;
 
 import com.fastasyncworldedit.core.configuration.Settings;
+import com.sk89q.worldedit.session.request.Request;
 
 import java.io.Closeable;
 import java.util.UUID;
@@ -54,10 +55,18 @@ public class AsyncNotifyKeyedQueue implements Closeable {
         Future[] self = new Future[1];
         Callable<T> wrapped = () -> {
             if (!closed) {
+                // Pool threads are reused, so a request set by this task would otherwise keep its edit session (and the
+                // actor) alive until the thread runs another task. Only clear it if this task created it, so a task
+                // running nested inside another task on the same thread does not remove the outer task's request.
+                boolean ownsRequest = !Request.hasRequest();
                 try {
                     return task.call();
                 } catch (Throwable e) {
                     handler.uncaughtException(Thread.currentThread(), e);
+                } finally {
+                    if (ownsRequest) {
+                        Request.reset();
+                    }
                 }
             }
             if (self[0] != null) {
