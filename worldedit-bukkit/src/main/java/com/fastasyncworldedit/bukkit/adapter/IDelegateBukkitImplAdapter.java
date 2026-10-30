@@ -1,6 +1,7 @@
 package com.fastasyncworldedit.bukkit.adapter;
 
 import com.fastasyncworldedit.core.queue.implementation.packet.ChunkPacket;
+import com.fastasyncworldedit.core.util.TaskManager;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.blocks.BaseItemStack;
@@ -99,7 +100,7 @@ public interface IDelegateBukkitImplAdapter<T> extends BukkitImplAdapter<T> {
 
     @Override
     default boolean simulateItemUse(World world, BlockVector3 position, BaseItem item, Direction face) {
-        return getParent().simulateItemUse(world, position, item, face);
+        return TaskManager.taskManager().sync(() -> getParent().simulateItemUse(world, position, item, face));
     }
 
     @Override
