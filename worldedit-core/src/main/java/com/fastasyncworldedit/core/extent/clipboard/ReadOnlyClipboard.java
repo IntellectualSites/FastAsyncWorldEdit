@@ -38,7 +38,7 @@ public abstract class ReadOnlyClipboard extends SimpleClipboard {
      *
      * @param region  dimensions of this clipboard instance.
      * @param maxSize maximum allowable size of the clipboard. A value of -1 implies infinite volume.
-     * @since TODO
+     * @since 2.16.2
      */
     public ReadOnlyClipboard(Region region, long maxSize) {
         super(region, maxSize);
