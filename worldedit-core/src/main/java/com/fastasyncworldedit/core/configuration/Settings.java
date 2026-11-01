@@ -985,7 +985,7 @@ public record Settings(
             @Default("true")
             boolean saveClipboardNbtToDisk,
             @Comment({
-                    "Apply a file lock on the clipboard file (only relevant if clipboad.on-disk is enabled)",
+                    "Apply a file lock on the clipboard file (only relevant if clipboard.use-disk is enabled)",
                     " - Prevents other processes using the file whilst in use by FAWE",
                     " - This extends to other servers, useful if you have multiple servers using a unified clipboard folder",
                     " - May run into issues where a file lock is not correctly lifted"
