@@ -34,6 +34,7 @@ import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.blocks.BaseItemStack;
+import com.sk89q.worldedit.blocks.TileEntityBlock;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.extent.Extent;
@@ -64,7 +65,6 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.bukkit.block.Biome;
-import org.bukkit.block.TileState;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -191,24 +191,12 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
     /**
      * Send the given NBT data to the player.
      *
-     * @param player  The player
-     * @param pos     The position
-     * @param nbtData The NBT Data
-     *
-     * @deprecated Only works for structure blocks
+     * @param player          The player
+     * @param pos             The position
+     * @param tileEntityBlock The block entity block
+     * @param nbtData         The NBT Data
      */
-    @Deprecated(since = "2.15.1")
-    void sendFakeNBT(Player player, BlockVector3 pos, LinCompoundTag nbtData);
-
-    /**
-     * Send the given NBT data to the player.
-     *
-     * @param player    The player
-     * @param pos       The position
-     * @param tileState The bukkit tile state
-     * @param nbtData   The NBT Data
-     */
-    void sendFakeNBT(Player player, BlockVector3 pos, TileState tileState, LinCompoundTag nbtData);
+    void sendFakeNBT(Player player, BlockVector3 pos, TileEntityBlock tileEntityBlock, LinCompoundTag nbtData);
 
     /**
      * Make the client think it has operator status.
