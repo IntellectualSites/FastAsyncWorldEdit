@@ -207,6 +207,7 @@ public class PlayerProxy extends AbstractPlayerActor {
     }
 
     @Override
+    @Deprecated(since = "2.16.3")
     public void sendFakeOP() {
         basePlayer.sendFakeOP();
     }
