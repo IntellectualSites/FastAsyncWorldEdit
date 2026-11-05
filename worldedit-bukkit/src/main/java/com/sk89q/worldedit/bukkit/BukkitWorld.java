@@ -453,6 +453,7 @@ public class BukkitWorld extends AbstractWorld {
         }
     }
 
+    @Deprecated
     @Override
     public boolean playEffect(Vector3 position, int type, int data) {
         World world = getWorld();

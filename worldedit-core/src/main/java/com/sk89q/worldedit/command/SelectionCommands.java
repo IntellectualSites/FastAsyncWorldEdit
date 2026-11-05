@@ -55,6 +55,7 @@ import com.sk89q.worldedit.function.mask.MaskIntersection;
 import com.sk89q.worldedit.function.mask.RegionMask;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.visitor.RegionVisitor;
+import com.sk89q.worldedit.internal.annotation.Chunk3d;
 import com.sk89q.worldedit.internal.annotation.Direction;
 import com.sk89q.worldedit.internal.annotation.MultiDirection;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -246,6 +247,7 @@ public class SelectionCommands {
     public void chunk(
             Actor actor, World world, LocalSession session,
             @Arg(desc = "The chunk to select", def = "")
+            @Chunk3d
                     BlockVector3 coordinates,
             @Switch(name = 's', desc = "Expand your selection to encompass all chunks that are part of it")
                     boolean expandSelection,

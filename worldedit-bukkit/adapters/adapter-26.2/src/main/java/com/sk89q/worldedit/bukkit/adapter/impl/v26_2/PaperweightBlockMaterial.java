@@ -29,7 +29,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.material.PushReaction;
 
 public class PaperweightBlockMaterial extends BukkitBlockMaterial<Block, BlockState> {
@@ -70,7 +69,7 @@ public class PaperweightBlockMaterial extends BukkitBlockMaterial<Block, BlockSt
 
     @Override
     public boolean isLiquid() {
-        return !this.blockState.getFluidState().is(Fluids.EMPTY);
+        return !this.blockState.getFluidState().isEmpty();
     }
 
     @Override

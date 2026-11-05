@@ -391,7 +391,9 @@ public interface World extends Extent, Keyed, IChunkCache<IChunkGet> {
      * @param type     the effect type
      * @param data     the effect data
      * @return true if the effect was played
+     * @deprecated This is deprecated without replacement.
      */
+    @Deprecated
     boolean playEffect(Vector3 position, int type, int data);
 
     //FAWE start - allow block break effect of non-legacy blocks
@@ -413,7 +415,9 @@ public interface World extends Extent, Keyed, IChunkCache<IChunkGet> {
      * @param blockType the block type
      * @param priority  the priority
      * @return true if the effect was played
+     * @deprecated This is deprecated without replacement.
      */
+    @Deprecated
     boolean queueBlockBreakEffect(Platform server, BlockVector3 position, BlockType blockType, double priority);
 
     /**
