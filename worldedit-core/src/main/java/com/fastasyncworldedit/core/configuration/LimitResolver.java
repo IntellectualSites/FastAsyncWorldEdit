@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Works out the limit of an actor from the limit groups they have permission for.
@@ -36,7 +37,7 @@ final class LimitResolver {
         this.source = limits;
         List<Group> ordered = new ArrayList<>(limits.size());
         Group fallback = null;
-        for (Map.Entry<String, Settings.Limits> entry : limits.entrySet()) {
+        for (var entry : limits.entrySet()) {
             Group group = new Group(entry.getKey(), entry.getValue());
             if (group.fallback) {
                 fallback = group;
@@ -74,11 +75,9 @@ final class LimitResolver {
      * {@return the blocks with the default namespace added where there is none, in lower case}
      */
     private static Set<String> namespaced(List<String> blocks) {
-        Set<String> result = new HashSet<>();
-        for (String block : blocks) {
-            result.add((block.contains(":") ? block : "minecraft:" + block).toLowerCase(Locale.ROOT));
-        }
-        return Set.copyOf(result);
+        return blocks.stream()
+                .map(block -> (block.contains(":") ? block : "minecraft:" + block).toLowerCase(Locale.ROOT))
+                .collect(Collectors.toUnmodifiableSet());
     }
 
     /**
@@ -183,7 +182,7 @@ final class LimitResolver {
                     );
                     continue;
                 }
-                List<Property<?>> properties = BlockTypesCache
+                var properties = BlockTypesCache
                         .getAllProperties()
                         .get(entry.substring(0, open).toLowerCase(Locale.ROOT));
                 if (properties == null) {

@@ -1,5 +1,8 @@
 package com.fastasyncworldedit.core.configuration;
 
+import org.yaml.snakeyaml.nodes.Node;
+import org.yaml.snakeyaml.nodes.NodeTuple;
+
 import javax.annotation.Nullable;
 import java.lang.invoke.SerializedLambda;
 import java.lang.reflect.Constructor;
@@ -164,7 +167,7 @@ final class ConfigMapper {
         }
         Record template = defaults.values().iterator().next();
         Map<String, Record> result = new LinkedHashMap<>();
-        for (Map.Entry<?, ?> group : groups.entrySet()) {
+        for (var group : groups.entrySet()) {
             String name = String.valueOf(group.getKey());
             result.put(name, bind(group.getValue(), template, path + "." + name, problems));
         }
@@ -325,39 +328,34 @@ final class ConfigMapper {
     }
 
     /**
-     * Writes the entries of a record as the top level of a file.
+     * {@return the entries of a record, as the top level of a file}
      *
      * @param spaced if an empty line should be left above each section directly inside this one
      */
-    static void write(Record record, boolean spaced, ConfigYaml.Writer out) {
-        write(record, spaced, out, 0);
-    }
-
     @SuppressWarnings("unchecked")
-    private static void write(Record record, boolean spaced, ConfigYaml.Writer out, int indent) {
-        for (Entry entry : SCHEMAS.get(record.getClass()).entries) {
+    static List<NodeTuple> write(Record record, boolean spaced) {
+        List<Entry> entries = SCHEMAS.get(record.getClass()).entries;
+        List<NodeTuple> nodes = new ArrayList<>(entries.size());
+        for (Entry entry : entries) {
             Object value = entry.read(record);
-            if (spaced && (entry.kind == Kind.SECTION || entry.kind == Kind.GROUPS)) {
-                out.blankLine();
-            }
-            out.comments(indent, entry.comments).key(indent, entry.key);
-            switch (entry.kind) {
-                case SECTION -> writeSection((Record) value, out, indent + 2);
+            boolean section = entry.kind == Kind.SECTION || entry.kind == Kind.GROUPS;
+            Node node = switch (entry.kind) {
+                case SECTION -> ConfigYaml.section(write((Record) value, false));
                 case GROUPS -> {
-                    Map<String, Record> groups = (Map<String, Record>) value;
-                    out.section(groups.isEmpty());
-                    groups.forEach((name, group) -> writeSection(group, out.key(indent + 2, name), indent + 4));
+                    List<NodeTuple> groups = new ArrayList<>();
+                    ((Map<String, Record>) value).forEach((name, group) -> groups.add(new NodeTuple(
+                            ConfigYaml.key(name, List.of(), false),
+                            ConfigYaml.section(write(group, false))
+                    )));
+                    yield ConfigYaml.section(groups);
                 }
-                case STRINGS -> out.list(indent, (List<String>) value);
-                case ENUM -> out.scalar(((Enum<?>) value).name());
-                default -> out.scalar(value);
-            }
+                case STRINGS -> ConfigYaml.list((List<String>) value);
+                case ENUM -> ConfigYaml.scalar(((Enum<?>) value).name());
+                default -> ConfigYaml.scalar(value);
+            };
+            nodes.add(new NodeTuple(ConfigYaml.key(entry.key, entry.comments, spaced && section), node));
         }
-    }
-
-    private static void writeSection(Record record, ConfigYaml.Writer out, int indent) {
-        out.section(SCHEMAS.get(record.getClass()).entries.isEmpty());
-        write(record, false, out, indent);
+        return nodes;
     }
 
     private enum Kind {

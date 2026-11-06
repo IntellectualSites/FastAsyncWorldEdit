@@ -45,7 +45,7 @@ clipboard:
   # Allows NBT stored in a clipboard to be written to disk
   #  - Requires clipboard.use-disk to be enabled
   save-clipboard-nbt-to-disk: true
-  # Apply a file lock on the clipboard file (only relevant if clipboad.on-disk is enabled)
+  # Apply a file lock on the clipboard file (only relevant if clipboard.use-disk is enabled)
   #  - Prevents other processes using the file whilst in use by FAWE
   #  - This extends to other servers, useful if you have multiple servers using a unified clipboard folder
   #  - May run into issues where a file lock is not correctly lifted
@@ -97,7 +97,7 @@ web:
   #  - 8294400 is 3840x2160
   max-image-size: 8294400
   # Whitelist of hostnames to allow images to be downloaded from
-  #  - Adding '*' to the list will allow any host, but this is NOT adviseable
+  #  - Adding '*' to the list will allow any host, but this is NOT advisable
   #  - Crash exploits exist with malformed images
   #  - See: https://medium.com/chargebee-engineering/perils-of-parsing-pixel-flood-attack-on-java-imageio-a97aeb06637d
   allowed-image-hosts:
@@ -120,12 +120,9 @@ experimental:
   #  - Larger numbers might reduce overhead but increase latency for edits with only few changes.
   #  - 0 means undo operations are not batched.
   undo-batch-size: 128
-  # [UNSAFE] Directly modify the region files. (OBSOLETE - USE ANVIL COMMANDS)
-  #  - IMPROPER USE CAN CAUSE WORLD CORRUPTION!
-  anvil-queue-mode: false
   # [SAFE] Dynamically increase the number of chunks rendered
   #  - Set your server view distance to 1 (spigot.yml, server.properties)
-  #  - Based on tps and player movement
+  #  - Based on TPS and player movement
   #  - Note: If entities become hidden, increase the server view distance to 3
   dynamic-chunk-rendering: -1
   # Allows brushes to be persistent (default: true)
@@ -248,7 +245,6 @@ history:
   # Delete history on disk on logout
   delete-disk-on-logout: false
   # If history should be enabled by default for plugins using WorldEdit:
-  #  - It is faster to have disabled
   #  - It is faster to have disabled
   #  - Use of the FAWE API will not be effected
   enable-for-console: true
@@ -376,7 +372,7 @@ limits:
     #  - Can prevent blocks being pasted from clipboards, etc.
     #  - If fast-placement is disabled, this may cause edits to be slower.
     universal-disallowed-blocks: true
-    # If legacy, mumerical, blocks IDs should be able to be used (i.e. 12:2).
+    # If legacy, numerical block IDs should be able to be used (i.e. 12:2).
     allow-legacy: true
     # If sending creature spawn events should be skipped upon creation.
     #  - Will not work when setting entities directly to a world, rather than using an EditSession(Builder)

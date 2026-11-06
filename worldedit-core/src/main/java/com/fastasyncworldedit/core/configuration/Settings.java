@@ -8,6 +8,7 @@ import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.ApiStatus;
 import org.yaml.snakeyaml.error.YAMLException;
+import org.yaml.snakeyaml.nodes.NodeTuple;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -281,17 +282,17 @@ public record Settings(
      * @since 3.0.0
      */
     public void save(Path file) throws IOException {
-        ConfigYaml.Writer out = new ConfigYaml.Writer();
         String[] values = {
                 "https://github.com/IntellectualSites/FastAsyncWorldEdit/issues",
                 "https://intellectualsites.github.io/fastasyncworldedit-documentation/"
         };
-        out.comments(0, List.of("These first 2 aren't configurable"));
+        List<NodeTuple> entries = new ArrayList<>();
         for (int i = 0; i < INFORMATION.size(); i++) {
-            out.key(0, INFORMATION.get(i)).scalar(values[i]);
+            List<String> comments = i == 0 ? List.of("These first 2 aren't configurable") : List.of();
+            entries.add(new NodeTuple(ConfigYaml.key(INFORMATION.get(i), comments, false), ConfigYaml.scalar(values[i])));
         }
-        ConfigMapper.write(this, true, out);
-        ConfigYaml.write(file, out);
+        entries.addAll(ConfigMapper.write(this, true));
+        ConfigYaml.write(file, ConfigYaml.dump(entries));
     }
 
     /**
@@ -572,7 +573,7 @@ public record Settings(
             })
             @Default("true")
             boolean universalDisallowedBlocks,
-            @Comment("If legacy, mumerical, blocks IDs should be able to be used (i.e. 12:2).")
+            @Comment("If legacy, numerical block IDs should be able to be used (i.e. 12:2).")
             @Default("true")
             boolean allowLegacy,
             @Comment({
@@ -681,7 +682,6 @@ public record Settings(
             boolean deleteDiskOnLogout,
             @Comment({
                     "If history should be enabled by default for plugins using WorldEdit:",
-                    " - It is faster to have disabled",
                     " - It is faster to have disabled",
                     " - Use of the FAWE API will not be effected"
             })
@@ -811,15 +811,9 @@ public record Settings(
             @Default("128")
             int undoBatchSize,
             @Comment({
-                    "[UNSAFE] Directly modify the region files. (OBSOLETE - USE ANVIL COMMANDS)",
-                    " - IMPROPER USE CAN CAUSE WORLD CORRUPTION!"
-            })
-            @Default("false")
-            boolean anvilQueueMode,
-            @Comment({
                     "[SAFE] Dynamically increase the number of chunks rendered",
                     " - Set your server view distance to 1 (spigot.yml, server.properties)",
-                    " - Based on tps and player movement",
+                    " - Based on TPS and player movement",
                     " - Note: If entities become hidden, increase the server view distance to 3"
             })
             @Default("-1")
@@ -903,7 +897,7 @@ public record Settings(
             int maxImageSize,
             @Comment({
                     "Whitelist of hostnames to allow images to be downloaded from",
-                    " - Adding '*' to the list will allow any host, but this is NOT adviseable",
+                    " - Adding '*' to the list will allow any host, but this is NOT advisable",
                     " - Crash exploits exist with malformed images",
                     " - See: https://medium.com/chargebee-engineering/perils-of-parsing-pixel-flood-attack-on-java-imageio-a97aeb06637d"
             })
@@ -992,7 +986,7 @@ public record Settings(
             @Default("true")
             boolean saveClipboardNbtToDisk,
             @Comment({
-                    "Apply a file lock on the clipboard file (only relevant if clipboad.on-disk is enabled)",
+                    "Apply a file lock on the clipboard file (only relevant if clipboard.use-disk is enabled)",
                     " - Prevents other processes using the file whilst in use by FAWE",
                     " - This extends to other servers, useful if you have multiple servers using a unified clipboard folder",
                     " - May run into issues where a file lock is not correctly lifted"
