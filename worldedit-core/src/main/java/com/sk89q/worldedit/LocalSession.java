@@ -73,6 +73,7 @@ import com.sk89q.worldedit.regions.selector.CuboidRegionSelector;
 import com.sk89q.worldedit.regions.selector.RegionSelectorType;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.Countable;
+import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.util.Identifiable;
 import com.sk89q.worldedit.util.SideEffectSet;
@@ -128,6 +129,7 @@ public class LocalSession implements TextureHolder {
     // Session related
     //FAWE start - allow saving to session store
     private RegionSelector selector = new CuboidRegionSelector();
+    private transient Direction lastRandomPasteRotation = null;
     //FAWE end
     private transient boolean placeAtPos1 = false;
     //FAWE start
@@ -1102,6 +1104,28 @@ public class LocalSession implements TextureHolder {
 
     public boolean isPlaceAtPos1() {
         return placeAtPos1;
+    }
+
+    /**
+     * Get the rotation, in quarter turns around the y-axis, that the last randomly rotated paste used.
+     *
+     * @return the last rotation, or {@code null} if no such paste has happened yet
+     * @since TODO
+     */
+    @Nullable
+    public Direction getLastRandomPasteRotation() {
+        return lastRandomPasteRotation;
+    }
+
+    /**
+     * Set the rotation around the y-axis that the last randomly rotated paste used, so that the next one can avoid
+     * repeating it.
+     *
+     * @param lastRandomPasteRotation a cardinal direction, or {@code null} to forget the previous one
+     * @since TODO
+     */
+    public void setLastRandomPasteRotation(@Nullable Direction lastRandomPasteRotation) {
+        this.lastRandomPasteRotation = lastRandomPasteRotation;
     }
 
     /**
