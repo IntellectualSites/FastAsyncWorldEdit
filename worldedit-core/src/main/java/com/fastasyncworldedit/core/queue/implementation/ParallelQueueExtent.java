@@ -130,7 +130,7 @@ public final class ParallelQueueExtent extends PassthroughExtent {
         queue.setFastMode(fastmode);
         queue.setSideEffectSet(sideEffectSet);
         queue.setFaweExceptionArray(faweExceptionReasonsUsed);
-        queue.setTargetSize(Settings.settings().QUEUE.TARGET_SIZE * Settings.settings().QUEUE.THREAD_TARGET_SIZE_PERCENT / 100);
+        queue.setTargetSize(Settings.settings().queue().targetSize() * Settings.settings().queue().threadTargetSizePercent() / 100);
         return queue;
     }
 
@@ -142,7 +142,7 @@ public final class ParallelQueueExtent extends PassthroughExtent {
         final Iterator<BlockVector2> chunksIter = chunks.iterator();
 
         // Get a pool, to operate on the chunks in parallel
-        final int size = Math.min(chunks.size(), Settings.settings().QUEUE.PARALLEL_THREADS);
+        final int size = Math.min(chunks.size(), Settings.settings().queue().parallelThreads());
         if (size <= 1) {
             // if PQE is ever used with PARALLEL_THREADS = 1, or only one chunk is edited, just run sequentially
             ChunkFilterBlock block = null;

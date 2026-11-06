@@ -33,7 +33,7 @@ public class FaweClipboardVersionMismatchException extends FaweException {
                         "fawe.error.clipboard.on.disk.version.mismatch",
                         expected,
                         version,
-                        Fawe.platform().getDirectory().getName() + File.separator + Settings.settings().PATHS.CLIPBOARD
+                        Fawe.platform().getDirectory().getName() + File.separator + Settings.settings().paths().clipboard()
                 ),
                 Type.CLIPBOARD
         );

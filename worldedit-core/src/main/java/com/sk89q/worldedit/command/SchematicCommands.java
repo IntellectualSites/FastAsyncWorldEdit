@@ -236,7 +236,7 @@ public class SchematicCommands {
         } else {
             final LocalConfiguration config = this.worldEdit.getConfiguration();
             File working = this.worldEdit.getWorkingDirectoryPath(config.saveDir).toFile();
-            File root = Settings.settings().PATHS.PER_PLAYER_SCHEMATICS ? new File(working, actor.getUniqueId().toString()) : working;
+            File root = Settings.settings().paths().perPlayerSchematics() ? new File(working, actor.getUniqueId().toString()) : working;
             uri = new File(root, fileName).toURI();
         }
 
@@ -269,13 +269,13 @@ public class SchematicCommands {
             IOException {
         LocalConfiguration config = worldEdit.getConfiguration();
         File working = worldEdit.getWorkingDirectoryPath(config.saveDir).toFile();
-        File dir = Settings.settings().PATHS.PER_PLAYER_SCHEMATICS ? new File(working, actor.getUniqueId().toString()) : working;
+        File dir = Settings.settings().paths().perPlayerSchematics() ? new File(working, actor.getUniqueId().toString()) : working;
         File destDir = new File(dir, directory);
         if (!MainUtil.isInSubDirectory(working, destDir)) {
             actor.print(Caption.of("worldedit.schematic.directory-does-not-exist", TextComponent.of(String.valueOf(destDir))));
             return;
         }
-        if (Settings.settings().PATHS.PER_PLAYER_SCHEMATICS && !MainUtil.isInSubDirectory(dir, destDir) && !actor.hasPermission(
+        if (Settings.settings().paths().perPlayerSchematics() && !MainUtil.isInSubDirectory(dir, destDir) && !actor.hasPermission(
                 "worldedit.schematic.move.other")) {
             actor.print(Caption.of("fawe.error.no-perm", "worldedit.schematic.move.other"));
             return;
@@ -296,7 +296,7 @@ public class SchematicCommands {
                 actor.print(Caption.of("fawe.worldedit.schematic.schematic.move.exists", destFile));
                 continue;
             }
-            if (Settings.settings().PATHS.PER_PLAYER_SCHEMATICS && (!MainUtil.isInSubDirectory(
+            if (Settings.settings().paths().perPlayerSchematics() && (!MainUtil.isInSubDirectory(
                     dir,
                     destFile
             ) || !MainUtil.isInSubDirectory(dir, source)) && !actor.hasPermission("worldedit.schematic.delete.other")) {
@@ -375,7 +375,7 @@ public class SchematicCommands {
                     return;
                 }
                 UUID uuid = UUID.fromString(filename.substring(4));
-                URL webUrl = new URL(Settings.settings().WEB.URL);
+                URL webUrl = new URL(Settings.settings().web().url());
                 if ((format = ClipboardFormats.findByAlias(formatName)) == null) {
                     actor.print(Caption.of("worldedit.schematic.unknown-format", TextComponent.of(formatName)));
                     return;
@@ -403,7 +403,7 @@ public class SchematicCommands {
                 uri = temp.toUri();
             } else {
                 File saveDir = worldEdit.getWorkingDirectoryPath(config.saveDir).toFile();
-                File dir = Settings.settings().PATHS.PER_PLAYER_SCHEMATICS ? new File(saveDir, actor.getUniqueId().toString()) : saveDir;
+                File dir = Settings.settings().paths().perPlayerSchematics() ? new File(saveDir, actor.getUniqueId().toString()) : saveDir;
                 File file;
                 if (filename.startsWith("#")) {
                     format = noExplicitFormat ? null : ClipboardFormats.findByAlias(formatName);
@@ -419,7 +419,7 @@ public class SchematicCommands {
                         return;
                     }
                 } else {
-                    if (Settings.settings().PATHS.PER_PLAYER_SCHEMATICS && !actor.hasPermission("worldedit.schematic.load.other") && Pattern
+                    if (Settings.settings().paths().perPlayerSchematics() && !actor.hasPermission("worldedit.schematic.load.other") && Pattern
                             .compile("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}")
                             .matcher(filename)
                             .find()) {
@@ -520,7 +520,7 @@ public class SchematicCommands {
         File dir = worldEdit.getWorkingDirectoryPath(config.saveDir).toFile();
 
         //FAWE start
-        if (!global && Settings.settings().PATHS.PER_PLAYER_SCHEMATICS) {
+        if (!global && Settings.settings().paths().perPlayerSchematics()) {
             dir = new File(dir, actor.getUniqueId().toString());
         }
 
@@ -649,7 +649,7 @@ public class SchematicCommands {
         LocalConfiguration config = worldEdit.getConfiguration();
         //FAWE start
         File working = worldEdit.getWorkingDirectoryPath(config.saveDir).toFile();
-        File dir = Settings.settings().PATHS.PER_PLAYER_SCHEMATICS ? new File(working, actor.getUniqueId().toString()) : working;
+        File dir = Settings.settings().paths().perPlayerSchematics() ? new File(working, actor.getUniqueId().toString()) : working;
         List<File> files = new ArrayList<>();
 
         if (filename.equalsIgnoreCase("*")) {
@@ -668,7 +668,7 @@ public class SchematicCommands {
                 actor.print(Caption.of("worldedit.schematic.delete.does-not-exist", TextComponent.of(filename)));
                 continue;
             }
-            if (Settings.settings().PATHS.PER_PLAYER_SCHEMATICS && !MainUtil.isInSubDirectory(dir, f) && !actor.hasPermission(
+            if (Settings.settings().paths().perPlayerSchematics() && !MainUtil.isInSubDirectory(dir, f) && !actor.hasPermission(
                     "worldedit.schematic.delete.other")) {
                 actor.print(Caption.of("fawe.error.no-perm", "worldedit.schematic.delete.other"));
                 continue;
@@ -766,7 +766,7 @@ public class SchematicCommands {
         final boolean hasShow = false;
 
         //If player forgot -p argument
-        boolean playerFolder = Settings.settings().PATHS.PER_PLAYER_SCHEMATICS;
+        boolean playerFolder = Settings.settings().paths().perPlayerSchematics();
         UUID uuid = playerFolder ? actor.getUniqueId() : null;
         List<File> files = UtilityCommands.getFiles(dir, actor, args, formatName, playerFolder, oldFirst, newFirst);
         List<Map.Entry<URI, String>> entries = UtilityCommands.filesToEntry(dir, files, uuid);
@@ -856,14 +856,14 @@ public class SchematicCommands {
 
         String headerBytesElem = String.format("%.1fkb", totalBytes / 1000.0);
 
-        if (Settings.settings().PATHS.PER_PLAYER_SCHEMATICS && actor.getLimit().SCHEM_FILE_SIZE_LIMIT > -1) {
+        if (Settings.settings().paths().perPlayerSchematics() && actor.getLimit().SCHEM_FILE_SIZE_LIMIT > -1) {
             headerBytesElem += String.format(
                     " / %dkb",
                     actor.getLimit().SCHEM_FILE_SIZE_LIMIT
             );
         }
 
-        if (Settings.settings().PATHS.PER_PLAYER_SCHEMATICS) {
+        if (Settings.settings().paths().perPlayerSchematics()) {
             String fullHeader = "| My Schematics: " + headerBytesElem + " |";
             PaginationBox paginationBox = PaginationBox.fromComponents(fullHeader, pageCommand, components);
             actor.print(paginationBox.create(page));
@@ -960,7 +960,7 @@ public class SchematicCommands {
             Clipboard target;
 
             //FAWE start
-            boolean checkFilesize = Settings.settings().PATHS.PER_PLAYER_SCHEMATICS
+            boolean checkFilesize = Settings.settings().paths().perPlayerSchematics()
                     && actor.getLimit().SCHEM_FILE_SIZE_LIMIT > -1;
 
             double directorysizeKb = 0;
@@ -991,7 +991,7 @@ public class SchematicCommands {
             }
 
 
-            if (Settings.settings().PATHS.PER_PLAYER_SCHEMATICS && actor.getLimit().SCHEM_FILE_NUM_LIMIT > -1) {
+            if (Settings.settings().paths().perPlayerSchematics() && actor.getLimit().SCHEM_FILE_NUM_LIMIT > -1) {
 
                 if (numFiles == -1) {
                     numFiles = 0;
@@ -1064,7 +1064,7 @@ public class SchematicCommands {
                         actor.print(Caption.of("fawe.worldedit.schematic.schematic.disk.space", String.format("%.1f", (allocatedKb - curKb))));
                     }
 
-                    if (Settings.settings().PATHS.PER_PLAYER_SCHEMATICS && actor.getLimit().SCHEM_FILE_NUM_LIMIT > -1) {
+                    if (Settings.settings().paths().perPlayerSchematics() && actor.getLimit().SCHEM_FILE_NUM_LIMIT > -1) {
                         actor.print(Caption.of("fawe.worldedit.schematic.schematic.slots.free", (actor.getLimit().SCHEM_FILE_NUM_LIMIT - numFiles)));
                     }
                     LOGGER.info(actor.getName() + " saved " + file.getCanonicalPath());

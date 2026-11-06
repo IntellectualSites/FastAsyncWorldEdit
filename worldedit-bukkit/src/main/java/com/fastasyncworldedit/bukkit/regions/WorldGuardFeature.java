@@ -159,7 +159,7 @@ public class WorldGuardFeature extends BukkitMaskManager implements Listener {
 
     @Override
     public FaweMask getMask(com.sk89q.worldedit.entity.Player wePlayer, MaskType type, boolean isWhitelist) {
-        if (isWhitelist && Settings.settings().REGION_RESTRICTIONS_OPTIONS.WORLDGUARD_REGION_BLACKLIST) {
+        if (isWhitelist && Settings.settings().regionRestrictionsOptions().worldguardRegionBlacklist()) {
             return new FaweMask(RegionWrapper.GLOBAL());
         }
         final Player player = BukkitAdapter.adapt(wePlayer);

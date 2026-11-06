@@ -67,7 +67,7 @@ public class PaperweightStarlightRelighter extends StarlightRelighter<ServerLeve
      * Also, if chunk packets are sent delayed, we need to do that here
      */
     protected void postProcessChunks(Set<ChunkPos> coords) {
-        boolean delay = Settings.settings().LIGHTING.DELAY_PACKET_SENDING;
+        boolean delay = Settings.settings().lighting().delayPacketSending();
         for (ChunkPos pos : coords) {
             int x = pos.x;
             int z = pos.z;

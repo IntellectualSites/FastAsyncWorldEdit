@@ -78,7 +78,7 @@ public class ChangeSetExecutor implements Operation {
         this.type = type;
         this.context = context;
         if (changeSet instanceof AbstractChangeSet abstractChangeSet) {
-            if (Settings.settings().EXPERIMENTAL.UNDO_BATCH_SIZE > 0) {
+            if (Settings.settings().experimental().undoBatchSize() > 0) {
                 this.changeExchangeCoordinator = abstractChangeSet.getCoordinatedChanges(blockBag, inventory, type == Type.REDO);
                 this.iterator = null;
             } else {
@@ -100,7 +100,7 @@ public class ChangeSetExecutor implements Operation {
         // FAWE start - ChangeExchangeCoordinator
         if (this.changeExchangeCoordinator != null) {
             try (this.changeExchangeCoordinator) {
-                Change[] changes = new Change[Settings.settings().EXPERIMENTAL.UNDO_BATCH_SIZE];
+                Change[] changes = new Change[Settings.settings().experimental().undoBatchSize()];
                 while ((changes = this.changeExchangeCoordinator.take(changes)) != null) {
                     for (final Change change : changes) {
                         if (change == null) {

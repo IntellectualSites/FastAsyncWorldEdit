@@ -18,7 +18,7 @@ import java.util.function.Supplier;
 public class AsyncNotifyKeyedQueue implements Closeable {
 
     private static final KeyQueuedExecutorService<UUID> QUEUE_SUBMISSIONS = new KeyQueuedExecutorService<>(new ForkJoinPool(
-            Settings.settings().QUEUE.PARALLEL_THREADS,
+            Settings.settings().queue().parallelThreads(),
             new FaweForkJoinWorkerThreadFactory("AsyncNotifyKeyedQueue - %s"),
             null,
             false

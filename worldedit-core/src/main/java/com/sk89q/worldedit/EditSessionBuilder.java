@@ -316,7 +316,7 @@ public final class EditSessionBuilder {
      */
     public EditSessionBuilder changeSet(boolean disk, @Nullable UUID uuid) {
         if (disk) {
-            if (Settings.settings().HISTORY.USE_DATABASE) {
+            if (Settings.settings().history().useDatabase()) {
                 this.changeSet = new RollbackOptimizedHistory(world, uuid);
             } else {
                 this.changeSet = new DiskStorageHistory(world, uuid);
@@ -460,7 +460,7 @@ public final class EditSessionBuilder {
         }
         if (fastMode == null) {
             if (actor == null) {
-                fastMode = !Settings.settings().HISTORY.ENABLE_FOR_CONSOLE;
+                fastMode = !Settings.settings().history().enableForConsole();
             } else {
                 fastMode = actor.getSession().hasFastMode();
             }
@@ -500,7 +500,7 @@ public final class EditSessionBuilder {
                 wnaMode = false;
                 if (unwrapped instanceof IQueueExtent) {
                     extent = queue = (IQueueExtent) unwrapped;
-                } else if (Settings.settings().QUEUE.PARALLEL_THREADS > 1 && !Fawe.isMainThread()) {
+                } else if (Settings.settings().queue().parallelThreads() > 1 && !Fawe.isMainThread()) {
                     ParallelQueueExtent parallel = new ParallelQueueExtent(
                             Fawe.instance().getQueueHandler(),
                             world,
@@ -520,7 +520,7 @@ public final class EditSessionBuilder {
             if (combineStages == null) {
                 combineStages =
                         // If it's enabled in the settings
-                        Settings.settings().HISTORY.COMBINE_STAGES
+                        Settings.settings().history().combineStages()
                                 // If fast placement is disabled, it's slower to perform a copy on each chunk
                                 && this.limit.FAST_PLACEMENT
                                 // If the edit uses items from the inventory we can't use a delayed task
@@ -530,17 +530,17 @@ public final class EditSessionBuilder {
             this.bypassHistory = this.extent = wrapExtent(bypassAll, eventBus, event, EditSession.Stage.BEFORE_REORDER);
             if (!this.fastMode || this.sideEffectSet.shouldApply(SideEffect.HISTORY) || changeSet != null) {
                 if (changeSet == null) {
-                    if (Settings.settings().HISTORY.USE_DISK) {
+                    if (Settings.settings().history().useDisk()) {
                         UUID uuid = actor == null ? Identifiable.CONSOLE : actor.getUniqueId();
-                        if (Settings.settings().HISTORY.USE_DATABASE) {
+                        if (Settings.settings().history().useDatabase()) {
                             changeSet = new RollbackOptimizedHistory(world, uuid);
                         } else {
                             changeSet = new DiskStorageHistory(world, uuid);
                         }
-//                    } else if (combineStages && Settings.settings().HISTORY.COMPRESSION_LEVEL == 0) {
+//                    } else if (combineStages && Settings.settings().history().compressionLevel() == 0) {
 //                        changeSet = new CPUOptimizedChangeSet(world);
                     } else {
-                        if (combineStages && Settings.settings().HISTORY.COMPRESSION_LEVEL == 0) {
+                        if (combineStages && Settings.settings().history().compressionLevel() == 0) {
                             //TODO add CPUOptimizedChangeSet
                         }
                         changeSet = new MemoryOptimizedHistory(world);
@@ -567,14 +567,14 @@ public final class EditSessionBuilder {
                     }
                 }
             }
-            if (allowedRegions == null && Settings.settings().REGION_RESTRICTIONS) {
+            if (allowedRegions == null && Settings.settings().regionRestrictions()) {
                 if (actor != null && !actor.hasPermission("fawe.bypass.regions")) {
                     if (actor instanceof Player player) {
                         allowedRegions = player.getAllowedRegions();
                     }
                 }
             }
-            if (disallowedRegions == null && Settings.settings().REGION_RESTRICTIONS && Settings.settings().REGION_RESTRICTIONS_OPTIONS.ALLOW_BLACKLISTS) {
+            if (disallowedRegions == null && Settings.settings().regionRestrictions() && Settings.settings().regionRestrictionsOptions().allowBlacklists()) {
                 if (actor != null && !actor.hasPermission("fawe.bypass.regions")) {
                     if (actor instanceof Player player) {
                         disallowedRegions = player.getDisallowedRegions();
@@ -606,7 +606,7 @@ public final class EditSessionBuilder {
                             .getPlatformPlacementProcessor(extent, null, region));
                 }
 
-                if (!Settings.settings().EXPERIMENTAL.KEEP_ENTITIES_IN_BLOCKS) {
+                if (!Settings.settings().experimental().keepEntitiesInBlocks()) {
                     queue.addProcessor(new EntityInBlockRemovingProcessor());
                 }
 
@@ -803,13 +803,13 @@ public final class EditSessionBuilder {
         }
         if (toReturn != extent) {
             String className = toReturn.getClass().getName().toLowerCase(Locale.ROOT);
-            for (String allowed : Settings.settings().EXTENT.ALLOWED_PLUGINS) {
+            for (String allowed : Settings.settings().extent().allowedPlugins()) {
                 if (className.contains(allowed.toLowerCase(Locale.ROOT))) {
                     this.wrapped = true;
                     return toReturn;
                 }
             }
-            if (Settings.settings().EXTENT.DEBUG) {
+            if (Settings.settings().extent().debug()) {
                 String blockedClassName = toReturn.getClass().getName();
                 if (event.getActor() != null) {
                     event.getActor().printDebug(TextComponent.of("Potentially unsafe extent blocked: " + blockedClassName));
