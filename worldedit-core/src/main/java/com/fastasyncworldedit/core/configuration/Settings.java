@@ -8,6 +8,7 @@ import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.ApiStatus;
 import org.yaml.snakeyaml.error.YAMLException;
+import org.yaml.snakeyaml.nodes.NodeTuple;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -281,17 +282,17 @@ public record Settings(
      * @since 3.0.0
      */
     public void save(Path file) throws IOException {
-        ConfigYaml.Writer out = new ConfigYaml.Writer();
         String[] values = {
                 "https://github.com/IntellectualSites/FastAsyncWorldEdit/issues",
                 "https://intellectualsites.github.io/fastasyncworldedit-documentation/"
         };
-        out.comments(0, List.of("These first 2 aren't configurable"));
+        List<NodeTuple> entries = new ArrayList<>();
         for (int i = 0; i < INFORMATION.size(); i++) {
-            out.key(0, INFORMATION.get(i)).scalar(values[i]);
+            List<String> comments = i == 0 ? List.of("These first 2 aren't configurable") : List.of();
+            entries.add(new NodeTuple(ConfigYaml.key(INFORMATION.get(i), comments, false), ConfigYaml.scalar(values[i])));
         }
-        ConfigMapper.write(this, true, out);
-        ConfigYaml.write(file, out);
+        entries.addAll(ConfigMapper.write(this, true));
+        ConfigYaml.write(file, ConfigYaml.dump(entries));
     }
 
     /**

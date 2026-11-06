@@ -3,34 +3,52 @@ package com.fastasyncworldedit.core.configuration;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.comments.CommentLine;
+import org.yaml.snakeyaml.comments.CommentType;
 import org.yaml.snakeyaml.constructor.SafeConstructor;
 import org.yaml.snakeyaml.error.YAMLException;
-import org.yaml.snakeyaml.nodes.NodeId;
+import org.yaml.snakeyaml.nodes.MappingNode;
+import org.yaml.snakeyaml.nodes.Node;
+import org.yaml.snakeyaml.nodes.NodeTuple;
+import org.yaml.snakeyaml.nodes.ScalarNode;
+import org.yaml.snakeyaml.nodes.SequenceNode;
 import org.yaml.snakeyaml.nodes.Tag;
-import org.yaml.snakeyaml.resolver.Resolver;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.Reader;
+import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Reads and writes the YAML files behind the configuration records.
+ * Reads and writes the YAML files behind the configuration records with SnakeYAML.
  * <p>
- * Files are read with SnakeYAML and written by {@link Writer} for improved writing speeds.
+ * Files are written from a tree of SnakeYAML nodes, as that is how SnakeYAML writes comments: in block style, indented
+ * by two spaces, with text in double quotes and long text kept on one line.
  */
 final class ConfigYaml {
+
+    private static final DumperOptions OPTIONS = new DumperOptions();
+
+    static {
+        OPTIONS.setIndent(2);
+        OPTIONS.setProcessComments(true);
+        OPTIONS.setSplitLines(false);
+        OPTIONS.setLineBreak(DumperOptions.LineBreak.getPlatformLineBreak());
+    }
+
+    // Can be shared, as serialize only reads it and makes a new emitter for each call
+    private static final Yaml DUMPER = new Yaml(OPTIONS);
 
     private ConfigYaml() {
     }
@@ -64,9 +82,18 @@ final class ConfigYaml {
     }
 
     /**
+     * {@return a file holding the entries, as UTF-8}
+     */
+    static byte[] dump(List<NodeTuple> entries) {
+        StringWriter out = new StringWriter(16 * 1024);
+        DUMPER.serialize(new MappingNode(Tag.MAP, entries, DumperOptions.FlowStyle.BLOCK), out);
+        return out.toString().getBytes(StandardCharsets.UTF_8);
+    }
+
+    /**
      * Writes the content to the file unless the file already holds exactly that content.
      */
-    static void write(Path file, Writer content) throws IOException {
+    static void write(Path file, byte[] content) throws IOException {
         BasicFileAttributes existing;
         try {
             existing = Files.readAttributes(file, BasicFileAttributes.class);
@@ -74,26 +101,20 @@ final class ConfigYaml {
             existing = null;
         }
         // Only a file of the same size can hold the same content, so a changed file is not read first
-        if (existing != null && existing.isRegularFile() && existing.size() == content.length()
-                && content.matches(Files.readAllBytes(file))) {
+        if (existing != null && existing.isRegularFile() && existing.size() == content.length
+                && Arrays.equals(content, Files.readAllBytes(file))) {
             return;
         }
         // Written in place so the file keeps its owner, permissions and any link it is reached through
         try {
-            writeBytes(file, content);
+            Files.write(file, content);
         } catch (NoSuchFileException e) {
             Path parent = file.toAbsolutePath().getParent();
             if (parent == null || Files.isDirectory(parent)) {
                 throw e;
             }
             Files.createDirectories(parent);
-            writeBytes(file, content);
-        }
-    }
-
-    private static void writeBytes(Path file, Writer content) throws IOException {
-        try (OutputStream stream = Files.newOutputStream(file)) {
-            content.writeTo(stream);
+            Files.write(file, content);
         }
     }
 
@@ -111,289 +132,63 @@ final class ConfigYaml {
     }
 
     /**
-     * Builds a file in block style, indented by two spaces, with text always in double quotes, directly as UTF-8.
-     * <p>
-     * The configuration only holds sections, booleans, whole numbers, text and lists of text, which is little enough to
-     * write directly. Going through SnakeYAML's node tree and emitter made saving slower than the old hand-written output.
-     * The bytes are compared with the file and written from the same buffer, so the content is never copied.
+     * {@return a key with its comments above it}
+     *
+     * @param blankLine if an empty line should be left above the comments
      */
-    static final class Writer {
-
-        private static final byte[] LINE_BREAK = DumperOptions.LineBreak.getPlatformLineBreak().getString()
-                .getBytes(StandardCharsets.US_ASCII);
-        private static final Resolver RESOLVER = new Resolver();
-        private static final byte[] HEX = "0123456789ABCDEF".getBytes(StandardCharsets.US_ASCII);
-        // Keys and comments come from the records and the limit group names, which are few and written on every save, so
-        // each is checked and encoded once. A key that needs quotes maps to QUOTED.
-        private static final Map<String, byte[]> KEYS = new ConcurrentHashMap<>();
-        private static final Map<String, byte[]> COMMENTS = new ConcurrentHashMap<>();
-        private static final byte[] QUOTED = new byte[0];
-
-        private byte[] bytes = new byte[16 * 1024];
-        private int length;
-
-        Writer blankLine() {
-            lineBreak();
-            return this;
+    static Node key(String name, List<String> comments, boolean blankLine) {
+        Node key = new ScalarNode(Tag.STR, name, null, null, DumperOptions.ScalarStyle.PLAIN);
+        List<CommentLine> lines = new ArrayList<>(comments.size() + 1);
+        if (blankLine) {
+            lines.add(new CommentLine(null, null, "", CommentType.BLANK_LINE));
         }
-
-        Writer comments(int indent, List<String> comments) {
-            for (String comment : comments) {
-                indent(indent);
-                put('#');
-                if (!comment.isEmpty()) {
-                    put(' ');
-                    copy(COMMENTS.computeIfAbsent(comment, text -> text.getBytes(StandardCharsets.UTF_8)));
-                }
-                lineBreak();
-            }
-            return this;
+        for (String comment : comments) {
+            lines.add(new CommentLine(null, null, comment.isEmpty() ? "" : " " + comment, CommentType.BLOCK));
         }
+        key.setBlockComments(lines);
+        return key;
+    }
 
-        /**
-         * Starts an entry. It must be followed by {@link #scalar}, {@link #list} or {@link #section}.
-         */
-        Writer key(int indent, String key) {
-            indent(indent);
-            byte[] plain = KEYS.computeIfAbsent(key, name -> isPlain(name) ? name.getBytes(StandardCharsets.UTF_8) : QUOTED);
-            if (plain == QUOTED) {
-                quoted(key);
-            } else {
-                copy(plain);
-            }
-            put(':');
-            return this;
+    /**
+     * {@return a boolean, a whole number, text or null}
+     */
+    static Node scalar(@Nullable Object value) {
+        return switch (value) {
+            case null -> plain(Tag.NULL, "null");
+            case Boolean b -> plain(Tag.BOOL, b.toString());
+            case Integer i -> plain(Tag.INT, i.toString());
+            case Long l -> plain(Tag.INT, l.toString());
+            default -> new ScalarNode(Tag.STR, value.toString(), null, null, DumperOptions.ScalarStyle.DOUBLE_QUOTED);
+        };
+    }
+
+    private static Node plain(Tag tag, String value) {
+        return new ScalarNode(tag, value, null, null, DumperOptions.ScalarStyle.PLAIN);
+    }
+
+    /**
+     * {@return a list of text}
+     */
+    static Node list(List<String> values) {
+        List<Node> items = new ArrayList<>(values.size());
+        for (String value : values) {
+            items.add(scalar(value));
         }
+        return new SequenceNode(Tag.SEQ, items, flowIfEmpty(values));
+    }
 
-        /**
-         * Ends an entry with a boolean, a whole number, text or null.
-         */
-        void scalar(@Nullable Object value) {
-            put(' ');
-            if (value == null) {
-                text("null");
-            } else if (value instanceof Boolean || value instanceof Integer || value instanceof Long) {
-                text(value.toString());
-            } else {
-                quoted(value.toString());
-            }
-            lineBreak();
-        }
+    /**
+     * {@return a section holding the entries}
+     */
+    static Node section(List<NodeTuple> entries) {
+        return new MappingNode(Tag.MAP, entries, flowIfEmpty(entries));
+    }
 
-        /**
-         * Ends an entry with a list, whose items go at the indent of its key.
-         */
-        void list(int indent, List<String> values) {
-            if (values.isEmpty()) {
-                text(" []");
-                lineBreak();
-                return;
-            }
-            lineBreak();
-            for (String value : values) {
-                indent(indent);
-                text("- ");
-                quoted(value);
-                lineBreak();
-            }
-        }
-
-        /**
-         * Ends an entry whose value is a section. Its entries follow, indented two more spaces.
-         */
-        void section(boolean empty) {
-            if (empty) {
-                text(" {}");
-            }
-            lineBreak();
-        }
-
-        /**
-         * {@return if the file holds exactly what was written}
-         */
-        boolean matches(byte[] content) {
-            return Arrays.equals(bytes, 0, length, content, 0, content.length);
-        }
-
-        int length() {
-            return length;
-        }
-
-        void writeTo(OutputStream stream) throws IOException {
-            stream.write(bytes, 0, length);
-        }
-
-        @Override
-        public String toString() {
-            return new String(bytes, 0, length, StandardCharsets.UTF_8);
-        }
-
-        /**
-         * {@return if a key can be written as is}
-         * That is a simple name which YAML reads back as text: {@code on}, {@code 123} or {@code null} need quotes.
-         */
-        private static boolean isPlain(String key) {
-            if (key.isEmpty() || key.charAt(0) == '-') {
-                return false;
-            }
-            for (int i = 0; i < key.length(); i++) {
-                char c = key.charAt(i);
-                if (!(c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z' || c >= '0' && c <= '9' || c == '-' || c == '_')) {
-                    return false;
-                }
-            }
-            return RESOLVER.resolve(NodeId.scalar, key, true) == Tag.STR;
-        }
-
-        /**
-         * Writes text in double quotes, escaping what YAML requires and what would not survive being written as is.
-         */
-        private void quoted(String value) {
-            // At most six bytes per character, for a lone surrogate written as a four digit escape
-            reserve(value.length() * 6 + 2);
-            raw('"');
-            for (int i = 0; i < value.length(); ) {
-                char ch = value.charAt(i);
-                if (ch >= 0x20 && ch < 0x7F && ch != '"' && ch != '\\') {
-                    raw(ch);
-                    i++;
-                    continue;
-                }
-                int c = value.codePointAt(i);
-                i += Character.charCount(c);
-                switch (c) {
-                    case '"' -> escape('"');
-                    case '\\' -> escape('\\');
-                    case 0 -> escape('0');
-                    case 0x07 -> escape('a');
-                    case '\b' -> escape('b');
-                    case '\t' -> escape('t');
-                    case '\n' -> escape('n');
-                    case 0x0B -> escape('v');
-                    case '\f' -> escape('f');
-                    case '\r' -> escape('r');
-                    case 0x1B -> escape('e');
-                    case 0x85 -> escape('N');
-                    case 0xA0 -> escape('_');
-                    case 0x2028 -> escape('L');
-                    case 0x2029 -> escape('P');
-                    default -> {
-                        if (isPrintable(c)) {
-                            codePoint(c);
-                        } else if (c <= 0xFF) {
-                            hex('x', c, 2);
-                        } else if (c <= 0xFFFF) {
-                            hex('u', c, 4);
-                        } else {
-                            hex('U', c, 8);
-                        }
-                    }
-                }
-            }
-            raw('"');
-        }
-
-        /**
-         * {@return if YAML allows the character unescaped} Lone surrogates and the byte order mark are escaped.
-         */
-        private static boolean isPrintable(int c) {
-            return c >= 0x20 && c <= 0x7E || c >= 0xA1 && c <= 0xD7FF || c >= 0xE000 && c <= 0xFFFD && c != 0xFEFF
-                    || c >= 0x10000 && c <= 0x10FFFF;
-        }
-
-        private void escape(char c) {
-            raw('\\');
-            raw(c);
-        }
-
-        private void hex(char kind, int c, int digits) {
-            escape(kind);
-            for (int shift = (digits - 1) * 4; shift >= 0; shift -= 4) {
-                raw(HEX[(c >> shift) & 0xF]);
-            }
-        }
-
-        /**
-         * Writes text as is, as UTF-8. A lone surrogate becomes {@code ?}, as {@link String#getBytes()} would make it.
-         */
-        private void text(String text) {
-            // At most three bytes per character, as a character outside the BMP takes two
-            reserve(text.length() * 3);
-            for (int i = 0; i < text.length(); ) {
-                char c = text.charAt(i);
-                if (c < 0x80) {
-                    raw(c);
-                    i++;
-                } else {
-                    int codePoint = text.codePointAt(i);
-                    i += Character.charCount(codePoint);
-                    codePoint(codePoint <= 0xFFFF && Character.isSurrogate((char) codePoint) ? '?' : codePoint);
-                }
-            }
-        }
-
-        /**
-         * Writes a character as UTF-8. The caller reserves the space.
-         */
-        private void codePoint(int c) {
-            if (c < 0x80) {
-                raw(c);
-            } else if (c < 0x800) {
-                raw(0xC0 | c >> 6);
-                raw(0x80 | c & 0x3F);
-            } else if (c < 0x10000) {
-                raw(0xE0 | c >> 12);
-                raw(0x80 | c >> 6 & 0x3F);
-                raw(0x80 | c & 0x3F);
-            } else {
-                raw(0xF0 | c >> 18);
-                raw(0x80 | c >> 12 & 0x3F);
-                raw(0x80 | c >> 6 & 0x3F);
-                raw(0x80 | c & 0x3F);
-            }
-        }
-
-        private void indent(int indent) {
-            reserve(indent);
-            Arrays.fill(bytes, length, length + indent, (byte) ' ');
-            length += indent;
-        }
-
-        private void lineBreak() {
-            copy(LINE_BREAK);
-        }
-
-        private void copy(byte[] encoded) {
-            reserve(encoded.length);
-            System.arraycopy(encoded, 0, bytes, length, encoded.length);
-            length += encoded.length;
-        }
-
-        /**
-         * Appends a single byte to the current output buffer after reserving space for it.
-         */
-        private void put(int b) {
-            reserve(1);
-            raw(b);
-        }
-
-        /**
-         * Ensures the internal buffer can hold at least {@code count} more bytes.
-         * If the current buffer is too small, it is expanded to keep the writer efficient.
-         */
-        private void reserve(int count) {
-            if (length + count > bytes.length) {
-                bytes = Arrays.copyOf(bytes, Math.max(bytes.length * 2, length + count));
-            }
-        }
-
-        /**
-         * Writes a byte into space already reserved.
-         */
-        private void raw(int b) {
-            bytes[length++] = (byte) b;
-        }
-
+    /**
+     * {@return the style of a list or section} An empty one is written as {@code []} or {@code {}}.
+     */
+    private static DumperOptions.FlowStyle flowIfEmpty(List<?> items) {
+        return items.isEmpty() ? DumperOptions.FlowStyle.FLOW : DumperOptions.FlowStyle.BLOCK;
     }
 
 }
