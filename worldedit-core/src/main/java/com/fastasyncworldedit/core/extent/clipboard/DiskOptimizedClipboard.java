@@ -43,6 +43,7 @@ import java.io.RandomAccessFile;
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
+import java.nio.file.Path;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.nio.channels.OverlappingFileLockException;
@@ -87,10 +88,10 @@ public class DiskOptimizedClipboard extends LinearClipboard {
     public DiskOptimizedClipboard(Region region, UUID uuid) {
         this(
                 region.getDimensions(),
-                MainUtil.getFile(
-                        Fawe.instance() != null ? Fawe.platform().getDirectory() : new File("."),
-                        Settings.settings().paths().clipboard() + File.separator + uuid + ".bd"
-                )
+                (Fawe.instance() != null ? Fawe.platform().getPath() : Path.of("."))
+                        .resolve(Settings.settings().paths().clipboard())
+                        .resolve(uuid + ".bd")
+                        .toFile()
         );
         setOffset(region.getMinimumPoint());
         setOrigin(region.getMinimumPoint());
@@ -107,10 +108,10 @@ public class DiskOptimizedClipboard extends LinearClipboard {
     public DiskOptimizedClipboard(BlockVector3 dimensions) {
         this(
                 dimensions,
-                MainUtil.getFile(
-                        Fawe.platform() != null ? Fawe.platform().getDirectory() : new File("."),
-                        Settings.settings().paths().clipboard() + File.separator + UUID.randomUUID() + ".bd"
-                )
+                (Fawe.platform() != null ? Fawe.platform().getPath() : Path.of("."))
+                        .resolve(Settings.settings().paths().clipboard())
+                        .resolve(UUID.randomUUID() + ".bd")
+                        .toFile()
         );
     }
 

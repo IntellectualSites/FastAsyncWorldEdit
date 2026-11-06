@@ -212,10 +212,10 @@ public class ImageUtil {
             }
             if (arg.startsWith("file:/")) {
                 arg = arg.replaceFirst("file:/+", "");
-                File file = MainUtil.getFile(MainUtil.getFile(
-                        Fawe.platform().getDirectory(),
-                        Settings.settings().paths().heightmap()
-                ), arg);
+                File file = Fawe.platform().getPath()
+                        .resolve(Settings.settings().paths().heightmap())
+                        .resolve(arg)
+                        .toFile();
                 return MainUtil.readImage(file);
             }
             throw new InputParseException(Caption.of("fawe.error.invalid-image", TextComponent.of(arg)));
@@ -236,10 +236,10 @@ public class ImageUtil {
             }
             if (arg.startsWith("file:/")) {
                 arg = arg.replaceFirst("file:/+", "");
-                File file = MainUtil.getFile(MainUtil.getFile(
-                        Fawe.platform().getDirectory(),
-                        Settings.settings().paths().heightmap()
-                ), arg);
+                File file = Fawe.platform().getPath()
+                        .resolve(Settings.settings().paths().heightmap())
+                        .resolve(arg)
+                        .toFile();
                 if (!file.exists()) {
                     throw new InputParseException(Caption.of(
                             "fawe.error.file-not-found",

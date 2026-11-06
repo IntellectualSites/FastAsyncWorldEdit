@@ -109,14 +109,16 @@ public class Fawe {
 
         TaskManager.taskManager().async(() -> {
             MainUtil.deleteOlder(
-                    MainUtil.getFile(this.implementation
-                            .getDirectory(), Settings.settings().paths().history()),
+                    this.implementation.getPath()
+                            .resolve(Settings.settings().paths().history())
+                            .toFile(),
                     TimeUnit.DAYS.toMillis(Settings.settings().history().deleteAfterDays()),
                     false
             );
             MainUtil.deleteOlder(
-                    MainUtil.getFile(this.implementation
-                            .getDirectory(), Settings.settings().paths().clipboard()),
+                    this.implementation.getPath()
+                            .resolve(Settings.settings().paths().clipboard())
+                            .toFile(),
                     TimeUnit.DAYS.toMillis(Settings.settings().clipboard().deleteAfterDays()),
                     false
             );

@@ -120,7 +120,7 @@ public class FaweBukkit implements IFawe, Listener {
 
     @Override
     public File getDirectory() {
-        return plugin.getDataFolder();
+        return getPath().toFile();
     }
 
     public ItemUtil getItemUtil() {
