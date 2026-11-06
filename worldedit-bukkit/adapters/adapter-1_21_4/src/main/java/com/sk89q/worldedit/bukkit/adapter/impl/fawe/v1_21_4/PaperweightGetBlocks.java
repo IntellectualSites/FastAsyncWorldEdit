@@ -342,6 +342,7 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
                 }
             copies.put(copyKey, copy);
         }
+        //TODO: optimise
         List<BlockEntity> beacons = TaskManager.taskManager().sync(() -> {
             // Remove existing tiles. Create a copy so that we can remove blocks
             Map<BlockPos, BlockEntity> chunkTiles = new HashMap<>(nmsChunk.getBlockEntities());
