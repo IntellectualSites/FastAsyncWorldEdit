@@ -249,7 +249,12 @@ public class DiskOptimizedClipboard extends LinearClipboard {
 
     private void loadNBTFromFileFooter(int nbtCount, int entitiesCount, long biomeLength) throws IOException {
         int biomeBlocksLength = headerSize + (getVolume() << 1) + (hasBiomes ? (int) biomeLength : 0);
-        MappedByteBuffer tmp = fileChannel.map(FileChannel.MapMode.READ_ONLY, biomeBlocksLength, braf.length());
+        // FileChannel#map takes a size, not an end position. Mapping past the end of the file would silently grow it.
+        MappedByteBuffer tmp = fileChannel.map(
+                FileChannel.MapMode.READ_ONLY,
+                biomeBlocksLength,
+                braf.length() - biomeBlocksLength
+        );
         try (NBTInputStream nbtIS = new NBTInputStream(MainUtil.getCompressedIS(new ByteBufferInputStream(tmp)))) {
             Iterator<CompoundTag> iter = nbtIS.toIterator();
             while (nbtCount > 0 && iter.hasNext()) { // TileEntities are stored "before" entities
@@ -625,11 +630,16 @@ public class DiskOptimizedClipboard extends LinearClipboard {
                 return;
             }
 
-            long currentLength = this.braf.length();
-            this.braf.setLength(currentLength + baOS.size());
+            // Overwrite the existing footer (if any) directly after the block and biome data instead of appending a new one
+            long footerStart = headerSize + ((long) getVolume() << 1) + (hasBiomes
+                    ? (long) ((getHeight() >> 2) + 1) * ((getLength() >> 2) + 1) * ((getWidth() >> 2) + 1)
+                    : 0);
+            if (this.braf.length() < footerStart + baOS.size()) {
+                this.braf.setLength(footerStart + baOS.size());
+            }
             MappedByteBuffer tempBuffer = fileChannel.map(
                     FileChannel.MapMode.READ_WRITE,
-                    currentLength,
+                    footerStart,
                     baOS.size()
             );
             tempBuffer.put(output);
