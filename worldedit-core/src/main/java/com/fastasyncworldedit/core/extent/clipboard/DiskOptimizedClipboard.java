@@ -631,9 +631,10 @@ public class DiskOptimizedClipboard extends LinearClipboard {
             }
 
             // Overwrite the existing footer (if any) directly after the block and biome data instead of appending a new one
-            long footerStart = headerSize + ((long) getVolume() << 1) + (hasBiomes
-                    ? getBiomeLength()
-                    : 0);
+            long footerStart = headerSize + ((long) getVolume() << 1);
+            if (hasBiomes) {
+                footerStart += getBiomeLength();
+            }
             if (this.braf.length() < footerStart + baOS.size()) {
                 this.braf.setLength(footerStart + baOS.size());
             }
