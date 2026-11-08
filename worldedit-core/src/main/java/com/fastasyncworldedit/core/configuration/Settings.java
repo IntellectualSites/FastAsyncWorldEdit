@@ -270,6 +270,7 @@ public record Settings(
         tree.remove("commit");
     }
 
+    @SuppressWarnings("unchecked")
     private static void moveIntoLimits(ConfigTree tree, String from, String option) {
         Object value = tree.remove(from);
         if (value == null) {
@@ -282,8 +283,11 @@ public record Settings(
             // Not a section, which binding reports
             return;
         }
-        for (String group : groups.keySet()) {
-            tree.putIfAbsent("limits." + group + "." + option, value);
+        // Groups are addressed through the map rather than a dotted path, as their names may contain dots
+        for (Object group : List.copyOf(groups.values())) {
+            if (group instanceof Map<?, ?> section) {
+                ((Map<String, Object>) section).putIfAbsent(option, value);
+            }
         }
     }
 
