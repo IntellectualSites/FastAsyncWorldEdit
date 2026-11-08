@@ -505,7 +505,7 @@ public abstract class QueueHandler implements Trimable, Runnable {
      * @return New queue for given world
      */
     public IQueueExtent<IQueueChunk> getQueue(World world, IBatchProcessor processor, IBatchProcessor postProcessor) {
-        final IQueueExtent<IQueueChunk> queue = pool();
+        final IQueueExtent<IQueueChunk> queue = create();
         IChunkCache<IChunkGet> cacheGet = getOrCreateWorldCache(world);
         IChunkCache<IChunkSet> set = null; // TODO cache?
         queue.init(world, cacheGet, set);
