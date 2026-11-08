@@ -11,6 +11,9 @@ import org.yaml.snakeyaml.error.YAMLException;
 import org.yaml.snakeyaml.nodes.NodeTuple;
 
 import java.io.IOException;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MutableCallSite;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -76,8 +79,9 @@ public record Settings(
     // Written to the file for people reading it, never read back
     private static final List<String> INFORMATION = List.of("issues", "wiki");
 
-    // Not volatile: settings are immutable, so a thread that has not yet seen a reload reads the previous ones, whole
-    private static Settings instance = defaults();
+    private static final MutableCallSite INSTANCE =
+            new MutableCallSite(MethodHandles.constant(Settings.class, defaults()));
+    private static final MethodHandle GET = INSTANCE.dynamicInvoker();
 
     public Settings {
         Map<String, Limits> groups = new LinkedHashMap<>(limits);
@@ -93,7 +97,11 @@ public record Settings(
      * @since 2.0.0
      */
     public static Settings settings() {
-        return instance;
+        try {
+            return (Settings) GET.invokeExact();
+        } catch (Throwable e) {
+            throw new AssertionError(e);
+        }
     }
 
     /**
@@ -104,7 +112,9 @@ public record Settings(
      */
     @ApiStatus.Internal
     public static void set(Settings settings) {
-        instance = Objects.requireNonNull(settings);
+        INSTANCE.setTarget(MethodHandles.constant(Settings.class, Objects.requireNonNull(settings)));
+        // Makes other threads see the new settings
+        MutableCallSite.syncAll(new MutableCallSite[] {INSTANCE});
     }
 
     /**
@@ -152,7 +162,9 @@ public record Settings(
     }
 
     private static synchronized void overrideOption(Option option, Object value) {
-        instance = instance.with(ConfigMapper.pathOf(Settings.class, option), value);
+        Settings updated = settings().with(ConfigMapper.pathOf(Settings.class, option), value);
+        INSTANCE.setTarget(MethodHandles.constant(Settings.class, updated));
+        MutableCallSite.syncAll(new MutableCallSite[] {INSTANCE});
     }
 
     /**
