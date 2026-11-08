@@ -24,6 +24,7 @@ import com.sk89q.worldedit.entity.metadata.EntityProperties;
 import com.sk89q.worldedit.function.EntityFunction;
 
 import javax.annotation.Nullable;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -32,107 +33,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * The implementation of /remove.
  */
 public class EntityRemover {
-
-    public enum Type {
-        ALL("all") {
-            @Override
-            boolean matches(EntityProperties type) {
-                for (Type value : values()) {
-                    if (value != this && value.matches(type)) {
-                        return true;
-                    }
-                }
-                return false;
-            }
-        },
-        PROJECTILES("projectiles?|arrows?") {
-            @Override
-            boolean matches(EntityProperties type) {
-                return type.isProjectile();
-            }
-        },
-        ITEMS("items?|drops?") {
-            @Override
-            boolean matches(EntityProperties type) {
-                return type.isItem();
-            }
-        },
-        FALLING_BLOCKS("falling(blocks?|sand|gravel)") {
-            @Override
-            boolean matches(EntityProperties type) {
-                return type.isFallingBlock();
-            }
-        },
-        PAINTINGS("paintings?|art") {
-            @Override
-            boolean matches(EntityProperties type) {
-                return type.isPainting();
-            }
-        },
-        ITEM_FRAMES("(item)frames?") {
-            @Override
-            boolean matches(EntityProperties type) {
-                return type.isItemFrame();
-            }
-        },
-        BOATS("boats?") {
-            @Override
-            boolean matches(EntityProperties type) {
-                return type.isBoat();
-            }
-        },
-        MINECARTS("(mine)?carts?") {
-            @Override
-            boolean matches(EntityProperties type) {
-                return type.isMinecart();
-            }
-        },
-        TNT("tnt") {
-            @Override
-            boolean matches(EntityProperties type) {
-                return type.isTNT();
-            }
-        },
-        XP_ORBS("xp") {
-            @Override
-            boolean matches(EntityProperties type) {
-                return type.isExperienceOrb();
-            }
-        };
-
-        private final Pattern pattern;
-
-        Type(String pattern) {
-            this.pattern = Pattern.compile(pattern);
-        }
-
-        public boolean matches(String str) {
-            return pattern.matcher(str).matches();
-        }
-
-        abstract boolean matches(EntityProperties type);
-
-        @Nullable
-        public static Type findByPattern(String str) {
-            for (Type type : values()) {
-                if (type.matches(str)) {
-                    return type;
-                }
-            }
-
-            return null;
-        }
-    }
-
-    public static EntityRemover fromString(String str) {
-        Type type = Type.findByPattern(str);
-        if (type != null) {
-            return new EntityRemover(type);
-        } else {
-            throw new IllegalArgumentException(
-                    "Acceptable types: projectiles, items, paintings, itemframes, boats, minecarts, tnt, xp, or all");
-        }
-    }
 
     private final Type type;
 
@@ -146,7 +46,7 @@ public class EntityRemover {
         return entity -> {
             EntityProperties registryType = entity.getFacet(EntityProperties.class);
             if (registryType != null) {
-                if (type.matches(registryType)) {
+                if (type.matcher.test(registryType)) {
                     //FAWE start - Calling this async violates thread safety
                     TaskManager.taskManager().sync(entity::remove);
                     //FAWE end
@@ -158,4 +58,59 @@ public class EntityRemover {
         };
     }
 
+    public static EntityRemover fromString(String str) {
+        Type type = Type.findByPattern(str);
+        if (type != null) {
+            return new EntityRemover(type);
+        } else {
+            throw new IllegalArgumentException(
+                    "Acceptable types: projectiles, items, paintings, itemframes, boats, minecarts, tnt, xp, or all");
+        }
+    }
+
+    public enum Type {
+        ALL("all", Type::isAll),
+        PROJECTILES("projectiles?|arrows?", EntityProperties::isProjectile),
+        ITEMS("items?|drops?", EntityProperties::isItem),
+        FALLING_BLOCKS("falling(blocks?|sand|gravel)", EntityProperties::isFallingBlock),
+        PAINTINGS("paintings?|art", EntityProperties::isPainting),
+        ITEM_FRAMES("(item)frames?", EntityProperties::isItemFrame),
+        BOATS("boats?", EntityProperties::isBoat),
+        MINECARTS("(mine)?carts?", EntityProperties::isMinecart),
+        TNT("tnt", EntityProperties::isTNT),
+        XP_ORBS("xp", EntityProperties::isExperienceOrb);
+
+        private final Pattern pattern;
+        private final Predicate<EntityProperties> matcher;
+
+        private static final Type[] VALUES;
+
+        Type(String pattern, final Predicate<EntityProperties> matcher) {
+            this.pattern = Pattern.compile(pattern);
+            this.matcher = matcher;
+        }
+        @Nullable
+        public static Type findByPattern(String str) {
+            for (Type type : Type.VALUES) {
+                if (type.pattern.matcher(str).matches()) {
+                    return type;
+                }
+            }
+
+            return null;
+        }
+
+        private static boolean isAll(EntityProperties type) {
+            for (Type value : Type.VALUES) {
+                if (value.matcher.test(type)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        static {
+            VALUES = values();
+        }
+    }
 }
