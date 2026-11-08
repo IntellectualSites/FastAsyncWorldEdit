@@ -529,32 +529,22 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
                     synchronized (lock) {
                         lock.acquire(); // Wait until we have the lock
                         lock.release();
-                        // Lock order: a section's lock (sectionLocks[i]) comes before sectionLock. Readers take them in
-                        // that order (CharBlocks EMPTY.get -> update -> getSections). reset() takes every section's lock,
-                        // so calling it while holding sectionLock deadlocks against a reader. Defer it until after unlock.
-                        boolean resetAll = false;
                         try {
                             sectionLock.writeLock().lock();
                             if (this.getChunk() != nmsChunk) {
                                 this.levelChunk = nmsChunk;
                                 this.sections = null;
-                                resetAll = true;
+                                this.reset();
                             } else if (existingSection != getSections(false)[getSectionIndex]) {
                                 this.sections[getSectionIndex] = existingSection;
-                                resetAll = true;
+                                this.reset();
                             } else if (!Arrays.equals(update(getSectionIndex, new char[4096], true), load(layerNo))) {
-                                // Safe under sectionLock: it only takes this section's lock, which we already hold.
                                 this.reset(layerNo);
                             /*} else if (lock.isModified()) {
                                 this.reset(layerNo);*/
                             }
                         } finally {
                             sectionLock.writeLock().unlock();
-                        }
-                        // Deferred from above: sectionLock is released, so taking every section's lock here is safe.
-                        // Still runs before newChunkSection(this::load, ...) reads the cache below.
-                        if (resetAll) {
-                            this.reset();
                         }
 
                         PalettedContainer<Holder<Biome>> biomeData = setBiomesToPalettedContainer(
@@ -834,16 +824,13 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
             char[] arr,
             int layer
     ) {
-        // reset() takes every section's lock, and a section's lock must come before sectionLock (see internalCall).
-        // Defer it until sectionLock is released to avoid deadlocking against a reader.
-        boolean resetAll = false;
         try {
             sectionLock.writeLock().lock();
             if (this.getChunk() != nmsChunk) {
                 this.levelChunk = nmsChunk;
                 this.sections = new LevelChunkSection[chunkSections.length];
                 System.arraycopy(chunkSections, 0, this.sections, 0, chunkSections.length);
-                resetAll = true;
+                this.reset();
             }
             if (this.sections == null) {
                 this.sections = new LevelChunkSection[chunkSections.length];
@@ -855,10 +842,6 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
             }
         } finally {
             sectionLock.writeLock().unlock();
-        }
-        // Deferred reset (see above). Must run before blocks[layer] is set, or it would clear the new array.
-        if (resetAll) {
-            this.reset();
         }
         this.blocks[layer] = arr;
     }
@@ -1093,13 +1076,11 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
                     blockLight = new DataLayer[getSectionCount()];
                     sections = null;
                     levelChunk = null;
+                    return super.trim(true);
                 }
             } finally {
                 sectionLock.writeLock().unlock();
             }
-            // super.trim(true) takes every section's lock, and a section's lock must come before sectionLock (see
-            // internalCall). Run it after sectionLock is released to avoid deadlocking against a reader.
-            return super.trim(true);
         }
         synchronized (this) {
             for (int i = getMinSectionPosition(); i <= getMaxSectionPosition(); i++) {
