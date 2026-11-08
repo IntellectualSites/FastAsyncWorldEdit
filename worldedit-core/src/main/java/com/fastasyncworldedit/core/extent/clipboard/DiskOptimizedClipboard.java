@@ -49,9 +49,11 @@ import java.nio.channels.OverlappingFileLockException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -80,6 +82,9 @@ public class DiskOptimizedClipboard extends LinearClipboard {
     private boolean hasBiomes = false;
     private boolean canHaveBiomes = true;
     private int nbtBytesRemaining;
+    // Whether the NBT footer must be rewritten on close. Cleared after loading from disk
+    private boolean footerOutdated = true;
+    private Set<BlockArrayClipboard.ClipboardEntity> entitiesOnLoad = Set.of();
 
     /**
      * Creates a new DiskOptimizedClipboard for the given region. Creates or overwrites a file using the given UUID as a name.
@@ -206,6 +211,8 @@ public class DiskOptimizedClipboard extends LinearClipboard {
                 hasBiomes = true;
             }
             getAndSetOffsetAndOrigin();
+            footerOutdated = false;
+            entitiesOnLoad = new HashSet<>(entities);
         } catch (IOException e) {
             close();
             throw new RuntimeException(e);
@@ -345,6 +352,8 @@ public class DiskOptimizedClipboard extends LinearClipboard {
         if (!hasBiomes) {
             try {
                 hasBiomes = true;
+                // Resizing the file below truncates the footer
+                footerOutdated = true;
                 close();
                 this.braf = new RandomAccessFile(file, "rw");
                 // Since biomes represent a 4x4x4 cube, we store fewer biome bytes that volume at 1 byte per biome
@@ -521,7 +530,8 @@ public class DiskOptimizedClipboard extends LinearClipboard {
         try {
             if (byteBuffer != null) {
                 if (headerSize >= VERSION_2_HEADER_SIZE) {
-                    if (Settings.settings().CLIPBOARD.SAVE_CLIPBOARD_NBT_TO_DISK) {
+                    if (Settings.settings().CLIPBOARD.SAVE_CLIPBOARD_NBT_TO_DISK
+                            && (footerOutdated || !entities.equals(entitiesOnLoad))) {
                         try {
                             writeNBTToDisk();
                         } catch (Exception e) {
@@ -734,6 +744,7 @@ public class DiskOptimizedClipboard extends LinearClipboard {
 
     @Override
     public boolean tile(final int x, final int y, final int z, final FaweCompoundTag tile) throws WorldEditException {
+        footerOutdated = true;
         nbtMap.put(new IntTriple(x, y, z), NbtUtils.withPosition(tile, x, y, z));
         return true;
     }
