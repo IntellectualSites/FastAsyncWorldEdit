@@ -124,7 +124,7 @@ public class DiskOptimizedClipboard extends LinearClipboard {
         if (headerSize + ((long) getVolume() << 1) >= Integer.MAX_VALUE) {
             throw new IllegalArgumentException(
                     "Dimensions too large for this clipboard format. Use //lazycopy for large selections.");
-        } else if (headerSize + ((long) getVolume() << 1) + (long) ((getHeight() >> 2) + 1) * ((getLength() >> 2) + 1) * ((getWidth() >> 2) + 1) >= Integer.MAX_VALUE) {
+        } else if (headerSize + ((long) getVolume() << 1) + getBiomeLength() >= Integer.MAX_VALUE) {
             LOGGER.error("Dimensions are too large for biomes to be stored in a DiskOptimizedClipboard");
             canHaveBiomes = false;
         }
@@ -192,7 +192,7 @@ public class DiskOptimizedClipboard extends LinearClipboard {
             this.nbtBytesRemaining = Integer.MAX_VALUE - (int) file.length();
             init();
 
-            int biomeLength = ((getHeight() >> 2) + 1) * ((getLength() >> 2) + 1) * ((getWidth() >> 2) + 1);
+            long biomeLength = getBiomeLength();
             canHaveBiomes = (long) headerSize + biomeLength < Integer.MAX_VALUE;
 
             if (headerSize >= VERSION_2_HEADER_SIZE) {
@@ -350,7 +350,7 @@ public class DiskOptimizedClipboard extends LinearClipboard {
                 // Since biomes represent a 4x4x4 cube, we store fewer biome bytes that volume at 1 byte per biome
                 // +1 to each to allow for cubes that lie across the region boundary
                 long length =
-                        headerSize + ((long) getVolume() << 1) + (long) ((getHeight() >> 2) + 1) * ((getLength() >> 2) + 1) * ((getWidth() >> 2) + 1);
+                        headerSize + ((long) getVolume() << 1) + getBiomeLength();
                 this.braf.setLength(length);
                 this.nbtBytesRemaining = Integer.MAX_VALUE - (int) length;
                 init();
@@ -632,7 +632,7 @@ public class DiskOptimizedClipboard extends LinearClipboard {
 
             // Overwrite the existing footer (if any) directly after the block and biome data instead of appending a new one
             long footerStart = headerSize + ((long) getVolume() << 1) + (hasBiomes
-                    ? (long) ((getHeight() >> 2) + 1) * ((getLength() >> 2) + 1) * ((getWidth() >> 2) + 1)
+                    ? getBiomeLength()
                     : 0);
             if (this.braf.length() < footerStart + baOS.size()) {
                 this.braf.setLength(footerStart + baOS.size());
@@ -658,6 +658,14 @@ public class DiskOptimizedClipboard extends LinearClipboard {
 
     public int getIndex(int x, int y, int z) {
         return x + y * getArea() + z * getWidth();
+    }
+
+    /**
+     * Get the number of bytes used to store biomes. Each biome covers a 4x4x4 cube, with one extra entry per axis to allow
+     * for cubes that lie across the clipboard boundary.
+     */
+    private long getBiomeLength() {
+        return (long) ((getHeight() >> 2) + 1) * ((getLength() >> 2) + 1) * ((getWidth() >> 2) + 1);
     }
 
     public int getBiomeIndex(int x, int y, int z) {
