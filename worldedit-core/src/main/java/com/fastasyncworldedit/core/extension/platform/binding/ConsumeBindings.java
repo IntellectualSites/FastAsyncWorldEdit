@@ -13,6 +13,9 @@ import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.NoMatchException;
 import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.extension.platform.Capability;
+import com.sk89q.worldedit.extension.platform.MultiUserPlatform;
+import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.extension.platform.PlatformCommandManager;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.internal.annotation.Selection;
@@ -29,8 +32,13 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import org.enginehub.piston.exception.StopExecutionException;
 import org.enginehub.piston.inject.InjectedValueAccess;
+import org.enginehub.piston.inject.Key;
 
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Stream;
+
+import static org.enginehub.piston.converter.SuggestionHelper.limitByPrefix;
 
 @SuppressWarnings("unused")
 public class ConsumeBindings extends Bindings {
@@ -153,7 +161,7 @@ public class ConsumeBindings extends Bindings {
     }
 
     @Binding
-    public UUID playerUUID(Actor actor, String argument) {
+    public UUID playerUUID(Actor actor, InjectedValueAccess context, String argument) {
         if (argument.equals("me")) {
             return actor.getUniqueId();
         }
@@ -167,12 +175,30 @@ public class ConsumeBindings extends Bindings {
         if (argument.length() > 16) {
             uuid = UUID.fromString(argument);
         } else {
+            // if the command is parsed for suggestions, we just return the actors UUID
+            // (the client requests suggestions on every keystroke, and looking up a partial name hits the Mojang API)
+            if (context.injectedValue(Key.of(boolean.class)).orElse(false)) {
+                return actor.getUniqueId();
+            }
             uuid = Fawe.platform().getUUID(argument);
         }
         if (uuid == null) {
             throw new InputParseException(Caption.of("fawe.error.player.not.found", TextComponent.of(argument)));
         }
         return uuid;
+    }
+
+    @Override
+    protected List<String> getSuggestions(Key<?> key, String input, InjectedValueAccess context) {
+        if (!key.equals(Key.of(UUID.class))) {
+            return super.getSuggestions(key, input, context);
+        }
+        Stream<String> suggestions = Stream.of("me", "*", "console");
+        Platform platform = getWorldEdit().getPlatformManager().queryCapability(Capability.GAME_HOOKS);
+        if (platform instanceof MultiUserPlatform multiUserPlatform) {
+            suggestions = Stream.concat(suggestions, multiUserPlatform.getConnectedUsers().stream().map(Actor::getName));
+        }
+        return limitByPrefix(suggestions, input);
     }
 
 
