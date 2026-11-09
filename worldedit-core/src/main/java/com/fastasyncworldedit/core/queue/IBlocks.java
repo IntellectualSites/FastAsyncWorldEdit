@@ -112,6 +112,7 @@ public interface IBlocks extends Trimable {
 
     void removeSectionLighting(int layer, boolean sky);
 
+    //TODO: value class for layer would be lovely to enforce layer != index
     boolean trim(boolean aggressive, int layer);
 
     IBlocks reset();
