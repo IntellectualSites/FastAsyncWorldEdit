@@ -28,7 +28,7 @@ public interface IQueueChunk<T extends Future<T>> extends IChunk, Callable<T> {
      *
      * @param parentWrapper wrapper wrapping this {@link ChunkHolder instance}
      * @throws IllegalStateException if there is already a wrapper set and a new wrapper instance is attempted to be se
-     * @since TODO
+     * @since 2.15.4
      */
     void setWrapper(WrapperChunk<?> parentWrapper);
 

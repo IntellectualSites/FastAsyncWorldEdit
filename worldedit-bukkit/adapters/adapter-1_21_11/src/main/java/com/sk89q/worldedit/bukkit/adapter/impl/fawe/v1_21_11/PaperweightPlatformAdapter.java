@@ -5,6 +5,7 @@ import ca.spottedleaf.moonrise.patches.chunk_system.scheduling.ChunkHolderManage
 import com.fastasyncworldedit.bukkit.adapter.CachedBukkitAdapter;
 import com.fastasyncworldedit.bukkit.adapter.DelegateSemaphore;
 import com.fastasyncworldedit.bukkit.adapter.NMSAdapter;
+import com.fastasyncworldedit.bukkit.util.PaperSupport;
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.math.BitArrayUnstretched;
@@ -19,7 +20,6 @@ import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
-import io.papermc.lib.PaperLib;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.IdMap;
@@ -41,6 +41,7 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.minecraft.world.level.chunk.PalettedContainer;
@@ -123,10 +124,10 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             fieldPalette.setAccessible(true);
 
             //noinspection JavaLangInvokeHandleSignature - method is obfuscated
-            palettedContainerUnpackSpigot = PaperLib.isPaper() ? null : lookup.findStatic(
-                    PalettedContainer.class,
-                    "a", // unpack
-                    MethodType.methodType(DataResult.class, Strategy.class, PalettedContainerRO.PackedData.class)
+            palettedContainerUnpackSpigot = PaperSupport.isPaper() ? null : lookup.findStatic(
+                PalettedContainer.class,
+                "a", // unpack
+                MethodType.methodType(DataResult.class, Strategy.class, PalettedContainerRO.PackedData.class)
             );
 
             fieldTickingFluidCount = LevelChunkSection.class.getDeclaredField(Refraction.pickName(
@@ -155,7 +156,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             getVisibleChunkIfPresent.setAccessible(true);
             methodGetVisibleChunk = lookup.unreflect(getVisibleChunkIfPresent);
 
-            if (!PaperLib.isPaper()) {
+            if (!PaperSupport.isPaper()) {
                 fieldThreadingDetector = PalettedContainer.class.getDeclaredField(Refraction.pickName("threadingDetector", "d"));
                 fieldThreadingDetector.setAccessible(true);
                 fieldLock = ThreadingDetector.class.getDeclaredField(Refraction.pickName("lock", "c"));
@@ -232,7 +233,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             ThreadLocal.withInitial(() -> new DelegateSemaphore(1, null));
 
     static DelegateSemaphore applyLock(LevelChunkSection section) {
-        if (PaperLib.isPaper()) {
+        if (PaperSupport.isPaper()) {
             return SEMAPHORE_THREAD_LOCAL.get();
         }
         try {
@@ -260,19 +261,19 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         if (levelChunk != null) {
             return CompletableFuture.completedFuture(levelChunk);
         }
-        if (PaperLib.isPaper()) {
+        if (PaperSupport.isPaper()) {
             CompletableFuture<LevelChunk> future = serverLevel
-                    .getWorld()
-                    .getChunkAtAsync(chunkX, chunkZ, true, true)
-                    .thenApply(chunk -> {
-                        addTicket(serverLevel, chunkX, chunkZ);
-                        try {
-                            return toLevelChunk(chunk);
-                        } catch (Throwable e) {
-                            LOGGER.error("Could not asynchronously load chunk at {},{}", chunkX, chunkZ, e);
-                            return null;
-                        }
-                    });
+                .getWorld()
+                .getChunkAtAsync(chunkX, chunkZ, true, true)
+                .thenApply(chunk -> {
+                    addTicket(serverLevel, chunkX, chunkZ);
+                    try {
+                        return toLevelChunk(chunk);
+                    } catch (Throwable e) {
+                        LOGGER.error("Could not asynchronously load chunk at {},{}", chunkX, chunkZ, e);
+                        return null;
+                    }
+                });
             try {
                 if (!future.isCompletedExceptionally() || (future.isDone() && future.get() != null)) {
                     return future;
@@ -281,10 +282,10 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                 LOGGER.error("Asynchronous chunk load at {},{} exceptionally completed immediately", chunkX, chunkZ, t);
             } catch (InterruptedException | ExecutionException e) {
                 LOGGER.error(
-                        "Unexpected error when getting completed future at chunk {},{}. Returning to default.",
-                        chunkX,
-                        chunkZ,
-                        e
+                    "Unexpected error when getting completed future at chunk {},{}. Returning to default.",
+                    chunkX,
+                    chunkZ,
+                    e
                 );
             }
         }
@@ -296,7 +297,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
     }
 
     public static @Nullable LevelChunk getChunkImmediatelyAsync(ServerLevel serverLevel, int chunkX, int chunkZ) {
-        if (!PaperLib.isPaper()) {
+        if (!PaperSupport.isPaper()) {
             LevelChunk nmsChunk = serverLevel.getChunkSource().getChunk(chunkX, chunkZ, false);
             if (nmsChunk != null) {
                 return nmsChunk;
@@ -347,7 +348,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             return;
         }
         LevelChunk levelChunk;
-        if (PaperLib.isPaper()) {
+        if (PaperSupport.isPaper()) {
             // getChunkAtIfLoadedImmediately is paper only
             levelChunk = nmsWorld.getChunkSource().getChunkAtIfLoadedImmediately(chunkX, chunkZ);
         } else {
@@ -365,21 +366,21 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             try {
                 ChunkPos pos = levelChunk.getPos();
                 ClientboundLevelChunkWithLightPacket packet;
-                if (PaperLib.isPaper()) {
+                if (PaperSupport.isPaper()) {
                     packet = new ClientboundLevelChunkWithLightPacket(
-                            levelChunk,
-                            nmsWorld.getLightEngine(),
-                            null,
-                            null,
-                            false // last false is to not bother with x-ray
+                        levelChunk,
+                        nmsWorld.getLightEngine(),
+                        null,
+                        null,
+                        false // last false is to not bother with x-ray
                     );
                 } else {
                     // deprecated on paper - deprecation suppressed
                     packet = new ClientboundLevelChunkWithLightPacket(
-                            levelChunk,
-                            nmsWorld.getLightEngine(),
-                            null,
-                            null
+                        levelChunk,
+                        nmsWorld.getLightEngine(),
+                        null,
+                        null
                     );
                 }
                 nearbyPlayers(nmsWorld, pos).forEach(p -> p.connection.send(packet));
@@ -457,12 +458,12 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             // Create palette with data
             var packedData = new PalettedContainerRO.PackedData<>(palette, Optional.ofNullable(bits));
             DataResult<PalettedContainer<net.minecraft.world.level.block.state.BlockState>> result;
-            if (PaperLib.isPaper()) {
+            if (PaperSupport.isPaper()) {
                 result = PalettedContainer.unpack(strategy, packedData, Blocks.AIR.defaultBlockState(), null);
             } else {
                 //noinspection unchecked
-                result = (DataResult<PalettedContainer<net.minecraft.world.level.block.state.BlockState>>)
-                        palettedContainerUnpackSpigot.invokeExact(strategy, packedData);
+                result = (DataResult<PalettedContainer<BlockState>>)
+                    palettedContainerUnpackSpigot.invokeExact(strategy, packedData);
             }
             if (biomes == null) {
                 biomes = PalettedContainerFactory.create(registryAccess).createForBiomes();
@@ -533,18 +534,18 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                 palette, Optional.of(LongStream.of(new long[arrayLength])), bitsPerEntry
         );
         DataResult<PalettedContainer<Holder<Biome>>> result;
-        if (PaperLib.isPaper()) {
+        if (PaperSupport.isPaper()) {
             result = PalettedContainer.unpack(
-                    strategy,
-                    packedData,
-                    biomeRegistry.byIdOrThrow(adapter.getInternalBiomeId(BiomeTypes.PLAINS)),
-                    null
+                strategy,
+                packedData,
+                biomeRegistry.byIdOrThrow(adapter.getInternalBiomeId(BiomeTypes.PLAINS)),
+                null
             );
         } else {
             try {
                 //noinspection unchecked
                 result = (DataResult<PalettedContainer<Holder<Biome>>>)
-                        palettedContainerUnpackSpigot.invokeExact(strategy, packedData);
+                    palettedContainerUnpackSpigot.invokeExact(strategy, packedData);
             } catch (Throwable e) {
                 throw new RuntimeException("Failed to create biome palette for Spigot", e);
             }
@@ -607,10 +608,10 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
     }
 
     static List<Entity> getEntities(LevelChunk chunk) {
-        if (PaperLib.isPaper()) {
+        if (PaperSupport.isPaper()) {
             return Optional.ofNullable(chunk.level
-                    .moonrise$getEntityLookup()
-                    .getChunk(chunk.locX, chunk.locZ)).map(ChunkEntitySlices::getAllEntities).orElse(Collections.emptyList());
+                .moonrise$getEntityLookup()
+                .getChunk(chunk.locX, chunk.locZ)).map(ChunkEntitySlices::getAllEntities).orElse(Collections.emptyList());
         }
         try {
             //noinspection unchecked

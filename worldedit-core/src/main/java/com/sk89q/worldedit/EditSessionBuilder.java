@@ -810,24 +810,21 @@ public final class EditSessionBuilder {
                 }
             }
             if (Settings.settings().EXTENT.DEBUG) {
+                String blockedClassName = toReturn.getClass().getName();
                 if (event.getActor() != null) {
-                    event.getActor().printDebug(TextComponent.of("Potentially unsafe extent blocked: " + toReturn
-                            .getClass()
-                            .getName()));
+                    event.getActor().printDebug(TextComponent.of("Potentially unsafe extent blocked: " + blockedClassName));
                     event.getActor().print(TextComponent.of(
                             "- For area restrictions and block logging, it is recommended that third party plugins use the FAWE" +
                                     " API"));
                     event.getActor().print(TextComponent.of("- Add the following line to the `allowed-plugins` list in the " +
                             "FAWE config.yml to let FAWE recognize the extent:"));
-                    event.getActor().print(toReturn.getClass().getName());
+                    event.getActor().print(blockedClassName);
                 } else {
-                    LOGGER.warn("Potentially unsafe extent blocked: {}", toReturn.getClass().getName());
-                    LOGGER.warn(
-                            " - For area restrictions and block logging, it is recommended that third party plugins use the FAWE API");
-                    LOGGER.warn(
-                            " - Add the following classpath to the `allowed-plugins` list in the FAWE config.yml to let FAWE " +
-                                    "recognize the extent:");
-                    LOGGER.warn(toReturn.getClass().getName());
+                    LOGGER.warn("""
+                            Potentially unsafe extent blocked: {}
+                             - For area restrictions and block logging, it is recommended that third party plugins use the FAWE API
+                             - Add the following classpath to the `allowed-plugins` list in the FAWE config.yml to let FAWE recognize the extent:
+                            {}""", blockedClassName, blockedClassName);
                 }
             }
         }

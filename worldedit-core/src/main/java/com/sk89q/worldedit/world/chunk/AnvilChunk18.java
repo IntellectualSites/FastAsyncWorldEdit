@@ -22,7 +22,6 @@ package com.sk89q.worldedit.world.chunk;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.IntTag;
 import com.sk89q.jnbt.ListTag;
-import com.sk89q.jnbt.LongArrayTag;
 import com.sk89q.jnbt.NBTUtils;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.entity.BaseEntity;
@@ -39,6 +38,7 @@ import com.sk89q.worldedit.world.storage.InvalidFormatException;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import org.enginehub.linbus.tree.LinCompoundTag;
 import org.enginehub.linbus.tree.LinListTag;
+import org.enginehub.linbus.tree.LinStringTag;
 import org.enginehub.linbus.tree.LinTagType;
 
 import javax.annotation.Nullable;
@@ -83,60 +83,70 @@ public class AnvilChunk18 implements Chunk {
                 continue;
             }
 
-            CompoundTag sectionTag = (CompoundTag) rawSectionTag;
-            Object yValue = sectionTag.getValue().get("Y").getValue(); // sometimes a byte, sometimes an int
+            var sectionTag = ((CompoundTag) rawSectionTag).toLinTag();
+            Object yValue = sectionTag.value().get("Y").value(); // sometimes a byte, sometimes an int
             if (!(yValue instanceof Number)) {
                 throw new InvalidFormatException("Y is not numeric: " + yValue);
             }
             int y = ((Number) yValue).intValue();
 
-            Tag rawBlockStatesTag = sectionTag.getValue().get("block_states"); // null for sections outside of the world limits
-            if (rawBlockStatesTag instanceof CompoundTag) {
-                CompoundTag blockStatesTag = (CompoundTag) rawBlockStatesTag;
-
-                // parse palette
-                List<CompoundTag> paletteEntries = blockStatesTag.getList("palette", CompoundTag.class);
-                int paletteSize = paletteEntries.size();
-                if (paletteSize == 0) {
-                    continue;
+            var blockStatesTag = sectionTag.findTag("block_states", LinTagType.compoundTag()); // null for sections outside
+                                                                                                  // of the world limits
+            if (blockStatesTag == null) {
+                // null for sections outside the world limits
+                continue;
+            }
+            // parse palette
+            var paletteEntries = blockStatesTag.getListTag("palette", LinTagType.compoundTag()).value();
+            int paletteSize = paletteEntries.size();
+            if (paletteSize == 0) {
+                continue;
+            }
+            BlockState[] palette = new BlockState[paletteSize];
+            for (int paletteEntryId = 0; paletteEntryId < paletteSize; paletteEntryId++) {
+                LinCompoundTag paletteEntry = paletteEntries.get(paletteEntryId);
+                LinStringTag typeTag = paletteEntry.findTag("id", LinTagType.stringTag());
+                if (typeTag == null) {
+                    typeTag = paletteEntry.getTag("Name", LinTagType.stringTag());
                 }
-                BlockState[] palette = new BlockState[paletteSize];
-                for (int paletteEntryId = 0; paletteEntryId < paletteSize; paletteEntryId++) {
-                    CompoundTag paletteEntry = paletteEntries.get(paletteEntryId);
-                    BlockType type = BlockTypes.get(paletteEntry.getString("Name"));
-                    if (type == null) {
-                        throw new InvalidFormatException("Invalid block type: " + paletteEntry.getString("Name"));
-                    }
-                    BlockState blockState = type.getDefaultState();
-                    if (paletteEntry.containsKey("Properties")) {
-                        CompoundTag properties = NBTUtils.getChildTag(paletteEntry.getValue(), "Properties", CompoundTag.class);
-                        for (Property<?> property : blockState.getStates().keySet()) {
-                            if (properties.containsKey(property.getName())) {
-                                String value = properties.getString(property.getName());
-                                try {
-                                    blockState = getBlockStateWith(blockState, property, value);
-                                } catch (IllegalArgumentException e) {
-                                    throw new InvalidFormatException("Invalid block state for " + blockState.getBlockType().id() + ", " + property.getName() + ": " + value);
-                                }
+                String typeString = typeTag.value();
+                BlockType type = BlockTypes.get(typeString);
+                if (type == null) {
+                    throw new InvalidFormatException("Invalid block type: " + typeString);
+                }
+                BlockState blockState = type.getDefaultState();
+                var properties = paletteEntry.findTag("properties", LinTagType.compoundTag());
+                if (properties == null) {
+                    properties = paletteEntry.findTag("Properties", LinTagType.compoundTag());
+                }
+                if (properties != null) {
+                    for (Property<?> property : blockState.getStates().keySet()) {
+                        var name = properties.findTag(property.getName(), LinTagType.stringTag());
+                        if (name != null) {
+                            String value = name.value();
+                            try {
+                                blockState = getBlockStateWith(blockState, property, value);
+                            } catch (IllegalArgumentException e) {
+                                throw new InvalidFormatException("Invalid block state for " + blockState.getBlockType().id() + ", " + property.getName() + ": " + value);
                             }
                         }
                     }
-                    palette[paletteEntryId] = blockState;
                 }
-                if (paletteSize == 1) {
-                    // the same block everywhere
-                    blocks.put(y, palette);
-                    continue;
-                }
-
-                // parse block states
-                long[] blockStatesSerialized = NBTUtils.getChildTag(blockStatesTag.getValue(), "data", LongArrayTag.class).getValue();
-
-                BlockState[] chunkSectionBlocks = new BlockState[16 * 16 * 16];
-                blocks.put(y, chunkSectionBlocks);
-
-                readBlockStates(palette, blockStatesSerialized, chunkSectionBlocks);
+                palette[paletteEntryId] = blockState;
             }
+            if (paletteSize == 1) {
+                // the same block everywhere
+                blocks.put(y, palette);
+                continue;
+            }
+
+            // parse block states
+            long[] blockStatesSerialized = blockStatesTag.getTag("data", LinTagType.longArrayTag()).value();
+
+            BlockState[] chunkSectionBlocks = new BlockState[16 * 16 * 16];
+            blocks.put(y, chunkSectionBlocks);
+
+            readBlockStates(palette, blockStatesSerialized, chunkSectionBlocks);
         }
     }
 

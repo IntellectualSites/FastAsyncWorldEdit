@@ -414,7 +414,7 @@ public class HistorySubCommands {
             top = top.clampY(world.getMinY(), world.getMaxY());
 
             long minTime = System.currentTimeMillis() - timeDiff;
-            Iterable<Supplier<RollbackOptimizedHistory>> edits = database.getEdits(other, minTime, bot, top, false, false);
+            var edits = database.getEdits(other, minTime, bot, top, false, false);
             history = Lists.newArrayList(edits);
             player.setMeta(pageCommand, new SoftReference<>(history));
             page = 1;
@@ -450,11 +450,7 @@ public class HistorySubCommands {
             SimpleChangeSetSummary summary = edit.summarize(RegionWrapper.GLOBAL(), false);
             if (summary != null) {
                 List<Countable<BlockState>> distr = summary.getBlockDistributionWithData();
-                SelectionCommands.BlockDistributionResult distrPages = new SelectionCommands.BlockDistributionResult(
-                        distr,
-                        true,
-                        pageCommand
-                );
+                var distrPages = new SelectionCommands.BlockDistributionResult(distr, true, pageCommand);
                 pages = new PaginationBox.MergedPaginationBox("Block Distribution", pageCommand, pages, distrPages);
                 player.setMeta(pageCommand, new SoftReference<>(pages));
             }

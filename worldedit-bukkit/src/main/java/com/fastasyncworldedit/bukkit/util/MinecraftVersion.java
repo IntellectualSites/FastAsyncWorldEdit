@@ -1,7 +1,6 @@
 package com.fastasyncworldedit.bukkit.util;
 
 import com.google.common.collect.ComparisonChain;
-import io.papermc.lib.PaperLib;
 import org.bukkit.Bukkit;
 
 import javax.annotation.Nonnull;
@@ -73,7 +72,7 @@ public class MinecraftVersion implements Comparable<MinecraftVersion> {
         int major;
         int minor;
         int release;
-        if (PaperLib.isPaper()) {
+        if (PaperSupport.isPaper()) {
             // Snapshots, pre-releases, release candidates have a space after the version.
             // Let's ignore that here
             String minecraftVersion = Bukkit.getMinecraftVersion().split(" ")[0];

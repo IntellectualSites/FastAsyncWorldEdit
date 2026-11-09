@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.bukkit.adapter.impl.v26_2;
 
+import com.fastasyncworldedit.bukkit.util.PaperSupport;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -31,6 +32,7 @@ import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.blocks.BaseItemStack;
+import com.sk89q.worldedit.blocks.TileEntityBlock;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v26_2.PaperweightFaweAdapter;
@@ -66,7 +68,6 @@ import com.sk89q.worldedit.world.generation.ConfiguredFeatureType;
 import com.sk89q.worldedit.world.generation.StructureType;
 import com.sk89q.worldedit.world.generation.TreeType;
 import com.sk89q.worldedit.world.item.ItemType;
-import io.papermc.lib.PaperLib;
 import io.papermc.paper.world.PaperWorldLoader;
 import io.papermc.paper.world.saveddata.PaperWorldPDC;
 import net.minecraft.SharedConstants;
@@ -76,6 +77,7 @@ import net.minecraft.core.HolderSet;
 import net.minecraft.core.Registry;
 import net.minecraft.core.SectionPos;
 import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.ByteArrayTag;
 import net.minecraft.nbt.ByteTag;
@@ -118,7 +120,7 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.StructureBlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.LevelChunk;
@@ -230,6 +232,9 @@ public final class PaperweightAdapter implements BukkitImplAdapter<Tag> {
 
         int dataVersion = SharedConstants.getCurrentVersion().dataVersion().version();
         if (dataVersion != Constants.DATA_VERSION_MC_26_2) {
+            if (dataVersion <= Constants.DATA_VERSION_MC_26_1_2) {
+                throw new RuntimeException("Force prevent this loading on <=26.1.2");
+            }
             logger.warning(WRONG_VERSION);
         }
 
@@ -611,15 +616,17 @@ public final class PaperweightAdapter implements BukkitImplAdapter<Tag> {
     }
 
     @Override
-    public void sendFakeNBT(Player player, BlockVector3 pos, LinCompoundTag nbtData) {
-        var structureBlock = new StructureBlockEntity(
-                new BlockPos(pos.x(), pos.y(), pos.z()),
-                Blocks.STRUCTURE_BLOCK.defaultBlockState()
-        );
-        structureBlock.setLevel(((CraftPlayer) player).getHandle().level());
-        ((CraftPlayer) player).getHandle().connection.send(ClientboundBlockEntityDataPacket.create(
-                structureBlock,
-                (blockEntity, registryAccess) -> (net.minecraft.nbt.CompoundTag) fromNative(nbtData)
+    public void sendFakeNBT(Player player, BlockVector3 pos, TileEntityBlock tileEntityBlock, LinCompoundTag nbtData) {
+        BlockEntityType<?> nativeBlockEntityType = BuiltInRegistries.BLOCK_ENTITY_TYPE
+            .getValue(Identifier.parse(tileEntityBlock.getNbtId()));
+        if (nativeBlockEntityType == null) {
+            return;
+        }
+
+        ((CraftPlayer) player).getHandle().connection.send(new ClientboundBlockEntityDataPacket(
+            new BlockPos(pos.x(), pos.y(), pos.z()),
+            nativeBlockEntityType,
+            (net.minecraft.nbt.CompoundTag) fromNative(nbtData)
         ));
     }
 
@@ -733,7 +740,7 @@ public final class PaperweightAdapter implements BukkitImplAdapter<Tag> {
     }
 
     private void doRegen(World bukkitWorld, Region region, Extent extent, RegenOptions options) throws Exception {
-        if (!PaperLib.isPaper()) {
+        if (!PaperSupport.isPaper()) {
             throw new UnsupportedOperationException("Regen requires Paper");
         }
 

@@ -450,10 +450,10 @@ public class ThreadUnsafeCharBlocks implements IChunkSet, IBlocks {
         biomes = new BiomeType[sectionCount][];
         light = new char[sectionCount][];
         skyLight = new char[sectionCount][];
-        tiles.clear();
-        entities.clear();
-        entityRemoves.clear();
-        heightMaps.clear();
+        tiles = null;
+        entities = null;
+        entityRemoves = null;
+        heightMaps = null;
         return this;
     }
 

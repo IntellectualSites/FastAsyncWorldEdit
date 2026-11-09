@@ -22,13 +22,13 @@ package com.sk89q.worldedit.bukkit.adapter.impl.v26_2;
 import com.fastasyncworldedit.bukkit.adapter.BukkitBlockMaterial;
 import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v26_2.PaperweightGetBlocks;
+import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v26_2.PlatformCompat;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.EmptyBlockGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.material.PushReaction;
 
 public class PaperweightBlockMaterial extends BukkitBlockMaterial<Block, BlockState> {
@@ -38,7 +38,7 @@ public class PaperweightBlockMaterial extends BukkitBlockMaterial<Block, BlockSt
     }
 
     public PaperweightBlockMaterial(Block block, BlockState blockState) {
-        super(block, blockState, blockState.asBlockData());
+        super(block, blockState, PlatformCompat.fromData(blockState));
     }
 
     @Override
@@ -69,7 +69,7 @@ public class PaperweightBlockMaterial extends BukkitBlockMaterial<Block, BlockSt
 
     @Override
     public boolean isLiquid() {
-        return !this.blockState.getFluidState().is(Fluids.EMPTY);
+        return !this.blockState.getFluidState().isEmpty();
     }
 
     @Override

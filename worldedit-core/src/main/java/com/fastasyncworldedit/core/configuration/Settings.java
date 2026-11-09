@@ -340,8 +340,8 @@ public class Settings extends Config {
         })
         public boolean ALLOW_BLACKLISTS = false;
         @Comment({
-                "List of plugin mask managers that should be exclusive. Exclusive managers are not ",
-                "checked for edit restrictions if another manager already allowed an edit, and further ",
+                "List of plugin mask managers that should be exclusive. Exclusive managers are not",
+                "checked for edit restrictions if another manager already allowed an edit, and further",
                 "managers are not checked if an exclusive manager allows an edit.",
                 " - May be useful to add PlotSquared if using both P2 and WorldGuard on a server",
                 " - Some custom-implementations in other plugins may override this setting"
@@ -369,7 +369,7 @@ public class Settings extends Config {
     @Comment({
             "The \"default\" limit group affects those without a specific limit permission.",
             "To grant someone different limits, copy the default limits group",
-            "and give it a different name (e.g. newbie). Then give the user the limit ",
+            "and give it a different name (e.g. newbie). Then give the user the limit",
             "permission node with that limit name (e.g. fawe.limit.newbie  )"
     })
     @BlockName("default") // The name for the default block
@@ -396,8 +396,8 @@ public class Settings extends Config {
         @Comment("Max allowed butcher radius")
         public int MAX_BUTCHER_RADIUS = LocalConfiguration.MAX_BUTCHER_RADIUS;
         @Comment({
-                "Blockstates include Banner, Beacon, BrewingStand, Chest, CommandBlock, ",
-                "CreatureSpawner, Dispenser, Dropper, EndGateway, Furnace, Hopper, Jukebox, ",
+                "Blockstates include Banner, Beacon, BrewingStand, Chest, CommandBlock,",
+                "CreatureSpawner, Dispenser, Dropper, EndGateway, Furnace, Hopper, Jukebox,",
                 "NoteBlock, Sign, Skull, Structure"
         })
         public int MAX_BLOCKSTATES = 1337;

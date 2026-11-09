@@ -4,6 +4,7 @@ import com.fastasyncworldedit.core.queue.implementation.packet.ChunkPacket;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.blocks.BaseItemStack;
+import com.sk89q.worldedit.blocks.TileEntityBlock;
 import com.sk89q.worldedit.bukkit.BukkitPlayer;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
@@ -82,8 +83,8 @@ public interface IDelegateBukkitImplAdapter<T> extends BukkitImplAdapter<T> {
     }
 
     @Override
-    default void sendFakeNBT(Player player, BlockVector3 pos, LinCompoundTag nbtData) {
-        getParent().sendFakeNBT(player, pos, nbtData);
+    default void sendFakeNBT(Player player, BlockVector3 pos, TileEntityBlock tileEntityBlock, LinCompoundTag nbtData) {
+        getParent().sendFakeNBT(player, pos, tileEntityBlock, nbtData);
     }
 
     @Override

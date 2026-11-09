@@ -1,5 +1,6 @@
 package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_21_9;
 
+import com.fastasyncworldedit.bukkit.util.PaperSupport;
 import com.fastasyncworldedit.core.extent.processor.heightmap.HeightMapType;
 import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.fastasyncworldedit.core.queue.IBlocks;
@@ -16,7 +17,6 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
-import io.papermc.lib.PaperLib;
 import net.minecraft.core.Holder;
 import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerLevel;
@@ -201,7 +201,7 @@ public class PaperweightGetBlocks_Copy implements IChunkGet {
             biomes[layer] = new Holder[64];
         }
         if (biomeData instanceof PalettedContainer<Holder<Biome>> palettedContainer) {
-            if (PaperLib.isPaper()) {
+            if (PaperSupport.isPaper()) {
                 for (int i = 0; i < 64; i++) {
                     biomes[layer][i] = palettedContainer.get(i); // Only public on paper
                 }
@@ -209,7 +209,7 @@ public class PaperweightGetBlocks_Copy implements IChunkGet {
                 try {
                     for (int i = 0; i < 64; i++) {
                         biomes[layer][i] =
-                                (Holder<Biome>) PaperweightPlatformAdapter.PALETTED_CONTAINER_GET.invoke(palettedContainer, i);
+                            (Holder<Biome>) PaperweightPlatformAdapter.PALETTED_CONTAINER_GET.invoke(palettedContainer, i);
                     }
                 } catch (Throwable e) {
                     throw new RuntimeException(e);

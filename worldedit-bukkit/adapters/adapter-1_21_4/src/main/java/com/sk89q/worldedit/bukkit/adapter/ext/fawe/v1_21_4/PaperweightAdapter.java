@@ -33,6 +33,7 @@ import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.blocks.BaseItemStack;
+import com.sk89q.worldedit.blocks.TileEntityBlock;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_21_4.PaperweightFaweAdapter;
@@ -75,6 +76,7 @@ import net.minecraft.core.HolderSet;
 import net.minecraft.core.Registry;
 import net.minecraft.core.SectionPos;
 import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
@@ -105,7 +107,7 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.StructureBlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.LevelChunk;
@@ -555,15 +557,17 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
     }
 
     @Override
-    public void sendFakeNBT(Player player, BlockVector3 pos, LinCompoundTag nbtData) {
-        var structureBlock = new StructureBlockEntity(
+    public void sendFakeNBT(Player player, BlockVector3 pos, TileEntityBlock tileEntityBlock, LinCompoundTag nbtData) {
+        BlockEntityType<?> nativeBlockEntityType = BuiltInRegistries.BLOCK_ENTITY_TYPE
+            .getValue(ResourceLocation.parse(tileEntityBlock.getNbtId()));
+        if (nativeBlockEntityType == null) {
+            return;
+        }
+
+        ((CraftPlayer) player).getHandle().connection.send(new ClientboundBlockEntityDataPacket(
             new BlockPos(pos.x(), pos.y(), pos.z()),
-            Blocks.STRUCTURE_BLOCK.defaultBlockState()
-        );
-        structureBlock.setLevel(((CraftPlayer) player).getHandle().level());
-        ((CraftPlayer) player).getHandle().connection.send(ClientboundBlockEntityDataPacket.create(
-            structureBlock,
-            (blockEntity, registryAccess) -> (net.minecraft.nbt.CompoundTag) fromNativeLin(nbtData)
+            nativeBlockEntityType,
+            (net.minecraft.nbt.CompoundTag) fromNativeLin(nbtData)
         ));
     }
 
