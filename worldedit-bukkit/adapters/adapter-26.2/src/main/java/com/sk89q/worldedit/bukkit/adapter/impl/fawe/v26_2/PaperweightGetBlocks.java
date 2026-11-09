@@ -629,7 +629,6 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
                             entitiesRemoved.add(uuid);
                             entityRemoves.remove(uuid);
                         }
-
                     }
                     if (Settings.settings().EXPERIMENTAL.REMOVE_ENTITY_FROM_WORLD_ON_CHUNK_FAIL) {
                         for (UUID uuid : entityRemoves) {
@@ -814,8 +813,6 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
             return handleCallFinalizer(syncTasks, callback, finalizer);
         }
     }
-
-
 
     private void updateGet(
             LevelChunk nmsChunk,

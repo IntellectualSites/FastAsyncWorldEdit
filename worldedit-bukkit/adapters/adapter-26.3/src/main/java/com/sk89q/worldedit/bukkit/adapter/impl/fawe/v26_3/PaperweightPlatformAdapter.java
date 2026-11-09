@@ -684,11 +684,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         return finalTag;
     }
 
-    static boolean addNoEvents(
-            Entity entity,
-            ServerLevel nmsWorld,
-            Runnable onError
-    ) {
+    static boolean addNoEvents(Entity entity, ServerLevel nmsWorld, Runnable onError) {
         entity.spawnReason = CreatureSpawnEvent.SpawnReason.CUSTOM;
         entity.generation = false;
         if (PaperSupport.isPaper()) {
