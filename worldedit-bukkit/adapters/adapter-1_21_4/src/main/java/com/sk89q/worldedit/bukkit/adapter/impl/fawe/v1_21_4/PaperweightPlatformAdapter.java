@@ -771,7 +771,6 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             }
             return status;
         } else {
-            // Not paper
             try {
                 return PaperweightPlatformAdapter.getEntitySectionManager(nmsWorld).addNewEntity(entity);
             } catch (IllegalAccessException e) {
