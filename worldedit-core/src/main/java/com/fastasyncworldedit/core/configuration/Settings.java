@@ -162,9 +162,7 @@ public record Settings(
     }
 
     private static synchronized void overrideOption(Option option, Object value) {
-        Settings updated = settings().with(ConfigMapper.pathOf(Settings.class, option), value);
-        INSTANCE.setTarget(MethodHandles.constant(Settings.class, updated));
-        MutableCallSite.syncAll(new MutableCallSite[] {INSTANCE});
+        set(settings().with(ConfigMapper.pathOf(Settings.class, option), value));
     }
 
     /**
