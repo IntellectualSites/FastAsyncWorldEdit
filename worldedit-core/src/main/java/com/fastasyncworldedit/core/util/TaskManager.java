@@ -112,7 +112,7 @@ public abstract class TaskManager {
             return;
         }
         if (numThreads == null) {
-            numThreads = Settings.settings().QUEUE.PARALLEL_THREADS;
+            numThreads = Settings.settings().queue().parallelThreads();
         }
         if (numThreads <= 1) {
             for (Runnable run : runnables) {

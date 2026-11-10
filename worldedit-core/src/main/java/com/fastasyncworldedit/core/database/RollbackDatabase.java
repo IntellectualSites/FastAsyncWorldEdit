@@ -43,15 +43,16 @@ public class RollbackDatabase extends AsyncNotifyQueue {
         super((t, e) -> e.printStackTrace());
         this.prefix = "";
         this.world = world;
-        this.dbLocation = MainUtil.getFile(
-                Fawe.platform().getDirectory(),
-                Settings.settings().PATHS.HISTORY + File.separator + world.getName() + File.separator + "summary.db"
-        );
+        this.dbLocation = Fawe.platform().getPath()
+                .resolve(Settings.settings().paths().history())
+                .resolve(world.getName())
+                .resolve("summary.db")
+                .toFile();
         connection = openConnection();
 
         try {
             init().get();
-            purge((int) TimeUnit.DAYS.toSeconds(Settings.settings().HISTORY.DELETE_AFTER_DAYS));
+            purge((int) TimeUnit.DAYS.toSeconds(Settings.settings().history().deleteAfterDays()));
         } catch (InterruptedException | ExecutionException e) {
             throw new RuntimeException(e);
         }

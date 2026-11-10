@@ -87,6 +87,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.AbstractMap.SimpleEntry;
@@ -141,11 +142,11 @@ public class UtilityCommands {
             @Arg(name = "max", desc = "int", def = "200") int max
     ) throws IOException {
         actor.print(TextComponent.of("Please wait while we generate the minified heightmaps."));
-        File srcFolder = MainUtil.getFile(Fawe.platform().getDirectory(), Settings.settings().PATHS.HEIGHTMAP);
+        File srcFolder = Fawe.platform().getPath().resolve(Settings.settings().paths().heightmap()).toFile();
 
-        File webSrc = new File(Fawe.platform().getDirectory(), "web" + File.separator + "heightmap");
-        File minImages = new File(webSrc, "images" + File.separator + "min");
-        File maxImages = new File(webSrc, "images" + File.separator + "max");
+        Path webSrc = Fawe.platform().getPath().resolve("web").resolve("heightmap");
+        Path minImages = webSrc.resolve("images").resolve("min");
+        Path maxImages = webSrc.resolve("images").resolve("max");
         final int sub = srcFolder.getAbsolutePath().length();
         List<String> images = new ArrayList<>();
         MainUtil.iterateFiles(srcFolder, file -> {
@@ -174,12 +175,12 @@ public class UtilityCommands {
                         true
                 );
                 actor.print(TextComponent.of(String.format("Writing %s", name)));
-                File minFile = new File(minImages, name);
-                File maxFile = new File(maxImages, name);
-                minFile.getParentFile().mkdirs();
-                maxFile.getParentFile().mkdirs();
-                ImageIO.write(minImg, "png", minFile);
-                ImageIO.write(maxImg, "png", maxFile);
+                Path minFile = minImages.resolve(name);
+                Path maxFile = maxImages.resolve(name);
+                Files.createDirectories(minFile.getParent());
+                Files.createDirectories(maxFile.getParent());
+                ImageIO.write(minImg, "png", minFile.toFile());
+                ImageIO.write(maxImg, "png", maxFile.toFile());
                 images.add(name);
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -197,9 +198,9 @@ public class UtilityCommands {
         config.append("var src_max = \"images/max/\";\n");
         config.append("// The local source for the image (used in commands)\n");
         config.append("var src_local = \"file://\";\n");
-        File configFile = new File(webSrc, "config.js");
+        Path configFile = webSrc.resolve("config.js");
         actor.print(TextComponent.of(String.format("Writing %s", configFile)));
-        Files.write(configFile.toPath(), config.toString().getBytes());
+        Files.write(configFile, config.toString().getBytes());
         actor.print(TextComponent.of("Done! See: `FastAsyncWorldEdit/web/heightmap`"));
     }
 
@@ -977,7 +978,7 @@ public class UtilityCommands {
         String dirFilter = File.separator;
 
         boolean listMine = false;
-        boolean listGlobal = !Settings.settings().PATHS.PER_PLAYER_SCHEMATICS;
+        boolean listGlobal = !Settings.settings().paths().perPlayerSchematics();
         if (len > 0) {
             for (String arg : args) {
                 switch (arg.toLowerCase(Locale.ROOT)) {

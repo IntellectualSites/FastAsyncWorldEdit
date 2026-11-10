@@ -137,7 +137,7 @@ public class MultiBatchProcessor implements IBatchProcessor {
                         lastException = hash;
                         exceptionCount = 0;
                         LOGGER.catching(e);
-                    } else if (exceptionCount < Settings.settings().QUEUE.PARALLEL_THREADS) {
+                    } else if (exceptionCount < Settings.settings().queue().parallelThreads()) {
                         exceptionCount++;
                         LOGGER.warn(message);
                     }
@@ -168,7 +168,7 @@ public class MultiBatchProcessor implements IBatchProcessor {
                         lastException = hash;
                         exceptionCount = 0;
                         LOGGER.catching(e);
-                    } else if (exceptionCount < Settings.settings().QUEUE.PARALLEL_THREADS) {
+                    } else if (exceptionCount < Settings.settings().queue().parallelThreads()) {
                         exceptionCount++;
                         LOGGER.warn(message);
                     }

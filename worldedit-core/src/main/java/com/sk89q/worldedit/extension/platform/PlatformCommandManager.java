@@ -422,7 +422,7 @@ public final class PlatformCommandManager {
 
     public void registerAllCommands() {
         //FAWE start
-        if (Settings.settings().ENABLED_COMPONENTS.COMMANDS) {
+        if (Settings.settings().enabledComponents().commands()) {
             // TODO: Ping @MattBDev to reimplement (or remove) 2020-02-04
 //            registerSubCommands(
 //                "patterns",

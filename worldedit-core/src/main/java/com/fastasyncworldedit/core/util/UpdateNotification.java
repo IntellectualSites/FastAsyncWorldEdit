@@ -62,7 +62,7 @@ public class UpdateNotification {
                     "This is not an official build distributed via https://ci.athion.net/job/FastAsyncWorldEdit/");
             return;
         }
-        if (Settings.settings().ENABLED_COMPONENTS.SNAPSHOT_UPDATE_NOTIFICATIONS && installedVersion.build > 0) {
+        if (Settings.settings().enabledComponents().snapshotUpdateNotifications() && installedVersion.build > 0) {
             checkLatestBuild().orTimeout(10, TimeUnit.SECONDS).whenComplete((build, throwable) -> {
                 if (throwable != null) {
                     LOGGER.error("Failed to check for latest build", throwable);
@@ -76,7 +76,7 @@ public class UpdateNotification {
                 LOGGER.warn(CONSOLE_NOTIFICATION_OUTDATED_BUILD, difference, installedVersion.build, lastBuild, LINK_DOWNLOAD_JENKINS);
             });
         }
-        if (Settings.settings().ENABLED_COMPONENTS.RELEASE_UPDATE_NOTIFICATIONS && installedVersion.semver != null) {
+        if (Settings.settings().enabledComponents().releaseUpdateNotifications() && installedVersion.semver != null) {
             checkLatestRelease().orTimeout(10, TimeUnit.SECONDS).whenComplete((version, throwable) -> {
                 if (throwable != null) {
                     LOGGER.error("Failed to check for latest release", throwable);
@@ -156,7 +156,7 @@ public class UpdateNotification {
         if (installed == null) {
             return;
         }
-        if (lastBuild != -1 && Settings.settings().ENABLED_COMPONENTS.SNAPSHOT_UPDATE_NOTIFICATIONS) {
+        if (lastBuild != -1 && Settings.settings().enabledComponents().snapshotUpdateNotifications()) {
             int difference = lastBuild - installed.build;
             if (difference > 0) {
                 actor.print(Caption.of(
@@ -166,7 +166,7 @@ public class UpdateNotification {
                 ));
             }
         }
-        if (installed.semver != null && lastRelease != null && Settings.settings().ENABLED_COMPONENTS.RELEASE_UPDATE_NOTIFICATIONS) {
+        if (installed.semver != null && lastRelease != null && Settings.settings().enabledComponents().releaseUpdateNotifications()) {
             if (hasUpdateSemver(installed.semver, lastRelease)) {
                 actor.print(Caption.of(
                         "fawe.info.update-available.release",
@@ -208,8 +208,8 @@ public class UpdateNotification {
     }
 
     private static boolean isAnyUpdateCheckEnabled() {
-        return Settings.settings().ENABLED_COMPONENTS.RELEASE_UPDATE_NOTIFICATIONS
-                || Settings.settings().ENABLED_COMPONENTS.SNAPSHOT_UPDATE_NOTIFICATIONS;
+        return Settings.settings().enabledComponents().releaseUpdateNotifications()
+                || Settings.settings().enabledComponents().snapshotUpdateNotifications();
     }
 
     private static final class UpdateCheckException extends RuntimeException {

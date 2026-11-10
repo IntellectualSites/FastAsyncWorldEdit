@@ -21,7 +21,7 @@ public abstract class ExtentBatchProcessorHolder extends BatchProcessorHolder im
 
     @Override
     public Extent enableHistory(AbstractChangeSet changeSet) {
-        if (Settings.settings().HISTORY.SEND_BEFORE_HISTORY) {
+        if (Settings.settings().history().sendBeforeHistory()) {
             return this.addPostProcessor(changeSet);
         } else {
             return this.addProcessor(changeSet);

@@ -43,6 +43,7 @@ import java.io.RandomAccessFile;
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
+import java.nio.file.Path;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.nio.channels.OverlappingFileLockException;
@@ -87,10 +88,10 @@ public class DiskOptimizedClipboard extends LinearClipboard {
     public DiskOptimizedClipboard(Region region, UUID uuid) {
         this(
                 region.getDimensions(),
-                MainUtil.getFile(
-                        Fawe.instance() != null ? Fawe.platform().getDirectory() : new File("."),
-                        Settings.settings().PATHS.CLIPBOARD + File.separator + uuid + ".bd"
-                )
+                (Fawe.instance() != null ? Fawe.platform().getPath() : Path.of("."))
+                        .resolve(Settings.settings().paths().clipboard())
+                        .resolve(uuid + ".bd")
+                        .toFile()
         );
         setOffset(region.getMinimumPoint());
         setOrigin(region.getMinimumPoint());
@@ -107,10 +108,10 @@ public class DiskOptimizedClipboard extends LinearClipboard {
     public DiskOptimizedClipboard(BlockVector3 dimensions) {
         this(
                 dimensions,
-                MainUtil.getFile(
-                        Fawe.platform() != null ? Fawe.platform().getDirectory() : new File("."),
-                        Settings.settings().PATHS.CLIPBOARD + File.separator + UUID.randomUUID() + ".bd"
-                )
+                (Fawe.platform() != null ? Fawe.platform().getPath() : Path.of("."))
+                        .resolve(Settings.settings().paths().clipboard())
+                        .resolve(UUID.randomUUID() + ".bd")
+                        .toFile()
         );
     }
 
@@ -199,7 +200,7 @@ public class DiskOptimizedClipboard extends LinearClipboard {
                 readBiomeStatusFromHeader();
                 int nbtCount = readNBTSavedCountFromHeader();
                 int entitiesCount = readEntitiesSavedCountFromHeader();
-                if (Settings.settings().CLIPBOARD.SAVE_CLIPBOARD_NBT_TO_DISK && (nbtCount + entitiesCount > 0)) {
+                if (Settings.settings().clipboard().saveClipboardNbtToDisk() && (nbtCount + entitiesCount > 0)) {
                     loadNBTFromFileFooter(nbtCount, entitiesCount, biomeLength);
                 }
             } else if (canHaveBiomes && braf.length() - headerSize == ((long) getVolume() << 1) + biomeLength) {
@@ -310,7 +311,7 @@ public class DiskOptimizedClipboard extends LinearClipboard {
     private void init() throws IOException {
         if (this.fileChannel == null) {
             this.fileChannel = braf.getChannel();
-            if (Settings.settings().CLIPBOARD.LOCK_CLIPBOARD_FILE) {
+            if (Settings.settings().clipboard().lockClipboardFile()) {
                 try {
                     FileLock lock = this.fileChannel.lock();
                     LOCK_HOLDER_CACHE.put(file.getName(), new LockHolder(lock));
@@ -516,7 +517,7 @@ public class DiskOptimizedClipboard extends LinearClipboard {
         try {
             if (byteBuffer != null) {
                 if (headerSize >= VERSION_2_HEADER_SIZE) {
-                    if (Settings.settings().CLIPBOARD.SAVE_CLIPBOARD_NBT_TO_DISK) {
+                    if (Settings.settings().clipboard().saveClipboardNbtToDisk()) {
                         try {
                             writeNBTToDisk();
                         } catch (Exception e) {
@@ -560,7 +561,7 @@ public class DiskOptimizedClipboard extends LinearClipboard {
             ByteArrayOutputStream baOS = new ByteArrayOutputStream();
             try (NBTOutputStream nbtOS = new NBTOutputStream(MainUtil.getCompressedOS(
                     baOS,
-                    Settings.settings().CLIPBOARD.COMPRESSION_LEVEL
+                    Settings.settings().clipboard().compressionLevel()
             ))) {
                 if (!nbtMap.isEmpty()) {
                     try {

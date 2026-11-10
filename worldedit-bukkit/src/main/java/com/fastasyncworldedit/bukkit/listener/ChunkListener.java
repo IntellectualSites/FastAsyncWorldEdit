@@ -55,11 +55,11 @@ public abstract class ChunkListener implements Listener {
     private static final Logger LOGGER = LogManagerCompat.getLogger();
     protected int rateLimit = 0;
     protected Location lastCancelPos;
-    private final int[] badLimit = new int[]{Settings.settings().TICK_LIMITER.PHYSICS_MS,
-            Settings.settings().TICK_LIMITER.FALLING, Settings.settings().TICK_LIMITER.ITEMS};
+    private final int[] badLimit = new int[]{Settings.settings().tickLimiter().physicsMs(),
+            Settings.settings().tickLimiter().falling(), Settings.settings().tickLimiter().items()};
 
     public ChunkListener() {
-        if (Settings.settings().TICK_LIMITER.ENABLED) {
+        if (Settings.settings().tickLimiter().enabled()) {
             PluginManager plm = Bukkit.getPluginManager();
             Plugin plugin = Fawe.<FaweBukkit>platform().getPlugin();
             plm.registerEvents(this, plugin);
@@ -85,7 +85,7 @@ public abstract class ChunkListener implements Listener {
                     counter.put(key, badLimit);
                 }
                 badChunks.clear();
-            }, Settings.settings().TICK_LIMITER.INTERVAL);
+            }, Settings.settings().tickLimiter().interval());
         }
     }
 
@@ -272,7 +272,7 @@ public abstract class ChunkListener implements Listener {
                 physStart = System.currentTimeMillis();
                 return;
             } else if (System.currentTimeMillis() - physStart
-                    < Settings.settings().TICK_LIMITER.PHYSICS_MS) {
+                    < Settings.settings().tickLimiter().physicsMs()) {
                 return;
             }
         }
@@ -349,12 +349,12 @@ public abstract class ChunkListener implements Listener {
         int cx = x >> 4;
         int cz = z >> 4;
         int[] count = getCount(cx, cz);
-        if (count[1] >= Settings.settings().TICK_LIMITER.FALLING) {
+        if (count[1] >= Settings.settings().tickLimiter().falling()) {
             event.setCancelled(true);
             return;
         }
         if (event.getEntityType() == EntityType.FALLING_BLOCK) {
-            if (++count[1] >= Settings.settings().TICK_LIMITER.FALLING) {
+            if (++count[1] >= Settings.settings().tickLimiter().falling()) {
 
                 // Only cancel falling blocks when it's lagging
                 if (Fawe.instance().getTimer().getTPS() < 18) {
@@ -381,11 +381,11 @@ public abstract class ChunkListener implements Listener {
         int cx = loc.getBlockX() >> 4;
         int cz = loc.getBlockZ() >> 4;
         int[] count = getCount(cx, cz);
-        if (count[2] >= Settings.settings().TICK_LIMITER.ITEMS) {
+        if (count[2] >= Settings.settings().tickLimiter().items()) {
             event.setCancelled(true);
             return;
         }
-        if (++count[2] >= Settings.settings().TICK_LIMITER.ITEMS) {
+        if (++count[2] >= Settings.settings().tickLimiter().items()) {
             cleanup(loc.getChunk());
             cancelNearby(cx, cz);
             if (rateLimit <= 0) {

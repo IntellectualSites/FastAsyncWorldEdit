@@ -69,7 +69,7 @@ public class FaweDelegateRegionManager {
                     session.flushQueue();
                     for (CuboidRegion region : regions) {
                         FaweAPI.fixLighting(world, region, null,
-                                RelightMode.valueOf(com.fastasyncworldedit.core.configuration.Settings.settings().LIGHTING.MODE)
+                                RelightMode.valueOf(com.fastasyncworldedit.core.configuration.Settings.settings().lighting().mode())
                         );
                     }
                 } catch (MaxChangedBlocksException e) {
@@ -200,7 +200,7 @@ public class FaweDelegateRegionManager {
                         world,
                         new CuboidRegion(plot.getBottomAbs().getBlockVector3(), plot.getTopAbs().getBlockVector3()),
                         null,
-                        RelightMode.valueOf(com.fastasyncworldedit.core.configuration.Settings.settings().LIGHTING.MODE)
+                        RelightMode.valueOf(com.fastasyncworldedit.core.configuration.Settings.settings().lighting().mode())
                 );
                 if (whenDone != null) {
                     TaskManager.taskManager().task(whenDone);
@@ -263,13 +263,13 @@ public class FaweDelegateRegionManager {
                         pos1World,
                         regionA,
                         null,
-                        RelightMode.valueOf(com.fastasyncworldedit.core.configuration.Settings.settings().LIGHTING.MODE)
+                        RelightMode.valueOf(com.fastasyncworldedit.core.configuration.Settings.settings().lighting().mode())
                 );
                 FaweAPI.fixLighting(
                         pos1World,
                         regionB,
                         null,
-                        RelightMode.valueOf(com.fastasyncworldedit.core.configuration.Settings.settings().LIGHTING.MODE)
+                        RelightMode.valueOf(com.fastasyncworldedit.core.configuration.Settings.settings().lighting().mode())
                 );
                 if (whenDone != null) {
                     TaskManager.taskManager().task(whenDone);
@@ -347,7 +347,7 @@ public class FaweDelegateRegionManager {
                                     pos3.getBlockVector3(),
                                     pos3.getBlockVector3().add(pos2.getBlockVector3().subtract(pos1.getBlockVector3()))
                             ),
-                            null, RelightMode.valueOf(com.fastasyncworldedit.core.configuration.Settings.settings().LIGHTING.MODE)
+                            null, RelightMode.valueOf(com.fastasyncworldedit.core.configuration.Settings.settings().lighting().mode())
                     );
                 } catch (MaxChangedBlocksException e) {
                     e.printStackTrace();

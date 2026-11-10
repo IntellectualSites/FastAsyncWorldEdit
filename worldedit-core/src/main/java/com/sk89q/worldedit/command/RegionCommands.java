@@ -747,7 +747,7 @@ public class RegionCommands {
             session.setSourceMask(mask);
             //FAWE end
         }
-        if (actor instanceof Player && Settings.settings().GENERAL.UNSTUCK_ON_GENERATE) {
+        if (actor instanceof Player && Settings.settings().general().unstuckOnGenerate()) {
             ((Player) actor).findFreePosition();
         }
         if (success) {
@@ -824,7 +824,7 @@ public class RegionCommands {
                     String.join(" ", expression),
                     session.getTimeout()
             );
-            if (actor instanceof Player && Settings.settings().GENERAL.UNSTUCK_ON_GENERATE) {
+            if (actor instanceof Player && Settings.settings().general().unstuckOnGenerate()) {
                 ((Player) actor).findFreePosition();
             }
             actor.print(Caption.of("worldedit.deform.deformed", TextComponent.of(affected)));

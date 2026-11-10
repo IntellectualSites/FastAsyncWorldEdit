@@ -189,7 +189,7 @@ public class GenerationCommands {
 
         BlockVector3 pos = session.getPlacementPosition(actor);
         int affected = editSession.makeCylinder(pos, pattern, radiusX, radiusZ, height, !hollow);
-        if (actor instanceof Player && Settings.settings().GENERAL.UNSTUCK_ON_GENERATE) {
+        if (actor instanceof Player && Settings.settings().general().unstuckOnGenerate()) {
             ((Player) actor).findFreePosition();
         }
         actor.print(Caption.of("worldedit.cyl.created", TextComponent.of(affected)));
@@ -236,7 +236,7 @@ public class GenerationCommands {
 
         BlockVector3 pos = session.getPlacementPosition(actor);
         int affected = editSession.makeCone(pos, pattern, radiusX, radiusZ, height, !hollow, thickness);
-        if (actor instanceof Player && Settings.settings().GENERAL.UNSTUCK_ON_GENERATE) {
+        if (actor instanceof Player && Settings.settings().general().unstuckOnGenerate()) {
             ((Player) actor).findFreePosition();
         }
         actor.printInfo(Caption.of("worldedit.cone.created", TextComponent.of(affected)));
@@ -307,7 +307,7 @@ public class GenerationCommands {
         }
 
         int affected = editSession.makeSphere(pos, pattern, radiusX, radiusY, radiusZ, !hollow);
-        if (actor instanceof Player && Settings.settings().GENERAL.UNSTUCK_ON_GENERATE) {
+        if (actor instanceof Player && Settings.settings().general().unstuckOnGenerate()) {
             ((Player) actor).findFreePosition();
         }
         actor.print(Caption.of("worldedit.sphere.created", TextComponent.of(affected)));
@@ -444,7 +444,7 @@ public class GenerationCommands {
         worldEdit.checkMaxRadius(size, actor);
         BlockVector3 pos = session.getPlacementPosition(actor);
         int affected = editSession.makePyramid(pos, pattern, size, !hollow);
-        if (actor instanceof Player && Settings.settings().GENERAL.UNSTUCK_ON_GENERATE) {
+        if (actor instanceof Player && Settings.settings().general().unstuckOnGenerate()) {
             ((Player) actor).findFreePosition();
         }
         actor.print(Caption.of("worldedit.pyramid.created", TextComponent.of(affected)));
@@ -523,7 +523,7 @@ public class GenerationCommands {
                     hollow,
                     session.getTimeout()
             );
-            if (actor instanceof Player && Settings.settings().GENERAL.UNSTUCK_ON_GENERATE) {
+            if (actor instanceof Player && Settings.settings().general().unstuckOnGenerate()) {
                 ((Player) actor).findFreePosition();
             }
             actor.print(Caption.of("worldedit.generate.created", TextComponent.of(affected)));
@@ -702,8 +702,8 @@ public class GenerationCommands {
         MainUtil.checkImageHost(url.toURI());
         if (dimensions != null) {
             checkCommandArgument(
-                    (long) dimensions.x() * dimensions.z() <= Settings.settings().WEB.MAX_IMAGE_SIZE,
-                    Caption.of("fawe.error.image-dimensions", Settings.settings().WEB.MAX_IMAGE_SIZE)
+                    (long) dimensions.x() * dimensions.z() <= Settings.settings().web().maxImageSize(),
+                    Caption.of("fawe.error.image-dimensions", Settings.settings().web().maxImageSize())
             );
         }
         ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -718,9 +718,9 @@ public class GenerationCommands {
         });
         BufferedImage image;
         try {
-            image = future.get(Settings.settings().WEB.MAX_IMAGE_LOAD_TIME, TimeUnit.SECONDS);
+            image = future.get(Settings.settings().web().maxImageLoadTime(), TimeUnit.SECONDS);
         } catch (InterruptedException | TimeoutException ignored) {
-            actor.printError(Caption.of("fawe.web.image.load.timeout", Settings.settings().WEB.MAX_IMAGE_LOAD_TIME));
+            actor.printError(Caption.of("fawe.web.image.load.timeout", Settings.settings().web().maxImageLoadTime()));
             return;
         } catch (Throwable t) {
             if (t.getCause() instanceof FaweException faweException) {
@@ -815,7 +815,7 @@ public class GenerationCommands {
                 radius.divide(max),
                 sphericity / 100
         );
-        if (actor instanceof Player && Settings.settings().GENERAL.UNSTUCK_ON_GENERATE) {
+        if (actor instanceof Player && Settings.settings().general().unstuckOnGenerate()) {
             ((Player) actor).findFreePosition();
         }
         actor.print(Caption.of("worldedit.blob.created", TextComponent.of(affected)));
