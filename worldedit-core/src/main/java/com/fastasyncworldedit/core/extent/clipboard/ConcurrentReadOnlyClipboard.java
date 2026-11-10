@@ -9,7 +9,6 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
-import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nonnull;
 import java.util.Iterator;
@@ -21,7 +20,7 @@ public class ConcurrentReadOnlyClipboard implements Clipboard {
     private final Clipboard parent;
 
     public static Clipboard tryWrap(Clipboard clipboard) {
-        if (clipboard.supportsParallelAccess()) {
+        if (clipboard.supportsParallelReading()) {
             return clipboard;
         }
         return new ConcurrentReadOnlyClipboard(clipboard);
@@ -146,7 +145,7 @@ public class ConcurrentReadOnlyClipboard implements Clipboard {
     }
 
     @Override
-    public boolean supportsParallelAccess() {
+    public boolean supportsParallelReading() {
         return true;
     }
 

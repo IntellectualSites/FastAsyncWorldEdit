@@ -223,7 +223,7 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable, Fl
      * @since TODO
      */
     @ApiStatus.Experimental
-    default boolean supportsParallelAccess() {
+    default boolean supportsParallelReading() {
         return false;
     }
 

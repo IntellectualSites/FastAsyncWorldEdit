@@ -304,7 +304,7 @@ public class DiskOptimizedClipboard extends LinearClipboard {
     }
 
     @Override
-    public boolean supportsParallelAccess() {
+    public boolean supportsParallelReading() {
         return true;
     }
 

@@ -47,7 +47,7 @@ public final class EmptyClipboard implements Clipboard {
     }
 
     @Override
-    public boolean supportsParallelAccess() {
+    public boolean supportsParallelReading() {
         return true;
     }
 
