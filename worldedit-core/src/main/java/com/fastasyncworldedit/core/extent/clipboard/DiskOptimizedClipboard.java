@@ -303,6 +303,11 @@ public class DiskOptimizedClipboard extends LinearClipboard {
         return file.toURI();
     }
 
+    @Override
+    public boolean supportsParallelReading() {
+        return true;
+    }
+
     public File getFile() {
         return file;
     }
