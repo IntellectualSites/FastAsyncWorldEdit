@@ -19,7 +19,7 @@
 
 package com.sk89q.worldedit.function.pattern;
 
-import com.fastasyncworldedit.core.extent.clipboard.ConcurrentReadClipboard;
+import com.fastasyncworldedit.core.extent.clipboard.ConcurrentReadOnlyClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.math.BlockVector3;
 
@@ -44,7 +44,7 @@ public class ClipboardPattern extends RepeatingExtentPattern {
      * @param offset    the offset
      */
     public ClipboardPattern(Clipboard clipboard, BlockVector3 offset) {
-        super(ConcurrentReadClipboard.tryWrap(clipboard), clipboard.getMinimumPoint(), offset);
+        super(ConcurrentReadOnlyClipboard.tryWrap(clipboard), clipboard.getMinimumPoint(), offset);
     }
 
 }

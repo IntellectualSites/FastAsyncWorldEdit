@@ -16,8 +16,7 @@ import java.util.Iterator;
 import java.util.List;
 
 // Only wraps block-handling as reading the rest should be safe for the CPU and memory clips (ignoring 3rd party impls)
-@ApiStatus.Experimental // Temporary wrapper
-public class ConcurrentReadClipboard implements Clipboard {
+public class ConcurrentReadOnlyClipboard implements Clipboard {
 
     private final Clipboard parent;
 
@@ -25,10 +24,10 @@ public class ConcurrentReadClipboard implements Clipboard {
         if (clipboard.supportsParallelAccess()) {
             return clipboard;
         }
-        return new ConcurrentReadClipboard(clipboard);
+        return new ConcurrentReadOnlyClipboard(clipboard);
     }
 
-    private ConcurrentReadClipboard(Clipboard parent) {
+    private ConcurrentReadOnlyClipboard(Clipboard parent) {
         this.parent = parent;
     }
 
