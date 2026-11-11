@@ -164,7 +164,7 @@ public class HistorySubCommands {
     @CommandPermissions("fawe.rollback.import")
     @Confirm
     public synchronized void importdb(Actor actor) throws WorldEditException {
-        File folder = MainUtil.getFile(Fawe.platform().getDirectory(), Settings.settings().paths().history());
+        File folder = Fawe.platform().getPath().resolve(Settings.settings().paths().history()).toFile();
         if (folder.exists()) {
             for (File worldFolder : Objects.requireNonNull(folder.listFiles())) {
                 if (worldFolder != null && worldFolder.isDirectory()) {

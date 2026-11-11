@@ -194,6 +194,39 @@ class SettingsTest {
     }
 
     @Test
+    void schematicLimitsMoveIntoGroupsWithDotsInTheirNameBeforeOtherGroups() throws IOException {
+        Settings settings = load("""
+                experimental:
+                  per-player-file-size-limit: 123
+                limits:
+                  vip.plus:
+                    max-changes: -1
+                  builder:
+                    max-changes: -1
+                """);
+
+        assertEquals(123, settings.limits().get("vip.plus").schemFileSizeLimit());
+        assertEquals(123, settings.limits().get("builder").schemFileSizeLimit());
+        assertFalse(settings.limits().containsKey("vip"));
+    }
+
+    @Test
+    void schematicLimitsMoveIntoGroupsWithDotsInTheirNameAsLastGroup() throws IOException {
+        Settings settings = load("""
+                experimental:
+                  per-player-file-size-limit: 123
+                limits:
+                  builder:
+                    max-changes: -1
+                  vip.plus:
+                    max-changes: -1
+                """);
+
+        assertEquals(123, settings.limits().get("vip.plus").schemFileSizeLimit());
+        assertFalse(settings.limits().containsKey("vip"));
+    }
+
+    @Test
     void newerOptionsWinOverTheOnesTheyReplaced() throws IOException {
         Settings settings = load("""
                 queue:

@@ -351,7 +351,7 @@ public class TextureUtil implements TextureHolder {
      * Do not use. Use {@link Fawe#getTextureUtil()}
      */
     public TextureUtil() throws FileNotFoundException {
-        this(MainUtil.getFile(Fawe.platform().getDirectory(), Settings.settings().paths().textures()));
+        this(Fawe.platform().getPath().resolve(Settings.settings().paths().textures()).toFile());
     }
 
     /**

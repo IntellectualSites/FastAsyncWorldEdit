@@ -232,7 +232,10 @@ public class FaweAPI {
         if (!(extent instanceof World world)) {
             throw new IllegalArgumentException("Origin is not a valid world");
         }
-        File history = MainUtil.getFile(Fawe.platform().getDirectory(), Settings.settings().paths().history() + File.separator + world.getName());
+        File history = Fawe.platform().getPath()
+                .resolve(Settings.settings().paths().history())
+                .resolve(world.getName())
+                .toFile();
         if (!history.exists()) {
             return new ArrayList<>();
         }
