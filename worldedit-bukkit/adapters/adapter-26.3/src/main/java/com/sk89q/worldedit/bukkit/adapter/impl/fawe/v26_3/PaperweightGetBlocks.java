@@ -104,6 +104,15 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
     private final PaperweightFaweAdapter adapter = ((PaperweightFaweAdapter) WorldEditPlugin
             .getInstance()
             .getBukkitImplAdapter());
+    /**
+     * Guards {@link #sections} and {@link #levelChunk}.
+     * <p>
+     * Lock order, outermost first: the NMS chunk -> a section's lock ({@code sectionLocks[i]}) -> a section's
+     * {@code DelegateSemaphore} -> {@code sectionLock} -> {@code this}. Readers already take them in that order
+     * (CharBlocks EMPTY.get -> update -> getSections -> getChunk), so nothing may take a section's lock while holding
+     * {@code sectionLock} or {@code this}, and nothing may take {@code sectionLock} while holding {@code this}. In
+     * particular {@code reset()} and {@code super.trim(...)} take section locks and must run after both are released.
+     */
     private final ReadWriteLock sectionLock = new ReentrantReadWriteLock();
     private final Registry<Biome> biomeRegistry;
     private final IdMap<Holder<Biome>> biomeHolderIdMap;
@@ -337,7 +346,27 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
             LevelChunk nmsChunk,
             ServerLevel nmsWorld
     ) throws Exception {
+        // Pending block entities of a not-yet-post-processed chunk are taken out of the chunk for the duration of the call
         Map<BlockPos, CompoundTag> tilesToInit = PaperweightPlatformAdapter.clearPostProcessing(nmsChunk, false);
+        try {
+            return doInternalCall(set, finalizer, copyKey, nmsChunk, nmsWorld, tilesToInit);
+        } catch (Throwable t) {
+            // Hand them back to the chunk, otherwise a failed call would silently drop them (e.g. generated chest loot)
+            if (!tilesToInit.isEmpty()) {
+                PaperweightPlatformAdapter.setPostProcessing(nmsChunk, tilesToInit);
+            }
+            throw t;
+        }
+    }
+
+    private <T extends Future<T>> T doInternalCall(
+            IChunkSet set,
+            Runnable finalizer,
+            int copyKey,
+            LevelChunk nmsChunk,
+            ServerLevel nmsWorld,
+            Map<BlockPos, CompoundTag> tilesToInit
+    ) throws Exception {
         boolean createCopy = this.createCopy;
         PaperweightGetBlocks_Copy copy = createCopy ? new PaperweightGetBlocks_Copy(nmsChunk) : null;
         if (createCopy) {
@@ -537,20 +566,27 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
                     synchronized (lock) {
                         lock.acquire(); // Wait until we have the lock
                         lock.release();
+                        // Lock order: a section's lock (sectionLocks[i]) comes before sectionLock, which comes before this.
+                        // Readers take them in that order (CharBlocks EMPTY.get -> update -> getSections -> getChunk), as does
+                        // this method. reset() takes every section's lock, so calling it while holding sectionLock or this
+                        // deadlocks against a reader. Defer it until after both are released.
+                        boolean resetAll = false;
                         try {
                             sectionLock.writeLock().lock();
+                            // sectionLock -> this, the same order as getSections -> getChunk and trim(true)
                             synchronized (this) {
                                 if (this.getChunk() != nmsChunk) {
                                     this.levelChunk = nmsChunk;
                                     this.sections = null;
-                                    this.reset();
+                                    resetAll = true;
                                 } else if (existingSection != getSections(false)[getSectionIndex]) {
                                     this.sections[getSectionIndex] = existingSection;
-                                    this.reset();
+                                    resetAll = true;
                                 } else if (!Arrays.equals(
                                         update(getSectionIndex, new char[4096], true),
                                         load(layerNo)
                                 )) {
+                                    // Safe under sectionLock: it only takes this section's lock, which we already hold.
                                     this.reset(layerNo);
                         /*} else if (lock.isModified()) {
                             this.reset(layerNo);*/
@@ -559,6 +595,11 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
                         } finally {
                             sectionLock.writeLock().unlock();
                         }
+                        // Deferred from above: sectionLock and this are released, so taking every section's lock here is safe.
+                        // Still runs before newChunkSection(this::load, ...) reads the cache below.
+                        if (resetAll) {
+                            this.reset();
+                        }
 
                         PalettedContainer<Holder<Biome>> biomeData = setBiomesToPalettedContainer(
                                 biomes,
@@ -566,17 +607,17 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
                                 existingSection.getBiomes()
                         );
 
-                        synchronized (this) {
-                            newSection = PaperweightPlatformAdapter.newChunkSection(
-                                    layerNo,
-                                    this::load,
-                                    setArr,
-                                    adapter,
-                                    nmsWorld.registryAccess(),
-                                    nmsWorld.palettedContainerFactory().blockStatesStrategy(),
-                                    biomeData != null ? biomeData : (PalettedContainer<Holder<Biome>>) existingSection.getBiomes()
-                            );
-                        }
+                        // Not synchronized on this: this::load may take sectionLock (getSections), which must come before this.
+                        // The cached data of this layer is already guarded by its section lock, held above.
+                        newSection = PaperweightPlatformAdapter.newChunkSection(
+                                layerNo,
+                                this::load,
+                                setArr,
+                                adapter,
+                                nmsWorld.registryAccess(),
+                                nmsWorld.palettedContainerFactory().blockStatesStrategy(),
+                                biomeData != null ? biomeData : (PalettedContainer<Holder<Biome>>) existingSection.getBiomes()
+                        );
                         if (!PaperweightPlatformAdapter.setSectionAtomic(
                                 nmsWorld.getWorld().getName(),
                                 chunkPos,
@@ -807,13 +848,16 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
             char[] arr,
             int layer
     ) {
+        // reset() takes every section's lock, and a section's lock must come before sectionLock (see internalCall).
+        // Defer it until sectionLock is released to avoid deadlocking against a reader.
+        boolean resetAll = false;
         try {
             sectionLock.writeLock().lock();
             if (this.getChunk() != nmsChunk) {
                 this.levelChunk = nmsChunk;
                 this.sections = new LevelChunkSection[chunkSections.length];
                 System.arraycopy(chunkSections, 0, this.sections, 0, chunkSections.length);
-                this.reset();
+                resetAll = true;
             }
             if (this.sections == null) {
                 this.sections = new LevelChunkSection[chunkSections.length];
@@ -825,6 +869,10 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
             }
         } finally {
             sectionLock.writeLock().unlock();
+        }
+        // Deferred reset (see above). Must run before blocks[layer] is set, or it would clear the new array.
+        if (resetAll) {
+            this.reset();
         }
         this.blocks[layer] = arr;
     }
@@ -1044,12 +1092,20 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
     @Override
     @SuppressWarnings("unchecked")
     public boolean trim(boolean aggressive) {
+        // Lock order (see the sectionLock field): a section's lock -> sectionLock -> this. super.trim(...) takes section
+        // locks, so it must never run while holding sectionLock or this. Each branch below only decides what to trim
+        // whilst locked, and does the trimming once those locks are released.
+        boolean nothingCached;
         synchronized (this) {
-            if (sections == null && (!aggressive || levelChunk == null)) {
+            nothingCached = sections == null && (!aggressive || levelChunk == null);
+            if (nothingCached) {
                 skyLight = new DataLayer[getSectionCount()];
                 blockLight = new DataLayer[getSectionCount()];
-                return !aggressive || super.trim(true);
             }
+        }
+        if (nothingCached) {
+            // Outside synchronized (this): a reader holding a section's lock may be waiting on this in getChunk().
+            return !aggressive || super.trim(true);
         }
         if (aggressive) {
             sectionLock.writeLock().lock();
@@ -1059,16 +1115,20 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
                     blockLight = new DataLayer[getSectionCount()];
                     sections = null;
                     levelChunk = null;
-                    return super.trim(true);
                 }
             } finally {
                 sectionLock.writeLock().unlock();
             }
+            // super.trim(true) takes every section's lock, and a section's lock must come before sectionLock. Run it
+            // after sectionLock is released to avoid deadlocking against a reader or a chunk call.
+            return super.trim(true);
         }
+        // Takes sectionLock (and possibly this, via getChunk()), so must be done before synchronizing on this.
         LevelChunkSection[] forcedSections = getSections(true);
-        boolean[] trim = new boolean[sectionCount];
+        // Indexed by section array index (0-based), not by section position.
+        boolean[] trim = new boolean[getSectionCount()];
         synchronized (this) {
-            for (int i = 0; i <= getSectionCount(); i++) {
+            for (int i = 0; i < getSectionCount(); i++) {
                 if (forcedSections[i] == null || super.blocks[i] == null) {
                     continue;
                 }
@@ -1096,14 +1156,16 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
                     trim[i] = true;
                 }
             }
-            int minSection = getMinSectionPosition();
-            for (int i = 0; i < trim.length; i++) {
-                if (trim[i]) {
-                    super.trim(false, i + minSection);
-                }
-            }
-            return true;
         }
+        // Deferred from above: super.trim(false, layer) takes that section's lock, so it runs outside synchronized (this).
+        // It expects the section position, hence the offset from the array index.
+        int minSection = getMinSectionPosition();
+        for (int i = 0; i < trim.length; i++) {
+            if (trim[i]) {
+                super.trim(false, i + minSection);
+            }
+        }
+        return true;
     }
 
 }
