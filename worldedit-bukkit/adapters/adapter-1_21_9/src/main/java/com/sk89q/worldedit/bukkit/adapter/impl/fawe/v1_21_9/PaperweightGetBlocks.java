@@ -352,27 +352,6 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
             final LevelChunk nmsChunk,
             final ServerLevel nmsWorld
     ) throws Exception {
-        // Pending block entities of a not-yet-post-processed chunk are taken out of the chunk for the duration of the call
-        Map<BlockPos, CompoundTag> tilesToInit = PaperweightPlatformAdapter.clearPostProcessing(nmsChunk, false);
-        try {
-            return doInternalCall(set, finalizer, copyKey, nmsChunk, nmsWorld, tilesToInit);
-        } catch (Throwable t) {
-            // Hand them back to the chunk, otherwise a failed call would silently drop them (e.g. generated chest loot)
-            if (!tilesToInit.isEmpty()) {
-                PaperweightPlatformAdapter.setPostProcessing(nmsChunk, tilesToInit);
-            }
-            throw t;
-        }
-    }
-
-    private <T extends Future<T>> T doInternalCall(
-            final IChunkSet set,
-            final Runnable finalizer,
-            final int copyKey,
-            final LevelChunk nmsChunk,
-            final ServerLevel nmsWorld,
-            Map<BlockPos, CompoundTag> tilesToInit
-    ) throws Exception {
         boolean createCopy = this.createCopy;
         PaperweightGetBlocks_Copy copy = createCopy ? new PaperweightGetBlocks_Copy(nmsChunk) : null;
         if (createCopy) {
@@ -381,6 +360,9 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
             }
             copies.put(copyKey, copy);
         }
+        // Positions of block entities the chunk still holds as NBT because the server has not post-processed it yet. Filled by
+        // the sync task below, which has completed (and so safely published it) by the time this thread reads it.
+        List<BlockPos> pendingTiles = new ArrayList<>();
         //TODO: optimise
         List<BlockEntity> beacons = TaskManager.taskManager().sync(() -> {
             // Remove existing tiles. Create a copy so that we can remove blocks
@@ -415,18 +397,18 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
                     }
                 }
             }
+            // Do the same for block entities that are still pending, i.e. the chunk was only just generated/loaded and the
+            // server has not post-processed it yet. Done here as the pending map may only be touched on the main thread (see
+            // PaperweightPlatformAdapter#removePendingBlockEntities). Those the edit does not overwrite stay in the chunk.
+            pendingTiles.addAll(PaperweightPlatformAdapter.removePendingBlockEntities(nmsChunk, pos -> {
+                final int layer = pos.getY() >> 4;
+                if (!set.hasSection(layer)) {
+                    return false;
+                }
+                int ordinal = set.getBlock(pos.getX() & 15, pos.getY(), pos.getZ() & 15).getOrdinal();
+                return ordinal != BlockTypesCache.ReservedIDs.__RESERVED__;
+            }));
             return beaconEntities;
-        });
-        tilesToInit.keySet().removeIf(pos -> {
-            int x = pos.getX() & 15;
-            int y = pos.getY();
-            int z = pos.getZ() & 15;
-            int layer = y >> 4;
-            if (!set.hasSection(layer)) {
-                return false;
-            }
-            int ordinal = set.getBlock(x, y, z).getOrdinal();
-            return ordinal != BlockTypesCache.ReservedIDs.__RESERVED__;
         });
         final BiomeType[][] biomes = set.getBiomes();
 
@@ -783,11 +765,14 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
                     });
                 }
 
-                if (!tilesToInit.isEmpty()) {
-                    PaperweightPlatformAdapter.setPostProcessing(nmsChunk, tilesToInit);
+                if (!pendingTiles.isEmpty()) {
+                    // Create the block entities the edit left pending now, on the main thread and before the edit's own tiles are
+                    // set, rather than waiting for the server to post-process the chunk. getBlockEntity takes the NBT out of the
+                    // pending map itself, and simply returns the block entity if the server got there first.
                     syncTasks.add(() -> {
-                        tilesToInit.forEach((pos, tag) -> nmsChunk.getBlockEntity(pos));
-                        PaperweightPlatformAdapter.clearPostProcessing(nmsChunk, true);
+                        for (BlockPos pos : pendingTiles) {
+                            nmsChunk.getBlockEntity(pos);
+                        }
                     });
                 }
 

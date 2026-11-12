@@ -77,6 +77,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Semaphore;
 import java.util.function.IntFunction;
+import java.util.function.Predicate;
 import java.util.stream.LongStream;
 
 import static net.minecraft.core.registries.Registries.BIOME;
@@ -620,31 +621,41 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         return (PersistentEntitySectionManager<Entity>) (SERVER_LEVEL_ENTITY_MANAGER.get(level));
     }
 
-    static Map<BlockPos, CompoundTag> clearPostProcessing(LevelChunk chunk, boolean force) {
-        if (!force && PaperSupport.isPaper() && chunk.moonrise$isPostProcessingDone()) {
-            return Collections.emptyMap();
+    /**
+     * Drop the pending block entities of a chunk that an edit is about to overwrite, and report the ones left behind.
+     * <p>
+     * A freshly generated/loaded chunk keeps its block entities as NBT in {@code pendingBlockEntities} until the server
+     * post-processes it. If an edit replaces the block first, the server would later try to create a block entity from NBT
+     * that no longer matches the block.
+     * <p>
+     * Must be called on the main thread. {@code pendingBlockEntities} is a plain HashMap that the server reads and
+     * modifies there (LevelChunk#postProcessGeneration, #getBlockEntity, #removeBlockEntity), so touching it from an edit
+     * thread races with the server. Entries that are not removed are deliberately left in the chunk rather than taken out
+     * for the duration of the edit: if the server looks one up in the meantime it still finds the NBT, instead of creating
+     * an empty block entity in its place.
+     *
+     * @param chunk  chunk to check
+     * @param remove tests if the pending block entity at a (world) position is to be removed
+     * @return positions of the pending block entities left in the chunk, empty if post-processing has already completed
+     */
+    static List<BlockPos> removePendingBlockEntities(LevelChunk chunk, Predicate<BlockPos> remove) {
+        // Once post-processing is done the server has promoted everything itself and nothing is pending
+        if (PaperSupport.isPaper() && chunk.moonrise$isPostProcessingDone()) {
+            return Collections.emptyList();
         }
         try {
             //noinspection unchecked
             Map<BlockPos, CompoundTag> pendingBlockEntities = (Map<BlockPos, CompoundTag>) fieldPendingBlockEntities.get(chunk);
-            Map<BlockPos, CompoundTag> toDo = new HashMap<>(pendingBlockEntities);
-            pendingBlockEntities.clear();
-            return toDo;
+            if (pendingBlockEntities.isEmpty()) {
+                return Collections.emptyList();
+            }
+            pendingBlockEntities.keySet().removeIf(remove);
+            // Copy, as the server will remove entries from the map as it promotes them
+            return new ArrayList<>(pendingBlockEntities.keySet());
         } catch (IllegalAccessException e) {
-            LOGGER.error("Error clearing pendingBlockEntities", e);
+            LOGGER.error("Error reading pendingBlockEntities", e);
         }
-        return Collections.emptyMap();
+        return Collections.emptyList();
     }
-
-    static void setPostProcessing(LevelChunk chunk, Map<BlockPos, CompoundTag> tiles) {
-        try {
-            //noinspection unchecked
-            Map<BlockPos, CompoundTag> pendingBlockEntities = (Map<BlockPos, CompoundTag>) fieldPendingBlockEntities.get(chunk);
-            pendingBlockEntities.putAll(tiles);
-        } catch (IllegalAccessException e) {
-            LOGGER.error("Error writing to pendingBlockEntities", e);
-        }
-    }
-
 
 }
