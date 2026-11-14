@@ -152,6 +152,10 @@ public class ClipboardFormats {
     public static ClipboardFormat findByFile(File file) {
         checkNotNull(file);
 
+        if (file.isDirectory()) {
+            return null;
+        }
+
         if (file.getName().toLowerCase().endsWith(".png")) {
             return BuiltInClipboardFormat.PNG;
         }
