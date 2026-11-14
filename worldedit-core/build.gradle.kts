@@ -67,6 +67,7 @@ dependencies {
 
 tasks.test {
     maxHeapSize = "1G"
+    jvmArgs("--add-modules=jdk.incubator.vector")
 }
 
 tasks.compileJava {

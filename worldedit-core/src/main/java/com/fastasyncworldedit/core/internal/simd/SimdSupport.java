@@ -109,7 +109,7 @@ public class SimdSupport {
         };
     }
 
-    private static final class VectorizedPattern<T extends Filter> extends DelegateFilter<T> implements VectorizedFilter {
+    static final class VectorizedPattern<T extends Filter> extends DelegateFilter<T> implements VectorizedFilter {
 
         private final char ordinal;
 
