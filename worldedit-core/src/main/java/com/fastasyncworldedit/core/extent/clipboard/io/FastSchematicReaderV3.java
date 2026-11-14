@@ -54,6 +54,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
@@ -80,6 +82,7 @@ public class FastSchematicReaderV3 implements ClipboardReader {
     private static final byte CACHE_IDENTIFIER_BIOMES = 0x02;
     private static final byte CACHE_IDENTIFIER_ENTITIES = 0x03;
     private static final byte CACHE_IDENTIFIER_BLOCK_TILE_ENTITIES = 0x04;
+    private static final byte[] SCHEMATIC_TAG_NAME = "Schematic".getBytes(StandardCharsets.UTF_8);
 
     private final InputStream parentStream;
     private final MutableBlockVector3 dimensions = MutableBlockVector3.at(0, 0, 0);
@@ -757,8 +760,15 @@ public class FastSchematicReaderV3 implements ClipboardReader {
      * @throws IOException on I/O error
      */
     private static void skipHeader(DataInputStream dataInputStream) throws IOException {
-        dataInputStream.skipNBytes(1 + 2); // 1 Byte = TAG_Compound, 2 Bytes = Short (Length of tag name = "")
-        dataInputStream.skipNBytes(1 + 2 + 9); // as above + 9 bytes = "Schematic"
+        // Validate instead of skipping blindly: other versions (e.g. v2 with a root named "Schematic") would otherwise
+        // misalign the stream and fail later with misleading errors
+        if (dataInputStream.readByte() != NBTConstants.TYPE_COMPOUND
+                || dataInputStream.readUnsignedShort() != 0
+                || dataInputStream.readByte() != NBTConstants.TYPE_COMPOUND
+                || dataInputStream.readUnsignedShort() != SCHEMATIC_TAG_NAME.length
+                || !Arrays.equals(dataInputStream.readNBytes(SCHEMATIC_TAG_NAME.length), SCHEMATIC_TAG_NAME)) {
+            throw new IOException("Invalid schematic - not a Sponge Schematic v3");
+        }
     }
 
     @ApiStatus.Internal
