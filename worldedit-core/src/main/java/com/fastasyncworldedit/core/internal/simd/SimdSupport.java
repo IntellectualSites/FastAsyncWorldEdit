@@ -127,7 +127,8 @@ public class SimdSupport {
         public void applyVector(final VectorFacade get, final VectorFacade set, final VectorMask<Short> mask) {
             ShortVector s = set.getOrZero(mask.vectorSpecies());
             // only change the lanes the mask dictates us to change, keep the rest
-            s = s.blend(ShortVector.broadcast(ShortVector.SPECIES_PREFERRED, ordinal), mask);
+            // cast to short: ordinals above Short.MAX_VALUE would otherwise be rejected by broadcast(long)
+            s = s.blend(ShortVector.broadcast(mask.vectorSpecies(), (short) ordinal), mask);
             set.setOrIgnore(s);
         }
 
