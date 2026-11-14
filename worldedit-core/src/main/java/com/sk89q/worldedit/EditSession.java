@@ -1333,7 +1333,14 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * Finish off the queue.
      */
     public void flushQueue() {
-        Operations.completeBlindly(commit());
+        try {
+            Operations.completeBlindly(commit());
+        } finally {
+            finishFlush();
+        }
+    }
+
+    private void finishFlush() {
         // Check fails
         FaweLimit used = getLimitUsed();
         if (used.MAX_FAILS.get() > 0) {
