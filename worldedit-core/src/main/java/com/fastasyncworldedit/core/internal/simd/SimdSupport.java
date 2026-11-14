@@ -16,6 +16,7 @@ import com.sk89q.worldedit.world.block.BlockTypesCache;
 import jdk.incubator.vector.ShortVector;
 import jdk.incubator.vector.VectorMask;
 import jdk.incubator.vector.VectorOperators;
+import jdk.incubator.vector.VectorSpecies;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
@@ -109,7 +110,19 @@ public class SimdSupport {
         };
     }
 
-    static final class VectorizedPattern<T extends Filter> extends DelegateFilter<T> implements VectorizedFilter {
+    /**
+     * {@return a vector with all lanes set to the given unsigned value}
+     *
+     * @param species the species to use
+     * @param value   the value, e.g. a block state ordinal
+     */
+    static ShortVector broadcast(VectorSpecies<Short> species, char value) {
+        // There is no broadcast(char): a char widens to long, and broadcast(long) rejects values above Short.MAX_VALUE.
+        // The short cast keeps the bit pattern, so reading the lanes back as chars yields the original value.
+        return ShortVector.broadcast(species, (short) value);
+    }
+
+    private static final class VectorizedPattern<T extends Filter> extends DelegateFilter<T> implements VectorizedFilter {
 
         private final char ordinal;
 
@@ -127,8 +140,7 @@ public class SimdSupport {
         public void applyVector(final VectorFacade get, final VectorFacade set, final VectorMask<Short> mask) {
             ShortVector s = set.getOrZero(mask.vectorSpecies());
             // only change the lanes the mask dictates us to change, keep the rest
-            // cast to short: ordinals above Short.MAX_VALUE would otherwise be rejected by broadcast(long)
-            s = s.blend(ShortVector.broadcast(mask.vectorSpecies(), (short) ordinal), mask);
+            s = s.blend(broadcast(mask.vectorSpecies(), ordinal), mask);
             set.setOrIgnore(s);
         }
 
