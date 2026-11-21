@@ -40,7 +40,7 @@ extra.set("revision", revision)
 extra.set("buildNumber", buildNumber)
 extra.set("date", date)
 
-version = String.format("%s-%s", rootVersion, snapshot)
+version = String.format("%s", rootVersion)
 
 if (!project.hasProperty("gitCommitHash")) {
     ext["gitCommitHash"] = try {
