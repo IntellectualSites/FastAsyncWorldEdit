@@ -273,6 +273,11 @@ public class DiskOptimizedClipboard extends LinearClipboard {
                 double y = pos.get(1).getValue();
                 double z = pos.get(2).getValue();
                 BaseEntity entity = new BaseEntity(tag);
+                if (entity.getType() == null) {
+                    LOGGER.warn("Skipping entity with unknown type: {}", tag);
+                    entitiesCount--;
+                    continue;
+                }
                 BlockArrayClipboard.ClipboardEntity clipboardEntity = new BlockArrayClipboard.ClipboardEntity(
                         this,
                         x,

@@ -555,7 +555,7 @@ public final class EntityTypes {
             case "illusion_illager":
                 return "illusioner";
             default: {
-                if (Character.isUpperCase(id.charAt(0))) {
+                if (!id.isEmpty() && Character.isUpperCase(id.charAt(0))) {
                     return convertEntityId(id.toLowerCase(Locale.ROOT));
                 }
                 return id;

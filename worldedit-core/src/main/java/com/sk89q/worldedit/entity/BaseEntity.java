@@ -123,7 +123,13 @@ public class BaseEntity implements NbtValued {
 
     //FAWE start
     public BaseEntity(CompoundTag tag) {
-        this(EntityTypes.parse(tag.getString("Id")), tag);
+        this(EntityTypes.parse(getEntityId(tag)), tag);
+    }
+
+    // FAWE uses "Id" internally, but entity NBT may also carry the vanilla "id" key
+    private static String getEntityId(CompoundTag tag) {
+        String id = tag.getString("Id");
+        return id.isEmpty() ? tag.getString("id") : id;
     }
 
     /**
