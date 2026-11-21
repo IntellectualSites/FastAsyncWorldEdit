@@ -19,11 +19,15 @@
 
 package com.sk89q.worldedit.regions;
 
+import java.util.List;
+import java.util.Set;
+
+import javax.annotation.Nullable;
+
 import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.extent.SingleRegionExtent;
 import com.fastasyncworldedit.core.extent.filter.block.ChunkFilterBlock;
 import com.fastasyncworldedit.core.extent.processor.ProcessorScope;
-import com.fastasyncworldedit.core.limit.FaweLimit;
 import com.fastasyncworldedit.core.queue.Filter;
 import com.fastasyncworldedit.core.queue.IBatchProcessor;
 import com.fastasyncworldedit.core.queue.IChunk;
@@ -39,10 +43,6 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
-
-import javax.annotation.Nullable;
-import java.util.List;
-import java.util.Set;
 
 /**
  * Represents a physical shape.
@@ -476,7 +476,8 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
                 for (int y = 0, index = 0; y < 16; y++) {
                     for (int z = 0; z < 16; z++) {
                         for (int x = 0; x < 16; x++, index++) {
-                            if (arr[index] != BlockTypesCache.ReservedIDs.__RESERVED__ && contains(x, y, z)) {
+                            if (arr[index] != BlockTypesCache.ReservedIDs.__RESERVED__
+                                    && contains(bx + x, by + y, bz + z)) {
                                 arr[index] = BlockTypesCache.ReservedIDs.__RESERVED__;
                                 processExtra = true;
                             }
