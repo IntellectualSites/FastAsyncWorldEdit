@@ -395,9 +395,15 @@ public class SchematicCommands {
                     urlIn.transferTo(tempOut);
                 }
                 // No format is specified -> try or fail
-                if (noExplicitFormat && (format = ClipboardFormats.findByFile(tempFile)) == null) {
-                    actor.print(Caption.of("fawe.worldedit.schematic.schematic.load-failure", TextComponent.of(filename)));
-                    return;
+                if (noExplicitFormat) {
+                    if ((format = ClipboardFormats.findByFile(tempFile)) == null) {
+                        actor.print(Caption.of("fawe.worldedit.schematic.schematic.load-failure", TextComponent.of(filename)));
+                        return;
+                    }
+                } else {
+                    // The web interface always generates the command with the "schem" format (Sponge v3),
+                    // even for v2 uploads
+                    format = getMatchingFormat(format, tempFile);
                 }
                 in = new FileInputStream(tempFile);
                 uri = temp.toUri();
@@ -458,6 +464,8 @@ public class SchematicCommands {
                         }
                         return;
                     }
+                } else {
+                    format = getMatchingFormat(format, file);
                 }
                 in = new FileInputStream(file);
                 uri = file.toURI();
@@ -485,6 +493,20 @@ public class SchematicCommands {
         }
         //FAWE end
     }
+
+    //FAWE start
+    /**
+     * Returns the requested format if the file matches it, otherwise the detected format of the file. Aliases like
+     * {@code schem} only point to a single version, while files with that extension can be of any Sponge version.
+     */
+    private static ClipboardFormat getMatchingFormat(ClipboardFormat requested, File file) {
+        if (requested.isFormat(file)) {
+            return requested;
+        }
+        ClipboardFormat detected = ClipboardFormats.findByFile(file);
+        return detected != null ? detected : requested;
+    }
+    //FAWE end
 
     @Command(
             name = "save",
