@@ -386,6 +386,11 @@ public class BlockArrayClipboard implements Clipboard {
     }
 
     @Override
+    public boolean supportsParallelReading() {
+        return parent.supportsParallelReading();
+    }
+
+    @Override
     public void close() {
         this.parent.close();
     }
