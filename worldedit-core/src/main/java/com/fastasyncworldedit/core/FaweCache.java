@@ -217,11 +217,11 @@ public enum FaweCache implements Trimable {
             Type.MAX_ENTITIES,
             true
     );
-    public static final FaweException MAX_TILES = new FaweException(Caption.of(
-            "fawe.cancel.reason.max.tiles",
+    public static final FaweException MAX_TILES = new FaweException(
+            Caption.of("fawe.cancel.reason.max.tiles"),
             Type.MAX_TILES,
             true
-    ));
+    );
     public static final FaweException MAX_ITERATIONS = new FaweException(
             Caption.of(
                     "fawe.cancel.reason.max.iterations"),
