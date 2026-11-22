@@ -1,4 +1,3 @@
-import buildlogic.sourceSets
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import io.papermc.paperweight.userdev.attribute.Obfuscation
 import me.modmuss50.mpp.ReleaseType
@@ -57,22 +56,12 @@ val adaptersMojmap = configurations.create("adapters") {
     }
 }
 
-val adaptersReobf = configurations.create("adaptersReobf") {
-    description = "Adapters to include in the JAR (Spigot-Mapped)"
-    isCanBeConsumed = false
-    isCanBeResolved = true
-    shouldResolveConsistentlyWith(configurations["runtimeClasspath"])
-    attributes {
-        attribute(Obfuscation.OBFUSCATION_ATTRIBUTE, objects.named(Obfuscation.OBFUSCATED))
-    }
-}
-
 val adaptersGlobalMojmap = configurations.create("adaptersGlobalMojmap") {
     extendsFrom(adaptersMojmap)
     isCanBeConsumed = false
     isCanBeResolved = true
     shouldResolveConsistentlyWith(configurations["runtimeClasspath"])
-    description = "Adapters which are included in Spigot + Paper JARs without being remapped (26+)"
+    description = "Adapters which are included Paper JARs without being remapped"
     attributes {
         attribute(Obfuscation.OBFUSCATION_ATTRIBUTE, objects.named(Obfuscation.NONE))
     }
@@ -114,19 +103,7 @@ dependencies {
     implementation(libs.fastutil)
 
     project.project(":worldedit-bukkit:adapters").subprojects.forEach {
-        // If the adapter module name starts with `adapter-1`, the adapter itself must be reobfuscated for spigot
-        // Otherwise, if the adapter starts with e.g. `adapter-26` the adapter does not need any reobfuscation as Spigot
-        // supports mojang-mapped code starting with MC 26
-        // Paper supports Mojang-Mapped adapters for the whole range of supported adapter versions
-        if (it.name.startsWith("adapter-1_")) {
-            // use adapters as is for Paper
-            "adapters"(project(it.path))
-            // reobfuscate adapters for spigot
-            "adaptersReobf"(project(it.path))
-        } else {
-            // don't reobfuscate for Paper or Spigot
-            "adaptersGlobalMojmap"(project(it.path))
-        }
+        "adaptersGlobalMojmap"(project(it.path))
     }
     compileOnly(libs.worldguard) {
         exclude("com.sk89q.worldedit", "worldedit-bukkit")
@@ -163,46 +140,6 @@ tasks.named<Copy>("processResources") {
     filesMatching("plugin.yml") {
         expand(mapOf("internalVersion" to internalVersion))
     }
-}
-
-tasks.register<ShadowJar>("reobfShadowJar") {
-    // The `fawe.properties` file from `worldedit-core` is not automatically
-    // included, so we explicitly add the `worldedit-core` source set output.
-    from(project(":worldedit-core").sourceSets.main.get().output)
-    archiveFileName.set("${rootProject.name}-Bukkit-${project.version}.${archiveExtension.getOrElse("jar")}")
-    configurations = listOf(
-        project.configurations.runtimeClasspath.get(), // as is done by shadow for the default shadowJar
-        adaptersReobf,
-        adaptersGlobalMojmap
-    )
-    relocate("com.sk89q.jchronic", "com.sk89q.worldedit.jchronic")
-
-    dependencies {
-        include(project(":worldedit-libs:core"))
-        include(project(":worldedit-libs:${project.name.replace("worldedit-", "")}"))
-        include(project(":worldedit-core"))
-        include(dependency(libs.jchronic))
-        exclude(dependency(libs.jsr305))
-    }
-    minimize {
-        // jchronic + lz4-java uses reflection to load things, so we need to exclude it from minimizing
-        exclude(dependency(libs.jchronic))
-        exclude(dependency(libs.lz4Java))
-    }
-
-    // as is done by shadow for the default shadowJar
-    from(sourceSets.main.map { it.output })
-    manifest.from(tasks.jar.get().manifest) {
-     eachEntry {
-         if (key == "FAWE-Plugin-Jar-Type") {
-             value = "spigot"
-         }
-         if (key == "paperweight-mappings-namespace") {
-             exclude()
-         }
-     }
-    }
-    exclude("META-INF/INDEX.LIST", "META-INF/*.SF", "META-INF/*.DSA", "META-INF/*.RSA", "module-info.class")
 }
 
 tasks.named<ShadowJar>("shadowJar") {
