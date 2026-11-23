@@ -157,13 +157,21 @@ public class ParallelQueueExtent extends PassthroughExtent {
                     new ApplyTask<>(region, filter, this, full, this.faweExceptionReasonsUsed)
             );
             // wait for task to finish
+            FaweException faweException = null;
             try {
                 task.join();
             } catch (Throwable e) {
-                LOGGER.catching(e);
+                // Propagate FaweExceptions (e.g. no allowed region) so the actor is told why the edit was cancelled
+                faweException = FaweException.get(e);
+                if (faweException == null) {
+                    LOGGER.catching(e);
+                }
             }
             // Join filters
             filter.join();
+            if (faweException != null) {
+                throw faweException;
+            }
         }
         return filter;
     }
