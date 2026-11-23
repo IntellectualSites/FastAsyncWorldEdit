@@ -19,6 +19,8 @@ import org.enginehub.piston.inject.Key;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -94,10 +96,16 @@ public class Bindings {
         if (provide) {
             store.injectValue(key, access -> Optional.ofNullable(invoke(null, argsFunc, access, method)));
         } else { // If the method consumes a String argument
+            final Key<?> converterKey = key;
             manager.registerConverter(key, new ArgumentConverter<Object>() {
                 @Override
                 public Component describeAcceptableArguments() {
                     return TextComponent.of(binding.value());
+                }
+
+                @Override
+                public List<String> getSuggestions(String input, InjectedValueAccess context) {
+                    return Bindings.this.getSuggestions(converterKey, input, context);
                 }
 
                 @Override
@@ -115,6 +123,19 @@ public class Bindings {
             });
         }
         return true;
+    }
+
+    /**
+     * Returns tab-completion suggestions for an argument parsed by one of this class's {@link Binding} methods.
+     * The default offers none.
+     *
+     * @param key     the key the binding's converter was registered under
+     * @param input   the partial argument typed so far
+     * @param context the injected values for the command being completed
+     * @return the suggestions for {@code input}
+     */
+    protected List<String> getSuggestions(Key<?> key, String input, InjectedValueAccess context) {
+        return Collections.emptyList();
     }
 
     private Object invoke(
