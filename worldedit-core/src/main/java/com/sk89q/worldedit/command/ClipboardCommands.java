@@ -93,6 +93,7 @@ import org.enginehub.piston.annotation.param.Arg;
 import org.enginehub.piston.annotation.param.ArgFlag;
 import org.enginehub.piston.annotation.param.Switch;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -102,6 +103,7 @@ import java.nio.file.Files;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -530,11 +532,40 @@ public class ClipboardCommands {
             @Switch(name = 'x', desc = "Remove existing entities in the affected region")
                     boolean removeEntities,
             @Switch(name = 'v', desc = "Don't paste structure void blocks and keep the target block state")
-                    boolean ignoreStructureVoidBlocks
+                    boolean ignoreStructureVoidBlocks,
+            @Switch(name = 'r', desc = "Rotate the clipboard by a random multiple of 90 degrees (y-axis)")
+                    boolean randomRotate
             //FAWE end
     ) throws WorldEditException {
-
         ClipboardHolder holder = session.getClipboard();
+        //FAWE start - random rotation
+        final Transform originalTransform = holder.getTransform();
+        final com.sk89q.worldedit.util.Direction rotation = randomRotate ? nextRandomPasteRotation(session.getLastRandomPasteRotation()) : null;
+        if (rotation != null) {
+            holder.setTransform(new AffineTransform().rotateY(90 * CARDINALS.indexOf(rotation)).combine(originalTransform));
+        }
+
+        try {
+            doPaste(actor, world, session, editSession, holder, ignoreAirBlocks, atOrigin, selectPasted, onlySelect,
+                    pasteEntities, pasteBiomes, sourceMask, removeEntities, ignoreStructureVoidBlocks
+            );
+        } finally {
+            if (randomRotate) {
+                holder.setTransform(originalTransform);
+            }
+        }
+
+        if (randomRotate && !onlySelect) {
+            session.setLastRandomPasteRotation(rotation);
+        }
+    }
+
+    private void doPaste(
+            Actor actor, World world, LocalSession session, EditSession editSession, ClipboardHolder holder,
+            boolean ignoreAirBlocks, boolean atOrigin, boolean selectPasted, boolean onlySelect, boolean pasteEntities,
+            boolean pasteBiomes, Mask sourceMask, boolean removeEntities, boolean ignoreStructureVoidBlocks
+    ) throws WorldEditException {
+        //FAWE end
         //FAWE start - use place
         if (holder.getTransform().isIdentity() && sourceMask == null && !ignoreStructureVoidBlocks) {
             place(actor, world, session, editSession, ignoreAirBlocks, atOrigin, selectPasted, onlySelect,
@@ -598,6 +629,27 @@ public class ClipboardCommands {
             actor.print(Caption.of("worldedit.paste.pasted", TextComponent.of(to.toString())));
         }
         messages.forEach(actor::print);
+    }
+
+    private static final List<com.sk89q.worldedit.util.Direction> CARDINALS = List.of(
+        com.sk89q.worldedit.util.Direction.NORTH,
+        com.sk89q.worldedit.util.Direction.EAST,
+        com.sk89q.worldedit.util.Direction.SOUTH,
+        com.sk89q.worldedit.util.Direction.WEST
+    );
+
+    /**
+     * Pick a random y-axis rotation, never the one the previous paste used.
+     *
+     * @param previous the previous paste's rotation, or {@code null} if there was none
+     * @return a cardinal direction
+     */
+    private static com.sk89q.worldedit.util.Direction nextRandomPasteRotation(@Nullable com.sk89q.worldedit.util.Direction previous) {
+        if (previous == null) {
+            return CARDINALS.get(ThreadLocalRandom.current().nextInt(4));
+        }
+
+        return CARDINALS.get((CARDINALS.indexOf(previous) + 1 + ThreadLocalRandom.current().nextInt(3)) % 4);
     }
 
     //FAWE start
