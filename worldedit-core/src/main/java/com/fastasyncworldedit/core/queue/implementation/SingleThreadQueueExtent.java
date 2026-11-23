@@ -402,8 +402,20 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
         final int overflow = submissions.size() - targetSize;
         if (aggressive) {
             if (targetSize == 0) {
+                // Wait for every submission before rethrowing, so no chunk is still being processed (e.g. written to
+                // history) after the caller has handled the cancellation
+                FaweException cancelled = null;
                 while (!submissions.isEmpty()) {
-                    iterateSubmissions();
+                    try {
+                        iterateSubmissions();
+                    } catch (FaweException e) {
+                        if (cancelled == null) {
+                            cancelled = e;
+                        }
+                    }
+                }
+                if (cancelled != null) {
+                    throw cancelled;
                 }
             }
             for (int i = 0; i < overflow; i++) {
