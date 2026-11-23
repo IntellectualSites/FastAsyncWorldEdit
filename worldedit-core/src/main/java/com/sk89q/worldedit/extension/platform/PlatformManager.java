@@ -409,6 +409,20 @@ public class PlatformManager {
         return tool;
     }
 
+    /**
+     * Requests are per thread, so the reset in the event handlers doesn't reach a tool action running on the actor's queue.
+     * The action has to clear its own request, or the edit session and actor stay reachable from the pool thread.
+     */
+    private Runnable resetRequestAfter(Runnable action) {
+        return () -> {
+            try {
+                action.run();
+            } finally {
+                Request.reset();
+            }
+        };
+    }
+
     @Subscribe
     public void handleBlockInteract(BlockInteractEvent event) {
         // Create a proxy actor with a potentially different world for
@@ -435,10 +449,10 @@ public class PlatformManager {
                     final BlockTool superPickaxe = session.getSuperPickaxe();
                     if (superPickaxe != null && superPickaxe.canUse(player)) {
                         //FAWE start - run async
-                        player.runAction(() -> reset(superPickaxe)
+                        player.runAction(resetRequestAfter(() -> reset(superPickaxe)
                                 .actPrimary(queryCapability(Capability.WORLD_EDITING),
                                         getConfiguration(), player, session, location, event.getFace()
-                                ), false, true);
+                                )), false, true);
                         //FAWE end
                         event.setCancelled(true);
                         return;
@@ -448,10 +462,10 @@ public class PlatformManager {
                 Tool tool = session.getTool(player);
                 if (tool instanceof DoubleActionBlockTool && tool.canUse(player)) {
                     //FAWE start - run async
-                    player.runAction(() -> reset((DoubleActionBlockTool) tool)
+                    player.runAction(resetRequestAfter(() -> reset((DoubleActionBlockTool) tool)
                             .actSecondary(queryCapability(Capability.WORLD_EDITING),
                                     getConfiguration(), player, session, location, event.getFace()
-                            ), false, true);
+                            )), false, true);
                     //FAWE end
                     event.setCancelled(true);
                 }
@@ -462,7 +476,7 @@ public class PlatformManager {
                 if (tool instanceof BlockTool && tool.canUse(player)) {
                     if (player.checkAction()) {
                         // FAWE run async
-                        player.runAction(() -> {
+                        player.runAction(resetRequestAfter(() -> {
                             BlockTool blockTool = (BlockTool) tool;
                             if (!(tool instanceof BrushTool)) {
                                 blockTool = reset(blockTool);
@@ -470,7 +484,7 @@ public class PlatformManager {
                             blockTool.actPrimary(queryCapability(Capability.WORLD_EDITING),
                                     getConfiguration(), player, session, location, event.getFace()
                             );
-                        }, false, true);
+                        }), false, true);
                         //FAWE end
                         event.setCancelled(true);
                     }
@@ -509,10 +523,10 @@ public class PlatformManager {
                     Tool tool = session.getTool(player);
                     if (tool instanceof DoubleActionTraceTool && tool.canUse(player)) {
                         //FAWE start - run async
-                        player.runAsyncIfFree(() -> reset((DoubleActionTraceTool) tool)
+                        player.runAsyncIfFree(resetRequestAfter(() -> reset((DoubleActionTraceTool) tool)
                                 .actSecondary(queryCapability(Capability.WORLD_EDITING),
                                         getConfiguration(), player, session
-                                ));
+                                )));
                         //FAWE end
                         event.setCancelled(true);
                         return;
@@ -526,9 +540,9 @@ public class PlatformManager {
                     if (tool instanceof TraceTool && tool.canUse(player)) {
                         //FAWE start - run async
                         //todo this needs to be fixed so the event is canceled after actPrimary is used and returns true
-                        player.runAction(() -> reset((TraceTool) tool).actPrimary(queryCapability(Capability.WORLD_EDITING),
+                        player.runAction(resetRequestAfter(() -> reset((TraceTool) tool).actPrimary(queryCapability(Capability.WORLD_EDITING),
                                 getConfiguration(), player, session
-                        ), false, true);
+                        )), false, true);
                         //FAWE end
                         event.setCancelled(true);
                         return;
