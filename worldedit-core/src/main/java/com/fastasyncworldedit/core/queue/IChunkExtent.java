@@ -14,6 +14,7 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import org.enginehub.linbus.tree.LinCompoundTag;
 import org.enginehub.linbus.tree.LinDoubleTag;
+import org.enginehub.linbus.tree.LinFloatTag;
 import org.enginehub.linbus.tree.LinListTag;
 import org.enginehub.linbus.tree.LinStringTag;
 import org.enginehub.linbus.tree.LinTag;
@@ -126,7 +127,8 @@ public interface IChunkExtent<T extends IChunk> extends Extent {
     @Override
     default Entity createEntity(Location location, BaseEntity entity, UUID uuid) {
         final IChunk chunk = getOrCreateChunk(location.getBlockX() >> 4, location.getBlockZ() >> 4);
-        Map<String, LinTag<?>> map = new HashMap<>(entity.getNbt().value()); //do not modify original entity data
+        LinCompoundTag nbt = entity.getNbt();
+        Map<String, LinTag<?>> map = nbt != null ? new HashMap<>(nbt.value()) : new HashMap<>();
         map.put("Id", LinStringTag.of(entity.getType().getName()));
 
         //Set pos
@@ -135,6 +137,13 @@ public interface IChunkExtent<T extends IChunk> extends Extent {
         posList.add(LinDoubleTag.of(location.y()));
         posList.add(LinDoubleTag.of(location.z()));
         map.put("Pos", LinListTag.of(LinTagType.doubleTag(), posList));
+
+        if (!map.containsKey("Rotation")) {
+            List<LinFloatTag> rotList = new ArrayList<>();
+            rotList.add(LinFloatTag.of(location.getYaw()));
+            rotList.add(LinFloatTag.of(location.getPitch()));
+            map.put("Rotation", LinListTag.of(LinTagType.floatTag(), rotList));
+        }
 
         NbtUtils.addUUIDToMap(map, uuid);
 
