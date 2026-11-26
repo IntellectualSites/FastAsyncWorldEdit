@@ -17,8 +17,8 @@ public class DefaultProgressTracker implements BiConsumer<DefaultProgressTracker
 
     private final Player player;
     private final long start;
-    private int delay = Settings.settings().QUEUE.PROGRESS.DELAY;
-    private int interval = Settings.settings().QUEUE.PROGRESS.INTERVAL;
+    private int delay = Settings.settings().queue().progress().delay();
+    private int interval = Settings.settings().queue().progress().interval();
 
     public DefaultProgressTracker(Player player) {
         this.start = System.currentTimeMillis();

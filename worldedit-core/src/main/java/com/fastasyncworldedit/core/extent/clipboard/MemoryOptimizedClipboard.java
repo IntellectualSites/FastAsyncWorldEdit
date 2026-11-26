@@ -48,7 +48,7 @@ public class MemoryOptimizedClipboard extends LinearClipboard {
     private final int compressionLevel;
 
     public MemoryOptimizedClipboard(Region region) {
-        this(region, Settings.settings().CLIPBOARD.COMPRESSION_LEVEL);
+        this(region, Settings.settings().clipboard().compressionLevel());
     }
 
     public MemoryOptimizedClipboard(Region region, int compressionLevel) {

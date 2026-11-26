@@ -238,7 +238,7 @@ public class LocalSession implements TextureHolder {
         if (world == null || uuid == null) {
             return false;
         }
-        if (Settings.settings().HISTORY.USE_DISK) {
+        if (Settings.settings().history().useDisk()) {
             MAX_HISTORY_SIZE = Integer.MAX_VALUE;
         }
         world = WorldWrapper.unwrap(world);
@@ -260,10 +260,11 @@ public class LocalSession implements TextureHolder {
 
     private boolean loadHistoryChangeSets(UUID uuid, World world) {
         SparseBitSet set = new SparseBitSet();
-        final File folder = MainUtil.getFile(
-                Fawe.platform().getDirectory(),
-                Settings.settings().PATHS.HISTORY + File.separator + world.getName() + File.separator + uuid
-        );
+        final File folder = Fawe.platform().getPath()
+                .resolve(Settings.settings().paths().history())
+                .resolve(world.getName())
+                .resolve(uuid.toString())
+                .toFile();
         if (folder.isDirectory()) {
             folder.listFiles(pathname -> {
                 String name = pathname.getName();
@@ -295,13 +296,15 @@ public class LocalSession implements TextureHolder {
     }
 
     private void loadHistoryNegativeIndex(UUID uuid, World world) {
-        if (!Settings.settings().HISTORY.USE_DISK) {
+        if (!Settings.settings().history().useDisk()) {
             return;
         }
-        File file = MainUtil.getFile(
-                Fawe.platform().getDirectory(),
-                Settings.settings().PATHS.HISTORY + File.separator + world.getName() + File.separator + uuid + File.separator + "index"
-        );
+        File file = Fawe.platform().getPath()
+                .resolve(Settings.settings().paths().history())
+                .resolve(world.getName())
+                .resolve(uuid.toString())
+                .resolve("index")
+                .toFile();
         if (file.exists()) {
             try (FaweInputStream is = new FaweInputStream(new FileInputStream(file))) {
                 historyNegativeIndex = Math.min(Math.max(0, is.readInt()), history.size());
@@ -314,14 +317,16 @@ public class LocalSession implements TextureHolder {
     }
 
     private void saveHistoryNegativeIndex(UUID uuid, World world) {
-        if (world == null || !Settings.settings().HISTORY.USE_DISK) {
+        if (world == null || !Settings.settings().history().useDisk()) {
             return;
         }
-        File file = MainUtil.getFile(
-                Fawe.platform().getDirectory(),
+        File file = Fawe.platform().getPath()
+                .resolve(Settings.settings().paths().history())
                 // Use "unsafe" method here as world does not need to be loaded to save this information.
-                Settings.settings().PATHS.HISTORY + File.separator + world.getNameUnsafe() + File.separator + uuid + File.separator + "index"
-        );
+                .resolve(world.getNameUnsafe())
+                .resolve(uuid.toString())
+                .resolve("index")
+                .toFile();
         if (getHistoryNegativeIndex() != 0) {
             try {
                 if (!file.exists()) {
@@ -480,10 +485,11 @@ public class LocalSession implements TextureHolder {
             return cs;
         }
         if (o instanceof Integer) {
-            File folder = MainUtil.getFile(
-                    Fawe.platform().getDirectory(),
-                    Settings.settings().PATHS.HISTORY + File.separator + currentWorld.getName() + File.separator + uuid
-            );
+            File folder = Fawe.platform().getPath()
+                    .resolve(Settings.settings().paths().history())
+                    .resolve(currentWorld.getName())
+                    .resolve(uuid.toString())
+                    .toFile();
             File specific = new File(folder, o.toString());
             if (specific.isDirectory()) {
                 // TODO NOT IMPLEMENTED
@@ -498,7 +504,7 @@ public class LocalSession implements TextureHolder {
     public void remember(Identifiable player, World world, ChangeSet changeSet, FaweLimit limit) {
         historyWriteLock.lock();
         try {
-            if (Settings.settings().HISTORY.USE_DISK) {
+            if (Settings.settings().history().useDisk()) {
                 LocalSession.MAX_HISTORY_SIZE = Integer.MAX_VALUE;
             }
             if (changeSet.longSize() == 0) {
@@ -531,7 +537,7 @@ public class LocalSession implements TextureHolder {
             }
             if (limit != null) {
                 int limitMb = limit.MAX_HISTORY;
-                while (((!Settings.settings().HISTORY.USE_DISK && history.size() > MAX_HISTORY_SIZE) || (historySize >> 20) > limitMb) && history
+                while (((!Settings.settings().history().useDisk() && history.size() > MAX_HISTORY_SIZE) || (historySize >> 20) > limitMb) && history
                         .size() > 1) {
                     ChangeSet item = (ChangeSet) history.remove(0);
                     item.delete();
@@ -547,7 +553,7 @@ public class LocalSession implements TextureHolder {
     public void remember(EditSession editSession, boolean append, int limitMb) {
         historyWriteLock.lock();
         try {
-            if (Settings.settings().HISTORY.USE_DISK) {
+            if (Settings.settings().history().useDisk()) {
                 LocalSession.MAX_HISTORY_SIZE = Integer.MAX_VALUE;
             }
             // It should have already been flushed, but just in case!
@@ -595,7 +601,7 @@ public class LocalSession implements TextureHolder {
             } else {
                 history.add(0, changeSet);
             }
-            while (((!Settings.settings().HISTORY.USE_DISK && history.size() > MAX_HISTORY_SIZE) || (historySize >> 20) > limitMb) && history
+            while (((!Settings.settings().history().useDisk() && history.size() > MAX_HISTORY_SIZE) || (historySize >> 20) > limitMb) && history
                     .size() > 1) {
                 ChangeSet item = (ChangeSet) history.remove(0);
                 item.delete();
@@ -1233,7 +1239,7 @@ public class LocalSession implements TextureHolder {
     @Nullable
     public Tool getTool(Player player) {
         loadDefaults(player, false);
-        if (!Settings.settings().EXPERIMENTAL.PERSISTENT_BRUSHES && tools.isEmpty()) {
+        if (!Settings.settings().experimental().persistentBrushes() && tools.isEmpty()) {
             return null;
         }
         BaseItem item = player.getItemInHand(HandSide.MAIN_HAND);
@@ -1244,7 +1250,7 @@ public class LocalSession implements TextureHolder {
 
     public Tool getTool(BaseItem item, Player player) {
         loadDefaults(player, false);
-        if (Settings.settings().EXPERIMENTAL.PERSISTENT_BRUSHES && item.getNativeItem() != null) {
+        if (Settings.settings().experimental().persistentBrushes() && item.getNativeItem() != null) {
             BrushTool tool = BrushCache.getTool(player, this, item);
             if (tool != null) {
                 return tool;
@@ -1406,7 +1412,7 @@ public class LocalSession implements TextureHolder {
         }
 
         Tool previous;
-        if (player != null && (tool instanceof BrushTool || tool == null) && Settings.settings().EXPERIMENTAL.PERSISTENT_BRUSHES && item.getNativeItem() != null) {
+        if (player != null && (tool instanceof BrushTool || tool == null) && Settings.settings().experimental().persistentBrushes() && item.getNativeItem() != null) {
             previous = BrushCache.getCachedTool(item);
             BrushCache.setTool(item, (BrushTool) tool);
             if (tool != null) {

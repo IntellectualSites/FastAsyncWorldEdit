@@ -943,7 +943,7 @@ public class BrushCommands {
         String filenamePng = filename.endsWith(".png") ? filename : filename + ".png";
         File file = new File(
                 Fawe.platform().getDirectory(),
-                Settings.settings().PATHS.HEIGHTMAP + File.separator + filenamePng
+                Settings.settings().paths().heightmap() + File.separator + filenamePng
         );
         if (file.exists()) {
             return new FileInputStream(file);
@@ -1029,7 +1029,7 @@ public class BrushCommands {
         if (tool != null) {
             root |= name.startsWith("../");
             name = FileSystems.getDefault().getPath(name).getFileName().toString();
-            File folder = MainUtil.getFile(Fawe.platform().getDirectory(), "brushes");
+            File folder = Fawe.platform().getPath().resolve("brushes").toFile();
             name = name.endsWith(".jsgz") ? name : name + ".jsgz";
             File file;
             if (root && player.hasPermission("worldedit.brush.save.other")) {
@@ -1064,7 +1064,7 @@ public class BrushCommands {
         public void loadBrush(Player player, LocalSession session, @Arg(desc = "String name") String name)
                 throws WorldEditException, IOException {
             name = FileSystems.getDefault().getPath(name).getFileName().toString();
-            File folder = MainUtil.getFile(Fawe.platform().getDirectory(), "brushes");
+            File folder = Fawe.platform().getPath().resolve("brushes").toFile();
             name = name.endsWith(".jsgz") ? name : name + ".jsgz";
             File file = new File(folder, player.getUniqueId() + File.separator + name);
             if (!file.exists()) {
@@ -1099,7 +1099,7 @@ public class BrushCommands {
                     int page
     ) throws WorldEditException {
         String baseCmd = "/brush loadbrush";
-        File dir = MainUtil.getFile(Fawe.platform().getDirectory(), "brushes");
+        File dir = Fawe.platform().getPath().resolve("brushes").toFile();
         // TODO NOT IMPLEMENTED
         //        UtilityCommands.list(dir, actor, args, page, null, true, baseCmd);
     }

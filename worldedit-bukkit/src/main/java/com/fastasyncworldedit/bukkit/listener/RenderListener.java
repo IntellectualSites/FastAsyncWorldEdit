@@ -81,7 +81,7 @@ public class RenderListener implements Listener {
 
     private void setViewDistance(Player player, int value) {
         UUID uuid = player.getUniqueId();
-        if (value == Settings.settings().EXPERIMENTAL.DYNAMIC_CHUNK_RENDERING) {
+        if (value == Settings.settings().experimental().dynamicChunkRendering()) {
             views.remove(uuid);
         } else {
             int[] val = views.get(uuid);
@@ -105,7 +105,7 @@ public class RenderListener implements Listener {
 
     private int getViewDistance(Player player) {
         int[] value = views.get(player.getUniqueId());
-        return value == null ? Settings.settings().EXPERIMENTAL.DYNAMIC_CHUNK_RENDERING : value[0];
+        return value == null ? Settings.settings().experimental().dynamicChunkRendering() : value[0];
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

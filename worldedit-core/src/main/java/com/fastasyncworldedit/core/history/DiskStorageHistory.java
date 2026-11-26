@@ -77,10 +77,11 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
     }
 
     private void init(UUID uuid, String worldName) {
-        final File folder = MainUtil.getFile(
-                Fawe.platform().getDirectory(),
-                Settings.settings().PATHS.HISTORY + File.separator + worldName + File.separator + uuid
-        );
+        final File folder = Fawe.platform().getPath()
+                .resolve(Settings.settings().paths().history())
+                .resolve(worldName)
+                .resolve(uuid.toString())
+                .toFile();
 
         final int max = NEXT_INDEX.computeIfAbsent(worldName, _worldName -> new ConcurrentHashMap<>())
                 .compute(uuid, (_uuid, id) -> (id == null ? MainUtil.getMaxFileId(folder) : id) + 1) - 1;
@@ -113,17 +114,18 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
     private void init(UUID uuid, int i) {
         this.uuid = uuid;
         this.index = i;
-        File folder = MainUtil.getFile(
-                Fawe.platform().getDirectory(),
-                Settings.settings().PATHS.HISTORY + File.separator + getWorld().getName() + File.separator + uuid
-        );
+        File folder = Fawe.platform().getPath()
+                .resolve(Settings.settings().paths().history())
+                .resolve(getWorld().getName())
+                .resolve(uuid.toString())
+                .toFile();
         initFiles(folder);
     }
 
     @Override
     public void delete() {
         deleteFiles();
-        if (Settings.settings().HISTORY.USE_DATABASE) {
+        if (Settings.settings().history().useDatabase()) {
             RollbackDatabase db = DBHandler.dbHandler().getDatabase(getWorld());
             db.delete(uuid, index);
         }

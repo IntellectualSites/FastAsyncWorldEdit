@@ -52,7 +52,7 @@ public class MemUtil {
         }
         final long heapFreeSize = Runtime.getRuntime().freeMemory();
         final int size = (int) ((heapFreeSize * 100) / heapMaxSize);
-        if (size > (100 - Settings.settings().MAX_MEMORY_PERCENT)) {
+        if (size > (100 - Settings.settings().maxMemoryPercent())) {
             memoryPlentifulTask();
             return Integer.MAX_VALUE;
         }
@@ -63,7 +63,7 @@ public class MemUtil {
         final long heapFreeSize = Runtime.getRuntime().freeMemory();
         final long heapMaxSize = Runtime.getRuntime().maxMemory();
         final int size = (int) ((heapFreeSize * 100) / heapMaxSize);
-        boolean limited = size >= Settings.settings().SLOWER_MEMORY_PERCENT;
+        boolean limited = size >= Settings.settings().slowerMemoryPercent();
         slower.set(limited);
     }
 

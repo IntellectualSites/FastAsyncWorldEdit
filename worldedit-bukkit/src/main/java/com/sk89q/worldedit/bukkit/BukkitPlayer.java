@@ -109,7 +109,7 @@ public class BukkitPlayer extends AbstractPlayerActor {
         this.plugin = plugin;
         this.player = player;
         //FAWE start
-        if (player != null && Settings.settings().CLIPBOARD.USE_DISK) {
+        if (player != null && Settings.settings().clipboard().useDisk()) {
             BukkitPlayer cached = WorldEditPlugin.getInstance().getCachedPlayer(player);
             if (cached == null) {
                 loadClipboardFromDisk();

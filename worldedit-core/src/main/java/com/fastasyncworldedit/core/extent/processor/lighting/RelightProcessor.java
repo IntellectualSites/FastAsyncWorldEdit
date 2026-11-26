@@ -23,9 +23,9 @@ public class RelightProcessor implements IBatchProcessor {
 
     @Override
     public IChunkSet processSet(IChunk chunk, IChunkGet get, IChunkSet set) {
-        if (Settings.settings().LIGHTING.MODE == 2) {
+        if (Settings.settings().lighting().mode() == 2) {
             relighter.addChunk(chunk.getX(), chunk.getZ(), null, chunk.getBitMask());
-        } else if (Settings.settings().LIGHTING.MODE == 1) {
+        } else if (Settings.settings().lighting().mode() == 1) {
             byte[] fix = new byte[get.getSectionCount()];
             boolean relight = false;
             for (int i = get.getMaxSectionPosition(); i >= get.getMinSectionPosition(); i--) {

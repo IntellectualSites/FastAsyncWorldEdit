@@ -75,7 +75,7 @@ public abstract class AbstractBukkitGetBlocks<ServerLevel, LevelChunk> extends C
         final ServerLevel nmsWorld = serverLevel;
         CompletableFuture<LevelChunk> nmsChunkFuture = ensureLoaded(nmsWorld);
         LevelChunk chunk = nmsChunkFuture.getNow(null);
-        if ((chunk == null && MemUtil.shouldBeginSlow()) || Settings.settings().QUEUE.ASYNC_CHUNK_LOAD_WRITE) {
+        if ((chunk == null && MemUtil.shouldBeginSlow()) || Settings.settings().queue().asyncChunkLoadWrite()) {
             try {
                 // "Artificially" slow FAWE down if memory low as performing the operation async can cause large amounts of
                 // memory usage

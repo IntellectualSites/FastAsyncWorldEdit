@@ -28,7 +28,7 @@ public class PaperweightPostProcessor implements IBatchProcessor {
     @SuppressWarnings("deprecation")
     @Override
     public void postProcess(final IChunk chunk, final IChunkGet iChunkGet, final IChunkSet iChunkSet) {
-        boolean tickFluid = Settings.settings().EXPERIMENTAL.ALLOW_TICK_FLUIDS;
+        boolean tickFluid = Settings.settings().experimental().allowTickFluids();
         // The PostProcessor shouldn't be added, but just in case
         if (!tickFluid) {
             return;

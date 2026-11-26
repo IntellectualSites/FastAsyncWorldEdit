@@ -28,7 +28,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
 
     private static final Pool<CharSetBlocks> POOL = FaweCache.INSTANCE.registerPool(
             CharSetBlocks.class,
-            CharSetBlocks::new, Settings.settings().QUEUE.POOL
+            CharSetBlocks::new, Settings.settings().queue().pool()
     );
 
     /**

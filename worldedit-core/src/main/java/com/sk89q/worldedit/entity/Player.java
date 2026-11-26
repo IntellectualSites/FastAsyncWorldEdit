@@ -431,15 +431,15 @@ public interface Player extends Entity, Actor {
     default void unregister() {
         cancel(true);
         LocalSession session = getSession();
-        if (Settings.settings().CLIPBOARD.USE_DISK && Settings.settings().CLIPBOARD.DELETE_ON_LOGOUT) {
+        if (Settings.settings().clipboard().useDisk() && Settings.settings().clipboard().deleteOnLogout()) {
             session.deleteClipboardOnDisk();
-        } else if (Settings.settings().CLIPBOARD.USE_DISK) {
+        } else if (Settings.settings().clipboard().useDisk()) {
             Fawe.instance().submitUUIDKeyQueuedTask(getUniqueId(), () -> session.setClipboard(null));
-        } else if (Settings.settings().CLIPBOARD.DELETE_ON_LOGOUT) {
+        } else if (Settings.settings().clipboard().deleteOnLogout()) {
             session.setClipboard(null);
         }
-        if (!Settings.settings().HISTORY.USE_DISK && Settings.settings().HISTORY.DELETE_ON_LOGOUT
-                || Settings.settings().HISTORY.USE_DISK && Settings.settings().HISTORY.DELETE_DISK_ON_LOGOUT) {
+        if (!Settings.settings().history().useDisk() && Settings.settings().history().deleteOnLogout()
+                || Settings.settings().history().useDisk() && Settings.settings().history().deleteDiskOnLogout()) {
             session.clearHistory();
         }
     }

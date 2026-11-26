@@ -1354,7 +1354,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
                 // Don't relight twice!
                 if (!relighter.isFinished() && relighter.getLock().tryLock()) {
                     try {
-                        if (Settings.settings().LIGHTING.REMOVE_FIRST) {
+                        if (Settings.settings().lighting().removeFirst()) {
                             relighter.removeAndRelight(true);
                         } else {
                             relighter.fixLightingSafe(true);
@@ -1377,7 +1377,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         }
         // Enqueue it
         if (getChangeSet() != null) {
-            if (Settings.settings().HISTORY.COMBINE_STAGES) {
+            if (Settings.settings().history().combineStages()) {
                 ((AbstractChangeSet) getChangeSet()).closeAsync();
             } else {
                 try {

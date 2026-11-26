@@ -37,7 +37,7 @@ public abstract class FaweMaskManager {
     }
 
     public boolean isExclusive() {
-        return Settings.settings().REGION_RESTRICTIONS_OPTIONS.EXCLUSIVE_MANAGERS.contains(this.key);
+        return Settings.settings().regionRestrictionsOptions().exclusiveManagers().contains(this.key);
     }
 
     public enum MaskType {
@@ -45,12 +45,7 @@ public abstract class FaweMaskManager {
         MEMBER;
 
         public static MaskType getDefaultMaskType() {
-            try {
-                return MaskType
-                        .valueOf(Settings.settings().REGION_RESTRICTIONS_OPTIONS.MODE.toUpperCase(Locale.ROOT));
-            } catch (Exception ignored) {
-                return MEMBER;
-            }
+            return Settings.settings().regionRestrictionsOptions().mode();
         }
     }
 

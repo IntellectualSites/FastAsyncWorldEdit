@@ -640,7 +640,7 @@ public class BukkitWorld extends AbstractWorld {
     }
 
     private void testCoords(BlockVector3 position) throws FaweException {
-        if (!Settings.settings().REGION_RESTRICTIONS_OPTIONS.RESTRICT_TO_SAFE_RANGE) {
+        if (!Settings.settings().regionRestrictionsOptions().restrictToSafeRange()) {
             return;
         }
         int x = position.x();

@@ -27,7 +27,6 @@ import com.fastasyncworldedit.core.util.MathMan;
 import com.fastasyncworldedit.core.util.StringMan;
 import com.fastasyncworldedit.core.world.block.BlanketBaseBlock;
 import com.google.common.collect.Maps;
-import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.NotABlockException;
