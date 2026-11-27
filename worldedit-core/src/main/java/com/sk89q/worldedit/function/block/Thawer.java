@@ -36,6 +36,11 @@ public class Thawer implements LayerFunction {
 
     private int affected;
 
+    //FAWE start - avoid reading the ground block twice
+    private BlockVector3 lastPosition;
+    private BlockState lastBlock;
+    //FAWE end
+
     /**
      * Create a new instance.
      *
@@ -53,6 +58,10 @@ public class Thawer implements LayerFunction {
     @Override
     public boolean isGround(BlockVector3 position) {
         BlockState block = this.extent.getBlock(position);
+        //FAWE start - avoid reading the ground block twice
+        this.lastPosition = position;
+        this.lastBlock = block;
+        //FAWE end
 
         // Stop searching when we hit anything non-air
         return !block.getBlockType().getMaterial().isAir();
@@ -65,7 +74,10 @@ public class Thawer implements LayerFunction {
             return false;
         }
 
-        BlockState block = this.extent.getBlock(position);
+        //FAWE start - avoid reading the ground block twice
+        // LayerVisitor passes the instance isGround accepted straight to apply, with no edit in between
+        BlockState block = position == this.lastPosition ? this.lastBlock : this.extent.getBlock(position);
+        //FAWE end
         BlockType blockType = block.getBlockType();
 
         if (blockType == BlockTypes.ICE) {
@@ -75,9 +87,27 @@ public class Thawer implements LayerFunction {
         } else if (blockType == BlockTypes.SNOW) {
             if (this.extent.setBlock(position, air)) {
                 affected++;
+                //FAWE start - the block beneath is no longer snowy
+                resetSnowy(position);
+                //FAWE end
             }
         }
 
         return false;
     }
+
+    //FAWE start - the block beneath is no longer snowy
+    private void resetSnowy(BlockVector3 snowPosition) throws WorldEditException {
+        if (snowPosition.y() <= this.extent.getMinimumPoint().y()) {
+            return;
+        }
+        BlockVector3 belowPosition = snowPosition.add(0, -1, 0);
+        BlockState below = this.extent.getBlock(belowPosition);
+        if (below.getBlockType().hasProperty(SnowSimulator.SNOWY)
+                && this.extent.setBlock(belowPosition, below.with(SnowSimulator.SNOWY, false))) {
+            affected++;
+        }
+    }
+    //FAWE end
+
 }

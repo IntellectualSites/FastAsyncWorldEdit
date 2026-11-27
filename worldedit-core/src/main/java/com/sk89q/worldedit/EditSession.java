@@ -2810,7 +2810,9 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         checkNotNull(region);
 
         Thawer thawer = new Thawer(this);
-        LayerVisitor layerVisitor = new LayerVisitor(region, region.getMinimumY(), region.getMaximumY(), thawer);
+        //FAWE start - provide extent for preloading
+        LayerVisitor layerVisitor = new LayerVisitor(region, region.getMinimumY(), region.getMaximumY(), thawer, this);
+        //FAWE end
         Operations.completeLegacy(layerVisitor);
         return thawer.getAffected();
     }
