@@ -24,7 +24,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+//FAWE start - Retain indexed property implementation for packed block states
 public class EnumProperty extends AbstractProperty<String> {
+//FAWE end
 
     //FAWE start
     private final Map<CharSequence, Integer> offsets = new HashMap<>();

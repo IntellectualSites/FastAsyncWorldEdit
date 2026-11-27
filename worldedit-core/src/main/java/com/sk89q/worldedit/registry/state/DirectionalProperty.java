@@ -26,7 +26,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
+//FAWE start - Retain indexed property implementation for packed block states
 public class DirectionalProperty extends AbstractProperty<Direction> {
+//FAWE end
 
     //FAWE start
     private final int[] map;
