@@ -788,6 +788,7 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
     }
 
     @Override
+    @Deprecated(since = "2.16.3")
     public void sendFakeOP() {
 
     }

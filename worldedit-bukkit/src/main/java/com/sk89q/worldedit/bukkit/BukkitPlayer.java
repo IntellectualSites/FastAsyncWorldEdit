@@ -49,14 +49,13 @@ import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.gamemode.GameMode;
 import com.sk89q.worldedit.world.gamemode.GameModes;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.block.TileState;
-import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerDropItemEvent;
@@ -445,22 +444,24 @@ public class BukkitPlayer extends AbstractPlayerActor {
             baseBlock = getExtent().getFullBlock(pos);
         }
 
-        BlockData data = BukkitAdapter.adapt(baseBlock);
-
-        player.sendBlockChange(loc, data);
+        player.sendBlockChange(loc, BukkitAdapter.adapt(baseBlock));
 
         BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
         if (adapter == null) {
             return;
         }
         LinCompoundTag nbtData = baseBlock.getNbt();
-        if (nbtData == null || !(data.createBlockState() instanceof TileState tileState)) {
+        if (nbtData == null) {
             return;
         }
-        adapter.sendFakeNBT(player, pos, tileState, nbtData);
+        adapter.sendFakeNBT(player, pos, baseBlock, nbtData);
+        if (block != null && block.getBlockType() == BlockTypes.STRUCTURE_BLOCK) {
+            adapter.sendFakeOP(player);
+        }
     }
 
     @Override
+    @Deprecated(since = "2.16.3")
     public void sendFakeOP() {
         BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
         if (adapter != null) {

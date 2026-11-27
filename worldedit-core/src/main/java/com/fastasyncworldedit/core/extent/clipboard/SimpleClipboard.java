@@ -38,7 +38,7 @@ public abstract class SimpleClipboard implements Clipboard {
      *
      * @param region  dimensions of this clipboard instance.
      * @param maxSize maximum allowable size of the clipboard implementation. A value of -1 implies infinite volume.
-     * @since TODO
+     * @since 2.16.2
      */
     SimpleClipboard(Region region, long maxSize) {
         this(region.getDimensions(), region.getMinimumPoint(), maxSize);
@@ -50,7 +50,7 @@ public abstract class SimpleClipboard implements Clipboard {
      * @param dimensions dimensions of this clipboard instance.
      * @param offset     initial offset of this clipboard.
      * @param maxSize    maximum allowable size of the clipboard implementation. A value of -1 implies infinite volume.
-     * @since TODO
+     * @since 2.16.2
      */
     SimpleClipboard(BlockVector3 dimensions, BlockVector3 offset, long maxSize) {
         this.size = dimensions;

@@ -177,7 +177,7 @@ public class WorldEditPlugin extends JavaPlugin {
         //FAWE end
 
         //FAWE start - Modify WorldEdit config name
-        config = new BukkitConfiguration(new YAMLProcessor(new File(getDataFolder(), "worldedit-config.yml"), true), this);
+        config = new BukkitConfiguration(new YAMLProcessor(new File(getDataFolder(), "worldedit-config.yml").toPath(), true), this);
         // Load config before we say we've loaded platforms as it is used in listeners of the event
         // Load config in onLoad to ensure it is loaded before FAWE settings to allow (inelegant) copying of values across
         // where needed

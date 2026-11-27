@@ -350,7 +350,9 @@ public interface Player extends Entity, Actor {
      * </p>
      *
      * @since 2.15.4
+     * @deprecated Internalized by {@link #sendFakeBlock} for structure blocks
      */
+    @Deprecated(since = "2.16.3")
     void sendFakeOP();
 
     //FAWE start
