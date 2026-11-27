@@ -88,14 +88,16 @@ public class FutureForwardingTask<V> extends AbstractTask<V> {
         if (isCancelled()) {
             return Task.State.CANCELLED;
         } else if (isDone()) {
+            //FAWE start - the Java 21 source level has no unnamed variables
             try {
                 get();
                 return Task.State.SUCCEEDED;
-            } catch (InterruptedException _) {
+            } catch (InterruptedException e) {
                 return Task.State.CANCELLED;
-            } catch (ExecutionException _) {
+            } catch (ExecutionException e) {
                 return Task.State.FAILED;
             }
+            //FAWE end
         } else {
             return Task.State.RUNNING;
         }
