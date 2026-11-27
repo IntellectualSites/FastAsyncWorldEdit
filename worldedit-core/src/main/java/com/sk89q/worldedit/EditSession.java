@@ -78,6 +78,7 @@ import com.sk89q.worldedit.function.GroundFunction;
 import com.sk89q.worldedit.function.block.BlockReplace;
 import com.sk89q.worldedit.function.block.Naturalizer;
 import com.sk89q.worldedit.function.block.SnowSimulator;
+import com.sk89q.worldedit.function.block.Thawer;
 import com.sk89q.worldedit.function.generator.ForestGenerator;
 import com.sk89q.worldedit.function.generator.GardenPatchGenerator;
 import com.sk89q.worldedit.function.mask.BlockStateMask;
@@ -172,7 +173,6 @@ import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.sk89q.worldedit.function.block.SnowSimulator.SNOWY;
 import static com.sk89q.worldedit.regions.Regions.asFlatRegion;
 import static com.sk89q.worldedit.regions.Regions.maximumBlockY;
 import static com.sk89q.worldedit.regions.Regions.minimumBlockY;
@@ -2795,68 +2795,26 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      */
     public int thaw(BlockVector3 position, double radius, int height)
             throws MaxChangedBlocksException {
-        int affected = 0;
-        double radiusSq = radius * radius;
 
-        int ox = position.x();
-        int oy = position.y();
-        int oz = position.z();
+        return thaw(new CylinderRegion(position, Vector2.at(radius, radius), position.y() - height, position.y() + height));
+    }
 
-        BlockState air = BlockTypes.AIR.getDefaultState();
-        BlockState water = BlockTypes.WATER.getDefaultState();
+    /**
+     * Thaw blocks in a cylinder.
+     *
+     * @param region the region to thaw in
+     * @return number of blocks affected
+     * @throws MaxChangedBlocksException thrown if too many blocks are changed
+     */
+    public final int thaw(FlatRegion region) throws MaxChangedBlocksException {
+        checkNotNull(region);
 
-        int centerY = Math.max(minY, Math.min(maxY, oy));
-        int minY = Math.max(this.minY, centerY - height);
-        int maxY = Math.min(this.maxY, centerY + height);
-
-        //FAWE start - mutable
-        MutableBlockVector3 mutable = new MutableBlockVector3();
-        MutableBlockVector3 mutable2 = new MutableBlockVector3();
+        Thawer thawer = new Thawer(this);
+        //FAWE start - provide extent for preloading
+        LayerVisitor layerVisitor = new LayerVisitor(region, region.getMinimumY(), region.getMaximumY(), thawer, this);
         //FAWE end
-
-        int ceilRadius = (int) Math.ceil(radius);
-        for (int x = ox - ceilRadius; x <= ox + ceilRadius; ++x) {
-            for (int z = oz - ceilRadius; z <= oz + ceilRadius; ++z) {
-                //FAWE start - mutable
-                if ((mutable.setComponents(x, oy, z)).distanceSq(position) > radiusSq) {
-                    //FAWE end
-                    continue;
-                }
-
-                for (int y = maxY; y > minY; --y) {
-                    //FAWE start - mutable
-                    mutable.setComponents(x, y, z);
-                    mutable2.setComponents(x, y - 1, z);
-                    BlockType id = getBlock(mutable).getBlockType();
-
-                    if (id == BlockTypes.ICE) {
-                        if (setBlock(mutable, water)) {
-                            ++affected;
-                        }
-                    } else if (id == BlockTypes.SNOW) {
-                        //FAWE start
-                        if (setBlock(mutable, air)) {
-                            if (y > getMinY()) {
-                                BlockState block = getBlock(mutable2);
-                                if (block.getBlockType().hasProperty(SNOWY)) {
-                                    if (setBlock(mutable2, block.with(SNOWY, false))) {
-                                        affected++;
-                                    }
-                                }
-                            }
-                            //FAWE end
-                            ++affected;
-                        }
-                    } else if (id.getMaterial().isAir()) {
-                        continue;
-                    }
-
-                    break;
-                }
-            }
-        }
-
-        return affected;
+        Operations.completeLegacy(layerVisitor);
+        return thawer.getAffected();
     }
 
     /**
@@ -2887,7 +2845,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     public int simulateSnow(BlockVector3 position, double radius, int height)
             throws MaxChangedBlocksException {
 
-        return simulateSnow(new CylinderRegion(position, Vector2.at(radius, radius), position.y(), height), false);
+        return simulateSnow(new CylinderRegion(position, Vector2.at(radius, radius), position.y() - height, position.y() + height), false);
     }
 
     /**
