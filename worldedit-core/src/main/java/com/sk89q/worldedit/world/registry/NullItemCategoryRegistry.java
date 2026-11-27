@@ -30,5 +30,4 @@ public class NullItemCategoryRegistry implements ItemCategoryRegistry {
     public Set<ItemType> getCategorisedByName(String category) {
         return Collections.emptySet();
     }
-
 }

@@ -130,6 +130,7 @@ public class PassthroughBlockMaterial implements BlockMaterial {
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public boolean isMovementBlocker() {
         return blockMaterial.isMovementBlocker();
     }

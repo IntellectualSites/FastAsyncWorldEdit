@@ -21,15 +21,14 @@ package com.sk89q.worldedit.util;
 
 import com.sk89q.util.StringUtil;
 
-import javax.swing.JFileChooser;
-import javax.swing.filechooser.FileFilter;
 import java.io.File;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileFilter;
 
 public final class FileDialogUtil {
-
     private FileDialogUtil() {
     }
 
@@ -66,7 +65,6 @@ public final class FileDialogUtil {
     }
 
     private static class ExtensionFilter extends FileFilter {
-
         private final Set<String> exts;
         private final String desc;
 
@@ -94,7 +92,5 @@ public final class FileDialogUtil {
         public String getDescription() {
             return desc;
         }
-
     }
-
 }
